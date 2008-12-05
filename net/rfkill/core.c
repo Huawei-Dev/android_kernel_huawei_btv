@@ -803,7 +803,7 @@ void rfkill_resume_polling(struct rfkill *rfkill)
 }
 EXPORT_SYMBOL(rfkill_resume_polling);
 
-#ifdef CONFIG_PM_SLEEP
+#ifdef CONFIG_RFKILL_PM
 static int rfkill_suspend(struct device *dev)
 {
 	struct rfkill *rfkill = to_rfkill(dev);
