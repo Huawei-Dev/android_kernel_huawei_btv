@@ -859,12 +859,7 @@ EXPORT_SYMBOL_GPL(blk_queue_flush);
 
 void blk_queue_flush_queueable(struct request_queue *q, bool queueable)
 {
-	spin_lock_irq(q->queue_lock);
-	if (queueable)
-		clear_bit(QUEUE_FLAG_FLUSH_NQ, &q->queue_flags);
-	else
-		set_bit(QUEUE_FLAG_FLUSH_NQ, &q->queue_flags);
-	spin_unlock_irq(q->queue_lock);
+	q->flush_not_queueable = !queueable;
 }
 EXPORT_SYMBOL_GPL(blk_queue_flush_queueable);
 

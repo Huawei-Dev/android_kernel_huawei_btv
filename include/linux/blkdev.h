@@ -488,6 +488,7 @@ struct request_queue {
 	 * for flush operations
 	 */
 	unsigned int		flush_flags;
+	unsigned int		flush_not_queueable:1;
 	struct blk_flush_queue	*fq;
 
 	struct list_head	requeue_list;
@@ -1441,7 +1442,7 @@ static inline unsigned int block_size(struct block_device *bdev)
 
 static inline bool queue_flush_queueable(struct request_queue *q)
 {
-	return !test_bit(QUEUE_FLAG_FLUSH_NQ, &q->queue_flags);
+	return !q->flush_not_queueable;
 }
 
 typedef struct {struct page *v;} Sector;
