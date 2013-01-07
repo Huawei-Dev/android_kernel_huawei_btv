@@ -1839,11 +1839,26 @@ static struct page *__rmqueue(struct zone *zone, unsigned int order,
 
 	page = __rmqueue_smallest(zone, order, migratetype);
 	if (unlikely(!page)) {
-		if (migratetype == MIGRATE_CMA)
-			page = __rmqueue_cma_fallback(zone, order);
+		page = __rmqueue_fallback(zone, order, migratetype);
+	}
 
-		if (!page)
-			page = __rmqueue_fallback(zone, order, migratetype);
+	trace_mm_page_alloc_zone_locked(page, order, migratetype);
+	return page;
+}
+
+static struct page *__rmqueue_cma(struct zone *zone, unsigned int order,
+					int migratetype, gfp_t gfp_flags)
+{
+	struct page *page = 0;
+#ifdef CONFIG_CMA
+	if (migratetype == MIGRATE_MOVABLE && !zone->cma_alloc)
+		page = __rmqueue_cma_fallback(zone, order);
+	else
+#endif
+		page = __rmqueue_smallest(zone, order, migratetype);
+
+	if (unlikely(!page)) {
+		page = __rmqueue_fallback(zone, order, migratetype);
 	}
 
 	trace_mm_page_alloc_zone_locked(page, order, migratetype);
@@ -1857,13 +1872,17 @@ static struct page *__rmqueue(struct zone *zone, unsigned int order,
  */
 static int rmqueue_bulk(struct zone *zone, unsigned int order,
 			unsigned long count, struct list_head *list,
-			int migratetype, bool cold, gfp_t gfp_flags)
+			int migratetype, bool cold, int cma)
 {
 	int i;
 
 	spin_lock(&zone->lock);
 	for (i = 0; i < count; ++i) {
-		struct page *page = __rmqueue(zone, order, migratetype, 0);
+		struct page *page;
+		if (cma)
+			page = __rmqueue_cma(zone, order, migratetype, 0);
+		else
+			page = __rmqueue(zone, order, migratetype, 0);
 		if (unlikely(page == NULL))
 			break;
 
@@ -2252,8 +2271,8 @@ struct page *buffered_rmqueue(struct zone *preferred_zone,
 		if (list_empty(list)) {
 			pcp->count += rmqueue_bulk(zone, 0,
 					pcp->batch, list,
-					migratetype, cold, gfp_flags);
-
+					migratetype, cold,
+					gfp_flags & __GFP_CMA);
 			if (unlikely(list_empty(list)))
 				goto failed;
 		}
@@ -2287,8 +2306,13 @@ struct page *buffered_rmqueue(struct zone *preferred_zone,
 			if (page)
 				trace_mm_page_alloc_zone_locked(page, order, migratetype);
 		}
-		if (!page)
+		if (!page) {
+		if (gfp_flags & __GFP_CMA)
+			page = __rmqueue_cma(zone, order, migratetype, gfp_flags);
+		else
 			page = __rmqueue(zone, order, migratetype, gfp_flags);
+
+		}
 		spin_unlock(&zone->lock);
 		if (!page)
 			goto failed;
@@ -6791,6 +6815,8 @@ int alloc_contig_range(unsigned long start, unsigned long end,
 	if (ret)
 		return ret;
 
+	cc.zone->cma_alloc = 1;
+
 	ret = __alloc_contig_migrate_range(&cc, start, end);
 	if (ret)
 		goto done;
@@ -6849,6 +6875,7 @@ int alloc_contig_range(unsigned long start, unsigned long end,
 done:
 	undo_isolate_page_range(pfn_max_align_down(start),
 				pfn_max_align_up(end), migratetype);
+	cc.zone->cma_alloc = 0;
 	return ret;
 }
 
