@@ -125,7 +125,6 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 	other_file = global_page_state(NR_FILE_PAGES) -
 						global_page_state(NR_SHMEM) -
 						total_swapcache_pages();
-	static atomic_t atomic_lmk = ATOMIC_INIT(0);
 
 	if (lowmem_adj_size < array_size)
 		array_size = lowmem_adj_size;
@@ -152,11 +151,6 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 
 	selected_oom_score_adj = min_score_adj;
 
-	if (atomic_inc_return(&atomic_lmk) > 1) {
-		atomic_dec(&atomic_lmk);
-		return 0;
-	}
-
 	rcu_read_lock();
 	for_each_process(tsk) {
 		struct task_struct *p;
@@ -165,10 +159,13 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 		if (tsk->flags & PF_KTHREAD)
 			continue;
 
+		/* if task no longer has any memory ignore it */
+		if (test_task_flag(tsk, TIF_MM_RELEASED))
+			continue;
+
 		if (time_before_eq(jiffies, lowmem_deathpending_timeout)) {
 			if (test_task_flag(tsk, TIF_MEMDIE)) {
 				rcu_read_unlock();
-				atomic_dec(&atomic_lmk);
 				/* give the system time to free up the memory */
 				msleep_interruptible(20);
 				mutex_unlock(&scan_mutex);
@@ -242,15 +239,14 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 			mark_oom_victim(selected);
 		task_unlock(selected);
 		rem += selected_tasksize;
+		rcu_read_unlock();
 		/* give the system time to free up the memory */
 		msleep_interruptible(20);
-	}
+	} else
+		rcu_read_unlock();
 
 	lowmem_print(4, "lowmem_scan %lu, %x, return %lu\n",
 		     sc->nr_to_scan, sc->gfp_mask, rem);
-
-	rcu_read_unlock();
-	atomic_dec(&atomic_lmk);
 	mutex_unlock(&scan_mutex);
 	return rem;
 }
