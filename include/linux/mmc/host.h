@@ -26,6 +26,7 @@ struct mmc_ios {
 	unsigned int	clock;			/* clock rate */
 	unsigned int	old_rate;
 	unsigned int	clock_store;    /*store the clock before power off*/
+	unsigned long	clk_ts;         /* time stamp of last updated clock */
 	unsigned short	vdd;
 
 /* vdd stores the bit number of the selected voltage range from below. */
