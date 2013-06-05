@@ -1131,4 +1131,6 @@ static inline void dwc3_ulpi_exit(struct dwc3 *dwc)
 { }
 #endif
 
+int dwc3_event_buffers_setup(struct dwc3 *dwc);
+
 #endif /* __DRIVERS_USB_DWC3_CORE_H */
