@@ -647,6 +647,7 @@ struct usb_gadget {
 	unsigned			is_selfpowered:1;
 	unsigned			deactivated:1;
 	unsigned			connected:1;
+	bool				l1_supported;
 #ifdef CONFIG_HISI_USB_CONFIGFS
 	unsigned			is_removing_driver;
 #endif
