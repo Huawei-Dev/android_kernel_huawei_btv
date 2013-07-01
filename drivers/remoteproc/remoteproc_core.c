@@ -780,13 +780,6 @@ void rproc_resource_cleanup(struct rproc *rproc)
 		kfree(entry);
 	}
 
-	/* clean up carveout allocations */
-	list_for_each_entry_safe(entry, tmp, &rproc->carveouts, node) {
-		dma_free_coherent(dev->parent, entry->len, entry->va, entry->dma);
-		list_del(&entry->node);
-		kfree(entry);
-	}
-
 	/* clean up reserved allocations */
 	list_for_each_entry_safe(entry, tmp, &rproc->reserved_mems, node) {
         if (use_nonsec_isp())
@@ -841,6 +834,13 @@ void rproc_resource_cleanup(struct rproc *rproc)
 			dev_err(dev, "failed to unmap %u/%zu\n", entry->len, unmapped);
 		}
 
+		list_del(&entry->node);
+		kfree(entry);
+	}
+
+	/* clean up carveout allocations */
+	list_for_each_entry_safe(entry, tmp, &rproc->carveouts, node) {
+		dma_free_coherent(dev->parent, entry->len, entry->va, entry->dma);
 		list_del(&entry->node);
 		kfree(entry);
 	}
