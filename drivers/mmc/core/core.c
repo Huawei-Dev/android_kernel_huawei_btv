@@ -1858,6 +1858,11 @@ int mmc_set_signal_voltage(struct mmc_host *host, int signal_voltage, u32 ocr)
 	 */
 	cmd.flags = MMC_RSP_PRESENT | MMC_RSP_OPCODE | MMC_CMD_AC | MMC_RSP_136;
 
+	/*
+	 * Hold the clock reference so clock doesn't get auto gated during this
+	 * voltage switch sequence.
+	 */
+	mmc_host_clk_hold(host);
 	err = mmc_wait_for_cmd(host, &cmd, 0);
 	if (err)
 	{
