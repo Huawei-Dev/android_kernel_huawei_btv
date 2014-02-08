@@ -79,6 +79,7 @@ enum ipi_msg_type {
 	IPI_MNTN_INFORM,
 	IPI_CPU_BACKTRACE,
 	IPI_HISEE_INFORM,
+	IPI_WAKEUP,
 };
 
 /*
@@ -626,7 +627,7 @@ void __init set_smp_cross_call(void (*fn)(const struct cpumask *, unsigned int))
 {
 	__smp_cross_call = fn;
 }
-/*lint -e773*/
+
 static const char *ipi_types[NR_IPI] __tracepoint_string = {
 #define S(x,s)	[x] = s
 	S(IPI_RESCHEDULE, "Rescheduling interrupts"),
@@ -638,8 +639,8 @@ static const char *ipi_types[NR_IPI] __tracepoint_string = {
 	S(IPI_MNTN_INFORM, "HISI MNTN Inform"),
 	S(IPI_CPU_BACKTRACE, "CPU backtrace"),
 	S(IPI_HISEE_INFORM, "HISI HISEE INFORM"),
+	S(IPI_WAKEUP, "CPU wakeup interrupts"),
 };
-/*lint +e773*/
 
 static void smp_cross_call(const struct cpumask *target, unsigned int ipinr)
 {
@@ -680,6 +681,11 @@ void arch_send_call_function_ipi_mask(const struct cpumask *mask)
 void arch_send_call_function_single_ipi(int cpu)
 {
 	smp_cross_call(cpumask_of(cpu), IPI_CALL_FUNC);
+}
+
+void arch_send_wakeup_ipi_mask(const struct cpumask *mask)
+{
+	smp_cross_call(mask, IPI_WAKEUP);
 }
 
 #ifdef CONFIG_IRQ_WORK
@@ -805,6 +811,9 @@ void handle_IPI(int ipinr, struct pt_regs *regs)
 		irq_exit();
 		break;
 #endif
+
+	case IPI_WAKEUP:
+		break;
 
 	default:
 		pr_crit("CPU%u: Unknown IPI message 0x%x\n", cpu, ipinr);
