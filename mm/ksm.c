@@ -225,7 +225,7 @@ static unsigned int ksm_thread_pages_to_scan = 10;
 static unsigned int ksm_thread_sleep_millisecs = 20;
 
 /* Boolean to indicate whether to use deferred timer or not */
-static bool use_deferred_timer = 1;
+static bool use_deferred_timer;
 
 #ifdef CONFIG_NUMA
 /* Zeroed when merging across nodes is not allowed */
@@ -1744,7 +1744,7 @@ static signed long __sched deferred_schedule_timeout(signed long timeout)
 	__set_current_state(TASK_INTERRUPTIBLE);
 	if (timeout < 0) {
 		pr_err("schedule_timeout: wrong timeout value %lx\n",
-				timeout);
+							timeout);
 		__set_current_state(TASK_RUNNING);
 		goto out;
 	}
@@ -1752,7 +1752,7 @@ static signed long __sched deferred_schedule_timeout(signed long timeout)
 	expire = timeout + jiffies;
 
 	setup_deferrable_timer_on_stack(&timer, process_timeout,
-		(unsigned long)current);
+			(unsigned long)current);
 	mod_timer(&timer, expire);
 	schedule();
 	del_singleshot_timer_sync(&timer);
@@ -1788,10 +1788,10 @@ static int ksm_scan_thread(void *nothing)
 		if (ksmd_should_run()) {
 			if (use_deferred_timer)
 				deferred_schedule_timeout(
-					msecs_to_jiffies(ksm_thread_sleep_millisecs));
+				msecs_to_jiffies(ksm_thread_sleep_millisecs));
 			else
 				schedule_timeout_interruptible(
-					msecs_to_jiffies(ksm_thread_sleep_millisecs));
+				msecs_to_jiffies(ksm_thread_sleep_millisecs));
 		} else {
 			wait_event_freezable(ksm_thread_wait,
 				ksmd_should_run() || kthread_should_stop());
@@ -2262,14 +2262,14 @@ static ssize_t run_store(struct kobject *kobj, struct kobj_attribute *attr,
 KSM_ATTR(run);
 
 static ssize_t deferred_timer_show(struct kobject *kobj,
-			struct kobj_attribute *attr, char *buf)
+				    struct kobj_attribute *attr, char *buf)
 {
 	return snprintf(buf, 8, "%d\n", use_deferred_timer);
 }
 
 static ssize_t deferred_timer_store(struct kobject *kobj,
-		struct kobj_attribute *attr,
-		const char *buf, size_t count)
+				     struct kobj_attribute *attr,
+				     const char *buf, size_t count)
 {
 	unsigned long enable;
 	int err;
