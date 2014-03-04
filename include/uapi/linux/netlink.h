@@ -27,6 +27,7 @@
 #define NETLINK_ECRYPTFS	19
 #define NETLINK_RDMA		20
 #define NETLINK_CRYPTO		21	/* Crypto layer */
+#define NETLINK_SOCKEV		22	/* Socket Administrative Events */
 
 #ifdef CONFIG_CHR_NETLINK_MODULE
 #define NETLINK_CHR_EVENT_NL  23
