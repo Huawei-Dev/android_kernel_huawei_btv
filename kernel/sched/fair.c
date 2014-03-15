@@ -6395,7 +6395,7 @@ static void detach_task(struct task_struct *p, struct lb_env *env)
  *
  * Returns a task if successful and NULL otherwise.
  */
-static struct task_struct *detach_one_task(struct lb_env *env)
+static struct task_struct *detach_one_task(struct lb_env *env, int *total_run_moved)
 {
 	struct task_struct *p, *n;
 
@@ -6414,6 +6414,11 @@ static struct task_struct *detach_one_task(struct lb_env *env)
 		 * inside detach_tasks().
 		 */
 		schedstat_inc(env->sd, lb_gained[env->idle]);
+
+		if (sysctl_sched_ravg_window)
+			*total_run_moved += div64_u64((u64)p->se.ravg.demand *
+					100, (u64)(sysctl_sched_ravg_window));
+
 		return p;
 	}
 	return NULL;
@@ -6427,7 +6432,7 @@ static const unsigned int sched_nr_migrate_break = 32;
  *
  * Returns number of detached tasks if successful and 0 otherwise.
  */
-static int detach_tasks(struct lb_env *env)
+static int detach_tasks(struct lb_env *env, int *total_run_moved)
 {
 	struct list_head *tasks = &env->src_rq->cfs_tasks;
 	struct task_struct *p;
@@ -6477,6 +6482,9 @@ static int detach_tasks(struct lb_env *env)
 
 		detached++;
 		env->imbalance -= load;
+		if (sysctl_sched_ravg_window)
+			*total_run_moved += div64_u64((u64)p->se.ravg.demand *
+					100, (u64)(sysctl_sched_ravg_window));
 
 #ifdef CONFIG_PREEMPT
 		/*
@@ -7690,6 +7698,7 @@ static int load_balance(int this_cpu, struct rq *this_rq,
 			int *continue_balancing)
 {
 	int ld_moved = 0, cur_ld_moved, active_balance = 0;
+	int total_run_moved = 0;
 	struct sched_domain *sd_parent = sd->parent;
 	struct sched_group *group = NULL;
 	struct rq *busiest = NULL;
@@ -7763,7 +7772,7 @@ more_balance:
 		 * cur_ld_moved - load moved in current iteration
 		 * ld_moved     - cumulative load moved across iterations
 		 */
-		cur_ld_moved = detach_tasks(&env);
+		cur_ld_moved = detach_tasks(&env, &total_run_moved);
 		/*
 		 * We want to potentially lower env.src_cpu's OPP.
 		 */
@@ -7905,9 +7914,15 @@ more_balance:
 	} else {
 		sd->nr_balance_failed = 0;
 		if (per_cpu(dbs_boost_needed, this_cpu)) {
+			struct migration_notify_data mnd;
+
 			per_cpu(dbs_boost_needed, this_cpu) = false;
+
+			mnd.src_cpu = cpu_of(busiest);
+			mnd.dest_cpu = this_cpu;
+			mnd.load = total_run_moved;
 			atomic_notifier_call_chain(&migration_notifier_head,
-				   this_cpu, (void *)(long)cpu_of(busiest));
+						   0, (void *)&mnd);
 		}
 	}
 	if (likely(!active_balance)) {
@@ -8101,6 +8116,7 @@ static int active_load_balance_cpu_stop(void *data)
 	struct rq *busiest_rq = data;
 	int busiest_cpu = cpu_of(busiest_rq);
 	int target_cpu = busiest_rq->push_cpu;
+	int total_run_moved = 0;
 	struct rq *target_rq = cpu_rq(target_cpu);
 	struct sched_domain *sd;
 	struct task_struct *p = NULL;
@@ -8143,7 +8159,7 @@ static int active_load_balance_cpu_stop(void *data)
 
 		schedstat_inc(sd, alb_count);
 
-		p = detach_one_task(&env);
+		p = detach_one_task(&env, &total_run_moved);
 		if (p) {
 			schedstat_inc(sd, alb_pushed);
 			/*
@@ -8165,10 +8181,15 @@ out_unlock:
 	local_irq_enable();
 
 	if (per_cpu(dbs_boost_needed, target_cpu)) {
+		struct migration_notify_data mnd;
+
 		per_cpu(dbs_boost_needed, target_cpu) = false;
+
+		mnd.src_cpu = cpu_of(busiest_rq);
+		mnd.dest_cpu = target_cpu;
+		mnd.load = total_run_moved;
 		atomic_notifier_call_chain(&migration_notifier_head,
-					   target_cpu,
-					   (void *)(long)cpu_of(busiest_rq));
+					   0, (void *)&mnd);
 	}
 	return 0;
 }
