@@ -3009,6 +3009,8 @@ static inline int idle_balance(struct rq *rq)
 
 #endif /* CONFIG_SMP */
 
+#ifdef CONFIG_SCHED_FREQ_INPUT
+
 static inline unsigned int task_load(struct task_struct *p)
 {
 	return p->ravg.demand;
@@ -3041,6 +3043,8 @@ void init_new_task_load(struct task_struct *p)
 	for (i = 0; i < RAVG_HIST_SIZE; ++i)
 		p->ravg.sum_history[i] = 0;
 }
+
+#endif /* CONFIG_SCHED_FREQ_INPUT */
 
 static void enqueue_sleeper(struct cfs_rq *cfs_rq, struct sched_entity *se)
 {
