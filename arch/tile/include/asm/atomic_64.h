@@ -58,6 +58,26 @@ static inline int __atomic_add_unless(atomic_t *v, int a, int u)
 	return oldval;
 }
 
+static inline void atomic_and(int i, atomic_t *v)
+{
+	__insn_fetchand4((void *)&v->counter, i);
+}
+
+static inline void atomic_or(int i, atomic_t *v)
+{
+	__insn_fetchor4((void *)&v->counter, i);
+}
+
+static inline void atomic_xor(int i, atomic_t *v)
+{
+	int guess, oldval = v->counter;
+	do {
+		guess = oldval;
+		__insn_mtspr(SPR_CMPEXCH_VALUE, guess);
+		oldval = __insn_cmpexch4(&v->counter, guess ^ i);
+	} while (guess != oldval);
+}
+
 /* Now the true 64-bit operations. */
 
 #define ATOMIC64_INIT(i)	{ (i) }

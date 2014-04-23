@@ -110,6 +110,18 @@ static __inline__ long atomic64_##op##_return(long i, atomic64_t * v)	\
 ATOMIC_OPS(add)
 ATOMIC_OPS(sub)
 
+#define atomic_andnot atomic_andnot
+#define atomic64_andnot atomic64_andnot
+
+ATOMIC_OP(and, and)
+ATOMIC_OP(andnot, bic)
+ATOMIC_OP(or, bis)
+ATOMIC_OP(xor, xor)
+ATOMIC64_OP(and, and)
+ATOMIC64_OP(andnot, bic)
+ATOMIC64_OP(or, bis)
+ATOMIC64_OP(xor, xor)
+
 #undef ATOMIC_OPS
 #undef ATOMIC64_OP_RETURN
 #undef ATOMIC64_OP

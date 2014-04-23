@@ -34,6 +34,19 @@ static inline void atomic_add(int i, atomic_t *v)
 	_atomic_xchg_add(&v->counter, i);
 }
 
+#define ATOMIC_OP(op)							\
+unsigned long _atomic_##op(volatile unsigned long *p, unsigned long mask); \
+static inline void atomic_##op(int i, atomic_t *v)			\
+{									\
+	_atomic_##op((unsigned long *)&v->counter, i);			\
+}
+
+ATOMIC_OP(and)
+ATOMIC_OP(or)
+ATOMIC_OP(xor)
+
+#undef ATOMIC_OP
+
 /**
  * atomic_add_return - add integer and return
  * @v: pointer of type atomic_t

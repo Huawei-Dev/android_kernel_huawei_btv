@@ -270,6 +270,17 @@ static inline long long atomic64_cmpxchg(atomic64_t *v,
 	return old;
 }
 
+#define ATOMIC64_OP(op, OP)						\
+static inline void atomic64_##op(long i, atomic64_t *v)			\
+{									\
+	__ATOMIC64_LOOP(v, i, __ATOMIC64_##OP, __ATOMIC64_NO_BARRIER);	\
+}
+
+ATOMIC64_OP(and, AND)
+ATOMIC64_OP(or, OR)
+ATOMIC64_OP(xor, XOR)
+
+#undef ATOMIC64_OP
 #undef __ATOMIC64_LOOP
 
 static inline int atomic64_add_unless(atomic64_t *v, long long i, long long u)

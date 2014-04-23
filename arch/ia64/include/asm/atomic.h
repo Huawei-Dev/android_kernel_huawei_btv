@@ -71,6 +71,16 @@ ATOMIC_OP(sub, -)
 		: ia64_atomic_sub(__ia64_asr_i, v);			\
 })
 
+ATOMIC_OP(and, &)
+ATOMIC_OP(or, |)
+ATOMIC_OP(xor, ^)
+
+#define atomic_and(i,v)	(void)ia64_atomic_and(i,v)
+#define atomic_or(i,v)	(void)ia64_atomic_or(i,v)
+#define atomic_xor(i,v)	(void)ia64_atomic_xor(i,v)
+
+#undef ATOMIC_OP
+
 #define ATOMIC64_OP(op, c_op)						\
 static __inline__ long							\
 ia64_atomic64_##op (__s64 i, atomic64_t *v)				\

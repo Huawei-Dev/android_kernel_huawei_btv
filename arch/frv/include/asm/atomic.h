@@ -196,5 +196,31 @@ static __inline__ int __atomic_add_unless(atomic_t *v, int a, int u)
 	return c;
 }
 
+#define ATOMIC_OP(op)							\
+static inline void atomic_##op(int i, atomic_t *v)			\
+{									\
+	(void)__atomic32_fetch_##op(i, &v->counter);			\
+}									\
+									\
+static inline void atomic64_##op(long long i, atomic64_t *v)		\
+{									\
+	(void)__atomic64_fetch_##op(i, &v->counter);			\
+}
+
+ATOMIC_OP(or)
+ATOMIC_OP(and)
+ATOMIC_OP(xor)
+
+#undef ATOMIC_OP
+
+static inline __deprecated void atomic_clear_mask(unsigned int mask, atomic_t *v)
+{
+	atomic_and(~mask, v);
+}
+
+static inline __deprecated void atomic_set_mask(unsigned int mask, atomic_t *v)
+{
+	atomic_or(mask, v);
+}
 
 #endif /* _ASM_ATOMIC_H */

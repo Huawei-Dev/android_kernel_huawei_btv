@@ -44,19 +44,9 @@ static inline int atomic_sub_return(int i, atomic_t *v)
 #define atomic_sub(i, v) atomic_sub_return(i, v)
 #define atomic_sub_and_test(i, v) (atomic_sub_return(i, v) == 0)
 
-static inline int atomic_inc_return(atomic_t *v)
-{
-	h8300flags flags;
-	int ret;
-
-	flags = arch_local_irq_save();
-	v->counter++;
-	ret = v->counter;
-	arch_local_irq_restore(flags);
-	return ret;
-}
-
-#define atomic_inc(v) atomic_inc_return(v)
+ATOMIC_OP(and, &=)
+ATOMIC_OP(or,  |=)
+ATOMIC_OP(xor, ^=)
 
 /*
  * atomic_inc_and_test - increment and test
