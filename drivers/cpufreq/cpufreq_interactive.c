@@ -147,6 +147,7 @@ struct cpufreq_interactive_tunables {
 
 /* For cases where we have single governor instance for system */
 static struct cpufreq_interactive_tunables *common_tunables;
+static DEFINE_PER_CPU(struct cpufreq_interactive_tunables *, cached_tunables);
 
 static struct attribute_group *get_sysfs_attr(void);
 
@@ -1345,6 +1346,63 @@ static struct notifier_block cpufreq_interactive_idle_nb = {
 	.notifier_call = cpufreq_interactive_idle_notifier,
 };
 
+static struct cpufreq_interactive_tunables *alloc_tunable(
+					struct cpufreq_policy *policy)
+{
+	struct cpufreq_interactive_tunables *tunables;
+
+	tunables = kzalloc(sizeof(*tunables), GFP_KERNEL);
+	if (!tunables) {
+		pr_err("%s: POLICY_INIT: kzalloc failed\n", __func__);
+		return ERR_PTR(-ENOMEM);
+	}
+
+	tunables->above_hispeed_delay = default_above_hispeed_delay;
+	tunables->nabove_hispeed_delay =
+		ARRAY_SIZE(default_above_hispeed_delay);
+	tunables->go_hispeed_load = DEFAULT_GO_HISPEED_LOAD;
+	tunables->target_loads = default_target_loads;
+	tunables->ntarget_loads = ARRAY_SIZE(default_target_loads);
+	tunables->min_sample_time = DEFAULT_MIN_SAMPLE_TIME;
+	tunables->timer_rate = DEFAULT_TIMER_RATE;
+	tunables->boostpulse_duration_val = DEFAULT_MIN_SAMPLE_TIME;
+	tunables->timer_slack_val = DEFAULT_TIMER_SLACK;
+
+#ifdef CONFIG_ARCH_HISI
+		tunables->boostpulse_min_interval = DEFAULT_MIN_BOOSTPULSE_INTERVAL;
+#endif
+
+#ifdef CONFIG_HISI_HMPTH_INTERACTIVE
+		tunables->boost_hmp_upthreshold = DEFAULT_HMP_UP_THRESHOLD;
+		tunables->boost_hmp_downthreshold = DEFAULT_HMP_DOWN_THRESHOLD;
+#endif
+
+	spin_lock_init(&tunables->target_loads_lock);
+	spin_lock_init(&tunables->above_hispeed_delay_lock);
+
+	return tunables;
+}
+
+static void save_tunables(struct cpufreq_policy *policy,
+			  struct cpufreq_interactive_tunables *tunables)
+{
+	int cpu;
+
+	if (have_governor_per_policy()) {
+		for_each_cpu(cpu, policy->related_cpus) {
+			WARN_ON(per_cpu(cached_tunables, cpu) &&
+				per_cpu(cached_tunables, cpu) != tunables);
+			per_cpu(cached_tunables, cpu) = tunables;
+		}
+	} else {
+		for_each_possible_cpu(cpu) {
+			WARN_ON(per_cpu(cached_tunables, cpu) &&
+				per_cpu(cached_tunables, cpu) != tunables);
+			per_cpu(cached_tunables, cpu) = tunables;
+		}
+	}
+}
+
 static int cpufreq_governor_interactive(struct cpufreq_policy *policy,
 		unsigned int event)
 {
@@ -1376,35 +1434,14 @@ static int cpufreq_governor_interactive(struct cpufreq_policy *policy,
 			return 0;
 		}
 
-		tunables = kzalloc(sizeof(*tunables), GFP_KERNEL);
+		tunables = per_cpu(cached_tunables, policy->cpu);
 		if (!tunables) {
-			pr_err("%s: POLICY_INIT: kzalloc failed\n", __func__);
-			return -ENOMEM;
+			tunables = alloc_tunable(policy);
+			if (IS_ERR(tunables))
+				return PTR_ERR(tunables);
 		}
 
 		tunables->usage_count = 1;
-		tunables->above_hispeed_delay = default_above_hispeed_delay;
-		tunables->nabove_hispeed_delay =
-			ARRAY_SIZE(default_above_hispeed_delay);
-		tunables->go_hispeed_load = DEFAULT_GO_HISPEED_LOAD;
-		tunables->target_loads = default_target_loads;
-		tunables->ntarget_loads = ARRAY_SIZE(default_target_loads);
-		tunables->min_sample_time = DEFAULT_MIN_SAMPLE_TIME;
-		tunables->timer_rate = DEFAULT_TIMER_RATE;
-		tunables->boostpulse_duration_val = DEFAULT_MIN_SAMPLE_TIME;
-		tunables->timer_slack_val = DEFAULT_TIMER_SLACK;
-#ifdef CONFIG_ARCH_HISI
-		tunables->boostpulse_min_interval = DEFAULT_MIN_BOOSTPULSE_INTERVAL;
-#endif
-
-#ifdef CONFIG_HISI_HMPTH_INTERACTIVE
-		tunables->boost_hmp_upthreshold = DEFAULT_HMP_UP_THRESHOLD;
-		tunables->boost_hmp_downthreshold = DEFAULT_HMP_DOWN_THRESHOLD;
-#endif
-
-		spin_lock_init(&tunables->target_loads_lock);
-		spin_lock_init(&tunables->above_hispeed_delay_lock);
-
 		policy->governor_data = tunables;
 		if (!have_governor_per_policy())
 			common_tunables = tunables;
@@ -1447,7 +1484,7 @@ static int cpufreq_governor_interactive(struct cpufreq_policy *policy,
 			sysfs_remove_group(get_governor_parent_kobj(policy),
 					get_sysfs_attr());
 
-			kfree(tunables);
+			save_tunables(policy, tunables);
 			common_tunables = NULL;
 		}
 
@@ -1594,9 +1631,16 @@ module_init(cpufreq_interactive_init);
 
 static void __exit cpufreq_interactive_exit(void)
 {
+	int cpu;
+
 	cpufreq_unregister_governor(&cpufreq_gov_interactive);
 	kthread_stop(speedchange_task);
 	put_task_struct(speedchange_task);
+
+	for_each_possible_cpu(cpu) {
+		kfree(per_cpu(cached_tunables, cpu));
+		per_cpu(cached_tunables, cpu) = NULL;
+	}
 }
 
 module_exit(cpufreq_interactive_exit);
