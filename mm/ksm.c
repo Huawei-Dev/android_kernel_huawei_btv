@@ -242,8 +242,7 @@ static int ksm_nr_node_ids = 1;
 #define KSM_RUN_UNMERGE	2
 /*lint -e750 -esym(750,KSM_RUN_OFFLINE) */
 #define KSM_RUN_OFFLINE	4
-/*lint -e750 +esym(750,KSM_RUN_OFFLINE */
-static unsigned long ksm_run = KSM_RUN_MERGE;	/*boot with start*/
+static unsigned long ksm_run = KSM_RUN_MERGE;
 static void wait_while_offlining(void);
 
 static DECLARE_WAIT_QUEUE_HEAD(ksm_thread_wait);
