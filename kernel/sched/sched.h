@@ -665,7 +665,7 @@ struct rq {
 	u64 max_idle_balance_cost;
 #endif
 
-#ifdef CONFIG_SCHED_FREQ_INPUT
+#if defined(CONFIG_SCHED_FREQ_INPUT) || defined(CONFIG_SCHED_HMP)
 	/*
 	 * max_freq = user or thermal defined maximum
 	 * max_possible_freq = maximum supported by hardware
@@ -943,7 +943,7 @@ static inline void sched_ttwu_pending(void) { }
 #include "stats.h"
 #include "auto_group.h"
 
-#ifdef CONFIG_SCHED_FREQ_INPUT
+#if defined(CONFIG_SCHED_FREQ_INPUT) || defined(CONFIG_SCHED_HMP)
 
 extern unsigned int sched_ravg_window;
 extern unsigned int max_possible_freq;
@@ -964,7 +964,7 @@ dec_cumulative_runnable_avg(struct rq *rq, struct task_struct *p)
 	BUG_ON((s64)rq->cumulative_runnable_avg < 0);
 }
 
-#else	/* CONFIG_SCHED_FREQ_INPUT */
+#else	/* CONFIG_SCHED_FREQ_INPUT || CONFIG_SCHED_HMP */
 
 static inline int pct_task_load(struct task_struct *p) { return 0; }
 
@@ -980,7 +980,7 @@ dec_cumulative_runnable_avg(struct rq *rq, struct task_struct *p)
 
 static inline void init_new_task_load(struct task_struct *p) { }
 
-#endif	/* CONFIG_SCHED_FREQ_INPUT */
+#endif	/* CONFIG_SCHED_FREQ_INPUT || CONFIG_SCHED_HMP */
 
 #ifdef CONFIG_CGROUP_SCHED
 
@@ -1279,15 +1279,15 @@ struct sched_class {
 #endif
 };
 
-#ifdef CONFIG_SCHED_FREQ_INPUT
+#if defined(CONFIG_SCHED_FREQ_INPUT) || defined(CONFIG_SCHED_HMP)
 extern void
 update_task_ravg(struct task_struct *p, struct rq *rq, int update_sum);
-#else	/* CONFIG_SCHED_FREQ_INPUT */
+#else	/* CONFIG_SCHED_FREQ_INPUT || CONFIG_SCHED_HMP */
 static inline void
 update_task_ravg(struct task_struct *p, struct rq *rq, int update_sum)
 {
 }
-#endif	/* CONFIG_SCHED_FREQ_INPUT */
+#endif	/* CONFIG_SCHED_FREQ_INPUT || CONFIG_SCHED_HMP */
 
 static inline void put_prev_task(struct rq *rq, struct task_struct *prev)
 {
