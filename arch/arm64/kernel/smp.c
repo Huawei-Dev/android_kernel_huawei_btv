@@ -690,6 +690,8 @@ void arch_irq_work_raise(void)
 
 static DEFINE_RAW_SPINLOCK(stop_lock);
 
+static struct pt_regs __percpu regs_before_stop;
+
 /*
  * ipi_cpu_stop - handle IPI from smp_send_stop()
  */
@@ -701,7 +703,7 @@ static DEFINE_RAW_SPINLOCK(stop_lock);
 unsigned int g_cpu_in_ipi_stop;
 #endif
 
-static void ipi_cpu_stop(unsigned int cpu)
+static void ipi_cpu_stop(unsigned int cpu, struct pt_regs *regs)
 {
 #ifdef CONFIG_HISI_BB
 	struct pt_regs regs;
@@ -710,6 +712,7 @@ static void ipi_cpu_stop(unsigned int cpu)
 
 	if (system_state == SYSTEM_BOOTING ||
 	    system_state == SYSTEM_RUNNING) {
+		per_cpu(regs_before_stop, cpu) = *regs;
 		raw_spin_lock(&stop_lock);
 		pr_crit("CPU%u: stopping\n", cpu);
 #ifdef CONFIG_HISI_BB
@@ -720,6 +723,7 @@ static void ipi_cpu_stop(unsigned int cpu)
 		show_regs(&regs);
 		put_cpu();
 #endif
+		show_regs(regs);
 		dump_stack();
 		raw_spin_unlock(&stop_lock);
 	}
@@ -758,7 +762,7 @@ void handle_IPI(int ipinr, struct pt_regs *regs)
 
 	case IPI_CPU_STOP:
 		irq_enter();
-		ipi_cpu_stop(cpu);
+		ipi_cpu_stop(cpu, regs);
 		irq_exit();
 		break;
 
