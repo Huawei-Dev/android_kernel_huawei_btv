@@ -704,6 +704,8 @@ void do_exit(long code)
 		su_exit();
 	}
 
+	sched_exit(tsk);
+
 	/*
 	 * tsk->flags are checked in the futex code to protect against
 	 * an exiting task cleaning up the robust pi futexes.
