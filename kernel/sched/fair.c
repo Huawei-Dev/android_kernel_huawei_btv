@@ -8951,6 +8951,7 @@ static int load_balance(int this_cpu, struct rq *this_rq,
 		.tasks		= LIST_HEAD_INIT(env.tasks),
 		.imbalance	= 0,
 		.flags		= 0,
+		.loop		= 0,
 	};
 
 	/*
@@ -9403,6 +9404,7 @@ static int active_load_balance_cpu_stop(void *data)
 		.src_rq		= busiest_rq,
 		.idle		= CPU_IDLE,
 		.flags		= 0,
+		.loop		= 0,
 	};
 
 	raw_spin_lock_irq(&busiest_rq->lock);
