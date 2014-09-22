@@ -37,6 +37,8 @@ struct ci_hdrc_platform_data {
 	struct regulator	*reg_vbus;
 	struct usb_otg_caps	ci_otg_caps;
 	bool			tpl_support;
+	/* interrupt threshold setting */
+	u32			itc_setting;
 };
 
 /* Default offset of capability registers */

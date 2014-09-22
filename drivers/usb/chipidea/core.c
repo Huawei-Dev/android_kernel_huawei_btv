@@ -425,6 +425,9 @@ void ci_platform_configure(struct ci_hdrc *ci)
 
 	if (ci->platdata->flags & CI_HDRC_SET_NON_ZERO_TTHA)
 		hw_write(ci, OP_TTCTRL, TTCTRL_TTHA_MASK, TTCTRL_TTHA);
+
+	hw_write(ci, OP_USBCMD, 0xff0000, ci->platdata->itc_setting << 16);
+
 }
 
 /**
@@ -621,6 +624,17 @@ static int ci_get_platdata(struct device *dev,
 
 	if (of_usb_get_maximum_speed(dev->of_node) == USB_SPEED_FULL)
 		platdata->flags |= CI_HDRC_FORCE_FULLSPEED;
+
+	platdata->itc_setting = 1;
+	if (of_find_property(dev->of_node, "itc-setting", NULL)) {
+		ret = of_property_read_u32(dev->of_node, "itc-setting",
+			&platdata->itc_setting);
+		if (ret) {
+			dev_err(dev,
+				"failed to get itc-setting\n");
+			return ret;
+		}
+	}
 
 	return 0;
 }
