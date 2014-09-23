@@ -53,6 +53,7 @@
 #include <asm/tlbflush.h>
 #include <asm/ptrace.h>
 #include <asm/virt.h>
+#include <asm/edac.h>
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/ipi.h>
@@ -741,6 +742,7 @@ static void ipi_cpu_stop(unsigned int cpu, struct pt_regs *regs)
 #endif
 		show_regs(regs);
 		dump_stack();
+		arm64_check_cache_ecc(NULL);
 		raw_spin_unlock(&stop_lock);
 	}
 
