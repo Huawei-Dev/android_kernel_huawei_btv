@@ -127,6 +127,16 @@ static inline u64 __raw_readq(const volatile void __iomem *addr)
 #define writel_relaxed(v,c)	((void)__raw_writel((__force u32)cpu_to_le32(v),(c)))
 #define writeq_relaxed(v,c)	((void)__raw_writeq((__force u64)cpu_to_le64(v),(c)))
 
+#define readb_relaxed_no_log(c)	({ u8 __v = __raw_readb_no_log(c); __v; })
+#define readw_relaxed_no_log(c)	({ u16 __v = le16_to_cpu((__force __le16)__raw_readw_no_log(c)); __v; })
+#define readl_relaxed_no_log(c)	({ u32 __v = le32_to_cpu((__force __le32)__raw_readl_no_log(c)); __v; })
+#define readq_relaxed_no_log(c)	({ u64 __v = le64_to_cpu((__force __le64)__raw_readq_no_log(c)); __v; })
+
+#define writeb_relaxed_no_log(v, c)	((void)__raw_writeb_no_log((v), (c)))
+#define writew_relaxed_no_log(v, c)	((void)__raw_writew_no_log((__force u16)cpu_to_le16(v), (c)))
+#define writel_relaxed_no_log(v, c)	((void)__raw_writel_no_log((__force u32)cpu_to_le32(v), (c)))
+#define writeq_relaxed_no_log(v, c)	((void)__raw_writeq_no_log((__force u64)cpu_to_le64(v), (c)))
+
 /*
  * I/O memory access primitives. Reads are ordered relative to any
  * following Normal memory access. Writes are ordered relative to any prior
