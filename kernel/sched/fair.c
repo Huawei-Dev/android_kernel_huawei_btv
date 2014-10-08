@@ -9444,6 +9444,7 @@ static int active_load_balance_cpu_stop(void *data)
 		.flags		= 0,
 		.loop		= 0,
 	};
+	bool moved = false;
 
 	raw_spin_lock_irq(&busiest_rq->lock);
 
@@ -9474,6 +9475,7 @@ static int active_load_balance_cpu_stop(void *data)
 					cpu_online(target_cpu)) {
 			detach_task(push_task, &env);
 			push_task_detached = 1;
+			moved = true;
 		}
 		goto out_unlock;
 	}
@@ -9493,13 +9495,10 @@ static int active_load_balance_cpu_stop(void *data)
 		p = detach_one_task(&env);
 		if (p) {
 			schedstat_inc(sd, alb_pushed);
-			/*
-			 * We want to potentially lower env.src_cpu's OPP.
-			 */
-			update_capacity_of(env.src_cpu);
-		}
-		else
+			moved = true;
+		} else {
 			schedstat_inc(sd, alb_failed);
+		}
 	}
 	rcu_read_unlock();
 out_unlock:
@@ -9523,6 +9522,11 @@ out_unlock:
 		attach_one_task(target_rq, p);
 
 	local_irq_enable();
+
+	if (moved && !same_freq_domain(busiest_cpu, target_cpu)) {
+		check_for_freq_change(busiest_rq);
+		check_for_freq_change(target_rq);
+	}
 
 	if (per_cpu(dbs_boost_needed, target_cpu)) {
 		struct migration_notify_data mnd;
