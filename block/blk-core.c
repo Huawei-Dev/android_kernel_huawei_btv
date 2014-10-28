@@ -2236,7 +2236,26 @@ out:
 }
 EXPORT_SYMBOL(generic_make_request);
 
-unsigned char trace_one_bio = 0;
+#ifdef CONFIG_BLK_DEV_IO_TRACE
+static inline struct task_struct *get_dirty_task(struct bio *bio)
+{
+	/*
+	 * Not all the pages in the bio are dirtied by the
+	 * same task but most likely it will be, since the
+	 * sectors accessed on the device must be adjacent.
+	 */
+	if (bio->bi_io_vec && bio->bi_io_vec->bv_page &&
+		bio->bi_io_vec->bv_page->tsk_dirty)
+			return bio->bi_io_vec->bv_page->tsk_dirty;
+	else
+		return current;
+}
+#else
+static inline struct task_struct *get_dirty_task(struct bio *bio)
+{
+	return current;
+}
+#endif
 
 /**
  * submit_bio - submit a bio to the block device layer for I/O
@@ -2250,7 +2269,6 @@ unsigned char trace_one_bio = 0;
  */
 blk_qc_t submit_bio(int rw, struct bio *bio)
 {
-	struct task_struct *tsk = current;
 	bio->bi_rw |= rw;
 
 	/*
@@ -2274,16 +2292,9 @@ blk_qc_t submit_bio(int rw, struct bio *bio)
 
 		if (unlikely(block_dump)) {
 			char b[BDEVNAME_SIZE];
+			struct task_struct *tsk;
 
-			/*
-			 * Not all the pages in the bio are dirtied by the
-			 * same task but most likely it will be, since the
-			 * sectors accessed on the device must be adjacent.
-			 */
-			if (bio->bi_io_vec && bio->bi_io_vec->bv_page &&
-			    bio->bi_io_vec->bv_page->tsk_dirty)
-				tsk = bio->bi_io_vec->bv_page->tsk_dirty;
-
+			tsk = get_dirty_task(bio);
 			printk(KERN_DEBUG "%s(%d): %s block %Lu on %s (%u sectors)\n",
 				tsk->comm, task_pid_nr(tsk),
 				(rw & WRITE) ? "WRITE" : "READ",
