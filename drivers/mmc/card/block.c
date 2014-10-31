@@ -2428,12 +2428,7 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
 			err = mmc_blk_reset(md, card->host, type);
 			if (!err)
 				break;
-#ifndef CONFIG_HISI_MMC
-			if (err == -ENODEV ||
-				mmc_packed_cmd(mq_rq->cmd_type))
-#endif
-				goto cmd_abort;
-			/* Fall through */
+			goto cmd_abort;
 		}
 		case MMC_BLK_ECC_ERR:
 #ifdef CONFIG_HISI_MMC
