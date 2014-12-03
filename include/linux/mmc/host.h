@@ -369,6 +369,7 @@ struct mmc_host {
 #define MMC_CAP2_HSX00_1_2V	(MMC_CAP2_HS200_1_2V_SDR | MMC_CAP2_HS400_1_2V)
 #define MMC_CAP2_SDIO_IRQ_NOTHREAD (1 << 17)
 #define MMC_CAP2_NO_WRITE_PROTECT (1 << 18)	/* No physical write protect pin, assume that card is always read-write */
+#define MMC_CAP2_PACKED_WR_CONTROL (1 << 19)	/* Allow write packing control */
 #define MMC_CAP2_CMD_QUEUE     	(1 << 19)       /* support eMMC command queue */
 #define MMC_CAP2_ENHANCED_STROBE		(1 << 20)
 #define MMC_CAP2_CACHE_FLUSH_BARRIER	(1 << 21)
