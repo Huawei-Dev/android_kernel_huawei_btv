@@ -13,6 +13,7 @@
 #include <linux/device.h>
 #include <linux/mmc/core.h>
 #include <linux/mod_devicetable.h>
+#include <linux/notifier.h>
 
 #define MMC_CARD_CMDQ_BLK_SIZE 512
 
@@ -367,6 +368,8 @@ struct mmc_card {
 	unsigned int	part_curr;
 
 	struct mmc_wr_pack_stats wr_pack_stats; /* packed commands stats*/
+	struct notifier_block        reboot_notify;
+	bool issue_long_pon;
 
 	bool                    cmdq_init; /* cmdq init done */
         struct dentry           *debugfs_sdxc;
@@ -598,5 +601,5 @@ extern void mmc_fixup_device(struct mmc_card *card,
 extern struct mmc_wr_pack_stats *mmc_blk_get_packed_statistics(
 			struct mmc_card *card);
 extern void mmc_blk_init_packed_statistics(struct mmc_card *card);
-
+extern int mmc_send_long_pon(struct mmc_card *card);
 #endif /* LINUX_MMC_CARD_H */
