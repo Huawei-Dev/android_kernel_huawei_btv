@@ -146,6 +146,16 @@ static void mmc_bus_shutdown(struct device *dev)
 	struct mmc_host *host = card->host;
 	int ret;
 	int present = 1;
+	
+	if (!drv) {
+		pr_debug("%s: %s: drv is NULL\n", dev_name(dev), __func__);
+		return;
+	}
+
+	if (!card) {
+		pr_debug("%s: %s: card is NULL\n", dev_name(dev), __func__);
+		return;
+	}
 
 	host->rescan_disable = 1;
 	if(host->ops->get_cd)
@@ -155,9 +165,8 @@ static void mmc_bus_shutdown(struct device *dev)
 		return;
 
 	printk("%s:%d ++\n", __func__, __LINE__);
-	if (dev->driver && drv->shutdown) {
+	if (dev->driver && drv->shutdown)
 		drv->shutdown(card);
-	}
 
 	if (host->bus_ops->shutdown) {
 		ret = host->bus_ops->shutdown(host);
