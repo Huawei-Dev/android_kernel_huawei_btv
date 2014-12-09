@@ -530,6 +530,8 @@ struct mmc_host {
 		bool		enable;
 		bool		initialized;
 		bool		in_progress;
+		/* freq. transitions are not allowed in invalid state */
+		bool		invalid_state;
 		struct delayed_work work;
 	} clk_scaling;
 	enum dev_state dev_status;
