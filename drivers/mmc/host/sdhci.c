@@ -3610,7 +3610,6 @@ int sdhci_add_host(struct sdhci_host *host)
 		sdhci_cmdq_init(host, mmc);
 	}
 #endif
-	mmc_add_host(mmc);
 
 	pr_info("%s: SDHCI controller on %s [%s] using %s\n",
 		mmc_hostname(mmc), host->hw_name, dev_name(mmc_dev(mmc)),
@@ -3620,6 +3619,7 @@ int sdhci_add_host(struct sdhci_host *host)
 
 	sdhci_enable_card_detection(host);
 
+	mmc_add_host(mmc);
 	return 0;
 
 #ifdef SDHCI_USE_LEDS_CLASS
