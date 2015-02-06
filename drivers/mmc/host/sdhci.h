@@ -594,6 +594,10 @@ struct sdhci_ops {
 	void     (*check_busy_before_send_cmd)(struct sdhci_host *host,
 				struct mmc_command* cmd);
 	void (*restore_transfer_para)(struct sdhci_host *host);
+	int	(*select_drive_strength)(struct sdhci_host *host,
+					 struct mmc_card *card,
+					 unsigned int max_dtr, int host_drv,
+					 int card_drv, int *drv_type);
 };
 
 #ifdef CONFIG_MMC_SDHCI_IO_ACCESSORS
