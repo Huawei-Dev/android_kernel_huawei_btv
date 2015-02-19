@@ -553,4 +553,15 @@ extern enum fscache_checkaux fscache_check_aux(struct fscache_object *object,
 					       const void *data,
 					       uint16_t datalen);
 
+extern void fscache_object_retrying_stale(struct fscache_object *object);
+
+enum fscache_why_object_killed {
+	FSCACHE_OBJECT_IS_STALE,
+	FSCACHE_OBJECT_NO_SPACE,
+	FSCACHE_OBJECT_WAS_RETIRED,
+	FSCACHE_OBJECT_WAS_CULLED,
+};
+extern void fscache_object_mark_killed(struct fscache_object *object,
+				       enum fscache_why_object_killed why);
+
 #endif /* _LINUX_FSCACHE_CACHE_H */
