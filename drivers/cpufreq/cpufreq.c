@@ -1185,7 +1185,16 @@ static int update_policy_cpu(struct cpufreq_policy *policy, unsigned int cpu,
 	return 0;
 }
 
-static int __cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
+/**
+ * cpufreq_add_dev - add a CPU device
+ *
+ * Adds the cpufreq interface for a CPU device.
+ *
+ * The Oracle says: try running cpufreq registration/unregistration concurrently
+ * with with cpu hotplugging and all hell will break loose. Tried to clean this
+ * mess up, but more thorough testing is needed. - Mathieu
+ */
+static int cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 {
 	unsigned int j, cpu = dev->id;
 	int ret = -ENOMEM;
@@ -1395,20 +1404,6 @@ nomem_out:
 	up_read(&cpufreq_rwsem);
 
 	return ret;
-}
-
-/**
- * cpufreq_add_dev - add a CPU device
- *
- * Adds the cpufreq interface for a CPU device.
- *
- * The Oracle says: try running cpufreq registration/unregistration concurrently
- * with with cpu hotplugging and all hell will break loose. Tried to clean this
- * mess up, but more thorough testing is needed. - Mathieu
- */
-static int cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
-{
-	return __cpufreq_add_dev(dev, sif);
 }
 
 static int __cpufreq_remove_dev_prepare(struct device *dev,
@@ -2424,7 +2419,7 @@ static int cpufreq_cpu_callback(struct notifier_block *nfb,
 	if (dev) {
 		switch (action & ~CPU_TASKS_FROZEN) {
 		case CPU_ONLINE:
-			__cpufreq_add_dev(dev, NULL);
+			cpufreq_add_dev(dev, NULL);
 #ifdef CONFIG_HISI_CPUFREQ
 			kobject_uevent(&dev->kobj, KOBJ_ADD);
 #endif
@@ -2439,7 +2434,7 @@ static int cpufreq_cpu_callback(struct notifier_block *nfb,
 			break;
 
 		case CPU_DOWN_FAILED:
-			__cpufreq_add_dev(dev, NULL);
+			cpufreq_add_dev(dev, NULL);
 			break;
 		}
 	}
