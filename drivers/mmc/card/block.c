@@ -43,7 +43,6 @@
 #include <linux/pm_runtime.h>
 #include <linux/version.h>
 
-#define CREATE_TRACE_POINTS
 #include <trace/events/mmc.h>
 
 #include <linux/mmc/ioctl.h>
