@@ -337,6 +337,43 @@ static void mcam_disable_mipi(struct mcam_camera *mcam)
 	mcam->mipi_enabled = false;
 }
 
+static bool mcam_fmt_is_planar(__u32 pfmt)
+{
+	struct mcam_format_struct *f;
+
+	f = mcam_find_format(pfmt);
+	return f->planar;
+}
+
+static void mcam_write_yuv_bases(struct mcam_camera *cam,
+				 unsigned frame, dma_addr_t base)
+{
+	struct v4l2_pix_format *fmt = &cam->pix_format;
+	u32 pixel_count = fmt->width * fmt->height;
+	dma_addr_t y, u = 0, v = 0;
+
+	y = base;
+
+	switch (fmt->pixelformat) {
+	case V4L2_PIX_FMT_YUV420:
+		u = y + pixel_count;
+		v = u + pixel_count / 4;
+		break;
+	case V4L2_PIX_FMT_YVU420:
+		v = y + pixel_count;
+		u = v + pixel_count / 4;
+		break;
+	default:
+		break;
+	}
+
+	mcam_reg_write(cam, REG_Y0BAR + frame * 4, y);
+	if (mcam_fmt_is_planar(fmt->pixelformat)) {
+		mcam_reg_write(cam, REG_U0BAR + frame * 4, u);
+		mcam_reg_write(cam, REG_V0BAR + frame * 4, v);
+	}
+}
+
 /* ------------------------------------------------------------------- */
 
 #ifdef MCAM_MODE_VMALLOC
@@ -777,10 +814,6 @@ static void mcam_ctlr_image(struct mcam_camera *cam)
 	 * Tell the controller about the image format we are using.
 	 */
 	switch (fmt->pixelformat) {
-	case V4L2_PIX_FMT_YUV422P:
-		mcam_reg_write_mask(cam, REG_CTRL0,
-			C0_DF_YUV | C0_YUV_PLANAR | C0_YUVE_YVYU, C0_DF_MASK);
-		break;
 	case V4L2_PIX_FMT_YUV420:
 	case V4L2_PIX_FMT_YVU420:
 		mcam_reg_write_mask(cam, REG_CTRL0,
