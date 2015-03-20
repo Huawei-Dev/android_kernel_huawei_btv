@@ -73,7 +73,7 @@ struct f_rndis {
 	u8				ethaddr[ETH_ALEN];
 	u32				vendorID;
 	const char			*manufacturer;
-	int				config;
+	struct rndis_params		*params;
 
 	struct usb_ep			*notify;
 	struct usb_request		*notify_req;
@@ -461,7 +461,7 @@ static void rndis_command_complete(struct usb_ep *ep, struct usb_request *req)
 
 	/* received RNDIS command from USB_CDC_SEND_ENCAPSULATED_COMMAND */
 //	spin_lock(&dev->lock);
-	status = rndis_msg_parser(rndis->config, (u8 *) req->buf);
+	status = rndis_msg_parser(rndis->params, (u8 *) req->buf);
 	if (status < 0)
 		pr_err("RNDIS command error %d, %d/%d\n",
 			status, req->actual, req->length);
@@ -523,13 +523,12 @@ rndis_setup(struct usb_function *f, const struct usb_ctrlrequest *ctrl)
 			u32 n;
 
 			/* return the result */
-			spin_lock(&rndis_response_lock);
-			buf = rndis_get_next_response(rndis->config, &n);
+			buf = rndis_get_next_response(rndis->params, &n);
 			if (buf) {
 				memcpy(req->buf, buf, n);
 				req->complete = rndis_response_complete;
 				req->context = rndis;
-				rndis_free_response(rndis->config, buf);
+				rndis_free_response(rndis->params, buf);
 				value = n;
 			}
 			spin_unlock(&rndis_response_lock);
@@ -624,7 +623,7 @@ static int rndis_set_alt(struct usb_function *f, unsigned intf, unsigned alt)
 		if (IS_ERR(net))
 			return PTR_ERR(net);
 
-		rndis_set_param_dev(rndis->config, net,
+		rndis_set_param_dev(rndis->params, net,
 				&rndis->port.cdc_filter);
 	} else
 		goto fail;
@@ -644,7 +643,7 @@ static void rndis_disable(struct usb_function *f)
 
 	DBG(cdev, "rndis deactivated\n");
 
-	rndis_uninit(rndis->config);
+	rndis_uninit(rndis->params);
 	gether_disconnect(&rndis->port);
 
 	usb_ep_disable(rndis->notify);
@@ -667,9 +666,9 @@ static void rndis_open(struct gether *geth)
 
 	DBG(cdev, "%s\n", __func__);
 
-	rndis_set_param_medium(rndis->config, RNDIS_MEDIUM_802_3,
+	rndis_set_param_medium(rndis->params, RNDIS_MEDIUM_802_3,
 				bitrate(cdev->gadget) / 100);
-	rndis_signal_connect(rndis->config);
+	rndis_signal_connect(rndis->params);
 }
 
 static void rndis_close(struct gether *geth)
@@ -678,8 +677,8 @@ static void rndis_close(struct gether *geth)
 
 	DBG(geth->func.config->cdev, "%s\n", __func__);
 
-	rndis_set_param_medium(rndis->config, RNDIS_MEDIUM_802_3, 0);
-	rndis_signal_disconnect(rndis->config);
+	rndis_set_param_medium(rndis->params, RNDIS_MEDIUM_802_3, 0);
+	rndis_signal_disconnect(rndis->params);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -855,12 +854,12 @@ rndis_bind(struct usb_configuration *c, struct usb_function *f)
 	rndis->port.open = rndis_open;
 	rndis->port.close = rndis_close;
 
-	rndis_set_param_medium(rndis->config, RNDIS_MEDIUM_802_3, 0);
-	rndis_set_host_mac(rndis->config, rndis->ethaddr);
+	rndis_set_param_medium(rndis->params, RNDIS_MEDIUM_802_3, 0);
+	rndis_set_host_mac(rndis->params, rndis->ethaddr);
 	rndis_set_max_pkt_xfer(rndis->config, rndis_ul_max_pkt_per_xfer);
 
 	if (rndis->manufacturer && rndis->vendorID &&
-			rndis_set_param_vendor(rndis->config, rndis->vendorID,
+			rndis_set_param_vendor(rndis->params, rndis->vendorID,
 					       rndis->manufacturer)) {
 		status = -EINVAL;
 		goto fail_free_descs;
@@ -1019,7 +1018,7 @@ static void rndis_free(struct usb_function *f)
 	struct f_rndis_opts *opts;
 
 	rndis = func_to_rndis(f);
-	rndis_deregister(rndis->config);
+	rndis_deregister(rndis->params);
 	opts = container_of(f->fi, struct f_rndis_opts, func_inst);
 	kfree(rndis);
 	mutex_lock(&opts->lock);
@@ -1053,7 +1052,7 @@ static struct usb_function *rndis_alloc(struct usb_function_instance *fi)
 {
 	struct f_rndis	*rndis;
 	struct f_rndis_opts *opts;
-	int status;
+	struct rndis_params *params;
 
 	/* allocate and initialize one new instance */
 	rndis = kzalloc(sizeof(*rndis), GFP_KERNEL);
@@ -1093,12 +1092,12 @@ static struct usb_function *rndis_alloc(struct usb_function_instance *fi)
 	rndis->port.func.disable = rndis_disable;
 	rndis->port.func.free_func = rndis_free;
 
-	status = rndis_register(rndis_response_available, rndis);
-	if (status < 0) {
+	params = rndis_register(rndis_response_available, rndis);
+	if (IS_ERR(params)) {
 		kfree(rndis);
-		return ERR_PTR(status);
+		return ERR_CAST(params);
 	}
-	rndis->config = status;
+	rndis->params = params;
 
 	return &rndis->port.func;
 }
