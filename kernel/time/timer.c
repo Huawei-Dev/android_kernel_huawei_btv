@@ -1577,15 +1577,20 @@ signed long __sched schedule_timeout_uninterruptible(signed long timeout)
 EXPORT_SYMBOL(schedule_timeout_uninterruptible);
 
 #if defined(CONFIG_HOTPLUG_CPU)
-static void migrate_timer_list(struct tvec_base *new_base, struct hlist_head *head)
+static void migrate_timer_list(struct tvec_base *new_base,
+			       struct hlist_head *head, bool remove_pinned)
 {
 	struct timer_list *timer;
 	int cpu = new_base->cpu;
+	struct hlist_node *n;
+	int is_pinned;
 
-	while (!hlist_empty(head)) {
-		timer = hlist_entry(head->first, struct timer_list, entry);
-		/* We ignore the accounting on the dying cpu */
-		detach_timer(timer, false);
+	hlist_for_each_entry_safe(timer, n, head, entry) {
+		is_pinned = timer->flags & TIMER_PINNED_ON_CPU;
+		if (!remove_pinned && is_pinned)
+			continue;
+
+		detach_if_pending(timer, get_timer_base(timer->flags), false);
 		timer->flags = (timer->flags & ~TIMER_BASEMASK) | cpu;
 		internal_add_timer(new_base, timer);
 	}
@@ -1598,7 +1603,6 @@ static void __migrate_timers(int cpu, bool remove_pinned)
 	unsigned long flags;
 	int i;
 
-	BUG_ON(cpu_online(cpu));
 	old_base = per_cpu_ptr(&tvec_bases, cpu);
 	new_base = get_cpu_ptr(&tvec_bases);
 	/*
@@ -1618,16 +1622,21 @@ static void __migrate_timers(int cpu, bool remove_pinned)
 		BUG_ON(old_base->running_timer);
 
 	for (i = 0; i < TVR_SIZE; i++)
-		migrate_timer_list(new_base, old_base->tv1.vec + i);
+		migrate_timer_list(new_base, old_base->tv1.vec + i,
+				   remove_pinned);
 	for (i = 0; i < TVN_SIZE; i++) {
-		migrate_timer_list(new_base, old_base->tv2.vec + i);
-		migrate_timer_list(new_base, old_base->tv3.vec + i);
-		migrate_timer_list(new_base, old_base->tv4.vec + i);
-		migrate_timer_list(new_base, old_base->tv5.vec + i);
+		migrate_timer_list(new_base, old_base->tv2.vec + i,
+				remove_pinned);
+		migrate_timer_list(new_base, old_base->tv3.vec + i,
+				remove_pinned);
+		migrate_timer_list(new_base, old_base->tv4.vec + i,
+				remove_pinned);
+		migrate_timer_list(new_base, old_base->tv5.vec + i,
+				remove_pinned);
 	}
 
 	spin_unlock(&old_base->lock);
-	spin_unlock_irq(&new_base->lock);
+	spin_unlock_irqrestore(&new_base->lock, flags);
 	put_cpu_ptr(&tvec_bases);
 }
 
