@@ -90,9 +90,6 @@ static long long __init keystone_init_meminfo(void)
 	keystone_dma_pfn_offset = PFN_DOWN(KEYSTONE_HIGH_PHYS_START -
 						KEYSTONE_LOW_PHYS_START);
 
-	pr_info("Switching to high address space at 0x%llx\n",
-	        (u64)PHYS_OFFSET + (u64)offset);
-
 	return offset;
 }
 
