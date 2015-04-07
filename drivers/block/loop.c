@@ -86,7 +86,7 @@ static DEFINE_MUTEX(loop_index_mutex); /*lint !e651 !e708 !e570 !e64 !e785 */
 static int max_part;
 static int part_shift;
 
-#define transfer_none (NULL)
+static struct workqueue_struct *loop_wq;
 
 static int transfer_xor(struct loop_device *lo, int cmd,
 			struct page *raw_page, unsigned raw_off,
@@ -126,7 +126,6 @@ static int xor_init(struct loop_device *lo, const struct loop_info64 *info)
 
 static struct loop_func_table none_funcs = {
 	.number = LO_CRYPT_NONE,
-	.transfer = transfer_none,
 	.init = NULL,
 	.release = NULL,
 	.ioctl = NULL,
@@ -137,7 +136,7 @@ static struct loop_func_table xor_funcs = {
 	.number = LO_CRYPT_XOR,
 	.transfer = transfer_xor,
 	.init = xor_init
-}; /*lint !e785 */
+}; 
 
 /* xfer_funcs[0] is special - its release function is never called */
 static struct loop_func_table *xfer_funcs[MAX_LO_CRYPT] = {
@@ -200,7 +199,7 @@ lo_do_transfer(struct loop_device *lo, int cmd,
 	int ret;
 
 	ret = lo->transfer(lo, cmd, rpage, roffs, lpage, loffs, size, rblock);
-	if (likely(!ret)) /*lint !e730 */
+	if (likely(!ret))
 		return 0;
 
 	printk_ratelimited(KERN_ERR
@@ -220,7 +219,7 @@ static int lo_write_bvec(struct file *file, struct bio_vec *bvec, loff_t *ppos)
 	bw = vfs_iter_write(file, &i, ppos);
 	file_end_write(file);
 
-	if (likely(bw ==  bvec->bv_len)) /*lint !e730 */
+	if (likely(bw ==  bvec->bv_len))
 		return 0;
 
 	printk_ratelimited(KERN_ERR
@@ -262,13 +261,13 @@ static int lo_write_transfer(struct loop_device *lo, struct request *rq,
 	int ret = 0;
 
 	page = alloc_page(GFP_NOIO);
-	if (unlikely(!page)) /*lint !e730 */
+	if (unlikely(!page))
 		return -ENOMEM;
 
 	rq_for_each_segment(bvec, rq, iter) {
 		ret = lo_do_transfer(lo, WRITE, page, 0, bvec.bv_page,
 			bvec.bv_offset, bvec.bv_len, pos >> 9);
-		if (unlikely(ret)) /*lint !e730 */
+		if (unlikely(ret))
 			break;
 
 		b.bv_page = page;
@@ -323,7 +322,7 @@ static int lo_read_transfer(struct loop_device *lo, struct request *rq,
 	int ret = 0;
 
 	page = alloc_page(GFP_NOIO);
-	if (unlikely(!page)) /*lint !e730 */
+	if (unlikely(!page))
 		return -ENOMEM;
 
 	rq_for_each_segment(bvec, rq, iter) {
