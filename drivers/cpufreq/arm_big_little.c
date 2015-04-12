@@ -413,7 +413,6 @@ static int _get_cluster_clk_and_freq_table(struct device *cpu_dev)
 		goto free_opp_table;
 	}
 
-<<<<<<< HEAD
 #ifdef CONFIG_HISI_BIG_MAXFREQ_HOTPLUG
 	/* only max freq of big cluster higher than THRESHOLD_FREQ
 	 * support hifreq hotplug
