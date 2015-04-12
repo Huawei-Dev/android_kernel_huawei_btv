@@ -290,8 +290,9 @@ static void alps_process_packet_v1_v2(struct psmouse *psmouse)
 		return;
 	}
 
-	/* Some models have separate stick button bits */
-	if (priv->flags & ALPS_STICK_BITS) {
+	/* Non interleaved V2 dualpoint has separate stick button bits */
+	if (priv->proto_version == ALPS_PROTO_V2 &&
+	    priv->flags == (ALPS_PASS | ALPS_DUALPOINT)) {
 		left |= packet[0] & 1;
 		right |= packet[0] & 2;
 		middle |= packet[0] & 4;
