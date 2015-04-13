@@ -1210,9 +1210,8 @@ static int igb_alloc_q_vector(struct igb_adapter *adapter,
 	} else if (size > ksize(q_vector)) {
 		kfree_rcu(q_vector, rcu);
 		q_vector = kzalloc(size, GFP_KERNEL);
-	} else {
+	else
 		memset(q_vector, 0, size);
-	}
 	if (!q_vector)
 		return -ENOMEM;
 
