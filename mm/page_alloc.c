@@ -1642,8 +1642,7 @@ static void steal_suitable_fallback(struct zone *zone, struct page *page,
  * fragmentation due to mixed migratetype pages in one pageblock.
  */
 int find_suitable_fallback(struct free_area *area, unsigned int order,
-			int migratetype, bool only_stealable, bool *can_steal,
-			gfp_t gfp_flags)
+			int migratetype, bool only_stealable, bool *can_steal)
 {
 	int i;
 	int fallback_mt;
@@ -1770,8 +1769,7 @@ static void unreserve_highatomic_pageblock(const struct alloc_context *ac)
 
 /* Remove an element from the buddy allocator from the fallback list */
 static inline struct page *
-__rmqueue_fallback(struct zone *zone, unsigned int order, int start_migratetype,
-		   gfp_t gfp_flags)
+__rmqueue_fallback(struct zone *zone, unsigned int order, int start_migratetype)
 {
 	struct free_area *area;
 	unsigned int current_order;
@@ -1785,7 +1783,7 @@ __rmqueue_fallback(struct zone *zone, unsigned int order, int start_migratetype,
 				--current_order) {
 		area = &(zone->free_area[current_order]);
 		fallback_mt = find_suitable_fallback(area, current_order,
-				start_migratetype, false, &can_steal, gfp_flags);
+				start_migratetype, false, &can_steal);
 		if (fallback_mt == -1)
 			continue;
 
