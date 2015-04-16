@@ -1624,7 +1624,7 @@ static int rtw_wx_set_enc(struct net_device *dev,
 		padapter->securitypriv.ndisencryptstatus = Ndis802_11EncryptionDisabled;
 		padapter->securitypriv.dot11PrivacyAlgrthm = _NO_PRIVACY_;
 		padapter->securitypriv.dot118021XGrpPrivacy = _NO_PRIVACY_;
-		padapter->securitypriv.dot11AuthAlgrthm = dot11AuthAlgrthm_Open; /* open system */
+		padapter->securitypriv.dot11AuthAlgrthm = dot11AuthAlgrthm_Open;
 		authmode = Ndis802_11AuthModeOpen;
 		padapter->securitypriv.ndisauthtype = authmode;
 
@@ -1663,7 +1663,7 @@ static int rtw_wx_set_enc(struct net_device *dev,
 		DBG_88E("rtw_wx_set_enc():erq->flags = 0x%x\n", erq->flags);
 
 		padapter->securitypriv.ndisencryptstatus = Ndis802_11Encryption1Enabled;/* Ndis802_11EncryptionDisabled; */
-		padapter->securitypriv.dot11AuthAlgrthm = dot11AuthAlgrthm_Open; /* open system */
+		padapter->securitypriv.dot11AuthAlgrthm = dot11AuthAlgrthm_Open;
 		padapter->securitypriv.dot11PrivacyAlgrthm = _NO_PRIVACY_;
 		padapter->securitypriv.dot118021XGrpPrivacy = _NO_PRIVACY_;
 		authmode = Ndis802_11AuthModeOpen;
@@ -1854,7 +1854,7 @@ static int rtw_wx_set_auth(struct net_device *dev,
 			padapter->securitypriv.ndisencryptstatus = Ndis802_11EncryptionDisabled;
 			padapter->securitypriv.dot11PrivacyAlgrthm = _NO_PRIVACY_;
 			padapter->securitypriv.dot118021XGrpPrivacy = _NO_PRIVACY_;
-			padapter->securitypriv.dot11AuthAlgrthm = dot11AuthAlgrthm_Open; /* open system */
+			padapter->securitypriv.dot11AuthAlgrthm = dot11AuthAlgrthm_Open;
 			padapter->securitypriv.ndisauthtype = Ndis802_11AuthModeOpen;
 		}
 
