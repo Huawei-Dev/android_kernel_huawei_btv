@@ -1836,7 +1836,9 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 
 				if (unlikely(IS_ERR(s))) {
 					err = PTR_ERR(s);
-					break;
+					current->link_count--;
+					nd->depth--;
+					return err;
 				}
 				err = 0;
 				if (likely(s)) {
