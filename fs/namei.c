@@ -1760,7 +1760,7 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 	while (*name=='/')
 		name++;
 	if (!*name)
-		return 0;
+		goto OK;
 
 	/* At this point we know we have a real path component. */
 	for(;;) {
@@ -1803,7 +1803,7 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 
 		name += hashlen_len(hash_len);
 		if (!*name)
-			return 0;
+			goto OK;
 		/*
 		 * If it wasn't NUL, we know it was '/'. Skip that
 		 * slash, and continue until no more slashes.
@@ -1812,12 +1812,12 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 			name++;
 		} while (unlikely(*name == '/'));
 		if (!*name)
-			return 0;
+			goto OK;
 
 		err = walk_component(nd, LOOKUP_FOLLOW);
 Walked:
 		if (err < 0)
-			return err;
+			goto Err;
 
 		if (err) {
 			struct path link;
@@ -1827,7 +1827,8 @@ Walked:
 			if (unlikely(current->link_count >= MAX_NESTED_LINKS)) {
 				path_put_conditional(&nd->link, nd);
 				path_put(&nd->path);
-				return -ELOOP;
+				err = -ELOOP;
+				goto Err;
 			}
 			BUG_ON(nd->depth >= MAX_NESTED_LINKS);
 
@@ -1841,7 +1842,7 @@ Walked:
 				err = PTR_ERR(s);
 				current->link_count--;
 				nd->depth--;
-				return err;
+				goto Err;
 			}
 			err = 0;
 			if (unlikely(!s)) {
@@ -1864,7 +1865,7 @@ Walked:
 					put_link(nd, &link, cookie);
 					current->link_count--;
 					nd->depth--;
-					return err;
+					goto Err;
 				} else {
 					err = walk_component(nd, LOOKUP_FOLLOW);
 					put_link(nd, &link, cookie);
@@ -1880,7 +1881,10 @@ Walked:
 		}
 	}
 	terminate_walk(nd);
+Err:
 	return err;
+OK:
+	return 0;
 }
 
 static int path_init(int dfd, const struct filename *name, unsigned int flags,
