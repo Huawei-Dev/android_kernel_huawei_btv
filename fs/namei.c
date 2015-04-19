@@ -915,9 +915,12 @@ out:
 
 static int follow_link(struct path *link, struct nameidata *nd, void **p)
 {
-	const char *s = get_link(link, nd, p);
-	int error;
-
+	const char *s;
+	int error = may_follow_link(link, nd);
+	if (unlikely(error))
+		return error;
+	nd->flags |= LOOKUP_PARENT;
+	s = get_link(link, nd, p);
 	if (unlikely(IS_ERR(s)))
 		return PTR_ERR(s);
 	if (unlikely(!s))
@@ -2047,10 +2050,6 @@ static int path_lookupat(int dfd, const struct filename *name,
 		while (err > 0) {
 			void *cookie;
 			struct path link = nd->link;
-			err = may_follow_link(&link, nd);
-			if (unlikely(err))
-				break;
-			nd->flags |= LOOKUP_PARENT;
 			err = follow_link(&link, nd, &cookie);
 			if (err)
 				break;
@@ -2414,10 +2413,6 @@ path_mountpoint(int dfd, const struct filename *name, struct path *path,
 	while (err > 0) {
 		void *cookie;
 		struct path link = *path;
-		err = may_follow_link(&link, nd);
-		if (unlikely(err))
-			break;
-		nd->flags |= LOOKUP_PARENT;
 		err = follow_link(&link, nd, &cookie);
 		if (err)
 			break;
@@ -3319,10 +3314,6 @@ static struct file *path_openat(int dfd, struct filename *pathname,
 	while (unlikely(error > 0)) { /* trailing symlink */
 		struct path link = nd->link;
 		void *cookie;
-		error = may_follow_link(&link, nd);
-		if (unlikely(error))
-			break;
-		nd->flags |= LOOKUP_PARENT;
 		nd->flags &= ~(LOOKUP_OPEN|LOOKUP_CREATE|LOOKUP_EXCL);
 		error = follow_link(&link, nd, &cookie);
 		if (unlikely(error))
