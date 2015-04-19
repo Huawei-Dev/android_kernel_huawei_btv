@@ -1815,6 +1815,7 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 			return 0;
 
 		err = walk_component(nd, LOOKUP_FOLLOW);
+Walked:
 		if (err < 0)
 			return err;
 
@@ -1833,7 +1834,6 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 			nd->depth++;
 			current->link_count++;
 
-loop:	/* will be gone very soon */
 			link = nd->link;
 			s = get_link(&link, nd, &cookie);
 
@@ -1870,13 +1870,7 @@ loop:	/* will be gone very soon */
 					put_link(nd, &link, cookie);
 					current->link_count--;
 					nd->depth--;
-					if (err < 0)
-						return err;
-					if (err > 0) {
-						current->link_count++;
-						nd->depth++;
-						goto loop;
-					}
+					goto Walked;
 				}
 			}
 		}
