@@ -648,6 +648,7 @@ struct usb_gadget {
 	unsigned			deactivated:1;
 	unsigned			connected:1;
 	bool				l1_supported;
+	bool                            remote_wakeup;
 #ifdef CONFIG_HISI_USB_CONFIGFS
 	unsigned			is_removing_driver;
 #endif
