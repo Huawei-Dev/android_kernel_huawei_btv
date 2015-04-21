@@ -1421,7 +1421,7 @@ static void vnt_bss_info_changed(struct ieee80211_hw *hw,
 
 	priv->current_aid = conf->aid;
 
-	if (changed & BSS_CHANGED_BSSID && conf->bssid) {
+	if (changed & BSS_CHANGED_BSSID) {
 		unsigned long flags;
 
 		spin_lock_irqsave(&priv->lock, flags);
