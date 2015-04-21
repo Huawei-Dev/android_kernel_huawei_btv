@@ -3149,13 +3149,13 @@ static int rt5645_i2c_probe(struct i2c_client *i2c,
 			RT5645_GP6_PIN_MASK, RT5645_GP6_PIN_DMIC2_SDA);
 		break;
 
-	case RT5645_DMIC_DATA_GPIO10:
-		regmap_update_bits(rt5645->regmap, RT5645_DMIC_CTRL1,
-			RT5645_DMIC_2_DP_MASK, RT5645_DMIC_2_DP_GPIO10);
-		regmap_update_bits(rt5645->regmap, RT5645_GPIO_CTRL1,
-			RT5645_GP10_PIN_MASK,
-			RT5645_GP10_PIN_DMIC2_SDA);
-		break;
+		case RT5645_DMIC_DATA_GPIO12:
+			regmap_update_bits(rt5645->regmap, RT5645_DMIC_CTRL1,
+				RT5645_DMIC_2_DP_MASK, RT5645_DMIC_2_DP_GPIO12);
+			regmap_update_bits(rt5645->regmap, RT5645_GPIO_CTRL1,
+				RT5645_GP12_PIN_MASK,
+				RT5645_GP12_PIN_DMIC2_SDA);
+			break;
 
 	case RT5645_DMIC_DATA_GPIO12:
 		regmap_update_bits(rt5645->regmap, RT5645_DMIC_CTRL1,
