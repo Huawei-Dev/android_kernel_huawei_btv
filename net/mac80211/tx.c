@@ -37,6 +37,16 @@
 
 /* misc utils */
 
+static inline void ieee80211_tx_stats(struct net_device *dev, u32 len)
+{
+	struct pcpu_sw_netstats *tstats = this_cpu_ptr(dev->tstats);
+
+	u64_stats_update_begin(&tstats->syncp);
+	tstats->tx_packets++;
+	tstats->tx_bytes += len;
+	u64_stats_update_end(&tstats->syncp);
+}
+
 static __le16 ieee80211_duration(struct ieee80211_tx_data *tx,
 				 struct sk_buff *skb, int group_addr,
 				 int next_frag_len)
@@ -2724,8 +2734,7 @@ static bool ieee80211_xmit_fast(struct ieee80211_sub_if_data *sdata,
 			return true;
 	}
 
-	dev->stats.tx_packets++;
-	dev->stats.tx_bytes += skb->len + extra_head;
+	ieee80211_tx_stats(dev, skb->len + extra_head);
 
 	/* will not be crypto-handled beyond what we do here, so use false
 	 * as the may-encrypt argument for the resize to not account for
@@ -2906,8 +2915,7 @@ void __ieee80211_subif_start_xmit(struct sk_buff *skb,
 		if (IS_ERR(skb))
 			goto out;
 
-		dev->stats.tx_packets++;
-		dev->stats.tx_bytes += skb->len;
+		ieee80211_tx_stats(dev, skb->len);
 
 		ieee80211_xmit(sdata, sta, skb);
 	}
