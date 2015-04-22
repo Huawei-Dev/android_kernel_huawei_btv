@@ -1067,7 +1067,7 @@ ieee80211_rx_h_check_dup(struct ieee80211_rx_data *rx)
 		if (unlikely(ieee80211_has_retry(hdr->frame_control) &&
 			     rx->sta->last_seq_ctrl[rx->seqno_idx] ==
 			     hdr->seq_ctrl)) {
-			rx->local->dot11FrameDuplicateCount++;
+			I802_DEBUG_INC(rx->local->dot11FrameDuplicateCount);
 			rx->sta->num_duplicates++;
 			return RX_DROP_UNUSABLE;
 		} else if (!(status->flag & RX_FLAG_AMSDU_MORE)) {
@@ -1775,7 +1775,7 @@ ieee80211_rx_h_defragment(struct ieee80211_rx_data *rx)
 	frag = sc & IEEE80211_SCTL_FRAG;
 
 	if (is_multicast_ether_addr(hdr->addr1)) {
-		rx->local->dot11MulticastReceivedFrameCount++;
+		I802_DEBUG_INC(rx->local->dot11MulticastReceivedFrameCount);
 		goto out_no_led;
 	}
 
@@ -3399,7 +3399,7 @@ static void __ieee80211_rx_handle_packet(struct ieee80211_hw *hw,
 	rx.local = local;
 
 	if (ieee80211_is_data(fc) || ieee80211_is_mgmt(fc))
-		local->dot11ReceivedFragmentCount++;
+		I802_DEBUG_INC(local->dot11ReceivedFragmentCount);
 
 	if (ieee80211_is_mgmt(fc)) {
 		/* drop frame if too short for header */
