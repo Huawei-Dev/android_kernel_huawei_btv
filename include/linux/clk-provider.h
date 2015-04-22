@@ -55,6 +55,7 @@ struct clk_core {
 	struct clk_core		*new_parent;
 	struct clk_core		*new_child;
 	unsigned long		flags;
+	bool			orphan;
 	unsigned int		enable_count;
 	unsigned int		prepare_count;
 	unsigned long		min_rate;
