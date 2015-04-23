@@ -234,16 +234,6 @@ static inline short int atomic_inc_short(short int *v)
 	return *v;
 }
 
-/* These are x86-specific, used by some header files */
-#define atomic_clear_mask(mask, addr)				\
-	asm volatile(LOCK_PREFIX "andl %0,%1"			\
-		     : : "r" (~(mask)), "m" (*(addr)) : "memory")
-
-#define atomic_set_mask(mask, addr)				\
-	asm volatile(LOCK_PREFIX "orl %0,%1"			\
-		     : : "r" ((unsigned)(mask)), "m" (*(addr))	\
-		     : "memory")
-
 #ifdef CONFIG_X86_32
 # include <asm/atomic64_32.h>
 #else

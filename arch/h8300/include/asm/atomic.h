@@ -110,40 +110,4 @@ static inline int __atomic_add_unless(atomic_t *v, int a, int u)
 	return ret;
 }
 
-static inline void atomic_clear_mask(unsigned long mask, unsigned long *v)
-{
-	unsigned char ccr;
-	unsigned long tmp;
-
-	__asm__ __volatile__("stc ccr,%w3\n\t"
-			     "orc #0x80,ccr\n\t"
-			     "mov.l %0,%1\n\t"
-			     "and.l %2,%1\n\t"
-			     "mov.l %1,%0\n\t"
-			     "ldc %w3,ccr"
-			     : "=m"(*v), "=r"(tmp)
-			     : "g"(~(mask)), "r"(ccr));
-}
-
-static inline void atomic_set_mask(unsigned long mask, unsigned long *v)
-{
-	unsigned char ccr;
-	unsigned long tmp;
-
-	__asm__ __volatile__("stc ccr,%w3\n\t"
-			     "orc #0x80,ccr\n\t"
-			     "mov.l %0,%1\n\t"
-			     "or.l %2,%1\n\t"
-			     "mov.l %1,%0\n\t"
-			     "ldc %w3,ccr"
-			     : "=m"(*v), "=r"(tmp)
-			     : "g"(~(mask)), "r"(ccr));
-}
-
-/* Atomic operations are already serializing */
-#define smp_mb__before_atomic_dec()    barrier()
-#define smp_mb__after_atomic_dec() barrier()
-#define smp_mb__before_atomic_inc()    barrier()
-#define smp_mb__after_atomic_inc() barrier()
-
 #endif /* __ARCH_H8300_ATOMIC __ */

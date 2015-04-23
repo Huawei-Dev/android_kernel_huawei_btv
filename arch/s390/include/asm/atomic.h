@@ -118,15 +118,17 @@ static inline void atomic_add(int i, atomic_t *v)
 #define atomic_dec_return(_v)		atomic_sub_return(1, _v)
 #define atomic_dec_and_test(_v)		(atomic_sub_return(1, _v) == 0)
 
-static inline void atomic_clear_mask(unsigned int mask, atomic_t *v)
-{
-	__ATOMIC_LOOP(v, ~mask, __ATOMIC_AND, __ATOMIC_NO_BARRIER);
+#define ATOMIC_OP(op, OP)						\
+static inline void atomic_##op(int i, atomic_t *v)			\
+{									\
+	__ATOMIC_LOOP(v, i, __ATOMIC_##OP, __ATOMIC_NO_BARRIER);	\
 }
 
-static inline void atomic_set_mask(unsigned int mask, atomic_t *v)
-{
-	__ATOMIC_LOOP(v, mask, __ATOMIC_OR, __ATOMIC_NO_BARRIER);
-}
+ATOMIC_OP(and, AND)
+ATOMIC_OP(or, OR)
+ATOMIC_OP(xor, XOR)
+
+#undef ATOMIC_OP
 
 #define atomic_xchg(v, new) (xchg(&((v)->counter), new))
 
