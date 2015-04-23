@@ -18,9 +18,7 @@
 #include <linux/platform_device.h>
 #include <linux/spi/spi.h>
 #include <linux/gpio.h>
-#include <linux/gpio/consumer.h>
 #include <linux/acpi.h>
-#include <linux/dmi.h>
 #include <sound/core.h>
 #include <sound/pcm.h>
 #include <sound/pcm_params.h>
@@ -3030,32 +3028,6 @@ static struct acpi_device_id rt5645_acpi_match[] = {
 };
 MODULE_DEVICE_TABLE(acpi, rt5645_acpi_match);
 #endif
-
-static struct rt5645_platform_data *rt5645_pdata;
-
-static struct rt5645_platform_data strago_platform_data = {
-	.dmic1_data_pin = RT5645_DMIC1_DISABLE,
-	.dmic2_data_pin = RT5645_DMIC_DATA_IN2P,
-	.jd_mode = 3,
-};
-
-static int strago_quirk_cb(const struct dmi_system_id *id)
-{
-	rt5645_pdata = &strago_platform_data;
-
-	return 1;
-}
-
-static struct dmi_system_id dmi_platform_intel_braswell[] __initdata = {
-	{
-		.ident = "Intel Strago",
-		.callback = strago_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_PRODUCT_NAME, "Strago"),
-		},
-	},
-	{ }
-};
 
 static int rt5645_i2c_probe(struct i2c_client *i2c,
 		    const struct i2c_device_id *id)
