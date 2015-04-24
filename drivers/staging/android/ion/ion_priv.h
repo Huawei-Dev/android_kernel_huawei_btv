@@ -42,7 +42,7 @@ struct ion_iommu_map {
 
 /**
  * struct ion_buffer - metadata for a particular buffer
- * @ref:		refernce count
+ * @ref:		reference count
  * @node:		node in the ion_device buffers tree
  * @dev:		back pointer to the ion_device
  * @heap:		back pointer to the heap the buffer came from
@@ -55,7 +55,7 @@ struct ion_iommu_map {
  *			an ion_phys_addr_t (and someday a phys_addr_t)
  * @lock:		protects the buffers cnt fields
  * @kmap_cnt:		number of times the buffer is mapped to the kernel
- * @vaddr:		the kenrel mapping if kmap_cnt is not zero
+ * @vaddr:		the kernel mapping if kmap_cnt is not zero
  * @dmap_cnt:		number of times the buffer is mapped for dma
  * @sg_table:		the sg table for the buffer if dmap_cnt is not zero
  * @pages:		flat array of pages in the buffer -- used by fault
@@ -287,7 +287,7 @@ void ion_heap_freelist_add(struct ion_heap *heap, struct ion_buffer *buffer);
 /**
  * ion_heap_freelist_drain - drain the deferred free list
  * @heap:		the heap
- * @size:		ammount of memory to drain in bytes
+ * @size:		amount of memory to drain in bytes
  *
  * Drains the indicated amount of memory from the deferred freelist immediately.
  * Returns the total amount freed.  The total freed may be higher depending

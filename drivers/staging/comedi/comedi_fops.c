@@ -1725,7 +1725,7 @@ cleanup:
 
 /*
  * COMEDI_CMDTEST ioctl
- * asynchronous aquisition command testing
+ * asynchronous acquisition command testing
  *
  * arg:
  *	pointer to comedi_cmd structure
