@@ -173,6 +173,12 @@ static inline bool vhost_has_feature(struct vhost_virtqueue *vq, int bit)
 	return vq->acked_features & (1ULL << bit);
 }
 
+static inline bool vhost_is_little_endian(struct vhost_virtqueue *vq)
+{
+	return vhost_has_feature(vq, VIRTIO_F_VERSION_1) ||
+		virtio_legacy_is_little_endian();
+}
+
 /* Memory accessors */
 static inline u16 vhost16_to_cpu(struct vhost_virtqueue *vq, __virtio16 val)
 {
