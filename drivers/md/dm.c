@@ -1074,10 +1074,12 @@ static void rq_completed(struct mapped_device *md, int rw, bool run_queue)
 	dm_put(md);
 }
 
-static void free_rq_clone(struct request *clone)
+static void free_rq_clone(struct request *clone, bool must_be_mapped)
 {
 	struct dm_rq_target_io *tio = clone->end_io_data;
 	struct mapped_device *md = tio->md;
+
+	WARN_ON_ONCE(must_be_mapped && !clone->q);
 
 	blk_rq_unprep_clone(clone);
 
@@ -1122,7 +1124,7 @@ static void dm_end_request(struct request *clone, int error)
 			rq->sense_len = clone->sense_len;
 	}
 
-	free_rq_clone(clone);
+	free_rq_clone(clone, true);
 	if (!rq->q->mq_ops)
 		blk_end_request_all(rq, error);
 	else
@@ -1141,9 +1143,7 @@ static void dm_unprep_request(struct request *rq)
 	}
 
 	if (clone)
-		free_rq_clone(clone);
-	else if (!tio->md->queue->mq_ops)
-		free_rq_tio(tio);
+		free_rq_clone(clone, false);
 }
 
 /*
