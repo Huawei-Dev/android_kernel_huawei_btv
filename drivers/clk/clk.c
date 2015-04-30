@@ -2596,14 +2596,12 @@ struct clk *clk_register(struct device *dev, struct clk_hw *hw)
 
 	core = kzalloc(sizeof(*core), GFP_KERNEL);
 	if (!core) {
-		pr_err("%s: could not allocate clk\n", __func__);
 		ret = -ENOMEM;
 		goto fail_out;
 	}
 
 	core->name = kstrdup_const(hw->init->name, GFP_KERNEL);
 	if (!core->name) {
-		pr_err("%s: could not allocate clk->name\n", __func__);
 		ret = -ENOMEM;
 		goto fail_name;
 	}
@@ -2620,7 +2618,6 @@ struct clk *clk_register(struct device *dev, struct clk_hw *hw)
 					GFP_KERNEL);
 
 	if (!core->parent_names) {
-		pr_err("%s: could not allocate clk->parent_names\n", __func__);
 		ret = -ENOMEM;
 		goto fail_parent_names;
 	}
@@ -2631,7 +2628,6 @@ struct clk *clk_register(struct device *dev, struct clk_hw *hw)
 		core->parent_names[i] = kstrdup_const(hw->init->parent_names[i],
 						GFP_KERNEL);
 		if (!core->parent_names[i]) {
-			pr_err("%s: could not copy parent_names\n", __func__);
 			ret = -ENOMEM;
 			goto fail_parent_names_copy;
 		}
@@ -2641,7 +2637,6 @@ struct clk *clk_register(struct device *dev, struct clk_hw *hw)
 
 	hw->clk = __clk_create_clk(hw, NULL, NULL);
 	if (IS_ERR(hw->clk)) {
-		pr_err("%s: could not allocate per-user clk\n", __func__);
 		ret = PTR_ERR(hw->clk);
 		goto fail_parent_names_copy;
 	}
