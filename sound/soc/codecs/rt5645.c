@@ -2502,6 +2502,126 @@ static irqreturn_t rt5645_irq(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
+static int rt5645_button_detect(struct snd_soc_codec *codec)
+{
+	int btn_type, val;
+
+	val = snd_soc_read(codec, RT5650_4BTN_IL_CMD1);
+	pr_debug("val=0x%x\n", val);
+	btn_type = val & 0xfff0;
+	snd_soc_write(codec, RT5650_4BTN_IL_CMD1, val);
+
+	return btn_type;
+}
+
+static int rt5645_irq_detection(struct rt5645_priv *rt5645)
+{
+	int val, btn_type, gpio_state = 0, report = 0;
+
+	switch (rt5645->pdata.jd_mode) {
+	case 0: /* Not using rt5645 JD */
+		if (gpio_is_valid(rt5645->pdata.hp_det_gpio)) {
+			gpio_state = gpio_get_value(rt5645->pdata.hp_det_gpio);
+			dev_dbg(rt5645->codec->dev, "gpio = %d(%d)\n",
+				rt5645->pdata.hp_det_gpio, gpio_state);
+		}
+		if ((rt5645->pdata.gpio_hp_det_active_high && gpio_state) ||
+			(!rt5645->pdata.gpio_hp_det_active_high &&
+			 !gpio_state)) {
+			report = rt5645_jack_detect(rt5645->codec, 1);
+		} else {
+			report = rt5645_jack_detect(rt5645->codec, 0);
+		}
+		snd_soc_jack_report(rt5645->hp_jack,
+				    report, SND_JACK_HEADPHONE);
+		snd_soc_jack_report(rt5645->mic_jack,
+				    report, SND_JACK_MICROPHONE);
+		return report;
+	case 1: /* 2 port */
+		val = snd_soc_read(rt5645->codec, RT5645_A_JD_CTRL1) & 0x0070;
+		break;
+	default: /* 1 port */
+		val = snd_soc_read(rt5645->codec, RT5645_A_JD_CTRL1) & 0x0020;
+		break;
+
+	}
+
+	switch (val) {
+	/* jack in */
+	case 0x30: /* 2 port */
+	case 0x0: /* 1 port or 2 port */
+		if (rt5645->jack_type == 0) {
+			report = rt5645_jack_detect(rt5645->codec, 1);
+			/* for push button and jack out */
+			break;
+		}
+		btn_type = 0;
+		if (snd_soc_read(rt5645->codec, RT5645_INT_IRQ_ST) & 0x4) {
+			/* button pressed */
+			report = SND_JACK_HEADSET;
+			btn_type = rt5645_button_detect(rt5645->codec);
+			/* rt5650 can report three kinds of button behavior,
+			   one click, double click and hold. However,
+			   currently we will report button pressed/released
+			   event. So all the three button behaviors are
+			   treated as button pressed. */
+			switch (btn_type) {
+			case 0x8000:
+			case 0x4000:
+			case 0x2000:
+				report |= SND_JACK_BTN_0;
+				break;
+			case 0x1000:
+			case 0x0800:
+			case 0x0400:
+				report |= SND_JACK_BTN_1;
+				break;
+			case 0x0200:
+			case 0x0100:
+			case 0x0080:
+				report |= SND_JACK_BTN_2;
+				break;
+			case 0x0040:
+			case 0x0020:
+			case 0x0010:
+				report |= SND_JACK_BTN_3;
+				break;
+			case 0x0000: /* unpressed */
+				break;
+			default:
+				dev_err(rt5645->codec->dev,
+					"Unexpected button code 0x%04x\n",
+					btn_type);
+				break;
+			}
+		}
+		if (btn_type == 0)/* button release */
+			report =  rt5645->jack_type;
+
+		break;
+	/* jack out */
+	case 0x70: /* 2 port */
+	case 0x10: /* 2 port */
+	case 0x20: /* 1 port */
+		report = 0;
+		snd_soc_update_bits(rt5645->codec,
+				    RT5645_INT_IRQ_ST, 0x1, 0x0);
+		rt5645_jack_detect(rt5645->codec, 0);
+		break;
+	default:
+		break;
+	}
+
+	snd_soc_jack_report(rt5645->hp_jack, report, SND_JACK_HEADPHONE);
+	snd_soc_jack_report(rt5645->mic_jack, report, SND_JACK_MICROPHONE);
+	if (rt5645->en_button_func)
+		snd_soc_jack_report(rt5645->btn_jack,
+			report, SND_JACK_BTN_0 | SND_JACK_BTN_1 |
+				SND_JACK_BTN_2 | SND_JACK_BTN_3);
+
+	return report;
+}
+
 static int rt5645_probe(struct snd_soc_codec *codec)
 {
 	struct rt5645_priv *rt5645 = snd_soc_codec_get_drvdata(codec);
