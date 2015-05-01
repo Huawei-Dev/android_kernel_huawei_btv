@@ -23,8 +23,7 @@
 #include <linux/rcupdate.h>
 #include <linux/percpu-refcount.h>
 #include <linux/wbt.h>
-
-#include <asm/scatterlist.h>
+#include <linux/scatterlist.h>
 
 struct module;
 struct scsi_ioctl_command;
