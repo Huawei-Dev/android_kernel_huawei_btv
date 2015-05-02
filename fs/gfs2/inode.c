@@ -1721,7 +1721,7 @@ static int gfs2_rename2(struct inode *odir, struct dentry *odentry,
  * Returns: 0 on success or error code
  */
 
-static const char *gfs2_follow_link(struct dentry *dentry, void **cookie, struct nameidata *nd)
+static const char *gfs2_follow_link(struct dentry *dentry, void **cookie)
 {
 	struct gfs2_inode *ip = GFS2_I(d_inode(dentry));
 	struct gfs2_holder i_gh;

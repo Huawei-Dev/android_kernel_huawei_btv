@@ -1647,7 +1647,7 @@ struct file_operations {
 
 struct inode_operations {
 	struct dentry * (*lookup) (struct inode *,struct dentry *, unsigned int);
-	const char * (*follow_link) (struct dentry *, void **, struct nameidata *);
+	const char * (*follow_link) (struct dentry *, void **);
 	int (*permission) (struct inode *, int);
 	int (*permission2) (struct vfsmount *, struct inode *, int);
 	struct posix_acl * (*get_acl)(struct inode *, int);
@@ -2752,7 +2752,7 @@ extern const struct file_operations generic_ro_fops;
 
 extern int readlink_copy(char __user *, int, const char *);
 extern int page_readlink(struct dentry *, char __user *, int);
-extern const char *page_follow_link_light(struct dentry *, void **, struct nameidata *);
+extern const char *page_follow_link_light(struct dentry *, void **);
 extern void page_put_link(struct dentry *, void *);
 extern int __page_symlink(struct inode *inode, const char *symname, int len,
 		int nofs);
@@ -2769,7 +2769,7 @@ void __inode_sub_bytes(struct inode *inode, loff_t bytes);
 void inode_sub_bytes(struct inode *inode, loff_t bytes);
 loff_t inode_get_bytes(struct inode *inode);
 void inode_set_bytes(struct inode *inode, loff_t bytes);
-const char *simple_follow_link(struct dentry *, void **, struct nameidata *);
+const char *simple_follow_link(struct dentry *, void **);
 extern const struct inode_operations simple_symlink_inode_operations;
 
 extern int iterate_dir(struct file *, struct dir_context *);

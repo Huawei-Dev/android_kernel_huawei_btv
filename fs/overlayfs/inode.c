@@ -177,7 +177,7 @@ struct ovl_link_data {
 	void *cookie;
 };
 
-static const char *ovl_follow_link(struct dentry *dentry, void **cookie, struct nameidata *nd)
+static const char *ovl_follow_link(struct dentry *dentry, void **cookie)
 {
 	struct dentry *realdentry;
 	struct inode *realinode;
@@ -197,7 +197,7 @@ static const char *ovl_follow_link(struct dentry *dentry, void **cookie, struct 
 		data->realdentry = realdentry;
 	}
 
-	ret = realinode->i_op->follow_link(realdentry, cookie, nd);
+	ret = realinode->i_op->follow_link(realdentry, cookie);
 	if (IS_ERR_OR_NULL(ret)) {
 		kfree(data);
 		return ret;
