@@ -517,7 +517,6 @@ struct nameidata {
 	int		last_type;
 	unsigned	depth;
 	struct file	*base;
-	char *saved_names[MAX_NESTED_LINKS + 1];
 };
 
 /**
@@ -746,23 +745,11 @@ void nd_jump_link(struct nameidata *nd, struct path *path)
 	nd->flags |= LOOKUP_JUMPED;
 }
 
-void nd_set_link(struct nameidata *nd, char *path)
-{
-	nd->saved_names[nd->depth] = path;
-}
-EXPORT_SYMBOL(nd_set_link);
-
-char *nd_get_link(struct nameidata *nd)
-{
-	return nd->saved_names[nd->depth];
-}
-EXPORT_SYMBOL(nd_get_link);
-
 static inline void put_link(struct nameidata *nd, struct path *link, void *cookie)
 {
 	struct inode *inode = link->dentry->d_inode;
-	if (inode->i_op->put_link)
-		inode->i_op->put_link(link->dentry, nd, cookie);
+	if (cookie && inode->i_op->put_link)
+		inode->i_op->put_link(link->dentry, cookie);
 	path_put(link);
 }
 
@@ -887,7 +874,7 @@ follow_link(struct path *link, struct nameidata *nd, void **p)
 {
 	struct dentry *dentry = link->dentry;
 	int error;
-	char *s;
+	const char *s;
 
 	BUG_ON(nd->flags & LOOKUP_RCU);
 
@@ -902,26 +889,20 @@ follow_link(struct path *link, struct nameidata *nd, void **p)
 	current->total_link_count++;
 
 	touch_atime(link);
-	nd_set_link(nd, NULL);
 
 	error = security_inode_follow_link(dentry);
 	if (error)
 		goto out_put_nd_path;
 
 	nd->last_type = LAST_BIND;
-	*p = dentry->d_inode->i_op->follow_link(dentry, nd);
-	error = PTR_ERR(*p);
-	if (IS_ERR(*p))
+	*p = NULL;
+	s = dentry->d_inode->i_op->follow_link(dentry, p, nd);
+	error = PTR_ERR(s);
+	if (IS_ERR(s))
 		goto out_put_nd_path;
 
 	error = 0;
-	s = nd_get_link(nd);
 	if (s) {
-		if (unlikely(IS_ERR(s))) {
-			path_put(&nd->path);
-			put_link(nd, link, *p);
-			return PTR_ERR(s);
-		}
 		if (*s == '/') {
 			if (!nd->root.mnt)
 				set_root(nd);
@@ -939,7 +920,6 @@ follow_link(struct path *link, struct nameidata *nd, void **p)
 	return error;
 
 out_put_nd_path:
-	*p = NULL;
 	path_put(&nd->path);
 	path_put(link);
 	return error;
@@ -4559,18 +4539,15 @@ EXPORT_SYMBOL(readlink_copy);
  */
 int generic_readlink(struct dentry *dentry, char __user *buffer, int buflen)
 {
-	struct nameidata nd;
 	void *cookie;
+	const char *link = dentry->d_inode->i_op->follow_link(dentry, &cookie, NULL);
 	int res;
 
-	nd.depth = 0;
-	cookie = dentry->d_inode->i_op->follow_link(dentry, &nd);
-	if (IS_ERR(cookie))
-		return PTR_ERR(cookie);
-
-	res = readlink_copy(buffer, buflen, nd_get_link(&nd));
-	if (dentry->d_inode->i_op->put_link)
-		dentry->d_inode->i_op->put_link(dentry, &nd, cookie);
+	if (IS_ERR(link))
+		return PTR_ERR(link);
+	res = readlink_copy(buffer, buflen, link);
+	if (cookie && dentry->d_inode->i_op->put_link)
+		dentry->d_inode->i_op->put_link(dentry, cookie);
 	return res;
 }
 EXPORT_SYMBOL(generic_readlink);
@@ -4602,22 +4579,21 @@ int page_readlink(struct dentry *dentry, char __user *buffer, int buflen)
 }
 EXPORT_SYMBOL(page_readlink);
 
-void *page_follow_link_light(struct dentry *dentry, struct nameidata *nd)
+const char *page_follow_link_light(struct dentry *dentry, void **cookie, struct nameidata *nd)
 {
 	struct page *page = NULL;
-	nd_set_link(nd, page_getlink(dentry, &page));
-	return page;
+	char *res = page_getlink(dentry, &page);
+	if (!IS_ERR(res))
+		*cookie = page;
+	return res;
 }
 EXPORT_SYMBOL(page_follow_link_light);
 
-void page_put_link(struct dentry *dentry, struct nameidata *nd, void *cookie)
+void page_put_link(struct dentry *dentry, void *cookie)
 {
 	struct page *page = cookie;
-
-	if (page) {
-		kunmap(page);
-		page_cache_release(page);
-	}
+	kunmap(page);
+	page_cache_release(page);
 }
 EXPORT_SYMBOL(page_put_link);
 
