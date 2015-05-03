@@ -125,6 +125,14 @@ static struct nf_bridge_info *nf_bridge_info_get(const struct sk_buff *skb)
 	return skb->nf_bridge;
 }
 
+static void nf_bridge_info_free(struct sk_buff *skb)
+{
+	if (skb->nf_bridge) {
+		nf_bridge_put(skb->nf_bridge);
+		skb->nf_bridge = NULL;
+	}
+}
+
 static inline struct rtable *bridge_parent_rtable(const struct net_device *dev)
 {
 	struct net_bridge_port *port;
@@ -832,6 +840,7 @@ static int br_nf_push_frag_xmit(struct sock *sk, struct sk_buff *skb)
 	skb_copy_to_linear_data_offset(skb, -data->size, data->mac, data->size);
 	__skb_push(skb, data->encap_size);
 
+	nf_bridge_info_free(skb);
 	return br_dev_queue_push_xmit(sk, skb);
 }
 
@@ -841,8 +850,10 @@ static int br_nf_dev_queue_xmit(struct sock *sk, struct sk_buff *skb)
 	int frag_max_size;
 	unsigned int mtu_reserved;
 
-	if (skb_is_gso(skb) || skb->protocol != htons(ETH_P_IP))
+	if (skb_is_gso(skb) || skb->protocol != htons(ETH_P_IP)) {
+		nf_bridge_info_free(skb);
 		return br_dev_queue_push_xmit(sk, skb);
+	}
 
 	mtu_reserved = nf_bridge_mtu_reduction(skb);
 	/* This is wrong! We should preserve the original fragment
@@ -868,6 +879,7 @@ static int br_nf_dev_queue_xmit(struct sock *sk, struct sk_buff *skb)
 
 		ret = ip_fragment(sk, skb, br_nf_push_frag_xmit);
 	} else {
+		nf_bridge_info_free(skb);
 		ret = br_dev_queue_push_xmit(sk, skb);
 	}
 
@@ -876,7 +888,8 @@ static int br_nf_dev_queue_xmit(struct sock *sk, struct sk_buff *skb)
 #else
 static int br_nf_dev_queue_xmit(struct sock *sk, struct sk_buff *skb)
 {
-        return br_dev_queue_push_xmit(sk, skb);
+	nf_bridge_info_free(skb);
+	return br_dev_queue_push_xmit(sk, skb);
 }
 #endif
 
