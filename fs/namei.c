@@ -1876,8 +1876,6 @@ Walked:
 				break;
 			}
 
-			nd->depth++;
-			nd->depth--;
 			s = get_link(nd);
 			nd->depth++;
 
@@ -1891,8 +1889,6 @@ Walked:
 				/* jumped */
 				nd->depth--;
 				put_link(nd);
-				nd->depth++;
-				nd->depth--;
 			} else {
 				if (*s == '/') {
 					if (!nd->root.mnt)
@@ -1922,8 +1918,6 @@ Err:
 	while (unlikely(nd->depth > 1)) {
 		nd->depth--;
 		put_link(nd);
-		nd->depth++;
-		nd->depth--;
 	}
 	nd->depth--;
 	return err;
@@ -1933,8 +1927,6 @@ OK:
 		err = walk_component(nd, LOOKUP_FOLLOW);
 		nd->depth--;
 		put_link(nd);
-		nd->depth++;
-		nd->depth--;
 		goto Walked;
 	}
 	nd->depth--;
