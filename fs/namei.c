@@ -925,7 +925,6 @@ const char *get_link(struct nameidata *nd)
 		mntget(nd->link.mnt);
 
 	if (unlikely(current->total_link_count >= MAXSYMLINKS)) {
-		path_put(&nd->path);
 		path_put(&nd->link);
 		return ERR_PTR(-ELOOP);
 	}
@@ -949,7 +948,6 @@ const char *get_link(struct nameidata *nd)
 		res = inode->i_op->follow_link(dentry, &last->cookie, nd);
 		if (IS_ERR(res)) {
 out:
-			path_put(&nd->path);
 			path_put(&last->link);
 			return res;
 		}
@@ -1871,7 +1869,7 @@ Walked:
 
 			if (unlikely(IS_ERR(s))) {
 				err = PTR_ERR(s);
-				goto Err;
+				break;
 			}
 			err = 0;
 			if (unlikely(!s)) {
@@ -1902,7 +1900,6 @@ Walked:
 		}
 	}
 	terminate_walk(nd);
-Err:
 	while (unlikely(nd->depth))
 		put_link(nd);
 	return err;
@@ -2039,8 +2036,10 @@ static int trailing_symlink(struct nameidata *nd)
 		return error;
 	nd->flags |= LOOKUP_PARENT;
 	s = get_link(nd);
-	if (unlikely(IS_ERR(s)))
+	if (unlikely(IS_ERR(s))) {
+		terminate_walk(nd);
 		return PTR_ERR(s);
+	}
 	if (unlikely(!s))
 		return 0;
 	if (*s == '/') {
