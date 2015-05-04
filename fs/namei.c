@@ -1807,7 +1807,6 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 	if (!*name)
 		return 0;
 
-	nd->depth++;
 	/* At this point we know we have a real path component. */
 	for(;;) {
 		u64 hash_len;
@@ -1917,7 +1916,6 @@ Err:
 		nd->depth--;
 		put_link(nd);
 	}
-	nd->depth--;
 	return err;
 OK:
 	if (unlikely(nd->depth > 1)) {
@@ -1927,7 +1925,6 @@ OK:
 		put_link(nd);
 		goto Walked;
 	}
-	nd->depth--;
 	return 0;
 }
 
@@ -2031,7 +2028,10 @@ static int path_init(int dfd, const struct filename *name, unsigned int flags,
 	return -ECHILD;
 done:
 	current->total_link_count = 0;
-	return link_path_walk(s, nd);
+	nd->depth++;
+	retval = link_path_walk(s, nd);
+	nd->depth--;
+	return retval;
 }
 
 static void path_cleanup(struct nameidata *nd)
@@ -2065,7 +2065,9 @@ static int trailing_symlink(struct nameidata *nd)
 		nd->flags |= LOOKUP_JUMPED;
 	}
 	nd->inode = nd->path.dentry->d_inode;
+	nd->depth++;
 	error = link_path_walk(s, nd);
+	nd->depth--;
 	if (unlikely(error))
 		put_link(nd);
 	return error;
