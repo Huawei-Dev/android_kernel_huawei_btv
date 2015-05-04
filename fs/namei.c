@@ -951,8 +951,10 @@ const char *get_link(struct nameidata *nd)
 out:
 			path_put(&nd->path);
 			path_put(&last->link);
+			return res;
 		}
 	}
+	nd->depth++;
 	return res;
 }
 
@@ -1874,11 +1876,9 @@ Walked:
 			}
 
 			s = get_link(nd);
-			nd->depth++;
 
 			if (unlikely(IS_ERR(s))) {
 				err = PTR_ERR(s);
-				nd->depth--;
 				goto Err;
 			}
 			err = 0;
@@ -2054,7 +2054,6 @@ static int trailing_symlink(struct nameidata *nd)
 	s = get_link(nd);
 	if (unlikely(IS_ERR(s)))
 		return PTR_ERR(s);
-	nd->depth++;
 	if (unlikely(!s)) {
 		nd->depth--;
 		return 0;
