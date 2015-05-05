@@ -86,8 +86,6 @@ static DEFINE_MUTEX(loop_index_mutex); /*lint !e651 !e708 !e570 !e64 !e785 */
 static int max_part;
 static int part_shift;
 
-static struct workqueue_struct *loop_wq;
-
 static int transfer_xor(struct loop_device *lo, int cmd,
 			struct page *raw_page, unsigned raw_off,
 			struct page *loop_page, unsigned loop_off,
@@ -728,6 +726,12 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
 	error = -EFBIG;
 	size = get_loop_size(lo, file);
 	if ((loff_t)(sector_t)size != size)
+		goto out_putf;
+	error = -ENOMEM;
+	lo->wq = alloc_workqueue("kloopd%d",
+			WQ_MEM_RECLAIM | WQ_HIGHPRI | WQ_UNBOUND, 0,
+			lo->lo_number);
+	if (!lo->wq)
 		goto out_putf;
 
 	error = -ENOMEM;
