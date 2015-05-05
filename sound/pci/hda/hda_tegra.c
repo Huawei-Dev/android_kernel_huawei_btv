@@ -435,6 +435,10 @@ static int hda_tegra_create(struct snd_card *card,
 	chip->single_cmd = false;
 	chip->snoop = true;
 
+	err = azx_bus_init(chip, NULL, &hda_tegra_io_ops);
+	if (err < 0)
+		return err;
+
 	err = snd_device_new(card, SNDRV_DEV_LOWLEVEL, chip, &ops);
 	if (err < 0) {
 		dev_err(card->dev, "Error creating device\n");
@@ -471,7 +475,7 @@ static int hda_tegra_probe(struct platform_device *pdev)
 		return err;
 	}
 
-	err = hda_tegra_create(card, driver_flags, &hda_tegra_ops, hda);
+	err = hda_tegra_create(card, driver_flags, hda);
 	if (err < 0)
 		goto out_free;
 	card->private_data = chip;
