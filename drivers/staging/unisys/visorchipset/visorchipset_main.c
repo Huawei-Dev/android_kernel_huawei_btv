@@ -525,12 +525,7 @@ bus_info_clear(void *v)
 	struct visorchipset_bus_info *p = (struct visorchipset_bus_info *) v;
 
 	kfree(p->name);
-	p->name = NULL;
-
 	kfree(p->description);
-	p->description = NULL;
-
-	p->state.created = 0;
 	memset(p, 0, sizeof(struct visorchipset_bus_info));
 }
 
@@ -540,7 +535,6 @@ dev_info_clear(void *v)
 	struct visorchipset_device_info *p =
 		(struct visorchipset_device_info *) v;
 
-	p->state.created = 0;
 	memset(p, 0, sizeof(struct visorchipset_device_info));
 }
 
