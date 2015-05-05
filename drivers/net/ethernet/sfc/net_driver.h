@@ -1091,6 +1091,7 @@ struct efx_mtd_partition {
 
 /**
  * struct efx_nic_type - Efx device type definition
+ * @mem_bar: Get the memory BAR
  * @mem_map_size: Get memory BAR mapped size
  * @probe: Probe the controller
  * @remove: Free resources allocated by probe()
@@ -1225,6 +1226,7 @@ struct efx_mtd_partition {
  * @hwtstamp_filters: Mask of hardware timestamp filter types supported
  */
 struct efx_nic_type {
+	unsigned int mem_bar;
 	unsigned int (*mem_map_size)(struct efx_nic *efx);
 	int (*probe)(struct efx_nic *efx);
 	void (*remove)(struct efx_nic *efx);
