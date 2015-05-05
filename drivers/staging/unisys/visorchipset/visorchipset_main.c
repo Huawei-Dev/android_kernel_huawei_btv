@@ -216,8 +216,6 @@ struct putfile_request {
 	int completion_status;
 };
 
-static atomic_t visorchipset_cache_buffers_in_use = ATOMIC_INIT(0);
-
 struct parahotplug_request {
 	struct list_head list;
 	int id;
@@ -2081,7 +2079,6 @@ visorchipset_cache_alloc(struct kmem_cache *pool, BOOL ok_to_block,
 	if (!p)
 		return NULL;
 
-	atomic_inc(&visorchipset_cache_buffers_in_use);
 	return p;
 }
 
@@ -2093,7 +2090,6 @@ visorchipset_cache_free(struct kmem_cache *pool, void *p, char *fn, int ln)
 	if (!p)
 		return;
 
-	atomic_dec(&visorchipset_cache_buffers_in_use);
 	kmem_cache_free(pool, p);
 }
 
