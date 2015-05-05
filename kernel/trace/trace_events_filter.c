@@ -782,7 +782,7 @@ static void __free_preds(struct event_filter *filter)
 
 static void filter_disable(struct trace_event_file *file)
 {
-	struct ftrace_event_call *call = file->event_call;
+	struct trace_event_call *call = file->event_call;
 
 	if (call->flags & TRACE_EVENT_FL_USE_CALL_FILTER)
 		call->flags &= ~TRACE_EVENT_FL_FILTERED;
@@ -839,7 +839,7 @@ static int __alloc_preds(struct event_filter *filter, int n_preds)
 
 static inline void __remove_filter(struct trace_event_file *file)
 {
-	struct ftrace_event_call *call = file->event_call;
+	struct trace_event_call *call = file->event_call;
 
 	filter_disable(file);
 	if (call->flags & TRACE_EVENT_FL_USE_CALL_FILTER)
@@ -862,7 +862,7 @@ static void filter_free_subsystem_preds(struct ftrace_subsystem_dir *dir,
 
 static inline void __free_subsystem_filter(struct trace_event_file *file)
 {
-	struct ftrace_event_call *call = file->event_call;
+	struct trace_event_call *call = file->event_call;
 
 	if (call->flags & TRACE_EVENT_FL_USE_CALL_FILTER) {
 		__free_filter(call->filter);
@@ -1342,7 +1342,7 @@ parse_operand:
 }
 
 static struct filter_pred *create_pred(struct filter_parse_state *ps,
-				       struct ftrace_event_call *call,
+				       struct trace_event_call *call,
 				       int op, char *operand1, char *operand2)
 {
 	struct ftrace_event_field *field;
@@ -1564,7 +1564,7 @@ static int fold_pred_tree(struct event_filter *filter,
 			      filter->preds);
 }
 
-static int replace_preds(struct ftrace_event_call *call,
+static int replace_preds(struct trace_event_call *call,
 			 struct event_filter *filter,
 			 struct filter_parse_state *ps,
 			 bool dry_run)
@@ -1679,7 +1679,7 @@ fail:
 
 static inline void event_set_filtered_flag(struct trace_event_file *file)
 {
-	struct ftrace_event_call *call = file->event_call;
+	struct trace_event_call *call = file->event_call;
 
 	if (call->flags & TRACE_EVENT_FL_USE_CALL_FILTER)
 		call->flags |= TRACE_EVENT_FL_FILTERED;
@@ -1690,7 +1690,7 @@ static inline void event_set_filtered_flag(struct trace_event_file *file)
 static inline void event_set_filter(struct trace_event_file *file,
 				    struct event_filter *filter)
 {
-	struct ftrace_event_call *call = file->event_call;
+	struct trace_event_call *call = file->event_call;
 
 	if (call->flags & TRACE_EVENT_FL_USE_CALL_FILTER)
 		rcu_assign_pointer(call->filter, filter);
@@ -1700,7 +1700,7 @@ static inline void event_set_filter(struct trace_event_file *file,
 
 static inline void event_clear_filter(struct trace_event_file *file)
 {
-	struct ftrace_event_call *call = file->event_call;
+	struct trace_event_call *call = file->event_call;
 
 	if (call->flags & TRACE_EVENT_FL_USE_CALL_FILTER)
 		RCU_INIT_POINTER(call->filter, NULL);
@@ -1711,7 +1711,7 @@ static inline void event_clear_filter(struct trace_event_file *file)
 static inline void
 event_set_no_set_filter_flag(struct trace_event_file *file)
 {
-	struct ftrace_event_call *call = file->event_call;
+	struct trace_event_call *call = file->event_call;
 
 	if (call->flags & TRACE_EVENT_FL_USE_CALL_FILTER)
 		call->flags |= TRACE_EVENT_FL_NO_SET_FILTER;
@@ -1722,7 +1722,7 @@ event_set_no_set_filter_flag(struct trace_event_file *file)
 static inline void
 event_clear_no_set_filter_flag(struct trace_event_file *file)
 {
-	struct ftrace_event_call *call = file->event_call;
+	struct trace_event_call *call = file->event_call;
 
 	if (call->flags & TRACE_EVENT_FL_USE_CALL_FILTER)
 		call->flags &= ~TRACE_EVENT_FL_NO_SET_FILTER;
@@ -1733,7 +1733,7 @@ event_clear_no_set_filter_flag(struct trace_event_file *file)
 static inline bool
 event_no_set_filter_flag(struct trace_event_file *file)
 {
-	struct ftrace_event_call *call = file->event_call;
+	struct trace_event_call *call = file->event_call;
 
 	if (file->flags & FTRACE_EVENT_FL_NO_SET_FILTER)
 		return true;
@@ -1899,8 +1899,8 @@ static void create_filter_finish(struct filter_parse_state *ps)
 }
 
 /**
- * create_filter - create a filter for a ftrace_event_call
- * @call: ftrace_event_call to create a filter for
+ * create_filter - create a filter for a trace_event_call
+ * @call: trace_event_call to create a filter for
  * @filter_str: filter string
  * @set_str: remember @filter_str and enable detailed error in filter
  * @filterp: out param for created filter (always updated on return)
@@ -1914,7 +1914,7 @@ static void create_filter_finish(struct filter_parse_state *ps)
  * information if @set_str is %true and the caller is responsible for
  * freeing it.
  */
-static int create_filter(struct ftrace_event_call *call,
+static int create_filter(struct trace_event_call *call,
 			 char *filter_str, bool set_str,
 			 struct event_filter **filterp)
 {
@@ -1934,7 +1934,7 @@ static int create_filter(struct ftrace_event_call *call,
 	return err;
 }
 
-int create_event_filter(struct ftrace_event_call *call,
+int create_event_filter(struct trace_event_call *call,
 			char *filter_str, bool set_str,
 			struct event_filter **filterp)
 {
@@ -1978,7 +1978,7 @@ static int create_system_filter(struct ftrace_subsystem_dir *dir,
 /* caller must hold event_mutex */
 int apply_event_filter(struct trace_event_file *file, char *filter_string)
 {
-	struct ftrace_event_call *call = file->event_call;
+	struct trace_event_call *call = file->event_call;
 	struct event_filter *filter;
 	int err;
 
@@ -2227,7 +2227,7 @@ int ftrace_profile_set_filter(struct perf_event *event, int event_id,
 {
 	int err;
 	struct event_filter *filter;
-	struct ftrace_event_call *call;
+	struct trace_event_call *call;
 
 	mutex_lock(&event_mutex);
 
