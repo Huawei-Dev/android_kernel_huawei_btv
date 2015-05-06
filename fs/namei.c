@@ -798,7 +798,6 @@ int sysctl_protected_hardlinks __read_mostly = 0;
 
 /**
  * may_follow_link - Check symlink following for unsafe situations
- * @link: The path of the symlink
  * @nd: nameidata pathwalk data
  *
  * In the case of the sysctl_protected_symlinks sysctl being enabled,
@@ -812,7 +811,7 @@ int sysctl_protected_hardlinks __read_mostly = 0;
  *
  * Returns 0 if following the symlink is allowed, -ve on error.
  */
-static inline int may_follow_link(struct path *link, struct nameidata *nd)
+static inline int may_follow_link(struct nameidata *nd)
 {
 	const struct inode *inode;
 	const struct inode *parent;
@@ -821,7 +820,7 @@ static inline int may_follow_link(struct path *link, struct nameidata *nd)
 		return 0;
 
 	/* Allowed if owner and follower match. */
-	inode = link->dentry->d_inode;
+	inode = nd->link.dentry->d_inode;
 	if (uid_eq(current_cred()->fsuid, inode->i_uid))
 		return 0;
 
@@ -834,8 +833,8 @@ static inline int may_follow_link(struct path *link, struct nameidata *nd)
 	if (uid_eq(parent->i_uid, inode->i_uid))
 		return 0;
 
-	audit_log_link_denied("follow_link", link);
-	path_put(link);
+	audit_log_link_denied("follow_link", &nd->link);
+	path_put(&nd->link);
 	path_put(&nd->path);
 	return -EACCES;
 }
@@ -2030,7 +2029,7 @@ static void path_cleanup(struct nameidata *nd)
 static int trailing_symlink(struct nameidata *nd)
 {
 	const char *s;
-	int error = may_follow_link(&nd->link, nd);
+	int error = may_follow_link(nd);
 	if (unlikely(error))
 		return error;
 	nd->flags |= LOOKUP_PARENT;
