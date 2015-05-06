@@ -2366,7 +2366,6 @@ context_switch(struct rq *rq, struct task_struct *prev,
 	 */
 	spin_release(&rq->lock.dep_map, 1, _THIS_IP_);
 
-	context_tracking_task_switch(prev, next);
 #ifdef CONFIG_HISI_BB
 	task_switch_hook((void *)prev, (void *)next);
 #endif
