@@ -65,6 +65,7 @@
 #include <asm/memblock.h>
 #include <asm/efi.h>
 #include <asm/virt.h>
+#include <asm/xen/hypervisor.h>
 
 unsigned long elf_hwcap __read_mostly;
 EXPORT_SYMBOL_GPL(elf_hwcap);
@@ -479,6 +480,7 @@ void __init setup_arch(char **cmdline_p)
 	} else {
 		psci_acpi_init();
 	}
+	xen_early_init();
 
 	cpu_read_bootcpu_ops();
 	smp_init_cpus();
