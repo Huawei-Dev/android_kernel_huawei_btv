@@ -372,10 +372,11 @@ struct mmc_host {
 				 MMC_CAP2_HS400_1_2V)
 #define MMC_CAP2_HSX00_1_2V	(MMC_CAP2_HS200_1_2V_SDR | MMC_CAP2_HS400_1_2V)
 #define MMC_CAP2_SDIO_IRQ_NOTHREAD (1 << 17)
-#define MMC_CAP2_CMD_QUEUE     	(1 << 18)       /* support eMMC command queue */
-#define MMC_CAP2_ENHANCED_STROBE		(1 << 19)
-#define MMC_CAP2_CACHE_FLUSH_BARRIER	(1 << 20)
-#define MMC_CAP2_BKOPS_AUTO_CTRL		(1 << 21)	/* Allow background operations auto enable control */
+#define MMC_CAP2_NO_WRITE_PROTECT (1 << 18)	/* No physical write protect pin, assume that card is always read-write */
+#define MMC_CAP2_CMD_QUEUE     	(1 << 19)       /* support eMMC command queue */
+#define MMC_CAP2_ENHANCED_STROBE		(1 << 20)
+#define MMC_CAP2_CACHE_FLUSH_BARRIER	(1 << 21)
+#define MMC_CAP2_BKOPS_AUTO_CTRL		(1 << 22)	/* Allow background operations auto enable control */
 
 #define MMC_CAP2_SUPPORT_VIA_MODEM		(1 << 26)	/* host is connected by via modem through sdio */
 #define MMC_CAP2_SUPPORT_WIFI        		(1 << 27)	/* host is connected by wifi through sdio */
