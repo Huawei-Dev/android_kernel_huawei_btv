@@ -513,6 +513,8 @@ EXPORT_SYMBOL_GPL(__clk_mux_determine_rate_closest);
 
 void clk_core_unprepare(struct clk_core *core)
 {
+	lockdep_assert_held(&prepare_lock);
+
 	if (!core)
 		return;
 
@@ -559,6 +561,8 @@ EXPORT_SYMBOL_GPL(clk_unprepare);
 int clk_core_prepare(struct clk_core *core)
 {
 	int ret = 0;
+
+	lockdep_assert_held(&prepare_lock);
 
 	if (!core)
 		return 0;
@@ -616,6 +620,8 @@ EXPORT_SYMBOL_GPL(clk_prepare);
 
 static void clk_core_disable(struct clk_core *core)
 {
+	lockdep_assert_held(&enable_lock);
+
 	if (!core)
 		return;
 
@@ -702,6 +708,8 @@ EXPORT_SYMBOL_GPL(clk_get_source);
 static int clk_core_enable(struct clk_core *core)
 {
 	int ret = 0;
+
+	lockdep_assert_held(&enable_lock);
 
 	if (!core)
 		return 0;
