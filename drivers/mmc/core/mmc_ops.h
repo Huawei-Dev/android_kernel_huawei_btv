@@ -30,5 +30,7 @@ int mmc_card_sleepawake(struct mmc_host *host, int sleep);
 int mmc_bus_test(struct mmc_card *card, u8 bus_width);
 int mmc_send_hpi_cmd(struct mmc_card *card, u32 *status);
 int mmc_can_ext_csd(struct mmc_card *card);
+int mmc_switch_status_error(struct mmc_host *host, u32 status);
+
 #endif
 
