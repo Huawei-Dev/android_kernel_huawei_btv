@@ -523,6 +523,7 @@ struct nameidata {
 		void *cookie;
 		const char *name;
 		struct inode *inode;
+		unsigned seq;
 	} *stack, internal[EMBEDDED_LEVELS];
 };
 
@@ -1621,6 +1622,7 @@ static int pick_link(struct nameidata *nd, struct path *link,
 	last->link = *link;
 	last->cookie = NULL;
 	last->inode = inode;
+	last->seq = seq;
 	return 1;
 }
 
