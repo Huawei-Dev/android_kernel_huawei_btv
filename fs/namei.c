@@ -600,6 +600,8 @@ static bool path_connected(const struct path *path)
  * to restart the path walk from the beginning in ref-walk mode.
  */
 
+static void terminate_walk(struct nameidata *nd);
+
 /**
  * unlazy_walk - try to switch to ref-walk mode.
  * @nd: nameidata pathwalk data
@@ -706,26 +708,12 @@ static int complete_walk(struct nameidata *nd)
 	int status;
 
 	if (nd->flags & LOOKUP_RCU) {
-		nd->flags &= ~LOOKUP_RCU;
 		if (!(nd->flags & LOOKUP_ROOT))
 			nd->root.mnt = NULL;
-
-		if (!legitimize_mnt(nd->path.mnt, nd->m_seq)) {
-			rcu_read_unlock();
+		if (unlikely(unlazy_walk(nd, NULL))) {
+			terminate_walk(nd);
 			return -ECHILD;
 		}
-		if (unlikely(!lockref_get_not_dead(&dentry->d_lockref))) {
-			rcu_read_unlock();
-			mntput(nd->path.mnt);
-			return -ECHILD;
-		}
-		if (read_seqcount_retry(&dentry->d_seq, nd->seq)) {
-			rcu_read_unlock();
-			dput(dentry);
-			mntput(nd->path.mnt);
-			return -ECHILD;
-		}
-		rcu_read_unlock();
 	}
 
 	if (likely(!(nd->flags & LOOKUP_JUMPED)))
@@ -741,7 +729,7 @@ static int complete_walk(struct nameidata *nd)
 	if (!status)
 		status = -ESTALE;
 
-	path_put(&nd->path);
+	terminate_walk(nd);
 	return status;
 }
 
@@ -3083,11 +3071,8 @@ static int do_last(struct nameidata *nd,
 		 * about to look up
 		 */
 		error = complete_walk(nd);
-		if (error) {
-			if (nd->depth)
-				put_link(nd);
+		if (error)
 			return error;
-		}
 
 		audit_inode(name, dir, LOOKUP_PARENT);
 		error = -EISDIR;
@@ -3193,8 +3178,6 @@ finish_lookup:
 finish_open:
 	error = complete_walk(nd);
 	if (error) {
-		if (nd->depth)
-			put_link(nd);
 		path_put(&save_parent);
 		return error;
 	}
