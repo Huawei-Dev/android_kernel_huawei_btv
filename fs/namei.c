@@ -831,7 +831,6 @@ static inline int may_follow_link(struct nameidata *nd)
 		return 0;
 
 	audit_log_link_denied("follow_link", &nd->stack[0].link);
-	terminate_walk(nd);
 	return -EACCES;
 }
 
@@ -2025,8 +2024,10 @@ static int trailing_symlink(struct nameidata *nd)
 {
 	const char *s;
 	int error = may_follow_link(nd);
-	if (unlikely(error))
+	if (unlikely(error)) {
+		terminate_walk(nd);
 		return error;
+	}
 	nd->flags |= LOOKUP_PARENT;
 	nd->stack[0].name = NULL;
 	s = get_link(nd);
