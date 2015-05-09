@@ -74,6 +74,8 @@ static int bond_option_ad_actor_sys_prio_set(struct bonding *bond,
 					     const struct bond_opt_value *newval);
 static int bond_option_ad_actor_system_set(struct bonding *bond,
 					   const struct bond_opt_value *newval);
+static int bond_option_ad_user_port_key_set(struct bonding *bond,
+					    const struct bond_opt_value *newval);
 
 
 static const struct bond_opt_value bond_mode_tbl[] = {
@@ -193,6 +195,12 @@ static const struct bond_opt_value bond_tlb_dynamic_lb_tbl[] = {
 static const struct bond_opt_value bond_ad_actor_sys_prio_tbl[] = {
 	{ "minval",  1,     BOND_VALFLAG_MIN},
 	{ "maxval",  65535, BOND_VALFLAG_MAX | BOND_VALFLAG_DEFAULT},
+	{ NULL,      -1,    0},
+};
+
+static const struct bond_opt_value bond_ad_user_port_key_tbl[] = {
+	{ "minval",  0,     BOND_VALFLAG_MIN | BOND_VALFLAG_DEFAULT},
+	{ "maxval",  1023,  BOND_VALFLAG_MAX},
 	{ NULL,      -1,    0},
 };
 
@@ -1415,5 +1423,15 @@ static int bond_option_ad_actor_system_set(struct bonding *bond,
 	}
 
 	ether_addr_copy(bond->params.ad_actor_system, macaddr);
+	return 0;
+}
+
+static int bond_option_ad_user_port_key_set(struct bonding *bond,
+					    const struct bond_opt_value *newval)
+{
+	netdev_info(bond->dev, "Setting ad_user_port_key to (%llu)\n",
+		    newval->value);
+
+	bond->params.ad_user_port_key = newval->value;
 	return 0;
 }

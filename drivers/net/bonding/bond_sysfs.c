@@ -756,6 +756,7 @@ static struct attribute *per_bond_attrs[] = {
 	&dev_attr_tlb_dynamic_lb.attr,
 	&dev_attr_ad_actor_sys_prio.attr,
 	&dev_attr_ad_actor_system.attr,
+	&dev_attr_ad_user_port_key.attr,
 	NULL,
 };
 
