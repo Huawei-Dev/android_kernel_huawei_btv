@@ -518,7 +518,6 @@ struct nameidata {
 	int		last_type;
 	unsigned	depth;
 	int		total_link_count;
-	struct file	*base;
 	struct saved {
 		struct path link;
 		void *cookie;
@@ -1916,7 +1915,6 @@ static int path_init(int dfd, const struct filename *name, unsigned int flags,
 	nd->last_type = LAST_ROOT; /* if there are only slashes... */
 	nd->flags = flags | LOOKUP_JUMPED | LOOKUP_PARENT;
 	nd->depth = 0;
-	nd->base = NULL;
 	if (flags & LOOKUP_ROOT) {
 		struct dentry *root = nd->root.dentry;
 		struct vfsmount *mnt = nd->root.mnt;
@@ -1986,14 +1984,15 @@ static int path_init(int dfd, const struct filename *name, unsigned int flags,
 
 		nd->path = f.file->f_path;
 		if (flags & LOOKUP_RCU) {
-			if (f.flags & FDPUT_FPUT)
-				nd->base = f.file;
-			nd->seq = __read_seqcount_begin(&nd->path.dentry->d_seq);
 			rcu_read_lock();
+			nd->inode = nd->path.dentry->d_inode;
+			nd->seq = read_seqcount_begin(&nd->path.dentry->d_seq);
 		} else {
 			path_get(&nd->path);
-			fdput(f);
+			nd->inode = nd->path.dentry->d_inode;
 		}
+		fdput(f);
+		goto done;
 	}
 
 	nd->inode = nd->path.dentry->d_inode;
@@ -2016,8 +2015,6 @@ static void path_cleanup(struct nameidata *nd)
 		path_put(&nd->root);
 		nd->root.mnt = NULL;
 	}
-	if (unlikely(nd->base))
-		fput(nd->base);
 }
 
 static int trailing_symlink(struct nameidata *nd)
