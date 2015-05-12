@@ -263,17 +263,13 @@ static int op_cpu_kill(unsigned int cpu)
 	return cpu_ops[cpu]->cpu_kill(cpu);
 }
 
-static DECLARE_COMPLETION(cpu_died);
-
 /*
  * called on the thread which is asking for a CPU to be shutdown -
  * waits until shutdown has completed, or it is timed out.
  */
 void __cpu_die(unsigned int cpu)
 {
-	int err;
-
-	if (!wait_for_completion_timeout(&cpu_died, msecs_to_jiffies(5000))) {
+	if (!cpu_wait_death(cpu, 5)) {
 		pr_crit("CPU%u: cpu didn't die\n", cpu);
 		return;
 	}
@@ -285,10 +281,8 @@ void __cpu_die(unsigned int cpu)
 	 * verify that it has really left the kernel before we consider
 	 * clobbering anything it might still be using.
 	 */
-	err = op_cpu_kill(cpu);
-	if (err)
-		pr_warn("CPU%d may not have shut down cleanly: %d\n",
-			cpu, err);
+	if (!op_cpu_kill(cpu))
+		pr_warn("CPU%d may not have shut down cleanly\n", cpu);
 }
 
 /*
@@ -308,7 +302,7 @@ void cpu_die(void)
 	local_irq_disable();
 
 	/* Tell __cpu_die() that this CPU is now safe to dispose of */
-	complete(&cpu_died);
+	(void)cpu_report_death();
 
 	/*
 	 * Actually shutdown the CPU. This must never fail. The specific hotplug
