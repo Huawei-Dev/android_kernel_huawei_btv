@@ -1331,6 +1331,20 @@ static void packet_sock_destruct(struct sock *sk)
 	sk_refcnt_debug_dec(sk);
 }
 
+static bool fanout_flow_is_huge(struct packet_sock *po, struct sk_buff *skb)
+{
+	u32 rxhash;
+	int i, count = 0;
+
+	rxhash = skb_get_hash(skb);
+	for (i = 0; i < ROLLOVER_HLEN; i++)
+		if (po->rollover->history[i] == rxhash)
+			count++;
+
+	po->rollover->history[prandom_u32() % ROLLOVER_HLEN] = rxhash;
+	return count > (ROLLOVER_HLEN >> 1);
+}
+
 static unsigned int fanout_demux_hash(struct packet_fanout *f,
 				      struct sk_buff *skb,
 				      unsigned int num)
@@ -1367,11 +1381,16 @@ static unsigned int fanout_demux_rollover(struct packet_fanout *f,
 					  unsigned int num)
 {
 	struct packet_sock *po, *po_next;
-	unsigned int i, j;
+	unsigned int i, j, room;
 
 	po = pkt_sk(f->arr[idx]);
-	if (try_self && packet_rcv_has_room(po, skb) != ROOM_NONE)
-		return idx;
+
+	if (try_self) {
+		room = packet_rcv_has_room(po, skb);
+		if (room == ROOM_NORMAL ||
+		    (room == ROOM_LOW && !fanout_flow_is_huge(po, skb)))
+			return idx;
+	}
 
 	i = j = min_t(int, po->rollover->sock, num - 1);
 	do {
