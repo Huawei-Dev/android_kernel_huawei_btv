@@ -747,10 +747,24 @@ iwl_mvm_build_scan_probe(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 	params->preq.common_data.len = cpu_to_le16(ies->common_ie_len);
 }
 
-static void
-iwl_mvm_build_generic_scan_cmd(struct iwl_mvm *mvm,
-			       struct iwl_scan_req_lmac *cmd,
-			       struct iwl_mvm_scan_params *params)
+static __le32 iwl_mvm_scan_priority(struct iwl_mvm *mvm,
+				    enum iwl_scan_priority_ext prio)
+{
+	if (mvm->fw->ucode_capa.api[0] & IWL_UCODE_TLV_API_EXT_SCAN_PRIORITY)
+		return cpu_to_le32(prio);
+
+	if (prio <= IWL_SCAN_PRIORITY_EXT_2)
+		return cpu_to_le32(IWL_SCAN_PRIORITY_LOW);
+
+	if (prio <= IWL_SCAN_PRIORITY_EXT_4)
+		return cpu_to_le32(IWL_SCAN_PRIORITY_MEDIUM);
+
+	return cpu_to_le32(IWL_SCAN_PRIORITY_HIGH);
+}
+
+static void iwl_mvm_scan_lmac_dwell(struct iwl_mvm *mvm,
+				    struct iwl_scan_req_lmac *cmd,
+				    struct iwl_mvm_scan_params *params)
 {
 	memset(cmd, 0, ksize(cmd));
 	cmd->active_dwell = params->dwell[IEEE80211_BAND_2GHZ].active;
@@ -761,12 +775,7 @@ iwl_mvm_build_generic_scan_cmd(struct iwl_mvm *mvm,
 	cmd->rx_chain_select = iwl_mvm_scan_rx_chain(mvm);
 	cmd->max_out_time = cpu_to_le32(params->max_out_time);
 	cmd->suspend_time = cpu_to_le32(params->suspend_time);
-	cmd->scan_prio = cpu_to_le32(IWL_SCAN_PRIORITY_HIGH);
-	cmd->iter_num = cpu_to_le32(1);
-
-	if (iwl_mvm_rrm_scan_needed(mvm))
-		cmd->scan_flags |=
-			cpu_to_le32(IWL_MVM_LMAC_SCAN_FLAGS_RRM_ENABLED);
+	cmd->scan_prio = iwl_mvm_scan_priority(mvm, IWL_SCAN_PRIORITY_EXT_6);
 }
 
 static inline bool iwl_mvm_scan_fits(struct iwl_mvm *mvm, int n_ssids,
@@ -1066,7 +1075,15 @@ iwl_mvm_build_generic_umac_scan_cmd(struct iwl_mvm *mvm,
 				params->dwell[IEEE80211_BAND_2GHZ].fragmented;
 	cmd->max_out_time = cpu_to_le32(params->max_out_time);
 	cmd->suspend_time = cpu_to_le32(params->suspend_time);
-	cmd->scan_priority = cpu_to_le32(IWL_SCAN_PRIORITY_HIGH);
+	cmd->scan_priority =
+		iwl_mvm_scan_priority(mvm, IWL_SCAN_PRIORITY_EXT_6);
+
+	if (iwl_mvm_scan_total_iterations(params) == 0)
+		cmd->ooc_priority =
+			iwl_mvm_scan_priority(mvm, IWL_SCAN_PRIORITY_EXT_6);
+	else
+		cmd->ooc_priority =
+			iwl_mvm_scan_priority(mvm, IWL_SCAN_PRIORITY_EXT_2);
 }
 
 static void
