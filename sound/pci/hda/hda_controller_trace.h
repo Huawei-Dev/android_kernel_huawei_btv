@@ -1,9 +1,9 @@
 #undef TRACE_SYSTEM
-#define TRACE_SYSTEM hda_intel
-#define TRACE_INCLUDE_FILE hda_intel_trace
+#define TRACE_SYSTEM hda_controller
+#define TRACE_INCLUDE_FILE hda_controller_trace
 
-#if !defined(_TRACE_HDA_INTEL_H) || defined(TRACE_HEADER_MULTI_READ)
-#define _TRACE_HDA_INTEL_H
+#if !defined(_TRACE_HDA_CONTROLLER_H) || defined(TRACE_HEADER_MULTI_READ)
+#define _TRACE_HDA_CONTROLLER_H
 
 #include <linux/tracepoint.h>
 
@@ -24,7 +24,7 @@ TRACE_EVENT(azx_pcm_trigger,
 
 	TP_fast_assign(
 		__entry->card = (chip)->card->number;
-		__entry->idx = (dev)->index;
+		__entry->idx = (dev)->core.index;
 		__entry->cmd = cmd;
 	),
 
@@ -46,7 +46,7 @@ TRACE_EVENT(azx_get_position,
 
 	TP_fast_assign(
 		__entry->card = (chip)->card->number;
-		__entry->idx = (dev)->index;
+		__entry->idx = (dev)->core.index;
 		__entry->pos = pos;
 		__entry->delay = delay;
 	),
@@ -54,7 +54,43 @@ TRACE_EVENT(azx_get_position,
 	TP_printk("[%d:%d] pos=%u, delay=%u", __entry->card, __entry->idx, __entry->pos, __entry->delay)
 );
 
-#endif /* _TRACE_HDA_INTEL_H */
+DECLARE_EVENT_CLASS(azx_pcm,
+	TP_PROTO(struct azx *chip, struct azx_dev *azx_dev),
+
+	TP_ARGS(chip, azx_dev),
+
+	TP_STRUCT__entry(
+		__field( unsigned char, stream_tag )
+	),
+
+	TP_fast_assign(
+		__entry->stream_tag = (azx_dev)->core.stream_tag;
+	),
+
+	TP_printk("stream_tag: %d", __entry->stream_tag)
+);
+
+DEFINE_EVENT(azx_pcm, azx_pcm_open,
+	TP_PROTO(struct azx *chip, struct azx_dev *azx_dev),
+	TP_ARGS(chip, azx_dev)
+);
+
+DEFINE_EVENT(azx_pcm, azx_pcm_close,
+	TP_PROTO(struct azx *chip, struct azx_dev *azx_dev),
+	TP_ARGS(chip, azx_dev)
+);
+
+DEFINE_EVENT(azx_pcm, azx_pcm_hw_params,
+	TP_PROTO(struct azx *chip, struct azx_dev *azx_dev),
+	TP_ARGS(chip, azx_dev)
+);
+
+DEFINE_EVENT(azx_pcm, azx_pcm_prepare,
+	TP_PROTO(struct azx *chip, struct azx_dev *azx_dev),
+	TP_ARGS(chip, azx_dev)
+);
+
+#endif /* _TRACE_HDA_CONTROLLER_H */
 
 /* This part must be outside protection */
 #undef TRACE_INCLUDE_PATH
