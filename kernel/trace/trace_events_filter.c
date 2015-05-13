@@ -2283,7 +2283,7 @@ out_unlock:
 
 static struct test_filter_data_t {
 	char *filter;
-	struct ftrace_raw_ftrace_test_filter rec;
+	struct trace_event_raw_ftrace_test_filter rec;
 	int match;
 	char *not_visited;
 } test_filter_data[] = {
