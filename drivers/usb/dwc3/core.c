@@ -454,8 +454,6 @@ void dwc3_phy_setup(struct dwc3 *dwc)
 
 	dwc3_writel(dwc->regs, DWC3_GUSB3PIPECTL(0), reg);
 
-	mdelay(100);
-
 	reg = dwc3_readl(dwc->regs, DWC3_GUSB2PHYCFG(0));
 
 	/*
@@ -471,8 +469,6 @@ void dwc3_phy_setup(struct dwc3 *dwc)
 		reg &= ~DWC3_GUSB2PHYCFG_SUSPHY;
 
 	dwc3_writel(dwc->regs, DWC3_GUSB2PHYCFG(0), reg);
-
-	mdelay(100);
 }
 
 void dwc3_resume_usb2_phy(struct dwc3 *dwc)
@@ -620,8 +616,6 @@ int dwc3_core_init(struct dwc3 *dwc)
 	dwc3_core_num_eps(dwc);
 
 	dwc3_writel(dwc->regs, DWC3_GCTL, reg);
-
-	/* dwc3_phy_setup(dwc); */
 
 	/* Set Turnaround Time = 9 (8-bit UTMI+ / ULPI) */
 	reg = dwc3_readl(dwc->regs, DWC3_GUSB2PHYCFG(0));
@@ -967,6 +961,8 @@ static int dwc3_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, dwc);
 	dwc3_cache_hwparams(dwc);
+
+	dwc3_phy_setup(dwc);
 
 	ret = dwc3_core_get_phy(dwc);
 	if (ret)
