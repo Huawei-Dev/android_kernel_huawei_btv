@@ -691,6 +691,7 @@ struct dwc3_otg;
  * @test_mode_nr: test feature selector
  * @lpm_nyet_threshold: LPM NYET response threshold
  * @hird_threshold: HIRD threshold
+ * @hsphy_interface: "utmi" or "ulpi"
  * @delayed_status: true when gadget driver asks for delayed status
  * @ep0_bounced: true when we used bounce buffer
  * @ep0_expect_in: true when we expect a DATA IN transfer
@@ -839,6 +840,8 @@ struct dwc3 {
 	int irq_state;
 #endif
 	struct tasklet_struct	bh;
+
+	const char		*hsphy_interface;
 
 	unsigned		delayed_status:1;
 
