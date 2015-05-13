@@ -787,7 +787,7 @@ static void filter_disable(struct trace_event_file *file)
 	if (call->flags & TRACE_EVENT_FL_USE_CALL_FILTER)
 		call->flags &= ~TRACE_EVENT_FL_FILTERED;
 	else
-		file->flags &= ~FTRACE_EVENT_FL_FILTERED;
+		file->flags &= ~EVENT_FILE_FL_FILTERED;
 }
 
 static void __free_filter(struct event_filter *filter)
@@ -1684,7 +1684,7 @@ static inline void event_set_filtered_flag(struct trace_event_file *file)
 	if (call->flags & TRACE_EVENT_FL_USE_CALL_FILTER)
 		call->flags |= TRACE_EVENT_FL_FILTERED;
 	else
-		file->flags |= FTRACE_EVENT_FL_FILTERED;
+		file->flags |= EVENT_FILE_FL_FILTERED;
 }
 
 static inline void event_set_filter(struct trace_event_file *file,
@@ -1716,7 +1716,7 @@ event_set_no_set_filter_flag(struct trace_event_file *file)
 	if (call->flags & TRACE_EVENT_FL_USE_CALL_FILTER)
 		call->flags |= TRACE_EVENT_FL_NO_SET_FILTER;
 	else
-		file->flags |= FTRACE_EVENT_FL_NO_SET_FILTER;
+		file->flags |= EVENT_FILE_FL_NO_SET_FILTER;
 }
 
 static inline void
@@ -1727,7 +1727,7 @@ event_clear_no_set_filter_flag(struct trace_event_file *file)
 	if (call->flags & TRACE_EVENT_FL_USE_CALL_FILTER)
 		call->flags &= ~TRACE_EVENT_FL_NO_SET_FILTER;
 	else
-		file->flags &= ~FTRACE_EVENT_FL_NO_SET_FILTER;
+		file->flags &= ~EVENT_FILE_FL_NO_SET_FILTER;
 }
 
 static inline bool
@@ -1735,7 +1735,7 @@ event_no_set_filter_flag(struct trace_event_file *file)
 {
 	struct trace_event_call *call = file->event_call;
 
-	if (file->flags & FTRACE_EVENT_FL_NO_SET_FILTER)
+	if (file->flags & EVENT_FILE_FL_NO_SET_FILTER)
 		return true;
 
 	if ((call->flags & TRACE_EVENT_FL_USE_CALL_FILTER) &&
