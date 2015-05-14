@@ -2818,6 +2818,7 @@ static struct {
 	{NULL}
 };
 
+#ifdef MODULE
 static struct isapnp_device_id id_table[] = {
 	{	ISAPNP_VENDOR('C','M','I'), ISAPNP_DEVICE(0x0001),
 		ISAPNP_VENDOR('@','@','@'), ISAPNP_FUNCTION(0x0001), 0 },
@@ -2835,6 +2836,7 @@ static struct isapnp_device_id id_table[] = {
 };
 
 MODULE_DEVICE_TABLE(isapnp, id_table);
+#endif
 
 static struct pnp_dev *activate_dev(char *devname, char *resname, struct pnp_dev *dev)
 {
