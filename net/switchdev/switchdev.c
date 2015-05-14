@@ -676,7 +676,7 @@ int switchdev_fib_ipv4_add(u32 dst, int dst_len, struct fib_info *fi,
 
 	err = switchdev_port_obj_add(dev, &fib_obj);
 	if (!err)
-		fi->fib_flags |= RTNH_F_EXTERNAL;
+		fi->fib_flags |= RTNH_F_OFFLOAD;
 
 	return err;
 }
@@ -721,7 +721,8 @@ int switchdev_fib_ipv4_del(u32 dst, int dst_len, struct fib_info *fi,
 
 	err = switchdev_port_obj_del(dev, &fib_obj);
 	if (!err)
-		fi->fib_flags &= ~RTNH_F_EXTERNAL;
+		fi->fib_flags &= ~RTNH_F_OFFLOAD;
+
 
 	return err;
 }
