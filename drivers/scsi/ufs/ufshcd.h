@@ -637,6 +637,9 @@ struct ufs_hba {
 	/* Interrupt aggregation support is broken */
 	#define UFSHCD_QUIRK_BROKEN_INTR_AGGR			UFS_BIT(0)
 
+	/* Interrupt aggregation support is broken */
+	#define UFSHCD_QUIRK_BROKEN_INTR_AGGR			UFS_BIT(0)
+
 	/*
 	 * delay before each dme command is required as the unipro
 	 * layer has shown instabilities
