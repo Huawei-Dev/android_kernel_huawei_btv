@@ -2710,6 +2710,7 @@ static int rt5645_jack_detect(struct snd_soc_codec *codec)
 }
 
 static int rt5645_irq_detection(struct rt5645_priv *rt5645);
+static irqreturn_t rt5645_irq(int irq, void *data);
 
 int rt5645_set_jack_detect(struct snd_soc_codec *codec,
 	struct snd_soc_jack *hp_jack, struct snd_soc_jack *mic_jack)
@@ -2718,7 +2719,17 @@ int rt5645_set_jack_detect(struct snd_soc_codec *codec,
 
 	rt5645->hp_jack = hp_jack;
 	rt5645->mic_jack = mic_jack;
-	rt5645_jack_detect(codec);
+	rt5645->btn_jack = btn_jack;
+	if (rt5645->btn_jack && rt5645->codec_type == CODEC_TYPE_RT5650) {
+		rt5645->en_button_func = true;
+		regmap_update_bits(rt5645->regmap, RT5645_GPIO_CTRL1,
+				RT5645_GP1_PIN_IRQ, RT5645_GP1_PIN_IRQ);
+		regmap_update_bits(rt5645->regmap, RT5645_DEPOP_M1,
+				RT5645_HP_CB_MASK, RT5645_HP_CB_PU);
+		regmap_update_bits(rt5645->regmap, RT5645_GEN_CTRL1,
+				RT5645_DIG_GATE_CTRL, RT5645_DIG_GATE_CTRL);
+	}
+	rt5645_irq(0, rt5645);
 
 	return 0;
 }
