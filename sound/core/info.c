@@ -687,7 +687,7 @@ const char *snd_info_get_str(char *dest, const char *src, int len)
 
 EXPORT_SYMBOL(snd_info_get_str);
 
-/**
+/*
  * snd_info_create_entry - create an info entry
  * @name: the proc file name
  * @parent: the parent directory
