@@ -29,26 +29,23 @@ static const char *ext4_follow_link(struct dentry *dentry, void **cookie)
 	char *caddr, *paddr = NULL;
 	struct ext4_str cstr, pstr;
 	struct inode *inode = d_inode(dentry);
-	struct ext4_fname_crypto_ctx *ctx = NULL;
 	struct ext4_encrypted_symlink_data *sd;
 	loff_t size = min_t(loff_t, i_size_read(inode), PAGE_SIZE - 1);
 	int res;
 	u32 plen, max_size = inode->i_sb->s_blocksize;
 
-	ctx = ext4_get_fname_crypto_ctx(inode, inode->i_sb->s_blocksize);
-	if (IS_ERR(ctx))
-		return ERR_CAST(ctx);
+	res = ext4_setup_fname_crypto(inode);
+	if (res)
+		return ERR_PTR(res);
 
 	if (ext4_inode_is_fast_symlink(inode)) {
 		caddr = (char *) EXT4_I(inode)->i_data;
 		max_size = sizeof(EXT4_I(inode)->i_data);
 	} else {
 		cpage = read_mapping_page(inode->i_mapping, 0, NULL);
-		if (IS_ERR(cpage)) {
-			ext4_put_fname_crypto_ctx(&ctx);
+		if (IS_ERR(cpage))
 			return ERR_CAST(cpage);
-		}
-		caddr = kmap(cpage);
+		caddr = page_address(cpage);
 		caddr[size] = 0;
 	}
 
@@ -72,24 +69,18 @@ static const char *ext4_follow_link(struct dentry *dentry, void **cookie)
 	}
 	pstr.name = paddr;
 	pstr.len = plen;
-	res = _ext4_fname_disk_to_usr(ctx, NULL, &cstr, &pstr);
+	res = _ext4_fname_disk_to_usr(inode, NULL, &cstr, &pstr);
 	if (res < 0)
 		goto errout;
 	/* Null-terminate the name */
 	if (res <= plen)
 		paddr[res] = '\0';
-	ext4_put_fname_crypto_ctx(&ctx);
-	if (cpage) {
-		kunmap(cpage);
+	if (cpage)
 		page_cache_release(cpage);
-	}
 	return *cookie = paddr;
 errout:
-	ext4_put_fname_crypto_ctx(&ctx);
-	if (cpage) {
-		kunmap(cpage);
+	if (cpage)
 		page_cache_release(cpage);
-	}
 	kfree(paddr);
 	return ERR_PTR(res);
 }
