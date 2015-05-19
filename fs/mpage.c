@@ -606,7 +606,7 @@ alloc_new:
 			}
 		}
 		bio = mpage_alloc(bdev, blocks[0] << (blkbits - 9),
-				bio_get_nr_vecs(bdev), GFP_NOFS|__GFP_HIGH);
+				BIO_MAX_PAGES, GFP_NOFS|__GFP_HIGH);
 		if (bio == NULL)
 			goto confused;
 
