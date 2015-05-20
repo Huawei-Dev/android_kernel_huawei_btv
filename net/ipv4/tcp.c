@@ -2800,6 +2800,8 @@ void tcp_get_info(struct sock *sk, struct tcp_info *info)
 		put_unaligned(tp->bytes_acked, &info->tcpi_bytes_acked);
 		put_unaligned(tp->bytes_received, &info->tcpi_bytes_received);
 	} while (u64_stats_fetch_retry_irq(&tp->syncp, start));
+	info->tcpi_segs_out = tp->segs_out;
+	info->tcpi_segs_in = tp->segs_in;
 }
 EXPORT_SYMBOL_GPL(tcp_get_info);
 
