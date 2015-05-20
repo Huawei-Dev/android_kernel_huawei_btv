@@ -1622,6 +1622,16 @@ int ip6_route_info_create(struct fib6_config *cfg, struct rt6_info **rt_ret)
 		int gwa_type;
 
 		gw_addr = &cfg->fc_gateway;
+
+		/* if gw_addr is local we will fail to detect this in case
+		 * address is still TENTATIVE (DAD in progress). rt6_lookup()
+		 * will return already-added prefix route via interface that
+		 * prefix route was assigned to, which might be non-loopback.
+		 */
+		err = -EINVAL;
+		if (ipv6_chk_addr_and_flags(net, gw_addr, NULL, 0, 0))
+			goto out;
+
 		rt->rt6i_gateway = *gw_addr;
 		gwa_type = ipv6_addr_type(gw_addr);
 
@@ -1635,7 +1645,6 @@ int ip6_route_info_create(struct fib6_config *cfg, struct rt6_info **rt_ret)
 			   (SIT, PtP, NBMA NOARP links) it is handy to allow
 			   some exceptions. --ANK
 			 */
-			err = -EINVAL;
 			if (!(gwa_type & IPV6_ADDR_UNICAST))
 				goto out;
 
