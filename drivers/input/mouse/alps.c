@@ -198,8 +198,8 @@ static const struct dmi_system_id alps_dmi_has_separate_stick_buttons[] = {
 
 static void alps_set_abs_params_st(struct alps_data *priv,
 				   struct input_dev *dev1);
-static void alps_set_abs_params_mt(struct alps_data *priv,
-				   struct input_dev *dev1);
+static void alps_set_abs_params_semi_mt(struct alps_data *priv,
+					struct input_dev *dev1);
 static void alps_set_abs_params_v7(struct alps_data *priv,
 				   struct input_dev *dev1);
 static void alps_set_abs_params_ss4_v2(struct alps_data *priv,
@@ -2660,7 +2660,7 @@ static int alps_set_protocol(struct psmouse *psmouse,
 	case ALPS_PROTO_V3:
 		priv->hw_init = alps_hw_init_v3;
 		priv->process_packet = alps_process_packet_v3;
-		priv->set_abs_params = alps_set_abs_params_mt;
+		priv->set_abs_params = alps_set_abs_params_semi_mt;
 		priv->decode_fields = alps_decode_pinnacle;
 		priv->nibble_commands = alps_v3_nibble_commands;
 		priv->addr_command = PSMOUSE_CMD_RESET_WRAP;
@@ -2669,7 +2669,7 @@ static int alps_set_protocol(struct psmouse *psmouse,
 	case ALPS_PROTO_V3_RUSHMORE:
 		priv->hw_init = alps_hw_init_rushmore_v3;
 		priv->process_packet = alps_process_packet_v3;
-		priv->set_abs_params = alps_set_abs_params_mt;
+		priv->set_abs_params = alps_set_abs_params_semi_mt;
 		priv->decode_fields = alps_decode_rushmore;
 		priv->nibble_commands = alps_v3_nibble_commands;
 		priv->addr_command = PSMOUSE_CMD_RESET_WRAP;
@@ -2685,7 +2685,7 @@ static int alps_set_protocol(struct psmouse *psmouse,
 	case ALPS_PROTO_V4:
 		priv->hw_init = alps_hw_init_v4;
 		priv->process_packet = alps_process_packet_v4;
-		priv->set_abs_params = alps_set_abs_params_mt;
+		priv->set_abs_params = alps_set_abs_params_semi_mt;
 		priv->nibble_commands = alps_v4_nibble_commands;
 		priv->addr_command = PSMOUSE_CMD_DISABLE;
 		break;
@@ -2694,7 +2694,7 @@ static int alps_set_protocol(struct psmouse *psmouse,
 		priv->hw_init = alps_hw_init_dolphin_v1;
 		priv->process_packet = alps_process_touchpad_packet_v3_v5;
 		priv->decode_fields = alps_decode_dolphin;
-		priv->set_abs_params = alps_set_abs_params_mt;
+		priv->set_abs_params = alps_set_abs_params_semi_mt;
 		priv->nibble_commands = alps_v3_nibble_commands;
 		priv->addr_command = PSMOUSE_CMD_RESET_WRAP;
 		priv->x_bits = 23;
@@ -2876,8 +2876,8 @@ static void alps_set_abs_params_mt_common(struct alps_data *priv,
 	set_bit(BTN_TOOL_QUADTAP, dev1->keybit);
 }
 
-static void alps_set_abs_params_mt(struct alps_data *priv,
-				   struct input_dev *dev1)
+static void alps_set_abs_params_semi_mt(struct alps_data *priv,
+					struct input_dev *dev1)
 {
 	alps_set_abs_params_mt_common(priv, dev1);
 	input_set_abs_params(dev1, ABS_PRESSURE, 0, 127, 0, 0);
