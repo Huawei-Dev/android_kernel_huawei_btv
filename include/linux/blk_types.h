@@ -299,6 +299,7 @@ enum rq_flag_bits {
 #define REQ_HASHED		(1ULL << __REQ_HASHED)
 #define REQ_MQ_INFLIGHT		(1ULL << __REQ_MQ_INFLIGHT)
 #define REQ_NO_TIMEOUT		(1ULL << __REQ_NO_TIMEOUT)
+#define REQ_CLONE		(1ULL << __REQ_CLONE)
 
 struct blk_rq_stat {
 	s64 mean;
