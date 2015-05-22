@@ -62,16 +62,6 @@ struct bdi_writeback {
 	struct percpu_counter stat[NR_WB_STAT_ITEMS];
 
 	atomic_t dirty_sleeping;	/* waiting on dirty limit exceeded */
-};
-
-struct backing_dev_info {
-	struct list_head bdi_list;
-	unsigned long ra_pages;	/* max readahead in PAGE_CACHE_SIZE units */
-	unsigned int capabilities; /* Device capabilities */
-	congested_fn *congested_fn; /* Function pointer if device is md/dm */
-	void *congested_data;	/* Pointer to aux data for congested func */
-
-	char *name;
 
 	unsigned long bw_time_stamp;	/* last time write bw is updated */
 	unsigned long dirtied_stamp;
@@ -90,6 +80,16 @@ struct backing_dev_info {
 
 	struct fprop_local_percpu completions;
 	int dirty_exceeded;
+};
+
+struct backing_dev_info {
+	struct list_head bdi_list;
+	unsigned long ra_pages;	/* max readahead in PAGE_CACHE_SIZE units */
+	unsigned int capabilities; /* Device capabilities */
+	congested_fn *congested_fn; /* Function pointer if device is md/dm */
+	void *congested_data;	/* Pointer to aux data for congested func */
+
+	char *name;
 
 	unsigned int min_ratio;
 	unsigned int max_ratio, max_prop_frac;
