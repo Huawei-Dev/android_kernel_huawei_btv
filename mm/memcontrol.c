@@ -343,6 +343,10 @@ struct mem_cgroup {
 	atomic_t	numainfo_updating;
 #endif
 
+#ifdef CONFIG_CGROUP_WRITEBACK
+	struct list_head cgwb_list;
+#endif
+
 	/* List of events which userspace want to receive */
 	struct list_head event_list;
 	spinlock_t event_list_lock;
@@ -3983,6 +3987,15 @@ static void memcg_destroy_kmem(struct mem_cgroup *memcg)
 }
 #endif
 
+#ifdef CONFIG_CGROUP_WRITEBACK
+
+struct list_head *mem_cgroup_cgwb_list(struct mem_cgroup *memcg)
+{
+	return &memcg->cgwb_list;
+}
+
+#endif	/* CONFIG_CGROUP_WRITEBACK */
+
 /*
  * DO NOT USE IN NEW FILES.
  *
@@ -4447,7 +4460,9 @@ mem_cgroup_css_alloc(struct cgroup_subsys_state *parent_css)
 #ifdef CONFIG_MEMCG_KMEM
 	memcg->kmemcg_id = -1;
 #endif
-
+#ifdef CONFIG_CGROUP_WRITEBACK
+	INIT_LIST_HEAD(&memcg->cgwb_list);
+#endif
 	return &memcg->css;
 
 free_out:
@@ -4535,6 +4550,8 @@ static void mem_cgroup_css_offline(struct cgroup_subsys_state *css)
 	vmpressure_cleanup(&memcg->vmpressure);
 
 	memcg_deactivate_kmem(memcg);
+
+	wb_memcg_offline(memcg);
 }
 
 static void mem_cgroup_css_free(struct cgroup_subsys_state *css)
