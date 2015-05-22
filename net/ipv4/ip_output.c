@@ -283,7 +283,7 @@ static int ip_finish_output(struct sock *sk, struct sk_buff *skb)
 	if (skb_is_gso(skb))
 		return ip_finish_output_gso(sk, skb, mtu);
 
-	if (skb->len > mtu)
+	if (skb->len > mtu || (IPCB(skb)->flags & IPSKB_FRAG_PMTU))
 		return ip_fragment(sk, skb, mtu, ip_finish_output2);
 
 	return ip_finish_output2(sk, skb);
@@ -506,7 +506,10 @@ static int ip_fragment(struct sock *sk, struct sk_buff *skb,
 {
 	struct iphdr *iph = ip_hdr(skb);
 
-	if (unlikely(((iph->frag_off & htons(IP_DF)) && !skb->ignore_df) ||
+	if ((iph->frag_off & htons(IP_DF)) == 0)
+		return ip_do_fragment(sk, skb, output);
+
+	if (unlikely(!skb->ignore_df ||
 		     (IPCB(skb)->frag_max_size &&
 		      IPCB(skb)->frag_max_size > mtu))) {
 		struct rtable *rt = skb_rtable(skb);
@@ -551,6 +554,8 @@ int ip_do_fragment(struct sock *sk, struct sk_buff *skb,
 	iph = ip_hdr(skb);
 
 	mtu = ip_skb_dst_mtu(skb);
+	if (IPCB(skb)->frag_max_size && IPCB(skb)->frag_max_size < mtu)
+		mtu = IPCB(skb)->frag_max_size;
 
 	/*
 	 *	Setup starting values.
@@ -745,6 +750,9 @@ slow_path:
 		 */
 		iph = ip_hdr(skb2);
 		iph->frag_off = htons((offset >> 3));
+
+		if (IPCB(skb)->flags & IPSKB_FRAG_PMTU)
+			iph->frag_off |= htons(IP_DF);
 
 		/* ANK: dirty, but effective trick. Upgrade options only if
 		 * the segment to be fragmented was THE FIRST (otherwise,
