@@ -1310,7 +1310,7 @@ dump_knl_turbo_ratio_limits(void)
 	int delta_ratio;
 	int i;
 
-	get_msr(0, MSR_NHM_TURBO_RATIO_LIMIT, &msr);
+	get_msr(base_cpu, MSR_NHM_TURBO_RATIO_LIMIT, &msr);
 
 	fprintf(stderr, "cpu0: MSR_NHM_TURBO_RATIO_LIMIT: 0x%08llx\n",
 	msr);
