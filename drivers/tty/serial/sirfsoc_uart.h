@@ -117,9 +117,12 @@ u32 uart_ff_full(int line)
 {
 	return (line == 1) ? (0x20) : (0x80);
 }
-u32 uart_ff_empty(int line)
+u32 uart_usp_ff_empty_mask(struct uart_port *port)
 {
-	return (line == 1) ? (0x40) : (0x100);
+	u32 empty_bit;
+
+	empty_bit = ilog2(port->fifosize) + 1;
+	return (1 << empty_bit);
 }
 struct sirfsoc_uart_register sirfsoc_usp = {
 	.uart_reg = {
