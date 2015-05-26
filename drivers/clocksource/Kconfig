@@ -288,4 +288,17 @@ config H8300_TMR16
 config H8300_TPU
         bool
 
+config CLKSRC_IMX_GPT
+	bool "Clocksource using i.MX GPT" if COMPILE_TEST
+	depends on ARM && CLKDEV_LOOKUP
+	select CLKSRC_MMIO
+
+config CLKSRC_ST_LPC
+	bool
+	depends on ARCH_STI
+	select CLKSRC_OF if OF
+	help
+	  Enable this option to use the Low Power controller timer
+	  as clocksource.
+
 endmenu
