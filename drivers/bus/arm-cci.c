@@ -114,6 +114,7 @@ struct cci_pmu_hw_events {
 	raw_spinlock_t pmu_lock;
 };
 
+struct cci_pmu;
 /*
  * struct cci_pmu_model:
  * @fixed_hw_cntrs - Number of fixed event counters
@@ -128,7 +129,6 @@ struct cci_pmu_model {
 	struct event_range event_ranges[CCI_IF_MAX];
 	int (*validate_hw_event)(struct cci_pmu *, unsigned long);
 	int (*get_event_idx)(struct cci_pmu *, struct cci_pmu_hw_events *, unsigned long);
-	void (*write_counters)(struct cci_pmu *, unsigned long *);
 };
 
 static struct cci_pmu_model cci_pmu_models[];
@@ -366,7 +366,29 @@ static int cci400_get_event_idx(struct cci_pmu *cci_pmu,
 	return -EAGAIN;
 }
 
-static int pmu_validate_hw_event(struct cci_pmu *cci_pmu, unsigned long hw_event)
+static int cci400_get_event_idx(struct cci_pmu *cci_pmu,
+				struct cci_pmu_hw_events *hw,
+				unsigned long cci_event)
+{
+	int idx;
+
+	/* cycles event idx is fixed */
+	if (cci_event == CCI_PMU_CYCLES) {
+		if (test_and_set_bit(CCI_PMU_CYCLE_CNTR_IDX, hw->used_mask))
+			return -EAGAIN;
+
+		return CCI_PMU_CYCLE_CNTR_IDX;
+	}
+
+	for (idx = CCI_PMU_CNTR0_IDX; idx <= CCI_PMU_CNTR_LAST(cci_pmu); ++idx)
+		if (!test_and_set_bit(idx, hw->used_mask))
+			return idx;
+
+	/* No counters available */
+	return -EAGAIN;
+}
+
+static int cci400_validate_hw_event(struct cci_pmu *cci_pmu, unsigned long hw_event)
 {
 	u8 ev_source = CCI400_PMU_EVENT_SOURCE(hw_event);
 	u8 ev_code = CCI400_PMU_EVENT_CODE(hw_event);
@@ -375,7 +397,7 @@ static int pmu_validate_hw_event(struct cci_pmu *cci_pmu, unsigned long hw_event
 	if (hw_event & ~CCI400_PMU_EVENT_MASK)
 		return -ENOENT;
 
-	if (hw_event == CCI400_PMU_CYCLES)
+	if (hw_event == CCI_PMU_CYCLES)
 		return hw_event;
 
 	switch (ev_source) {
@@ -814,13 +836,7 @@ static int pmu_map_event(struct perf_event *event)
 			!cci_pmu->model->validate_hw_event)
 		return -ENOENT;
 
-	if (config == CCI_PMU_CYCLES)
-		mapping = config;
-	else
-		mapping = pmu_validate_hw_event(to_cci_pmu(event->pmu),
-							config);
-
-	return mapping;
+	return	cci_pmu->model->validate_hw_event(cci_pmu, event->attr.config);
 }
 
 static int pmu_request_irq(struct cci_pmu *cci_pmu, irq_handler_t handler)
@@ -1152,8 +1168,8 @@ static void cci_pmu_start(struct perf_event *event, int pmu_flags)
 
 	raw_spin_lock_irqsave(&hw_events->pmu_lock, flags);
 
-	/* Configure the event to count, unless you are counting cycles */
-	if (idx != CCI_PMU_CYCLE_CNTR_IDX)
+	/* Configure the counter unless you are counting a fixed event */
+	if (!pmu_fixed_hw_idx(cci_pmu, idx))
 		pmu_set_event(cci_pmu, idx, hwc->config_base);
 
 	pmu_event_set_period(event);
@@ -1510,7 +1526,7 @@ static struct cci_pmu_model cci_pmu_models[] = {
 				CCI400_R0_MASTER_PORT_MAX_EV,
 			},
 		},
-		.validate_hw_event = pmu_validate_hw_event,
+		.validate_hw_event = cci400_validate_hw_event,
 		.get_event_idx = cci400_get_event_idx,
 	},
 	[CCI400_R1] = {
@@ -1556,8 +1572,8 @@ static struct cci_pmu_model cci_pmu_models[] = {
 				CCI5xx_GLOBAL_PORT_MAX_EV,
 			},
 		},
-		.validate_hw_event = cci550_validate_hw_event,
-		.write_counters	= cci5xx_pmu_write_counters,
+		.validate_hw_event = cci400_validate_hw_event,
+		.get_event_idx = cci400_get_event_idx,
 	},
 #endif
 };
