@@ -779,7 +779,6 @@ dwc_timer_t *DWC_TIMER_ALLOC(char *name, dwc_timer_callback_t cb, void *data)
 	}
 
 	t->scheduled = 0;
-	t->t->base = &boot_tvec_bases;
 	t->t->expires = jiffies;
 	setup_timer(t->t, timer_callback, (unsigned long)t);
 
