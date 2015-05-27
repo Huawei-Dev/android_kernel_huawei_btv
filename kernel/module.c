@@ -3712,19 +3712,15 @@ const char *module_address_lookup(unsigned long addr,
 			    char **modname,
 			    char *namebuf)
 {
-	struct module *mod;
 	const char *ret = NULL;
+	struct module *mod;
 
 	preempt_disable();
-	list_for_each_entry_rcu(mod, &modules, list) {
-		if (mod->state == MODULE_STATE_UNFORMED)
-			continue;
-		if (within_module(addr, mod)) {
-			if (modname)
-				*modname = mod->name;
-			ret = get_ksymbol(mod, addr, size, offset);
-			break;
-		}
+	mod = __module_address(addr);
+	if (mod) {
+		if (modname)
+			*modname = mod->name;
+		ret = get_ksymbol(mod, addr, size, offset);
 	}
 	/* Make a copy in here where it's safe */
 	if (ret) {
@@ -3732,6 +3728,7 @@ const char *module_address_lookup(unsigned long addr,
 		ret = namebuf;
 	}
 	preempt_enable();
+
 	return ret;
 }
 
