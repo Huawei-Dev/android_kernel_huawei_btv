@@ -38,3 +38,4 @@ the PCIe specification.
 
 - hisilicon,broken-prefetch-cmd
                     : Avoid sending CMD_PREFETCH_* commands to the SMMU.
+
