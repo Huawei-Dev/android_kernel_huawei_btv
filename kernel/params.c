@@ -254,7 +254,7 @@ char *parse_args(const char *doing,
 		return scnprintf(buffer, PAGE_SIZE, format,		\
 				*((type *)kp->arg));			\
 	}								\
-	struct kernel_param_ops param_ops_##name = {			\
+	const struct kernel_param_ops param_ops_##name = {			\
 		.set = param_set_##name,				\
 		.get = param_get_##name,				\
 	};								\
@@ -306,7 +306,7 @@ static void param_free_charp(void *arg)
 	maybe_kfree_parameter(*((char **)arg));
 }
 
-struct kernel_param_ops param_ops_charp = {
+const struct kernel_param_ops param_ops_charp = {
 	.set = param_set_charp,
 	.get = param_get_charp,
 	.free = param_free_charp,
@@ -331,7 +331,7 @@ int param_get_bool(char *buffer, const struct kernel_param *kp)
 }
 EXPORT_SYMBOL(param_get_bool);
 
-struct kernel_param_ops param_ops_bool = {
+const struct kernel_param_ops param_ops_bool = {
 	.flags = KERNEL_PARAM_OPS_FL_NOARG,
 	.set = param_set_bool,
 	.get = param_get_bool,
@@ -359,7 +359,7 @@ int param_get_invbool(char *buffer, const struct kernel_param *kp)
 }
 EXPORT_SYMBOL(param_get_invbool);
 
-struct kernel_param_ops param_ops_invbool = {
+const struct kernel_param_ops param_ops_invbool = {
 	.set = param_set_invbool,
 	.get = param_get_invbool,
 };
@@ -382,7 +382,7 @@ int param_set_bint(const char *val, const struct kernel_param *kp)
 }
 EXPORT_SYMBOL(param_set_bint);
 
-struct kernel_param_ops param_ops_bint = {
+const struct kernel_param_ops param_ops_bint = {
 	.flags = KERNEL_PARAM_OPS_FL_NOARG,
 	.set = param_set_bint,
 	.get = param_get_int,
@@ -479,7 +479,7 @@ static void param_array_free(void *arg)
 			arr->ops->free(arr->elem + arr->elemsize * i);
 }
 
-struct kernel_param_ops param_array_ops = {
+const struct kernel_param_ops param_array_ops = {
 	.set = param_array_set,
 	.get = param_array_get,
 	.free = param_array_free,
@@ -507,7 +507,7 @@ int param_get_string(char *buffer, const struct kernel_param *kp)
 }
 EXPORT_SYMBOL(param_get_string);
 
-struct kernel_param_ops param_ops_string = {
+const struct kernel_param_ops param_ops_string = {
 	.set = param_set_copystring,
 	.get = param_get_string,
 };

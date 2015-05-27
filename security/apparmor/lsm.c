@@ -656,7 +656,7 @@ static struct security_hook_list apparmor_hooks[] = {
 static int param_set_aabool(const char *val, const struct kernel_param *kp);
 static int param_get_aabool(char *buffer, const struct kernel_param *kp);
 #define param_check_aabool param_check_bool
-static struct kernel_param_ops param_ops_aabool = {
+static const struct kernel_param_ops param_ops_aabool = {
 	.flags = KERNEL_PARAM_OPS_FL_NOARG,
 	.set = param_set_aabool,
 	.get = param_get_aabool
@@ -665,7 +665,7 @@ static struct kernel_param_ops param_ops_aabool = {
 static int param_set_aauint(const char *val, const struct kernel_param *kp);
 static int param_get_aauint(char *buffer, const struct kernel_param *kp);
 #define param_check_aauint param_check_uint
-static struct kernel_param_ops param_ops_aauint = {
+static const struct kernel_param_ops param_ops_aauint = {
 	.set = param_set_aauint,
 	.get = param_get_aauint
 };
@@ -673,7 +673,7 @@ static struct kernel_param_ops param_ops_aauint = {
 static int param_set_aalockpolicy(const char *val, const struct kernel_param *kp);
 static int param_get_aalockpolicy(char *buffer, const struct kernel_param *kp);
 #define param_check_aalockpolicy param_check_bool
-static struct kernel_param_ops param_ops_aalockpolicy = {
+static const struct kernel_param_ops param_ops_aalockpolicy = {
 	.flags = KERNEL_PARAM_OPS_FL_NOARG,
 	.set = param_set_aalockpolicy,
 	.get = param_get_aalockpolicy
