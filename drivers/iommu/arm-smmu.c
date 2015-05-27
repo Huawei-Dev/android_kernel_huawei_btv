@@ -1217,9 +1217,11 @@ static phys_addr_t arm_smmu_iova_to_phys_hard(struct iommu_domain *domain,
 
 	/* ATS1 registers can only be written atomically */
 	va = iova & ~0xfffUL;
+#ifdef CONFIG_64BIT
 	if (smmu->version == ARM_SMMU_V2)
-		smmu_writeq(va, cb_base + ARM_SMMU_CB_ATS1PR);
+		writeq_relaxed(va, cb_base + ARM_SMMU_CB_ATS1PR);
 	else
+#endif
 		writel_relaxed(va, cb_base + ARM_SMMU_CB_ATS1PR);
 
 	if (readl_poll_timeout_atomic(cb_base + ARM_SMMU_CB_ATSR, tmp,
