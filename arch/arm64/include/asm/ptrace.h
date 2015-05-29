@@ -186,7 +186,6 @@ static inline int valid_user_regs(struct user_pt_regs *regs)
 
 extern unsigned long profile_pc(struct pt_regs *regs);
 
-
 #ifdef CONFIG_HISI_BB
 /*
  * Get pt_regs info in handling exception.

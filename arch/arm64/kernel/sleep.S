@@ -157,7 +157,6 @@ ENDPROC(cpu_resume_after_mmu)
 
 ENTRY(cpu_resume)
 	bl	el2_setup		// if in EL2 drop to EL1 cleanly
-#ifdef CONFIG_SMP
 	mrs	x1, mpidr_el1
 	adrp	x8, mpidr_hash
 	add x8, x8, #:lo12:mpidr_hash // x8 = struct mpidr_hash phys address
@@ -167,9 +166,7 @@ ENTRY(cpu_resume)
 	ldp	w5, w6, [x8, #(MPIDR_HASH_SHIFTS + 8)]
 	compute_mpidr_hash x7, x3, x4, x5, x6, x1, x2
         /* x7 contains hash index, let's use it to grab context pointer */
-#else
 	mov	x7, xzr
-#endif
 	ldr_l	x0, sleep_save_sp + SLEEP_SAVE_SP_PHYS
 	ldr	x0, [x0, x7, lsl #3]
 	/* load sp from context */
