@@ -391,6 +391,9 @@ struct mlx4_eq {
 	struct mlx4_buf_list   *page_list;
 	struct mlx4_mtt		mtt;
 	struct mlx4_eq_tasklet	tasklet_ctx;
+	struct mlx4_active_ports actv_ports;
+	u32			ref_count;
+	cpumask_var_t		affinity_mask;
 };
 
 struct mlx4_slave_eqe {

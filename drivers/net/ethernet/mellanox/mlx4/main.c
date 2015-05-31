@@ -2481,6 +2481,36 @@ err_uar_table_free:
 	return err;
 }
 
+static int mlx4_init_affinity_hint(struct mlx4_dev *dev, int port, int eqn)
+{
+	int requested_cpu = 0;
+	struct mlx4_priv *priv = mlx4_priv(dev);
+	struct mlx4_eq *eq;
+	int off = 0;
+	int i;
+
+	if (eqn > dev->caps.num_comp_vectors)
+		return -EINVAL;
+
+	for (i = 1; i < port; i++)
+		off += mlx4_get_eqs_per_port(dev, i);
+
+	requested_cpu = eqn - off - !!(eqn > MLX4_EQ_ASYNC);
+
+	/* Meaning EQs are shared, and this call comes from the second port */
+	if (requested_cpu < 0)
+		return 0;
+
+	eq = &priv->eq_table.eq[eqn];
+
+	if (!zalloc_cpumask_var(&eq->affinity_mask, GFP_KERNEL))
+		return -ENOMEM;
+
+	cpumask_set_cpu(requested_cpu, eq->affinity_mask);
+
+	return 0;
+}
+
 static void mlx4_enable_msi_x(struct mlx4_dev *dev)
 {
 	struct mlx4_priv *priv = mlx4_priv(dev);
@@ -2515,8 +2545,51 @@ static void mlx4_enable_msi_x(struct mlx4_dev *dev)
 			dev->caps.comp_pool           = nreq - MSIX_LEGACY_SZ;
 			dev->caps.num_comp_vectors = MSIX_LEGACY_SZ - 1;
 		}
-		for (i = 0; i < nreq; ++i)
-			priv->eq_table.eq[i].irq = entries[i].vector;
+		/* 1 is reserved for events (asyncrounous EQ) */
+		dev->caps.num_comp_vectors = nreq - 1;
+
+		priv->eq_table.eq[MLX4_EQ_ASYNC].irq = entries[0].vector;
+		bitmap_zero(priv->eq_table.eq[MLX4_EQ_ASYNC].actv_ports.ports,
+			    dev->caps.num_ports);
+
+		for (i = 0; i < dev->caps.num_comp_vectors + 1; i++) {
+			if (i == MLX4_EQ_ASYNC)
+				continue;
+
+			priv->eq_table.eq[i].irq =
+				entries[i + 1 - !!(i > MLX4_EQ_ASYNC)].vector;
+
+			if (MLX4_IS_LEGACY_EQ_MODE(dev->caps)) {
+				bitmap_fill(priv->eq_table.eq[i].actv_ports.ports,
+					    dev->caps.num_ports);
+				/* We don't set affinity hint when there
+				 * aren't enough EQs
+				 */
+			} else {
+				set_bit(port,
+					priv->eq_table.eq[i].actv_ports.ports);
+				if (mlx4_init_affinity_hint(dev, port + 1, i))
+					mlx4_warn(dev, "Couldn't init hint cpumask for EQ %d\n",
+						  i);
+			}
+			/* We divide the Eqs evenly between the two ports.
+			 * (dev->caps.num_comp_vectors / dev->caps.num_ports)
+			 * refers to the number of Eqs per port
+			 * (i.e eqs_per_port). Theoretically, we would like to
+			 * write something like (i + 1) % eqs_per_port == 0.
+			 * However, since there's an asynchronous Eq, we have
+			 * to skip over it by comparing this condition to
+			 * !!((i + 1) > MLX4_EQ_ASYNC).
+			 */
+			if ((dev->caps.num_comp_vectors > dev->caps.num_ports) &&
+			    ((i + 1) %
+			     (dev->caps.num_comp_vectors / dev->caps.num_ports)) ==
+			    !!((i + 1) > MLX4_EQ_ASYNC))
+				/* If dev->caps.num_comp_vectors < dev->caps.num_ports,
+				 * everything is shared anyway.
+				 */
+				port++;
+		}
 
 		dev->flags |= MLX4_FLAG_MSI_X;
 
