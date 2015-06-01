@@ -162,6 +162,10 @@ static int sdio_bus_probe(struct device *dev)
 	if (!id)
 		return -ENODEV;
 
+	ret = dev_pm_domain_attach(dev, false);
+	if (ret == -EPROBE_DEFER)
+		return ret;
+
 	/* Unbound SDIO functions are always suspended.
 	 * During probe, the function is set active and the usage count
 	 * is incremented.  If the driver supports runtime PM,
@@ -191,6 +195,7 @@ static int sdio_bus_probe(struct device *dev)
 disable_runtimepm:
 	if (func->card->host->caps & MMC_CAP_POWER_OFF_CARD)
 		pm_runtime_put_noidle(dev);
+	dev_pm_domain_detach(dev, false);
 	return ret;
 }
 
@@ -221,6 +226,8 @@ static int sdio_bus_remove(struct device *dev)
 	/* Then undo the runtime PM settings in sdio_bus_probe() */
 	if (func->card->host->caps & MMC_CAP_POWER_OFF_CARD)
 		pm_runtime_put_sync(dev);
+
+	dev_pm_domain_detach(dev, false);
 
 	return ret;
 }
@@ -366,14 +373,8 @@ int sdio_add_func(struct sdio_func *func)
 	sdio_set_of_node(func);
 	sdio_acpi_set_handle(func);
 	ret = device_add(&func->dev);
-	if (ret == 0) {
+	if (ret == 0)
 		sdio_func_set_present(func);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
-		dev_pm_domain_attach(&func->dev, false);
-#else
-		acpi_dev_pm_attach(&func->dev, false);
-#endif
-	}
 
 	return ret;
 }
@@ -389,13 +390,6 @@ void sdio_remove_func(struct sdio_func *func)
 	if (!sdio_func_present(func))
 		return;
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
-	dev_pm_domain_detach(&func->dev, false);
-#else
-#if ((!defined(CONFIG_ACPI)) || (!defined(CONFIG_PM)))
-	acpi_dev_pm_detach(&func->dev, false);
-#endif
-#endif
 	device_del(&func->dev);
 	of_node_put(func->dev.of_node);
 	put_device(&func->dev);
