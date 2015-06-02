@@ -221,6 +221,7 @@ static void mlx4_slave_event(struct mlx4_dev *dev, int slave,
 	slave_event(dev, slave, eqe);
 }
 
+#if defined(CONFIG_SMP)
 static void mlx4_set_eq_affinity_hint(struct mlx4_priv *priv, int vec)
 {
 	int hint_err;
@@ -234,6 +235,7 @@ static void mlx4_set_eq_affinity_hint(struct mlx4_priv *priv, int vec)
 	if (hint_err)
 		mlx4_warn(dev, "irq_set_affinity_hint failed, err %d\n", hint_err);
 }
+#endif
 
 int mlx4_gen_pkey_eqe(struct mlx4_dev *dev, int slave, u8 port)
 {
@@ -1217,15 +1219,43 @@ int mlx4_init_eq_table(struct mlx4_dev *dev)
 		goto err_out_bitmap;
 	}
 
-	for (i = 0; i < dev->caps.num_comp_vectors; ++i) {
-		err = mlx4_create_eq(dev, dev->caps.num_cqs -
-					  dev->caps.reserved_cqs +
-					  MLX4_NUM_SPARE_EQE,
-				     (dev->flags & MLX4_FLAG_MSI_X) ? i : 0,
-				     &priv->eq_table.eq[i]);
-		if (err) {
-			--i;
-			goto err_out_unmap;
+	for (i = 0; i < dev->caps.num_comp_vectors + 1; ++i) {
+		if (i == MLX4_EQ_ASYNC) {
+			err = mlx4_create_eq(dev,
+					     MLX4_NUM_ASYNC_EQE + MLX4_NUM_SPARE_EQE,
+					     0, &priv->eq_table.eq[MLX4_EQ_ASYNC]);
+		} else {
+			struct mlx4_eq	*eq = &priv->eq_table.eq[i];
+#ifdef CONFIG_RFS_ACCEL
+			int port = find_first_bit(eq->actv_ports.ports,
+						  dev->caps.num_ports) + 1;
+
+			if (port <= dev->caps.num_ports) {
+				struct mlx4_port_info *info =
+					&mlx4_priv(dev)->port[port];
+
+				if (!info->rmap) {
+					info->rmap = alloc_irq_cpu_rmap(
+						mlx4_get_eqs_per_port(dev, port));
+					if (!info->rmap) {
+						mlx4_warn(dev, "Failed to allocate cpu rmap\n");
+						err = -ENOMEM;
+						goto err_out_unmap;
+					}
+				}
+
+				err = irq_cpu_rmap_add(
+					info->rmap, eq->irq);
+				if (err)
+					mlx4_warn(dev, "Failed adding irq rmap\n");
+			}
+#endif
+			err = mlx4_create_eq(dev, dev->caps.num_cqs -
+						  dev->caps.reserved_cqs +
+						  MLX4_NUM_SPARE_EQE,
+					     (dev->flags & MLX4_FLAG_MSI_X) ?
+					     i + 1 - !!(i > MLX4_EQ_ASYNC) : 0,
+					     eq);
 		}
 	}
 
