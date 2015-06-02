@@ -6950,8 +6950,8 @@ int ath10k_mac_register(struct ath10k *ar)
 		ar->hw->wiphy->features |= NL80211_FEATURE_DYNAMIC_SMPS;
 
 	if (ar->ht_cap_info & WMI_HT_CAP_ENABLED) {
-		ar->hw->flags |= IEEE80211_HW_AMPDU_AGGREGATION;
-		ar->hw->flags |= IEEE80211_HW_TX_AMPDU_SETUP_IN_HW;
+		ieee80211_hw_set(ar->hw, AMPDU_AGGREGATION);
+		ieee80211_hw_set(ar->hw, TX_AMPDU_SETUP_IN_HW);
 	}
 
 	ar->hw->wiphy->max_scan_ssids = WLAN_SCAN_PARAMS_MAX_SSID;
