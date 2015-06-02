@@ -1558,6 +1558,102 @@ nodata:
 	return  pdata;
 }
 
+/* All serializers must have equal number of channels */
+static int davinci_mcasp_ch_constraint(struct davinci_mcasp *mcasp,
+				       struct snd_pcm_hw_constraint_list *cl,
+				       int serializers)
+{
+	unsigned int *list;
+	int i, count = 0;
+
+	if (serializers <= 1)
+		return 0;
+
+	list = devm_kzalloc(mcasp->dev, sizeof(unsigned int) *
+			    (mcasp->tdm_slots + serializers - 2),
+			    GFP_KERNEL);
+	if (!list)
+		return -ENOMEM;
+
+	for (i = 2; i <= mcasp->tdm_slots; i++)
+		list[count++] = i;
+
+	for (i = 2; i <= serializers; i++)
+		list[count++] = i*mcasp->tdm_slots;
+
+	cl->count = count;
+	cl->list = list;
+
+	return 0;
+}
+
+
+static int davinci_mcasp_init_ch_constraints(struct davinci_mcasp *mcasp)
+{
+	int rx_serializers = 0, tx_serializers = 0, ret, i;
+
+	for (i = 0; i < mcasp->num_serializer; i++)
+		if (mcasp->serial_dir[i] == TX_MODE)
+			tx_serializers++;
+		else if (mcasp->serial_dir[i] == RX_MODE)
+			rx_serializers++;
+
+	ret = davinci_mcasp_ch_constraint(mcasp, &mcasp->chconstr[
+						  SNDRV_PCM_STREAM_PLAYBACK],
+					  tx_serializers);
+	if (ret)
+		return ret;
+
+	ret = davinci_mcasp_ch_constraint(mcasp, &mcasp->chconstr[
+						  SNDRV_PCM_STREAM_CAPTURE],
+					  rx_serializers);
+
+	return ret;
+}
+
+enum {
+	PCM_EDMA,
+	PCM_SDMA,
+};
+static const char *sdma_prefix = "ti,omap";
+
+static int davinci_mcasp_get_dma_type(struct davinci_mcasp *mcasp)
+{
+	struct dma_chan *chan;
+	const char *tmp;
+	int ret = PCM_EDMA;
+
+	if (!mcasp->dev->of_node)
+		return PCM_EDMA;
+
+	tmp = mcasp->dma_data[SNDRV_PCM_STREAM_PLAYBACK].filter_data;
+	chan = dma_request_slave_channel_reason(mcasp->dev, tmp);
+	if (IS_ERR(chan)) {
+		if (PTR_ERR(chan) != -EPROBE_DEFER)
+			dev_err(mcasp->dev,
+				"Can't verify DMA configuration (%ld)\n",
+				PTR_ERR(chan));
+		return PTR_ERR(chan);
+	}
+	BUG_ON(!chan->device || !chan->device->dev);
+
+	if (chan->device->dev->of_node)
+		ret = of_property_read_string(chan->device->dev->of_node,
+					      "compatible", &tmp);
+	else
+		dev_dbg(mcasp->dev, "DMA controller has no of-node\n");
+
+	dma_release_channel(chan);
+	if (ret)
+		return ret;
+
+	dev_dbg(mcasp->dev, "DMA controller compatible = \"%s\"\n", tmp);
+	if (!strncmp(tmp, sdma_prefix, strlen(sdma_prefix)))
+		return PCM_SDMA;
+
+	return PCM_EDMA;
+}
+
 static int davinci_mcasp_probe(struct platform_device *pdev)
 {
 	struct snd_dmaengine_dai_dma_data *dma_data;
@@ -1752,27 +1848,34 @@ static int davinci_mcasp_probe(struct platform_device *pdev)
 	if (ret != 0)
 		goto err;
 
-	switch (mcasp->version) {
+	ret = davinci_mcasp_get_dma_type(mcasp);
+	switch (ret) {
+	case PCM_EDMA:
 #if IS_BUILTIN(CONFIG_SND_EDMA_SOC) || \
 	(IS_MODULE(CONFIG_SND_DAVINCI_SOC_MCASP) && \
 	 IS_MODULE(CONFIG_SND_EDMA_SOC))
-	case MCASP_VERSION_1:
-	case MCASP_VERSION_2:
-	case MCASP_VERSION_3:
 		ret = edma_pcm_platform_register(&pdev->dev);
-		break;
+#else
+		dev_err(&pdev->dev, "Missing SND_EDMA_SOC\n");
+		ret = -EINVAL;
+		goto err;
 #endif
+		break;
+	case PCM_SDMA:
 #if IS_BUILTIN(CONFIG_SND_OMAP_SOC) || \
 	(IS_MODULE(CONFIG_SND_DAVINCI_SOC_MCASP) && \
 	 IS_MODULE(CONFIG_SND_OMAP_SOC))
-	case MCASP_VERSION_4:
 		ret = omap_pcm_platform_register(&pdev->dev);
-		break;
-#endif
-	default:
-		dev_err(&pdev->dev, "Invalid McASP version: %d\n",
-			mcasp->version);
+#else
+		dev_err(&pdev->dev, "Missing SND_SDMA_SOC\n");
 		ret = -EINVAL;
+		goto err;
+#endif
+		break;
+	default:
+		dev_err(&pdev->dev, "No DMA controller found (%d)\n", ret);
+	case -EPROBE_DEFER:
+		goto err;
 		break;
 	}
 
