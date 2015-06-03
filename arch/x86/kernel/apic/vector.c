@@ -358,13 +358,10 @@ int apic_set_affinity(struct irq_data *data, const struct cpumask *mask,
 	if (!cpumask_intersects(mask, cpu_online_mask))
 		return -EINVAL;
 
-	err = assign_irq_vector(irq, cfg, mask);
-	if (err)
-		return err;
-
-	err = apic->cpu_mask_to_apicid_and(mask, cfg->domain, dest_id);
+	err = assign_irq_vector(irq, data, dest);
 	if (err) {
-		if (assign_irq_vector(irq, cfg, data->affinity))
+		if (assign_irq_vector(irq, data,
+				      irq_data_get_affinity_mask(irq_data)))
 			pr_err("Failed to recover vector for irq %d\n", irq);
 		return err;
 	}
