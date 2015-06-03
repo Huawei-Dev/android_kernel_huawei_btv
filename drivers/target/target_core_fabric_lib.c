@@ -35,6 +35,8 @@
 #include <linux/spinlock.h>
 #include <linux/export.h>
 
+#include <scsi/scsi_proto.h>
+
 #include <target/target_core_base.h>
 #include <target/target_core_fabric.h>
 
