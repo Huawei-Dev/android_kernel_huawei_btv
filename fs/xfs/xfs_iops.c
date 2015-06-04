@@ -699,7 +699,7 @@ xfs_setattr_nonsize(
 
 	if (mp->m_flags & XFS_MOUNT_WSYNC)
 		xfs_trans_set_sync(tp);
-	error = xfs_trans_commit(tp, 0);
+	error = xfs_trans_commit(tp);
 
 	xfs_iunlock(ip, XFS_ILOCK_EXCL);
 
@@ -927,7 +927,7 @@ xfs_setattr_size(
 	if (mp->m_flags & XFS_MOUNT_WSYNC)
 		xfs_trans_set_sync(tp);
 
-	error = xfs_trans_commit(tp, XFS_TRANS_RELEASE_LOG_RES);
+	error = xfs_trans_commit(tp);
 out_unlock:
 	if (lock_flags)
 		xfs_iunlock(ip, lock_flags);
@@ -1003,7 +1003,7 @@ xfs_vn_update_time(
 	}
 	xfs_trans_ijoin(tp, ip, XFS_ILOCK_EXCL);
 	xfs_trans_log_inode(tp, ip, XFS_ILOG_TIMESTAMP);
-	return xfs_trans_commit(tp, 0);
+	return xfs_trans_commit(tp);
 }
 
 #define XFS_FIEMAP_FLAGS	(FIEMAP_FLAG_SYNC|FIEMAP_FLAG_XATTR)
