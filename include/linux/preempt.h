@@ -181,20 +181,34 @@ do { \
 		__preempt_schedule(); \
 } while (0)
 
+#define preempt_enable_notrace() \
+do { \
+	barrier(); \
+	if (unlikely(__preempt_count_dec_and_test())) \
+		__preempt_schedule_notrace(); \
+} while (0)
+
 #define preempt_check_resched() \
 do { \
 	if (should_resched(0)) \
 		__preempt_schedule(); \
 } while (0)
 
-#else
+#else /* !CONFIG_PREEMPT */
 #define preempt_enable() \
 do { \
 	barrier(); \
 	preempt_count_dec(); \
 } while (0)
+
+#define preempt_enable_notrace() \
+do { \
+	barrier(); \
+	__preempt_count_dec(); \
+} while (0)
+
 #define preempt_check_resched() do { } while (0)
-#endif
+#endif /* CONFIG_PREEMPT */
 
 #define preempt_disable_notrace() \
 do { \
@@ -207,22 +221,6 @@ do { \
 	barrier(); \
 	__preempt_count_dec(); \
 } while (0)
-
-#ifdef CONFIG_PREEMPT
-
-#define preempt_enable_notrace() \
-do { \
-	barrier(); \
-	if (unlikely(__preempt_count_dec_and_test())) \
-		__preempt_schedule_notrace(); \
-} while (0)
-#else
-#define preempt_enable_notrace() \
-do { \
-	barrier(); \
-	__preempt_count_dec(); \
-} while (0)
-#endif
 
 #else /* !CONFIG_PREEMPT_COUNT */
 
