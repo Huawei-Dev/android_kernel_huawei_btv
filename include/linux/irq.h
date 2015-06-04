@@ -488,8 +488,7 @@ extern int irq_chip_set_type_parent(struct irq_data *data, unsigned int type);
 #endif
 
 /* Handling of unhandled and spurious interrupts: */
-extern void note_interrupt(unsigned int irq, struct irq_desc *desc,
-			   irqreturn_t action_ret);
+extern void note_interrupt(struct irq_desc *desc, irqreturn_t action_ret);
 
 
 /* Enable/disable irq debugging output: */
