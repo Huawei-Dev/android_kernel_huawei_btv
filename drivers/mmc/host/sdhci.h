@@ -451,6 +451,8 @@ struct sdhci_host {
 /* Controller broken with using ACMD23 */
 #define SDHCI_QUIRK2_ACMD23_BROKEN			(1<<14)
 #define SDHCI_QUIRK2_USE_1_8_V_VMMC			(1<<15)
+/* Broken Clock divider zero in controller */
+#define SDHCI_QUIRK2_CLOCK_DIV_ZERO_BROKEN		(1<<15)
 
 	int irq;		/* Device IRQ */
 	void __iomem *ioaddr;	/* Mapped address */
