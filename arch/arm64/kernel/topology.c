@@ -19,6 +19,8 @@
 #include <linux/nodemask.h>
 #include <linux/of.h>
 #include <linux/sched.h>
+#include <linux/sched.h>
+#include <linux/sched_energy.h>
 
 #include <asm/cputype.h>
 #include <asm/topology.h>
@@ -479,4 +481,6 @@ void __init init_cpu_topology(void)
 		for_each_possible_cpu(cpu)
 			update_siblings_masks(cpu);
 	}
+
+	init_sched_energy_costs();
 }
