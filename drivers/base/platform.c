@@ -341,19 +341,23 @@ int platform_device_add(struct platform_device *pdev)
 
 	for (i = 0; i < pdev->num_resources; i++) {
 		struct resource *p, *r = &pdev->resource[i];
+		unsigned long type = resource_type(r);
 
 		if (r->name == NULL)
 			r->name = dev_name(&pdev->dev);
+			
+		if (!(type == IORESOURCE_MEM || type == IORESOURCE_IO))
+			continue;
 
 		p = r->parent;
 		if (!p) {
-			if (resource_type(r) == IORESOURCE_MEM)
+			if (type == IORESOURCE_MEM)
 				p = &iomem_resource;
-			else if (resource_type(r) == IORESOURCE_IO)
+			else if (type == IORESOURCE_IO)
 				p = &ioport_resource;
 		}
 
-		if (p && insert_resource(p, r)) {
+		if (insert_resource(p, r)) {
 			dev_err(&pdev->dev, "failed to claim resource %d\n", i);
 			ret = -EBUSY;
 			goto failed;
@@ -367,6 +371,7 @@ int platform_device_add(struct platform_device *pdev)
 	if (ret == 0)
 		return ret;
 
+ failed:
 	if (pdev->id_auto) {
 		ida_simple_remove(&platform_devid_ida, pdev->id);
 		pdev->id = PLATFORM_DEVID_AUTO;
@@ -376,8 +381,7 @@ int platform_device_add(struct platform_device *pdev)
 		struct resource *r = &pdev->resource[i];
 		unsigned long type = resource_type(r);
 
-		if ((type == IORESOURCE_MEM || type == IORESOURCE_IO) &&
-				r->parent)
+		if (type == IORESOURCE_MEM || type == IORESOURCE_IO)
 			release_resource(r);
 	}
 
@@ -410,8 +414,7 @@ void platform_device_del(struct platform_device *pdev)
 			struct resource *r = &pdev->resource[i];
 			unsigned long type = resource_type(r);
 
-			if ((type == IORESOURCE_MEM || type == IORESOURCE_IO) &&
-					r->parent)
+			if (type == IORESOURCE_MEM || type == IORESOURCE_IO)
 				release_resource(r);
 		}
 	}
