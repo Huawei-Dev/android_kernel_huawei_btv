@@ -791,6 +791,14 @@ static struct iommu_group *iommu_group_get_for_pci_dev(struct pci_dev *pdev)
 	if (IS_ERR(group))
 		return NULL;
 
+	/*
+	 * Try to allocate a default domain - needs support from the
+	 * IOMMU driver.
+	 */
+	group->default_domain = __iommu_domain_alloc(pdev->dev.bus,
+						     IOMMU_DOMAIN_DMA);
+	group->domain = group->default_domain;
+
 	return group;
 }
 
