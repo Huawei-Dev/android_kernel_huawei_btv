@@ -60,7 +60,6 @@ struct clk_core {
 	int			phase;
 	struct hlist_head	children;
 	struct hlist_node	child_node;
-	struct hlist_node	debug_node;
 	struct hlist_head	clks;
 	unsigned int		notifier_count;
 #ifdef CONFIG_HISI_CLK_DEBUG
@@ -68,6 +67,7 @@ struct clk_core {
 #endif
 #ifdef CONFIG_DEBUG_FS
 	struct dentry		*dentry;
+	struct hlist_node	debug_node;
 #endif
 	struct kref		ref;
 };
