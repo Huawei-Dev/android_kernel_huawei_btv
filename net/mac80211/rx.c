@@ -2136,9 +2136,8 @@ ieee80211_deliver_skb(struct ieee80211_rx_data *rx)
 		/* deliver to local stack */
 		skb->protocol = eth_type_trans(skb, dev);
 		memset(skb->cb, 0, sizeof(skb->cb));
-		if (!(rx->flags & IEEE80211_RX_REORDER_TIMER) &&
-		    rx->local->napi)
-			napi_gro_receive(rx->local->napi, skb);
+		if (rx->napi)
+			napi_gro_receive(rx->napi, skb);
 		else
 			netif_receive_skb(skb);
 	}
@@ -3244,7 +3243,7 @@ void ieee80211_release_reorder_timeout(struct sta_info *sta, int tid)
 		/* This is OK -- must be QoS data frame */
 		.security_idx = tid,
 		.seqno_idx = tid,
-		.flags = IEEE80211_RX_REORDER_TIMER,
+		.napi = NULL, /* must be NULL to not have races */
 	};
 	struct tid_ampdu_rx *tid_agg_rx;
 
@@ -3421,7 +3420,8 @@ static bool ieee80211_prepare_and_rx_handle(struct ieee80211_rx_data *rx,
  * be called with rcu_read_lock protection.
  */
 static void __ieee80211_rx_handle_packet(struct ieee80211_hw *hw,
-					 struct sk_buff *skb)
+					 struct sk_buff *skb,
+					 struct napi_struct *napi)
 {
 	struct ieee80211_local *local = hw_to_local(hw);
 	struct ieee80211_sub_if_data *sdata;
@@ -3437,6 +3437,7 @@ static void __ieee80211_rx_handle_packet(struct ieee80211_hw *hw,
 	memset(&rx, 0, sizeof(rx));
 	rx.skb = skb;
 	rx.local = local;
+	rx.napi = napi;
 
 	if (ieee80211_is_data(fc) || ieee80211_is_mgmt(fc))
 		I802_DEBUG_INC(local->dot11ReceivedFragmentCount);
@@ -3538,7 +3539,8 @@ static void __ieee80211_rx_handle_packet(struct ieee80211_hw *hw,
  * This is the receive path handler. It is called by a low level driver when an
  * 802.11 MPDU is received from the hardware.
  */
-void ieee80211_rx(struct ieee80211_hw *hw, struct sk_buff *skb)
+void ieee80211_rx_napi(struct ieee80211_hw *hw, struct sk_buff *skb,
+		       struct napi_struct *napi)
 {
 	struct ieee80211_local *local = hw_to_local(hw);
 	struct ieee80211_rate *rate = NULL;
@@ -3637,7 +3639,7 @@ void ieee80211_rx(struct ieee80211_hw *hw, struct sk_buff *skb)
 	ieee80211_tpt_led_trig_rx(local,
 			((struct ieee80211_hdr *)skb->data)->frame_control,
 			skb->len);
-	__ieee80211_rx_handle_packet(hw, skb);
+	__ieee80211_rx_handle_packet(hw, skb, napi);
 
 	rcu_read_unlock();
 
@@ -3645,7 +3647,7 @@ void ieee80211_rx(struct ieee80211_hw *hw, struct sk_buff *skb)
  drop:
 	kfree_skb(skb);
 }
-EXPORT_SYMBOL(ieee80211_rx);
+EXPORT_SYMBOL(ieee80211_rx_napi);
 
 /* This is a version of the rx handler that can be called from hard irq
  * context. Post the skb on the queue and schedule the tasklet */
