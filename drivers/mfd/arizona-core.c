@@ -469,6 +469,18 @@ static int arizona_runtime_suspend(struct device *dev)
 	regcache_mark_dirty(arizona->regmap);
 	regulator_disable(arizona->dcvdd);
 
+	/* Allow us to completely power down if no jack detection */
+	if (!(val & ARIZONA_JD1_ENA)) {
+		dev_dbg(arizona->dev, "Fully powering off\n");
+
+		arizona->has_fully_powered_off = true;
+
+		disable_irq_nosync(arizona->irq);
+		arizona_enable_reset(arizona);
+		regulator_bulk_disable(arizona->num_core_supplies,
+				       arizona->core_supplies);
+	}
+
 	return 0;
 }
 #endif
