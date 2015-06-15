@@ -29,6 +29,7 @@ struct inet_diag_handler {
 				   const struct inet_diag_req_v2 *req);
 
 	__u16		idiag_type;
+	__u16		idiag_info_size;
 };
 
 struct inet_connection_sock;

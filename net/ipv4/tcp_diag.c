@@ -66,6 +66,7 @@ static const struct inet_diag_handler tcp_diag_handler = {
 	.dump_one	 = tcp_diag_dump_one,
 	.idiag_get_info	 = tcp_diag_get_info,
 	.idiag_type	 = IPPROTO_TCP,
+	.idiag_info_size = sizeof(struct tcp_info),
 #ifdef CONFIG_INET_DIAG_DESTROY
 	.destroy	 = tcp_diag_destroy,
 #endif
