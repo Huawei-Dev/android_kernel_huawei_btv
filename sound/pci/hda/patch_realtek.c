@@ -4542,6 +4542,8 @@ enum {
 	ALC288_FIXUP_DELL1_MIC_NO_PRESENCE,
 	ALC288_FIXUP_DELL_XPS_13_GPIO6,
 	ALC298_FIXUP_DELL1_MIC_NO_PRESENCE,
+	ALC292_FIXUP_DELL_E7X,
+	ALC292_FIXUP_DISABLE_AAMIX,
 };
 
 static const struct hda_fixup alc269_fixups[] = {
@@ -5082,6 +5084,16 @@ static const struct hda_fixup alc269_fixups[] = {
 		},
 		.chained = true,
 		.chain_id = ALC269_FIXUP_HEADSET_MODE
+	},
+	[ALC292_FIXUP_DISABLE_AAMIX] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc_fixup_disable_aamix,
+	},
+	[ALC292_FIXUP_DELL_E7X] = {
+		.type = HDA_FIXUP_FUNC,
+		.v.func = alc_fixup_dell_xps13,
+		.chained = true,
+		.chain_id = ALC292_FIXUP_DISABLE_AAMIX
 	},
 };
 
@@ -5725,8 +5737,7 @@ static int patch_alc269(struct hda_codec *codec)
 
 	spec = codec->spec;
 	spec->gen.shared_mic_vref_pin = 0x18;
-	if (codec->core.vendor_id != 0x10ec0292)
-		codec->power_save_node = 1;
+	codec->power_save_node = 1;
 
 #ifdef CONFIG_PM
 	codec->patch_ops.suspend = alc269_suspend;
