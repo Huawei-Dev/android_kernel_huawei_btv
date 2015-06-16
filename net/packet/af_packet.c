@@ -1620,7 +1620,8 @@ static void fanout_release(struct sock *sk)
 	}
 	mutex_unlock(&fanout_mutex);
 
-	kfree(po->rollover);
+	if (po->rollover)
+		kfree_rcu(po->rollover, rcu);
 }
 
 static bool packet_extra_vlan_len_allowed(const struct net_device *dev,
