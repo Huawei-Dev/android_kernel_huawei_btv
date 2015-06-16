@@ -1449,8 +1449,9 @@ static bool numa_has_capacity(struct task_numa_env *env)
 	 * --------------------- vs ---------------------
 	 * src->compute_capacity    dst->compute_capacity
 	 */
-	if (src->load * dst->compute_capacity >
-	    dst->load * src->compute_capacity)
+	if (src->load * dst->compute_capacity * env->imbalance_pct >
+
+	    dst->load * src->compute_capacity * 100)
 		return true;
 
 	return false;
