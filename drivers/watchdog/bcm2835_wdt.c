@@ -31,6 +31,13 @@
 #define PM_RSTC_WRCFG_FULL_RESET	0x00000020
 #define PM_RSTC_RESET			0x00000102
 
+/*
+ * The Raspberry Pi firmware uses the RSTS register to know which partiton
+ * to boot from. The partiton value is spread into bits 0, 2, 4, 6, 8, 10.
+ * Partiton 63 is a special partition used by the firmware to indicate halt.
+ */
+#define PM_RSTS_RASPBERRYPI_HALT	0x555
+
 #define SECS_TO_WDOG_TICKS(x) ((x) << 16)
 #define WDOG_TICKS_TO_SECS(x) ((x) >> 16)
 
@@ -105,6 +112,52 @@ static struct watchdog_device bcm2835_wdt_wdd = {
 	.max_timeout =	WDOG_TICKS_TO_SECS(PM_WDOG_TIME_SET),
 	.timeout =	WDOG_TICKS_TO_SECS(PM_WDOG_TIME_SET),
 };
+
+static int
+bcm2835_restart(struct notifier_block *this, unsigned long mode, void *cmd)
+{
+	struct bcm2835_wdt *wdt = container_of(this, struct bcm2835_wdt,
+					       restart_handler);
+	u32 val;
+
+	/* use a timeout of 10 ticks (~150us) */
+	writel_relaxed(10 | PM_PASSWORD, wdt->base + PM_WDOG);
+	val = readl_relaxed(wdt->base + PM_RSTC);
+	val &= PM_RSTC_WRCFG_CLR;
+	val |= PM_PASSWORD | PM_RSTC_WRCFG_FULL_RESET;
+	writel_relaxed(val, wdt->base + PM_RSTC);
+
+	/* No sleeping, possibly atomic. */
+	mdelay(1);
+
+	return 0;
+}
+
+/*
+ * We can't really power off, but if we do the normal reset scheme, and
+ * indicate to bootcode.bin not to reboot, then most of the chip will be
+ * powered off.
+ */
+static void bcm2835_power_off(void)
+{
+	struct device_node *np =
+		of_find_compatible_node(NULL, NULL, "brcm,bcm2835-pm-wdt");
+	struct platform_device *pdev = of_find_device_by_node(np);
+	struct bcm2835_wdt *wdt = platform_get_drvdata(pdev);
+	u32 val;
+
+	/*
+	 * We set the watchdog hard reset bit here to distinguish this reset
+	 * from the normal (full) reset. bootcode.bin will not reboot after a
+	 * hard reset.
+	 */
+	val = readl_relaxed(wdt->base + PM_RSTS);
+	val |= PM_PASSWORD | PM_RSTS_RASPBERRYPI_HALT;
+	writel_relaxed(val, wdt->base + PM_RSTS);
+
+	/* Continue with normal reset mechanism */
+	bcm2835_restart(&wdt->restart_handler, REBOOT_HARD, NULL);
+}
 
 static int bcm2835_wdt_probe(struct platform_device *pdev)
 {
