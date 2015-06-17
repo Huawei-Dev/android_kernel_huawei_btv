@@ -7907,8 +7907,6 @@ static void btrfs_endio_direct_write(struct bio *bio, int err)
 	struct bio *dio_bio;
 	int ret;
 
-	if (err)
-		goto out_done;
 again:
 	ret = btrfs_dec_test_first_ordered_pending(inode, &ordered,
 						   &ordered_offset,
@@ -7931,7 +7929,6 @@ out_test:
 		ordered = NULL;
 		goto again;
 	}
-out_done:
 	dio_bio = dip->dio_bio;
 
 	kfree(dip);
