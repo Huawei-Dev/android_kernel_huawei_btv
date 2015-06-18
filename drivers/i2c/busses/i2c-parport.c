@@ -20,6 +20,8 @@
    GNU General Public License for more details.
  * ------------------------------------------------------------------------ */
 
+#define pr_fmt(fmt) "i2c-parport: " fmt
+
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -163,19 +165,34 @@ static void i2c_parport_irq(void *data)
 static void i2c_parport_attach(struct parport *port)
 {
 	struct i2c_par *adapter;
+	int i;
+	struct pardev_cb i2c_parport_cb;
 
-	adapter = kzalloc(sizeof(struct i2c_par), GFP_KERNEL);
-	if (adapter == NULL) {
-		printk(KERN_ERR "i2c-parport: Failed to kzalloc\n");
+	for (i = 0; i < MAX_DEVICE; i++) {
+		if (parport[i] == -1)
+			continue;
+		if (port->number == parport[i])
+			break;
+	}
+	if (i == MAX_DEVICE) {
+		pr_debug("Not using parport%d.\n", port->number);
 		return;
 	}
 
-	pr_debug("i2c-parport: attaching to %s\n", port->name);
+	adapter = kzalloc(sizeof(struct i2c_par), GFP_KERNEL);
+	if (!adapter)
+		return;
+	memset(&i2c_parport_cb, 0, sizeof(i2c_parport_cb));
+	i2c_parport_cb.flags = PARPORT_FLAG_EXCL;
+	i2c_parport_cb.irq_func = i2c_parport_irq;
+	i2c_parport_cb.private = adapter;
+
+	pr_debug("attaching to %s\n", port->name);
 	parport_disable_irq(port);
 	adapter->pdev = parport_register_device(port, "i2c-parport",
 		NULL, NULL, i2c_parport_irq, PARPORT_FLAG_EXCL, adapter);
 	if (!adapter->pdev) {
-		printk(KERN_ERR "i2c-parport: Unable to register with parport\n");
+		pr_err("Unable to register with parport\n");
 		goto err_free;
 	}
 
@@ -278,12 +295,12 @@ static struct parport_driver i2c_parport_driver = {
 static int __init i2c_parport_init(void)
 {
 	if (type < 0) {
-		printk(KERN_WARNING "i2c-parport: adapter type unspecified\n");
+		pr_warn("adapter type unspecified\n");
 		return -ENODEV;
 	}
 
 	if (type >= ARRAY_SIZE(adapter_parm)) {
-		printk(KERN_WARNING "i2c-parport: invalid type (%d)\n", type);
+		pr_warn("invalid type (%d)\n", type);
 		return -ENODEV;
 	}
 
