@@ -38,14 +38,12 @@ static __init int register_pmem_devices(void)
 	for (i = 0; i < e820.nr_map; i++) {
 		struct e820entry *ei = &e820.map[i];
 
-		if (ei->type == E820_PRAM) {
-			struct resource res = {
-				.flags	= IORESOURCE_MEM,
-				.start	= ei->addr,
-				.end	= ei->addr + ei->size - 1,
-			};
-			register_pmem_device(&res);
-		}
+		memset(&ndr_desc, 0, sizeof(ndr_desc));
+		ndr_desc.res = &res;
+		ndr_desc.attr_groups = e820_pmem_region_attribute_groups;
+		ndr_desc.numa_node = NUMA_NO_NODE;
+		if (!nvdimm_pmem_region_create(nvdimm_bus, &ndr_desc))
+			goto err;
 	}
 
 	return 0;
