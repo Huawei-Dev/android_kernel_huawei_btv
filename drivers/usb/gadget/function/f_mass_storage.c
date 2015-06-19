@@ -2850,8 +2850,6 @@ int fsg_common_set_nluns(struct fsg_common *common, int nluns)
 	common->luns = curlun;
 	common->nluns = nluns;
 
-	pr_info("Number of LUNs=%d\n", common->nluns);
-
 	return 0;
 }
 EXPORT_SYMBOL_GPL(fsg_common_set_nluns);
