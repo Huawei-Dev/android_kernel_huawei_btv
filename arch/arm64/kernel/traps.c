@@ -345,8 +345,7 @@ asmlinkage void __exception do_undefinstr(struct pt_regs *regs)
 	if (call_undef_hook(regs) == 0)
 		return;
 
-	if (show_unhandled_signals && unhandled_signal(current, SIGILL) &&
-	    printk_ratelimit()) {
+	if (show_unhandled_signals_ratelimited() && unhandled_signal(current, SIGILL)) {
 #ifdef CONFIG_HUAWEI_PRINTK_CTRL
 		printk_level_setup(LOGLEVEL_DEBUG);
 #endif
@@ -379,7 +378,7 @@ asmlinkage long do_ni_syscall(struct pt_regs *regs)
 	}
 #endif
 
-	if (show_unhandled_signals && printk_ratelimit()) {
+	if (show_unhandled_signals_ratelimited()) {
 		pr_info("%s[%d]: syscall %d\n", current->comm,
 			task_pid_nr(current), (int)regs->syscallno);
 		dump_instr("", regs);
