@@ -2128,6 +2128,7 @@ static int xs_tcp_finish_connecting(struct rpc_xprt *xprt, struct socket *sock)
 		unsigned int keepidle = xprt->timeout->to_initval / HZ;
 		unsigned int keepcnt = xprt->timeout->to_retries + 1;
 		unsigned int opt_on = 1;
+		unsigned int timeo;
 
 		/* TCP Keepalive options */
 		kernel_setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE,
@@ -2138,6 +2139,12 @@ static int xs_tcp_finish_connecting(struct rpc_xprt *xprt, struct socket *sock)
 				(char *)&keepidle, sizeof(keepidle));
 		kernel_setsockopt(sock, SOL_TCP, TCP_KEEPCNT,
 				(char *)&keepcnt, sizeof(keepcnt));
+
+		/* TCP user timeout (see RFC5482) */
+		timeo = jiffies_to_msecs(xprt->timeout->to_initval) *
+			(xprt->timeout->to_retries + 1);
+		kernel_setsockopt(sock, SOL_TCP, TCP_USER_TIMEOUT,
+				(char *)&timeo, sizeof(timeo));
 
 		write_lock_bh(&sk->sk_callback_lock);
 
