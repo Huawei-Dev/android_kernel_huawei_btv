@@ -1773,8 +1773,7 @@ xlog_recover_do_inode_buffer(
 			return -EFSCORRUPTED;
 		}
 
-		buffer_nextp = (xfs_agino_t *)xfs_buf_offset(bp,
-					      next_unlinked_offset);
+		buffer_nextp = xfs_buf_offset(bp, next_unlinked_offset);
 		*buffer_nextp = *logged_nextp;
 
 		/*
@@ -1782,7 +1781,7 @@ xlog_recover_do_inode_buffer(
 		 * have to leave the inode in a consistent state for whoever
 		 * reads it next....
 		 */
-		xfs_dinode_calc_crc(mp, (struct xfs_dinode *)
+		xfs_dinode_calc_crc(mp,
 				xfs_buf_offset(bp, i * mp->m_sb.sb_inodesize));
 
 	}
@@ -2535,7 +2534,7 @@ xlog_recover_inode_pass2(
 		goto out_release;
 	}
 	ASSERT(in_f->ilf_fields & XFS_ILOG_CORE);
-	dip = (xfs_dinode_t *)xfs_buf_offset(bp, in_f->ilf_boffset);
+	dip = xfs_buf_offset(bp, in_f->ilf_boffset);
 
 	/*
 	 * Make sure the place we're flushing out to really looks
@@ -2874,7 +2873,7 @@ xlog_recover_dquot_pass2(
 		return error;
 
 	ASSERT(bp);
-	ddq = (xfs_disk_dquot_t *)xfs_buf_offset(bp, dq_f->qlf_boffset);
+	ddq = xfs_buf_offset(bp, dq_f->qlf_boffset);
 
 	/*
 	 * If the dquot has an LSN in it, recover the dquot only if it's less
