@@ -538,52 +538,11 @@ static void dw_mci_translate_sglist(struct dw_mci *host, struct mmc_data *data,
 				    unsigned int sg_len)
 {
 	unsigned int desc_len;
-	if(SDMMC_32_BIT_DMA == host->dma_64bit_address) {
-		int i;
-		struct idmac_desc *desc = host->sg_cpu;
-
-		if (!sg_len)
-			return;
-
-		for (i = 0; i < sg_len; i++, desc++) {
-			unsigned int length = sg_dma_len(&data->sg[i]);
-			u32 mem_addr = sg_dma_address(&data->sg[i]);
-
-			/* Set the OWN bit and disable interrupts for this descriptor */
-			desc->des0 = IDMAC_DES0_OWN | IDMAC_DES0_DIC | IDMAC_DES0_CH;
-			if(desc->des0 & IDMAC_DES0_CH) {
-				desc->des1 = 0;
-			}
-			if(desc->des0 & IDMAC_DES0_CH) {
-				desc->des1 = 0;
-			}
-
-			/* Buffer length */
-			IDMAC_SET_BUFFER1_SIZE(desc, length);
-
-			/* Physical address to DMA to/from */
-			desc->des2 = mem_addr;
-		}
-
-		/* Set first descriptor */
-		desc = host->sg_cpu;
-		desc->des0 |= IDMAC_DES0_FD;
-
-		/* Set last descriptor */
-		desc = host->sg_cpu + (i - 1) * sizeof(struct idmac_desc);
-		desc->des0 &= ~(IDMAC_DES0_CH | IDMAC_DES0_DIC);
-		desc->des0 |= IDMAC_DES0_LD;
-
-		wmb();
-	} else {
-		int i;
-
-		struct idmac_desc_64bit *desc_first, *desc_last, *desc;
+	int i;
+	if (host->dma_64bit_address == 1) {
+		struct idmac_desc_64addr *desc_first, *desc_last, *desc;
 
 		desc_first = desc_last = desc = host->sg_cpu;
-
-		if (!sg_len)
-			return;
 
 		for (i = 0; i < sg_len; i++) {
 			unsigned int length = sg_dma_len(&data->sg[i]);
@@ -594,17 +553,13 @@ static void dw_mci_translate_sglist(struct dw_mci *host, struct mmc_data *data,
 					   length : DW_MCI_DESC_DATA_LENGTH;
 
 				length -= desc_len;
-				/* Set the OWN bit and disable interrupts for this descriptor */
-				desc->des0 = IDMAC_DES0_OWN | IDMAC_DES0_DIC | IDMAC_DES0_CH;
 
-				if(desc->des0 & IDMAC_DES0_CH) {
-				        desc->des2 = 0;
-				}
-
-				if(desc->des0 & IDMAC_DES0_CH) {
-					desc->des2 = 0;
-				}
-
+				/*
+				 * Set the OWN bit and disable interrupts
+				 * for this descriptor
+				 */
+				desc->des0 = IDMAC_DES0_OWN | IDMAC_DES0_DIC |
+							IDMAC_DES0_CH;
 
 				/* Buffer length */
 				IDMAC_64ADDR_SET_BUFFER1_SIZE(desc, desc_len);
@@ -612,6 +567,7 @@ static void dw_mci_translate_sglist(struct dw_mci *host, struct mmc_data *data,
 				/* Physical address to DMA to/from */
 				desc->des4 = mem_addr & 0xffffffff;
 				desc->des5 = mem_addr >> 32;
+
 				/* Update physical address for the next desc */
 				mem_addr += desc_len;
 
@@ -627,8 +583,53 @@ static void dw_mci_translate_sglist(struct dw_mci *host, struct mmc_data *data,
 		desc_last->des0 &= ~(IDMAC_DES0_CH | IDMAC_DES0_DIC);
 		desc_last->des0 |= IDMAC_DES0_LD;
 
-		wmb();
+	} else {
+		struct idmac_desc *desc_first, *desc_last, *desc;
+
+		desc_first = desc_last = desc = host->sg_cpu;
+
+		for (i = 0; i < sg_len; i++) {
+			unsigned int length = sg_dma_len(&data->sg[i]);
+			u32 mem_addr = sg_dma_address(&data->sg[i]);
+
+			for ( ; length ; desc++) {
+				desc_len = (length <= DW_MCI_DESC_DATA_LENGTH) ?
+					   length : DW_MCI_DESC_DATA_LENGTH;
+
+				length -= desc_len;
+
+				/*
+				 * Set the OWN bit and disable interrupts
+				 * for this descriptor
+				 */
+				desc->des0 = cpu_to_le32(IDMAC_DES0_OWN |
+							 IDMAC_DES0_DIC |
+							 IDMAC_DES0_CH);
+
+				/* Buffer length */
+				IDMAC_SET_BUFFER1_SIZE(desc, desc_len);
+
+				/* Physical address to DMA to/from */
+				desc->des2 = cpu_to_le32(mem_addr);
+
+				/* Update physical address for the next desc */
+				mem_addr += desc_len;
+
+				/* Save pointer to the last descriptor */
+				desc_last = desc;
+			}
+		}
+
+		/* Set first descriptor */
+		desc_first->des0 |= cpu_to_le32(IDMAC_DES0_FD);
+
+		/* Set last descriptor */
+		desc_last->des0 &= cpu_to_le32(~(IDMAC_DES0_CH |
+					       IDMAC_DES0_DIC));
+		desc_last->des0 |= cpu_to_le32(IDMAC_DES0_LD);
 	}
+
+	wmb();
 }
 
 static void dw_mci_idmac_start_dma(struct dw_mci *host, unsigned int sg_len)
@@ -2555,7 +2556,7 @@ static int dw_mci_init_slot(struct dw_mci *host, unsigned int id)
 #ifdef CONFIG_MMC_DW_IDMAC
 		mmc->max_segs = host->ring_size;
 		mmc->max_blk_size = 65536;
-		mmc->max_seg_size = 0x1000;
+		mmc->max_seg_size = DW_MCI_DESC_DATA_LENGTH;
 		mmc->max_req_size = mmc->max_seg_size * host->ring_size;
 		mmc->max_blk_count = mmc->max_req_size / 512;
 #else
