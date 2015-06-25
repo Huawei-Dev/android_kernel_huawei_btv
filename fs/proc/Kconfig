@@ -72,4 +72,8 @@ config PROC_PAGE_MONITOR
 	  /proc/kpagecount, and /proc/kpageflags. Disabling these
           interfaces will reduce the size of the kernel by approximately 4kb.
 
+config PROC_CHILDREN
+	bool "Include /proc/<pid>/task/<tid>/children file"
+	default n
+	
 source "fs/proc/hisi/Kconfig"
