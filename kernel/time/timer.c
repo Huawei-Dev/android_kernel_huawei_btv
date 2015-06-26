@@ -1494,7 +1494,7 @@ static void __migrate_timers(int cpu, bool remove_pinned)
 
 	BUG_ON(cpu_online(cpu));
 	old_base = per_cpu_ptr(&tvec_bases, cpu);
-	new_base = this_cpu_ptr(&tvec_bases);
+	new_base = get_cpu_ptr(&tvec_bases);
 	/*
 	 * The caller is globally serialized and nobody else
 	 * takes two locks at once, deadlock is not possible.
@@ -1522,6 +1522,7 @@ static void __migrate_timers(int cpu, bool remove_pinned)
 
 	spin_unlock(&old_base->lock);
 	spin_unlock_irq(&new_base->lock);
+	put_cpu_ptr(&tvec_bases);
 }
 
 /* Migrate timers from 'cpu' to this_cpu */
