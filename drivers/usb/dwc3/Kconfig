@@ -129,11 +129,6 @@ config HISI_USB_DWC3_MASK_IRQ_WORKAROUND
 
 comment "Debugging features"
 
-config USB_DWC3_DEBUG
-	bool "Enable Debugging Messages"
-	help
-	  Say Y here to enable debugging messages on DWC3 Driver.
-
 comment "Other features"
 
 config USB_DWC3_OTG

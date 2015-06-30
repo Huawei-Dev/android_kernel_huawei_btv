@@ -1,7 +1,6 @@
 # define_trace.h needs to know how to find our header
 CFLAGS_trace.o				:= -I$(src)
 
-ccflags-$(CONFIG_USB_DWC3_DEBUG)	:= -DDEBUG
 ccflags-$(CONFIG_USB_DWC3_HISI)		+= -DDWC3_ENABLE_CSP
 ccflags-$(CONFIG_USB_DWC3_OTG)		+= -DDWC3_OTG_FORCE_MODE
 ifneq ($(TARGET_BUILD_VARIANT),user)
