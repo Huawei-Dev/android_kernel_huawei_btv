@@ -194,6 +194,111 @@ static void imx5_pm_idle(void)
 	imx5_cpu_do_idle();
 }
 
+static int __init imx_suspend_alloc_ocram(
+				size_t size,
+				void __iomem **virt_out,
+				phys_addr_t *phys_out)
+{
+	struct device_node *node;
+	struct platform_device *pdev;
+	struct gen_pool *ocram_pool;
+	unsigned long ocram_base;
+	void __iomem *virt;
+	phys_addr_t phys;
+	int ret = 0;
+
+	/* Copied from imx6: TODO factorize */
+	node = of_find_compatible_node(NULL, NULL, "mmio-sram");
+	if (!node) {
+		pr_warn("%s: failed to find ocram node!\n", __func__);
+		return -ENODEV;
+	}
+
+	pdev = of_find_device_by_node(node);
+	if (!pdev) {
+		pr_warn("%s: failed to find ocram device!\n", __func__);
+		ret = -ENODEV;
+		goto put_node;
+	}
+
+	ocram_pool = gen_pool_get(&pdev->dev);
+	if (!ocram_pool) {
+		pr_warn("%s: ocram pool unavailable!\n", __func__);
+		ret = -ENODEV;
+		goto put_node;
+	}
+
+	ocram_base = gen_pool_alloc(ocram_pool, size);
+	if (!ocram_base) {
+		pr_warn("%s: unable to alloc ocram!\n", __func__);
+		ret = -ENOMEM;
+		goto put_node;
+	}
+
+	phys = gen_pool_virt_to_phys(ocram_pool, ocram_base);
+	virt = __arm_ioremap_exec(phys, size, false);
+	if (phys_out)
+		*phys_out = phys;
+	if (virt_out)
+		*virt_out = virt;
+
+put_node:
+	of_node_put(node);
+
+	return ret;
+}
+
+static int __init imx5_suspend_init(const struct imx5_pm_data *soc_data)
+{
+	struct imx5_cpu_suspend_info *suspend_info;
+	int ret;
+	/* Need this to avoid compile error due to const typeof in fncpy.h */
+	void (*suspend_asm)(void __iomem *) = soc_data->suspend_asm;
+
+	if (!suspend_asm)
+		return 0;
+
+	if (!soc_data->suspend_asm_sz || !*soc_data->suspend_asm_sz)
+		return -EINVAL;
+
+	ret = imx_suspend_alloc_ocram(
+		*soc_data->suspend_asm_sz + sizeof(*suspend_info),
+		&suspend_ocram_base, NULL);
+	if (ret)
+		return ret;
+
+	suspend_info = suspend_ocram_base;
+
+	suspend_info->io_count = soc_data->suspend_io_count;
+	memcpy(suspend_info->io_state, soc_data->suspend_io_config,
+	       sizeof(*suspend_info->io_state) * soc_data->suspend_io_count);
+
+	suspend_info->m4if_base = ioremap(soc_data->m4if_addr, SZ_16K);
+	if (!suspend_info->m4if_base) {
+		ret = -ENOMEM;
+		goto failed_map_m4if;
+	}
+
+	suspend_info->iomuxc_base = ioremap(soc_data->iomuxc_addr, SZ_16K);
+	if (!suspend_info->iomuxc_base) {
+		ret = -ENOMEM;
+		goto failed_map_iomuxc;
+	}
+
+	imx5_suspend_in_ocram_fn = fncpy(
+		suspend_ocram_base + sizeof(*suspend_info),
+		suspend_asm,
+		*soc_data->suspend_asm_sz);
+
+	return 0;
+
+failed_map_iomuxc:
+	iounmap(suspend_info->m4if_base);
+
+failed_map_m4if:
+	return ret;
+}
+
 static int __init imx5_pm_common_init(const struct imx5_pm_data *data)
 {
 	int ret;
