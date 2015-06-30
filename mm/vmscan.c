@@ -3469,7 +3469,7 @@ static void kswapd_try_to_sleep(pg_data_t *pgdat, int order,
  * If there are applications that are active memory-allocators
  * (most normal use), this basically shouldn't matter.
  */
-static int kswapd(void *p)
+static int __defermem_init kswapd(void *p)
 {
 	unsigned long order, new_order;
 	int classzone_idx, new_classzone_idx;
@@ -3502,6 +3502,8 @@ static int kswapd(void *p)
 	 */
 	tsk->flags |= PF_MEMALLOC | PF_SWAPWRITE | PF_KSWAPD;
 	set_freezable();
+
+	deferred_init_memmap(pgdat->node_id);
 
 	order = new_order = 0;
 	classzone_idx = new_classzone_idx = pgdat->nr_zones - 1;
@@ -3652,8 +3654,11 @@ static int cpu_callback(struct notifier_block *nfb, unsigned long action,
 	return NOTIFY_OK;
 }
 
-
-int kswapd_run(int nid)
+/*
+ * This kswapd start function will be called by init and node-hot-add.
+ * On node-hot-add, kswapd will moved to proper cpus if cpus are hot-added.
+ */
+int __defermem_init kswapd_run(int nid)
 {
 	pg_data_t *pgdat = NODE_DATA(nid);
 	int ret = 0;
