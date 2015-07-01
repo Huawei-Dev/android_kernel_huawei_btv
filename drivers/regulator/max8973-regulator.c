@@ -72,6 +72,7 @@
 #define MAX8973_DISCH_ENBABLE				BIT(5)
 #define MAX8973_FT_ENABLE				BIT(4)
 
+#define MAX8973_CKKADV_TRIP_MASK			0xC
 #define MAX8973_CKKADV_TRIP_DISABLE			0xC
 #define MAX8973_CKKADV_TRIP_75mV_PER_US			0x0
 #define MAX8973_CKKADV_TRIP_150mV_PER_US		0x4
@@ -240,6 +241,86 @@ static unsigned int max8973_dcdc_get_mode(struct regulator_dev *rdev)
 	}
 	return (data & MAX8973_FPWM_EN_M) ?
 		REGULATOR_MODE_FAST : REGULATOR_MODE_NORMAL;
+}
+
+static int max8973_set_ramp_delay(struct regulator_dev *rdev,
+		int ramp_delay)
+{
+	struct max8973_chip *max = rdev_get_drvdata(rdev);
+	unsigned int control;
+	int ret;
+	int ret_val;
+
+	/* Set ramp delay */
+	if (ramp_delay < 25000) {
+		control = MAX8973_RAMP_12mV_PER_US;
+		ret_val = 12000;
+	} else if (ramp_delay < 50000) {
+		control = MAX8973_RAMP_25mV_PER_US;
+		ret_val = 25000;
+	} else if (ramp_delay < 200000) {
+		control = MAX8973_RAMP_50mV_PER_US;
+		ret_val = 50000;
+	} else {
+		control = MAX8973_RAMP_200mV_PER_US;
+		ret_val = 200000;
+	}
+
+	ret = regmap_update_bits(max->regmap, MAX8973_CONTROL1,
+			MAX8973_RAMP_MASK, control);
+	if (ret < 0)
+		dev_err(max->dev, "register %d update failed, %d",
+				MAX8973_CONTROL1, ret);
+	return ret;
+}
+
+static int max8973_set_current_limit(struct regulator_dev *rdev,
+		int min_ua, int max_ua)
+{
+	struct max8973_chip *max = rdev_get_drvdata(rdev);
+	unsigned int val;
+	int ret;
+
+	if (max_ua <= 9000000)
+		val = MAX8973_CKKADV_TRIP_75mV_PER_US;
+	else if (max_ua <= 12000000)
+		val = MAX8973_CKKADV_TRIP_150mV_PER_US;
+	else
+		val = MAX8973_CKKADV_TRIP_DISABLE;
+
+	ret = regmap_update_bits(max->regmap, MAX8973_CONTROL2,
+			MAX8973_CKKADV_TRIP_MASK, val);
+	if (ret < 0) {
+		dev_err(max->dev, "register %d update failed: %d\n",
+				MAX8973_CONTROL2, ret);
+		return ret;
+	}
+	return 0;
+}
+
+static int max8973_get_current_limit(struct regulator_dev *rdev)
+{
+	struct max8973_chip *max = rdev_get_drvdata(rdev);
+	unsigned int control2;
+	int ret;
+
+	ret = regmap_read(max->regmap, MAX8973_CONTROL2, &control2);
+	if (ret < 0) {
+		dev_err(max->dev, "register %d read failed: %d\n",
+				MAX8973_CONTROL2, ret);
+		return ret;
+	}
+	switch (control2 & MAX8973_CKKADV_TRIP_MASK) {
+	case MAX8973_CKKADV_TRIP_DISABLE:
+		return 15000000;
+	case MAX8973_CKKADV_TRIP_150mV_PER_US:
+		return 12000000;
+	case MAX8973_CKKADV_TRIP_75mV_PER_US:
+		return 9000000;
+	default:
+		break;
+	}
+	return 9000000;
 }
 
 static const struct regulator_ops max8973_dcdc_ops = {
@@ -521,6 +602,23 @@ static int max8973_probe(struct i2c_client *client,
 			dev_err(max->dev, "Max8973 Init failed, err = %d\n", ret);
 			return ret;
 		}
+
+		max->desc.enable_reg = MAX8973_VOUT;
+		max->desc.enable_mask = MAX8973_VOUT_ENABLE;
+		max->ops.enable = regulator_enable_regmap;
+		max->ops.disable = regulator_disable_regmap;
+		max->ops.is_enabled = regulator_is_enabled_regmap;
+		max->ops.set_current_limit = max8973_set_current_limit;
+		max->ops.get_current_limit = max8973_get_current_limit;
+		break;
+	default:
+		break;
+	}
+
+	ret = max8973_init_dcdc(max, pdata);
+	if (ret < 0) {
+		dev_err(max->dev, "Max8973 Init failed, err = %d\n", ret);
+		return ret;
 	}
 
 	config.dev = &client->dev;
