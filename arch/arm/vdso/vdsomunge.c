@@ -45,6 +45,7 @@
  * it does.
  */
 
+#include <byteswap.h>
 #include <elf.h>
 #include <errno.h>
 #include <fcntl.h>
