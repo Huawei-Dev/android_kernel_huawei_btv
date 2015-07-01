@@ -120,6 +120,17 @@ struct msm_otg_platform_data {
 };
 
 /**
+ * struct msm_usb_cable - structure for exteternal connector cable
+ *			  state tracking
+ * @nb: hold event notification callback
+ * @conn: used for notification registration
+ */
+struct msm_usb_cable {
+	struct notifier_block		nb;
+	struct extcon_dev		*extcon;
+};
+
+/**
  * struct msm_otg: OTG driver data. Shared by HCD and DCD.
  * @otg: USB OTG Transceiver structure.
  * @pdata: otg device platform data.

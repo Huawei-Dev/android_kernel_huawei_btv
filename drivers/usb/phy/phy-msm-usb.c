@@ -1487,6 +1487,56 @@ static int msm_otg_read_dt(struct platform_device *pdev, struct msm_otg *motg)
 		motg->vdd_levels[VDD_LEVEL_MAX] = tmp[VDD_LEVEL_MAX];
 	}
 
+	motg->manual_pullup = of_property_read_bool(node, "qcom,manual-pullup");
+
+	ext_id = ERR_PTR(-ENODEV);
+	ext_vbus = ERR_PTR(-ENODEV);
+	if (of_property_read_bool(node, "extcon")) {
+
+		/* Each one of them is not mandatory */
+		ext_vbus = extcon_get_edev_by_phandle(&pdev->dev, 0);
+		if (IS_ERR(ext_vbus) && PTR_ERR(ext_vbus) != -ENODEV)
+			return PTR_ERR(ext_vbus);
+
+		ext_id = extcon_get_edev_by_phandle(&pdev->dev, 1);
+		if (IS_ERR(ext_id) && PTR_ERR(ext_id) != -ENODEV)
+			return PTR_ERR(ext_id);
+	}
+
+	if (!IS_ERR(ext_vbus)) {
+		motg->vbus.extcon = ext_vbus;
+		motg->vbus.nb.notifier_call = msm_otg_vbus_notifier;
+		ret = extcon_register_notifier(ext_vbus, EXTCON_USB,
+						&motg->vbus.nb);
+		if (ret < 0) {
+			dev_err(&pdev->dev, "register VBUS notifier failed\n");
+			return ret;
+		}
+
+		ret = extcon_get_cable_state_(ext_vbus, EXTCON_USB);
+		if (ret)
+			set_bit(B_SESS_VLD, &motg->inputs);
+		else
+			clear_bit(B_SESS_VLD, &motg->inputs);
+	}
+
+	if (!IS_ERR(ext_id)) {
+		motg->id.extcon = ext_id;
+		motg->id.nb.notifier_call = msm_otg_id_notifier;
+		ret = extcon_register_notifier(ext_id, EXTCON_USB_HOST,
+						&motg->id.nb);
+		if (ret < 0) {
+			dev_err(&pdev->dev, "register ID notifier failed\n");
+			return ret;
+		}
+
+		ret = extcon_get_cable_state_(ext_id, EXTCON_USB_HOST);
+		if (ret)
+			clear_bit(ID, &motg->inputs);
+		else
+			set_bit(ID, &motg->inputs);
+	}
+
 	prop = of_find_property(node, "qcom,phy-init-sequence", &len);
 	if (!prop || !len)
 		return 0;
@@ -1699,6 +1749,9 @@ static int msm_otg_remove(struct platform_device *pdev)
 
 	if (phy->otg->host || phy->otg->gadget)
 		return -EBUSY;
+
+	extcon_unregister_notifier(motg->id.extcon, EXTCON_USB_HOST, &motg->id.nb);
+	extcon_unregister_notifier(motg->vbus.extcon, EXTCON_USB, &motg->vbus.nb);
 
 	msm_otg_debugfs_cleanup();
 	cancel_delayed_work_sync(&motg->chg_work);
