@@ -2516,15 +2516,14 @@ static bool tcp_try_undo_loss(struct sock *sk, bool frto_undo)
 	return false;
 }
 
-/* The cwnd reduction in CWR and Recovery use the PRR algorithm
- * https://datatracker.ietf.org/doc/draft-ietf-tcpm-proportional-rate-reduction/
+/* The cwnd reduction in CWR and Recovery uses the PRR algorithm in RFC 6937.
  * It computes the number of packets to send (sndcnt) based on packets newly
  * delivered:
  *   1) If the packets in flight is larger than ssthresh, PRR spreads the
  *	cwnd reductions across a full RTT.
- *   2) If packets in flight is lower than ssthresh (such as due to excess
- *	losses and/or application stalls), do not perform any further cwnd
- *	reductions, but instead slow start up to ssthresh.
+ *   2) Otherwise PRR uses packet conservation to send as much as delivered.
+ *      But when the retransmits are acked without further losses, PRR
+ *      slow starts cwnd up to ssthresh to speed up the recovery.
  */
 static void tcp_init_cwnd_reduction(struct sock *sk)
 {
@@ -2541,7 +2540,7 @@ static void tcp_init_cwnd_reduction(struct sock *sk)
 }
 
 static void tcp_cwnd_reduction(struct sock *sk, const int prior_unsacked,
-			       int fast_rexmit)
+			       int fast_rexmit, int flag)
 {
 	struct tcp_sock *tp = tcp_sk(sk);
 	int sndcnt = 0;
@@ -2553,16 +2552,18 @@ static void tcp_cwnd_reduction(struct sock *sk, const int prior_unsacked,
 		return;
 
 	tp->prr_delivered += newly_acked_sacked;
-	if (tcp_packets_in_flight(tp) > tp->snd_ssthresh) {
+	if (delta < 0) {
 		u64 dividend = (u64)tp->snd_ssthresh * tp->prr_delivered +
 			       tp->prior_cwnd - 1;
 		sndcnt = div_u64(dividend, tp->prior_cwnd) - tp->prr_out;
-	} else {
+	} else if ((flag & FLAG_RETRANS_DATA_ACKED) &&
+		   !(flag & FLAG_LOST_RETRANS)) {
 		sndcnt = min_t(int, delta,
 			       max_t(int, tp->prr_delivered - tp->prr_out,
 				     newly_acked_sacked) + 1);
+	} else {
+		sndcnt = min(delta, newly_acked_sacked);
 	}
-
 	sndcnt = max(sndcnt, (fast_rexmit ? 1 : 0));
 	tp->snd_cwnd = tcp_packets_in_flight(tp) + sndcnt;
 }
@@ -2623,7 +2624,7 @@ static void tcp_try_to_open(struct sock *sk, int flag, const int prior_unsacked)
 	if (inet_csk(sk)->icsk_ca_state != TCP_CA_CWR) {
 		tcp_try_keep_open(sk);
 	} else {
-		tcp_cwnd_reduction(sk, prior_unsacked, 0);
+		tcp_cwnd_reduction(sk, prior_unsacked, 0, flag);
 	}
 }
 
@@ -2784,7 +2785,7 @@ static void tcp_process_loss(struct sock *sk, int flag, bool is_dupack)
 
 /* Undo during fast recovery after partial ACK. */
 static bool tcp_try_undo_partial(struct sock *sk, const int acked,
-				 const int prior_unsacked)
+				 const int prior_unsacked, int flag)
 {
 	struct tcp_sock *tp = tcp_sk(sk);
 
@@ -2800,7 +2801,7 @@ static bool tcp_try_undo_partial(struct sock *sk, const int acked,
 		 * mark more packets lost or retransmit more.
 		 */
 		if (tp->retrans_out) {
-			tcp_cwnd_reduction(sk, prior_unsacked, 0);
+			tcp_cwnd_reduction(sk, prior_unsacked, 0, flag);
 			return true;
 		}
 
@@ -2893,7 +2894,7 @@ static void tcp_fastretrans_alert(struct sock *sk, const int acked,
 			if (tcp_is_reno(tp) && is_dupack)
 				tcp_add_reno_sack(sk);
 		} else {
-			if (tcp_try_undo_partial(sk, acked, prior_unsacked))
+			if (tcp_try_undo_partial(sk, acked, prior_unsacked, flag))
 				return;
 			/* Partial ACK arrived. Force fast retransmit. */
 			do_lost = tcp_is_reno(tp) ||
@@ -2953,9 +2954,9 @@ static void tcp_fastretrans_alert(struct sock *sk, const int acked,
 		tcp_update_scoreboard(sk, fast_rexmit);
 #ifdef CONFIG_HW_CROSSLAYER_OPT
 	if (icsk->icsk_ca_state != TCP_CA_Modem_Drop)
-		tcp_cwnd_reduction(sk, prior_unsacked, fast_rexmit);
+		tcp_cwnd_reduction(sk, prior_unsacked, fast_rexmit, flag);
 #else
-	tcp_cwnd_reduction(sk, prior_unsacked, fast_rexmit);
+	tcp_cwnd_reduction(sk, prior_unsacked, fast_rexmit, flag);
 #endif
 	tcp_xmit_retransmit_queue(sk);
 }
