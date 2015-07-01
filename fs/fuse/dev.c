@@ -52,6 +52,7 @@ static void fuse_request_init(struct fuse_req *req, struct page **pages,
 	req->pages = pages;
 	req->page_descs = page_descs;
 	req->max_pages = npages;
+	__set_bit(FR_PENDING, &req->flags);
 }
 
 static struct fuse_req *__fuse_request_alloc(unsigned npages, gfp_t flags)
@@ -384,8 +385,10 @@ __releases(fc->lock)
 	req->end = NULL;
 	list_del_init(&req->list);
 	list_del_init(&req->intr_entry);
+	WARN_ON(test_bit(FR_PENDING, &req->flags));
+	WARN_ON(test_bit(FR_SENT, &req->flags));
 	smp_wmb();
-	req->state = FUSE_REQ_FINISHED;
+	set_bit(FR_FINISHED, &req->flags);
 	if (test_bit(FR_BACKGROUND, &req->flags)) {
 		clear_bit(FR_BACKGROUND, &req->flags);
 		if (fc->num_background == fc->max_background)
@@ -425,13 +428,13 @@ static void request_wait_answer(struct fuse_conn *fc, struct fuse_req *req)
 	if (!fc->no_interrupt) {
 		/* Any signal may interrupt this */
 		err = wait_event_interruptible(req->waitq,
-					req->state == FUSE_REQ_FINISHED);
+					test_bit(FR_FINISHED, &req->flags));
 		if (!err)
 			return;
 
 		spin_lock(&fc->lock);
 		set_bit(FR_INTERRUPTED, &req->flags);
-		if (req->state == FUSE_REQ_SENT)
+		if (test_bit(FR_SENT, &req->flags))
 			queue_interrupt(fc, req);
 		spin_unlock(&fc->lock);
 	}
@@ -442,7 +445,7 @@ static void request_wait_answer(struct fuse_conn *fc, struct fuse_req *req)
 		/* Only fatal signals may interrupt this */
 		block_sigs(&oldset);
 		err = wait_event_interruptible(req->waitq,
-					req->state == FUSE_REQ_FINISHED);
+					test_bit(FR_FINISHED, &req->flags));
 		restore_sigs(&oldset);
 
 		if (!err)
@@ -450,7 +453,7 @@ static void request_wait_answer(struct fuse_conn *fc, struct fuse_req *req)
 
 		spin_lock(&fc->lock);
 		/* Request is not yet in userspace, bail out */
-		if (req->state == FUSE_REQ_PENDING) {
+		if (test_bit(FR_PENDING, &req->flags)) {
 			list_del(&req->list);
 			spin_unlock(&fc->lock);
 			__fuse_put_request(req);
@@ -464,7 +467,7 @@ static void request_wait_answer(struct fuse_conn *fc, struct fuse_req *req)
 	 * Either request is already in userspace, or it was forced.
 	 * Wait it out.
 	 */
-	wait_event(req->waitq, req->state == FUSE_REQ_FINISHED);
+	wait_event(req->waitq, test_bit(FR_FINISHED, &req->flags));
 }
 
 static void __fuse_request_send(struct fuse_conn *fc, struct fuse_req *req)
@@ -1277,7 +1280,7 @@ static ssize_t fuse_dev_do_read(struct fuse_conn *fc, struct file *file,
 	}
 
 	req = list_entry(fc->pending.next, struct fuse_req, list);
-	req->state = FUSE_REQ_IO;
+	clear_bit(FR_PENDING, &req->flags);
 	list_move(&req->list, &fc->io);
 
 	in = &req->in;
@@ -1312,7 +1315,7 @@ static ssize_t fuse_dev_do_read(struct fuse_conn *fc, struct file *file,
 	if (!test_bit(FR_ISREPLY, &req->flags)) {
 		request_end(fc, req);
 	} else {
-		req->state = FUSE_REQ_SENT;
+		set_bit(FR_SENT, &req->flags);
 		list_move_tail(&req->list, &fc->processing);
 		if (test_bit(FR_INTERRUPTED, &req->flags))
 			queue_interrupt(fc, req);
@@ -1908,7 +1911,7 @@ static ssize_t fuse_dev_do_write(struct fuse_conn *fc,
 		return nbytes;
 	}
 
-	req->state = FUSE_REQ_IO;
+	clear_bit(FR_SENT, &req->flags);
 	list_move(&req->list, &fc->io);
 	req->out.h = oh;
 	set_bit(FR_LOCKED, &req->flags);
@@ -2067,6 +2070,8 @@ __acquires(fc->lock)
 		struct fuse_req *req;
 		req = list_entry(head->next, struct fuse_req, list);
 		req->out.h.error = -ECONNABORTED;
+		clear_bit(FR_PENDING, &req->flags);
+		clear_bit(FR_SENT, &req->flags);
 		request_end(fc, req);
 		spin_lock(&fc->lock);
 	}
