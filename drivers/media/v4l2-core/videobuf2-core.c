@@ -852,7 +852,8 @@ void vb2_buffer_done(struct vb2_buffer *vb, enum vb2_buffer_state state)
 
 	if (WARN_ON(state != VB2_BUF_STATE_DONE &&
 		    state != VB2_BUF_STATE_ERROR &&
-		    state != VB2_BUF_STATE_QUEUED))
+		    state != VB2_BUF_STATE_QUEUED &&
+		    state != VB2_BUF_STATE_REQUEUEING))
 		state = VB2_BUF_STATE_ERROR;
 
 #ifdef CONFIG_VIDEO_ADV_DEBUG
@@ -869,24 +870,32 @@ void vb2_buffer_done(struct vb2_buffer *vb, enum vb2_buffer_state state)
 	for (plane = 0; plane < vb->num_planes; ++plane)
 		call_void_memop(vb, finish, vb->planes[plane].mem_priv);
 
-	/* Add the buffer to the done buffers list */
 	spin_lock_irqsave(&q->done_lock, flags);
-	vb->state = state;
-	if (state != VB2_BUF_STATE_QUEUED)
+	if (state == VB2_BUF_STATE_QUEUED ||
+	    state == VB2_BUF_STATE_REQUEUEING) {
+		vb->state = VB2_BUF_STATE_QUEUED;
+	} else {
+		/* Add the buffer to the done buffers list */
 		list_add_tail(&vb->done_entry, &q->done_list);
+		vb->state = state;
+	}
 	atomic_dec(&q->owned_by_drv_count);
 	spin_unlock_irqrestore(&q->done_lock, flags);
 
 	trace_vb2_buf_done(q, vb);
 
-	if (state == VB2_BUF_STATE_QUEUED) {
+	switch (state) {
+	case VB2_BUF_STATE_QUEUED:
+		return;
+	case VB2_BUF_STATE_REQUEUEING:
 		if (q->start_streaming_called)
 			__enqueue_in_driver(vb);
 		return;
+	default:
+		/* Inform any processes that may be waiting for buffers */
+		wake_up(&q->done_wq);
+		break;
 	}
-
-	/* Inform any processes that may be waiting for buffers */
-	wake_up(&q->done_wq);
 }
 EXPORT_SYMBOL_GPL(vb2_buffer_done);
 
