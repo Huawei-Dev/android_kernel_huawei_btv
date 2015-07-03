@@ -345,7 +345,7 @@ asmlinkage void __exception do_undefinstr(struct pt_regs *regs)
 	if (call_undef_hook(regs) == 0)
 		return;
 
-	if (show_unhandled_signals_ratelimited() && unhandled_signal(current, SIGILL)) {
+	if (unhandled_signal(current, SIGILL) && show_unhandled_signals_ratelimited()) {
 #ifdef CONFIG_HUAWEI_PRINTK_CTRL
 		printk_level_setup(LOGLEVEL_DEBUG);
 #endif
