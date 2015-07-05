@@ -1,8 +1,8 @@
 VERSION = 4
-PATCHLEVEL = 1
-SUBLEVEL = 18
-EXTRAVERSION =
-NAME = Series 4800
+PATCHLEVEL = 2
+SUBLEVEL = 0
+EXTRAVERSION = -rc1
+NAME = Hurr durr I'ma sheep
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
