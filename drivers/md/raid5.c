@@ -6388,8 +6388,7 @@ static unsigned long raid5_cache_scan(struct shrinker *shrink,
 
 	if (mutex_trylock(&conf->cache_size_mutex)) {
 		ret= 0;
-		while (ret < sc->nr_to_scan &&
-		       conf->max_nr_stripes > conf->min_nr_stripes) {
+		while (ret < sc->nr_to_scan) {
 			if (drop_one_stripe(conf) == 0) {
 				ret = SHRINK_STOP;
 				break;
