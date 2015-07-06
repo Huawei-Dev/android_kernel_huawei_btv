@@ -621,8 +621,6 @@ next:
 		return ERR_PTR(-EAGAIN);
 	}
 
-	iter->p = NULL;
-
 	return NULL;
 }
 EXPORT_SYMBOL_GPL(rhashtable_walk_next);
