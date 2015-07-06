@@ -1832,6 +1832,13 @@ static struct sk_buff *xgbe_create_skb(struct napi_struct *napi,
 	if (!skb)
 		return NULL;
 
+	/* Start with the header buffer which may contain just the header
+	 * or the header plus data
+	 */
+	dma_sync_single_range_for_cpu(pdata->dev, rdata->rx.hdr.dma_base,
+				      rdata->rx.hdr.dma_off,
+				      rdata->rx.hdr.dma_len, DMA_FROM_DEVICE);
+
 	packet = page_address(rdata->rx.hdr.pa.pages) +
 		 rdata->rx.hdr.pa.pages_offset;
 	copy_len = (rdata->rx.hdr_len) ? rdata->rx.hdr_len : *len;
@@ -1839,7 +1846,21 @@ static struct sk_buff *xgbe_create_skb(struct napi_struct *napi,
 	skb_copy_to_linear_data(skb, packet, copy_len);
 	skb_put(skb, copy_len);
 
-	*len -= copy_len;
+	len -= copy_len;
+	if (len) {
+		/* Add the remaining data as a frag */
+		dma_sync_single_range_for_cpu(pdata->dev,
+					      rdata->rx.buf.dma_base,
+					      rdata->rx.buf.dma_off,
+					      rdata->rx.buf.dma_len,
+					      DMA_FROM_DEVICE);
+
+		skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags,
+				rdata->rx.buf.pa.pages,
+				rdata->rx.buf.pa.pages_offset,
+				len, rdata->rx.buf.dma_len);
+		rdata->rx.buf.pa.pages = NULL;
+	}
 
 	return skb;
 }
@@ -2001,13 +2022,10 @@ read_again:
 				skb = xgbe_create_skb(napi, rdata, &put_len);
 				if (!skb) {
 					error = 1;
-					goto skip_data;
-				}
-			}
-
-			if (put_len) {
-				dma_sync_single_for_cpu(pdata->dev,
-							rdata->rx.buf.dma,
+			} else if (rdesc_len) {
+				dma_sync_single_range_for_cpu(pdata->dev,
+							rdata->rx.buf.dma_base,
+							rdata->rx.buf.dma_off,
 							rdata->rx.buf.dma_len,
 							DMA_FROM_DEVICE);
 
