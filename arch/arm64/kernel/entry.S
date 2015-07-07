@@ -368,8 +368,8 @@ el1_inv:
 	// TODO: add support for undefined instructions in kernel mode
 	enable_dbg
 	mov	x0, sp
+	mov	x2, x1
 	mov	x1, #BAD_SYNC
-	mrs	x2, esr_el1
 	b	bad_mode
 #ifdef CONFIG_TLB_CONFLICT_WORKAROUND
 el1_iabt_curr_el:
@@ -593,7 +593,7 @@ el0_inv:
 	ct_user_exit
 	mov	x0, sp
 	mov	x1, #BAD_SYNC
-	mrs	x2, esr_el1
+	mov	x2, x25
 	bl	bad_mode
 	b	ret_to_user
 ENDPROC(el0_sync)
