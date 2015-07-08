@@ -980,7 +980,7 @@ static int soc_bind_dai_link(struct snd_soc_card *card, int num)
 
 static void soc_remove_component(struct snd_soc_component *component)
 {
-	if (!component->probed)
+	if (!component->card)
 		return;
 
 	/* This is a HACK and will be removed soon */
@@ -993,7 +993,7 @@ static void soc_remove_component(struct snd_soc_component *component)
 	snd_soc_dapm_free(snd_soc_component_get_dapm(component));
 
 	soc_cleanup_component_debugfs(component);
-	component->probed = 0;
+	component->card = NULL;
 	module_put(component->dev->driver->owner);
 }
 
@@ -1107,7 +1107,7 @@ static int soc_probe_component(struct snd_soc_card *card,
 	if (!strcmp(component->name, "snd-soc-dummy"))
 		return 0;
 
-	if (component->probed) {
+	if (component->card) {
 		if (component->card != card) {
 			dev_err(component->dev,
 				"Trying to bind component to card \"%s\" but is already bound to card \"%s\"\n",
@@ -1117,12 +1117,12 @@ static int soc_probe_component(struct snd_soc_card *card,
 		return 0;
 	}
 
+	if (!try_module_get(component->dev->driver->owner))
+		return -ENODEV;
+
 	component->card = card;
 	dapm->card = card;
 	soc_set_name_prefix(card, component);
-
-	if (!try_module_get(component->dev->driver->owner))
-		return -ENODEV;
 
 	soc_init_component_debugfs(component);
 
@@ -1167,7 +1167,6 @@ static int soc_probe_component(struct snd_soc_card *card,
 		snd_soc_dapm_add_routes(dapm, component->dapm_routes,
 					component->num_dapm_routes);
 
-	component->probed = 1;
 	list_add(&dapm->list, &card->dapm_list);
 
 	/* This is a HACK and will be removed soon */
@@ -1178,6 +1177,7 @@ static int soc_probe_component(struct snd_soc_card *card,
 
 err_probe:
 	soc_cleanup_component_debugfs(component);
+	component->card = NULL;
 	module_put(component->dev->driver->owner);
 
 	return ret;
@@ -1461,7 +1461,7 @@ static void soc_remove_aux_dev(struct snd_soc_card *card, int num)
 		rtd->dev_registered = 0;
 	}
 
-	if (component && component->probed)
+	if (component)
 		soc_remove_component(component);
 }
 
