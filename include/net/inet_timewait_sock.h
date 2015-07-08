@@ -123,7 +123,7 @@ static inline void inet_twsk_reschedule(struct inet_timewait_sock *tw, int timeo
 	__inet_twsk_schedule(tw, timeo, true);
 }
 
-void inet_twsk_deschedule(struct inet_timewait_sock *tw);
+void inet_twsk_deschedule_put(struct inet_timewait_sock *tw);
 
 void inet_twsk_purge(struct inet_hashinfo *hashinfo,
 		     struct inet_timewait_death_row *twdr, int family);
