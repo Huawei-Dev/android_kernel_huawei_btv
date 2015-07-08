@@ -420,6 +420,7 @@ __v7_setup:
 	bl      v7_invalidate_l1
 	ldmia	r12, {r0-r5, lr}
 
+__v7_setup_cont:
 	and	r0, r9, #0xff000000		@ ARM?
 	teq	r0, #0x41000000
 	bne	__errata_finish
