@@ -12,6 +12,7 @@
 #include <linux/init.h>
 #include <linux/ioport.h>
 #include <linux/interrupt.h>
+#include <linux/irqchip.h>
 #include <linux/irqdomain.h>
 #include <linux/kernel.h>
 #include <linux/spinlock.h>
