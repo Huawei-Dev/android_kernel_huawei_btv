@@ -57,6 +57,7 @@ struct blkcg {
 	int				max_inflights;
 #endif
 
+	struct list_head		all_blkcgs_node;
 #ifdef CONFIG_CGROUP_WRITEBACK
 	struct list_head		cgwb_list;
 #endif
