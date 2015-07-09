@@ -126,7 +126,7 @@ static long clk_composite_determine_rate(struct clk_hw *hw, unsigned long rate,
 					       best_parent_p);
 	} else {
 		pr_err("clk: clk_composite_determine_rate function called, but no mux or rate callback set!\n");
-		return 0;
+		return -EINVAL;
 	}
 }
 

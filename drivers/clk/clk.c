@@ -450,6 +450,9 @@ clk_mux_determine_rate_flags(struct clk_hw *hw, unsigned long rate,
 		}
 	}
 
+	if (!best_parent)
+		return -EINVAL;
+
 out:
 	if (best_parent)
 		*best_parent_p = best_parent->hw;
