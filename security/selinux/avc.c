@@ -116,14 +116,7 @@ static void avc_dump_av(struct audit_buffer *ab, u16 tclass, u32 av)
 		return;
 	}
 
-/*e846 -e514 -e866 -e30 -e84这5个告警都是由ARRAY_SIZE宏引入，由于该宏是原生的宏，定义在kernel.h中，故申请屏蔽*/
-/*lint -e846 -e514 -e866 -e30 -e84 */
-	if (tclass >= ARRAY_SIZE(secclass_map)) {
-		audit_log_format(ab, " tclass error");
-		return;
-	}
-/*lint +e846 +e514 +e866 +e30 +e84 */
-
+	BUG_ON(!tclass || tclass >= ARRAY_SIZE(secclass_map));
 	perms = secclass_map[tclass-1].perms;
 
 	audit_log_format(ab, " {");
@@ -172,7 +165,7 @@ static void avc_dump_query(struct audit_buffer *ab, u32 ssid, u32 tsid, u16 tcla
 		kfree(scontext);
 	}
 
-	BUG_ON(tclass >= ARRAY_SIZE(secclass_map));
+	BUG_ON(!tclass || tclass >= ARRAY_SIZE(secclass_map));
 	audit_log_format(ab, " tclass=%s", secclass_map[tclass-1].name);
 }
 
