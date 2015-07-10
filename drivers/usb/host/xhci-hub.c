@@ -974,14 +974,12 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 		}
 		break;
 	case SetPortFeature:
-		/* The MSB of wIndex is the TEST Mode */
-		test_mode = (wIndex & 0xff00) >> 8;
 		if (wValue == USB_PORT_FEAT_LINK_STATE)
 			link_state = (wIndex & 0xff00) >> 3;
 		if (wValue == USB_PORT_FEAT_REMOTE_WAKE_MASK)
 			wake_mask = wIndex & 0xff00;
-		/* The MSB of wIndex is the U1/U2 timeout */
-		timeout = (wIndex & 0xff00) >> 8;
+		/* The MSB of wIndex is the U1/U2 timeout OR TEST mode*/
+		test_mode = timeout = (wIndex & 0xff00) >> 8;
 		wIndex &= 0xff;
 		if (!wIndex || wIndex > max_ports)
 			goto error;
@@ -1157,7 +1155,7 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 			break;
 		case USB_PORT_FEAT_TEST:
 			slot_id = xhci_find_slot_id_by_port(hcd, xhci,
-					wIndex + 1);
+							wIndex + 1);
 			if (test_mode && test_mode <= 5) {
 				/* unlock to execute stop endpoint commands */
 				spin_unlock_irqrestore(&xhci->lock, flags);
@@ -1165,9 +1163,13 @@ int xhci_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 				spin_lock_irqsave(&xhci->lock, flags);
 				xhci_halt(xhci);
 
-				temp = readl(port_array[wIndex] + PORTPMSC);
+				temp = readl_relaxed(port_array[wIndex] +
+								PORTPMSC);
 				temp |= test_mode << 28;
-				writel(temp, port_array[wIndex] + PORTPMSC);
+				writel_relaxed(temp, port_array[wIndex] +
+								PORTPMSC);
+				/* to make sure above write goes through */
+				mb();
 			} else {
 				goto error;
 			}
@@ -1423,9 +1425,6 @@ int xhci_bus_suspend(struct usb_hcd *hcd)
 	hcd->state = HC_STATE_SUSPENDED;
 	bus_state->next_statechange = jiffies + msecs_to_jiffies(10);
 	spin_unlock_irqrestore(&xhci->lock, flags);
-
-	if (bus_state->bus_suspended)
-		usleep_range(5000, 10000);
 
 	return 0;
 }
