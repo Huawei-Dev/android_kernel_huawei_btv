@@ -4929,9 +4929,6 @@ static int be_ndo_bridge_getlink(struct sk_buff *skb, u32 pid, u32 seq,
 	int status = 0;
 	u8 hsw_mode;
 
-	if (!sriov_enabled(adapter))
-		return 0;
-
 	/* BE and Lancer chips support VEB mode only */
 	if (BEx_chip(adapter) || lancer_chip(adapter)) {
 		hsw_mode = PORT_FWD_TYPE_VEB;
@@ -4940,6 +4937,9 @@ static int be_ndo_bridge_getlink(struct sk_buff *skb, u32 pid, u32 seq,
 					       adapter->if_handle, &hsw_mode,
 					       NULL);
 		if (status)
+			return 0;
+
+		if (hsw_mode == PORT_FWD_TYPE_PASSTHRU)
 			return 0;
 	}
 
