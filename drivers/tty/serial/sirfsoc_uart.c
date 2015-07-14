@@ -966,6 +966,7 @@ static int sirfsoc_uart_startup(struct uart_port *port)
 		wr_regl(port, ureg->sirfsoc_rx_dma_io_ctrl,
 			rd_regl(port, ureg->sirfsoc_rx_dma_io_ctrl) |
 			SIRFSOC_USP_FRADDR_CLR_EN);
+	enable_irq(port->irq);
 	if (sirfport->rx_dma_chan && !sirfport->is_hrt_enabled) {
 		sirfport->is_hrt_enabled = true;
 		sirfport->rx_period_time = 20000000;
