@@ -10,6 +10,14 @@ Optional properties:
 - phys: reference to the USB PHY
 - phy-names: should be "usb-phy"
 - vbus-supply: reference to the VBUS regulator
+- maximum-speed: limit the maximum connection speed to "full-speed".
+- tpl-support: TPL (Targeted Peripheral List) feature for targeted hosts
+- fsl,usbmisc: (FSL only) phandler of non-core register device, with one
+  argument that indicate usb controller index
+- disable-over-current: (FSL only) disable over current detect
+- external-vbus-divider: (FSL only) enables off-chip resistor divider for Vbus
+- itc-setting: interrupt threshold control register control, the setting
+  should be aligned with ITC bits at register USBCMD.
 
 Example:
 
@@ -21,4 +29,5 @@ Example:
 		phys = <&usb_phy0>;
 		phy-names = "usb-phy";
 		vbus-supply = <&reg_usb0_vbus>;
+		gadget-itc-setting = <0x4>; /* 4 micro-frames */
 	};
