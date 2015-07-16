@@ -1333,7 +1333,15 @@ static void sdhci_set_power(struct sdhci_host *host, unsigned char mode,
 	struct mmc_host *mmc = host->mmc;
 	u8 pwr = 0;
 
-	pr_debug("%s: mode=%d, vdd=%d\n", __func__, mode, vdd);
+	/*
+	 * Don't disable/re-enable power to the card when running a
+	 * suspend/resume sequence and the pm_flags are configured to preserve
+	 * card power during suspend.
+	 */
+	if (mmc_card_keep_power(mmc) &&
+	    ((mmc->dev_status == DEV_SUSPENDED && mode == MMC_POWER_UP) ||
+	     (mmc->dev_status == DEV_SUSPENDING && mode == MMC_POWER_OFF)))
+		return;
 
 #ifdef CONFIG_REGULATOR
 	if (!IS_ERR(mmc->supply.vmmc)) {
