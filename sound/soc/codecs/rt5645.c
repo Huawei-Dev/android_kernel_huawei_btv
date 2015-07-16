@@ -2667,12 +2667,11 @@ static int rt5645_jack_detect(struct snd_soc_codec *codec, int jack_insert)
 		snd_soc_write(codec, RT5645_IN1_CTRL1, 0x0006);
 		snd_soc_write(codec, RT5645_JD_CTRL3, 0x00b0);
 
-		if (codec->component.card->instantiated) {
-			/* for jack type detect */
-			snd_soc_dapm_force_enable_pin(dapm, "LDO2");
-			snd_soc_dapm_force_enable_pin(dapm, "Mic Det Power");
-			snd_soc_dapm_sync(dapm);
-		} else {
+		/* for jack type detect */
+		snd_soc_dapm_force_enable_pin(dapm, "LDO2");
+		snd_soc_dapm_force_enable_pin(dapm, "Mic Det Power");
+		snd_soc_dapm_sync(dapm);
+		if (!dapm->card->instantiated) {
 			/* Power up necessary bits for JD if dapm is
 			   not ready yet */
 			regmap_update_bits(rt5645->regmap, RT5645_PWR_ANLG1,
@@ -2694,12 +2693,8 @@ static int rt5645_jack_detect(struct snd_soc_codec *codec, int jack_insert)
 				rt5645_enable_push_button_irq(codec, true);
 			}
 		} else {
-			if (codec->component.card->instantiated) {
-				snd_soc_dapm_disable_pin(dapm, "Mic Det Power");
-				snd_soc_dapm_sync(dapm);
-			} else
-				regmap_update_bits(rt5645->regmap,
-					RT5645_PWR_VOL, RT5645_PWR_MIC_DET, 0);
+			snd_soc_dapm_disable_pin(dapm, "Mic Det Power");
+			snd_soc_dapm_sync(dapm);
 			rt5645->jack_type = SND_JACK_HEADPHONE;
 		}
 
@@ -2708,19 +2703,10 @@ static int rt5645_jack_detect(struct snd_soc_codec *codec, int jack_insert)
 		if (rt5645->en_button_func)
 			rt5645_enable_push_button_irq(codec, false);
 		else {
-			if (codec->component.card->instantiated) {
-				if (rt5645->pdata.jd_mode == 0)
-					snd_soc_dapm_disable_pin(dapm, "LDO2");
-				snd_soc_dapm_disable_pin(dapm, "Mic Det Power");
-				snd_soc_dapm_sync(dapm);
-			} else {
-				if (rt5645->pdata.jd_mode == 0)
-					regmap_update_bits(rt5645->regmap,
-						RT5645_PWR_MIXER,
-						RT5645_PWR_LDO2, 0);
-				regmap_update_bits(rt5645->regmap,
-					RT5645_PWR_VOL, RT5645_PWR_MIC_DET, 0);
-			}
+			if (rt5645->pdata.jd_mode == 0)
+				snd_soc_dapm_disable_pin(dapm, "LDO2");
+			snd_soc_dapm_disable_pin(dapm, "Mic Det Power");
+			snd_soc_dapm_sync(dapm);
 		}
 	}
 
