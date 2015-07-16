@@ -57,6 +57,8 @@ struct clk_core {
 	unsigned long		flags;
 	unsigned int		enable_count;
 	unsigned int		prepare_count;
+	unsigned long		min_rate;
+	unsigned long		max_rate;
 	unsigned long		accuracy;
 	int			phase;
 	struct hlist_head	children;
@@ -672,6 +674,8 @@ int __clk_determine_rate(struct clk_hw *core, struct clk_rate_request *req);
 int __clk_mux_determine_rate_closest(struct clk_hw *hw,
 				     struct clk_rate_request *req);
 void clk_hw_reparent(struct clk_hw *hw, struct clk_hw *new_parent);
+void clk_hw_set_rate_range(struct clk_hw *hw, unsigned long min_rate,
+			   unsigned long max_rate);
 
 static inline void __clk_hw_set_clk(struct clk_hw *dst, struct clk_hw *src)
 {
