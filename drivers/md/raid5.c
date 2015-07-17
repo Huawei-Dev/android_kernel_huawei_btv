@@ -5536,7 +5536,10 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr, int *sk
 	 * then we need to write out the superblock.
 	 */
 	sector_nr += reshape_sectors;
-	if ((sector_nr - mddev->curr_resync_completed) * 2
+	retn = reshape_sectors;
+finish:
+	if (mddev->curr_resync_completed > mddev->resync_max ||
+	    (sector_nr - mddev->curr_resync_completed) * 2
 	    >= mddev->resync_max - mddev->curr_resync_completed) {
 		/* Cannot proceed until we've updated the superblock... */
 		wait_event(conf->wait_for_overlap,
