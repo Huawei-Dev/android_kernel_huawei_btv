@@ -28,4 +28,4 @@ obj-$(CONFIG_CRYPTO_DEV_UX500) += ux500/
 obj-$(CONFIG_CRYPTO_DEV_QAT) += qat/
 obj-$(CONFIG_CRYPTO_DEV_QCE) += qce/
 obj-$(CONFIG_CRYPTO_DEV_VMX) += vmx/
-obj-$(CONFIG_CRYPTO_DEV_DX_CC63P) += dx_ccp63/
+obj-$(CONFIG_CRYPTO_DEV_SUN4I_SS) += sunxi-ss/

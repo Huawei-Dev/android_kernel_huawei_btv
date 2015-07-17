@@ -480,17 +480,21 @@ config CRYPTO_DEV_IMGTEC_HASH
 	  hardware hash accelerator. Supporting MD5/SHA1/SHA224/SHA256
 	  hashing algorithms.
 
-config CRYPTO_DEV_DX_CC63P
-	tristate "Driver for Discretix dx_cc63p crypto hardwareacceleration"
-	select CRYPTO_ALGAPI
-	default n
+config CRYPTO_DEV_SUN4I_SS
+	tristate "Support for Allwinner Security System cryptographic accelerator"
+	depends on ARCH_SUNXI
+	select CRYPTO_MD5
+	select CRYPTO_SHA1
+	select CRYPTO_AES
+	select CRYPTO_DES
+	select CRYPTO_BLKCIPHER
 	help
-	  This optiontion allows you to have support for Discretix dx_cc63p
-	  acceleration.
+	  Some Allwinner SoC have a crypto accelerator named
+	  Security System. Select this if you want to use it.
+	  The Security System handle AES/DES/3DES ciphers in CBC mode
+	  and SHA1 and MD5 hash algorithms.
 
-
-if CRYPTO_DEV_DX_CC63P
-	source "drivers/crypto/dx_ccp63/Kconfig"
-endif # if CRYPTO_DEV_DX_CC63P
+	  To compile this driver as a module, choose M here: the module
+	  will be called sun4i-ss.
 
 endif # CRYPTO_HW
