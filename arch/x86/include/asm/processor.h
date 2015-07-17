@@ -508,6 +508,7 @@ struct thread_struct {
 	unsigned long		fs;
 #endif
 	unsigned long		gs;
+
 	/* Save middle states of ptrace breakpoints */
 	struct perf_event	*ptrace_bps[HBP_NUM];
 	/* Debug status used for traps, single steps, etc... */
@@ -535,15 +536,13 @@ struct thread_struct {
 	unsigned long		iopl;
 	/* Max allowed port in the bitmap, in bytes: */
 	unsigned		io_bitmap_max;
+
+	/* Floating point and extended processor state */
+	struct fpu		fpu;
 	/*
-	 * fpu_counter contains the number of consecutive context switches
-	 * that the FPU is used. If this is over a threshold, the lazy fpu
-	 * saving becomes unlazy to save the trap. This is an unsigned char
-	 * so that after 256 times the counter wraps and the behavior turns
-	 * lazy again; this to deal with bursty apps that only use FPU for
-	 * a short time
+	 * WARNING: 'fpu' is dynamically-sized.  It *MUST* be at
+	 * the end.
 	 */
-	unsigned char fpu_counter;
 };
 
 /*
