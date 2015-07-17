@@ -1193,6 +1193,33 @@ static int its_alloc_device_irq(struct its_device *dev, irq_hw_number_t *hwirq)
 	return 0;
 }
 
+struct its_pci_alias {
+	struct pci_dev	*pdev;
+	u32		dev_id;
+	u32		count;
+};
+
+static int its_pci_msi_vec_count(struct pci_dev *pdev)
+{
+	int msi, msix;
+
+	msi = max(pci_msi_vec_count(pdev), 0);
+	msix = max(pci_msix_vec_count(pdev), 0);
+
+	return max(msi, msix);
+}
+
+static int its_get_pci_alias(struct pci_dev *pdev, u16 alias, void *data)
+{
+	struct its_pci_alias *dev_alias = data;
+
+	dev_alias->dev_id = alias;
+	if (pdev != dev_alias->pdev)
+		dev_alias->count += its_pci_msi_vec_count(dev_alias->pdev);
+
+	return 0;
+}
+
 static int its_msi_prepare(struct irq_domain *domain, struct device *dev,
 			   int nvec, msi_alloc_info_t *info)
 {
@@ -1272,9 +1299,9 @@ static int its_irq_domain_alloc(struct irq_domain *domain, unsigned int virq,
 
 		irq_domain_set_hwirq_and_chip(domain, virq + i,
 					      hwirq, &its_irq_chip, its_dev);
-		pr_debug("ID:%d pID:%d vID:%d\n",
-			 (int)(hwirq - its_dev->event_map.lpi_base),
-			 (int) hwirq, virq + i);
+		dev_dbg(info->scratchpad[1].ptr, "ID:%d pID:%d vID:%d\n",
+			(int)(hwirq - its_dev->event_map.lpi_base),
+			(int)hwirq, virq + i);
 	}
 
 	return 0;
