@@ -19,6 +19,8 @@
 #include <linux/spi/spi.h>
 #include <linux/gpio.h>
 #include <linux/acpi.h>
+#include <linux/dmi.h>
+#include <linux/regulator/consumer.h>
 #include <sound/core.h>
 #include <sound/pcm.h>
 #include <sound/pcm_params.h>
@@ -219,6 +221,38 @@ static const struct reg_default rt5645_reg[] = {
 	{ 0xfd, 0x0002 },
 	{ 0xfe, 0x10ec },
 	{ 0xff, 0x6308 },
+};
+
+static const char *const rt5645_supply_names[] = {
+	"avdd",
+	"cpvdd",
+};
+
+struct rt5645_priv {
+	struct snd_soc_codec *codec;
+	struct rt5645_platform_data pdata;
+	struct regmap *regmap;
+	struct i2c_client *i2c;
+	struct gpio_desc *gpiod_hp_det;
+	struct snd_soc_jack *hp_jack;
+	struct snd_soc_jack *mic_jack;
+	struct snd_soc_jack *btn_jack;
+	struct delayed_work jack_detect_work;
+	struct regulator_bulk_data supplies[ARRAY_SIZE(rt5645_supply_names)];
+
+	int codec_type;
+	int sysclk;
+	int sysclk_src;
+	int lrck[RT5645_AIFS];
+	int bclk[RT5645_AIFS];
+	int master[RT5645_AIFS];
+
+	int pll_src;
+	int pll_in;
+	int pll_out;
+
+	int jack_type;
+	bool en_button_func;
 };
 
 static int rt5645_reset(struct snd_soc_codec *codec)
@@ -3178,7 +3212,7 @@ static int rt5645_i2c_probe(struct i2c_client *i2c,
 {
 	struct rt5645_platform_data *pdata = dev_get_platdata(&i2c->dev);
 	struct rt5645_priv *rt5645;
-	int ret;
+	int ret, i;
 	unsigned int val;
 
 	rt5645 = devm_kzalloc(&i2c->dev, sizeof(struct rt5645_priv),
@@ -3212,6 +3246,24 @@ static int rt5645_i2c_probe(struct i2c_client *i2c,
 		return ret;
 	}
 
+	for (i = 0; i < ARRAY_SIZE(rt5645->supplies); i++)
+		rt5645->supplies[i].supply = rt5645_supply_names[i];
+
+	ret = devm_regulator_bulk_get(&i2c->dev,
+				      ARRAY_SIZE(rt5645->supplies),
+				      rt5645->supplies);
+	if (ret) {
+		dev_err(&i2c->dev, "Failed to request supplies: %d\n", ret);
+		return ret;
+	}
+
+	ret = regulator_bulk_enable(ARRAY_SIZE(rt5645->supplies),
+				    rt5645->supplies);
+	if (ret) {
+		dev_err(&i2c->dev, "Failed to enable supplies: %d\n", ret);
+		return ret;
+	}
+
 	regmap_read(rt5645->regmap, RT5645_VENDOR_ID2, &val);
 
 	switch (val) {
@@ -3225,7 +3277,8 @@ static int rt5645_i2c_probe(struct i2c_client *i2c,
 		dev_err(&i2c->dev,
 			"Device with ID register %#x is not rt5645 or rt5650\n",
 			val);
-		return -ENODEV;
+		ret = -ENODEV;
+		goto err_enable;
 	}
 
 	regmap_write(rt5645->regmap, RT5645_RESET, 0);
@@ -3359,7 +3412,7 @@ static int rt5645_i2c_probe(struct i2c_client *i2c,
 			| IRQF_ONESHOT, "rt5645", rt5645);
 		if (ret) {
 			dev_err(&i2c->dev, "Failed to reguest IRQ: %d\n", ret);
-			return ret;
+			goto err_enable;
 		}
 	}
 
@@ -3373,6 +3426,8 @@ static int rt5645_i2c_probe(struct i2c_client *i2c,
 err_irq:
 	if (rt5645->i2c->irq)
 		free_irq(rt5645->i2c->irq, rt5645);
+err_enable:
+	regulator_bulk_disable(ARRAY_SIZE(rt5645->supplies), rt5645->supplies);
 	return ret;
 }
 
@@ -3386,6 +3441,7 @@ static int rt5645_i2c_remove(struct i2c_client *i2c)
 	cancel_delayed_work_sync(&rt5645->jack_detect_work);
 
 	snd_soc_unregister_codec(&i2c->dev);
+	regulator_bulk_disable(ARRAY_SIZE(rt5645->supplies), rt5645->supplies);
 
 	return 0;
 }
