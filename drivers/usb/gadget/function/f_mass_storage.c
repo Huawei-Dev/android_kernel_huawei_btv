@@ -3611,7 +3611,6 @@ static struct usb_function_instance *fsg_alloc_inst(void)
 remove_luns:
 	fsg_common_remove_luns(opts->common);
 #endif
-
 release_buffers:
 	fsg_common_free_buffers(opts->common);
 release_luns:
