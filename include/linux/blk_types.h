@@ -15,7 +15,7 @@ struct page;
 struct block_device;
 struct io_context;
 struct cgroup_subsys_state;
-typedef void (bio_end_io_t) (struct bio *, int);
+typedef void (bio_end_io_t) (struct bio *);
 typedef void (bio_destructor_t) (struct bio *);
 typedef void (bio_throtl_end_io_t) (struct bio *);
 
@@ -81,6 +81,7 @@ struct bio {
 	unsigned char bi_async_flush;
 	struct bvec_iter	bi_iter;
 
+	int			bi_error;
 	/* Number of segments in this BIO after
 	 * physical address coalescing is performed.
 	 */
@@ -158,7 +159,6 @@ struct bio {
 /*
  * bio flags
  */
-#define BIO_UPTODATE	0	/* ok after I/O completion */
 #define BIO_SEG_VALID	1	/* bi_phys_segments valid */
 #define BIO_CLONED	2	/* doesn't own data */
 #define BIO_BOUNCED	3	/* bio is a bounce bio */
