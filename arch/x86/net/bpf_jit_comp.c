@@ -231,36 +231,124 @@ static int do_jit(struct bpf_prog *bpf_prog, int *addrs, u8 *image,
 	EMIT2(0x31, 0xc0); /* xor eax, eax */
 	EMIT3(0x4D, 0x31, 0xED); /* xor r13, r13 */
 
-	if (seen_ld_abs) {
-		/* r9d : skb->len - skb->data_len (headlen)
-		 * r10 : skb->data
-		 */
-		if (is_imm8(offsetof(struct sk_buff, len)))
-			/* mov %r9d, off8(%rdi) */
-			EMIT4(0x44, 0x8b, 0x4f,
-			      offsetof(struct sk_buff, len));
-		else
-			/* mov %r9d, off32(%rdi) */
-			EMIT3_off32(0x44, 0x8b, 0x8f,
-				    offsetof(struct sk_buff, len));
+	/* clear tail_cnt: mov qword ptr [rbp-X], rax */
+	EMIT3_off32(0x48, 0x89, 0x85, -STACKSIZE + 32);
 
-		if (is_imm8(offsetof(struct sk_buff, data_len)))
-			/* sub %r9d, off8(%rdi) */
-			EMIT4(0x44, 0x2b, 0x4f,
-			      offsetof(struct sk_buff, data_len));
-		else
-			EMIT3_off32(0x44, 0x2b, 0x8f,
-				    offsetof(struct sk_buff, data_len));
+	BUILD_BUG_ON(cnt != PROLOGUE_SIZE);
+	*pprog = prog;
+}
 
-		if (is_imm8(offsetof(struct sk_buff, data)))
-			/* mov %r10, off8(%rdi) */
-			EMIT4(0x4c, 0x8b, 0x57,
-			      offsetof(struct sk_buff, data));
-		else
-			/* mov %r10, off32(%rdi) */
-			EMIT3_off32(0x4c, 0x8b, 0x97,
-				    offsetof(struct sk_buff, data));
-	}
+/* generate the following code:
+ * ... bpf_tail_call(void *ctx, struct bpf_array *array, u64 index) ...
+ *   if (index >= array->map.max_entries)
+ *     goto out;
+ *   if (++tail_call_cnt > MAX_TAIL_CALL_CNT)
+ *     goto out;
+ *   prog = array->prog[index];
+ *   if (prog == NULL)
+ *     goto out;
+ *   goto *(prog->bpf_func + prologue_size);
+ * out:
+ */
+static void emit_bpf_tail_call(u8 **pprog)
+{
+	u8 *prog = *pprog;
+	int label1, label2, label3;
+	int cnt = 0;
+
+	/* rdi - pointer to ctx
+	 * rsi - pointer to bpf_array
+	 * rdx - index in bpf_array
+	 */
+
+	/* if (index >= array->map.max_entries)
+	 *   goto out;
+	 */
+	EMIT4(0x48, 0x8B, 0x46,                   /* mov rax, qword ptr [rsi + 16] */
+	      offsetof(struct bpf_array, map.max_entries));
+	EMIT3(0x48, 0x39, 0xD0);                  /* cmp rax, rdx */
+#define OFFSET1 44 /* number of bytes to jump */
+	EMIT2(X86_JBE, OFFSET1);                  /* jbe out */
+	label1 = cnt;
+
+	/* if (tail_call_cnt > MAX_TAIL_CALL_CNT)
+	 *   goto out;
+	 */
+	EMIT2_off32(0x8B, 0x85, -STACKSIZE + 36); /* mov eax, dword ptr [rbp - 516] */
+	EMIT3(0x83, 0xF8, MAX_TAIL_CALL_CNT);     /* cmp eax, MAX_TAIL_CALL_CNT */
+#define OFFSET2 33
+	EMIT2(X86_JA, OFFSET2);                   /* ja out */
+	label2 = cnt;
+	EMIT3(0x83, 0xC0, 0x01);                  /* add eax, 1 */
+	EMIT2_off32(0x89, 0x85, -STACKSIZE + 36); /* mov dword ptr [rbp - 516], eax */
+
+	/* prog = array->prog[index]; */
+	EMIT4(0x48, 0x8D, 0x44, 0xD6);            /* lea rax, [rsi + rdx * 8 + 0x50] */
+	EMIT1(offsetof(struct bpf_array, prog));
+	EMIT3(0x48, 0x8B, 0x00);                  /* mov rax, qword ptr [rax] */
+
+	/* if (prog == NULL)
+	 *   goto out;
+	 */
+	EMIT4(0x48, 0x83, 0xF8, 0x00);            /* cmp rax, 0 */
+#define OFFSET3 10
+	EMIT2(X86_JE, OFFSET3);                   /* je out */
+	label3 = cnt;
+
+	/* goto *(prog->bpf_func + prologue_size); */
+	EMIT4(0x48, 0x8B, 0x40,                   /* mov rax, qword ptr [rax + 32] */
+	      offsetof(struct bpf_prog, bpf_func));
+	EMIT4(0x48, 0x83, 0xC0, PROLOGUE_SIZE);   /* add rax, prologue_size */
+
+	/* now we're ready to jump into next BPF program
+	 * rdi == ctx (1st arg)
+	 * rax == prog->bpf_func + prologue_size
+	 */
+	EMIT2(0xFF, 0xE0);                        /* jmp rax */
+
+	/* out: */
+	BUILD_BUG_ON(cnt - label1 != OFFSET1);
+	BUILD_BUG_ON(cnt - label2 != OFFSET2);
+	BUILD_BUG_ON(cnt - label3 != OFFSET3);
+	*pprog = prog;
+}
+
+
+static void emit_load_skb_data_hlen(u8 **pprog)
+{
+	u8 *prog = *pprog;
+	int cnt = 0;
+
+	/* r9d = skb->len - skb->data_len (headlen)
+	 * r10 = skb->data
+	 */
+	/* mov %r9d, off32(%rdi) */
+	EMIT3_off32(0x44, 0x8b, 0x8f, offsetof(struct sk_buff, len));
+
+	/* sub %r9d, off32(%rdi) */
+	EMIT3_off32(0x44, 0x2b, 0x8f, offsetof(struct sk_buff, data_len));
+
+	/* mov %r10, off32(%rdi) */
+	EMIT3_off32(0x4c, 0x8b, 0x97, offsetof(struct sk_buff, data));
+	*pprog = prog;
+}
+
+static int do_jit(struct bpf_prog *bpf_prog, int *addrs, u8 *image,
+		  int oldproglen, struct jit_context *ctx)
+{
+	struct bpf_insn *insn = bpf_prog->insnsi;
+	int insn_cnt = bpf_prog->len;
+	bool seen_ld_abs = ctx->seen_ld_abs | (oldproglen == 0);
+	bool seen_exit = false;
+	u8 temp[BPF_MAX_INSN_SIZE + BPF_INSN_SAFETY];
+	int i, cnt = 0;
+	int proglen = 0;
+	u8 *prog = temp;
+
+	emit_prologue(&prog);
+
+	if (seen_ld_abs)
+		emit_load_skb_data_hlen(&prog);
 
 	for (i = 0; i < insn_cnt; i++, insn++) {
 		const s32 imm32 = insn->imm;
@@ -269,6 +357,7 @@ static int do_jit(struct bpf_prog *bpf_prog, int *addrs, u8 *image,
 		u8 b1 = 0, b2 = 0, b3 = 0;
 		s64 jmp_offset;
 		u8 jmp_cond;
+		bool reload_skb_data;
 		int ilen;
 		u8 *func;
 
@@ -720,12 +809,18 @@ xadd:			if (is_imm8(insn->off))
 			func = (u8 *) __bpf_call_base + imm32;
 			jmp_offset = func - (image + addrs[i]);
 			if (seen_ld_abs) {
-				EMIT2(0x41, 0x52); /* push %r10 */
-				EMIT2(0x41, 0x51); /* push %r9 */
-				/* need to adjust jmp offset, since
-				 * pop %r9, pop %r10 take 4 bytes after call insn
-				 */
-				jmp_offset += 4;
+				reload_skb_data = bpf_helper_changes_skb_data(func);
+				if (reload_skb_data) {
+					EMIT1(0x57); /* push %rdi */
+					jmp_offset += 22; /* pop, mov, sub, mov */
+				} else {
+					EMIT2(0x41, 0x52); /* push %r10 */
+					EMIT2(0x41, 0x51); /* push %r9 */
+					/* need to adjust jmp offset, since
+					 * pop %r9, pop %r10 take 4 bytes after call insn
+					 */
+					jmp_offset += 4;
+				}
 			}
 			if (!imm32 || !is_simm32(jmp_offset)) {
 				pr_err("unsupported bpf func %d addr %p image %p\n",
@@ -734,8 +829,13 @@ xadd:			if (is_imm8(insn->off))
 			}
 			EMIT1_off32(0xE8, jmp_offset);
 			if (seen_ld_abs) {
-				EMIT2(0x41, 0x59); /* pop %r9 */
-				EMIT2(0x41, 0x5A); /* pop %r10 */
+				if (reload_skb_data) {
+					EMIT1(0x5F); /* pop %rdi */
+					emit_load_skb_data_hlen(&prog);
+				} else {
+					EMIT2(0x41, 0x59); /* pop %r9 */
+					EMIT2(0x41, 0x5A); /* pop %r10 */
+				}
 			}
 			break;
 
