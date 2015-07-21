@@ -2336,7 +2336,7 @@ void snd_soc_dapm_free_widget(struct snd_soc_dapm_widget *w)
 		dapm_free_path(p);
 
 	kfree(w->kcontrols);
-	kfree(w->name);
+	kfree_const(w->name);
 	kfree(w);
 }
 
@@ -3357,7 +3357,7 @@ snd_soc_dapm_new_control_unlocked(struct snd_soc_dapm_context *dapm,
 	if (prefix)
 		w->name = kasprintf(GFP_KERNEL, "%s %s", prefix, widget->name);
 	else
-		w->name = kasprintf(GFP_KERNEL, "%s", widget->name);
+		w->name = kstrdup_const(widget->name, GFP_KERNEL);
 	if (w->name == NULL) {
 		kfree(w);
 		return NULL;
