@@ -31,6 +31,7 @@
 #define SSIC_PORT_NUM		2
 #define SSIC_PORT_CFG2		0x880c
 #define SSIC_PORT_CFG2_OFFSET	0x30
+#define PORT2_SSIC_CONFIG_REG2	0x883c
 #define PROG_DONE		(1 << 30)
 #define SSIC_PORT_UNUSED	(1 << 31)
 
@@ -189,18 +190,50 @@ static void xhci_pci_quirks(struct device *dev, struct xhci_hcd *xhci)
 				"QUIRK: Resetting on resume");
 }
 
-#ifdef CONFIG_ACPI
-static void xhci_pme_acpi_rtd3_enable(struct pci_dev *dev)
+/*
+ * In some Intel xHCI controllers, in order to get D3 working,
+ * through a vendor specific SSIC CONFIG register at offset 0x883c,
+ * SSIC PORT need to be marked as "unused" before putting xHCI
+ * into D3. After D3 exit, the SSIC port need to be marked as "used".
+ * Without this change, xHCI might not enter D3 state.
+ * Make sure PME works on some Intel xHCI controllers by writing 1 to clear
+ * the Internal PME flag bit in vendor specific PMCTRL register at offset 0x80a4
+ */
+static void xhci_pme_quirk(struct usb_hcd *hcd, bool suspend)
 {
-	static const u8 intel_dsm_uuid[] = {
-		0xb7, 0x0c, 0x34, 0xac,	0x01, 0xe9, 0xbf, 0x45,
-		0xb7, 0xe6, 0x2b, 0x34, 0xec, 0x93, 0x1e, 0x23,
-	};
-	acpi_evaluate_dsm(ACPI_HANDLE(&dev->dev), intel_dsm_uuid, 3, 1, NULL);
+	struct xhci_hcd	*xhci = hcd_to_xhci(hcd);
+	struct pci_dev		*pdev = to_pci_dev(hcd->self.controller);
+	u32 val;
+	void __iomem *reg;
+
+	if (pdev->vendor == PCI_VENDOR_ID_INTEL &&
+		 pdev->device == PCI_DEVICE_ID_INTEL_CHERRYVIEW_XHCI) {
+
+		reg = (void __iomem *) xhci->cap_regs + PORT2_SSIC_CONFIG_REG2;
+
+		/* Notify SSIC that SSIC profile programming is not done */
+		val = readl(reg) & ~PROG_DONE;
+		writel(val, reg);
+
+		/* Mark SSIC port as unused(suspend) or used(resume) */
+		val = readl(reg);
+		if (suspend)
+			val |= SSIC_PORT_UNUSED;
+		else
+			val &= ~SSIC_PORT_UNUSED;
+		writel(val, reg);
+
+		/* Notify SSIC that SSIC profile programming is done */
+		val = readl(reg) | PROG_DONE;
+		writel(val, reg);
+		readl(reg);
+	}
+
+	reg = (void __iomem *) xhci->cap_regs + 0x80a4;
+	val = readl(reg);
+	writel(val | BIT(28), reg);
+	readl(reg);
 }
-#else
-	static void xhci_pme_acpi_rtd3_enable(struct pci_dev *dev) { }
-#endif /* CONFIG_ACPI */
 
 #ifdef CONFIG_ACPI
 static void xhci_pme_acpi_rtd3_enable(struct pci_dev *dev)
@@ -390,7 +423,7 @@ static int xhci_pci_suspend(struct usb_hcd *hcd, bool do_wakeup)
 		pdev->no_d3cold = true;
 
 	if (xhci->quirks & XHCI_PME_STUCK_QUIRK)
-		xhci_pme_quirk(hcd);
+		xhci_pme_quirk(hcd, true);
 
 	if (xhci->quirks & XHCI_SSIC_PORT_UNUSED)
 		xhci_ssic_port_unused_quirk(hcd, true);
@@ -433,7 +466,7 @@ static int xhci_pci_resume(struct usb_hcd *hcd, bool hibernated)
 		xhci_ssic_port_unused_quirk(hcd, false);
 
 	if (xhci->quirks & XHCI_PME_STUCK_QUIRK)
-		xhci_pme_quirk(hcd);
+		xhci_pme_quirk(hcd, false);
 
 	retval = xhci_resume(xhci, hibernated);
 	return retval;
