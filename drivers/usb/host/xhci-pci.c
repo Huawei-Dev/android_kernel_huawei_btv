@@ -202,6 +202,19 @@ static void xhci_pme_acpi_rtd3_enable(struct pci_dev *dev)
 	static void xhci_pme_acpi_rtd3_enable(struct pci_dev *dev) { }
 #endif /* CONFIG_ACPI */
 
+#ifdef CONFIG_ACPI
+static void xhci_pme_acpi_rtd3_enable(struct pci_dev *dev)
+{
+	static const u8 intel_dsm_uuid[] = {
+		0xb7, 0x0c, 0x34, 0xac,	0x01, 0xe9, 0xbf, 0x45,
+		0xb7, 0xe6, 0x2b, 0x34, 0xec, 0x93, 0x1e, 0x23,
+	};
+	acpi_evaluate_dsm(ACPI_HANDLE(&dev->dev), intel_dsm_uuid, 3, 1, NULL);
+}
+#else
+	static void xhci_pme_acpi_rtd3_enable(struct pci_dev *dev) { }
+#endif /* CONFIG_ACPI */
+
 /* called during probe() after chip reset completes */
 static int xhci_pci_setup(struct usb_hcd *hcd)
 {
