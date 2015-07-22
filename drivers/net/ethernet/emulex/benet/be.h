@@ -103,6 +103,8 @@
 
 #define MAX_VFS			30 /* Max VFs supported by BE3 FW */
 #define FW_VER_LEN		32
+#define	CNTL_SERIAL_NUM_WORDS	8  /* Controller serial number words */
+#define	CNTL_SERIAL_NUM_WORD_SZ	(sizeof(u16)) /* Byte-sz of serial num word */
 
 #define	RSS_INDIR_TABLE_LEN	128
 #define RSS_HASH_KEY_LEN	40
@@ -575,6 +577,9 @@ struct be_adapter {
 	int be_get_temp_freq;
 	u8 pf_number;
 	struct rss_info rss_info;
+	/* Filters for packets that need to be sent to BMC */
+	u32 bmc_filt_mask;
+	u16 serial_num[CNTL_SERIAL_NUM_WORDS];
 };
 
 #define be_physfn(adapter)		(!adapter->virtfn)
