@@ -1,4 +1,21 @@
-
+/* bnx2x_cmn.c: QLogic Everest network driver.
+ *
+ * Copyright (c) 2007-2013 Broadcom Corporation
+ * Copyright (c) 2014 QLogic Corporation
+ * All rights reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
+ *
+ * Maintained by: Ariel Elior <ariel.elior@qlogic.com>
+ * Written by: Eliezer Tamir
+ * Based on code from Michael Chan's bnx2 driver
+ * UDP CSUM errata workaround by Arik Gendelman
+ * Slowpath and fastpath rework by Vladislav Zolotarov
+ * Statistics and Link management by Yitchak Gertner
+ *
+ */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
