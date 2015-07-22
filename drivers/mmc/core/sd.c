@@ -1015,10 +1015,8 @@ int mmc_sd_init_card(struct mmc_host *host, u32 ocr,
 	if (!mmc_host_is_spi(host)) {
 		err = mmc_send_relative_addr(host, &card->rca);
 		if (err)
-			{
-			 printk(KERN_ERR "%s:send cmd3 to get RCA fail,err=%d\n",mmc_hostname(host),err);
 			goto free_card;
-			}
+			host->card = card;
 	}
 
 	if (!oldcard) {
@@ -1107,12 +1105,14 @@ int mmc_sd_init_card(struct mmc_host *host, u32 ocr,
 			mmc_set_bus_width(host, MMC_BUS_WIDTH_4);
 		}
 	}
-	host->card = card;
+
 	return 0;
 
 free_card:
-	if (!oldcard)
+	if (!oldcard) {
+		host->card = NULL;
 		mmc_remove_card(card);
+	}
 
 	return err;
 }
