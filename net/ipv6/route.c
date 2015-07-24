@@ -1778,7 +1778,8 @@ int ip6_route_info_create(struct fib6_config *cfg, struct rt6_info **rt_ret)
 			goto out;
 		lwtunnel_state_get(lwtstate);
 		rt->rt6i_lwtstate = lwtstate;
-		rt->dst.output = lwtunnel_output6;
+		if (lwtunnel_output_redirect(rt->rt6i_lwtstate))
+			rt->dst.output = lwtunnel_output6;
 	}
 
 	ipv6_addr_prefix(&rt->rt6i_dst.addr, &cfg->fc_dst, cfg->fc_dst_len);
