@@ -1776,8 +1776,7 @@ int ip6_route_info_create(struct fib6_config *cfg, struct rt6_info **rt_ret)
 					   cfg->fc_encap, &lwtstate);
 		if (err)
 			goto out;
-		lwtunnel_state_get(lwtstate);
-		rt->rt6i_lwtstate = lwtstate;
+		rt->rt6i_lwtstate = lwtstate_get(lwtstate);
 		if (lwtunnel_output_redirect(rt->rt6i_lwtstate))
 			rt->dst.output = lwtunnel_output6;
 	}
@@ -2183,10 +2182,7 @@ static void ip6_rt_copy_init(struct rt6_info *rt, struct rt6_info *ort)
 #endif
 	rt->rt6i_prefsrc = ort->rt6i_prefsrc;
 	rt->rt6i_table = ort->rt6i_table;
-	if (ort->rt6i_lwtstate) {
-		lwtunnel_state_get(ort->rt6i_lwtstate);
-		rt->rt6i_lwtstate = ort->rt6i_lwtstate;
-	}
+	rt->rt6i_lwtstate = lwtstate_get(ort->rt6i_lwtstate);
 }
 
 #ifdef CONFIG_IPV6_ROUTE_INFO
