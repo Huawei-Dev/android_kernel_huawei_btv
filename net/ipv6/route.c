@@ -2183,6 +2183,10 @@ static void ip6_rt_copy_init(struct rt6_info *rt, struct rt6_info *ort)
 #endif
 	rt->rt6i_prefsrc = ort->rt6i_prefsrc;
 	rt->rt6i_table = ort->rt6i_table;
+	if (ort->rt6i_lwtstate) {
+		lwtunnel_state_get(ort->rt6i_lwtstate);
+		rt->rt6i_lwtstate = ort->rt6i_lwtstate;
+	}
 }
 
 #ifdef CONFIG_IPV6_ROUTE_INFO
