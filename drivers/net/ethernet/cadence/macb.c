@@ -2884,9 +2884,8 @@ static int macb_probe(struct platform_device *pdev)
 	bp->pclk = pclk;
 	bp->hclk = hclk;
 	bp->tx_clk = tx_clk;
-	if (macb_config->jumbo_max_len) {
+	if (macb_config)
 		bp->jumbo_max_len = macb_config->jumbo_max_len;
-	}
 
 	spin_lock_init(&bp->lock);
 
