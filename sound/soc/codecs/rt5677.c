@@ -5116,38 +5116,23 @@ static int rt5677_i2c_probe(struct i2c_client *i2c,
 	if (pdata)
 		rt5677->pdata = *pdata;
 
-	if (i2c->dev.of_node) {
-		ret = rt5677_parse_dt(rt5677, i2c->dev.of_node);
-		if (ret) {
-			dev_err(&i2c->dev, "Failed to parse device tree: %d\n",
-				ret);
-			return ret;
-		}
-	} else {
-		rt5677->pow_ldo2 = -EINVAL;
-		rt5677->reset_pin = -EINVAL;
+	/* pow-ldo2 and reset are optional. The codec pins may be statically
+	 * connected on the board without gpios. If the gpio device property
+	 * isn't specified, devm_gpiod_get_optional returns NULL.
+	 */
+	rt5677->pow_ldo2 = devm_gpiod_get_optional(&i2c->dev,
+			"realtek,pow-ldo2", GPIOD_OUT_HIGH);
+	if (IS_ERR(rt5677->pow_ldo2)) {
+		ret = PTR_ERR(rt5677->pow_ldo2);
+		dev_err(&i2c->dev, "Failed to request POW_LDO2: %d\n", ret);
+		return ret;
 	}
-
-	if (gpio_is_valid(rt5677->pow_ldo2)) {
-		ret = devm_gpio_request_one(&i2c->dev, rt5677->pow_ldo2,
-					    GPIOF_OUT_INIT_HIGH,
-					    "RT5677 POW_LDO2");
-		if (ret < 0) {
-			dev_err(&i2c->dev, "Failed to request POW_LDO2 %d: %d\n",
-				rt5677->pow_ldo2, ret);
-			return ret;
-		}
-	}
-
-	if (gpio_is_valid(rt5677->reset_pin)) {
-		ret = devm_gpio_request_one(&i2c->dev, rt5677->reset_pin,
-					    GPIOF_OUT_INIT_HIGH,
-					    "RT5677 RESET");
-		if (ret < 0) {
-			dev_err(&i2c->dev, "Failed to request RESET %d: %d\n",
-				rt5677->reset_pin, ret);
-			return ret;
-		}
+	rt5677->reset_pin = devm_gpiod_get_optional(&i2c->dev,
+			"realtek,reset", GPIOD_OUT_HIGH);
+	if (IS_ERR(rt5677->reset_pin)) {
+		ret = PTR_ERR(rt5677->reset_pin);
+		dev_err(&i2c->dev, "Failed to request RESET: %d\n", ret);
+		return ret;
 	}
 
 	if (gpio_is_valid(rt5677->pow_ldo2) ||
