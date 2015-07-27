@@ -227,10 +227,7 @@ void __init omap1_init_irq(void)
 
 			irq_trigger = irq_banks[i].trigger_map >> IRQ_BIT(j);
 			omap_irq_set_cfg(j, 0, 0, irq_trigger);
-
-			irq_set_chip_and_handler(j, &omap_irq_chip,
-						 handle_level_irq);
-			set_irq_flags(j, IRQF_VALID);
+			irq_clear_status_flags(j, IRQ_NOREQUEST);
 		}
 	}
 
