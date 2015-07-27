@@ -169,6 +169,7 @@ obj-$(CONFIG_RAS)		+= ras/
 obj-$(CONFIG_THUNDERBOLT)	+= thunderbolt/
 obj-$(CONFIG_CORESIGHT)		+= hwtracing/hisi_coresight/
 obj-$(CONFIG_ANDROID)		+= android/
+obj-$(CONFIG_NVMEM)		+= nvmem/
 ifeq ($(BOARD_CHARGER_ENABLE_DRM),true)
 obj-$(CONFIG_IMAGINATION_D5500_DRM_VCODEC)  += vcodec/imagination/D5500_DRM/
 else
