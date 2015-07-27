@@ -80,16 +80,16 @@ enum {
 };
 
 struct pwm_device {
-	const char		*label;
-	unsigned long		flags;
-	unsigned int		hwpwm;
-	unsigned int		pwm;
-	struct pwm_chip		*chip;
-	void			*chip_data;
+	const char *label;
+	unsigned long flags;
+	unsigned int hwpwm;
+	unsigned int pwm;
+	struct pwm_chip *chip;
+	void *chip_data;
 
-	unsigned int		period; 	/* in nanoseconds */
-	unsigned int		duty_cycle;	/* in nanoseconds */
-	enum pwm_polarity	polarity;
+	unsigned int period;
+	unsigned int duty_cycle;
+	enum pwm_polarity polarity;
 };
 
 static inline void pwm_set_period(struct pwm_device *pwm, unsigned int period)
@@ -131,25 +131,18 @@ int pwm_set_polarity(struct pwm_device *pwm, enum pwm_polarity polarity);
  * @owner: helps prevent removal of modules exporting active PWMs
  */
 struct pwm_ops {
-	int			(*request)(struct pwm_chip *chip,
-					   struct pwm_device *pwm);
-	void			(*free)(struct pwm_chip *chip,
-					struct pwm_device *pwm);
-	int			(*config)(struct pwm_chip *chip,
-					  struct pwm_device *pwm,
-					  int duty_ns, int period_ns);
-	int			(*set_polarity)(struct pwm_chip *chip,
-					  struct pwm_device *pwm,
-					  enum pwm_polarity polarity);
-	int			(*enable)(struct pwm_chip *chip,
-					  struct pwm_device *pwm);
-	void			(*disable)(struct pwm_chip *chip,
-					   struct pwm_device *pwm);
+	int (*request)(struct pwm_chip *chip, struct pwm_device *pwm);
+	void (*free)(struct pwm_chip *chip, struct pwm_device *pwm);
+	int (*config)(struct pwm_chip *chip, struct pwm_device *pwm,
+		      int duty_ns, int period_ns);
+	int (*set_polarity)(struct pwm_chip *chip, struct pwm_device *pwm,
+			    enum pwm_polarity polarity);
+	int (*enable)(struct pwm_chip *chip, struct pwm_device *pwm);
+	void (*disable)(struct pwm_chip *chip, struct pwm_device *pwm);
 #ifdef CONFIG_DEBUG_FS
-	void			(*dbg_show)(struct pwm_chip *chip,
-					    struct seq_file *s);
+	void (*dbg_show)(struct pwm_chip *chip, struct seq_file *s);
 #endif
-	struct module		*owner;
+	struct module *owner;
 };
 
 /**
@@ -164,18 +157,18 @@ struct pwm_ops {
  *             operations may sleep
  */
 struct pwm_chip {
-	struct device		*dev;
-	struct list_head	list;
-	const struct pwm_ops	*ops;
-	int			base;
-	unsigned int		npwm;
+	struct device *dev;
+	struct list_head list;
+	const struct pwm_ops *ops;
+	int base;
+	unsigned int npwm;
 
-	struct pwm_device	*pwms;
+	struct pwm_device *pwms;
 
-	struct pwm_device *	(*of_xlate)(struct pwm_chip *pc,
-					    const struct of_phandle_args *args);
-	unsigned int		of_pwm_n_cells;
-	bool			can_sleep;
+	struct pwm_device * (*of_xlate)(struct pwm_chip *pc,
+					const struct of_phandle_args *args);
+	unsigned int of_pwm_n_cells;
+	bool can_sleep;
 };
 
 #if IS_ENABLED(CONFIG_PWM)
