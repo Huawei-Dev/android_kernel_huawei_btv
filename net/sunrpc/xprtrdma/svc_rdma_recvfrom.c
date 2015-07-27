@@ -115,15 +115,6 @@ static void rdma_build_arg_xdr(struct svc_rqst *rqstp,
 	rqstp->rq_arg.tail[0].iov_len = 0;
 }
 
-static int rdma_read_max_sge(struct svcxprt_rdma *xprt, int sge_count)
-{
-	if (rdma_node_get_transport(xprt->sc_cm_id->device->node_type) ==
-	     RDMA_TRANSPORT_IWARP)
-		return 1;
-	else
-		return min_t(int, sge_count, xprt->sc_max_sge);
-}
-
 /* Issue an RDMA_READ using the local lkey to map the data sink */
 int rdma_read_chunk_lcl(struct svcxprt_rdma *xprt,
 			struct svc_rqst *rqstp,
@@ -144,10 +135,8 @@ int rdma_read_chunk_lcl(struct svcxprt_rdma *xprt,
 
 	ctxt->direction = DMA_FROM_DEVICE;
 	ctxt->read_hdr = head;
-	pages_needed =
-		min_t(int, pages_needed, rdma_read_max_sge(xprt, pages_needed));
-	read = min_t(int, (pages_needed << PAGE_SHIFT) - *page_offset,
-		     rs_length);
+	pages_needed = min_t(int, pages_needed, xprt->sc_max_sge_rd);
+	read = min_t(int, pages_needed << PAGE_SHIFT, rs_length);
 
 	for (pno = 0; pno < pages_needed; pno++) {
 		int len = min_t(int, rs_length, PAGE_SIZE - pg_off);
