@@ -354,8 +354,7 @@ static ssize_t tsc2005_selftest_show(struct device *dev,
 				     struct device_attribute *attr,
 				     char *buf)
 {
-	struct spi_device *spi = to_spi_device(dev);
-	struct tsc2005 *ts = spi_get_drvdata(spi);
+	struct tsc2005 *ts = dev_get_drvdata(dev);
 	unsigned int temp_high;
 	unsigned int temp_high_orig;
 	unsigned int temp_high_test;
