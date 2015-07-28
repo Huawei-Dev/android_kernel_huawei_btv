@@ -14,9 +14,44 @@ extern int pci_msi_ignore_mask;
 /* Helper functions */
 struct irq_data;
 struct msi_desc;
+struct pci_dev;
+struct platform_msi_priv_data;
 void __get_cached_msi_msg(struct msi_desc *entry, struct msi_msg *msg);
 void get_cached_msi_msg(unsigned int irq, struct msi_msg *msg);
 
+typedef void (*irq_write_msi_msg_t)(struct msi_desc *desc,
+				    struct msi_msg *msg);
+
+/**
+ * platform_msi_desc - Platform device specific msi descriptor data
+ * @msi_priv_data:	Pointer to platform private data
+ * @msi_index:		The index of the MSI descriptor for multi MSI
+ */
+struct platform_msi_desc {
+	struct platform_msi_priv_data	*msi_priv_data;
+	u16				msi_index;
+};
+
+/**
+ * struct msi_desc - Descriptor structure for MSI based interrupts
+ * @list:	List head for management
+ * @irq:	The base interrupt number
+ * @nvec_used:	The number of vectors used
+ * @dev:	Pointer to the device which uses this descriptor
+ * @msg:	The last set MSI message cached for reuse
+ *
+ * @masked:	[PCI MSI/X] Mask bits
+ * @is_msix:	[PCI MSI/X] True if MSI-X
+ * @multiple:	[PCI MSI/X] log2 num of messages allocated
+ * @multi_cap:	[PCI MSI/X] log2 num of messages supported
+ * @maskbit:	[PCI MSI/X] Mask-Pending bit supported?
+ * @is_64:	[PCI MSI/X] Address size: 0=32bit 1=64bit
+ * @entry_nr:	[PCI MSI/X] Entry which is described by this descriptor
+ * @default_irq:[PCI MSI/X] The default pre-assigned non-MSI irq
+ * @mask_pos:	[PCI MSI]   Mask register position
+ * @mask_base:	[PCI MSI-X] Mask register base address
+ * @platform:	[platform]  Platform device specific msi descriptor data
+ */
 struct msi_desc {
 	struct {
 		__u8	is_msix	: 1;
@@ -34,8 +69,32 @@ struct msi_desc {
 	struct list_head list;
 
 	union {
-		void __iomem *mask_base;
-		u8 mask_pos;
+		/* PCI MSI/X specific data */
+		struct {
+			u32 masked;
+			struct {
+				__u8	is_msix		: 1;
+				__u8	multiple	: 3;
+				__u8	multi_cap	: 3;
+				__u8	maskbit		: 1;
+				__u8	is_64		: 1;
+				__u16	entry_nr;
+				unsigned default_irq;
+			} msi_attrib;
+			union {
+				u8	mask_pos;
+				void __iomem *mask_base;
+			};
+		};
+
+		/*
+		 * Non PCI variants add their data structure here. New
+		 * entries need to use a named structure. We want
+		 * proper name spaces for this. The PCI part is
+		 * anonymous for now as it would require an immediate
+		 * tree wide cleanup.
+		 */
+		struct platform_msi_desc platform;
 	};
 	struct pci_dev *dev;
 
@@ -218,6 +277,12 @@ int msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
 void msi_domain_free_irqs(struct irq_domain *domain, struct device *dev);
 struct msi_domain_info *msi_get_domain_info(struct irq_domain *domain);
 
+struct irq_domain *platform_msi_create_irq_domain(struct device_node *np,
+						  struct msi_domain_info *info,
+						  struct irq_domain *parent);
+int platform_msi_domain_alloc_irqs(struct device *dev, unsigned int nvec,
+				   irq_write_msi_msg_t write_msi_msg);
+void platform_msi_domain_free_irqs(struct device *dev);
 #endif /* CONFIG_GENERIC_MSI_IRQ_DOMAIN */
 
 #ifdef CONFIG_PCI_MSI_IRQ_DOMAIN
