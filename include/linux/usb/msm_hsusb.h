@@ -149,6 +149,15 @@ struct msm_usb_cable {
  * @chg_type: The type of charger attached.
  * @dcd_retires: The retry count used to track Data contact
  *               detection process.
+ * @manual_pullup: true if VBUS is not routed to USB controller/phy
+ *	and controller driver therefore enables pull-up explicitly before
+ *	starting controller using usbcmd run/stop bit.
+ * @vbus: VBUS signal state trakining, using extcon framework
+ * @id: ID signal state trakining, using extcon framework
+ * @switch_gpio: Descriptor for GPIO used to control external Dual
+ *               SPDT USB Switch.
+ * @reboot: Used to inform the driver to route USB D+/D- line to Device
+ *	    connector
  */
 struct msm_otg {
 	struct usb_phy phy;
@@ -177,6 +186,14 @@ struct msm_otg {
 	struct reset_control *phy_rst;
 	struct reset_control *link_rst;
 	int vdd_levels[3];
+
+	bool manual_pullup;
+
+	struct msm_usb_cable vbus;
+	struct msm_usb_cable id;
+
+	struct gpio_desc *switch_gpio;
+	struct notifier_block reboot;>>>>>> 6f98f545b0b4... usb: phy: msm: Add D+/D- lines route control
 };
 
 #endif
