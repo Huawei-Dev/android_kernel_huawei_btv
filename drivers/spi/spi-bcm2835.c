@@ -636,6 +636,25 @@ static int bcm2835_spi_prepare_message(struct spi_master *master,
 static void bcm2835_spi_handle_err(struct spi_master *master,
 				   struct spi_message *msg)
 {
+	struct spi_device *spi = msg->spi;
+	struct bcm2835_spi *bs = spi_master_get_devdata(master);
+	u32 cs = bcm2835_rd(bs, BCM2835_SPI_CS);
+
+	cs &= ~(BCM2835_SPI_CS_CPOL | BCM2835_SPI_CS_CPHA);
+
+	if (spi->mode & SPI_CPOL)
+		cs |= BCM2835_SPI_CS_CPOL;
+	if (spi->mode & SPI_CPHA)
+		cs |= BCM2835_SPI_CS_CPHA;
+
+	bcm2835_wr(bs, BCM2835_SPI_CS, cs);
+
+	return 0;
+}
+
+static void bcm2835_spi_handle_err(struct spi_master *master,
+				   struct spi_message *msg)
+{
 	bcm2835_spi_reset_hw(master);
 }
 
