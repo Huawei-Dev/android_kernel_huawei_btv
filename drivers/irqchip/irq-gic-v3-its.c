@@ -1193,52 +1193,13 @@ static int its_alloc_device_irq(struct its_device *dev, irq_hw_number_t *hwirq)
 	return 0;
 }
 
-struct its_pci_alias {
-	struct pci_dev	*pdev;
-	u32		dev_id;
-	u32		count;
-};
-
-static int its_pci_msi_vec_count(struct pci_dev *pdev)
-{
-	int msi, msix;
-
-	msi = max(pci_msi_vec_count(pdev), 0);
-	msix = max(pci_msix_vec_count(pdev), 0);
-
-	return max(msi, msix);
-}
-
-static int its_get_pci_alias(struct pci_dev *pdev, u16 alias, void *data)
-{
-	struct its_pci_alias *dev_alias = data;
-
-	dev_alias->dev_id = alias;
-	if (pdev != dev_alias->pdev)
-		dev_alias->count += its_pci_msi_vec_count(dev_alias->pdev);
-
-	return 0;
-}
-
-static int its_msi_prepare(struct irq_domain *domain, struct device *dev,
-			   int nvec, msi_alloc_info_t *info)
+int its_msi_prepare(struct irq_domain *domain, u32 dev_id,
+		    int nvec, msi_alloc_info_t *info)
 {
 	struct its_node *its;
 	struct its_device *its_dev;
-	struct msi_domain_info *msi_info;
-	u32 dev_id;
 
-	/*
-	 * We ignore "dev" entierely, and rely on the dev_id that has
-	 * been passed via the scratchpad. This limits this domain's
-	 * usefulness to upper layers that definitely know that they
-	 * are built on top of the ITS.
-	 */
-	dev_id = info->scratchpad[0].ul;
-
-	msi_info = msi_get_domain_info(domain);
-	its = msi_info->data;
-
+	its = domain->parent->host_data;
 	its_dev = its_find_device(its, dev_id);
 	if (its_dev) {
 		/*
@@ -1259,10 +1220,6 @@ out:
 	info->scratchpad[0].ptr = its_dev;
 	return 0;
 }
-
-static struct msi_domain_ops its_msi_domain_ops = {
-	.msi_prepare	= its_msi_prepare,
-};
 
 static int its_irq_gic_domain_alloc(struct irq_domain *domain,
 				    unsigned int virq,
@@ -1299,9 +1256,9 @@ static int its_irq_domain_alloc(struct irq_domain *domain, unsigned int virq,
 
 		irq_domain_set_hwirq_and_chip(domain, virq + i,
 					      hwirq, &its_irq_chip, its_dev);
-		dev_dbg(info->scratchpad[1].ptr, "ID:%d pID:%d vID:%d\n",
-			(int)(hwirq - its_dev->event_map.lpi_base),
-			(int)hwirq, virq + i);
+		pr_debug("ID:%d pID:%d vID:%d\n",
+			 (int)(hwirq - its_dev->event_map.lpi_base),
+			 (int) hwirq, virq + i);
 	}
 
 	return 0;
@@ -1500,8 +1457,11 @@ static int its_probe(struct device_node *node, struct irq_domain *parent)
 			goto out_free_tables;
 		}
 
-		inner_domain = irq_domain_add_tree(node, &its_domain_ops, its);
-		if (!inner_domain) {
+		its->domain->parent = parent;
+
+		its->msi_chip.domain = its_pci_msi_alloc_domain(node,
+								its->domain);
+		if (!its->msi_chip.domain) {
 			err = -ENOMEM;
 			kfree(info);
 			goto out_free_tables;
