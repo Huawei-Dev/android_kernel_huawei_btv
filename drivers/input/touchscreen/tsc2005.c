@@ -34,7 +34,6 @@
 #include <linux/spi/tsc2005.h>
 #include <linux/regulator/consumer.h>
 #include <linux/regmap.h>
-#include <linux/gpio/consumer.h>
 
 /*
  * The touchscreen interface operates as follows:
@@ -355,7 +354,8 @@ static ssize_t tsc2005_selftest_show(struct device *dev,
 				     struct device_attribute *attr,
 				     char *buf)
 {
-	struct tsc2005 *ts = dev_get_drvdata(dev);
+	struct spi_device *spi = to_spi_device(dev);
+	struct tsc2005 *ts = spi_get_drvdata(spi);
 	unsigned int temp_high;
 	unsigned int temp_high_orig;
 	unsigned int temp_high_test;
