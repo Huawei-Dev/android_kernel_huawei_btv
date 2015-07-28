@@ -59,6 +59,7 @@ struct its_collection {
 struct its_node {
 	raw_spinlock_t		lock;
 	struct list_head	entry;
+	struct irq_domain	*domain;
 	void __iomem		*base;
 	unsigned long		phys_base;
 	struct its_cmd_block	*cmd_base;
@@ -1359,7 +1360,7 @@ static int its_probe(struct device_node *node, struct irq_domain *parent)
 	struct resource res;
 	struct its_node *its;
 	void __iomem *its_base;
-	struct irq_domain *inner_domain;
+	struct irq_domain *inner_domain = NULL;
 	u32 val;
 	u64 baser, tmp;
 	int err;
@@ -1448,29 +1449,22 @@ static int its_probe(struct device_node *node, struct irq_domain *parent)
 	writeq_relaxed(0, its->base + GITS_CWRITER);
 	writel_relaxed(GITS_CTLR_ENABLE, its->base + GITS_CTLR);
 
-	if (of_property_read_bool(its->msi_chip.of_node, "msi-controller")) {
-		its->domain = irq_domain_add_tree(node, &its_domain_ops, its);
-		if (!its->domain) {
+	if (of_property_read_bool(node, "msi-controller")) {
+		inner_domain = irq_domain_add_tree(node, &its_domain_ops, its);
+		if (!inner_domain) {
 			err = -ENOMEM;
-			goto out_free_tables;
-		}
-
-		its->domain->parent = parent;
-		its->domain->bus_token = DOMAIN_BUS_NEXUS;
-
-		its->msi_chip.domain = its_pci_msi_alloc_domain(node,
-								its->domain);
-		if (!its->msi_chip.domain) {
-			err = -ENOMEM;
-			kfree(info);
 			goto out_free_tables;
 		}
 
 		inner_domain->parent = parent;
 		inner_domain->bus_token = DOMAIN_BUS_NEXUS;
-		info->ops = &its_msi_domain_ops;
-		info->data = its;
-		inner_domain->host_data = info;
+
+		its->domain = its_pci_msi_alloc_domain(node, inner_domain);
+		if (!its->domain) {
+			err = -ENOMEM;
+			kfree(info);
+			goto out_free_tables;
+		}
 	}
 
 	spin_lock(&its_lock);
@@ -1479,6 +1473,11 @@ static int its_probe(struct device_node *node, struct irq_domain *parent)
 
 	return 0;
 
+out_free_domains:
+	if (its->domain)
+		irq_domain_remove(its->domain);
+	if (inner_domain)
+		irq_domain_remove(inner_domain);
 out_free_tables:
 	its_free_tables(its);
 out_free_cmd:
