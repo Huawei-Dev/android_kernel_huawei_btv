@@ -2758,3 +2758,63 @@ int mlx4_ACCESS_REG_wrapper(struct mlx4_dev *dev, int slave,
 			    0, MLX4_CMD_ACCESS_REG, MLX4_CMD_TIME_CLASS_C,
 			    MLX4_CMD_NATIVE);
 }
+
+static int mlx4_SET_PORT_phv_bit(struct mlx4_dev *dev, u8 port, u8 phv_bit)
+{
+#define SET_PORT_GEN_PHV_VALID	0x10
+#define SET_PORT_GEN_PHV_EN	0x80
+
+	struct mlx4_cmd_mailbox *mailbox;
+	struct mlx4_set_port_general_context *context;
+	u32 in_mod;
+	int err;
+
+	mailbox = mlx4_alloc_cmd_mailbox(dev);
+	if (IS_ERR(mailbox))
+		return PTR_ERR(mailbox);
+	context = mailbox->buf;
+
+	context->v_ignore_fcs |=  SET_PORT_GEN_PHV_VALID;
+	if (phv_bit)
+		context->phv_en |=  SET_PORT_GEN_PHV_EN;
+
+	in_mod = MLX4_SET_PORT_GENERAL << 8 | port;
+	err = mlx4_cmd(dev, mailbox->dma, in_mod, MLX4_SET_PORT_ETH_OPCODE,
+		       MLX4_CMD_SET_PORT, MLX4_CMD_TIME_CLASS_B,
+		       MLX4_CMD_NATIVE);
+
+	mlx4_free_cmd_mailbox(dev, mailbox);
+	return err;
+}
+
+int get_phv_bit(struct mlx4_dev *dev, u8 port, int *phv)
+{
+	int err;
+	struct mlx4_func_cap func_cap;
+
+	memset(&func_cap, 0, sizeof(func_cap));
+	err = mlx4_QUERY_FUNC_CAP(dev, port, &func_cap);
+	if (!err)
+		*phv = func_cap.flags & QUERY_FUNC_CAP_PHV_BIT;
+	return err;
+}
+EXPORT_SYMBOL(get_phv_bit);
+
+int set_phv_bit(struct mlx4_dev *dev, u8 port, int new_val)
+{
+	int ret;
+
+	if (mlx4_is_slave(dev))
+		return -EPERM;
+
+	if (dev->caps.flags2 & MLX4_DEV_CAP_FLAG2_PHV_EN &&
+	    !(dev->caps.flags2 & MLX4_DEV_CAP_FLAG2_SKIP_OUTER_VLAN)) {
+		ret = mlx4_SET_PORT_phv_bit(dev, port, new_val);
+		if (!ret)
+			dev->caps.phv_bit[port] = new_val;
+		return ret;
+	}
+
+	return -EOPNOTSUPP;
+}
+EXPORT_SYMBOL(set_phv_bit);
