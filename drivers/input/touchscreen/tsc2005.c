@@ -34,6 +34,7 @@
 #include <linux/spi/tsc2005.h>
 #include <linux/regulator/consumer.h>
 #include <linux/regmap.h>
+#include <linux/gpio/consumer.h>
 
 /*
  * The touchscreen interface operates as follows:
