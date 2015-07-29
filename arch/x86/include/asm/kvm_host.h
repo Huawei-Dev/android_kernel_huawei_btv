@@ -637,6 +637,9 @@ struct kvm_arch {
 	#endif
 
 	bool boot_vcpu_runs_old_kvmclock;
+	u32 bsp_vcpu_id;
+
+	u64 disabled_quirks;
 };
 
 struct kvm_vm_stat {
@@ -1170,16 +1173,11 @@ void kvm_complete_insn_gp(struct kvm_vcpu *vcpu, int err);
 
 int kvm_is_in_guest(void);
 
-void kvm_pmu_init(struct kvm_vcpu *vcpu);
-void kvm_pmu_destroy(struct kvm_vcpu *vcpu);
-void kvm_pmu_reset(struct kvm_vcpu *vcpu);
-void kvm_pmu_cpuid_update(struct kvm_vcpu *vcpu);
-bool kvm_pmu_msr(struct kvm_vcpu *vcpu, u32 msr);
-int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data);
-int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
-int kvm_pmu_check_pmc(struct kvm_vcpu *vcpu, unsigned pmc);
-int kvm_pmu_read_pmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
-void kvm_handle_pmu_event(struct kvm_vcpu *vcpu);
-void kvm_deliver_pmi(struct kvm_vcpu *vcpu);
+int __x86_set_memory_region(struct kvm *kvm,
+			    const struct kvm_userspace_memory_region *mem);
+int x86_set_memory_region(struct kvm *kvm,
+			  const struct kvm_userspace_memory_region *mem);
+bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu);
+bool kvm_vcpu_is_bsp(struct kvm_vcpu *vcpu);
 
 #endif /* _ASM_X86_KVM_HOST_H */
