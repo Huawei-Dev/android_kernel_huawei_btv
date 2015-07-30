@@ -630,10 +630,19 @@ static int twl4030_bci_probe(struct platform_device *pdev)
 
 	INIT_WORK(&bci->work, twl4030_bci_usb_work);
 
-	bci->transceiver = usb_get_phy(USB_PHY_TYPE_USB2);
-	if (!IS_ERR_OR_NULL(bci->transceiver)) {
-		bci->usb_nb.notifier_call = twl4030_bci_usb_ncb;
-		usb_register_notifier(bci->transceiver, &bci->usb_nb);
+	bci->usb_nb.notifier_call = twl4030_bci_usb_ncb;
+	if (bci->dev->of_node) {
+		struct device_node *phynode;
+
+		phynode = of_find_compatible_node(bci->dev->of_node->parent,
+						  NULL, "ti,twl4030-usb");
+		if (phynode) {
+			bci->transceiver = devm_usb_get_phy_by_node(
+				bci->dev, phynode, &bci->usb_nb);
+			if (IS_ERR(bci->transceiver) &&
+			    PTR_ERR(bci->transceiver) == -EPROBE_DEFER)
+				return -EPROBE_DEFER;
+		}
 	}
 
 	/* Enable interrupts now. */
