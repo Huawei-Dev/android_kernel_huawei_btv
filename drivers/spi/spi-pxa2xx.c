@@ -21,6 +21,7 @@
 #include <linux/err.h>
 #include <linux/interrupt.h>
 #include <linux/kernel.h>
+#include <linux/pci.h>
 #include <linux/platform_device.h>
 #include <linux/spi/pxa2xx_spi.h>
 #include <linux/spi/spi.h>
@@ -72,9 +73,66 @@ MODULE_ALIAS("platform:pxa2xx-spi");
 #define SPI_CS_CONTROL_SW_MODE	BIT(0)
 #define SPI_CS_CONTROL_CS_HIGH	BIT(1)
 
+struct lpss_config {
+	/* LPSS offset from drv_data->ioaddr */
+	unsigned offset;
+	/* Register offsets from drv_data->lpss_base or -1 */
+	int reg_general;
+	int reg_ssp;
+	int reg_cs_ctrl;
+	/* FIFO thresholds */
+	u32 rx_threshold;
+	u32 tx_threshold_lo;
+	u32 tx_threshold_hi;
+};
+
+/* Keep these sorted with enum pxa_ssp_type */
+static const struct lpss_config lpss_platforms[] = {
+	{	/* LPSS_LPT_SSP */
+		.offset = 0x800,
+		.reg_general = 0x08,
+		.reg_ssp = 0x0c,
+		.reg_cs_ctrl = 0x18,
+		.rx_threshold = 64,
+		.tx_threshold_lo = 160,
+		.tx_threshold_hi = 224,
+	},
+	{	/* LPSS_BYT_SSP */
+		.offset = 0x400,
+		.reg_general = 0x08,
+		.reg_ssp = 0x0c,
+		.reg_cs_ctrl = 0x18,
+		.rx_threshold = 64,
+		.tx_threshold_lo = 160,
+		.tx_threshold_hi = 224,
+	},
+	{	/* LPSS_SPT_SSP */
+		.offset = 0x200,
+		.reg_general = -1,
+		.reg_ssp = 0x20,
+		.reg_cs_ctrl = 0x24,
+		.rx_threshold = 1,
+		.tx_threshold_lo = 32,
+		.tx_threshold_hi = 56,
+	},
+};
+
+static inline const struct lpss_config
+*lpss_get_config(const struct driver_data *drv_data)
+{
+	return &lpss_platforms[drv_data->ssp_type - LPSS_LPT_SSP];
+}
+
 static bool is_lpss_ssp(const struct driver_data *drv_data)
 {
-	return drv_data->ssp_type == LPSS_SSP;
+	switch (drv_data->ssp_type) {
+	case LPSS_LPT_SSP:
+	case LPSS_BYT_SSP:
+	case LPSS_SPT_SSP:
+		return true;
+	default:
+		return false;
+	}
 }
 
 static bool is_quark_x1000_ssp(const struct driver_data *drv_data)
@@ -1089,10 +1147,13 @@ static int setup(struct spi_device *spi)
 		tx_hi_thres = 0;
 		rx_thres = RX_THRESH_QUARK_X1000_DFLT;
 		break;
-	case LPSS_SSP:
-		tx_thres = LPSS_TX_LOTHRESH_DFLT;
-		tx_hi_thres = LPSS_TX_HITHRESH_DFLT;
-		rx_thres = LPSS_RX_THRESH_DFLT;
+	case LPSS_LPT_SSP:
+	case LPSS_BYT_SSP:
+	case LPSS_SPT_SSP:
+		config = lpss_get_config(drv_data);
+		tx_thres = config->tx_threshold_lo;
+		tx_hi_thres = config->tx_threshold_hi;
+		rx_thres = config->rx_threshold;
 		break;
 	default:
 		tx_thres = TX_THRESH_DFLT;
@@ -1246,6 +1307,42 @@ static void cleanup(struct spi_device *spi)
 }
 
 #ifdef CONFIG_ACPI
+
+static const struct acpi_device_id pxa2xx_spi_acpi_match[] = {
+	{ "INT33C0", LPSS_LPT_SSP },
+	{ "INT33C1", LPSS_LPT_SSP },
+	{ "INT3430", LPSS_LPT_SSP },
+	{ "INT3431", LPSS_LPT_SSP },
+	{ "80860F0E", LPSS_BYT_SSP },
+	{ "8086228E", LPSS_BYT_SSP },
+	{ },
+};
+MODULE_DEVICE_TABLE(acpi, pxa2xx_spi_acpi_match);
+
+/*
+ * PCI IDs of compound devices that integrate both host controller and private
+ * integrated DMA engine. Please note these are not used in module
+ * autoloading and probing in this module but matching the LPSS SSP type.
+ */
+static const struct pci_device_id pxa2xx_spi_pci_compound_match[] = {
+	/* SPT-LP */
+	{ PCI_VDEVICE(INTEL, 0x9d29), LPSS_SPT_SSP },
+	{ PCI_VDEVICE(INTEL, 0x9d2a), LPSS_SPT_SSP },
+	/* SPT-H */
+	{ PCI_VDEVICE(INTEL, 0xa129), LPSS_SPT_SSP },
+	{ PCI_VDEVICE(INTEL, 0xa12a), LPSS_SPT_SSP },
+};
+
+static bool pxa2xx_spi_idma_filter(struct dma_chan *chan, void *param)
+{
+	struct device *dev = param;
+
+	if (dev != chan->device->dev->parent)
+		return false;
+
+	return true;
+}
+
 static struct pxa2xx_spi_master *
 pxa2xx_spi_acpi_get_pdata(struct platform_device *pdev)
 {
@@ -1253,10 +1350,26 @@ pxa2xx_spi_acpi_get_pdata(struct platform_device *pdev)
 	struct acpi_device *adev;
 	struct ssp_device *ssp;
 	struct resource *res;
-	int devid;
+	const struct acpi_device_id *adev_id = NULL;
+	const struct pci_device_id *pcidev_id = NULL;
+	int devid, type;
 
 	if (!ACPI_HANDLE(&pdev->dev) ||
 	    acpi_bus_get_device(ACPI_HANDLE(&pdev->dev), &adev))
+		return NULL;
+
+	if (dev_is_pci(pdev->dev.parent))
+		pcidev_id = pci_match_id(pxa2xx_spi_pci_compound_match,
+					 to_pci_dev(pdev->dev.parent));
+	else
+		adev_id = acpi_match_device(pdev->dev.driver->acpi_match_table,
+					    &pdev->dev);
+
+	if (adev_id)
+		type = (int)adev_id->driver_data;
+	else if (pcidev_id)
+		type = (int)pcidev_id->driver_data;
+	else
 		return NULL;
 
 	pdata = devm_kzalloc(&pdev->dev, sizeof(*pdata), GFP_KERNEL);
@@ -1273,6 +1386,12 @@ pxa2xx_spi_acpi_get_pdata(struct platform_device *pdev)
 	ssp->mmio_base = devm_ioremap_resource(&pdev->dev, res);
 	if (IS_ERR(ssp->mmio_base))
 		return NULL;
+
+	if (pcidev_id) {
+		pdata->tx_param = pdev->dev.parent;
+		pdata->rx_param = pdev->dev.parent;
+		pdata->dma_filter = pxa2xx_spi_idma_filter;
+	}
 
 	ssp->clk = devm_clk_get(&pdev->dev, NULL);
 	ssp->irq = platform_get_irq(pdev, 0);
