@@ -504,6 +504,7 @@ static int enter_state(suspend_state_t state)
 	if (state == PM_SUSPEND_FREEZE)
 		freeze_begin();
 
+#ifndef CONFIG_SUSPEND_SKIP_SYNC
 	trace_suspend_resume(TPS("sync_filesystems"), 0, true);
 #ifndef CONFIG_HISI_SR_SYNC
 	printk(KERN_INFO "PM: Syncing filesystems ... ");
@@ -522,6 +523,7 @@ static int enter_state(suspend_state_t state)
 #endif
 
 	trace_suspend_resume(TPS("sync_filesystems"), 0, false);
+#endif
 
 	pr_debug("PM: Preparing system for sleep (%s)\n", pm_states[state]);
 	error = suspend_prepare(state);
