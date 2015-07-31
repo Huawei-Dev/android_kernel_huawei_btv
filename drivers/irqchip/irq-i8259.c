@@ -343,4 +343,40 @@ void __init init_i8259_irqs(void)
 		panic("Failed to add i8259 IRQ domain");
 
 	setup_irq(I8259A_IRQ_BASE + PIC_CASCADE_IR, &irq2);
+	return domain;
+}
+
+void __init init_i8259_irqs(void)
+{
+	__init_i8259_irqs(NULL);
+}
+
+static void i8259_irq_dispatch(unsigned int __irq, struct irq_desc *desc)
+{
+	struct irq_domain *domain = irq_desc_get_handler_data(desc);
+	int hwirq = i8259_irq();
+	unsigned int irq;
+
+	if (hwirq < 0)
+		return;
+
+	irq = irq_linear_revmap(domain, hwirq);
+	generic_handle_irq(irq);
+}
+
+int __init i8259_of_init(struct device_node *node, struct device_node *parent)
+{
+	struct irq_domain *domain;
+	unsigned int parent_irq;
+
+	parent_irq = irq_of_parse_and_map(node, 0);
+	if (!parent_irq) {
+		pr_err("Failed to map i8259 parent IRQ\n");
+		return -ENODEV;
+	}
+
+	domain = __init_i8259_irqs(node);
+	irq_set_handler_data(parent_irq, domain);
+	irq_set_chained_handler(parent_irq, i8259_irq_dispatch);
+	return 0;
 }
