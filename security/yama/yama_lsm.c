@@ -393,6 +393,17 @@ static struct ctl_table yama_sysctl_table[] = {
 };
 static void __init yama_init_sysctl(void)
 {
+#ifndef CONFIG_SECURITY_YAMA_STACKED
+	/*
+	 * If yama is being stacked this is already taken care of.
+	 */
+	if (!security_module_enable("yama"))
+		return 0;
+	yama_add_hooks();
+#endif
+	pr_info("Yama: becoming mindful.\n");
+
+#ifdef CONFIG_SYSCTL
 	if (!register_sysctl_paths(yama_sysctl_path, yama_sysctl_table))
 		panic("Yama: sysctl registration failed.\n");
 }
