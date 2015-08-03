@@ -100,7 +100,7 @@ static const struct alps_nibble_commands alps_v6_nibble_commands[] = {
 #define ALPS_FOUR_BUTTONS	0x40	/* 4 direction button present */
 #define ALPS_PS2_INTERLEAVED	0x80	/* 3-byte PS/2 packet interleaved with
 					   6-byte ALPS packet */
-#define ALPS_STICK_BITS		0x100	/* separate stick button bits */
+#define ALPS_DELL		0x100	/* device is a Dell laptop */
 #define ALPS_BUTTONPAD		0x200	/* device is a clickpad */
 
 static const struct alps_model_info alps_model_data[] = {
@@ -290,9 +290,9 @@ static void alps_process_packet_v1_v2(struct psmouse *psmouse)
 		return;
 	}
 
-	/* Non interleaved V2 dualpoint has separate stick button bits */
+	/* Dell non interleaved V2 dualpoint has separate stick button bits */
 	if (priv->proto_version == ALPS_PROTO_V2 &&
-	    priv->flags == (ALPS_PASS | ALPS_DUALPOINT)) {
+	    priv->flags == (ALPS_DELL | ALPS_PASS | ALPS_DUALPOINT)) {
 		left |= packet[0] & 1;
 		right |= packet[0] & 2;
 		middle |= packet[0] & 4;
@@ -2589,6 +2589,8 @@ static int alps_set_protocol(struct psmouse *psmouse,
 	priv->byte0 = protocol->byte0;
 	priv->mask0 = protocol->mask0;
 	priv->flags = protocol->flags;
+	if (dmi_name_in_vendors("Dell"))
+		priv->flags |= ALPS_DELL;
 
 	priv->x_max = 2000;
 	priv->y_max = 1400;
