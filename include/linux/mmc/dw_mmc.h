@@ -162,11 +162,7 @@ struct dw_mci {
 	dma_addr_t		sg_dma;
 	void			*sg_cpu;
 	const struct dw_mci_dma_ops	*dma_ops;
-#ifdef CONFIG_MMC_DW_IDMAC
 	unsigned int		ring_size;
-#else
-	struct dw_mci_dma_data	*dma_data;
-#endif
 	unsigned int		desc_sz;
 	u64			dma_mask;		/* custom DMA mask */
 	u32			cmd_status;
