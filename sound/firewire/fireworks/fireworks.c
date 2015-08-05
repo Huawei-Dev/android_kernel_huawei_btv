@@ -248,6 +248,7 @@ efw_probe(struct fw_unit *unit,
 	err = get_hardware_info(efw);
 	if (err < 0)
 		goto error;
+	/* AudioFire8 (since 2009) and AudioFirePre8 */
 	if (entry->model_id == MODEL_ECHO_AUDIOFIRE_9)
 		efw->is_af9 = true;
 	/* These models uses the same firmware. */
