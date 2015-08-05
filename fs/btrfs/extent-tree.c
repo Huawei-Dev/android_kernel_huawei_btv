@@ -8819,13 +8819,12 @@ static u64 update_block_group_flags(struct btrfs_root *root, u64 flags)
 	return flags;
 }
 
-static int set_block_group_ro(struct btrfs_block_group_cache *cache, int force)
+static int inc_block_group_ro(struct btrfs_block_group_cache *cache, int force)
 {
 	struct btrfs_space_info *sinfo = cache->space_info;
 	u64 num_bytes;
 	u64 min_allocable_bytes;
 	int ret = -ENOSPC;
-
 
 	/*
 	 * We need some metadata space and system metadata space for
@@ -8843,6 +8842,7 @@ static int set_block_group_ro(struct btrfs_block_group_cache *cache, int force)
 	spin_lock(&cache->lock);
 
 	if (cache->ro) {
+		cache->ro++;
 		ret = 0;
 		goto out;
 	}
@@ -8854,7 +8854,7 @@ static int set_block_group_ro(struct btrfs_block_group_cache *cache, int force)
 	    sinfo->bytes_may_use + sinfo->bytes_readonly + num_bytes +
 	    min_allocable_bytes <= sinfo->total_bytes) {
 		sinfo->bytes_readonly += num_bytes;
-		cache->ro = 1;
+		cache->ro++;
 		list_add_tail(&cache->ro_list, &sinfo->ro_bgs);
 		ret = 0;
 	}
@@ -8864,15 +8864,13 @@ out:
 	return ret;
 }
 
-int btrfs_set_block_group_ro(struct btrfs_root *root,
+int btrfs_inc_block_group_ro(struct btrfs_root *root,
 			     struct btrfs_block_group_cache *cache)
 
 {
 	struct btrfs_trans_handle *trans;
 	u64 alloc_flags;
 	int ret;
-
-	BUG_ON(cache->ro);
 
 again:
 	trans = btrfs_join_transaction(root);
@@ -8916,7 +8914,7 @@ again:
 			goto out;
 	}
 
-	ret = set_block_group_ro(cache, 0);
+	ret = inc_block_group_ro(cache, 0);
 	if (!ret)
 		goto out;
 	alloc_flags = get_alloc_profile(root, cache->space_info->flags);
@@ -8924,7 +8922,7 @@ again:
 			     CHUNK_ALLOC_FORCE);
 	if (ret < 0)
 		goto out;
-	ret = set_block_group_ro(cache, 0);
+	ret = inc_block_group_ro(cache, 0);
 out:
 	if (cache->flags & BTRFS_BLOCK_GROUP_SYSTEM) {
 		alloc_flags = update_block_group_flags(root, cache->flags);
@@ -8987,7 +8985,7 @@ u64 btrfs_account_ro_block_groups_free_space(struct btrfs_space_info *sinfo)
 	return free_bytes;
 }
 
-void btrfs_set_block_group_rw(struct btrfs_root *root,
+void btrfs_dec_block_group_ro(struct btrfs_root *root,
 			      struct btrfs_block_group_cache *cache)
 {
 	struct btrfs_space_info *sinfo = cache->space_info;
@@ -8997,11 +8995,13 @@ void btrfs_set_block_group_rw(struct btrfs_root *root,
 
 	spin_lock(&sinfo->lock);
 	spin_lock(&cache->lock);
-	num_bytes = cache->key.offset - cache->reserved - cache->pinned -
-		    cache->bytes_super - btrfs_block_group_used(&cache->item);
-	sinfo->bytes_readonly -= num_bytes;
-	cache->ro = 0;
-	list_del_init(&cache->ro_list);
+	if (!--cache->ro) {
+		num_bytes = cache->key.offset - cache->reserved -
+			    cache->pinned - cache->bytes_super -
+			    btrfs_block_group_used(&cache->item);
+		sinfo->bytes_readonly -= num_bytes;
+		list_del_init(&cache->ro_list);
+	}
 	spin_unlock(&cache->lock);
 	spin_unlock(&sinfo->lock);
 }
@@ -9517,7 +9517,7 @@ int btrfs_read_block_groups(struct btrfs_root *root)
 
 		set_avail_alloc_bits(root->fs_info, cache->flags);
 		if (btrfs_chunk_readonly(root, cache->key.objectid)) {
-			set_block_group_ro(cache, 1);
+			inc_block_group_ro(cache, 1);
 		} else if (btrfs_block_group_used(&cache->item) == 0) {
 			spin_lock(&info->unused_bgs_lock);
 			/* Should always be true but just in case. */
@@ -9545,11 +9545,11 @@ int btrfs_read_block_groups(struct btrfs_root *root)
 		list_for_each_entry(cache,
 				&space_info->block_groups[BTRFS_RAID_RAID0],
 				list)
-			set_block_group_ro(cache, 1);
+			inc_block_group_ro(cache, 1);
 		list_for_each_entry(cache,
 				&space_info->block_groups[BTRFS_RAID_SINGLE],
 				list)
-			set_block_group_ro(cache, 1);
+			inc_block_group_ro(cache, 1);
 	}
 
 	init_global_block_rsv(info);
@@ -10043,7 +10043,7 @@ void btrfs_delete_unused_bgs(struct btrfs_fs_info *fs_info)
 		spin_unlock(&block_group->lock);
 
 		/* We don't want to force the issue, only flip if it's ok. */
-		ret = set_block_group_ro(block_group, 0);
+		ret = inc_block_group_ro(block_group, 0);
 		up_write(&space_info->groups_sem);
 		if (ret < 0) {
 			ret = 0;
@@ -10057,7 +10057,7 @@ void btrfs_delete_unused_bgs(struct btrfs_fs_info *fs_info)
 		/* 1 for btrfs_orphan_reserve_metadata() */
 		trans = btrfs_start_transaction(root, 1);
 		if (IS_ERR(trans)) {
-			btrfs_set_block_group_rw(root, block_group);
+			btrfs_dec_block_group_ro(root, block_group);
 			ret = PTR_ERR(trans);
 			goto next;
 		}
@@ -10084,14 +10084,14 @@ void btrfs_delete_unused_bgs(struct btrfs_fs_info *fs_info)
 				  EXTENT_DIRTY, GFP_NOFS);
 		if (ret) {
 			mutex_unlock(&fs_info->unused_bg_unpin_mutex);
-			btrfs_set_block_group_rw(root, block_group);
+			btrfs_dec_block_group_ro(root, block_group);
 			goto end_trans;
 		}
 		ret = clear_extent_bits(&fs_info->freed_extents[1], start, end,
 				  EXTENT_DIRTY, GFP_NOFS);
 		if (ret) {
 			mutex_unlock(&fs_info->unused_bg_unpin_mutex);
-			btrfs_set_block_group_rw(root, block_group);
+			btrfs_dec_block_group_ro(root, block_group);
 			goto end_trans;
 		}
 		mutex_unlock(&fs_info->unused_bg_unpin_mutex);
