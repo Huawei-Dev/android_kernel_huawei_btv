@@ -2563,28 +2563,20 @@ static int dw_mci_init_slot(struct dw_mci *host, unsigned int id)
 	if (host->pdata->quirks & DW_MCI_QUIRK_HIGHSPEED)
 		mmc->caps |= MMC_CAP_SD_HIGHSPEED | MMC_CAP_MMC_HIGHSPEED;
 
-	if (host->pdata->blk_settings) {
-		mmc->max_segs = host->pdata->blk_settings->max_segs;
-		mmc->max_blk_size = host->pdata->blk_settings->max_blk_size;
-		mmc->max_blk_count = host->pdata->blk_settings->max_blk_count;
-		mmc->max_req_size = host->pdata->blk_settings->max_req_size;
-		mmc->max_seg_size = host->pdata->blk_settings->max_seg_size;
+	/* Useful defaults if platform data is unset. */
+	if (host->use_dma) {
+		mmc->max_segs = host->ring_size;
+		mmc->max_blk_size = 65536;
+		mmc->max_seg_size = 0x1000;
+		mmc->max_req_size = mmc->max_seg_size * host->ring_size;
+		mmc->max_blk_count = mmc->max_req_size / 512;
 	} else {
-		/* Useful defaults if platform data is unset. */
-		if (host->use_dma) {
-			mmc->max_segs = host->ring_size;
-			mmc->max_blk_size = 65536;
-			mmc->max_seg_size = 0x1000;
-			mmc->max_req_size = mmc->max_seg_size * host->ring_size;
-			mmc->max_blk_count = mmc->max_req_size / 512;
-		} else {
-			mmc->max_segs = 64;
-			mmc->max_blk_size = 65536; /* BLKSIZ is 16 bits */
-			mmc->max_blk_count = 512;
-			mmc->max_req_size = mmc->max_blk_size *
-					    mmc->max_blk_count;
-			mmc->max_seg_size = mmc->max_req_size;
-		}
+		mmc->max_segs = 64;
+		mmc->max_blk_size = 65536; /* BLKSIZ is 16 bits */
+		mmc->max_blk_count = 512;
+		mmc->max_req_size = mmc->max_blk_size *
+				    mmc->max_blk_count;
+		mmc->max_seg_size = mmc->max_req_size;
 	}
 
 	host->pinctrl = devm_pinctrl_get(mmc_dev(mmc));
