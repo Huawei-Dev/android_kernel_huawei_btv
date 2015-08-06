@@ -2,8 +2,8 @@
 #define LLIST_H
 
 
+#include <linux/atomic.h>
 #include <linux/kernel.h>
-#include <asm/cmpxchg.h>
 
 struct llist_head {
 	struct llist_node *first;
