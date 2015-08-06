@@ -1761,7 +1761,7 @@ void audit_log_name(struct audit_context *context, struct audit_names *n,
 	} else
 		audit_log_format(ab, " name=(null)");
 
-	if (n->ino != (unsigned long)-1)
+	if (n->ino != AUDIT_INO_UNSET) {
 		audit_log_format(ab, " inode=%lu"
 				 " dev=%02x:%02x mode=%#ho"
 				 " ouid=%u ogid=%u rdev=%02x:%02x",
@@ -1773,6 +1773,7 @@ void audit_log_name(struct audit_context *context, struct audit_names *n,
 				 from_kgid(&init_user_ns, n->gid),
 				 MAJOR(n->rdev),
 				 MINOR(n->rdev));
+	}
 	if (n->osid != 0) {
 		char *ctx = NULL;
 		u32 len;
