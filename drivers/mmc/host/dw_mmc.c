@@ -2894,7 +2894,7 @@ int dw_mci_probe(struct dw_mci *host)
 		}
 	}
 
-	if (!host->pdata->select_slot && host->pdata->num_slots > 1) {
+	if (host->pdata->num_slots < 1) {
 		dev_err(host->dev,
 			"Platform data must supply select_slot function\n");
 		return -ENODEV;
