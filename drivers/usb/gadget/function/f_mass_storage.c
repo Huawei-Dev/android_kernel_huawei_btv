@@ -220,7 +220,6 @@
 #include <linux/usb/composite.h>
 #include <asm/uaccess.h>
 
-#include "gadget_chips.h"
 #include "configfs.h"
 
 #include <chipset_common/hwusb/hw_usb_rwswitch.h>
