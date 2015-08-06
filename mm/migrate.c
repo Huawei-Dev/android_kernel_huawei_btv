@@ -967,7 +967,6 @@ out:
 		if (reason == MR_MEMORY_FAILURE)
 			put_page(page);
 		else
-		if (reason != MR_MEMORY_FAILURE)
 			putback_lru_page(page);
 	}
 
