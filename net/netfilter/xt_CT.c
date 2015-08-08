@@ -184,6 +184,7 @@ out:
 static int xt_ct_tg_check(const struct xt_tgchk_param *par,
 			  struct xt_ct_target_info_v1 *info)
 {
+	struct nf_conntrack_zone zone;
 	struct nf_conn *ct;
 	int ret = -EOPNOTSUPP;
 
@@ -200,8 +201,11 @@ static int xt_ct_tg_check(const struct xt_tgchk_param *par,
 	ret = nf_ct_l3proto_try_module_get(par->family);
 	if (ret < 0)
 		goto err1;
+		
+	memset(&zone, 0, sizeof(zone));
+	zone.id = info->zone;
 
-	ct = nf_ct_tmpl_alloc(par->net, info->zone, GFP_KERNEL);
+	ct = nf_ct_tmpl_alloc(par->net, &zone, GFP_KERNEL);
 	if (!ct) {
 		ret = -ENOMEM;
 		goto err2;
