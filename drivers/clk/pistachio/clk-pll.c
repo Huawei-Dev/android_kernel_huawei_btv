@@ -148,8 +148,12 @@ static int pll_gf40lp_frac_set_rate(struct clk_hw *hw, unsigned long rate,
 {
 	struct pistachio_clk_pll *pll = to_pistachio_pll(hw);
 	struct pistachio_pll_rate_table *params;
-	bool was_enabled;
-	u32 val;
+	int enabled = pll_gf40lp_frac_is_enabled(hw);
+	u32 val, vco, old_postdiv1, old_postdiv2;
+	const char *name = clk_hw_get_name(hw);
+
+	if (rate < MIN_OUTPUT_FRAC || rate > MAX_OUTPUT_FRAC)
+		return -EINVAL;
 
 	params = pll_get_params(pll, parent_rate, rate);
 	if (!params)
@@ -265,8 +269,12 @@ static int pll_gf40lp_laint_set_rate(struct clk_hw *hw, unsigned long rate,
 {
 	struct pistachio_clk_pll *pll = to_pistachio_pll(hw);
 	struct pistachio_pll_rate_table *params;
-	bool was_enabled;
-	u32 val;
+	int enabled = pll_gf40lp_laint_is_enabled(hw);
+	u32 val, vco, old_postdiv1, old_postdiv2;
+	const char *name = clk_hw_get_name(hw);
+
+	if (rate < MIN_OUTPUT_LA || rate > MAX_OUTPUT_LA)
+		return -EINVAL;
 
 	params = pll_get_params(pll, parent_rate, rate);
 	if (!params)
