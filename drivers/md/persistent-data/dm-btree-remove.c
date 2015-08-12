@@ -653,11 +653,13 @@ static int remove_one(struct dm_btree_info *info, dm_block_t root,
 	int index = 0, r = 0;
 	struct shadow_spine spine;
 	struct btree_node *n;
+	struct dm_btree_value_type le64_vt;
 	uint64_t k;
 
+	init_le64_type(info->tm, &le64_vt);
 	init_shadow_spine(&spine, info);
 	for (level = 0; level < last_level; level++) {
-		r = remove_raw(&spine, info, &le64_type,
+		r = remove_raw(&spine, info, &le64_vt,
 			       root, keys[level], (unsigned *) &index);
 		if (r < 0)
 			goto out;
