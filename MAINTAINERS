@@ -2523,6 +2523,27 @@ F:	net/ceph/
 F:	include/linux/ceph/
 F:	include/linux/crush/
 
+CEPH DISTRIBUTED FILE SYSTEM CLIENT (CEPH)
+M:	"Yan, Zheng" <zyan@redhat.com>
+M:	Sage Weil <sage@redhat.com>
+M:	Ilya Dryomov <idryomov@gmail.com>
+L:	ceph-devel@vger.kernel.org
+W:	http://ceph.com/
+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/sage/ceph-client.git
+T:	git git://github.com/ceph/ceph-client.git
+S:	Supported
+F:	Documentation/filesystems/ceph.txt
+F:	fs/ceph/
+
+CERTIFICATE HANDLING:
+M:	David Howells <dhowells@redhat.com>
+M:	David Woodhouse <dwmw2@infradead.org>
+L:	keyrings@linux-nfs.org
+S:	Maintained
+F:	Documentation/module-signing.txt
+F:	certs/
+F:	scripts/extract-cert.c
+
 CERTIFIED WIRELESS USB (WUSB) SUBSYSTEM:
 L:	linux-usb@vger.kernel.org
 S:	Orphan
