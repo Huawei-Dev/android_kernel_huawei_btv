@@ -98,6 +98,8 @@ struct omap8250_priv {
 	struct pm_qos_request pm_qos_request;
 	struct work_struct qos_work;
 	struct uart_8250_dma omap8250_dma;
+	spinlock_t rx_dma_lock;
+	bool rx_dma_broken;
 };
 
 static u32 uart_read(struct uart_8250_port *up, u32 reg)
@@ -753,6 +755,29 @@ static void __dma_rx_complete(void *param)
 	__dma_rx_do_complete(param, false);
 }
 
+static void omap_8250_rx_dma_flush(struct uart_8250_port *p)
+{
+	struct omap8250_priv	*priv = p->port.private_data;
+	struct uart_8250_dma	*dma = p->dma;
+	unsigned long		flags;
+	int ret;
+
+	spin_lock_irqsave(&priv->rx_dma_lock, flags);
+
+	if (!dma->rx_running) {
+		spin_unlock_irqrestore(&priv->rx_dma_lock, flags);
+		return;
+	}
+
+	ret = dmaengine_pause(dma->rxchan);
+	if (WARN_ON_ONCE(ret))
+		priv->rx_dma_broken = true;
+
+	spin_unlock_irqrestore(&priv->rx_dma_lock, flags);
+
+	__dma_rx_do_complete(p, true);
+}
+
 static int omap_8250_rx_dma(struct uart_8250_port *p, unsigned int iir)
 {
 	struct uart_8250_dma            *dma = p->dma;
@@ -795,6 +820,11 @@ static int omap_8250_rx_dma(struct uart_8250_port *p, unsigned int iir)
 	default:
 		break;
 	}
+
+	if (priv->rx_dma_broken)
+		return -EINVAL;
+
+	spin_lock_irqsave(&priv->rx_dma_lock, flags);
 
 	if (dma->rx_running)
 		return 0;
@@ -1162,6 +1192,11 @@ static int omap8250_probe(struct platform_device *pdev)
 
 			if (of_machine_is_compatible("ti,am33xx"))
 				priv->habit |= OMAP_DMA_TX_KICK;
+			/*
+			 * pause is currently not supported atleast on omap-sdma
+			 * and edma on most earlier kernels.
+			 */
+			priv->rx_dma_broken = true;
 		}
 	}
 #endif
