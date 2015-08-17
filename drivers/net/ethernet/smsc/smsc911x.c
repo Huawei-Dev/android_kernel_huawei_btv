@@ -2367,12 +2367,17 @@ static int smsc911x_probe_config_dt(struct smsc911x_platform_config *config,
 				    struct device_node *np)
 {
 	const char *mac;
+	int phy_interface;
 	u32 width = 0;
 
 	if (!np)
 		return -ENODEV;
 
-	config->phy_interface = of_get_phy_mode(np);
+	phy_interface = device_get_phy_mode(dev);
+	if (phy_interface < 0)
+		return phy_interface;
+
+	config->phy_interface = phy_interface;
 
 	mac = of_get_mac_address(np);
 	if (mac)
