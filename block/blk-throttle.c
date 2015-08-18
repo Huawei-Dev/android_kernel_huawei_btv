@@ -264,11 +264,6 @@ static inline struct blkcg_gq *tg_to_blkg(struct throtl_grp *tg)
 	return pd_to_blkg(&tg->pd);
 }
 
-static inline struct throtl_grp *td_root_tg(struct throtl_data *td)
-{
-	return blkg_to_tg(td->queue->root_blkg);
-}
-
 /**
  * sq_to_tg - return the throl_grp the specified service queue belongs to
  * @sq: the throtl_service_queue of interest
@@ -674,39 +669,6 @@ static void throtl_pd_reset_stats(struct blkg_policy_data *pd)
 		blkg_rwstat_reset(&sc->service_bytes);
 		blkg_rwstat_reset(&sc->serviced);
 	}
-}
-
-static struct throtl_grp *throtl_lookup_tg(struct throtl_data *td,
-					   struct blkcg *blkcg)
-{
-	return blkg_to_tg(blkg_lookup(blkcg, td->queue));
-}
-
-static struct throtl_grp *throtl_lookup_create_tg(struct throtl_data *td,
-						  struct blkcg *blkcg)
-{
-	struct request_queue *q = td->queue;
-	struct throtl_grp *tg = NULL;
-
-	/*
-	 * This is the common case when there are no blkcgs.  Avoid lookup
-	 * in this case
-	 */
-	if (blkcg == &blkcg_root) {
-		tg = td_root_tg(td);
-	} else {
-		struct blkcg_gq *blkg;
-
-		blkg = blkg_lookup_create(blkcg, q);
-
-		/* if %NULL and @q is alive, fall back to root_tg */
-		if (!IS_ERR(blkg))
-			tg = blkg_to_tg(blkg);
-		else
-			tg = td_root_tg(td);
-	}
-
-	return tg;
 }
 
 static struct throtl_grp *
@@ -2995,7 +2957,6 @@ static struct cftype throtl_files[] = {
 	},
 	{ }	/* terminate */
 };
-/*lint -restore*/
 
 static void throtl_shutdown_wq(struct request_queue *q)
 {
@@ -3006,7 +2967,6 @@ static void throtl_shutdown_wq(struct request_queue *q)
 	cancel_work_sync(&td->dispatch_work);
 }
 
-/*lint -save -e31*/
 static struct blkcg_policy blkcg_policy_throtl = {
 	.cftypes		= throtl_files,
 
@@ -3017,18 +2977,20 @@ static struct blkcg_policy blkcg_policy_throtl = {
 	.pd_free_fn		= throtl_pd_free,
 	.pd_reset_stats_fn	= throtl_pd_reset_stats,
 };
-/*lint -restore*/
 
-bool blk_throtl_bio(struct request_queue *q, struct bio *bio)
+bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+		    struct bio *bio)
 {
-	struct throtl_data *td = q->td;
 	struct throtl_qnode *qn = NULL;
-	struct throtl_grp *tg;
+	struct throtl_grp *tg = blkg_to_tg(blkg ?: q->root_blkg);
 	struct throtl_service_queue *sq;
 	bool rw = bio_data_dir(bio);
 	int index;
+	struct throtl_data *td = q->td;
 	struct blkcg *blkcg;
 	bool throttled = false;
+
+	WARN_ON_ONCE(!rcu_read_lock_held());
 
 	/* see throtl_charge_bio() */
 	if (bio->bi_rw & (REQ_THROTTLED | REQ_META | REQ_FLUSH |
@@ -3048,42 +3010,27 @@ bool blk_throtl_bio(struct request_queue *q, struct bio *bio)
 	 */
 	rcu_read_lock();
 again:
-	blkcg = bio_blkcg(bio);
+	if (!blkg)
+		goto out;
+		
+	index =  tg_data_index(tg, rw);
+	if (!tg->has_rules[index])
+		goto out;
+		
+	blkcg = blkg->blkcg;
 	if (td_weight_based(td) &&
-	    (blkcg == &blkcg_root || !blk_throtl_weight_offon))
-		goto out_unlock_rcu;
-
-	tg = throtl_lookup_tg(td, blkcg);
-	/*lint -save -e730*/
-	if (unlikely(!tg)) {
-	/*lint -restore*/
-		spin_lock_irq(q->queue_lock);
-		tg = throtl_lookup_create_tg(td, blkcg);
-		spin_unlock_irq(q->queue_lock);
-		if (!tg)
-			goto out_unlock_rcu;
-	}
+	    	(blkcg == &blkcg_root || !blk_throtl_weight_offon))
+		goto out;
 
 	if (tg->fg_flag)
 		bio->bi_rw |= REQ_FG;
 
-	index = tg_data_index(tg, rw);
-	if (!tg->has_rules[index]) {
-		/*lint -save -e712 -e747*/
-		throtl_update_dispatch_stats(tg_to_blkg(tg),
-				bio->bi_iter.bi_size, bio->bi_rw);
-		/*lint -restore*/
-		goto out_unlock_rcu;
-	}
-
 	/*
 	 * Now we just support limit control for one layer.
 	 */
-	/*lint -save -e438 -e529 -e666*/
 	if (ACCESS_ONCE(tg->td->max_inflights) && !bio->bi_throtl_private1 &&
 	    current->mm &&
 	    ACCESS_ONCE(current->mm->io_limit->max_inflights)) {
-	/*lint -restore*/
 		struct blk_throtl_io_limit *io_limit = current->mm->io_limit;
 		int ret;
 
@@ -3177,14 +3124,12 @@ skip:
 	}
 
 	/* out-of-limit, queue to @tg */
-	/*lint -save -e747*/
 	throtl_log(sq, "[%c] bio. bdisp=%llu sz=%u bps=%llu iodisp=%u iops=%u queued=%d/%d",
 		   rw == READ ? 'R' : 'W',
 		   tg->io_cost.bytes_disp[index], bio->bi_iter.bi_size,
 		   tg->io_cost.bps[index], tg->io_cost.io_disp[index],
 		   tg->io_cost.iops[index],
 		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
-	/*lint -restore*/
 
 	bio_associate_current(bio);
 	tg->td->nr_queued[index]++;
@@ -3199,15 +3144,11 @@ skip:
 	 */
 	if (tg->flags & THROTL_TG_WAS_EMPTY) {
 		tg_update_disptime(tg);
-		/*lint -save -e747*/
 		throtl_schedule_next_dispatch(tg->service_queue.parent_sq, true);
-		/*lint -restore*/
 	}
 
 out_unlock:
 	spin_unlock_irq(q->queue_lock);
-out_unlock_rcu:
-	rcu_read_unlock();
 out:
 	/*
 	 * As multiple blk-throtls may stack in the same issue path, we
@@ -3215,9 +3156,7 @@ out:
 	 * being issued.
 	 */
 	if (!throttled)
-		/*lint -save -e613*/
 		bio->bi_rw &= ~REQ_THROTTLED;
-		/*lint -restore*/
 	return throttled;
 }
 

@@ -2063,8 +2063,8 @@ generic_make_request_checks(struct bio *bio)
 	blk_update_perf(q,
 		part->partno ? &part_to_disk(part)->part0 : part);
 
-	if (blk_throtl_bio(q, bio))
-		return false;	/* throttled, will be resubmitted later */
+	if (!blkcg_bio_issue_check(q, bio))
+		return false;
 
 	trace_block_bio_queue(q, bio);
 	return true;
