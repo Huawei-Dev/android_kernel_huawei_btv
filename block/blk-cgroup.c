@@ -488,6 +488,7 @@ const char *blkg_dev_name(struct blkcg_gq *blkg)
 		return dev_name(blkg->q->backing_dev_info.dev);
 	return NULL;
 }
+EXPORT_SYMBOL_GPL(blkg_dev_name);
 
 /**
  * blkcg_print_blkgs - helper for printing per-blkg data
