@@ -872,15 +872,13 @@ void blkg_conf_finish(struct blkg_conf_ctx *ctx)
 }
 EXPORT_SYMBOL_GPL(blkg_conf_finish);
 
-/*lint -save -e785*/
-struct cftype blkcg_files[] = {
+struct cftype blkcg_legacy_files[] = {
 	{
 		.name = "reset_stats",
 		.write_u64 = blkcg_reset_stats,
 	},
 	{ }	/* terminate */
 };
-/*lint -restore*/
 
 /**
  * blkcg_css_offline - cgroup css_offline callback
@@ -900,10 +898,8 @@ static void blkcg_css_offline(struct cgroup_subsys_state *css)
 	spin_lock_irq(&blkcg->lock);
 
 	while (!hlist_empty(&blkcg->blkg_list)) {
-		/*lint -save -e826*/
 		struct blkcg_gq *blkg = hlist_entry(blkcg->blkg_list.first,
 						struct blkcg_gq, blkcg_node);
-		/*lint -restore*/
 		struct request_queue *q = blkg->q;
 
 		if (spin_trylock(q->queue_lock)) {
@@ -1202,7 +1198,7 @@ struct cgroup_subsys io_cgrp_subsys = {
 	.attach = blkcg_attach,
 	.fork = blkcg_fork,
 #endif
-	.legacy_cftypes = blkcg_files,
+	.legacy_cftypes = blkcg_legacy_files,
 	.legacy_name = "blkio",
 #ifdef CONFIG_MEMCG
 	/*
@@ -1376,9 +1372,9 @@ int blkcg_policy_register(struct blkcg_policy *pol)
 	mutex_unlock(&blkcg_pol_mutex);
 
 	/* everything is in place, add intf files for the new policy */
-	if (pol->cftypes)
+	if (pol->legacy_cftypes)
 		WARN_ON(cgroup_add_legacy_cftypes(&io_cgrp_subsys,
-						  pol->cftypes));
+						  pol->legacy_cftypes));
 	mutex_unlock(&blkcg_pol_register_mutex);
 	return 0;
 
@@ -1417,8 +1413,8 @@ void blkcg_policy_unregister(struct blkcg_policy *pol)
 		goto out_unlock;
 
 	/* kill the intf files first */
-	if (pol->cftypes)
-		cgroup_rm_cftypes(pol->cftypes);
+	if (pol->legacy_cftypes)
+		cgroup_rm_cftypes(pol->legacy_cftypes);
 
 	/* remove cpds and unregister */
 	mutex_lock(&blkcg_pol_mutex);

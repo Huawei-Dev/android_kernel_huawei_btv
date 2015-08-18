@@ -2708,11 +2708,8 @@ static int tg_print_iops_slice_device(struct seq_file *sf, void *v)
 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
 			  tg_prfill_iops_slice_device,
 			  &blkcg_policy_throtl, 0, false);
-	/*lint -restore*/
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static ssize_t tg_set_iops_slice_device(struct kernfs_open_file *of,
 			   char *buf, size_t nbytes, loff_t off)
@@ -2742,15 +2739,10 @@ static ssize_t tg_set_iops_slice_device(struct kernfs_open_file *of,
 	ret = 0;
 out_finish:
 	blkg_conf_finish(&ctx);
-	/*lint -save -e713 -e737*/
 	return ret ?: nbytes;
-	/*lint -restore*/
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
-/*lint -save -e785*/
-static struct cftype throtl_files[] = {
+static struct cftype throtl_legacy_files[] = {
 	{
 		.name = "throttle.mode_device",
 		.flags = CFTYPE_ONLY_ON_ROOT,
@@ -2856,7 +2848,7 @@ static void throtl_shutdown_wq(struct request_queue *q)
 }
 
 static struct blkcg_policy blkcg_policy_throtl = {
-	.cftypes		= throtl_files,
+	.legacy_cftypes		= throtl_legacy_files,
 
 	.pd_alloc_fn		= throtl_pd_alloc,
 	.pd_init_fn		= throtl_pd_init,
