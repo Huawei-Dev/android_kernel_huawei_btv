@@ -1947,53 +1947,37 @@ static u64 tg_prfill_conf_u64(struct seq_file *sf, struct blkg_policy_data *pd,
 			      int off)
 {
 	struct throtl_grp *tg = pd_to_tg(pd);
-	/*lint -save -e124*/
 	u64 v = *(u64 *)((void *)tg + off);
-	/*lint -restore*/
 
-	/*lint -save -e650 -e737 -e747*/
 	if (v == -1)
 		return 0;
 	return __blkg_prfill_u64(sf, pd, (u64)v);
-	/*lint -restore*/
 }
 
 static u64 tg_prfill_conf_uint(struct seq_file *sf, struct blkg_policy_data *pd,
 			       int off)
 {
 	struct throtl_grp *tg = pd_to_tg(pd);
-	/*lint -save -e124*/
 	unsigned int v = *(unsigned int *)((void *)tg + off);
-	/*lint -restore*/
 
-	/*lint -save -e650 -e737 -e747*/
 	if (v == -1)
 		return 0;
 	return __blkg_prfill_u64(sf, pd, v);
-	/*lint -restore*/
 }
 
 static int tg_print_conf_u64(struct seq_file *sf, void *v)
 {
-	/*lint -save -e747*/
 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), tg_prfill_conf_u64,
 			  &blkcg_policy_throtl, seq_cft(sf)->private, false);
-	/*lint -restore*/
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static int tg_print_conf_uint(struct seq_file *sf, void *v)
 {
-	/*lint -save -e747*/
 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), tg_prfill_conf_uint,
 			  &blkcg_policy_throtl, seq_cft(sf)->private, false);
-	/*lint -restore*/
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static ssize_t tg_set_conf(struct kernfs_open_file *of,
 			   char *buf, size_t nbytes, loff_t off, bool is_u64)
@@ -2005,10 +1989,17 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
 	struct blkcg_gq *blkg;
 	struct cgroup_subsys_state *pos_css;
 	int ret;
+	u64 v;
 
 	ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
 	if (ret)
 		return ret;
+		
+	ret = -EINVAL;
+	if (sscanf(ctx.body, "%llu", &v) != 1)
+		goto out_finish;
+	if (!v)
+		v = -1;
 
 	tg = blkg_to_tg(ctx.blkg);
 	if (td_weight_based(tg->td)) {
@@ -2018,14 +2009,10 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
 
 	sq = &tg->service_queue;
 
-	/*lint -save -e124 -e570 -e712 -e747 -e820*/
-	if (!ctx.v)
-		ctx.v = -1;
-
 	if (is_u64)
-		*(u64 *)((void *)tg + of_cft(of)->private) = ctx.v;
+		*(u64 *)((void *)tg + of_cft(of)->private) = v;
 	else
-		*(unsigned int *)((void *)tg + of_cft(of)->private) = ctx.v;
+		*(unsigned int *)((void *)tg + of_cft(of)->private) = v;
 
 	tg->td->mode = MODE_THROTTLE;
 
@@ -2043,7 +2030,6 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
 	 */
 	blkg_for_each_descendant_pre(blkg, pos_css, ctx.blkg)
 		tg_update_has_rules(blkg_to_tg(blkg));
-	/*lint -restore*/
 
 	/*
 	 * We're already holding queue_lock and know @tg is valid.  Let's
@@ -2053,7 +2039,6 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
 	 * that a group's limit are dropped suddenly and we don't want to
 	 * account recently dispatched IO with new low rate.
 	 */
-	/*lint -save -e713 -e737 -e747*/
 	throtl_start_new_slice(tg, 0);
 	throtl_start_new_slice(tg, 1);
 
@@ -2061,28 +2046,23 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
 		tg_update_disptime(tg);
 		throtl_schedule_next_dispatch(sq->parent_sq, true);
 	}
+	
+	ret = 0;
 out_finish:
 	blkg_conf_finish(&ctx);
-	return ret ? ret : nbytes;
-	/*lint -restore*/
-/*lint -save -e715*/
+	return ret ?: nbytes;
 }
-/*lint -restore*/
 
 static ssize_t tg_set_conf_u64(struct kernfs_open_file *of,
 			       char *buf, size_t nbytes, loff_t off)
 {
-	/*lint -save -e747*/
 	return tg_set_conf(of, buf, nbytes, off, true);
-	/*lint -restore*/
 }
 
 static ssize_t tg_set_conf_uint(struct kernfs_open_file *of,
 				char *buf, size_t nbytes, loff_t off)
 {
-	/*lint -save -e747*/
 	return tg_set_conf(of, buf, nbytes, off, false);
-	/*lint -restore*/
 }
 
 static u64 tg_prfill_mode_device(struct seq_file *sf,
@@ -2097,9 +2077,7 @@ static u64 tg_prfill_mode_device(struct seq_file *sf,
 		return 0;
 	seq_printf(sf, "%s %s\n", dname, run_mode_name[tg->td->mode]);
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static int throtl_print_mode_device(struct seq_file *sf, void *v)
 {
