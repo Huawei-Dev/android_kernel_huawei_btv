@@ -702,7 +702,7 @@ static struct throtl_grp *throtl_lookup_create_tg(struct throtl_data *td,
 		/* if %NULL and @q is alive, fall back to root_tg */
 		if (!IS_ERR(blkg))
 			tg = blkg_to_tg(blkg);
-		else if (!blk_queue_dying(q))
+		else
 			tg = td_root_tg(td);
 	}
 
@@ -3105,9 +3105,8 @@ skip:
 	 * IO group
 	 */
 	spin_lock_irq(q->queue_lock);
-	/*lint -save -e730*/
+
 	if (unlikely(blk_queue_bypass(q)))
-	/*lint -restore*/
 		goto out_unlock;
 
 	if (!(tg->flags & THROTL_TG_ONLINE))
@@ -3130,12 +3129,11 @@ skip:
 		throtl_add_bio_weight(bio, tg);
 		blk_run_throtl_bios_weight(td, tg, &bios);
 		spin_unlock_irq(q->queue_lock);
+		
 		rcu_read_unlock();
-
-		/*lint -save -e820*/
 		while((bio = bio_list_pop(&bios)))
-		/*lint -restore*/
 			generic_make_request(bio);
+		rcu_read_lock();	
 		goto out;
 	}
 
