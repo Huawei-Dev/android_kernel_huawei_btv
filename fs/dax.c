@@ -24,6 +24,7 @@
 #include <linux/memcontrol.h>
 #include <linux/mm.h>
 #include <linux/mutex.h>
+#include <linux/pmem.h>
 #include <linux/sched.h>
 #include <linux/uio.h>
 #include <linux/vmstat.h>
@@ -62,6 +63,7 @@ int dax_clear_blocks(struct inode *inode, sector_t block, long size)
 		}
 	} while (size);
 
+	wmb_pmem();
 	return 0;
 }
 EXPORT_SYMBOL_GPL(dax_clear_blocks);
@@ -113,12 +115,13 @@ static ssize_t dax_io(struct inode *inode, struct iov_iter *iter,
 	loff_t bh_max = start;
 	void __pmem *addr;
 	bool hole = false;
+	bool need_wmb = false;
 
 	if (iov_iter_rw(iter) != WRITE)
 		end = min(end, i_size_read(inode));
 
 	while (pos < end) {
-		unsigned len;
+		size_t len;
 		if (pos == max) {
 			unsigned blkbits = inode->i_blkbits;
 			long page = pos >> PAGE_SHIFT;
@@ -151,9 +154,11 @@ static ssize_t dax_io(struct inode *inode, struct iov_iter *iter,
 				retval = dax_get_addr(bh, &addr, blkbits);
 				if (retval < 0)
 					break;
-				if (buffer_unwritten(bh) || buffer_new(bh))
+				if (buffer_unwritten(bh) || buffer_new(bh)) {
 					dax_new_buf(addr, retval, first, pos,
 									end);
+					need_wmb = true;
+				}
 				addr += first;
 				size = retval - first;
 			}
@@ -177,6 +182,9 @@ static ssize_t dax_io(struct inode *inode, struct iov_iter *iter,
 		pos += len;
 		addr += len;
 	}
+
+	if (need_wmb)
+		wmb_pmem();
 
 	return (pos == start) ? retval : pos - start;
 }
