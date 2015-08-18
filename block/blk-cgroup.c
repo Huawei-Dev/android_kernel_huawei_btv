@@ -69,7 +69,9 @@ static void blkg_free(struct blkcg_gq *blkg)
 		kfree(blkg->pd[i]);
 
 	percpu_counter_destroy(&blkg->nr_dirtied);
-	blk_exit_rl(&blkg->rl);
+
+	if (blkg->blkcg != &blkcg_root)
+		blk_exit_rl(&blkg->rl);
 	kfree(blkg);
 }
 
@@ -992,10 +994,8 @@ int blkcg_init_queue(struct request_queue *q)
 		radix_tree_preload_end();
 
 	if (IS_ERR(blkg)) {
-		kfree(new_blkg);
-		/*lint -save -e712*/
+		blkg_free(new_blkg);
 		return PTR_ERR(blkg);
-		/*lint -restore*/
 	}
 
 	q->root_blkg = blkg;
