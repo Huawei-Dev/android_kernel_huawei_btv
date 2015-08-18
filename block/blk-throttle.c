@@ -1520,9 +1520,7 @@ static void tg_dispatch_one_bio_weight(struct throtl_grp *tg,
 	bio = throtl_pop_queued_weight(tg);
 	tg->service_queue.nr_queued[0]--;
 
-	/*lint -save -e730*/
 	if (unlikely(!charge))
-	/*lint -restore*/
 		goto skip_charge;
 
 	throtl_charge_bio(tg, bio);
@@ -1544,9 +1542,7 @@ static void tg_dispatch_one_bio_weight(struct throtl_grp *tg,
 	}
 
 skip_charge:
-	/*lint -save -e730 -e775*/
 	BUG_ON(tg->td->nr_queued[0] <= 0);
-	/*lint -restore*/
 	tg->td->nr_queued[0]--;
 
 	bio_list_add(bios, bio);
@@ -1557,9 +1553,7 @@ static int throtl_dispatch_tg_weight(struct throtl_grp *tg,
 {
 	int nr = 0;
 
-	/*lint -save -e730*/
 	BUG_ON(!td_weight_based(tg->td));
-	/*lint -restore*/
 
 	while (!bio_list_empty(&tg->bios) &&
 	       tg_may_dispatch_weight(tg)) {
@@ -1585,9 +1579,7 @@ static void throtl_start_new_slice_weight(struct throtl_data *td)
 {
 	struct throtl_grp *tg;
 
-	/*lint -save -e64 -e826*/
 	list_for_each_entry(tg, &td->expired, node) {
-	/*lint -restore*/
 		if (tg->td->mode == MODE_WEIGHT_BANDWIDTH)
 			tg->io_cost.bytes_disp[0] = 0;
 		else if (tg->td->mode == MODE_WEIGHT_IOPS)
@@ -1604,7 +1596,6 @@ static bool should_start_new_slice(struct throtl_data *td)
 
 	interval = msecs_to_jiffies(THROTL_IDLE_INTERVAL / 2);
 
-	/*lint -save -e64 -e550 -e774 -e826*/
 	list_for_each_entry(tg, &td->expired, node) {
 		if (tg->fg_flag)
 			return true;
@@ -1614,7 +1605,6 @@ static bool should_start_new_slice(struct throtl_data *td)
 		if (time_before(jiffies, tg->intime + interval))
 			return false;
 	}
-	/*lint -restore*/
 
 	return true;
 }
@@ -1631,9 +1621,7 @@ static void blk_run_throtl_bios_weight(struct throtl_data *td,
 	if (list_empty(&td->active) && bio_list_empty(bios))
 		goto start_new_slice;
 
-	/*lint -save -e64 -e530 -e826*/
 	list_for_each_entry_safe(curr, next, &td->active, node) {
-	/*lint -restore*/
 		if (curr == tg)
 			continue;
 		throtl_dispatch_tg_weight(curr, bios);
@@ -1657,18 +1645,14 @@ start_new_slice:
 
 	throtl_start_new_slice_weight(td);
 
-	/*lint -save -e64 -e826*/
 	list_for_each_entry_safe(curr, next, &td->active, node)
 		throtl_dispatch_tg_weight(curr, bios);
-	/*lint -restore*/
 }
 
 static void blk_throtl_kick_queue_fn(struct work_struct *work)
 {
-	/*lint -save -e826*/
 	struct throtl_data *td = container_of(work, struct throtl_data,
 					      dispatch_work);
-	/*lint -restore*/
 	struct request_queue *q = td->queue;
 	struct bio_list bio_list_on_stack;
 	struct bio *bio;
@@ -1682,9 +1666,7 @@ static void blk_throtl_kick_queue_fn(struct work_struct *work)
 
 	if (!bio_list_empty(&bio_list_on_stack)) {
 		blk_start_plug(&plug);
-		/*lint -save -e820*/
 		while((bio = bio_list_pop(&bio_list_on_stack)))
-		/*lint -restore*/
 			generic_make_request(bio);
 		blk_finish_plug(&plug);
 	}
@@ -1696,7 +1678,6 @@ static void blk_throtl_rescue_timer_fn(unsigned long arg)
 	struct request_queue *q = td->queue;
 	unsigned long flags;
 
-	/*lint -save -e50 -e438 -e529 -e550 -e1058*/
 	if (ACCESS_ONCE(td->nr_queued[0])) {
 		smp_mb__after_atomic();
 		if (!atomic_read(&td->inflights))
@@ -1717,7 +1698,6 @@ static void blk_throtl_rescue_timer_fn(unsigned long arg)
 			  jiffies + msecs_to_jiffies(THROTL_IDLE_INTERVAL));
 	}
 	spin_unlock_irqrestore(q->queue_lock, flags);
-	/*lint -restore*/
 }
 
 static void blk_throtl_idle_timer_fn(unsigned long arg)
@@ -1726,9 +1706,7 @@ static void blk_throtl_idle_timer_fn(unsigned long arg)
 	struct request_queue *q = td->queue;
 	unsigned long flags;
 
-	/*lint -save -e550*/
 	spin_lock_irqsave(q->queue_lock, flags);
-	/*lint -restore*/
 	if (td->nr_queued[0])
 		queue_work(kthrotld_workqueue, &td->dispatch_work);
 	spin_unlock_irqrestore(q->queue_lock, flags);
@@ -1736,14 +1714,12 @@ static void blk_throtl_idle_timer_fn(unsigned long arg)
 
 static void tg_drain_bios_weight(struct throtl_grp *tg, struct bio_list *bios)
 {
-	/*lint -save -e730 -e747*/
 	WARN_ON(list_empty(&tg->node));
 
 	list_del_init(&tg->node);
 
 	while (!bio_list_empty(&tg->bios))
 		tg_dispatch_one_bio_weight(tg, bios, false);
-	/*lint -restore*/
 
 	tg->io_cost.bytes_disp[0] = 0;
 	tg->io_cost.io_disp[0] = 0;
@@ -1760,29 +1736,23 @@ static void blk_throtl_drain_weight(struct request_queue *q)
 
 	bio_list_init(&bios);
 
-	/*lint -save -e64 -e530 -e826*/
 	list_for_each_entry_safe(curr, next, &td->active, node)
 		tg_drain_bios_weight(curr, &bios);
 
 	list_for_each_entry_safe(curr, next, &td->expired, node)
 		tg_drain_bios_weight(curr, &bios);
-	/*lint -restore*/
 
 	spin_unlock_irq(q->queue_lock);
 
-	/*lint -save -e820*/
 	while((bio = bio_list_pop(&bios)))
 		generic_make_request(bio);
-	/*lint -restore*/
 
 	spin_lock_irq(q->queue_lock);
 }
 
 static bool atomic_inc_below(atomic_t *v, int below)
 {
-	/*lint -save -e438 -e529*/
 	int cur = atomic_read(v);
-	/*lint -restore*/
 
 	for (;;) {
 		int old;
@@ -1842,9 +1812,7 @@ static void blk_throtl_limit_io_done(struct bio *bio)
 	int index = (int)bio_data_dir(bio);
 
 	io_limit = (struct blk_throtl_io_limit *)bio->bi_throtl_private1;
-	/*lint -save -e438 -e529*/
 	limit = ACCESS_ONCE(io_limit->max_inflights);
-	/*lint -restore*/
 	__throtl_limit_io_done(&io_limit->io_limits[index], limit);
 
 	bio->bi_throtl_private1 = NULL;
@@ -1858,7 +1826,6 @@ static int blk_throtl_io_limit_wait(struct blkcg *blkcg,
 				    struct throtl_grp *tg,
 				    struct bio *bio)
 {
-	/*lint -save -e438 -e446 -e529 -e727 -e730*/
 	struct blkcg *new;
 	DEFINE_WAIT(wait);
 	int limit;
@@ -1869,16 +1836,13 @@ static int blk_throtl_io_limit_wait(struct blkcg *blkcg,
 	WARN_ON_ONCE(!rcu_read_lock_held());
 
 	limit = ACCESS_ONCE(task_limit->max_inflights);
-	/*lint -restore*/
 	if (io_event_ok(io_limit, limit))
 		return 0;
 
 	ret = 0;
 	for (;;) {
 		prepare_to_wait(&io_limit->waitq, &wait, TASK_UNINTERRUPTIBLE);
-		/*lint -save -e438 -e529*/
 		limit = ACCESS_ONCE(task_limit->max_inflights);
-		/*lint -restore*/
 		if (io_event_ok(io_limit, limit))
 			break;
 
@@ -1979,15 +1943,50 @@ static int tg_print_conf_uint(struct seq_file *sf, void *v)
 	return 0;
 }
 
+static void tg_conf_updated(struct throtl_grp *tg)
+{
+	struct throtl_service_queue *sq = &tg->service_queue;
+	struct cgroup_subsys_state *pos_css;
+	struct blkcg_gq *blkg;
+	
+	throtl_log(&tg->service_queue,
+		   "limit change rbps=%llu wbps=%llu riops=%u wiops=%u",
+		   tg->io_cost.bps[READ], tg->io_cost.bps[WRITE],
+		   tg->io_cost.iops[READ], tg->io_cost.iops[WRITE]);
+
+	/*
+	 * Update has_rules[] flags for the updated tg's subtree.  A tg is
+	 * considered to have rules if either the tg itself or any of its
+	 * ancestors has rules.  This identifies groups without any
+	 * restrictions in the whole hierarchy and allows them to bypass
+	 * blk-throttle.
+	 */
+	blkg_for_each_descendant_pre(blkg, pos_css, tg_to_blkg(tg))
+		tg_update_has_rules(blkg_to_tg(blkg));
+
+	/*
+	 * We're already holding queue_lock and know @tg is valid.  Let's
+	 * apply the new config directly.
+	 *
+	 * Restart the slices for both READ and WRITES. It might happen
+	 * that a group's limit are dropped suddenly and we don't want to
+	 * account recently dispatched IO with new low rate.
+	 */
+	throtl_start_new_slice(tg, 0);
+	throtl_start_new_slice(tg, 1);
+
+	if (tg->flags & THROTL_TG_PENDING) {
+		tg_update_disptime(tg);
+		throtl_schedule_next_dispatch(sq->parent_sq, true);
+	}
+}
+
 static ssize_t tg_set_conf(struct kernfs_open_file *of,
 			   char *buf, size_t nbytes, loff_t off, bool is_u64)
 {
 	struct blkcg *blkcg = css_to_blkcg(of_css(of));
 	struct blkg_conf_ctx ctx;
 	struct throtl_grp *tg;
-	struct throtl_service_queue *sq;
-	struct blkcg_gq *blkg;
-	struct cgroup_subsys_state *pos_css;
 	int ret;
 	u64 v;
 
@@ -2007,46 +2006,13 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
 		goto out_finish;
 	}
 
-	sq = &tg->service_queue;
-
 	if (is_u64)
 		*(u64 *)((void *)tg + of_cft(of)->private) = v;
 	else
 		*(unsigned int *)((void *)tg + of_cft(of)->private) = v;
 
 	tg->td->mode = MODE_THROTTLE;
-
-	throtl_log(&tg->service_queue,
-		   "limit change rbps=%llu wbps=%llu riops=%u wiops=%u",
-		   tg->io_cost.bps[READ], tg->io_cost.bps[WRITE],
-		   tg->io_cost.iops[READ], tg->io_cost.iops[WRITE]);
-
-	/*
-	 * Update has_rules[] flags for the updated tg's subtree.  A tg is
-	 * considered to have rules if either the tg itself or any of its
-	 * ancestors has rules.  This identifies groups without any
-	 * restrictions in the whole hierarchy and allows them to bypass
-	 * blk-throttle.
-	 */
-	blkg_for_each_descendant_pre(blkg, pos_css, ctx.blkg)
-		tg_update_has_rules(blkg_to_tg(blkg));
-
-	/*
-	 * We're already holding queue_lock and know @tg is valid.  Let's
-	 * apply the new config directly.
-	 *
-	 * Restart the slices for both READ and WRITES. It might happen
-	 * that a group's limit are dropped suddenly and we don't want to
-	 * account recently dispatched IO with new low rate.
-	 */
-	throtl_start_new_slice(tg, 0);
-	throtl_start_new_slice(tg, 1);
-
-	if (tg->flags & THROTL_TG_PENDING) {
-		tg_update_disptime(tg);
-		throtl_schedule_next_dispatch(sq->parent_sq, true);
-	}
-	
+	tg_conf_updated(tg);
 	ret = 0;
 out_finish:
 	blkg_conf_finish(&ctx);
@@ -2090,15 +2056,11 @@ static int throtl_print_mode_device(struct seq_file *sf, void *v)
 	seq_printf(sf, "default %s\n", run_mode_name[MODE_NONE]);
 
 	mutex_lock(&throtl_mode_lock);
-	/*lint -save -e747*/
 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
 		tg_prfill_mode_device,  &blkcg_policy_throtl, 0, false);
-	/*lint -restore*/
 	mutex_unlock(&throtl_mode_lock);
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static void tg_update_rules(struct throtl_data *td)
 {
@@ -2107,10 +2069,8 @@ static void tg_update_rules(struct throtl_data *td)
 
 	top_blkg = td->queue->root_blkg;
 
-	/*lint -save -e747 -e820*/
 	blkg_for_each_descendant_pre(blkg, pos_css, top_blkg)
 		tg_update_has_rules(blkg_to_tg(blkg));
-	/*lint -restore*/
 }
 
 static void tg_change_mode(struct throtl_data *td, int mode)
@@ -2127,7 +2087,6 @@ static void tg_change_mode(struct throtl_data *td, int mode)
 	blkcg_drain_queue(q);
 	spin_unlock_irq(q->queue_lock);
 
-	/*lint -save -e40 -e64 -e438 -e529 -e666 -e730 -e774 -e845*/
 	WARN_ON(td->nr_queued[0]);
 	WARN_ON(td->nr_queued[1]);
 
@@ -2139,7 +2098,6 @@ static void tg_change_mode(struct throtl_data *td, int mode)
 
 	spin_lock_irq(q->queue_lock);
 	td->mode = mode;
-	/*lint -restore*/
 
 	if (td_weight_based(td))
 		INIT_WORK(&td->dispatch_work, blk_throtl_kick_queue_fn);
@@ -2197,7 +2155,6 @@ static ssize_t tg_set_mode_device(struct kernfs_open_file *of,
 out_finish:
 	blkg_conf_finish(&ctx);
 
-	/*lint -save -e644 -e713 -e737*/
 	if (need_change) {
 		tg_change_mode(td, mode);
 		put_disk(disk);
@@ -2205,10 +2162,7 @@ out_finish:
 out:
 	mutex_unlock(&throtl_mode_lock);
 	return ret ?: nbytes;
-	/*lint -restore*/
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static u64 tg_prfill_weight_device(struct seq_file *sf,
 		struct blkg_policy_data *pd, int off)
@@ -2224,35 +2178,25 @@ static u64 tg_prfill_weight_device(struct seq_file *sf,
 		return 0;
 	seq_printf(sf, "%s: weight %u\n", dname, blkg->weight);
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static int tg_print_weight(struct seq_file *sf, void *v)
 {
 	struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
 
 	seq_printf(sf, "default: %u\n", blkcg->weight);
-	/*lint -save -e747*/
 	blkcg_print_blkgs(sf, blkcg, tg_prfill_weight_device,
 			  &blkcg_policy_throtl, 0, false);
-	/*lint -restore*/
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static int tg_print_weight_device(struct seq_file *sf, void *v)
 {
-	/*lint -save -e747*/
 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
 			  tg_prfill_weight_device,
 			  &blkcg_policy_throtl, 0, false);
-	/*lint -restore*/
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static ssize_t tg_set_weight_device(struct kernfs_open_file *of,
 			   char *buf, size_t nbytes, loff_t off)
@@ -2288,12 +2232,8 @@ static ssize_t tg_set_weight_device(struct kernfs_open_file *of,
 	ret = 0;
 out_finish:
 	blkg_conf_finish(&ctx);
-	/*lint -save -e713 -e737*/
 	return ret ?: nbytes;
-	/*lint -restore*/
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static ssize_t tg_set_weight_offon(struct kernfs_open_file *of,
 				   char *buf, size_t nbytes,
@@ -2315,21 +2255,15 @@ static ssize_t tg_set_weight_offon(struct kernfs_open_file *of,
 	else
 		ret = -EINVAL;
 
-	/*lint -save -e713 -e737*/
 	return ret ?: nbytes;
-	/*lint -restore*/
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static int tg_print_weight_offon(struct seq_file *sf, void *v)
 {
 	seq_printf(sf, "Weight Based Throttle: %s\n",
 		   blk_throtl_weight_offon ? "on" : "off");
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static u64 tg_prfill_max_inflights_device(struct seq_file *sf,
 					  struct blkg_policy_data *pd, int off)
@@ -2340,18 +2274,14 @@ static u64 tg_prfill_max_inflights_device(struct seq_file *sf,
 	if (!dname)
 		return 0;
 
-	/*lint -save -e438 -e529*/
 	seq_printf(sf, "%s: queued %u, read inflight %d, write inflight %d, devices inflights %d\n",
 		   dname, tg->service_queue.nr_queued[0],
 		   atomic_read(&tg->inflights[0]),
 		   atomic_read(&tg->inflights[1]),
 		   atomic_read(&tg->td->inflights));
-	/*lint -restore*/
 
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static int tg_print_max_inflights(struct seq_file *sf, void *v)
 {
@@ -2359,16 +2289,12 @@ static int tg_print_max_inflights(struct seq_file *sf, void *v)
 
 	seq_printf(sf, "max limit: %d\n", blkcg->max_inflights);
 
-	/*lint -save -e747*/
 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
 			  tg_prfill_max_inflights_device,
 			  &blkcg_policy_throtl, 0, false);
-	/*lint -restore*/
 
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static int tg_set_max_inflights(struct cgroup_subsys_state *css,
 				struct cftype *cft, s64 val)
@@ -2389,9 +2315,7 @@ static int tg_set_max_inflights(struct cgroup_subsys_state *css,
 
 	rcu_read_lock();
 	css_task_iter_start(css, &it);
-	/*lint -save -e820*/
 	while ((task = css_task_iter_next(&it))) {
-	/*lint -restore*/
 		if (!task->mm)
 			continue;
 
@@ -2405,9 +2329,7 @@ static int tg_set_max_inflights(struct cgroup_subsys_state *css,
 out_unlock:
 	spin_unlock_irq(&blkcg->lock);
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static u64 tg_prfill_enable_max_inflights_device(struct seq_file *sf,
 		struct blkg_policy_data *pd, int off)
@@ -2421,21 +2343,15 @@ static u64 tg_prfill_enable_max_inflights_device(struct seq_file *sf,
 	seq_printf(sf, "%s: limit %s\n",
 		   dname, (tg->td->max_inflights ? "open" : "close"));
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static int tg_print_enable_max_inflight_device(struct seq_file *sf, void *v)
 {
-	/*lint -save -e747*/
 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
 			  tg_prfill_enable_max_inflights_device,
 			  &blkcg_policy_throtl, 0, false);
-	/*lint -restore*/
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static ssize_t tg_set_enable_max_inflights_device(struct kernfs_open_file *of,
 			   char *buf, size_t nbytes, loff_t off)
@@ -2466,17 +2382,13 @@ static ssize_t tg_set_enable_max_inflights_device(struct kernfs_open_file *of,
 	if (tg->td->max_inflights == max_inflight)
 		goto out_finish;
 
-	/*lint -save -e550*/
 	spin_lock_irqsave(&blkcg->lock, flags);
-	/*lint -restore*/
 
 	if (!max_inflight)
 		goto skip_check;
 
 	/* we just open only one device for limit */
-	/*lint -save -e62 -e64 -e826*/
 	hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
-	/*lint -restore*/
 		struct throtl_grp *curr_tg = blkg_to_tg(blkg);
 
 		if (!curr_tg || curr_tg == tg)
@@ -2496,9 +2408,7 @@ skip_check:
 	rcu_read_lock();
 
 	css_task_iter_start(css, &it);
-	/*lint -save -e820*/
 	while ((task = css_task_iter_next(&it))) {
-	/*lint -restore*/
 		if (task_sleep_on_throtl(task))
 			wake_up_process(task);
 	}
@@ -2509,12 +2419,8 @@ out_unlock:
 	spin_unlock_irqrestore(&blkcg->lock, flags);
 out_finish:
 	blkg_conf_finish(&ctx);
-	/*lint -save -e713 -e737*/
 	return ret ?: nbytes;
-	/*lint -restore*/
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static u64 tg_prfill_quantum_device(struct seq_file *sf,
 				    struct blkg_policy_data *pd, int off)
@@ -2534,23 +2440,17 @@ static u64 tg_prfill_quantum_device(struct seq_file *sf,
 	seq_printf(sf, "%s: quantum %u\n", dname,
 		   blkg_to_tg(blkg)->td->quantum);
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static int tg_print_quantum_device(struct seq_file *sf, void *v)
 {
 	seq_printf(sf, "default: %d\n", QUANTUM_INQUEUE_DEF);
 
-	/*lint -save -e747*/
 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
 			  tg_prfill_quantum_device,
 			  &blkcg_policy_throtl, 0, false);
-	/*lint -restore*/
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
 static ssize_t tg_set_quantum_device(struct kernfs_open_file *of,
 				     char *buf, size_t nbytes, loff_t off)
