@@ -2463,7 +2463,6 @@ static int nvme_dev_add(struct nvme_dev *dev)
 {
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 	int res;
-	unsigned nn;
 	struct nvme_id_ctrl *ctrl;
 	int shift = NVME_CAP_MPSMIN(readq(&dev->bar->cap)) + 12;
 
@@ -2473,7 +2472,6 @@ static int nvme_dev_add(struct nvme_dev *dev)
 		return -EIO;
 	}
 
-	nn = le32_to_cpup(&ctrl->nn);
 	dev->oncs = le16_to_cpup(&ctrl->oncs);
 	dev->abort_limit = ctrl->acl + 1;
 	dev->vwc = ctrl->vwc;
