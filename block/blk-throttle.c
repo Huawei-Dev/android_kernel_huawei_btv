@@ -179,9 +179,6 @@ struct throtl_grp {
 	/* Per cpu stats pointer */
 	struct tg_stats_cpu __percpu *stats_cpu;
 
-	/* List of tgs waiting for per cpu stats memory to be allocated */
-	struct list_head stats_alloc_node;
-
 	unsigned long		intime;
 
 	atomic_t		inflights[2];
@@ -209,7 +206,6 @@ static char *run_mode_name[MAX_MODE] = {
 
 unsigned int THROTL_IDLE_INTERVAL = 40;  /* ms */
 
-/*lint -e754 -esym(754,*)*/
 struct throtl_data
 {
 	/* service tree for active throtl groups */
@@ -245,29 +241,17 @@ struct throtl_data
 
 	struct timer_list	idle_timer;
 };
-/*lint -e754 +esym(754,*)*/
 
 static bool td_weight_based(struct throtl_data *td)
 {
 	return td->mode > MODE_THROTTLE;
 }
 
-/*lint -save -e64 -e570 -e708 -e785*/
-/* list and work item to allocate percpu group stats */
-static DEFINE_SPINLOCK(tg_stats_alloc_lock);
-static LIST_HEAD(tg_stats_alloc_list);
-
-static void tg_stats_alloc_fn(struct work_struct *);
-static DECLARE_DELAYED_WORK(tg_stats_alloc_work, tg_stats_alloc_fn);
-/*lint -restore*/
-
 static void throtl_pending_timer_fn(unsigned long arg);
 
 static inline struct throtl_grp *pd_to_tg(struct blkg_policy_data *pd)
 {
-	/*lint -save -e826*/
 	return pd ? container_of(pd, struct throtl_grp, pd) : NULL;
-	/*lint -restore*/
 }
 
 static inline struct throtl_grp *blkg_to_tg(struct blkcg_gq *blkg)
@@ -295,9 +279,7 @@ static inline struct throtl_grp *td_root_tg(struct throtl_data *td)
 static struct throtl_grp *sq_to_tg(struct throtl_service_queue *sq)
 {
 	if (sq && sq->parent_sq)
-		/*lint -save -e826*/
 		return container_of(sq, struct throtl_grp, service_queue);
-		/*lint -restore*/
 	else
 		return NULL;
 }
@@ -364,55 +346,6 @@ static inline unsigned int queue_iops_slice(struct throtl_data *td)
 		blk_add_trace_msg(__td->queue, "throtl " fmt, ##args);	\
 	}								\
 } while (0)
-
-static void tg_stats_init(struct tg_stats_cpu *tg_stats)
-{
-	blkg_rwstat_init(&tg_stats->service_bytes);
-	blkg_rwstat_init(&tg_stats->serviced);
-}
-
-/*
- * Worker for allocating per cpu stat for tgs. This is scheduled on the
- * system_wq once there are some groups on the alloc_list waiting for
- * allocation.
- */
-static void tg_stats_alloc_fn(struct work_struct *work)
-{
-	static struct tg_stats_cpu *stats_cpu;	/* this fn is non-reentrant */
-	struct delayed_work *dwork = to_delayed_work(work);
-	bool empty = false;
-
-alloc_stats:
-	/*lint -save -e48 -e64 -e151 -e529 -e530 -e713 -e727 -e826 -e838*/
-	if (!stats_cpu) {
-		int cpu;
-
-		stats_cpu = alloc_percpu(struct tg_stats_cpu);
-		if (!stats_cpu) {
-			/* allocation failed, try again after some time */
-			schedule_delayed_work(dwork, msecs_to_jiffies(10));
-			return;
-		}
-		for_each_possible_cpu(cpu)
-			tg_stats_init(per_cpu_ptr(stats_cpu, cpu));
-	}
-
-	spin_lock_irq(&tg_stats_alloc_lock);
-
-	if (!list_empty(&tg_stats_alloc_list)) {
-		struct throtl_grp *tg = list_first_entry(&tg_stats_alloc_list,
-							 struct throtl_grp,
-							 stats_alloc_node);
-		swap(tg->stats_cpu, stats_cpu);
-		list_del_init(&tg->stats_alloc_node);
-	}
-
-	empty = list_empty(&tg_stats_alloc_list);
-	/*lint -restore*/
-	spin_unlock_irq(&tg_stats_alloc_lock);
-	if (!empty)
-		goto alloc_stats;
-}
 
 static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg)
 {
@@ -530,7 +463,27 @@ static inline void io_cost_init(struct throtl_grp *tg)
 
 static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
 {
-	return kzalloc_node(sizeof(struct throtl_grp), gfp, node);
+	struct throtl_grp *tg;
+	int cpu;
+
+	tg = kzalloc_node(sizeof(*tg), gfp, node);
+	if (!tg)
+		return NULL;
+
+	tg->stats_cpu = alloc_percpu_gfp(struct tg_stats_cpu, gfp);
+	if (!tg->stats_cpu) {
+		kfree(tg);
+		return NULL;
+	}
+
+	for_each_possible_cpu(cpu) {
+		struct tg_stats_cpu *stats_cpu = per_cpu_ptr(tg->stats_cpu, cpu);
+
+		blkg_rwstat_init(&stats_cpu->service_bytes);
+		blkg_rwstat_init(&stats_cpu->serviced);
+	}
+
+	return &tg->pd;
 }
 
 static void throtl_pd_init(struct blkcg_gq *blkg)
@@ -538,8 +491,7 @@ static void throtl_pd_init(struct blkcg_gq *blkg)
 	struct throtl_grp *tg = blkg_to_tg(blkg);
 	struct throtl_data *td = blkg->q->td;
 	struct throtl_service_queue *parent_sq;
-	unsigned long flags;
-	int i;
+	int rw;
 
 	/*
 	 * If on the default hierarchy, we switch to properly hierarchical
@@ -561,12 +513,10 @@ static void throtl_pd_init(struct blkcg_gq *blkg)
 
 	throtl_service_queue_init(&tg->service_queue, parent_sq);
 
-	/*lint -save -e574 -e737*/
-	for (i = READ; i <= WRITE; i++) {
-		throtl_qnode_init(&tg->qnode_on_self[i], tg);
-		throtl_qnode_init(&tg->qnode_on_parent[i], tg);
+	for (rw = READ; rw <= WRITE; rw++) {
+		throtl_qnode_init(&tg->qnode_on_self[rw], tg);
+		throtl_qnode_init(&tg->qnode_on_parent[rw], tg);
 	}
-	/*lint -restore*/
 
 	tg->intime = 0;
 	atomic_set(&tg->inflights[0], 0);
@@ -578,18 +528,6 @@ static void throtl_pd_init(struct blkcg_gq *blkg)
 	tg->td = td;
 
 	io_cost_init(tg);
-
-	/*
-	 * Ugh... We need to perform per-cpu allocation for tg->stats_cpu
-	 * but percpu allocator can't be called from IO path.  Queue tg on
-	 * tg_stats_alloc_list and allocate from work item.
-	 */
-	/*lint -save -e550 -e747*/
-	spin_lock_irqsave(&tg_stats_alloc_lock, flags);
-	list_add(&tg->stats_alloc_node, &tg_stats_alloc_list);
-	schedule_delayed_work(&tg_stats_alloc_work, 0);
-	spin_unlock_irqrestore(&tg_stats_alloc_lock, flags);
-	/*lint -restore*/
 }
 
 static inline bool io_cost_has_limit(struct throtl_grp *tg, int index)
@@ -726,22 +664,16 @@ static void throtl_pd_offline(struct blkcg_gq *blkg)
 static void throtl_pd_exit(struct blkcg_gq *blkg)
 {
 	struct throtl_grp *tg = blkg_to_tg(blkg);
-	unsigned long flags;
-
-	/*lint -save -e550*/
-	spin_lock_irqsave(&tg_stats_alloc_lock, flags);
-	/*lint -restore*/
-	list_del_init(&tg->stats_alloc_node);
-	spin_unlock_irqrestore(&tg_stats_alloc_lock, flags);
-
-	free_percpu(tg->stats_cpu);
 
 	throtl_service_queue_exit(&tg->service_queue);
 }
 
 static void throtl_pd_free(struct blkg_policy_data *pd)
 {
-	kfree(pd);
+	struct throtl_grp *tg = pd_to_tg(pd);
+
+	free_percpu(tg->stats_cpu);
+	kfree(tg);
 }
 
 static void throtl_pd_reset_stats(struct blkcg_gq *blkg)
@@ -749,17 +681,12 @@ static void throtl_pd_reset_stats(struct blkcg_gq *blkg)
 	struct throtl_grp *tg = blkg_to_tg(blkg);
 	int cpu;
 
-	if (tg->stats_cpu == NULL)
-		return;
-
-	/*lint -save -e64 -e530 -e713*/
 	for_each_possible_cpu(cpu) {
 		struct tg_stats_cpu *sc = per_cpu_ptr(tg->stats_cpu, cpu);
 
 		blkg_rwstat_reset(&sc->service_bytes);
 		blkg_rwstat_reset(&sc->serviced);
 	}
-	/*lint -restore*/
 }
 
 static struct throtl_grp *throtl_lookup_tg(struct throtl_data *td,
@@ -1287,10 +1214,6 @@ static void throtl_update_dispatch_stats(struct blkcg_gq *blkg, u64 bytes,
 	struct throtl_grp *tg = blkg_to_tg(blkg);
 	struct tg_stats_cpu *stats_cpu;
 	unsigned long flags;
-
-	/* If per cpu stats are not allocated yet, don't do any accounting. */
-	if (tg->stats_cpu == NULL)
-		return;
 
 	/*
 	 * Disabling interrupts to provide mutual exclusion between two
@@ -2118,9 +2041,6 @@ static u64 tg_prfill_cpu_rwstat(struct seq_file *sf,
 	struct throtl_grp *tg = pd_to_tg(pd);
 	struct blkg_rwstat rwstat = { }, tmp;
 	int i, cpu;
-
-	if (tg->stats_cpu == NULL)
-		return 0;
 
 	for_each_possible_cpu(cpu) {
 		struct tg_stats_cpu *sc = per_cpu_ptr(tg->stats_cpu, cpu);
