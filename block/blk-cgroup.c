@@ -874,7 +874,7 @@ static void blkcg_css_free(struct cgroup_subsys_state *css)
 	mutex_unlock(&blkcg_pol_mutex);
 
 	for (i = 0; i < BLKCG_MAX_POLS; i++)
-		kfree(blkcg->pd[i]);
+		kfree(blkcg->cpd[i]);
 	kfree(blkcg);
 }
 
@@ -910,15 +910,16 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
 		if (!pol || !pol->cpd_size)
 			continue;
 
-		BUG_ON(blkcg->pd[i]);
+		BUG_ON(blkcg->cpd[i]);
 		cpd = kzalloc(pol->cpd_size, GFP_KERNEL);
 		if (!cpd) {
 			ret = ERR_PTR(-ENOMEM);
 			goto free_pd_blkcg;
 		}
-		blkcg->pd[i] = cpd;
+		blkcg->cpd[i] = cpd;
+		cpd->blkcg = blkcg;
 		cpd->plid = i;
-		pol->cpd_init_fn(blkcg);
+		pol->cpd_init_fn(cpd);
 	}
 
 	spin_lock_init(&blkcg->lock);
@@ -934,7 +935,7 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
 
 free_pd_blkcg:
 	for (i--; i >= 0; i--)
-		kfree(blkcg->pd[i]);
+		kfree(blkcg->cpd[i]);
 free_blkcg:
 	kfree(blkcg);
 	mutex_unlock(&blkcg_pol_mutex);
@@ -1311,9 +1312,10 @@ int blkcg_policy_register(struct blkcg_policy *pol)
 				goto err_free_cpds;
 			}
 
-			blkcg->pd[pol->plid] = cpd;
+			blkcg->cpd[pol->plid] = cpd;
+			cpd->blkcg = blkcg;
 			cpd->plid = pol->plid;
-			pol->cpd_init_fn(blkcg);
+			pol->cpd_init_fn(cpd);
 		}
 	}
 
@@ -1329,8 +1331,8 @@ int blkcg_policy_register(struct blkcg_policy *pol)
 err_free_cpds:
 	if (pol->cpd_size) {
 		list_for_each_entry(blkcg, &all_blkcgs, all_blkcgs_node) {
-			kfree(blkcg->pd[pol->plid]);
-			blkcg->pd[pol->plid] = NULL;
+			kfree(blkcg->cpd[pol->plid]);
+			blkcg->cpd[pol->plid] = NULL;
 		}
 	}
 	blkcg_policy[pol->plid] = NULL;
@@ -1367,8 +1369,8 @@ void blkcg_policy_unregister(struct blkcg_policy *pol)
 
 	if (pol->cpd_size) {
 		list_for_each_entry(blkcg, &all_blkcgs, all_blkcgs_node) {
-			kfree(blkcg->pd[pol->plid]);
-			blkcg->pd[pol->plid] = NULL;
+			kfree(blkcg->cpd[pol->plid]);
+			blkcg->cpd[pol->plid] = NULL;
 		}
 	}
 	blkcg_policy[pol->plid] = NULL;
