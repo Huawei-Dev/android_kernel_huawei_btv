@@ -138,27 +138,10 @@ err_free:
 	return NULL;
 }
 
-/**
- * __blkg_lookup - internal version of blkg_lookup()
- * @blkcg: blkcg of interest
- * @q: request_queue of interest
- * @update_hint: whether to update lookup hint with the result or not
- *
- * This is internal version and shouldn't be used by policy
- * implementations.  Looks up blkgs for the @blkcg - @q pair regardless of
- * @q's bypass state.  If @update_hint is %true, the caller should be
- * holding @q->queue_lock and lookup hint is updated on success.
- */
-struct blkcg_gq *__blkg_lookup(struct blkcg *blkcg, struct request_queue *q,
-			       bool update_hint)
+struct blkcg_gq *blkg_lookup_slowpath(struct blkcg *blkcg,
+				      struct request_queue *q, bool update_hint)
 {
 	struct blkcg_gq *blkg;
-
-	/*lint -save -e50 -e64 -e529 -e1058*/
-	blkg = rcu_dereference(blkcg->blkg_hint);
-	/*lint -restore*/
-	if (blkg && blkg->q == q)
-		return blkg;
 
 	/*
 	 * Hint didn't match.  Look up from the radix tree.  Note that the
@@ -166,42 +149,17 @@ struct blkcg_gq *__blkg_lookup(struct blkcg *blkcg, struct request_queue *q,
 	 * could have already been removed from blkg_tree.  The caller is
 	 * responsible for grabbing queue_lock if @update_hint.
 	 */
-	/*lint -save -e732 -e747*/
 	blkg = radix_tree_lookup(&blkcg->blkg_tree, q->id);
-	/*lint -restore*/
 	if (blkg && blkg->q == q) {
 		if (update_hint) {
 			lockdep_assert_held(q->queue_lock);
-			/*lint -save -e744 -e774 -e845 -e1564*/
 			rcu_assign_pointer(blkcg->blkg_hint, blkg);
-			/*lint -restore*/
 		}
 		return blkg;
 	}
 
 	return NULL;
 }
-
-/**
- * blkg_lookup - lookup blkg for the specified blkcg - q pair
- * @blkcg: blkcg of interest
- * @q: request_queue of interest
- *
- * Lookup blkg for the @blkcg - @q pair.  This function should be called
- * under RCU read lock and is guaranteed to return %NULL if @q is bypassing
- * - see blk_queue_bypass_start() for details.
- */
-struct blkcg_gq *blkg_lookup(struct blkcg *blkcg, struct request_queue *q)
-{
-	/*lint -save -e727 -e730 -e747*/
-	WARN_ON_ONCE(!rcu_read_lock_held());
-
-	if (unlikely(blk_queue_bypass(q)))
-		return NULL;
-	return __blkg_lookup(blkcg, q, false);
-	/*lint -restore*/
-}
-EXPORT_SYMBOL_GPL(blkg_lookup);
 
 /*
  * If @new_blkg is %NULL, this function tries to allocate a new one as
@@ -215,7 +173,6 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
 	struct bdi_writeback_congested *wb_congested;
 	int i, ret;
 
-	/*lint -save -e727 -e730 -e732 -e747*/
 	WARN_ON_ONCE(!rcu_read_lock_held());
 	lockdep_assert_held(q->queue_lock);
 
@@ -292,7 +249,6 @@ err_put_css:
 err_free_blkg:
 	blkg_free(new_blkg);
 	return ERR_PTR(ret);
-	/*lint -restore*/
 }
 
 /**
