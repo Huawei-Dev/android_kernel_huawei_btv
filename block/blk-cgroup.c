@@ -1154,7 +1154,6 @@ static void blkcg_fork(struct task_struct *task)
  * of the main cic data structures.  For now we allow a task to change
  * its cgroup only if it's the only owner of its ioc.
  */
-/*lint -save -e438 -e529 -e715*/
 static int blkcg_can_attach(struct cgroup_subsys_state *css,
 			    struct cgroup_taskset *tset)
 {
@@ -1174,12 +1173,10 @@ static int blkcg_can_attach(struct cgroup_subsys_state *css,
 	}
 	return ret;
 }
-/*lint -restore*/
 
 static int blkcg_allow_attach(struct cgroup_subsys_state *css,
 			      struct cgroup_taskset *tset)
 {
-	/*lint -save -e50 -e64 -e529 -e666 -e1058*/
 	const struct cred *cred = current_cred(), *tcred;
 	struct task_struct *task;
 
@@ -1191,15 +1188,11 @@ static int blkcg_allow_attach(struct cgroup_subsys_state *css,
 		    !uid_eq(cred->euid, tcred->suid))
 			return -EACCES;
 	}
-	/*lint -restore*/
 
 	return 0;
-/*lint -save -e715*/
 }
-/*lint -restore*/
 
-/*lint -save -e785*/
-struct cgroup_subsys blkio_cgrp_subsys = {
+struct cgroup_subsys io_cgrp_subsys = {
 	.css_alloc = blkcg_css_alloc,
 	.css_offline = blkcg_css_offline,
 	.css_free = blkcg_css_free,
@@ -1210,6 +1203,7 @@ struct cgroup_subsys blkio_cgrp_subsys = {
 	.fork = blkcg_fork,
 #endif
 	.legacy_cftypes = blkcg_files,
+	.legacy_name = "blkio",
 #ifdef CONFIG_MEMCG
 	/*
 	 * This ensures that, if available, memcg is automatically enabled
@@ -1219,9 +1213,7 @@ struct cgroup_subsys blkio_cgrp_subsys = {
 	.depends_on = 1 << memory_cgrp_id,
 #endif
 };
-/*lint -restore*/
-
-EXPORT_SYMBOL_GPL(blkio_cgrp_subsys);
+EXPORT_SYMBOL_GPL(io_cgrp_subsys);
 
 /**
  * blkcg_activate_policy - activate a blkcg policy on a request_queue
@@ -1385,7 +1377,7 @@ int blkcg_policy_register(struct blkcg_policy *pol)
 
 	/* everything is in place, add intf files for the new policy */
 	if (pol->cftypes)
-		WARN_ON(cgroup_add_legacy_cftypes(&blkio_cgrp_subsys,
+		WARN_ON(cgroup_add_legacy_cftypes(&io_cgrp_subsys,
 						  pol->cftypes));
 	mutex_unlock(&blkcg_pol_register_mutex);
 	return 0;
