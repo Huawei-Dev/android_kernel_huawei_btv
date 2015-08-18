@@ -66,7 +66,8 @@ static void blkg_free(struct blkcg_gq *blkg)
 		return;
 
 	for (i = 0; i < BLKCG_MAX_POLS; i++)
-		kfree(blkg->pd[i]);
+		if (blkg->pd[i])
+			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
 
 	percpu_counter_destroy(&blkg->nr_dirtied);
 
@@ -116,7 +117,7 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
 			continue;
 
 		/* alloc per-policy data and attach it to blkg */
-		pd = kzalloc_node(pol->pd_size, gfp_mask, q->node);
+		pd = pol->pd_alloc_fn(gfp_mask, q->node);
 		if (!pd)
 			goto err_free;
 
@@ -1200,7 +1201,7 @@ int blkcg_activate_policy(struct request_queue *q,
 	blk_queue_bypass_start(q);
 pd_prealloc:
 	if (!pd_prealloc) {
-		pd_prealloc = kzalloc_node(pol->pd_size, GFP_KERNEL, q->node);
+		pd_prealloc = pol->pd_alloc_fn(GFP_KERNEL, q->node);
 		if (!pd_prealloc) {
 			ret = -ENOMEM;
 			goto out_bypass_end;
@@ -1215,7 +1216,7 @@ pd_prealloc:
 		if (blkg->pd[pol->plid])
 			continue;
 
-		pd = kzalloc_node(pol->pd_size, GFP_NOWAIT, q->node);
+		pd = pol->pd_alloc_fn(GFP_NOWAIT, q->node);
 		if (!pd)
 			swap(pd, pd_prealloc);
 		if (!pd) {
@@ -1236,7 +1237,8 @@ pd_prealloc:
 	spin_unlock_irq(q->queue_lock);
 out_bypass_end:
 	blk_queue_bypass_end(q);
-	kfree(pd_prealloc);
+	if (pd_prealloc)
+		pol->pd_free_fn(pd_prealloc);
 	return ret;
 }
 EXPORT_SYMBOL_GPL(blkcg_activate_policy);
@@ -1273,8 +1275,10 @@ void blkcg_deactivate_policy(struct request_queue *q,
 		if (pol->pd_exit_fn)
 			pol->pd_exit_fn(blkg);
 
-		kfree(blkg->pd[pol->plid]);
-		blkg->pd[pol->plid] = NULL;
+		if (blkg->pd[pol->plid]) {
+			pol->pd_free_fn(blkg->pd[pol->plid]);
+			blkg->pd[pol->plid] = NULL;
+		}
 
 		spin_unlock(&blkg->blkcg->lock);
 	}
@@ -1295,11 +1299,6 @@ int blkcg_policy_register(struct blkcg_policy *pol)
 {
 	struct blkcg *blkcg;
 	int i, ret;
-
-	/*lint -save -e730*/
-	if (WARN_ON(pol->pd_size < sizeof(struct blkg_policy_data)))
-	/*lint -restore*/
-		return -EINVAL;
 
 	mutex_lock(&blkcg_pol_register_mutex);
 	mutex_lock(&blkcg_pol_mutex);
