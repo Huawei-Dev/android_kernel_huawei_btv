@@ -495,9 +495,10 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
 	return &tg->pd;
 }
 
-static void throtl_pd_init(struct blkcg_gq *blkg)
+static void throtl_pd_init(struct blkg_policy_data *pd)
 {
-	struct throtl_grp *tg = blkg_to_tg(blkg);
+	struct throtl_grp *tg = pd_to_tg(pd);
+	struct blkcg_gq *blkg = tg_to_blkg(tg);
 	struct throtl_data *td = blkg->q->td;
 	struct throtl_service_queue *sq = &tg->service_queue;
 
@@ -608,10 +609,11 @@ static void tg_update_share(struct throtl_data *td, struct throtl_grp *tg)
 	}
 }
 
-static void throtl_pd_online(struct blkcg_gq *blkg)
+static void throtl_pd_online(struct blkg_policy_data *pd)
 {
-	struct throtl_grp *tg = blkg_to_tg(blkg);
+	struct throtl_grp *tg = pd_to_tg(pd);
 	struct throtl_service_queue *parent_sq;
+	struct blkcg_gq *blkg = tg_to_blkg(tg);
 
 	/*
 	 * We don't want new groups to escape the limits of its ancestors.
@@ -628,17 +630,18 @@ static void throtl_pd_online(struct blkcg_gq *blkg)
 	tg_update_share(tg->td, tg);
 }
 
-static void throtl_pd_offline(struct blkcg_gq *blkg)
+static void throtl_pd_offline(struct blkg_policy_data *pd)
 {
-	struct throtl_grp *tg = blkg_to_tg(blkg);
+	struct throtl_grp *tg = pd_to_tg(pd);
 	struct throtl_service_queue *sq = &tg->service_queue;
+	struct blkcg_gq *blkg = tg_to_blkg(tg);
 
 	if (!(tg->flags & THROTL_TG_ONLINE))
 		return;
 
 	if (bio_list_empty(&tg->bios) && !list_empty(&tg->node)) {
 		list_del_init(&tg->node);
-		blkg_put(tg_to_blkg(tg));
+		blkg_put(blkg);
 	}
 
 	tg->flags &= ~THROTL_TG_ONLINE;
@@ -660,9 +663,9 @@ static void throtl_pd_free(struct blkg_policy_data *pd)
 	kfree(tg);
 }
 
-static void throtl_pd_reset_stats(struct blkcg_gq *blkg)
+static void throtl_pd_reset_stats(struct blkg_policy_data *pd)
 {
-	struct throtl_grp *tg = blkg_to_tg(blkg);
+	struct throtl_grp *tg = pd_to_tg(pd);
 	int cpu;
 
 	for_each_possible_cpu(cpu) {
