@@ -23,6 +23,7 @@ TARGETS += user
 TARGETS += jumplabel
 TARGETS += vm
 TARGETS += x86
+TARGETS += zram
 #Please keep the TARGETS list alphabetically sorted
 # Run "make quicktest=1 run_tests" or
 # "make quicktest=1 kselftest from top level Makefile
