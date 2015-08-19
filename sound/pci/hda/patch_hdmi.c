@@ -37,6 +37,8 @@
 #include <sound/jack.h>
 #include <sound/asoundef.h>
 #include <sound/tlv.h>
+#include <sound/hdaudio.h>
+#include <sound/hda_i915.h>
 #include "hda_codec.h"
 #include "hda_local.h"
 #include "hda_jack.h"
@@ -145,6 +147,9 @@ struct hdmi_spec {
 	 */
 	struct hda_multi_out multiout;
 	struct hda_pcm_stream pcm_playback;
+
+	/* i915/powerwell (Haswell+/Valleyview+) specific */
+	struct i915_audio_component_audio_ops i915_audio_ops;
 };
 
 
@@ -2192,6 +2197,9 @@ static void generic_hdmi_free(struct hda_codec *codec)
 	struct hdmi_spec *spec = codec->spec;
 	int pin_idx;
 
+	if (is_haswell_plus(codec) || is_valleyview_plus(codec))
+		snd_hdac_i915_register_notifier(NULL);
+
 	for (pin_idx = 0; pin_idx < spec->num_pins; pin_idx++) {
 		struct hdmi_spec_per_pin *per_pin = get_pin(spec, pin_idx);
 
@@ -2317,6 +2325,14 @@ static void haswell_set_power_state(struct hda_codec *codec, hda_nid_t fg,
 	snd_hda_codec_set_power_to_all(codec, fg, power_state);
 }
 
+static void intel_pin_eld_notify(void *audio_ptr, int port, int port_mst_index)
+{
+	struct hda_codec *codec = audio_ptr;
+	int pin_nid = port + 0x04;
+
+	check_presence_and_report(codec, pin_nid);
+}
+
 static int patch_generic_hdmi(struct hda_codec *codec)
 {
 	struct hdmi_spec *spec;
@@ -2334,8 +2350,21 @@ static int patch_generic_hdmi(struct hda_codec *codec)
 		intel_haswell_fixup_enable_dp12(codec);
 	}
 
-	if (is_haswell_plus(codec) || is_valleyview_plus(codec))
+	/* For Valleyview/Cherryview, only the display codec is in the display
+	 * power well and can use link_power ops to request/release the power.
+	 * For Haswell/Broadwell, the controller is also in the power well and
+	 * can cover the codec power request, and so need not set this flag.
+	 * For previous platforms, there is no such power well feature.
+	 */
+	if (is_valleyview_plus(codec) || is_skylake(codec))
+		codec->core.link_power_control = 1;
+
+	if (is_haswell_plus(codec) || is_valleyview_plus(codec)) {
 		codec->depop_delay = 0;
+		spec->i915_audio_ops.audio_ptr = codec;
+		spec->i915_audio_ops.pin_eld_notify = intel_pin_eld_notify;
+		snd_hdac_i915_register_notifier(&spec->i915_audio_ops);
+	}
 
 	if (hdmi_parse_codec(codec) < 0) {
 		codec->spec = NULL;
