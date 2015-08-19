@@ -66,7 +66,10 @@ endif
 UTS_MACHINE := $(OLDARCH)
 
 ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
-override CC	+= -mlittle-endian -mno-strict-align
+override CC	+= -mlittle-endian
+ifneq ($(cc-name),clang)
+override CC	+= -mno-strict-align
+endif
 override AS	+= -mlittle-endian
 override LD	+= -EL
 override CROSS32CC += -mlittle-endian
@@ -314,7 +317,8 @@ TOUT	:= .tmp_gas_check
 # - Require gcc 4.0 or above on 64-bit
 # - gcc-4.2.0 has issues compiling modules on 64-bit
 checkbin:
-	@if test "$(cc-version)" = "0304" ; then \
+	@if test "$(cc-name)" != "clang" \
+	    && test "$(cc-version)" = "0304" ; then \
 		if ! /bin/echo mftb 5 | $(AS) -v -mppc -many -o $(TOUT) >/dev/null 2>&1 ; then \
 			echo -n '*** ${VERSION}.${PATCHLEVEL} kernels no longer build '; \
 			echo 'correctly with gcc-3.4 and your version of binutils.'; \
@@ -322,13 +326,15 @@ checkbin:
 			false; \
 		fi ; \
 	fi
-	@if test "$(cc-version)" -lt "0400" \
+	@if test "$(cc-name)" != "clang" \
+	    && test "$(cc-version)" -lt "0400" \
 	    && test "x${CONFIG_PPC64}" = "xy" ; then \
                 echo -n "Sorry, GCC v4.0 or above is required to build " ; \
                 echo "the 64-bit powerpc kernel." ; \
                 false ; \
         fi
-	@if test "$(cc-fullversion)" = "040200" \
+	@if test "$(cc-name)" != "clang" \
+	    && test "$(cc-fullversion)" = "040200" \
 	    && test "x${CONFIG_MODULES}${CONFIG_PPC64}" = "xyy" ; then \
 		echo -n '*** GCC-4.2.0 cannot compile the 64-bit powerpc ' ; \
 		echo 'kernel with modules enabled.' ; \
