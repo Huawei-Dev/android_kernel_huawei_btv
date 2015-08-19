@@ -305,6 +305,7 @@ struct blk_queue_tag {
 struct queue_limits {
 	unsigned long		bounce_pfn;
 	unsigned long		seg_boundary_mask;
+	unsigned long		virt_boundary_mask;
 
 	unsigned int		max_hw_sectors;
 	unsigned int		chunk_sectors;
@@ -558,7 +559,7 @@ struct request_queue {
 #define QUEUE_FLAG_DEAD        19	/* queue tear-down finished */
 #define QUEUE_FLAG_INIT_DONE   20	/* queue is initialized */
 #define QUEUE_FLAG_NO_SG_MERGE 21	/* don't attempt to merge SG segments*/
-#define QUEUE_FLAG_SG_GAPS     22	/* queue doesn't support SG gaps */
+#define QUEUE_FLAG_POLL	       22	/* IO polling enabled if set */
 #define QUEUE_FLAG_WC	       23       /* Write back caching */
 #define QUEUE_FLAG_FUA	       24       /* device supports FUA writes */
 #define QUEUE_FLAG_FLUSH_NQ    25      /* flush not queueuable */
@@ -1075,6 +1076,7 @@ extern int blk_queue_dma_drain(struct request_queue *q,
 			       void *buf, unsigned int size);
 extern void blk_queue_lld_busy(struct request_queue *q, lld_busy_fn *fn);
 extern void blk_queue_segment_boundary(struct request_queue *, unsigned long);
+extern void blk_queue_virt_boundary(struct request_queue *, unsigned long);
 extern void blk_queue_prep_rq(struct request_queue *, prep_rq_fn *pfn);
 extern void blk_queue_unprep_rq(struct request_queue *, unprep_rq_fn *ufn);
 extern void blk_queue_merge_bvec(struct request_queue *, merge_bvec_fn *);
@@ -1246,6 +1248,11 @@ static inline unsigned long queue_bounce_pfn(struct request_queue *q)
 static inline unsigned long queue_segment_boundary(struct request_queue *q)
 {
 	return q->limits.seg_boundary_mask;
+}
+
+static inline unsigned long queue_virt_boundary(struct request_queue *q)
+{
+	return q->limits.virt_boundary_mask;
 }
 
 static inline unsigned int queue_max_sectors(struct request_queue *q)
@@ -1446,6 +1453,19 @@ unsigned char *read_dev_sector(struct block_device *, sector_t, Sector *);
 static inline void put_dev_sector(Sector p)
 {
 	page_cache_release(p.v);
+}
+
+/*
+ * Check if adding a bio_vec after bprv with offset would create a gap in
+ * the SG list. Most drivers don't care about this, but some do.
+ */
+static inline bool bvec_gap_to_prev(struct request_queue *q,
+				struct bio_vec *bprv, unsigned int offset)
+{
+	if (!queue_virt_boundary(q))
+		return false;
+	return offset ||
+		((bprv->bv_offset + bprv->bv_len) & queue_virt_boundary(q));
 }
 
 struct work_struct;
