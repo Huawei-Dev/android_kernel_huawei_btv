@@ -2332,6 +2332,7 @@ static int patch_generic_hdmi(struct hda_codec *codec)
 	if (is_haswell_plus(codec)) {
 		intel_haswell_enable_all_pins(codec, true);
 		intel_haswell_fixup_enable_dp12(codec);
+		snd_hdac_refresh_widget_sysfs(&codec->core);
 	}
 
 	if (is_haswell_plus(codec) || is_valleyview_plus(codec))
