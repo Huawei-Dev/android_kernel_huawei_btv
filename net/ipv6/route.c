@@ -1817,7 +1817,8 @@ int ip6_route_info_create(struct fib6_config *cfg, struct rt6_info **rt_ret)
 		struct lwtunnel_state *lwtstate;
 
 		err = lwtunnel_build_state(dev, cfg->fc_encap_type,
-					   cfg->fc_encap, &lwtstate);
+					   cfg->fc_encap, AF_INET6, cfg,
+					   &lwtstate);
 		if (err)
 			goto out;
 		rt->dst.lwtstate = lwtstate_get(lwtstate);
