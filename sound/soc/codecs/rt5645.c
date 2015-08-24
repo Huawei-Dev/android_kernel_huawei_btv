@@ -2787,8 +2787,18 @@ static int rt5645_jack_detect(struct snd_soc_codec *codec, int jack_insert)
 				RT5645_PWR_MIC_DET, RT5645_PWR_MIC_DET);
 		}
 
-		msleep(400);
-		val = snd_soc_read(codec, RT5645_IN1_CTRL3) & 0x7;
+		regmap_write(rt5645->regmap, RT5645_JD_CTRL3, 0x00f0);
+		regmap_update_bits(rt5645->regmap,
+				   RT5645_IN1_CTRL2, 0x1000, 0x1000);
+		regmap_update_bits(rt5645->regmap, RT5645_IN1_CTRL1, 0x0004,
+			0x0004);
+		msleep(100);
+		regmap_update_bits(rt5645->regmap,
+				   RT5645_IN1_CTRL2, 0x1000, 0x0000);
+
+		msleep(600);
+		regmap_read(rt5645->regmap, RT5645_IN1_CTRL3, &val);
+		val &= 0x7;
 		dev_dbg(codec->dev, "val = %d\n", val);
 
 		if (val == 1 || val == 2) {
@@ -2802,8 +2812,16 @@ static int rt5645_jack_detect(struct snd_soc_codec *codec, int jack_insert)
 			rt5645->jack_type = SND_JACK_HEADPHONE;
 		}
 
+		snd_soc_update_bits(codec, RT5645_CHARGE_PUMP, 0x0300, 0x0200);
+		snd_soc_write(codec, RT5645_DEPOP_M1, 0x001d);
+		snd_soc_write(codec, RT5645_DEPOP_M1, 0x0001);
 	} else { /* jack out */
 		rt5645->jack_type = 0;
+
+		regmap_update_bits(rt5645->regmap, RT5645_IN1_CTRL2, 0x1000,
+			0x1000);
+		regmap_update_bits(rt5645->regmap, RT5645_IN1_CTRL1, 0x0004,
+			0x0000);
 
 		if (rt5645->en_button_func)
 			rt5645_enable_push_button_irq(codec, false);
