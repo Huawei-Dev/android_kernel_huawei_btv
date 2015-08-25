@@ -334,6 +334,158 @@ static int _vnic_dev_cmd(struct vnic_dev *vdev, enum vnic_devcmd_cmd cmd,
 	return -ETIMEDOUT;
 }
 
+static int _vnic_dev_cmd2(struct vnic_dev *vdev, enum vnic_devcmd_cmd cmd,
+			  int wait)
+{
+	struct devcmd2_controller *dc2c = vdev->devcmd2;
+	struct devcmd2_result *result = dc2c->result + dc2c->next_result;
+	unsigned int i;
+	int delay, err;
+	u32 fetch_index, new_posted;
+	u32 posted = dc2c->posted;
+
+	fetch_index = ioread32(&dc2c->wq_ctrl->fetch_index);
+
+	if (fetch_index == 0xFFFFFFFF)
+		return -ENODEV;
+
+	new_posted = (posted + 1) % DEVCMD2_RING_SIZE;
+
+	if (new_posted == fetch_index) {
+		vdev_neterr("devcmd2 %d: wq is full. fetch index: %u, posted index: %u\n",
+			    _CMD_N(cmd), fetch_index, posted);
+		return -EBUSY;
+	}
+	dc2c->cmd_ring[posted].cmd = cmd;
+	dc2c->cmd_ring[posted].flags = 0;
+
+	if ((_CMD_FLAGS(cmd) & _CMD_FLAGS_NOWAIT))
+		dc2c->cmd_ring[posted].flags |= DEVCMD2_FNORESULT;
+	if (_CMD_DIR(cmd) & _CMD_DIR_WRITE)
+		for (i = 0; i < VNIC_DEVCMD_NARGS; i++)
+			dc2c->cmd_ring[posted].args[i] = vdev->args[i];
+
+	/* Adding write memory barrier prevents compiler and/or CPU reordering,
+	 * thus avoiding descriptor posting before descriptor is initialized.
+	 * Otherwise, hardware can read stale descriptor fields.
+	 */
+	wmb();
+	iowrite32(new_posted, &dc2c->wq_ctrl->posted_index);
+	dc2c->posted = new_posted;
+
+	if (dc2c->cmd_ring[posted].flags & DEVCMD2_FNORESULT)
+		return 0;
+
+	for (delay = 0; delay < wait; delay++) {
+		if (result->color == dc2c->color) {
+			dc2c->next_result++;
+			if (dc2c->next_result == dc2c->result_size) {
+				dc2c->next_result = 0;
+				dc2c->color = dc2c->color ? 0 : 1;
+			}
+			if (result->error) {
+				err = result->error;
+				if (err != ERR_ECMDUNKNOWN ||
+				    cmd != CMD_CAPABILITY)
+					vdev_neterr("Error %d devcmd %d\n",
+						    err, _CMD_N(cmd));
+				return -err;
+			}
+			if (_CMD_DIR(cmd) & _CMD_DIR_READ)
+				for (i = 0; i < VNIC_DEVCMD2_NARGS; i++)
+					vdev->args[i] = result->results[i];
+
+			return 0;
+		}
+		udelay(100);
+	}
+
+	vdev_neterr("devcmd %d timed out\n", _CMD_N(cmd));
+
+	return -ETIMEDOUT;
+}
+
+static int vnic_dev_init_devcmd1(struct vnic_dev *vdev)
+{
+	vdev->devcmd = vnic_dev_get_res(vdev, RES_TYPE_DEVCMD, 0);
+	if (!vdev->devcmd)
+		return -ENODEV;
+	vdev->devcmd_rtn = _vnic_dev_cmd;
+
+	return 0;
+}
+
+static int vnic_dev_init_devcmd2(struct vnic_dev *vdev)
+{
+	int err;
+	unsigned int fetch_index;
+
+	if (vdev->devcmd2)
+		return 0;
+
+	vdev->devcmd2 = kzalloc(sizeof(*vdev->devcmd2), GFP_KERNEL);
+	if (!vdev->devcmd2)
+		return -ENOMEM;
+
+	vdev->devcmd2->color = 1;
+	vdev->devcmd2->result_size = DEVCMD2_RING_SIZE;
+	err = enic_wq_devcmd2_alloc(vdev, &vdev->devcmd2->wq, DEVCMD2_RING_SIZE,
+				    DEVCMD2_DESC_SIZE);
+	if (err)
+		goto err_free_devcmd2;
+
+	fetch_index = ioread32(&vdev->devcmd2->wq.ctrl->fetch_index);
+	if (fetch_index == 0xFFFFFFFF) { /* check for hardware gone  */
+		vdev_err("Fatal error in devcmd2 init - hardware surprise removal");
+
+		return -ENODEV;
+	}
+
+	enic_wq_init_start(&vdev->devcmd2->wq, 0, fetch_index, fetch_index, 0,
+			   0);
+	vdev->devcmd2->posted = fetch_index;
+	vnic_wq_enable(&vdev->devcmd2->wq);
+
+	err = vnic_dev_alloc_desc_ring(vdev, &vdev->devcmd2->results_ring,
+				       DEVCMD2_RING_SIZE, DEVCMD2_DESC_SIZE);
+	if (err)
+		goto err_free_wq;
+
+	vdev->devcmd2->result = vdev->devcmd2->results_ring.descs;
+	vdev->devcmd2->cmd_ring = vdev->devcmd2->wq.ring.descs;
+	vdev->devcmd2->wq_ctrl = vdev->devcmd2->wq.ctrl;
+	vdev->args[0] = (u64)vdev->devcmd2->results_ring.base_addr |
+			VNIC_PADDR_TARGET;
+	vdev->args[1] = DEVCMD2_RING_SIZE;
+
+	err = _vnic_dev_cmd2(vdev, CMD_INITIALIZE_DEVCMD2, 1000);
+	if (err)
+		goto err_free_desc_ring;
+
+	vdev->devcmd_rtn = _vnic_dev_cmd2;
+
+	return 0;
+
+err_free_desc_ring:
+	vnic_dev_free_desc_ring(vdev, &vdev->devcmd2->results_ring);
+err_free_wq:
+	vnic_wq_disable(&vdev->devcmd2->wq);
+	vnic_wq_free(&vdev->devcmd2->wq);
+err_free_devcmd2:
+	kfree(vdev->devcmd2);
+	vdev->devcmd2 = NULL;
+
+	return err;
+}
+
+static void vnic_dev_deinit_devcmd2(struct vnic_dev *vdev)
+{
+	vnic_dev_free_desc_ring(vdev, &vdev->devcmd2->results_ring);
+	vnic_wq_disable(&vdev->devcmd2->wq);
+	vnic_wq_free(&vdev->devcmd2->wq);
+	kfree(vdev->devcmd2);
+}
+
 static int vnic_dev_cmd_proxy(struct vnic_dev *vdev,
 	enum vnic_devcmd_cmd proxy_cmd, enum vnic_devcmd_cmd cmd,
 	u64 *a0, u64 *a1, int wait)
