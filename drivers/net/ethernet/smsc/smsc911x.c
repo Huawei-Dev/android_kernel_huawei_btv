@@ -2369,26 +2369,28 @@ static int smsc911x_probe_config_dt(struct smsc911x_platform_config *config,
 	const char *mac;
 	int phy_interface;
 	u32 width = 0;
+	int err;
 
 	phy_interface = device_get_phy_mode(dev);
 	if (phy_interface < 0)
-		return phy_interface;
-
+		phy_interface = PHY_INTERFACE_MODE_NA;
 	config->phy_interface = phy_interface;
 
 	mac = of_get_mac_address(np);
 	if (mac)
 		memcpy(config->mac, mac, ETH_ALEN);
 
-	of_property_read_u32(np, "reg-shift", &config->shift);
-
-	of_property_read_u32(np, "reg-io-width", &width);
-	if (width == 4)
+	err = device_property_read_u32(dev, "reg-io-width", &width);
+	if (err == -ENXIO)
+		return err;
+	if (!err && width == 4)
 		config->flags |= SMSC911X_USE_32BIT;
 	else
 		config->flags |= SMSC911X_USE_16BIT;
 
-	if (of_get_property(np, "smsc,irq-active-high", NULL))
+	device_property_read_u32(dev, "reg-shift", &config->shift);
+
+	if (device_property_present(dev, "smsc,irq-active-high"))
 		config->irq_polarity = SMSC911X_IRQ_POLARITY_ACTIVE_HIGH;
 
 	if (of_get_property(np, "smsc,irq-push-pull", NULL))
