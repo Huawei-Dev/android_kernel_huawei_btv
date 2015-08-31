@@ -2288,7 +2288,6 @@ static int dwc3_cleanup_done_reqs(struct dwc3 *dwc, struct dwc3_ep *dep,
 			if (trb->ctrl & DWC3_TRB_CTRL_HWO)
 				trb->ctrl &= ~DWC3_TRB_CTRL_HWO;
 		}
-
 		dwc3_gadget_giveback(dep, req, status);
 
 		/* EP possibly disabled during giveback? */
