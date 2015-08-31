@@ -524,7 +524,7 @@ static void i2c_dw_xfer_init(struct dw_i2c_dev *dev)
 	__i2c_dw_enable(dev, true);
 
 	/* Clear and enable interrupts */
-	i2c_dw_clear_int(dev);
+	dw_readl(dev, DW_IC_CLR_INTR);
 #if defined CONFIG_HISI_I2C_DESIGNWARE
 	dw_writel(dev, DW_IC_INTR_TX_ABRT | DW_IC_INTR_STOP_DET, DW_IC_INTR_MASK);
 #else
@@ -1113,12 +1113,6 @@ void i2c_dw_disable(struct dw_i2c_dev *dev)
 	dw_readl(dev, DW_IC_CLR_INTR);
 }
 EXPORT_SYMBOL_GPL(i2c_dw_disable);
-
-void i2c_dw_clear_int(struct dw_i2c_dev *dev)
-{
-	dw_readl(dev, DW_IC_CLR_INTR);
-}
-EXPORT_SYMBOL_GPL(i2c_dw_clear_int);
 
 void i2c_dw_disable_int(struct dw_i2c_dev *dev)
 {
