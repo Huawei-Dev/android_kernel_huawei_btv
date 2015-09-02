@@ -945,9 +945,9 @@ static inline __u32 skb_get_hash_flowi6(struct sk_buff *skb, struct flowi6 *fl6)
 {
 	if (!skb->l4_hash && !skb->sw_hash) {
 		struct flow_keys keys;
+		__u32 hash = __get_hash_from_flowi6(fl6, &keys);
 
-		__skb_set_sw_hash(skb, __get_hash_from_flowi6(fl6, &keys),
-				  flow_keys_have_l4(&keys));
+		__skb_set_sw_hash(skb, hash, flow_keys_have_l4(&keys));
 	}
 
 	return skb->hash;
@@ -959,9 +959,9 @@ static inline __u32 skb_get_hash_flowi4(struct sk_buff *skb, struct flowi4 *fl4)
 {
 	if (!skb->l4_hash && !skb->sw_hash) {
 		struct flow_keys keys;
+		__u32 hash = __get_hash_from_flowi4(fl4, &keys);
 
-		__skb_set_sw_hash(skb, __get_hash_from_flowi4(fl4, &keys),
-				  flow_keys_have_l4(&keys));
+		__skb_set_sw_hash(skb, hash, flow_keys_have_l4(&keys));
 	}
 
 	return skb->hash;
