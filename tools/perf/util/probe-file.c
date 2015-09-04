@@ -274,8 +274,8 @@ error:
 	return ret;
 }
 
-static int probe_file__get_events(int fd, struct strfilter *filter,
-				  struct strlist *plist)
+int probe_file__get_events(int fd, struct strfilter *filter,
+			   struct strlist *plist)
 {
 	struct strlist *namelist;
 	struct str_node *ent;
@@ -299,7 +299,7 @@ static int probe_file__get_events(int fd, struct strfilter *filter,
 	return ret;
 }
 
-static int probe_file__del_strlist(int fd, struct strlist *namelist)
+int probe_file__del_strlist(int fd, struct strlist *namelist)
 {
 	int ret = 0;
 	struct str_node *ent;
