@@ -201,6 +201,8 @@ struct perf_event;
  */
 #define PERF_EVENT_TXN 0x1
 
+#define PERF_PMU_TXN_ADD  0x1		/* txn to add/schedule event on PMU */
+
 /**
  * pmu::capabilities flags
  */
@@ -324,20 +326,33 @@ struct pmu {
 	 */
 	void (*read)			(struct perf_event *event);
 
-	
-	void (*start_txn)		(struct pmu *pmu); /* optional */
+	/*
+	 * Group events scheduling is treated as a transaction, add
+	 * group events as a whole and perform one schedulability test.
+	 * If the test fails, roll back the whole group
+	 *
+	 * Start the transaction, after this ->add() doesn't need to
+	 * do schedulability tests.
+	 *
+	 * Optional.
+	 */
+	void (*start_txn)		(struct pmu *pmu, unsigned int txn_flags);
 	/*
 	 * If ->start_txn() disabled the ->add() schedulability test
 	 * then ->commit_txn() is required to perform one. On success
 	 * the transaction is closed. On error the transaction is kept
 	 * open until ->cancel_txn() is called.
+	 *
+	 * Optional.
 	 */
-	int  (*commit_txn)		(struct pmu *pmu); /* optional */
+	int  (*commit_txn)		(struct pmu *pmu);
 	/*
 	 * Will cancel the transaction, assumes ->del() is called
 	 * for each successful ->add() during the transaction.
+	 *
+	 * Optional.
 	 */
-	void (*cancel_txn)		(struct pmu *pmu); /* optional */
+	void (*cancel_txn)		(struct pmu *pmu);
 
 	/*
 	 * Will return the value for perf_event_mmap_page::index for this event,
