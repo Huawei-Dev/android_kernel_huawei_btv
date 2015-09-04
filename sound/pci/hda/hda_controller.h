@@ -229,7 +229,7 @@ struct azx {
 	unsigned int snoop:1;
 	unsigned int align_buffer_size:1;
 	unsigned int region_requested:1;
-	unsigned int disabled:1; /* disabled by VGA-switcher */
+	unsigned int disabled:1; /* disabled by vga_switcheroo */
 
 	/* for debugging */
 	unsigned int last_cmd[AZX_MAX_CODECS];
