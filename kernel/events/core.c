@@ -8422,13 +8422,30 @@ SYSCALL_DEFINE5(perf_event_open,
 
 	if (move_group) {
 		gctx = group_leader->ctx;
+		mutex_lock_double(&gctx->mutex, &ctx->mutex);
+	} else {
+		mutex_lock(&ctx->mutex);
+	}
 
+	/*
+	 * Must be under the same ctx::mutex as perf_install_in_context(),
+	 * because we need to serialize with concurrent event creation.
+	 */
+	if (!exclusive_event_installable(event, ctx)) {
+		/* exclusive and group stuff are assumed mutually exclusive */
+		WARN_ON_ONCE(move_group);
+
+		err = -EBUSY;
+		goto err_locked;
+	}
+
+	WARN_ON_ONCE(ctx->parent_ctx);
+
+	if (move_group) {
 		/*
 		 * See perf_event_ctx_lock() for comments on the details
 		 * of swizzling perf_event::ctx.
 		 */
-		mutex_lock_double(&gctx->mutex, &ctx->mutex);
-
 		perf_remove_from_context(group_leader, false);
 
 		list_for_each_entry(sibling, &group_leader->sibling_list,
@@ -8436,13 +8453,7 @@ SYSCALL_DEFINE5(perf_event_open,
 			perf_remove_from_context(sibling, false);
 			put_ctx(gctx);
 		}
-	} else {
-		mutex_lock(&ctx->mutex);
-	}
 
-	WARN_ON_ONCE(ctx->parent_ctx);
-
-	if (move_group) {
 		/*
 		 * Wait for everybody to stop referencing the events through
 		 * the old lists, before installing it on new lists.
@@ -8474,22 +8485,20 @@ SYSCALL_DEFINE5(perf_event_open,
 		perf_event__state_init(group_leader);
 		perf_install_in_context(ctx, group_leader, group_leader->cpu);
 		get_ctx(ctx);
-	}
 
-	if (!exclusive_event_installable(event, ctx)) {
-		err = -EBUSY;
-		mutex_unlock(&ctx->mutex);
-		fput(event_file);
-		goto err_context;
+		/*
+		 * Now that all events are installed in @ctx, nothing
+		 * references @gctx anymore, so drop the last reference we have
+		 * on it.
+		 */
+		put_ctx(gctx);
 	}
 
 	perf_install_in_context(ctx, event, event->cpu);
 	perf_unpin_context(ctx);
 
-	if (move_group) {
+	if (move_group)
 		mutex_unlock(&gctx->mutex);
-		put_ctx(gctx);
-	}
 	mutex_unlock(&ctx->mutex);
 	if (group_leader)
 		mutex_unlock(&group_leader->group_leader_mutex);
@@ -8518,6 +8527,12 @@ SYSCALL_DEFINE5(perf_event_open,
 	fd_install(event_fd, event_file);
 	return event_fd;
 
+err_locked:
+	if (move_group)
+		mutex_unlock(&gctx->mutex);
+	mutex_unlock(&ctx->mutex);
+/* err_file: */
+	fput(event_file);
 err_context:
 	perf_unpin_context(ctx);
 	put_ctx(ctx);
