@@ -52,12 +52,6 @@ dma_unmap_single(struct device *dev, dma_addr_t dma_addr, size_t size,
 }
 
 static inline int
-dma_supported(struct device *dev, u64 mask)
-{
-	return 1;
-}
-
-static inline int
 dma_set_mask(struct device *dev, u64 mask)
 {
 	if(!dev->dma_mask || !dma_supported(dev, mask))
