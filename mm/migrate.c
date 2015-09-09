@@ -37,8 +37,10 @@
 #include <linux/gfp.h>
 #include <linux/balloon_compaction.h>
 #include <linux/mmu_notifier.h>
+#include <linux/page_idle.h>
 #include <linux/hisi/page_tracker.h>
 #include <linux/backing-dev.h>
+
 #include <asm/tlbflush.h>
 
 #define CREATE_TRACE_POINTS
@@ -534,6 +536,11 @@ void migrate_page_copy(struct page *newpage, struct page *page)
 	/* Move dirty on pages not done by migrate_page_move_mapping() */
 	if (PageDirty(page))
 		SetPageDirty(newpage);
+
+	if (page_is_young(page))
+		set_page_young(newpage);
+	if (page_is_idle(page))
+		set_page_idle(newpage);
 
 	/*
 	 * Copy NUMA information to the new page, to prevent over-eager

@@ -9,6 +9,7 @@
 #include <linux/vmalloc.h>
 #include <linux/kmemleak.h>
 #include <linux/page_owner.h>
+#include <linux/page_idle.h>
 #include <linux/hisi/page_ext.h>
 #include <linux/hisi/page_tracker.h>
 
@@ -63,6 +64,9 @@ static struct page_ext_operations *page_ext_ops[] = {
 #endif
 #ifdef CONFIG_PAGE_OWNER
 	&page_owner_ops,
+#endif
+#if defined(CONFIG_IDLE_PAGE_TRACKING) && !defined(CONFIG_64BIT)
+	&page_idle_ops,
 #endif
 #ifdef CONFIG_HISI_PAGE_TRACKER
 	&page_tracker_ops,
