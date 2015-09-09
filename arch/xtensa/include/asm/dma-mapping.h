@@ -116,6 +116,9 @@ dma_sync_single_range_for_cpu(struct device *dev, dma_addr_t dma_handle,
 	consistent_sync((void *)bus_to_virt(dma_handle)+offset,size,direction);
 }
 
+#define dma_alloc_noncoherent(d, s, h, f) dma_alloc_attrs(d, s, h, f, NULL)
+#define dma_free_noncoherent(d, s, v, h) dma_free_attrs(d, s, v, h, NULL)
+
 static inline void
 dma_sync_single_range_for_device(struct device *dev, dma_addr_t dma_handle,
 		      unsigned long offset, size_t size,
