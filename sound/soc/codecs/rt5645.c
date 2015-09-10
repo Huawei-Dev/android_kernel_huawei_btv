@@ -2824,9 +2824,6 @@ static int rt5645_jack_detect(struct snd_soc_codec *codec, int jack_insert)
 			snd_soc_dapm_sync(dapm);
 			rt5645->jack_type = SND_JACK_HEADPHONE;
 		}
-		if (rt5645->pdata.jd_invert)
-			regmap_update_bits(rt5645->regmap, RT5645_IRQ_CTRL2,
-				RT5645_JD_1_1_MASK, RT5645_JD_1_1_INV);
 	} else { /* jack out */
 		rt5645->jack_type = 0;
 
