@@ -512,7 +512,7 @@ static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
 			      PTE_PROT_NONE | PTE_VALID | PTE_WRITE;
 	/* preserve the hardware dirty information */
 	if (pte_hw_dirty(pte))
-		newprot |= PTE_DIRTY;
+		pte = pte_mkdirty(pte);
 	pte_val(pte) = (pte_val(pte) & ~mask) | (pgprot_val(newprot) & mask);
 	return pte;
 }
