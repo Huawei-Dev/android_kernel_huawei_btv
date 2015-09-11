@@ -55,8 +55,38 @@ static ssize_t debug_read_regs(struct file *file, char __user *userbuf,
 	return bytes;
 }
 
-static ssize_t debug_read_tlb(struct file *file, char __user *userbuf,
-			      size_t count, loff_t *ppos)
+static int
+__dump_tlb_entries(struct omap_iommu *obj, struct cr_regs *crs, int num)
+{
+	int i;
+	struct iotlb_lock saved;
+	struct cr_regs tmp;
+	struct cr_regs *p = crs;
+
+	pm_runtime_get_sync(obj->dev);
+	iotlb_lock_get(obj, &saved);
+
+	for_each_iotlb_cr(obj, num, i, tmp) {
+		if (!iotlb_cr_valid(&tmp))
+			continue;
+		*p++ = tmp;
+	}
+
+	iotlb_lock_set(obj, &saved);
+	pm_runtime_put_sync(obj->dev);
+
+	return  p - crs;
+}
+
+static ssize_t iotlb_dump_cr(struct omap_iommu *obj, struct cr_regs *cr,
+			     struct seq_file *s)
+{
+	seq_printf(s, "%08x %08x %01x\n", cr->cam, cr->ram,
+			  (cr->cam & MMU_CAM_P) ? 1 : 0);
+	return 0;
+}
+
+static size_t omap_dump_tlb_entries(struct omap_iommu *obj, struct seq_file *s)
 {
 	struct omap_iommu *obj = file->private_data;
 	char *p, *buf;
