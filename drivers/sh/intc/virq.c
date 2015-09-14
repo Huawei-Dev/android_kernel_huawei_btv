@@ -107,7 +107,7 @@ static int add_virq_to_pirq(unsigned int irq, unsigned int virq)
 	return 0;
 }
 
-static void intc_virq_handler(unsigned int irq, struct irq_desc *desc)
+static void intc_virq_handler(struct irq_desc *desc)
 {
 	struct irq_data *data = irq_get_irq_data(irq);
 	struct irq_chip *chip = irq_data_get_irq_chip(data);
@@ -119,11 +119,12 @@ static void intc_virq_handler(unsigned int irq, struct irq_desc *desc)
 	for_each_virq(entry, vlist) {
 		unsigned long addr, handle;
 
-		handle = (unsigned long)irq_get_handler_data(entry->irq);
-		addr = INTC_REG(d, _INTC_ADDR_E(handle), 0);
-
-		if (intc_reg_fns[_INTC_FN(handle)](addr, handle, 0))
-			generic_handle_irq(entry->irq);
+		if (vdesc) {
+			handle = (unsigned long)irq_desc_get_handler_data(vdesc);
+			addr = INTC_REG(d, _INTC_ADDR_E(handle), 0);
+			if (intc_reg_fns[_INTC_FN(handle)](addr, handle, 0))
+				generic_handle_irq_desc(vdesc);
+		}
 	}
 
 	chip->irq_unmask(data);

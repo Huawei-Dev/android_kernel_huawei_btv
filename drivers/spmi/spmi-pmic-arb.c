@@ -451,7 +451,7 @@ static void periph_interrupt(struct spmi_pmic_arb_dev *pa, u8 apid)
 	}
 }
 
-static void pmic_arb_chained_irq(unsigned int irq, struct irq_desc *desc)
+static void pmic_arb_chained_irq(struct irq_desc *desc)
 {
 	struct spmi_pmic_arb_dev *pa = irq_get_handler_data(irq);
 	struct irq_chip *chip = irq_get_chip(irq);

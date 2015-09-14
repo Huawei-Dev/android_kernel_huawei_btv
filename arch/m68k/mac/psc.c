@@ -113,7 +113,7 @@ void __init psc_init(void)
  * PSC interrupt handler. It's a lot like the VIA interrupt handler.
  */
 
-static void psc_irq(unsigned int irq, struct irq_desc *desc)
+static void psc_irq(struct irq_desc *desc)
 {
 	unsigned int offset = (unsigned int)irq_desc_get_handler_data(desc);
 	int pIFR	= pIFRbase + offset;

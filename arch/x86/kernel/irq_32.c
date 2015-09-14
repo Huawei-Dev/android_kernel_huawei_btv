@@ -74,11 +74,10 @@ static inline void *current_stack(void)
 	return (void *)(current_stack_pointer() & ~(THREAD_SIZE - 1));
 }
 
-static inline int
-execute_on_irq_stack(int overflow, struct irq_desc *desc, int irq)
+static inline int execute_on_irq_stack(int overflow, struct irq_desc *desc)
 {
 	struct irq_stack *curstk, *irqstk;
-	u32 *isp, *prev_esp, arg1, arg2;
+	u32 *isp, *prev_esp, arg1;
 
 	curstk = (struct irq_stack *) current_stack();
 	irqstk = __this_cpu_read(hardirq_stack);
@@ -104,8 +103,8 @@ execute_on_irq_stack(int overflow, struct irq_desc *desc, int irq)
 	asm volatile("xchgl	%%ebx,%%esp	\n"
 		     "call	*%%edi		\n"
 		     "movl	%%ebx,%%esp	\n"
-		     : "=a" (arg1), "=d" (arg2), "=b" (isp)
-		     :  "0" (irq),   "1" (desc),  "2" (isp),
+		     : "=a" (arg1), "=b" (isp)
+		     :  "0" (desc),   "1" (isp),
 			"D" (desc->handle_irq)
 		     : "memory", "cc", "ecx");
 	return 1;
@@ -156,19 +155,16 @@ void do_softirq_own_stack(void)
 
 bool handle_irq(unsigned irq, struct pt_regs *regs)
 {
-	struct irq_desc *desc;
-	int overflow;
-
-	overflow = check_stack_overflow();
+	int overflow = check_stack_overflow();
 
 	desc = irq_to_desc(irq);
 	if (unlikely(!desc))
 		return false;
 
-	if (user_mode(regs) || !execute_on_irq_stack(overflow, desc, irq)) {
+	if (user_mode(regs) || !execute_on_irq_stack(overflow, desc)) {
 		if (unlikely(overflow))
 			print_stack_overflow();
-		desc->handle_irq(irq, desc);
+		generic_handle_irq_desc(desc);
 	}
 
 	return true;

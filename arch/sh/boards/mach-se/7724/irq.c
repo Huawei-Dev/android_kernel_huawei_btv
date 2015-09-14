@@ -92,7 +92,7 @@ static struct irq_chip se7724_irq_chip __read_mostly = {
 	.irq_unmask	= enable_se7724_irq,
 };
 
-static void se7724_irq_demux(unsigned int irq, struct irq_desc *desc)
+static void se7724_irq_demux(struct irq_desc *desc)
 {
 	struct fpga_irq set = get_fpga_irq(irq);
 	unsigned short intv = __raw_readw(set.sraddr);
