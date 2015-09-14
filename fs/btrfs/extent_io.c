@@ -3143,6 +3143,7 @@ static inline void __do_contiguous_readpages(struct extent_io_tree *tree,
 	struct inode *inode;
 	struct btrfs_ordered_extent *ordered;
 	int index;
+	u64 prev_em_start = (u64)-1;
 
 	inode = pages[0]->mapping->host;
 	while (1) {
@@ -3158,7 +3159,7 @@ static inline void __do_contiguous_readpages(struct extent_io_tree *tree,
 
 	for (index = 0; index < nr_pages; index++) {
 		__do_readpage(tree, pages[index], get_extent, em_cached, bio,
-			      mirror_num, bio_flags, rw, prev_em_start);
+			      mirror_num, bio_flags, rw, &prev_em_start);
 		page_cache_release(pages[index]);
 	}
 }
