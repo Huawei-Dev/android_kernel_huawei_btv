@@ -135,9 +135,19 @@ static struct pmem_device *pmem_alloc(struct device *dev,
 		return ERR_PTR(-EBUSY);
 	}
 
-	pmem->virt_addr = memremap_pmem(dev, pmem->phys_addr, pmem->size);
-	if (!pmem->virt_addr)
-		return ERR_PTR(-ENXIO);
+	if (pmem_should_map_pages(dev)) {
+		void *addr = devm_memremap_pages(dev, res);
+
+		if (IS_ERR(addr))
+			return addr;
+		pmem->virt_addr = (void __pmem *) addr;
+	} else {
+		pmem->virt_addr = (void __pmem *) devm_memremap(dev,
+				pmem->phys_addr, pmem->size,
+				ARCH_MEMREMAP_PMEM);
+		if (!pmem->virt_addr)
+			return ERR_PTR(-ENXIO);
+	}
 
 	return pmem;
 }
@@ -204,6 +214,154 @@ static int pmem_rw_bytes(struct nd_namespace_common *ndns,
 	}
 
 	return 0;
+}
+
+static int nd_pfn_init(struct nd_pfn *nd_pfn)
+{
+	struct nd_pfn_sb *pfn_sb = kzalloc(sizeof(*pfn_sb), GFP_KERNEL);
+	struct pmem_device *pmem = dev_get_drvdata(&nd_pfn->dev);
+	struct nd_namespace_common *ndns = nd_pfn->ndns;
+	struct nd_region *nd_region;
+	unsigned long npfns;
+	phys_addr_t offset;
+	u64 checksum;
+	int rc;
+
+	if (!pfn_sb)
+		return -ENOMEM;
+
+	nd_pfn->pfn_sb = pfn_sb;
+	rc = nd_pfn_validate(nd_pfn);
+	if (rc == 0 || rc == -EBUSY)
+		return rc;
+
+	/* section alignment for simple hotplug */
+	if (nvdimm_namespace_capacity(ndns) < ND_PFN_ALIGN
+			|| pmem->phys_addr & ND_PFN_MASK)
+		return -ENODEV;
+
+	nd_region = to_nd_region(nd_pfn->dev.parent);
+	if (nd_region->ro) {
+		dev_info(&nd_pfn->dev,
+				"%s is read-only, unable to init metadata\n",
+				dev_name(&nd_region->dev));
+		goto err;
+	}
+
+	memset(pfn_sb, 0, sizeof(*pfn_sb));
+	npfns = (pmem->size - SZ_8K) / SZ_4K;
+	/*
+	 * Note, we use 64 here for the standard size of struct page,
+	 * debugging options may cause it to be larger in which case the
+	 * implementation will limit the pfns advertised through
+	 * ->direct_access() to those that are included in the memmap.
+	 */
+	if (nd_pfn->mode == PFN_MODE_PMEM)
+		offset = ALIGN(SZ_8K + 64 * npfns, PMD_SIZE);
+	else if (nd_pfn->mode == PFN_MODE_RAM)
+		offset = SZ_8K;
+	else
+		goto err;
+
+	npfns = (pmem->size - offset) / SZ_4K;
+	pfn_sb->mode = cpu_to_le32(nd_pfn->mode);
+	pfn_sb->dataoff = cpu_to_le64(offset);
+	pfn_sb->npfns = cpu_to_le64(npfns);
+	memcpy(pfn_sb->signature, PFN_SIG, PFN_SIG_LEN);
+	memcpy(pfn_sb->uuid, nd_pfn->uuid, 16);
+	pfn_sb->version_major = cpu_to_le16(1);
+	checksum = nd_sb_checksum((struct nd_gen_sb *) pfn_sb);
+	pfn_sb->checksum = cpu_to_le64(checksum);
+
+	rc = nvdimm_write_bytes(ndns, SZ_4K, pfn_sb, sizeof(*pfn_sb));
+	if (rc)
+		goto err;
+
+	return 0;
+ err:
+	nd_pfn->pfn_sb = NULL;
+	kfree(pfn_sb);
+	return -ENXIO;
+}
+
+static int nvdimm_namespace_detach_pfn(struct nd_namespace_common *ndns)
+{
+	struct nd_pfn *nd_pfn = to_nd_pfn(ndns->claim);
+	struct pmem_device *pmem;
+
+	/* free pmem disk */
+	pmem = dev_get_drvdata(&nd_pfn->dev);
+	pmem_detach_disk(pmem);
+
+	/* release nd_pfn resources */
+	kfree(nd_pfn->pfn_sb);
+	nd_pfn->pfn_sb = NULL;
+
+	return 0;
+}
+
+static int nvdimm_namespace_attach_pfn(struct nd_namespace_common *ndns)
+{
+	struct nd_namespace_io *nsio = to_nd_namespace_io(&ndns->dev);
+	struct nd_pfn *nd_pfn = to_nd_pfn(ndns->claim);
+	struct device *dev = &nd_pfn->dev;
+	struct vmem_altmap *altmap;
+	struct nd_region *nd_region;
+	struct nd_pfn_sb *pfn_sb;
+	struct pmem_device *pmem;
+	phys_addr_t offset;
+	int rc;
+
+	if (!nd_pfn->uuid || !nd_pfn->ndns)
+		return -ENODEV;
+
+	nd_region = to_nd_region(dev->parent);
+	rc = nd_pfn_init(nd_pfn);
+	if (rc)
+		return rc;
+
+	if (PAGE_SIZE != SZ_4K) {
+		dev_err(dev, "only supported on systems with 4K PAGE_SIZE\n");
+		return -ENXIO;
+	}
+	if (nsio->res.start & ND_PFN_MASK) {
+		dev_err(dev, "%s not memory hotplug section aligned\n",
+				dev_name(&ndns->dev));
+		return -ENXIO;
+	}
+
+	pfn_sb = nd_pfn->pfn_sb;
+	offset = le64_to_cpu(pfn_sb->dataoff);
+	nd_pfn->mode = le32_to_cpu(nd_pfn->pfn_sb->mode);
+	if (nd_pfn->mode == PFN_MODE_RAM) {
+		if (offset != SZ_8K)
+			return -EINVAL;
+		nd_pfn->npfns = le64_to_cpu(pfn_sb->npfns);
+		altmap = NULL;
+	} else {
+		rc = -ENXIO;
+		goto err;
+	}
+
+	/* establish pfn range for lookup, and switch to direct map */
+	pmem = dev_get_drvdata(dev);
+	devm_memunmap(dev, (void __force *) pmem->virt_addr);
+	pmem->virt_addr = (void __pmem *) devm_memremap_pages(dev, &nsio->res);
+	if (IS_ERR(pmem->virt_addr)) {
+		rc = PTR_ERR(pmem->virt_addr);
+		goto err;
+	}
+
+	/* attach pmem disk in "pfn-mode" */
+	pmem->data_offset = offset;
+	rc = pmem_attach_disk(dev, ndns, pmem);
+	if (rc)
+		goto err;
+
+	return rc;
+ err:
+	nvdimm_namespace_detach_pfn(ndns);
+	return rc;
 }
 
 static int nd_pmem_probe(struct device *dev)
