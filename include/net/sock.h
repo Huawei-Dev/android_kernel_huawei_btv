@@ -1685,12 +1685,16 @@ static inline kuid_t sock_net_uid(const struct net *net, const struct sock *sk)
 	return sk ? sk->sk_uid : make_kuid(net->user_ns, 0);
 }
 
+static inline u32 net_tx_rndhash(void)
+{
+	u32 v = prandom_u32();
+
+	return v ?: 1;
+}
+
 static inline void sk_set_txhash(struct sock *sk)
 {
-	sk->sk_txhash = prandom_u32();
-
-	if (unlikely(!sk->sk_txhash))
-		sk->sk_txhash = 1;
+	sk->sk_txhash = net_tx_rndhash();
 }
 
 static inline void sk_rethink_txhash(struct sock *sk)
