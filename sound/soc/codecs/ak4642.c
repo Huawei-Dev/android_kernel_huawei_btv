@@ -130,6 +130,8 @@
 #define FS2		(1 << 2)
 #define FS3		(1 << 5)
 #define FS_MASK		(FS0 | FS1 | FS2 | FS3)
+#define FSs(val)	(((val & 0x7) << 0) | ((val & 0x8) << 2))
+#define PSs(val)	((val & 0x3) << 6)
 
 /* MD_CTL3 */
 #define BST1		(1 << 3)
@@ -415,6 +417,44 @@ static int ak4642_dai_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 		return -EINVAL;
 	}
 	snd_soc_update_bits(codec, MD_CTL1, DIF_MASK, data);
+
+	return 0;
+}
+
+static int ak4642_set_mcko(struct snd_soc_codec *codec,
+			   u32 frequency)
+{
+	u32 fs_list[] = {
+		[0] = 8000,
+		[1] = 12000,
+		[2] = 16000,
+		[3] = 24000,
+		[4] = 7350,
+		[5] = 11025,
+		[6] = 14700,
+		[7] = 22050,
+		[10] = 32000,
+		[11] = 48000,
+		[14] = 29400,
+		[15] = 44100,
+	};
+	u32 ps_list[] = {
+		[0] = 256,
+		[1] = 128,
+		[2] = 64,
+		[3] = 32
+	};
+	int ps, fs;
+
+	for (ps = 0; ps < ARRAY_SIZE(ps_list); ps++) {
+		for (fs = 0; fs < ARRAY_SIZE(fs_list); fs++) {
+			if (frequency == ps_list[ps] * fs_list[fs]) {
+				snd_soc_write(codec, MD_CTL2,
+					      PSs(ps) | FSs(fs));
+				return 0;
+			}
+		}
+	}
 
 	return 0;
 }
