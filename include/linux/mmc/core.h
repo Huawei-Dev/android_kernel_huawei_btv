@@ -172,8 +172,6 @@ extern int mmc_app_cmd(struct mmc_host *, struct mmc_card *);
 extern int mmc_wait_for_app_cmd(struct mmc_host *, struct mmc_card *,
 	struct mmc_command *, int);
 extern void mmc_start_bkops(struct mmc_card *card, bool from_exception);
-extern int __mmc_switch(struct mmc_card *, u8, u8, u8, unsigned int, bool,
-			bool, bool);
 extern int mmc_switch(struct mmc_card *, u8, u8, u8, unsigned int);
 #ifdef CONFIG_HISI_MMC
 extern int __mmc_switch_cmdq_mode(struct mmc_command *cmd, u8 set, u8 index,
