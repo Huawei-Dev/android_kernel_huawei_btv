@@ -1355,12 +1355,10 @@ static void dw_mci_hi3xxx_work_fail_reset(struct dw_mci *host)
 
 	mci_writel(host, RINTSTS, INTMSK_ALL);
 
-#ifdef CONFIG_MMC_DW_IDMAC
 	if (SDMMC_32_BIT_DMA == host->dma_64bit_address)
 		mci_writel(host, IDSTS, IDMAC_INT_CLR);
 	else
 		mci_writel(host, IDSTS64, IDMAC_INT_CLR);
-#endif
 
 	ctype = mci_readl(host, CTYPE);
 	clkena = mci_readl(host, CLKENA);
@@ -1415,7 +1413,6 @@ static void dw_mci_hi3xxx_work_fail_reset(struct dw_mci *host)
 	mci_writel(host, GPIO, gpio | GPIO_CLK_ENABLE);
 
 	mci_writel(host, BMOD, SDMMC_IDMAC_SWRESET);
-#ifdef CONFIG_MMC_DW_IDMAC
 	if (SDMMC_32_BIT_DMA == host->dma_64bit_address) {
 		mci_writel(host, IDSTS, IDMAC_INT_CLR);
 		mci_writel(host, IDINTEN, SDMMC_IDMAC_INT_NI | SDMMC_IDMAC_INT_RI | SDMMC_IDMAC_INT_TI);
@@ -1426,18 +1423,15 @@ static void dw_mci_hi3xxx_work_fail_reset(struct dw_mci *host)
 		mci_writel(host, DBADDRL, host->sg_dma & 0xffffffff);
 		mci_writel(host, DBADDRU,(u64)host->sg_dma >> 32);
 	}
-#endif
 
 
 	mci_writel(host, RINTSTS, INTMSK_ALL);
 	mci_writel(host, INTMASK, 0);
 	mci_writel(host, RINTSTS, INTMSK_ALL);
-#ifdef CONFIG_MMC_DW_IDMAC
 	if (SDMMC_32_BIT_DMA == host->dma_64bit_address)
 		mci_writel(host, IDSTS, IDMAC_INT_CLR);
 	else
 		mci_writel(host, IDSTS64, IDMAC_INT_CLR);
-#endif
 	mci_writel(host, INTMASK, SDMMC_INT_CMD_DONE | SDMMC_INT_DATA_OVER | SDMMC_INT_TXDR | SDMMC_INT_RXDR | DW_MCI_ERROR_FLAGS | SDMMC_INT_CD);
 	mci_writel(host, CTRL, SDMMC_CTRL_INT_ENABLE);	/* Enable mci interrupt */
 
@@ -2636,9 +2630,8 @@ void dw_mci_work_routine_card(struct work_struct *work)
 
 				dw_mci_fifo_reset(host->dev, host);
 				dw_mci_ciu_reset(host->dev, host);
-#ifdef CONFIG_MMC_DW_IDMAC
-				dw_mci_idmac_reset(host);
-#endif
+				if (host->use_dma == TRANS_MODE_IDMAC)
+					dw_mci_idmac_reset(host);
 			}
 
 			spin_unlock_bh(&host->lock);

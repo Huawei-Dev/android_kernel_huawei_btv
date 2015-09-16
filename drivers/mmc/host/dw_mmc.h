@@ -158,6 +158,13 @@
 					 ((t) & 0xFFF))
 
 #define SDMMC_SET_RD_THLD(v, x)         (((v) & 0x1FFF) << 16 | (x))
+
+/* HCON register defines */
+#define DMA_INTERFACE_IDMA		(0x0)
+#define DMA_INTERFACE_DWDMA		(0x1)
+#define DMA_INTERFACE_GDMA		(0x2)
+#define DMA_INTERFACE_NODMA		(0x3)
+#define SDMMC_GET_TRANS_MODE(x)		(((x)>>16) & 0x3)
 /* Internal DMAC interrupt defines */
 #define SDMMC_IDMAC_INT_AI		BIT(9)
 #define SDMMC_IDMAC_INT_NI		BIT(8)
