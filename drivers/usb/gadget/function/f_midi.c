@@ -313,8 +313,7 @@ static int f_midi_start_ep(struct f_midi *midi,
 	int err;
 	struct usb_composite_dev *cdev = f->config->cdev;
 
-	if (ep->driver_data)
-		usb_ep_disable(ep);
+	usb_ep_disable(ep);
 
 	err = config_ep_by_speed(midi->gadget, f, ep);
 	if (err) {
@@ -352,8 +351,7 @@ static int f_midi_set_alt(struct usb_function *f, unsigned intf, unsigned alt)
 	if (err)
 		return err;
 
-	if (midi->out_ep->driver_data)
-		usb_ep_disable(midi->out_ep);
+	usb_ep_disable(midi->out_ep);
 
 	err = config_ep_by_speed(midi->gadget, f, midi->out_ep);
 	if (err) {
@@ -778,12 +776,10 @@ static int f_midi_bind(struct usb_configuration *c, struct usb_function *f)
 	midi->in_ep = usb_ep_autoconfig(cdev->gadget, &bulk_in_desc);
 	if (!midi->in_ep)
 		goto fail;
-	midi->in_ep->driver_data = cdev;	/* claim */
 
 	midi->out_ep = usb_ep_autoconfig(cdev->gadget, &bulk_out_desc);
 	if (!midi->out_ep)
 		goto fail;
-	midi->out_ep->driver_data = cdev;	/* claim */
 
 	/* allocate temporary function list */
 	midi_function = kcalloc((MAX_PORTS * 4) + 9, sizeof(*midi_function),
@@ -952,12 +948,6 @@ fail_f_midi:
 fail:
 	f_midi_unregister_card(midi);
 fail_register:
-	/* we might as well release our claims on endpoints */
-	if (midi->out_ep)
-		midi->out_ep->driver_data = NULL;
-	if (midi->in_ep)
-		midi->in_ep->driver_data = NULL;
-
 	ERROR(cdev, "%s: can't bind, err %d\n", f->name, status);
 
 	return status;
