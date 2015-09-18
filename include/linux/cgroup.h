@@ -500,6 +500,19 @@ static inline void pr_cont_cgroup_path(struct cgroup *cgrp)
 int subsys_cgroup_allow_attach(struct cgroup_subsys_state *css,
 			       struct cgroup_taskset *tset);
 
+/**
+ * cgroup_file_notify - generate a file modified event for a cgroup_file
+ * @cfile: target cgroup_file
+ *
+ * @cfile must have been obtained by setting cftype->file_offset.
+ */
+static inline void cgroup_file_notify(struct cgroup_file *cfile)
+{
+	/* might not have been created due to one of the CFTYPE selector flags */
+	if (cfile->kn)
+		kernfs_notify(cfile->kn);
+}
+
 #else /* !CONFIG_CGROUPS */
 
 struct cgroup_subsys_state;
