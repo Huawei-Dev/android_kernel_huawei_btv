@@ -67,7 +67,7 @@ static unsigned int ipv6_defrag(const struct nf_hook_ops *ops,
 		if (!strncmp(skb->dev->name, "rmnet_ims1", (size_t)IFNAMSIZ))
 			return NF_ACCEPT;
 
-	reasm = nf_ct_frag6_gather(skb, nf_ct6_defrag_user(ops->hooknum, skb));
+	reasm = nf_ct_frag6_gather(skb, nf_ct6_defrag_user(state->hook, skb));
 	/* queued */
 	if (reasm == NULL)
 		return NF_STOLEN;
@@ -78,7 +78,7 @@ static unsigned int ipv6_defrag(const struct nf_hook_ops *ops,
 
 	nf_ct_frag6_consume_orig(reasm);
 
-	NF_HOOK_THRESH(NFPROTO_IPV6, ops->hooknum, state->net, state->sk, reasm,
+	NF_HOOK_THRESH(NFPROTO_IPV6, state->hook, state->net, state->sk, reasm,
 		       state->in, state->out,
 		       state->okfn, NF_IP6_PRI_CONNTRACK_DEFRAG + 1);
 
