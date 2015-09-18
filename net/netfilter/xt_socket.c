@@ -143,7 +143,8 @@ static bool xt_socket_sk_is_transparent(struct sock *sk)
 	}
 }
 
-struct sock *xt_socket_lookup_slow_v4(const struct sk_buff *skb,
+struct sock *xt_socket_lookup_slow_v4(struct net *net,
+					     const struct sk_buff *skb,
 					     const struct net_device *indev)
 {
 	const struct iphdr *iph = ip_hdr(skb);
@@ -217,7 +218,7 @@ socket_match(const struct sk_buff *skb, struct xt_action_param *par,
 	struct sock *sk = skb->sk;
 
 	if (!sk)
-		sk = xt_socket_lookup_slow_v4(skb, par->in);
+		sk = xt_socket_lookup_slow_v4(par->net, skb, par->in);
 	if (sk) {
 		bool wildcard;
 		bool transparent = true;
@@ -342,7 +343,8 @@ xt_socket_get_sock_v6(struct net *net, const u8 protocol,
 	return NULL;
 }
 
-struct sock *xt_socket_lookup_slow_v6(const struct sk_buff *skb,
+struct sock *xt_socket_lookup_slow_v6(struct net *net,
+					     const struct sk_buff *skb,
 					     const struct net_device *indev)
 {
 	struct sock *sk = skb->sk;
@@ -398,7 +400,7 @@ socket_mt6_v1_v2_v3(const struct sk_buff *skb, struct xt_action_param *par)
 	struct sock *sk = skb->sk;
 
 	if (!sk)
-		sk = xt_socket_lookup_slow_v6(skb, par->in);
+		sk = xt_socket_lookup_slow_v6(par->net, skb, par->in);
 	if (sk) {
 		bool wildcard;
 		bool transparent = true;
