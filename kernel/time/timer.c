@@ -421,13 +421,20 @@ void __timer_stats_timer_set_start_info(struct timer_list *timer, void *addr)
 static void timer_stats_account_timer(struct timer_list *timer)
 {
 	unsigned int flag = 0;
+	void *site;
 
-	if (likely(!timer->start_site))
+	/*
+	 * start_site can be concurrently reset by
+	 * timer_stats_timer_clear_start_info()
+	 */
+	site = READ_ONCE(timer->start_site);
+	if (likely(!site))
 		return;
+
 	if (unlikely(tbase_get_deferrable(timer->base)))
 		flag |= TIMER_STATS_FLAG_DEFERRABLE;
 
-	timer_stats_update_stats(timer, timer->start_pid, timer->start_site,
+	timer_stats_update_stats(timer, timer->start_pid, site,
 				 timer->function, timer->start_comm, flag);
 }
 
