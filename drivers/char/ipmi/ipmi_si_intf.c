@@ -2691,8 +2691,19 @@ static struct pci_driver ipmi_pci_driver = {
 };
 #endif /* CONFIG_PCI */
 
-static const struct of_device_id ipmi_match[];
-static int ipmi_probe(struct platform_device *dev)
+#ifdef CONFIG_OF
+static const struct of_device_id of_ipmi_match[] = {
+	{ .type = "ipmi", .compatible = "ipmi-kcs",
+	  .data = (void *)(unsigned long) SI_KCS },
+	{ .type = "ipmi", .compatible = "ipmi-smic",
+	  .data = (void *)(unsigned long) SI_SMIC },
+	{ .type = "ipmi", .compatible = "ipmi-bt",
+	  .data = (void *)(unsigned long) SI_BT },
+	{},
+};
+MODULE_DEVICE_TABLE(of, of_ipmi_match);
+
+static int of_ipmi_probe(struct platform_device *dev)
 {
 #ifdef CONFIG_OF
 	const struct of_device_id *match;
@@ -2776,6 +2787,14 @@ static int ipmi_probe(struct platform_device *dev)
 		kfree(info);
 		return ret;
 	}
+	return 0;
+}
+#else
+#define of_ipmi_match NULL
+static int of_ipmi_probe(struct platform_device *dev)
+{
+	return -ENODEV;
+}
 #endif
 	return 0;
 }
