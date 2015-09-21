@@ -61,15 +61,6 @@ static int pwm_regulator_set_voltage_sel(struct regulator_dev *dev,
 
 	drvdata->state = selector;
 
-	if (!drvdata->enabled) {
-		ret = pwm_enable(drvdata->pwm);
-		if (ret) {
-			dev_err(&dev->dev, "Failed to enable PWM\n");
-			return ret;
-		}
-		drvdata->enabled = true;
-	}
-
 	return 0;
 }
 
@@ -84,14 +75,98 @@ static int pwm_regulator_list_voltage(struct regulator_dev *dev,
 	return drvdata->duty_cycle_table[selector].uV;
 }
 
-static struct regulator_ops pwm_regulator_voltage_ops = {
+static int pwm_regulator_enable(struct regulator_dev *dev)
+{
+	struct pwm_regulator_data *drvdata = rdev_get_drvdata(dev);
+
+	return pwm_enable(drvdata->pwm);
+}
+
+static int pwm_regulator_disable(struct regulator_dev *dev)
+{
+	struct pwm_regulator_data *drvdata = rdev_get_drvdata(dev);
+
+	pwm_disable(drvdata->pwm);
+
+	return 0;
+}
+
+static int pwm_regulator_is_enabled(struct regulator_dev *dev)
+{
+	struct pwm_regulator_data *drvdata = rdev_get_drvdata(dev);
+
+	return pwm_is_enabled(drvdata->pwm);
+}
+
+/**
+ * Continuous voltage call-backs
+ */
+static int pwm_voltage_to_duty_cycle_percentage(struct regulator_dev *rdev, int req_uV)
+{
+	int min_uV = rdev->constraints->min_uV;
+	int max_uV = rdev->constraints->max_uV;
+	int diff = max_uV - min_uV;
+
+	return 100 - (((req_uV * 100) - (min_uV * 100)) / diff);
+}
+
+static int pwm_regulator_get_voltage(struct regulator_dev *rdev)
+{
+	struct pwm_regulator_data *drvdata = rdev_get_drvdata(rdev);
+
+	return drvdata->volt_uV;
+}
+
+static int pwm_regulator_set_voltage(struct regulator_dev *rdev,
+					int min_uV, int max_uV,
+					unsigned *selector)
+{
+	struct pwm_regulator_data *drvdata = rdev_get_drvdata(rdev);
+	unsigned int ramp_delay = rdev->constraints->ramp_delay;
+	unsigned int period = pwm_get_period(drvdata->pwm);
+	int duty_cycle;
+	int ret;
+
+	duty_cycle = pwm_voltage_to_duty_cycle_percentage(rdev, min_uV);
+
+	ret = pwm_config(drvdata->pwm, (period / 100) * duty_cycle, period);
+	if (ret) {
+		dev_err(&rdev->dev, "Failed to configure PWM\n");
+		return ret;
+	}
+
+	ret = pwm_enable(drvdata->pwm);
+	if (ret) {
+		dev_err(&rdev->dev, "Failed to enable PWM\n");
+		return ret;
+	}
+	drvdata->volt_uV = min_uV;
+
+	/* Delay required by PWM regulator to settle to the new voltage */
+	usleep_range(ramp_delay, ramp_delay + 1000);
+
+	return 0;
+}
+
+static struct regulator_ops pwm_regulator_voltage_table_ops = {
 	.set_voltage_sel = pwm_regulator_set_voltage_sel,
 	.get_voltage_sel = pwm_regulator_get_voltage_sel,
 	.list_voltage    = pwm_regulator_list_voltage,
 	.map_voltage     = regulator_map_voltage_iterate,
+	.enable          = pwm_regulator_enable,
+	.disable         = pwm_regulator_disable,
+	.is_enabled      = pwm_regulator_is_enabled,
 };
 
-static const struct regulator_desc pwm_regulator_desc = {
+static struct regulator_ops pwm_regulator_voltage_continuous_ops = {
+	.get_voltage = pwm_regulator_get_voltage,
+	.set_voltage = pwm_regulator_set_voltage,
+	.enable          = pwm_regulator_enable,
+	.disable         = pwm_regulator_disable,
+	.is_enabled      = pwm_regulator_is_enabled,
+};
+
+static struct regulator_desc pwm_regulator_desc = {
 	.name		= "pwm-regulator",
 	.ops		= &pwm_regulator_voltage_ops,
 	.type		= REGULATOR_VOLTAGE,
