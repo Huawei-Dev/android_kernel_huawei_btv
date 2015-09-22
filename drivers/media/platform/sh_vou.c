@@ -27,7 +27,8 @@
 #include <media/v4l2-device.h>
 #include <media/v4l2-ioctl.h>
 #include <media/v4l2-mediabus.h>
-#include <media/videobuf-dma-contig.h>
+#include <media/videobuf2-v4l2.h>
+#include <media/videobuf2-dma-contig.h>
 
 /* Mirror addresses are not available for all registers */
 #define VOUER	0
@@ -58,7 +59,18 @@ enum sh_vou_status {
 };
 
 #define VOU_MAX_IMAGE_WIDTH	720
-#define VOU_MAX_IMAGE_HEIGHT	576
+#define VOU_MIN_IMAGE_HEIGHT	16
+
+struct sh_vou_buffer {
+	struct vb2_v4l2_buffer vb;
+	struct list_head list;
+};
+
+static inline struct
+sh_vou_buffer *to_sh_vou_buffer(struct vb2_v4l2_buffer *vb2)
+{
+	return container_of(vb2, struct sh_vou_buffer, vb);
+}
 
 struct sh_vou_device {
 	struct v4l2_device v4l2_dev;
@@ -178,11 +190,11 @@ static struct sh_vou_fmt vou_fmt[] = {
 };
 
 static void sh_vou_schedule_next(struct sh_vou_device *vou_dev,
-				 struct videobuf_buffer *vb)
+				 struct vb2_v4l2_buffer *vbuf)
 {
 	dma_addr_t addr1, addr2;
 
-	addr1 = videobuf_to_dma_contig(vb);
+	addr1 = vb2_dma_contig_plane_dma_addr(&vbuf->vb2_buf, 0);
 	switch (vou_dev->pix.pixelformat) {
 	case V4L2_PIX_FMT_NV12:
 	case V4L2_PIX_FMT_NV16:
@@ -314,40 +326,29 @@ static int sh_vou_buf_prepare(struct videobuf_queue *vq,
 static void sh_vou_buf_queue(struct videobuf_queue *vq,
 			     struct videobuf_buffer *vb)
 {
-	struct video_device *vdev = vq->priv_data;
-	struct sh_vou_device *vou_dev = video_get_drvdata(vdev);
+	struct vb2_v4l2_buffer *vbuf = to_vb2_v4l2_buffer(vb);
+	struct sh_vou_device *vou_dev = vb2_get_drv_priv(vb->vb2_queue);
+	struct sh_vou_buffer *shbuf = to_sh_vou_buffer(vbuf);
+	unsigned long flags;
+
+	spin_lock_irqsave(&vou_dev->lock, flags);
+	list_add_tail(&shbuf->list, &vou_dev->buf_list);
+	spin_unlock_irqrestore(&vou_dev->lock, flags);
+}
 
 	dev_dbg(vou_dev->v4l2_dev.dev, "%s()\n", __func__);
 
-	vb->state = VIDEOBUF_QUEUED;
-	list_add_tail(&vb->queue, &vou_dev->queue);
-
-	if (vou_dev->status == SH_VOU_RUNNING) {
-		return;
-	} else if (!vou_dev->active) {
-		vou_dev->active = vb;
-		/* Start from side A: we use mirror addresses, so, set B */
-		sh_vou_reg_a_write(vou_dev, VOURPR, 1);
-		dev_dbg(vou_dev->v4l2_dev.dev, "%s: first buffer status 0x%x\n",
-			__func__, sh_vou_reg_a_read(vou_dev, VOUSTR));
-		sh_vou_schedule_next(vou_dev, vb);
-		/* Only activate VOU after the second buffer */
-	} else if (vou_dev->active->queue.next == &vb->queue) {
-		/* Second buffer - initialise register side B */
-		sh_vou_reg_a_write(vou_dev, VOURPR, 0);
-		sh_vou_stream_start(vou_dev, vb);
-
-		/* Register side switching with frame VSYNC */
-		sh_vou_reg_a_write(vou_dev, VOURCR, 5);
-		dev_dbg(vou_dev->v4l2_dev.dev, "%s: second buffer status 0x%x\n",
-			__func__, sh_vou_reg_a_read(vou_dev, VOUSTR));
-
-		/* Enable End-of-Frame (VSYNC) interrupts */
-		sh_vou_reg_a_write(vou_dev, VOUIR, 0x10004);
-		/* Two buffers on the queue - activate the hardware */
-
-		vou_dev->status = SH_VOU_RUNNING;
-		sh_vou_reg_a_write(vou_dev, VOUER, 0x107);
+	vou_dev->sequence = 0;
+	ret = v4l2_device_call_until_err(&vou_dev->v4l2_dev, 0,
+					 video, s_stream, 1);
+	if (ret < 0 && ret != -ENOIOCTLCMD) {
+		list_for_each_entry_safe(buf, node, &vou_dev->buf_list, list) {
+			vb2_buffer_done(&buf->vb.vb2_buf,
+					VB2_BUF_STATE_QUEUED);
+			list_del(&buf->list);
+		}
+		vou_dev->active = NULL;
+		return ret;
 	}
 }
 
@@ -361,18 +362,9 @@ static void sh_vou_buf_release(struct videobuf_queue *vq,
 	dev_dbg(vou_dev->v4l2_dev.dev, "%s()\n", __func__);
 
 	spin_lock_irqsave(&vou_dev->lock, flags);
-
-	if (vou_dev->active == vb) {
-		/* disable output */
-		sh_vou_reg_a_set(vou_dev, VOUER, 0, 1);
-		/* ...but the current frame will complete */
-		sh_vou_reg_a_set(vou_dev, VOUIR, 0, 0x30000);
-		vou_dev->active = NULL;
-	}
-
-	if ((vb->state == VIDEOBUF_ACTIVE || vb->state == VIDEOBUF_QUEUED)) {
-		vb->state = VIDEOBUF_ERROR;
-		list_del(&vb->queue);
+	list_for_each_entry_safe(buf, node, &vou_dev->buf_list, list) {
+		vb2_buffer_done(&buf->vb.vb2_buf, VB2_BUF_STATE_ERROR);
+		list_del(&buf->list);
 	}
 
 	spin_unlock_irqrestore(&vou_dev->lock, flags);
@@ -1113,10 +1105,21 @@ static irqreturn_t sh_vou_isr(int irq, void *dev_id)
 	vou_dev->active = list_entry(vou_dev->queue.next,
 				     struct videobuf_buffer, queue);
 
-	if (vou_dev->active->queue.next != &vou_dev->queue) {
-		struct videobuf_buffer *new = list_entry(vou_dev->active->queue.next,
-						struct videobuf_buffer, queue);
-		sh_vou_schedule_next(vou_dev, new);
+	v4l2_get_timestamp(&vb->vb.timestamp);
+	vb->vb.sequence = vou_dev->sequence++;
+	vb->vb.field = V4L2_FIELD_INTERLACED;
+	vb2_buffer_done(&vb->vb.vb2_buf, VB2_BUF_STATE_DONE);
+
+	vou_dev->active = list_entry(vou_dev->buf_list.next,
+				     struct sh_vou_buffer, list);
+
+	if (list_is_singular(&vou_dev->buf_list)) {
+		/* Keep cycling while no next buffer is available */
+		sh_vou_schedule_next(vou_dev, &vou_dev->active->vb);
+	} else {
+		struct sh_vou_buffer *new = list_entry(vou_dev->active->list.next,
+						struct sh_vou_buffer, list);
+		sh_vou_schedule_next(vou_dev, &new->vb);
 	}
 
 	spin_unlock(&vou_dev->lock);
