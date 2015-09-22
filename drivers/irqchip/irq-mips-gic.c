@@ -287,8 +287,16 @@ static void gic_handle_shared_int(bool chained)
 	for (i = 0; i < BITS_TO_LONGS(gic_shared_intrs); i++) {
 		pending[i] = gic_read(pending_reg);
 		intrmask[i] = gic_read(intrmask_reg);
-		pending_reg += 0x4;
-		intrmask_reg += 0x4;
+		pending_reg += gic_reg_step;
+		intrmask_reg += gic_reg_step;
+
+		if (!config_enabled(CONFIG_64BIT) || mips_cm_is64)
+			continue;
+
+		pending[i] |= (u64)gic_read(pending_reg) << 32;
+		intrmask[i] |= (u64)gic_read(intrmask_reg) << 32;
+		pending_reg += gic_reg_step;
+		intrmask_reg += gic_reg_step;
 	}
 
 	bitmap_and(pending, pending, intrmask, gic_shared_intrs);
