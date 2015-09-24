@@ -201,6 +201,214 @@ out:
 	return 0;
 }
 
+static int dsa_bridge_check_vlan_range(struct dsa_switch *ds,
+				       const struct net_device *bridge,
+				       u16 vid_begin, u16 vid_end)
+{
+	struct dsa_slave_priv *p;
+	struct net_device *dev, *vlan_br;
+	DECLARE_BITMAP(members, DSA_MAX_PORTS);
+	DECLARE_BITMAP(untagged, DSA_MAX_PORTS);
+	u16 vid;
+	int member, err;
+
+	if (!ds->drv->vlan_getnext || !vid_begin)
+		return -EOPNOTSUPP;
+
+	vid = vid_begin - 1;
+
+	do {
+		err = ds->drv->vlan_getnext(ds, &vid, members, untagged);
+		if (err)
+			break;
+
+		if (vid > vid_end)
+			break;
+
+		member = find_first_bit(members, DSA_MAX_PORTS);
+		if (member == DSA_MAX_PORTS)
+			continue;
+
+		dev = ds->ports[member];
+		p = netdev_priv(dev);
+		vlan_br = p->bridge_dev;
+		if (vlan_br == bridge)
+			continue;
+
+		netdev_dbg(vlan_br, "hardware VLAN %d already in use\n", vid);
+		return -EOPNOTSUPP;
+	} while (vid < vid_end);
+
+	return err == -ENOENT ? 0 : err;
+}
+
+static int dsa_slave_port_vlan_add(struct net_device *dev,
+				   struct switchdev_obj *obj)
+{
+	struct switchdev_obj_vlan *vlan = &obj->u.vlan;
+	struct dsa_slave_priv *p = netdev_priv(dev);
+	struct dsa_switch *ds = p->parent;
+	u16 vid;
+	int err;
+
+	switch (obj->trans_ph) {
+	case SWITCHDEV_TRANS_PREPARE:
+		if (!ds->drv->port_vlan_add || !ds->drv->port_pvid_set)
+			return -EOPNOTSUPP;
+
+		/* If the requested port doesn't belong to the same bridge as
+		 * the VLAN members, fallback to software VLAN (hopefully).
+		 */
+		err = dsa_bridge_check_vlan_range(ds, p->bridge_dev,
+						  vlan->vid_begin,
+						  vlan->vid_end);
+		if (err)
+			return err;
+		break;
+	case SWITCHDEV_TRANS_COMMIT:
+		for (vid = vlan->vid_begin; vid <= vlan->vid_end; ++vid) {
+			err = ds->drv->port_vlan_add(ds, p->port, vid,
+						     vlan->flags &
+						     BRIDGE_VLAN_INFO_UNTAGGED);
+			if (!err && vlan->flags & BRIDGE_VLAN_INFO_PVID)
+				err = ds->drv->port_pvid_set(ds, p->port, vid);
+			if (err)
+				return err;
+		}
+		break;
+	default:
+		return -EOPNOTSUPP;
+	}
+
+	return 0;
+}
+
+static int dsa_slave_port_vlan_del(struct net_device *dev,
+				   struct switchdev_obj *obj)
+{
+	struct switchdev_obj_vlan *vlan = &obj->u.vlan;
+	struct dsa_slave_priv *p = netdev_priv(dev);
+	struct dsa_switch *ds = p->parent;
+	u16 vid;
+	int err;
+
+	if (!ds->drv->port_vlan_del)
+		return -EOPNOTSUPP;
+
+	for (vid = vlan->vid_begin; vid <= vlan->vid_end; ++vid) {
+		err = ds->drv->port_vlan_del(ds, p->port, vid);
+		if (err)
+			return err;
+	}
+
+	return 0;
+}
+
+static int dsa_slave_port_vlan_dump(struct net_device *dev,
+				    struct switchdev_obj *obj)
+{
+	struct switchdev_obj_vlan *vlan = &obj->u.vlan;
+	struct dsa_slave_priv *p = netdev_priv(dev);
+	struct dsa_switch *ds = p->parent;
+	DECLARE_BITMAP(members, DSA_MAX_PORTS);
+	DECLARE_BITMAP(untagged, DSA_MAX_PORTS);
+	u16 pvid, vid = 0;
+	int err;
+
+	if (!ds->drv->vlan_getnext || !ds->drv->port_pvid_get)
+		return -EOPNOTSUPP;
+
+	err = ds->drv->port_pvid_get(ds, p->port, &pvid);
+	if (err)
+		return err;
+
+	for (;;) {
+		err = ds->drv->vlan_getnext(ds, &vid, members, untagged);
+		if (err)
+			break;
+
+		if (!test_bit(p->port, members))
+			continue;
+
+		memset(vlan, 0, sizeof(*vlan));
+		vlan->vid_begin = vlan->vid_end = vid;
+
+		if (vid == pvid)
+			vlan->flags |= BRIDGE_VLAN_INFO_PVID;
+
+		if (test_bit(p->port, untagged))
+			vlan->flags |= BRIDGE_VLAN_INFO_UNTAGGED;
+
+		err = obj->cb(dev, obj);
+		if (err)
+			break;
+	}
+
+	return err == -ENOENT ? 0 : err;
+}
+
+static int dsa_slave_port_fdb_add(struct net_device *dev,
+				  struct switchdev_obj *obj)
+{
+	struct switchdev_obj_fdb *fdb = &obj->u.fdb;
+	struct dsa_slave_priv *p = netdev_priv(dev);
+	struct dsa_switch *ds = p->parent;
+	int ret = -EOPNOTSUPP;
+
+	if (obj->trans_ph == SWITCHDEV_TRANS_PREPARE)
+		ret = ds->drv->port_fdb_add ? 0 : -EOPNOTSUPP;
+	else if (obj->trans_ph == SWITCHDEV_TRANS_COMMIT)
+		ret = ds->drv->port_fdb_add(ds, p->port, fdb->addr, fdb->vid);
+
+	return ret;
+}
+
+static int dsa_slave_port_fdb_del(struct net_device *dev,
+				  struct switchdev_obj *obj)
+{
+	struct switchdev_obj_fdb *fdb = &obj->u.fdb;
+	struct dsa_slave_priv *p = netdev_priv(dev);
+	struct dsa_switch *ds = p->parent;
+	int ret = -EOPNOTSUPP;
+
+	if (ds->drv->port_fdb_del)
+		ret = ds->drv->port_fdb_del(ds, p->port, fdb->addr, fdb->vid);
+
+	return ret;
+}
+
+static int dsa_slave_port_fdb_dump(struct net_device *dev,
+				   struct switchdev_obj *obj)
+{
+	struct dsa_slave_priv *p = netdev_priv(dev);
+	struct dsa_switch *ds = p->parent;
+	unsigned char addr[ETH_ALEN] = { 0 };
+	u16 vid = 0;
+	int ret;
+
+	if (!ds->drv->port_fdb_getnext)
+		return -EOPNOTSUPP;
+
+	for (;;) {
+		bool is_static;
+
+		ret = ds->drv->port_fdb_getnext(ds, p->port, addr, &vid,
+						&is_static);
+		if (ret < 0)
+			break;
+
+		obj->u.fdb.addr = addr;
+		obj->u.fdb.vid = vid;
+		obj->u.fdb.ndm_state = is_static ? NUD_NOARP : NUD_REACHABLE;
+
+		ret = obj->cb(dev, obj);
+		if (ret < 0)
+			break;
+	}
+
+	return ret == -ENOENT ? 0 : ret;
+}
+
 static int dsa_slave_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
 {
 	struct dsa_slave_priv *p = netdev_priv(dev);
@@ -255,7 +463,7 @@ static int dsa_slave_port_attr_set(struct net_device *dev,
 
 	switch (attr->id) {
 	case SWITCHDEV_ATTR_PORT_STP_STATE:
-		if (attr->trans == SWITCHDEV_TRANS_COMMIT)
+		if (attr->trans_ph == SWITCHDEV_TRANS_COMMIT)
 			ret = dsa_slave_stp_update(dev, attr->u.stp_state);
 		break;
 	default:
