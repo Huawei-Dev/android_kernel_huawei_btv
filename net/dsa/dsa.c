@@ -601,8 +601,10 @@ static int dsa_of_probe(struct device *dev)
 		return -EPROBE_DEFER;
 
 	pd = kzalloc(sizeof(*pd), GFP_KERNEL);
-	if (!pd)
-		return -ENOMEM;
+	if (!pd) {
+		ret = -ENOMEM;
+		goto out_put_ethernet;
+	}
 
 	dev->platform_data = pd;
 	pd->of_netdev = ethernet_dev;
@@ -688,6 +690,10 @@ out_free_chip:
 out_free:
 	kfree(pd);
 	dev->platform_data = NULL;
+out_put_ethernet:
+	put_device(&ethernet_dev->dev);
+out_put_mdio:
+	put_device(&mdio_bus->dev);
 	return ret;
 }
 
@@ -699,6 +705,7 @@ static void dsa_of_remove(struct device *dev)
 		return;
 
 	dsa_of_free_platform_data(pd);
+	put_device(&pd->of_netdev->dev);
 	kfree(pd);
 }
 #else
