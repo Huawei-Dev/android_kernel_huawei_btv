@@ -392,7 +392,7 @@ void sctp_generate_heartbeat_event(unsigned long data)
 			   transport, GFP_ATOMIC);
 
 	if (error)
-		sk->sk_err = -error;
+		asoc->base.sk->sk_err = -error;
 
 out_unlock:
 	bh_unlock_sock(sk);
