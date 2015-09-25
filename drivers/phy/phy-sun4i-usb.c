@@ -260,6 +260,45 @@ static int sun4i_usb_phy_probe(struct platform_device *pdev)
 	if (IS_ERR(data->base))
 		return PTR_ERR(data->base);
 
+	data->id_det_gpio = devm_gpiod_get_optional(dev, "usb0_id_det",
+						    GPIOD_IN);
+	if (IS_ERR(data->id_det_gpio))
+		return PTR_ERR(data->id_det_gpio);
+
+	data->vbus_det_gpio = devm_gpiod_get_optional(dev, "usb0_vbus_det",
+						      GPIOD_IN);
+	if (IS_ERR(data->vbus_det_gpio))
+		return PTR_ERR(data->vbus_det_gpio);
+
+	if (of_find_property(np, "usb0_vbus_power-supply", NULL)) {
+		data->vbus_power_supply = devm_power_supply_get_by_phandle(dev,
+						     "usb0_vbus_power-supply");
+		if (IS_ERR(data->vbus_power_supply))
+			return PTR_ERR(data->vbus_power_supply);
+
+		if (!data->vbus_power_supply)
+			return -EPROBE_DEFER;
+	}
+
+	/* vbus_det without id_det makes no sense, and is not supported */
+	if (sun4i_usb_phy0_have_vbus_det(data) && !data->id_det_gpio) {
+		dev_err(dev, "usb0_id_det missing or invalid\n");
+		return -ENODEV;
+	}
+
+	if (data->id_det_gpio) {
+		data->extcon = devm_extcon_dev_allocate(dev,
+							sun4i_usb_phy0_cable);
+		if (IS_ERR(data->extcon))
+			return PTR_ERR(data->extcon);
+
+		ret = devm_extcon_dev_register(dev, data->extcon);
+		if (ret) {
+			dev_err(dev, "failed to register extcon: %d\n", ret);
+			return ret;
+		}
+	}
+
 	for (i = 0; i < data->num_phys; i++) {
 		struct sun4i_usb_phy *phy = data->phys + i;
 		char name[16];
