@@ -1981,7 +1981,7 @@ static void blk_mq_map_swqueue(struct request_queue *q,
 	}
 
 	queue_for_each_ctx(q, ctx, i) {
-		if (!cpu_online(i))
+		if (!cpumask_test_cpu(i, online_mask))
 			continue;
 
 		hctx = q->mq_ops->map_queue(q, i);
@@ -2172,8 +2172,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
 	list_add_tail(&q->all_q_node, &all_q_list);
 	blk_mq_add_queue_tag_set(set, q);
 	blk_mq_map_swqueue(q, cpu_online_mask);
-	
-	mutex_unlock(&all_q_mutex);	
+
+	mutex_unlock(&all_q_mutex);
 	put_online_cpus();
 
 	return q;
