@@ -542,6 +542,7 @@ struct request_queue {
 	sector_t		disk_bw;
 	unsigned long		disk_iops;
 
+	bool			mq_sysfs_init_done;
 };
 
 #ifdef CONFIG_HISI_BLK_INLINE_CRYPTO
