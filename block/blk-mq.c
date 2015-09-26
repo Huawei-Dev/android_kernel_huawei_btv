@@ -2054,6 +2054,9 @@ void blk_mq_release(struct request_queue *q)
 		kfree(hctx);
 	}
 
+	kfree(q->mq_map);
+	q->mq_map = NULL;
+
 	kfree(q->queue_hw_ctx);
 
 	/* ctx kobj stays in queue_ctx */
@@ -2204,11 +2207,6 @@ void blk_mq_free_queue(struct request_queue *q)
 	blk_mq_free_hw_queues(q, set);
 
 	percpu_ref_exit(&q->mq_usage_counter);
-
-	kfree(q->mq_map);
-
-	q->mq_map = NULL;
-
 	mutex_lock(&all_q_mutex);
 	list_del_init(&q->all_q_node);
 	mutex_unlock(&all_q_mutex);
