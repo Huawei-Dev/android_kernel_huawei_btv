@@ -620,16 +620,15 @@ static void req_completion(struct nvme_queue *nvmeq, void *ctx,
 			spin_unlock_irqrestore(req->q->queue_lock, flags);
 			goto release_iod;
 		}
+
 		if (req->cmd_type == REQ_TYPE_DRV_PRIV) {
 			if (cmd_rq->ctx == CMD_CTX_CANCELLED)
-				req->errors = -EINTR;
-			else
-				req->errors = status;
+				status = -EINTR;
 		} else {
-			req->errors = nvme_error_status(status);
+			status = nvme_error_status(status);
 		}
-	} else
-		req->errors = 0;
+	}
+
 	if (req->cmd_type == REQ_TYPE_DRV_PRIV) {
 		u32 result = le32_to_cpup(&cqe->result);
 		req->special = (void *)(uintptr_t)result;
@@ -652,8 +651,7 @@ static void req_completion(struct nvme_queue *nvmeq, void *ctx,
 	}
 	nvme_free_iod(nvmeq->dev, iod);
 
-	if (likely(!requeue))
-		blk_mq_complete_request(req);
+	blk_mq_complete_request(req, status);
 }
 
 /* length is in bytes.  gfp flags indicates whether we may sleep. */
@@ -866,8 +864,7 @@ static int nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
 	if (ns && ns->ms && !blk_integrity_rq(req)) {
 		if (!(ns->pi_type && ns->ms == 8) &&
 					req->cmd_type != REQ_TYPE_DRV_PRIV) {
-			req->errors = -EFAULT;
-			blk_mq_complete_request(req);
+			blk_mq_complete_request(req, -EFAULT);
 			return BLK_MQ_RQ_QUEUE_OK;
 		}
 	}
