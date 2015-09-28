@@ -755,6 +755,12 @@ u32 __init r8a7779_read_mode_pins(void)
 	return mode;
 }
 
+static void __init r8a7779_init_time(void)
+{
+	r8a7779_clocks_init(r8a7779_read_mode_pins());
+	clocksource_probe();
+}
+
 static const char *const r8a7779_compat_dt[] __initconst = {
 	"renesas,r8a7779",
 	NULL,
