@@ -843,6 +843,26 @@ static void lenovo_remove(struct hid_device *hdev)
 	hid_hw_stop(hdev);
 }
 
+static int lenovo_input_configured(struct hid_device *hdev,
+		struct hid_input *hi)
+{
+	switch (hdev->product) {
+		case USB_DEVICE_ID_LENOVO_TPKBD:
+		case USB_DEVICE_ID_LENOVO_CUSBKBD:
+		case USB_DEVICE_ID_LENOVO_CBTKBD:
+			if (test_bit(EV_REL, hi->input->evbit)) {
+				/* set only for trackpoint device */
+				__set_bit(INPUT_PROP_POINTER, hi->input->propbit);
+				__set_bit(INPUT_PROP_POINTING_STICK,
+						hi->input->propbit);
+			}
+			break;
+	}
+
+	return 0;
+}
+
+
 static const struct hid_device_id lenovo_devices[] = {
 	{ HID_USB_DEVICE(USB_VENDOR_ID_LENOVO, USB_DEVICE_ID_LENOVO_TPKBD) },
 	{ HID_USB_DEVICE(USB_VENDOR_ID_LENOVO, USB_DEVICE_ID_LENOVO_CUSBKBD) },
