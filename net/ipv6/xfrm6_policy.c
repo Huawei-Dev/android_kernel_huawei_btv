@@ -289,7 +289,7 @@ static struct dst_ops xfrm6_dst_ops_template = {
 	.destroy =		xfrm6_dst_destroy,
 	.ifdown =		xfrm6_dst_ifdown,
 	.local_out =		__ip6_local_out,
-	.gc_thresh =		32768,
+	.gc_thresh =		INT_MAX,
 };
 
 static struct xfrm_policy_afinfo xfrm6_policy_afinfo = {
