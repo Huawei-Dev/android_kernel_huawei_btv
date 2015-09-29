@@ -485,8 +485,7 @@ struct switchdev_vlan_dump {
 	u16 end;
 };
 
-static int switchdev_port_vlan_dump_put(struct net_device *dev,
-					struct switchdev_vlan_dump *dump)
+static int switchdev_port_vlan_dump_put(struct switchdev_vlan_dump *dump)
 {
 	struct bridge_vlan_info vinfo;
 
@@ -532,7 +531,7 @@ static int switchdev_port_vlan_dump_cb(struct net_device *dev,
 		for (dump->begin = dump->end = vlan->vid_begin;
 		     dump->begin <= vlan->vid_end;
 		     dump->begin++, dump->end++) {
-			err = switchdev_port_vlan_dump_put(dev, dump);
+			err = switchdev_port_vlan_dump_put(dump);
 			if (err)
 				return err;
 		}
@@ -544,7 +543,7 @@ static int switchdev_port_vlan_dump_cb(struct net_device *dev,
 				/* prepend */
 				dump->begin = vlan->vid_begin;
 			} else {
-				err = switchdev_port_vlan_dump_put(dev, dump);
+				err = switchdev_port_vlan_dump_put(dump);
 				dump->flags = vlan->flags;
 				dump->begin = vlan->vid_begin;
 				dump->end = vlan->vid_end;
@@ -556,7 +555,7 @@ static int switchdev_port_vlan_dump_cb(struct net_device *dev,
 				/* append */
 				dump->end = vlan->vid_end;
 			} else {
-				err = switchdev_port_vlan_dump_put(dev, dump);
+				err = switchdev_port_vlan_dump_put(dump);
 				dump->flags = vlan->flags;
 				dump->begin = vlan->vid_begin;
 				dump->end = vlan->vid_end;
@@ -589,7 +588,7 @@ static int switchdev_port_vlan_fill(struct sk_buff *skb, struct net_device *dev,
 			goto err_out;
 		if (filter_mask & RTEXT_FILTER_BRVLAN_COMPRESSED)
 			/* last one */
-			err = switchdev_port_vlan_dump_put(dev, &dump);
+			err = switchdev_port_vlan_dump_put(&dump);
 	}
 
 err_out:
