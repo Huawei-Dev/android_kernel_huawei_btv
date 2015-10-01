@@ -319,7 +319,7 @@ static int acpi_thermal_trips_update(struct acpi_thermal *tz, int flag)
 			if (crt == -1) {
 				tz->trips.critical.flags.valid = 0;
 			} else if (crt > 0) {
-				unsigned long crt_k = CELSIUS_TO_KELVIN(crt);
+				unsigned long crt_k = CELSIUS_TO_DECI_KELVIN(crt);
 				/*
 				 * Allow override critical threshold
 				 */
@@ -355,7 +355,7 @@ static int acpi_thermal_trips_update(struct acpi_thermal *tz, int flag)
 		if (psv == -1) {
 			status = AE_SUPPORT;
 		} else if (psv > 0) {
-			tmp = CELSIUS_TO_KELVIN(psv);
+			tmp = CELSIUS_TO_DECI_KELVIN(psv);
 			status = AE_OK;
 		} else {
 			status = acpi_evaluate_integer(tz->device->handle,
@@ -435,7 +435,7 @@ static int acpi_thermal_trips_update(struct acpi_thermal *tz, int flag)
 					break;
 				if (i == 1)
 					tz->trips.active[0].temperature =
-						CELSIUS_TO_KELVIN(act);
+						CELSIUS_TO_DECI_KELVIN(act);
 				else
 					/*
 					 * Don't allow override higher than
@@ -443,9 +443,9 @@ static int acpi_thermal_trips_update(struct acpi_thermal *tz, int flag)
 					 */
 					tz->trips.active[i - 1].temperature =
 						(tz->trips.active[i - 2].temperature <
-						CELSIUS_TO_KELVIN(act) ?
+						CELSIUS_TO_DECI_KELVIN(act) ?
 						tz->trips.active[i - 2].temperature :
-						CELSIUS_TO_KELVIN(act));
+						CELSIUS_TO_DECI_KELVIN(act));
 				break;
 			} else {
 				tz->trips.active[i].temperature = tmp;
@@ -1109,7 +1109,7 @@ static int acpi_thermal_add(struct acpi_device *device)
 	INIT_WORK(&tz->thermal_check_work, acpi_thermal_check_fn);
 
 	pr_info(PREFIX "%s [%s] (%ld C)\n", acpi_device_name(device),
-		acpi_device_bid(device), KELVIN_TO_CELSIUS(tz->temperature));
+		acpi_device_bid(device), DECI_KELVIN_TO_CELSIUS(tz->temperature));
 	goto end;
 
 free_memory:
