@@ -56,6 +56,7 @@ static void uid_stat_atomic_int_show(struct seq_file *m, void *v)
 
 	bytes = (unsigned int) (atomic_read(counter) + INT_MIN);
 	seq_printf(m, "%u\n", bytes);
+	return seq_has_overflowed(m) ? -ENOSPC : 0;
 }
 
 static int uid_stat_read_atomic_int_open(struct inode *inode, struct file *file)
