@@ -627,8 +627,12 @@ clear_hash_noput:
 	return 1;
 }
 
-static bool tcp_v6_inbound_md5_hash(struct sock *sk, const struct sk_buff *skb)
+#endif
+
+static bool tcp_v6_inbound_md5_hash(const struct sock *sk,
+				    const struct sk_buff *skb)
 {
+#ifdef CONFIG_TCP_MD5SIG
 	const __u8 *hash_location = NULL;
 	struct tcp_md5sig_key *hash_expected;
 	const struct ipv6hdr *ip6h = ipv6_hdr(skb);
@@ -665,9 +669,9 @@ static bool tcp_v6_inbound_md5_hash(struct sock *sk, const struct sk_buff *skb)
 				     &ip6h->daddr, ntohs(th->dest));
 		return true;
 	}
+#endif
 	return false;
 }
-#endif
 
 static void tcp_v6_init_req(struct request_sock *req,
 			    const struct sock *sk_listener,
@@ -1417,10 +1421,8 @@ process:
 
 	tcp_v6_fill_cb(skb, hdr, th);
 
-#ifdef CONFIG_TCP_MD5SIG
 	if (tcp_v6_inbound_md5_hash(sk, skb))
 		goto discard_and_relse;
-#endif
 
 	if (tcp_filter(sk, skb))
 		goto discard_and_relse;
