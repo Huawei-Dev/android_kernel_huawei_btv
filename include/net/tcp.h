@@ -1660,7 +1660,6 @@ struct tcp_iter_state {
 	enum tcp_seq_states	state;
 	struct sock		*syn_wait_sk;
 	int			bucket, offset, sbucket, num;
-	kuid_t			uid;
 	loff_t			last_pos;
 };
 
