@@ -32,9 +32,10 @@
 
 
 static int
-xfs_xattr_get(struct dentry *dentry, const char *name,
-		void *value, size_t size, int xflags)
+xfs_xattr_get(const struct xattr_handler *handler, struct dentry *dentry,
+		const char *name, void *value, size_t size)
 {
+	int xflags = handler->flags;
 	struct xfs_inode *ip = XFS_I(d_inode(dentry));
 	int error, asize = size;
 
@@ -76,11 +77,11 @@ xfs_forget_acl(
 }
 
 static int
-xfs_xattr_set(struct dentry *dentry, const char *name, const void *value,
-		size_t size, int flags, int xflags)
+xfs_xattr_set(const struct xattr_handler *handler, struct dentry *dentry,
+		const char *name, const void *value, size_t size, int flags)
 {
-	struct xfs_inode	*ip = XFS_I(d_inode(dentry));
-	int			error;
+	int xflags = handler->flags;
+	struct xfs_inode *ip = XFS_I(d_inode(dentry));
 
 	if (strcmp(name, "") == 0)
 		return -EINVAL;
@@ -93,12 +94,8 @@ xfs_xattr_set(struct dentry *dentry, const char *name, const void *value,
 
 	if (!value)
 		return xfs_attr_remove(ip, (unsigned char *)name, xflags);
-	error = xfs_attr_set(ip, (unsigned char *)name,
+	return xfs_attr_set(ip, (unsigned char *)name,
 				(void *)value, size, xflags);
-	if (!error)
-		xfs_forget_acl(d_inode(dentry), name, xflags);
-
-	return error;
 }
 
 static const struct xattr_handler xfs_xattr_user_handler = {

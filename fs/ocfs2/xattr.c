@@ -7194,9 +7194,10 @@ leave:
 /*
  * 'security' attributes support
  */
-static size_t ocfs2_xattr_security_list(struct dentry *dentry, char *list,
+static size_t ocfs2_xattr_security_list(const struct xattr_handler *handler,
+					struct dentry *dentry, char *list,
 					size_t list_size, const char *name,
-					size_t name_len, int type)
+					size_t name_len)
 {
 	const size_t prefix_len = XATTR_SECURITY_PREFIX_LEN;
 	const size_t total_len = prefix_len + name_len + 1;
@@ -7209,8 +7210,9 @@ static size_t ocfs2_xattr_security_list(struct dentry *dentry, char *list,
 	return total_len;
 }
 
-static int ocfs2_xattr_security_get(struct dentry *dentry, const char *name,
-				    void *buffer, size_t size, int type)
+static int ocfs2_xattr_security_get(const struct xattr_handler *handler,
+				    struct dentry *dentry, const char *name,
+				    void *buffer, size_t size)
 {
 	if (strcmp(name, "") == 0)
 		return -EINVAL;
@@ -7218,8 +7220,9 @@ static int ocfs2_xattr_security_get(struct dentry *dentry, const char *name,
 			       name, buffer, size);
 }
 
-static int ocfs2_xattr_security_set(struct dentry *dentry, const char *name,
-		const void *value, size_t size, int flags, int type)
+static int ocfs2_xattr_security_set(const struct xattr_handler *handler,
+				    struct dentry *dentry, const char *name,
+				    const void *value, size_t size, int flags)
 {
 	if (strcmp(name, "") == 0)
 		return -EINVAL;
@@ -7284,9 +7287,10 @@ const struct xattr_handler ocfs2_xattr_security_handler = {
 /*
  * 'trusted' attributes support
  */
-static size_t ocfs2_xattr_trusted_list(struct dentry *dentry, char *list,
+static size_t ocfs2_xattr_trusted_list(const struct xattr_handler *handler,
+				       struct dentry *dentry, char *list,
 				       size_t list_size, const char *name,
-				       size_t name_len, int type)
+				       size_t name_len)
 {
 	const size_t prefix_len = XATTR_TRUSTED_PREFIX_LEN;
 	const size_t total_len = prefix_len + name_len + 1;
@@ -7302,8 +7306,9 @@ static size_t ocfs2_xattr_trusted_list(struct dentry *dentry, char *list,
 	return total_len;
 }
 
-static int ocfs2_xattr_trusted_get(struct dentry *dentry, const char *name,
-		void *buffer, size_t size, int type)
+static int ocfs2_xattr_trusted_get(const struct xattr_handler *handler,
+				   struct dentry *dentry, const char *name,
+				   void *buffer, size_t size)
 {
 	if (strcmp(name, "") == 0)
 		return -EINVAL;
@@ -7311,8 +7316,9 @@ static int ocfs2_xattr_trusted_get(struct dentry *dentry, const char *name,
 			       name, buffer, size);
 }
 
-static int ocfs2_xattr_trusted_set(struct dentry *dentry, const char *name,
-		const void *value, size_t size, int flags, int type)
+static int ocfs2_xattr_trusted_set(const struct xattr_handler *handler,
+				   struct dentry *dentry, const char *name,
+				   const void *value, size_t size, int flags)
 {
 	if (strcmp(name, "") == 0)
 		return -EINVAL;
@@ -7331,9 +7337,10 @@ const struct xattr_handler ocfs2_xattr_trusted_handler = {
 /*
  * 'user' attributes support
  */
-static size_t ocfs2_xattr_user_list(struct dentry *dentry, char *list,
+static size_t ocfs2_xattr_user_list(const struct xattr_handler *handler,
+				    struct dentry *dentry, char *list,
 				    size_t list_size, const char *name,
-				    size_t name_len, int type)
+				    size_t name_len)
 {
 	const size_t prefix_len = XATTR_USER_PREFIX_LEN;
 	const size_t total_len = prefix_len + name_len + 1;
@@ -7350,8 +7357,9 @@ static size_t ocfs2_xattr_user_list(struct dentry *dentry, char *list,
 	return total_len;
 }
 
-static int ocfs2_xattr_user_get(struct dentry *dentry, const char *name,
-		void *buffer, size_t size, int type)
+static int ocfs2_xattr_user_get(const struct xattr_handler *handler,
+				struct dentry *dentry, const char *name,
+				void *buffer, size_t size)
 {
 	struct ocfs2_super *osb = OCFS2_SB(dentry->d_sb);
 
@@ -7363,8 +7371,9 @@ static int ocfs2_xattr_user_get(struct dentry *dentry, const char *name,
 			       buffer, size);
 }
 
-static int ocfs2_xattr_user_set(struct dentry *dentry, const char *name,
-		const void *value, size_t size, int flags, int type)
+static int ocfs2_xattr_user_set(const struct xattr_handler *handler,
+				struct dentry *dentry, const char *name,
+				const void *value, size_t size, int flags)
 {
 	struct ocfs2_super *osb = OCFS2_SB(dentry->d_sb);
 
