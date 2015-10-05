@@ -1160,7 +1160,11 @@ static int rt286_i2c_probe(struct i2c_client *i2c,
 		return -ENODEV;
 	}
 
-	rt286->index_cache = rt286_index_def;
+	rt286->index_cache = devm_kmemdup(&i2c->dev, rt286_index_def,
+					  sizeof(rt286_index_def), GFP_KERNEL);
+	if (!rt286->index_cache)
+		return -ENOMEM;
+
 	rt286->index_cache_size = INDEX_CACHE_SIZE;
 	rt286->i2c = i2c;
 	i2c_set_clientdata(i2c, rt286);
