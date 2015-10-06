@@ -250,11 +250,14 @@ static void free_buffer(struct videobuf_queue *vq, struct videobuf_buffer *vb)
 }
 
 /* Locking: caller holds fop_lock mutex */
-static int sh_vou_buf_setup(struct videobuf_queue *vq, unsigned int *count,
-			    unsigned int *size)
+static int sh_vou_queue_setup(struct vb2_queue *vq, const void *parg,
+		       unsigned int *nbuffers, unsigned int *nplanes,
+		       unsigned int sizes[], void *alloc_ctxs[])
 {
-	struct video_device *vdev = vq->priv_data;
-	struct sh_vou_device *vou_dev = video_get_drvdata(vdev);
+	const struct v4l2_format *fmt = parg;
+	struct sh_vou_device *vou_dev = vb2_get_drv_priv(vq);
+	struct v4l2_pix_format *pix = &vou_dev->pix;
+	int bytes_per_line = vou_fmt[vou_dev->pix_idx].bpp * pix->width / 8;
 
 	*size = vou_fmt[vou_dev->pix_idx].bpp * vou_dev->pix.width *
 		vou_dev->pix.height / 8;
