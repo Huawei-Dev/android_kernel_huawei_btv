@@ -36,10 +36,15 @@
 
 const char *pm_labels[] = { "mem", "standby", "freeze", NULL };
 const char *pm_states[PM_SUSPEND_MAX];
+
+unsigned int pm_suspend_global_flags;
+EXPORT_SYMBOL_GPL(pm_suspend_global_flags);
+
 #ifdef CONFIG_HISI_SR_SYNC
 extern void hisi_sys_sync_queue(void);
 extern int hisi_sys_sync_wait(void);
 #endif
+
 static const struct platform_suspend_ops *suspend_ops;
 static const struct platform_freeze_ops *freeze_ops;
 static DECLARE_WAIT_QUEUE_HEAD(suspend_freeze_wait_head);
@@ -526,6 +531,7 @@ static int enter_state(suspend_state_t state)
 #endif
 
 	pr_debug("PM: Preparing system for sleep (%s)\n", pm_states[state]);
+	pm_suspend_clear_flags();
 	error = suspend_prepare(state);
 	if (error)
 		goto Unlock;
