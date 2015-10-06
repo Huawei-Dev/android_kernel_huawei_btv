@@ -65,7 +65,7 @@ struct unix_sock {
 	wait_queue_t		peer_wake;
 };
 
-static inline struct unix_sock *unix_sk(struct sock *sk)
+static inline struct unix_sock *unix_sk(const struct sock *sk)
 {
 	return (struct unix_sock *)sk;
 }
