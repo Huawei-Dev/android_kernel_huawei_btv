@@ -217,4 +217,6 @@ source "drivers/hwusb/Kconfig"
 
 source "drivers/cpuload/Kconfig"
 
+source "drivers/fpga/Kconfig"
+
 endmenu
