@@ -112,7 +112,7 @@ int __ip_local_out(struct sock *sk, struct sk_buff *skb)
 		       dst_output);
 }
 
-int ip_local_out_sk(struct sock *sk, struct sk_buff *skb)
+int ip_local_out(struct sock *sk, struct sk_buff *skb)
 {
 	struct net *net = dev_net(skb_dst(skb)->dev);
 	int err;
@@ -123,7 +123,7 @@ int ip_local_out_sk(struct sock *sk, struct sk_buff *skb)
 
 	return err;
 }
-EXPORT_SYMBOL_GPL(ip_local_out_sk);
+EXPORT_SYMBOL_GPL(ip_local_out);
 
 static inline int ip_select_ttl(struct inet_sock *inet, struct dst_entry *dst)
 {
@@ -173,7 +173,7 @@ int ip_build_and_send_pkt(struct sk_buff *skb, const struct sock *sk,
 	skb->mark = sk->sk_mark;
 
 	/* Send it out. */
-	return ip_local_out(skb);
+	return ip_local_out(skb->sk, skb);
 }
 EXPORT_SYMBOL_GPL(ip_build_and_send_pkt);
 
@@ -470,7 +470,7 @@ packet_routed:
 	skb->priority = sk->sk_priority;
 	skb->mark = sk->sk_mark;
 
-	res = ip_local_out_sk(sk, skb);
+	res = ip_local_out(sk, skb);
 	rcu_read_unlock();
 	return res;
 
@@ -1450,7 +1450,7 @@ int ip_send_skb(struct net *net, struct sk_buff *skb)
 {
 	int err;
 
-	err = ip_local_out(skb);
+	err = ip_local_out(skb->sk, skb);
 	if (err) {
 		if (err > 0)
 			err = net_xmit_errno(err);
