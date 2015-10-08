@@ -7,6 +7,7 @@
 
 #include "dm-exception-store.h"
 
+#include <linux/ctype.h>
 #include <linux/mm.h>
 #include <linux/pagemap.h>
 #include <linux/vmalloc.h>
@@ -846,8 +847,7 @@ static void persistent_drop_snapshot(struct dm_exception_store *store)
 		DMWARN("write header failed");
 }
 
-static int persistent_ctr(struct dm_exception_store *store,
-			  unsigned argc, char **argv)
+static int persistent_ctr(struct dm_exception_store *store, char *options)
 {
 	struct pstore *ps;
 
@@ -876,6 +876,16 @@ static int persistent_ctr(struct dm_exception_store *store,
 		return -ENOMEM;
 	}
 
+	if (options) {
+		char overflow = toupper(options[0]);
+		if (overflow == 'O')
+			store->userspace_supports_overflow = true;
+		else {
+			DMERR("Unsupported persistent store option: %s", options);
+			return -EINVAL;
+		}
+	}
+
 	store->context = ps;
 
 	return 0;
@@ -891,7 +901,8 @@ static unsigned persistent_status(struct dm_exception_store *store,
 	case STATUSTYPE_INFO:
 		break;
 	case STATUSTYPE_TABLE:
-		DMEMIT(" P %llu", (unsigned long long)store->chunk_size);
+		DMEMIT(" %s %llu", store->userspace_supports_overflow ? "PO" : "P",
+		       (unsigned long long)store->chunk_size);
 	}
 
 	return sz;
