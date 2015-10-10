@@ -216,6 +216,7 @@ static int __get_v4l2_format32(struct v4l2_format *kp, struct v4l2_format32 __us
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT:
 		return get_v4l2_sliced_vbi_format(&kp->fmt.sliced, &up->fmt.sliced);
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
+	case V4L2_BUF_TYPE_SDR_OUTPUT:
 		return get_v4l2_sdr_format(&kp->fmt.sdr, &up->fmt.sdr);
 	case V4L2_BUF_TYPE_PRIVATE:
 		if (copy_from_user(kp, up, sizeof(kp->fmt.raw_data)))
@@ -266,6 +267,7 @@ static int __put_v4l2_format32(struct v4l2_format *kp, struct v4l2_format32 __us
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT:
 		return put_v4l2_sliced_vbi_format(&kp->fmt.sliced, &up->fmt.sliced);
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
+	case V4L2_BUF_TYPE_SDR_OUTPUT:
 		return put_v4l2_sdr_format(&kp->fmt.sdr, &up->fmt.sdr);
 	default:
 		pr_info("compat_ioctl32: unexpected VIDIOC_FMT type %d\n",
