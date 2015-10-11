@@ -1091,7 +1091,7 @@ struct qlcnic_filter_hash {
 struct qlcnic_mailbox {
 	struct workqueue_struct	*work_q;
 	struct qlcnic_adapter	*adapter;
-	struct qlcnic_mbx_ops	*ops;
+	const struct qlcnic_mbx_ops *ops;
 	struct work_struct	work;
 	struct completion	completion;
 	struct list_head	cmd_q;
