@@ -1297,16 +1297,6 @@ static int rockchip_pinctrl_register(struct platform_device *pdev,
  * GPIO handling
  */
 
-static int rockchip_gpio_request(struct gpio_chip *chip, unsigned offset)
-{
-	return pinctrl_request_gpio(chip->base + offset);
-}
-
-static void rockchip_gpio_free(struct gpio_chip *chip, unsigned offset)
-{
-	pinctrl_free_gpio(chip->base + offset);
-}
-
 static void rockchip_gpio_set(struct gpio_chip *gc, unsigned offset, int value)
 {
 	struct rockchip_pin_bank *bank = gc_to_pin_bank(gc);
@@ -1380,8 +1370,8 @@ static int rockchip_gpio_to_irq(struct gpio_chip *gc, unsigned offset)
 }
 
 static const struct gpio_chip rockchip_gpiolib_chip = {
-	.request = rockchip_gpio_request,
-	.free = rockchip_gpio_free,
+	.request = gpiochip_generic_request,
+	.free = gpiochip_generic_free,
 	.set = rockchip_gpio_set,
 	.get = rockchip_gpio_get,
 	.direction_input = rockchip_gpio_direction_input,
