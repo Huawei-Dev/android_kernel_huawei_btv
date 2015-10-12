@@ -2135,7 +2135,6 @@ extern int hisi_mmc_reset(struct mmc_host *host);
 static int mmc_reset(struct mmc_host *host)
 {
 	struct mmc_card *card = host->card;
-	u32 status;
 
 	if (!(host->caps & MMC_CAP_HW_RESET) || !host->ops->hw_reset)
 		return -EOPNOTSUPP;
@@ -2147,12 +2146,6 @@ static int mmc_reset(struct mmc_host *host)
 	mmc_set_clock(host, host->f_init);
 
 	host->ops->hw_reset(host);
-
-	/* If the reset has happened, then a status command will fail */
-	if (!mmc_send_status(card, &status)) {
-		mmc_host_clk_release(host);
-		return -ENOSYS;
-	}
 
 	if (mmc_host_is_spi(host))
 		host->ios.bus_mode = MMC_BUSMODE_PUSHPULL;
