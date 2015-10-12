@@ -579,6 +579,7 @@ struct be_adapter {
 	u32 msg_enable;
 	int be_get_temp_freq;
 	u8 pf_number;
+	u8 pci_func_num;
 	struct rss_info rss_info;
 	/* Filters for packets that need to be sent to BMC */
 	u32 bmc_filt_mask;
