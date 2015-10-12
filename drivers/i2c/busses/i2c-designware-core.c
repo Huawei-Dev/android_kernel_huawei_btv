@@ -962,7 +962,11 @@ u32 i2c_dw_func(struct i2c_adapter *adap)
 	struct dw_i2c_dev *dev = i2c_get_adapdata(adap);
 	return dev->functionality;
 }
-EXPORT_SYMBOL_GPL(i2c_dw_func);
+
+static struct i2c_algorithm i2c_dw_algo = {
+	.master_xfer	= i2c_dw_xfer,
+	.functionality	= i2c_dw_func,
+};
 
 static u32 i2c_dw_read_clear_intrbits(struct dw_i2c_dev *dev)
 {
@@ -1088,7 +1092,6 @@ tx_aborted:
 #endif
 	return IRQ_HANDLED;
 }
-EXPORT_SYMBOL_GPL(i2c_dw_isr);
 
 void i2c_dw_disable(struct dw_i2c_dev *dev)
 {
@@ -1112,6 +1115,41 @@ u32 i2c_dw_read_comp_param(struct dw_i2c_dev *dev)
 	return dw_readl(dev, DW_IC_COMP_PARAM_1);
 }
 EXPORT_SYMBOL_GPL(i2c_dw_read_comp_param);
+
+int i2c_dw_probe(struct dw_i2c_dev *dev)
+{
+	struct i2c_adapter *adap = &dev->adapter;
+	int r;
+
+	init_completion(&dev->cmd_complete);
+	mutex_init(&dev->lock);
+
+	r = i2c_dw_init(dev);
+	if (r)
+		return r;
+
+	snprintf(adap->name, sizeof(adap->name),
+		 "Synopsys DesignWare I2C adapter");
+	adap->algo = &i2c_dw_algo;
+	adap->dev.parent = dev->dev;
+	i2c_set_adapdata(adap, dev);
+
+	i2c_dw_disable_int(dev);
+	r = devm_request_irq(dev->dev, dev->irq, i2c_dw_isr, IRQF_SHARED,
+			     dev_name(dev->dev), dev);
+	if (r) {
+		dev_err(dev->dev, "failure requesting irq %i: %d\n",
+			dev->irq, r);
+		return r;
+	}
+
+	r = i2c_add_numbered_adapter(adap);
+	if (r)
+		dev_err(dev->dev, "failure adding adapter: %d\n", r);
+
+	return r;
+}
+EXPORT_SYMBOL_GPL(i2c_dw_probe);
 
 MODULE_DESCRIPTION("Synopsys DesignWare I2C bus adapter core");
 MODULE_LICENSE("GPL");
