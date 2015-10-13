@@ -92,7 +92,6 @@ struct nf_hook_ops {
 #ifdef CONFIG_NETFILTER_INGRESS
 	struct net_device	*dev;
 #endif
-	struct module		*owner;
 	void			*priv;
 	u_int8_t		pf;
 	unsigned int		hooknum;
