@@ -2010,7 +2010,7 @@ static int __spi_validate_bits_per_word(struct spi_master *master, u8 bits_per_w
 int spi_setup(struct spi_device *spi)
 {
 	unsigned	bad_bits, ugly_bits;
-	int		status = 0;
+	int		status;
 
 	/* check mode to prevent that DUAL and QUAD set at the same time
 	 */
@@ -2047,8 +2047,9 @@ int spi_setup(struct spi_device *spi)
 	if (!spi->bits_per_word)
 		spi->bits_per_word = 8;
 
-	if (__spi_validate_bits_per_word(spi->master, spi->bits_per_word))
-		return -EINVAL;
+	status = __spi_validate_bits_per_word(spi->master, spi->bits_per_word);
+	if (status)
+		return status;
 
 	if (!spi->max_speed_hz)
 		spi->max_speed_hz = spi->master->max_speed_hz;
