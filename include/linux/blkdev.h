@@ -37,6 +37,7 @@ struct bsg_job;
 struct blkcg_gq;
 struct blk_flush_queue;
 struct rq_wb;
+struct pr_ops;
 
 #define BLKDEV_MIN_RQ	4
 #define BLKDEV_MAX_RQ	128	/* Default maximum */
@@ -1682,6 +1683,7 @@ struct block_device_operations {
 	/* this callback is with swap_lock and sometimes page table lock held */
 	void (*swap_slot_free_notify) (struct block_device *, unsigned long);
 	struct module *owner;
+	const struct pr_ops *pr_ops;
 };
 
 extern int __blkdev_driver_ioctl(struct block_device *, fmode_t, unsigned int,
