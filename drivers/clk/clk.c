@@ -248,7 +248,7 @@ struct clk *__clk_get_parent(struct clk *clk)
 }
 EXPORT_SYMBOL_GPL(__clk_get_parent);
 
-const char *__clk_get_name(struct clk *clk)
+const char *__clk_get_name(const struct clk *clk)
 {
 	return !clk ? NULL : clk->core->name;
 }
