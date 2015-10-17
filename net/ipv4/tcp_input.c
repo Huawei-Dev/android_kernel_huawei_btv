@@ -909,6 +909,7 @@ static void tcp_update_reordering(struct sock *sk, const int metric,
 
 	if (metric > 0)
 		tcp_disable_early_retrans(tp);
+	tp->rack.reord = 1;
 }
 
 /* This must be called before lost_out is incremented */
@@ -934,8 +935,7 @@ static void tcp_skb_mark_lost(struct tcp_sock *tp, struct sk_buff *skb)
 	}
 }
 
-static void tcp_skb_mark_lost_uncond_verify(struct tcp_sock *tp,
-					    struct sk_buff *skb)
+void tcp_skb_mark_lost_uncond_verify(struct tcp_sock *tp, struct sk_buff *skb)
 {
 	tcp_verify_retransmit_hint(tp, skb);
 
@@ -2837,6 +2837,11 @@ static void tcp_fastretrans_alert(struct sock *sk, const int acked,
 
 		}
 	}
+
+	/* Use RACK to detect loss */
+	if (sysctl_tcp_recovery & TCP_RACK_LOST_RETRANS &&
+	    tcp_rack_mark_lost(sk))
+		flag |= FLAG_LOST_RETRANS;
 
 	/* E. Process state. */
 	switch (icsk->icsk_ca_state) {
