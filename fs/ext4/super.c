@@ -117,8 +117,7 @@ MODULE_ALIAS("ext3");
 static int ext4_verify_csum_type(struct super_block *sb,
 				 struct ext4_super_block *es)
 {
-	if (!EXT4_HAS_RO_COMPAT_FEATURE(sb,
-					EXT4_FEATURE_RO_COMPAT_METADATA_CSUM))
+	if (!ext4_has_feature_metadata_csum(sb))
 		return 1;
 
 	return es->s_checksum_type == EXT4_CRC32C_CHKSUM;
@@ -843,7 +842,7 @@ static void ext4_put_super(struct super_block *sb)
 	ext4_xattr_put_super(sb);
 
 	if (!(sb->s_flags & MS_RDONLY)) {
-		EXT4_CLEAR_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_RECOVER);
+		ext4_clear_feature_journal_needs_recovery(sb);
 		es->s_state = cpu_to_le16(sbi->s_mount_state);
 	}
 	if (!(sb->s_flags & MS_RDONLY))
@@ -1318,10 +1317,10 @@ static int set_qf_name(struct super_block *sb, int qtype, substring_t *args)
 			"quota options when quota turned on");
 		return -1;
 	}
-	if (EXT4_HAS_RO_COMPAT_FEATURE(sb, EXT4_FEATURE_RO_COMPAT_QUOTA)) {
-		ext4_msg(sb, KERN_INFO, "Journaled quota options "
-			 "ignored when QUOTA feature is enabled");
-		return 1;
+	if (ext4_has_feature_quota(sb)) {
+		ext4_msg(sb, KERN_ERR, "Cannot set journaled quota options "
+			 "when QUOTA feature is enabled");
+		return -1;
 	}
 	qname = match_strdup(args);
 	if (!qname) {
@@ -1677,10 +1676,9 @@ static int handle_mount_opt(struct super_block *sb, char *opt, int token,
 				 "quota options when quota turned on");
 			return -1;
 		}
-		if (EXT4_HAS_RO_COMPAT_FEATURE(sb,
-					       EXT4_FEATURE_RO_COMPAT_QUOTA)) {
-			ext4_msg(sb, KERN_INFO,
-				 "Quota format mount options ignored "
+		if (ext4_has_feature_quota(sb)) {
+			ext4_msg(sb, KERN_ERR,
+				 "Cannot set journaled quota options "
 				 "when QUOTA feature is enabled");
 			return 1;
 		}
@@ -1737,7 +1735,7 @@ static int parse_options(char *options, struct super_block *sb,
 			return 0;
 	}
 #ifdef CONFIG_QUOTA
-	if (EXT4_HAS_RO_COMPAT_FEATURE(sb, EXT4_FEATURE_RO_COMPAT_QUOTA) &&
+	if (ext4_has_feature_quota(sb) &&
 	    (test_opt(sb, USRQUOTA) || test_opt(sb, GRPQUOTA))) {
 		ext4_msg(sb, KERN_INFO, "Quota feature enabled, usrquota and grpquota "
 			 "mount options ignored.");
@@ -1961,7 +1959,7 @@ static int ext4_setup_super(struct super_block *sb, struct ext4_super_block *es,
 	es->s_mtime = cpu_to_le32(get_seconds());
 	ext4_update_dynamic_rev(sb);
 	if (sbi->s_journal)
-		EXT4_SET_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_RECOVER);
+		ext4_set_feature_journal_needs_recovery(sb);
 
 	ext4_commit_super(sb, 1);
 done:
@@ -2044,12 +2042,13 @@ failed:
 	return 0;
 }
 
-static __le16 ext4_group_desc_csum(struct ext4_sb_info *sbi, __u32 block_group,
+static __le16 ext4_group_desc_csum(struct super_block *sb, __u32 block_group,
 				   struct ext4_group_desc *gdp)
 {
 	int offset;
 	__u16 crc = 0;
 	__le32 le_group = cpu_to_le32(block_group);
+	struct ext4_sb_info *sbi = EXT4_SB(sb);
 
 	if (ext4_has_metadata_csum(sbi->s_sb)) {
 		/* Use new metadata_csum algorithm */
@@ -2069,8 +2068,7 @@ static __le16 ext4_group_desc_csum(struct ext4_sb_info *sbi, __u32 block_group,
 	}
 
 	/* old crc16 code */
-	if (!(sbi->s_es->s_feature_ro_compat &
-	      cpu_to_le32(EXT4_FEATURE_RO_COMPAT_GDT_CSUM)))
+	if (!ext4_has_feature_gdt_csum(sb))
 		return 0;
 
 	offset = offsetof(struct ext4_group_desc, bg_checksum);
@@ -2080,8 +2078,7 @@ static __le16 ext4_group_desc_csum(struct ext4_sb_info *sbi, __u32 block_group,
 	crc = crc16(crc, (__u8 *)gdp, offset);
 	offset += sizeof(gdp->bg_checksum); /* skip checksum */
 	/* for checksum of struct ext4_group_desc do the rest...*/
-	if ((sbi->s_es->s_feature_incompat &
-	     cpu_to_le32(EXT4_FEATURE_INCOMPAT_64BIT)) &&
+	if (ext4_has_feature_64bit(sb) &&
 	    offset < le16_to_cpu(sbi->s_es->s_desc_size))
 		crc = crc16(crc, (__u8 *)gdp + offset,
 			    le16_to_cpu(sbi->s_es->s_desc_size) -
@@ -2095,8 +2092,7 @@ int ext4_group_desc_csum_verify(struct super_block *sb, __u32 block_group,
 				struct ext4_group_desc *gdp)
 {
 	if (ext4_has_group_desc_csum(sb) &&
-	    (gdp->bg_checksum != ext4_group_desc_csum(EXT4_SB(sb),
-						      block_group, gdp)))
+	    (gdp->bg_checksum != ext4_group_desc_csum(sb, block_group, gdp)))
 		return 0;
 
 	return 1;
@@ -2107,7 +2103,7 @@ void ext4_group_desc_csum_set(struct super_block *sb, __u32 block_group,
 {
 	if (!ext4_has_group_desc_csum(sb))
 		return;
-	gdp->bg_checksum = ext4_group_desc_csum(EXT4_SB(sb), block_group, gdp);
+	gdp->bg_checksum = ext4_group_desc_csum(sb, block_group, gdp);
 }
 
 /* Called at mount-time, super-block is locked */
@@ -2123,7 +2119,7 @@ static int ext4_check_descriptors(struct super_block *sb,
 	int flexbg_flag = 0;
 	ext4_group_t i, grp = sbi->s_groups_count;
 
-	if (EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_FLEX_BG))
+	if (ext4_has_feature_flex_bg(sb))
 		flexbg_flag = 1;
 
 	ext4_debug("Checking group descriptors");
@@ -2167,7 +2163,7 @@ static int ext4_check_descriptors(struct super_block *sb,
 		if (!ext4_group_desc_csum_verify(sb, i, gdp)) {
 			ext4_msg(sb, KERN_ERR, "ext4_check_descriptors: "
 				 "Checksum for group %u failed (%u!=%u)",
-				 i, le16_to_cpu(ext4_group_desc_csum(sbi, i,
+				 i, le16_to_cpu(ext4_group_desc_csum(sb, i,
 				     gdp)), le16_to_cpu(gdp->bg_checksum));
 			if (!(sb->s_flags & MS_RDONLY)) {
 				ext4_unlock_group(sb, i);
@@ -2430,8 +2426,7 @@ static ext4_fsblk_t descriptor_loc(struct super_block *sb,
 
 	first_meta_bg = le32_to_cpu(sbi->s_es->s_first_meta_bg);
 
-	if (!EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_META_BG) ||
-	    nr < first_meta_bg)
+	if (!ext4_has_feature_meta_bg(sb) || nr < first_meta_bg)
 		return logical_sb_block + nr + 1;
 	bg = sbi->s_desc_per_block * nr;
 	if (ext4_bg_has_super(sb, bg))
@@ -2495,7 +2490,7 @@ static unsigned long ext4_get_stripe_size(struct ext4_sb_info *sbi)
  */
 static int ext4_feature_set_ok(struct super_block *sb, int readonly)
 {
-	if (EXT4_HAS_INCOMPAT_FEATURE(sb, ~EXT4_FEATURE_INCOMPAT_SUPP)) {
+	if (ext4_has_unknown_ext4_incompat_features(sb)) {
 		ext4_msg(sb, KERN_ERR,
 			"Couldn't mount because of "
 			"unsupported optional features (%x)",
@@ -2507,14 +2502,14 @@ static int ext4_feature_set_ok(struct super_block *sb, int readonly)
 	if (readonly)
 		return 1;
 
-	if (EXT4_HAS_RO_COMPAT_FEATURE(sb, EXT4_FEATURE_RO_COMPAT_READONLY)) {
+	if (ext4_has_feature_readonly(sb)) {
 		ext4_msg(sb, KERN_INFO, "filesystem is read-only");
 		sb->s_flags |= MS_RDONLY;
 		return 1;
 	}
 
 	/* Check that feature set is OK for a read-write mount */
-	if (EXT4_HAS_RO_COMPAT_FEATURE(sb, ~EXT4_FEATURE_RO_COMPAT_SUPP)) {
+	if (ext4_has_unknown_ext4_ro_compat_features(sb)) {
 		ext4_msg(sb, KERN_ERR, "couldn't mount RDWR because of "
 			 "unsupported optional features (%x)",
 			 (le32_to_cpu(EXT4_SB(sb)->s_es->s_feature_ro_compat) &
@@ -2525,7 +2520,7 @@ static int ext4_feature_set_ok(struct super_block *sb, int readonly)
 	 * Large file size enabled file system can only be mounted
 	 * read-write on 32-bit systems if kernel is built with CONFIG_LBDAF
 	 */
-	if (EXT4_HAS_RO_COMPAT_FEATURE(sb, EXT4_FEATURE_RO_COMPAT_HUGE_FILE)) {
+	if (ext4_has_feature_huge_file(sb)) {
 		if (sizeof(blkcnt_t) < sizeof(u64)) {
 			ext4_msg(sb, KERN_ERR, "Filesystem with huge files "
 				 "cannot be mounted RDWR without "
@@ -2533,8 +2528,7 @@ static int ext4_feature_set_ok(struct super_block *sb, int readonly)
 			return 0;
 		}
 	}
-	if (EXT4_HAS_RO_COMPAT_FEATURE(sb, EXT4_FEATURE_RO_COMPAT_BIGALLOC) &&
-	    !EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_EXTENTS)) {
+	if (ext4_has_feature_bigalloc(sb) && !ext4_has_feature_extents(sb)) {
 		ext4_msg(sb, KERN_ERR,
 			 "Can't support bigalloc feature without "
 			 "extents feature\n");
@@ -2542,8 +2536,7 @@ static int ext4_feature_set_ok(struct super_block *sb, int readonly)
 	}
 
 #ifndef CONFIG_QUOTA
-	if (EXT4_HAS_RO_COMPAT_FEATURE(sb, EXT4_FEATURE_RO_COMPAT_QUOTA) &&
-	    !readonly) {
+	if (ext4_has_feature_quota(sb) && !readonly) {
 		ext4_msg(sb, KERN_ERR,
 			 "Filesystem with quota feature cannot be mounted RDWR "
 			 "without CONFIG_QUOTA");
@@ -3000,7 +2993,7 @@ static int count_overhead(struct super_block *sb, ext4_group_t grp,
 	ext4_group_t		i, ngroups = ext4_get_groups_count(sb);
 	int			s, j, count = 0;
 
-	if (!EXT4_HAS_RO_COMPAT_FEATURE(sb, EXT4_FEATURE_RO_COMPAT_BIGALLOC))
+	if (!ext4_has_feature_bigalloc(sb))
 		return (ext4_bg_has_super(sb, grp) + ext4_bg_num_gdb(sb, grp) +
 			sbi->s_itb_per_group + 2);
 
@@ -3102,7 +3095,7 @@ static void ext4_set_resv_clusters(struct super_block *sb)
 	 * hole punching doesn't need new metadata... This is needed especially
 	 * to keep ext2/3 backward compatibility.
 	 */
-	if (!EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_EXTENTS))
+	if (!ext4_has_feature_extents(sb))
 		return;
 	/*
 	 * By default we reserve 2% or 4096 clusters, whichever is smaller.
@@ -3201,9 +3194,8 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	sbi->s_kbytes_written = le64_to_cpu(es->s_kbytes_written);
 
 	/* Warn if metadata_csum and gdt_csum are both set. */
-	if (EXT4_HAS_RO_COMPAT_FEATURE(sb,
-				       EXT4_FEATURE_RO_COMPAT_METADATA_CSUM) &&
-	    EXT4_HAS_RO_COMPAT_FEATURE(sb, EXT4_FEATURE_RO_COMPAT_GDT_CSUM))
+	if (ext4_has_feature_metadata_csum(sb) &&
+	    ext4_has_feature_gdt_csum(sb))
 		ext4_warning(sb, "metadata_csum and uninit_bg are "
 			     "redundant flags; please run fsck.");
 
@@ -3216,8 +3208,7 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	}
 
 	/* Load the checksum driver */
-	if (EXT4_HAS_RO_COMPAT_FEATURE(sb,
-				       EXT4_FEATURE_RO_COMPAT_METADATA_CSUM)) {
+	if (ext4_has_feature_metadata_csum(sb)) {
 		sbi->s_chksum_driver = crypto_alloc_shash("crc32c", 0, 0);
 		if (IS_ERR(sbi->s_chksum_driver)) {
 			ext4_msg(sb, KERN_ERR, "Cannot load crc32c driver.");
@@ -3237,7 +3228,7 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	}
 
 	/* Precompute checksum seed for all metadata */
-	if (EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_CSUM_SEED))
+	if (ext4_has_feature_csum_seed(sb))
 		sbi->s_csum_seed = le32_to_cpu(es->s_checksum_seed);
 	else if (ext4_has_metadata_csum(sb))
 		sbi->s_csum_seed = ext4_chksum(sbi, ~0, es->s_uuid,
@@ -3342,17 +3333,16 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 		(test_opt(sb, POSIX_ACL) ? MS_POSIXACL : 0);
 
 	if (le32_to_cpu(es->s_rev_level) == EXT4_GOOD_OLD_REV &&
-	    (EXT4_HAS_COMPAT_FEATURE(sb, ~0U) ||
-	     EXT4_HAS_RO_COMPAT_FEATURE(sb, ~0U) ||
-	     EXT4_HAS_INCOMPAT_FEATURE(sb, ~0U)))
+	    (ext4_has_compat_features(sb) ||
+	     ext4_has_ro_compat_features(sb) ||
+	     ext4_has_incompat_features(sb)))
 		ext4_msg(sb, KERN_WARNING,
 		       "feature flags set on rev 0 fs, "
 		       "running e2fsck is recommended");
 
 	if (es->s_creator_os == cpu_to_le32(EXT4_OS_HURD)) {
 		set_opt2(sb, HURD_COMPAT);
-		if (EXT4_HAS_INCOMPAT_FEATURE(sb,
-					      EXT4_FEATURE_INCOMPAT_64BIT)) {
+		if (ext4_has_feature_64bit(sb)) {
 			ext4_msg(sb, KERN_ERR,
 				 "The Hurd can't support 64-bit file systems");
 			goto failed_mount;
@@ -3410,8 +3400,7 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 		}
 	}
 
-	if (EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_ENCRYPT) &&
-	    es->s_encryption_level) {
+	if (ext4_has_feature_encrypt(sb) && es->s_encryption_level) {
 		ext4_msg(sb, KERN_ERR, "Unsupported encryption level %d",
 			 es->s_encryption_level);
 		goto failed_mount;
@@ -3443,8 +3432,7 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 		}
 	}
 
-	has_huge_files = EXT4_HAS_RO_COMPAT_FEATURE(sb,
-				EXT4_FEATURE_RO_COMPAT_HUGE_FILE);
+	has_huge_files = ext4_has_feature_huge_file(sb);
 	sbi->s_bitmap_maxbytes = ext4_max_bitmap_size(sb->s_blocksize_bits,
 						      has_huge_files);
 	sb->s_maxbytes = ext4_max_size(sb->s_blocksize_bits, has_huge_files);
@@ -3468,7 +3456,7 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	}
 
 	sbi->s_desc_size = le16_to_cpu(es->s_desc_size);
-	if (EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_64BIT)) {
+	if (ext4_has_feature_64bit(sb)) {
 		if (sbi->s_desc_size < EXT4_MIN_DESC_SIZE_64BIT ||
 		    sbi->s_desc_size > EXT4_MAX_DESC_SIZE ||
 		    !is_power_of_2(sbi->s_desc_size)) {
@@ -3499,7 +3487,7 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	for (i = 0; i < 4; i++)
 		sbi->s_hash_seed[i] = le32_to_cpu(es->s_hash_seed[i]);
 	sbi->s_def_hash_version = es->s_def_hash_version;
-	if (EXT4_HAS_COMPAT_FEATURE(sb, EXT4_FEATURE_COMPAT_DIR_INDEX)) {
+	if (ext4_has_feature_dir_index(sb)) {
 		i = le32_to_cpu(es->s_flags);
 		if (i & EXT2_FLAGS_UNSIGNED_HASH)
 			sbi->s_hash_unsigned = 3;
@@ -3519,8 +3507,7 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 
 	/* Handle clustersize */
 	clustersize = BLOCK_SIZE << le32_to_cpu(es->s_log_cluster_size);
-	has_bigalloc = EXT4_HAS_RO_COMPAT_FEATURE(sb,
-				EXT4_FEATURE_RO_COMPAT_BIGALLOC);
+	has_bigalloc = ext4_has_feature_bigalloc(sb);
 	if (has_bigalloc) {
 		if (clustersize < blocksize) {
 			ext4_msg(sb, KERN_ERR,
@@ -3679,7 +3666,7 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	sb->s_xattr = ext4_xattr_handlers;
 #ifdef CONFIG_QUOTA
 	sb->dq_op = &ext4_quota_operations;
-	if (EXT4_HAS_RO_COMPAT_FEATURE(sb, EXT4_FEATURE_RO_COMPAT_QUOTA))
+	if (ext4_has_feature_quota(sb))
 		sb->s_qcop = &dquot_quotactl_sysfile_ops;
 	else
 		sb->s_qcop = &ext4_qctl_operations;
@@ -3693,11 +3680,9 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	sb->s_root = NULL;
 
 	needs_recovery = (es->s_last_orphan != 0 ||
-			  EXT4_HAS_INCOMPAT_FEATURE(sb,
-				    EXT4_FEATURE_INCOMPAT_RECOVER));
+			  ext4_has_feature_journal_needs_recovery(sb));
 
-	if (EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_MMP) &&
-	    !(sb->s_flags & MS_RDONLY))
+	if (ext4_has_feature_mmp(sb) && !(sb->s_flags & MS_RDONLY))
 		if (ext4_multi_mount_protect(sb, le64_to_cpu(es->s_mmp_block)))
 			goto failed_mount3a;
 
@@ -3705,12 +3690,11 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	 * The first inode we look at is the journal inode.  Don't try
 	 * root first: it may be modified in the journal!
 	 */
-	if (!test_opt(sb, NOLOAD) &&
-	    EXT4_HAS_COMPAT_FEATURE(sb, EXT4_FEATURE_COMPAT_HAS_JOURNAL)) {
+	if (!test_opt(sb, NOLOAD) && ext4_has_feature_journal(sb)) {
 		if (ext4_load_journal(sb, es, journal_devnum))
 			goto failed_mount3a;
 	} else if (test_opt(sb, NOLOAD) && !(sb->s_flags & MS_RDONLY) &&
-	      EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_RECOVER)) {
+		   ext4_has_feature_journal_needs_recovery(sb)) {
 		ext4_msg(sb, KERN_ERR, "required journal recovery "
 		       "suppressed and not mounted read-only");
 		goto failed_mount_wq;
@@ -3721,7 +3705,7 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 		goto no_journal;
 	}
 
-	if (EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_64BIT) &&
+	if (ext4_has_feature_64bit(sb) &&
 	    !jbd2_journal_set_features(EXT4_SB(sb)->s_journal, 0, 0,
 				       JBD2_FEATURE_INCOMPAT_64BIT)) {
 		ext4_msg(sb, KERN_ERR, "Failed to set 64-bit journal feature");
@@ -3773,18 +3757,16 @@ no_journal:
 		}
 	}
 
-	if ((DUMMY_ENCRYPTION_ENABLED(sbi) ||
-	     EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_ENCRYPT)) &&
+	if ((DUMMY_ENCRYPTION_ENABLED(sbi) || ext4_has_feature_encrypt(sb)) &&
 	    (blocksize != PAGE_CACHE_SIZE)) {
 		ext4_msg(sb, KERN_ERR,
 			 "Unsupported blocksize for fs encryption");
 		goto failed_mount_wq;
 	}
 
-	if (DUMMY_ENCRYPTION_ENABLED(sbi) &&
-	    !(sb->s_flags & MS_RDONLY) &&
-	    !EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_ENCRYPT)) {
-		EXT4_SET_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_ENCRYPT);
+	if (DUMMY_ENCRYPTION_ENABLED(sbi) && !(sb->s_flags & MS_RDONLY) &&
+	    !ext4_has_feature_encrypt(sb)) {
+		ext4_set_feature_encrypt(sb);
 		ext4_commit_super(sb, 1);
 	}
 
@@ -3843,8 +3825,7 @@ no_journal:
 	if (sbi->s_inode_size > EXT4_GOOD_OLD_INODE_SIZE) {
 		sbi->s_want_extra_isize = sizeof(struct ext4_inode) -
 						     EXT4_GOOD_OLD_INODE_SIZE;
-		if (EXT4_HAS_RO_COMPAT_FEATURE(sb,
-				       EXT4_FEATURE_RO_COMPAT_EXTRA_ISIZE)) {
+		if (ext4_has_feature_extra_isize(sb)) {
 			if (sbi->s_want_extra_isize <
 			    le16_to_cpu(es->s_want_extra_isize))
 				sbi->s_want_extra_isize =
@@ -3903,7 +3884,7 @@ no_journal:
 		goto failed_mount6;
 	}
 
-	if (EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_FLEX_BG))
+	if (ext4_has_feature_flex_bg(sb))
 		if (!ext4_fill_flex_info(sb)) {
 			ext4_msg(sb, KERN_ERR,
 			       "unable to initialize "
@@ -3921,8 +3902,7 @@ no_journal:
 
 #ifdef CONFIG_QUOTA
 	/* Enable quota usage during mount. */
-	if (EXT4_HAS_RO_COMPAT_FEATURE(sb, EXT4_FEATURE_RO_COMPAT_QUOTA) &&
-	    !(sb->s_flags & MS_RDONLY)) {
+	if (ext4_has_feature_quota(sb) && !(sb->s_flags & MS_RDONLY)) {
 		err = ext4_enable_quotas(sb);
 		if (err)
 			goto failed_mount8;
@@ -4068,7 +4048,7 @@ static journal_t *ext4_get_journal(struct super_block *sb,
 	struct inode *journal_inode;
 	journal_t *journal;
 
-	BUG_ON(!EXT4_HAS_COMPAT_FEATURE(sb, EXT4_FEATURE_COMPAT_HAS_JOURNAL));
+	BUG_ON(!ext4_has_feature_journal(sb));
 
 	/* First, test for the existence of a valid inode on disk.  Bad
 	 * things happen if we iget() an unused inode, as the subsequent
@@ -4118,7 +4098,7 @@ static journal_t *ext4_get_dev_journal(struct super_block *sb,
 	struct ext4_super_block *es;
 	struct block_device *bdev;
 
-	BUG_ON(!EXT4_HAS_COMPAT_FEATURE(sb, EXT4_FEATURE_COMPAT_HAS_JOURNAL));
+	BUG_ON(!ext4_has_feature_journal(sb));
 
 	bdev = ext4_blkdev_get(j_dev, sb);
 	if (bdev == NULL)
@@ -4210,7 +4190,7 @@ static int ext4_load_journal(struct super_block *sb,
 	int err = 0;
 	int really_read_only;
 
-	BUG_ON(!EXT4_HAS_COMPAT_FEATURE(sb, EXT4_FEATURE_COMPAT_HAS_JOURNAL));
+	BUG_ON(!ext4_has_feature_journal(sb));
 
 	if (journal_devnum &&
 	    journal_devnum != le32_to_cpu(es->s_journal_dev)) {
@@ -4227,7 +4207,7 @@ static int ext4_load_journal(struct super_block *sb,
 	 * crash?  For recovery, we need to check in advance whether we
 	 * can get read-write access to the device.
 	 */
-	if (EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_RECOVER)) {
+	if (ext4_has_feature_journal_needs_recovery(sb)) {
 		if (sb->s_flags & MS_RDONLY) {
 			ext4_msg(sb, KERN_INFO, "INFO: recovery "
 					"required on readonly filesystem");
@@ -4258,7 +4238,7 @@ static int ext4_load_journal(struct super_block *sb,
 	if (!(journal->j_flags & JBD2_BARRIER))
 		ext4_msg(sb, KERN_INFO, "barriers disabled");
 
-	if (!EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_RECOVER))
+	if (!ext4_has_feature_journal_needs_recovery(sb))
 		err = jbd2_journal_wipe(journal, !really_read_only);
 	if (!err) {
 		char *save = kmalloc(EXT4_S_ERR_LEN, GFP_KERNEL);
@@ -4372,7 +4352,7 @@ static void ext4_mark_recovery_complete(struct super_block *sb,
 {
 	journal_t *journal = EXT4_SB(sb)->s_journal;
 
-	if (!EXT4_HAS_COMPAT_FEATURE(sb, EXT4_FEATURE_COMPAT_HAS_JOURNAL)) {
+	if (!ext4_has_feature_journal(sb)) {
 		BUG_ON(journal != NULL);
 		return;
 	}
@@ -4380,9 +4360,9 @@ static void ext4_mark_recovery_complete(struct super_block *sb,
 	if (jbd2_journal_flush(journal) < 0)
 		goto out;
 
-	if (EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_RECOVER) &&
+	if (ext4_has_feature_journal_needs_recovery(sb) &&
 	    sb->s_flags & MS_RDONLY) {
-		EXT4_CLEAR_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_RECOVER);
+		ext4_clear_feature_journal_needs_recovery(sb);
 		ext4_commit_super(sb, 1);
 	}
 
@@ -4402,7 +4382,7 @@ static void ext4_clear_journal_err(struct super_block *sb,
 	int j_errno;
 	const char *errstr;
 
-	BUG_ON(!EXT4_HAS_COMPAT_FEATURE(sb, EXT4_FEATURE_COMPAT_HAS_JOURNAL));
+	BUG_ON(!ext4_has_feature_journal(sb));
 
 	journal = EXT4_SB(sb)->s_journal;
 
@@ -4517,7 +4497,7 @@ static int ext4_freeze(struct super_block *sb)
 			goto out;
 
 		/* Journal blocked and flushed, clear needs_recovery flag. */
-		EXT4_CLEAR_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_RECOVER);
+		ext4_clear_feature_journal_needs_recovery(sb);
 	}
 
 	error = ext4_commit_super(sb, 1);
@@ -4539,7 +4519,7 @@ static int ext4_unfreeze(struct super_block *sb)
 
 	if (EXT4_SB(sb)->s_journal) {
 		/* Reset the needs_recovery flag before the fs is unlocked. */
-		EXT4_SET_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_RECOVER);
+		ext4_set_feature_journal_needs_recovery(sb);
 	}
 
 	ext4_commit_super(sb, 1);
@@ -4692,8 +4672,7 @@ static int ext4_remount(struct super_block *sb, int *flags, char *data)
 				ext4_mark_recovery_complete(sb, es);
 		} else {
 			/* Make sure we can mount this feature set readwrite */
-			if (EXT4_HAS_RO_COMPAT_FEATURE(sb,
-					EXT4_FEATURE_RO_COMPAT_READONLY) ||
+			if (ext4_has_feature_readonly(sb) ||
 			    !ext4_feature_set_ok(sb, 0)) {
 				err = -EROFS;
 				goto restore_opts;
@@ -4709,7 +4688,7 @@ static int ext4_remount(struct super_block *sb, int *flags, char *data)
 				if (!ext4_group_desc_csum_verify(sb, g, gdp)) {
 					ext4_msg(sb, KERN_ERR,
 	       "ext4_remount: Checksum for group %u failed (%u!=%u)",
-		g, le16_to_cpu(ext4_group_desc_csum(sbi, g, gdp)),
+		g, le16_to_cpu(ext4_group_desc_csum(sb, g, gdp)),
 					       le16_to_cpu(gdp->bg_checksum));
 					err = -EFSBADCRC;
 					goto restore_opts;
@@ -4741,8 +4720,7 @@ static int ext4_remount(struct super_block *sb, int *flags, char *data)
 			sbi->s_mount_state = le16_to_cpu(es->s_state);
 			if (!ext4_setup_super(sb, es, 0))
 				sb->s_flags &= ~MS_RDONLY;
-			if (EXT4_HAS_INCOMPAT_FEATURE(sb,
-						     EXT4_FEATURE_INCOMPAT_MMP))
+			if (ext4_has_feature_mmp(sb))
 				if (ext4_multi_mount_protect(sb,
 						le64_to_cpu(es->s_mmp_block))) {
 					err = -EROFS;
@@ -4775,8 +4753,7 @@ static int ext4_remount(struct super_block *sb, int *flags, char *data)
 	if (enable_quota) {
 		if (sb_any_quota_suspended(sb))
 			dquot_resume(sb, -1);
-		else if (EXT4_HAS_RO_COMPAT_FEATURE(sb,
-					EXT4_FEATURE_RO_COMPAT_QUOTA)) {
+		else if (ext4_has_feature_quota(sb)) {
 			err = ext4_enable_quotas(sb);
 			if (err)
 				goto restore_opts;
@@ -4920,7 +4897,7 @@ static int ext4_mark_dquot_dirty(struct dquot *dquot)
 	struct ext4_sb_info *sbi = EXT4_SB(sb);
 
 	/* Are we journaling quotas? */
-	if (EXT4_HAS_RO_COMPAT_FEATURE(sb, EXT4_FEATURE_RO_COMPAT_QUOTA) ||
+	if (ext4_has_feature_quota(sb) ||
 	    sbi->s_qf_names[USRQUOTA] || sbi->s_qf_names[GRPQUOTA]) {
 		dquot_mark_dquot_dirty(dquot);
 		return ext4_write_dquot(dquot);
@@ -5026,7 +5003,7 @@ static int ext4_quota_enable(struct super_block *sb, int type, int format_id,
 		le32_to_cpu(EXT4_SB(sb)->s_es->s_grp_quota_inum)
 	};
 
-	BUG_ON(!EXT4_HAS_RO_COMPAT_FEATURE(sb, EXT4_FEATURE_RO_COMPAT_QUOTA));
+	BUG_ON(!ext4_has_feature_quota(sb));
 
 	if (!qf_inums[type])
 		return -EPERM;
@@ -5223,11 +5200,11 @@ static inline void unregister_as_ext2(void)
 
 static inline int ext2_feature_set_ok(struct super_block *sb)
 {
-	if (EXT4_HAS_INCOMPAT_FEATURE(sb, ~EXT2_FEATURE_INCOMPAT_SUPP))
+	if (ext4_has_unknown_ext2_incompat_features(sb))
 		return 0;
 	if (sb->s_flags & MS_RDONLY)
 		return 1;
-	if (EXT4_HAS_RO_COMPAT_FEATURE(sb, ~EXT2_FEATURE_RO_COMPAT_SUPP))
+	if (ext4_has_unknown_ext2_ro_compat_features(sb))
 		return 0;
 	return 1;
 }
@@ -5252,13 +5229,13 @@ static inline void unregister_as_ext3(void)
 
 static inline int ext3_feature_set_ok(struct super_block *sb)
 {
-	if (EXT4_HAS_INCOMPAT_FEATURE(sb, ~EXT3_FEATURE_INCOMPAT_SUPP))
+	if (ext4_has_unknown_ext3_incompat_features(sb))
 		return 0;
-	if (!EXT4_HAS_COMPAT_FEATURE(sb, EXT4_FEATURE_COMPAT_HAS_JOURNAL))
+	if (!ext4_has_feature_journal(sb))
 		return 0;
 	if (sb->s_flags & MS_RDONLY)
 		return 1;
-	if (EXT4_HAS_RO_COMPAT_FEATURE(sb, ~EXT3_FEATURE_RO_COMPAT_SUPP))
+	if (ext4_has_unknown_ext3_ro_compat_features(sb))
 		return 0;
 	return 1;
 }
