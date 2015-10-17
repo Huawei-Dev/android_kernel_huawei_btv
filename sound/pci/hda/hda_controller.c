@@ -1839,7 +1839,15 @@ int azx_bus_create(struct azx *chip, const char *model)
 	bus->private_data = chip;
 	bus->pci = chip->pci;
 	bus->modelname = model;
-	bus->ops = bus_ops;
+	bus->mixer_assigned = -1;
+	bus->core.snoop = azx_snoop(chip);
+	if (chip->get_position[0] != azx_get_pos_lpib ||
+	    chip->get_position[1] != azx_get_pos_lpib)
+		bus->core.use_posbuf = true;
+	if (chip->bdl_pos_adj)
+		bus->core.bdl_pos_adj = chip->bdl_pos_adj[chip->dev_index];
+	if (chip->driver_caps & AZX_DCAPS_CORBRP_SELF_CLEAR)
+		bus->core.corbrp_self_clear = true;
 
 	if (chip->driver_caps & AZX_DCAPS_RIRB_DELAY) {
 		dev_dbg(chip->card->dev, "Enable delay in RIRB handling\n");
