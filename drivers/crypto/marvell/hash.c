@@ -351,7 +351,7 @@ static int mv_cesa_ahash_process(struct crypto_async_request *req, u32 status)
 		 * Hardware's MD5 digest is in little endian format, but
 		 * SHA in big endian format
 		 */
-		if (digsize == MD5_DIGEST_SIZE) {
+		if (creq->algo_le) {
 			__le32 *result = (void *)ahashreq->result;
 
 			for (i = 0; i < digsize / 4; i++)
@@ -407,7 +407,7 @@ static const struct mv_cesa_req_ops mv_cesa_ahash_req_ops = {
 };
 
 static int mv_cesa_ahash_init(struct ahash_request *req,
-			      struct mv_cesa_op_ctx *tmpl)
+			      struct mv_cesa_op_ctx *tmpl, bool algo_le)
 {
 	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
 
@@ -421,6 +421,7 @@ static int mv_cesa_ahash_init(struct ahash_request *req,
 	mv_cesa_set_mac_op_frag_len(tmpl, 0);
 	creq->op_tmpl = *tmpl;
 	creq->len = 0;
+	creq->algo_le = algo_le;
 
 	return 0;
 }
@@ -861,7 +862,7 @@ static int mv_cesa_md5_init(struct ahash_request *req)
 
 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_MD5);
 
-	mv_cesa_ahash_init(req, &tmpl);
+	mv_cesa_ahash_init(req, &tmpl, true);
 
 	return 0;
 }
@@ -924,7 +925,7 @@ static int mv_cesa_sha1_init(struct ahash_request *req)
 
 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_SHA1);
 
-	mv_cesa_ahash_init(req, &tmpl);
+	mv_cesa_ahash_init(req, &tmpl, false);
 
 	return 0;
 }
@@ -987,7 +988,7 @@ static int mv_cesa_sha256_init(struct ahash_request *req)
 
 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_SHA256);
 
-	mv_cesa_ahash_init(req, &tmpl);
+	mv_cesa_ahash_init(req, &tmpl, false);
 
 	return 0;
 }
@@ -1218,7 +1219,7 @@ static int mv_cesa_ahmac_md5_init(struct ahash_request *req)
 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_HMAC_MD5);
 	memcpy(tmpl.ctx.hash.iv, ctx->iv, sizeof(ctx->iv));
 
-	mv_cesa_ahash_init(req, &tmpl);
+	mv_cesa_ahash_init(req, &tmpl, true);
 
 	return 0;
 }
@@ -1288,7 +1289,7 @@ static int mv_cesa_ahmac_sha1_init(struct ahash_request *req)
 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_HMAC_SHA1);
 	memcpy(tmpl.ctx.hash.iv, ctx->iv, sizeof(ctx->iv));
 
-	mv_cesa_ahash_init(req, &tmpl);
+	mv_cesa_ahash_init(req, &tmpl, false);
 
 	return 0;
 }
@@ -1378,7 +1379,7 @@ static int mv_cesa_ahmac_sha256_init(struct ahash_request *req)
 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_HMAC_SHA256);
 	memcpy(tmpl.ctx.hash.iv, ctx->iv, sizeof(ctx->iv));
 
-	mv_cesa_ahash_init(req, &tmpl);
+	mv_cesa_ahash_init(req, &tmpl, false);
 
 	return 0;
 }
