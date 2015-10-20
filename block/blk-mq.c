@@ -1185,7 +1185,7 @@ static inline bool blk_mq_merge_queue_io(struct blk_mq_hw_ctx *hctx,
 					 struct blk_mq_ctx *ctx,
 					 struct request *rq, struct bio *bio)
 {
-	if ((!hctx_allow_merges(hctx)) || (rq->cmd_type == REQ_TYPE_BLOCK_PC)) {
+	if (!hctx_allow_merges(hctx) || !bio_mergeable(bio)|| (rq->cmd_type == REQ_TYPE_BLOCK_PC)) {
 		blk_mq_bio_to_request(rq, bio);
 		spin_lock(&ctx->lock);
 insert_rq:
