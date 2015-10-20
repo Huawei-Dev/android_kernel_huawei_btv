@@ -1314,7 +1314,6 @@ static void blk_mq_make_request(struct request_queue *q, struct bio *bio)
 	unsigned int request_count = 0;
 	struct blk_plug *plug = NULL;
 	struct request *same_queue_rq = NULL;
-	bool merge_plug;
 	unsigned long rq_start_jiffies = jiffies;
 	bool wb_acct;
 
@@ -1325,18 +1324,16 @@ static void blk_mq_make_request(struct request_queue *q, struct bio *bio)
 		return;
 	}
 
-	merge_plug = true;
-
-	if (merge_plug && !is_flush_fua && !blk_queue_nomerges(q) &&
-	    blk_attempt_plug_merge(q, bio, &request_count, &same_queue_rq)){
-		return;
-	}
+	if (!is_flush_fua && !blk_queue_nomerges(q)) {
+		if (blk_attempt_plug_merge(q, bio, &request_count,
+					   &same_queue_rq))
+			return;
+	} else
+		request_count = blk_plug_queued_count(q);
 
 	/*lint -save -e712 -e747*/
-	wb_acct = wbt_wait(q->rq_wb, bio, NULL);
+	wb_acct = wbt_wait(q->rq_wb, bio->bi_rw, NULL);
 	/*lint -restore*/
-
-	bio_latency_check(bio,BIO_PROC_STAGE_WBT);
 
 	rq = blk_mq_map_request(q, bio, &data);
 	if (unlikely(!rq)) {
