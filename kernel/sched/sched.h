@@ -1159,6 +1159,7 @@ extern void update_up_down_migrate(void);
 extern int update_preferred_cluster(struct related_thread_group *grp,
 			struct task_struct *p, u32 old_load);
 extern void set_preferred_cluster(struct related_thread_group *grp);
+extern void add_new_task_to_grp(struct task_struct *new);
 
 enum sched_boost_type {
 	SCHED_BOOST_NONE,
@@ -1633,6 +1634,8 @@ static inline int update_preferred_cluster(struct related_thread_group *grp,
 {
 	return 0;
 }
+
+static inline void add_new_task_to_grp(struct task_struct *new) {}
 
 #define sched_enable_hmp 0
 #define sched_freq_legacy_mode 1
