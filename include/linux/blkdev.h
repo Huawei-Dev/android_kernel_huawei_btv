@@ -530,7 +530,7 @@ struct request_queue {
 	unsigned int crypto_flag;
 #endif
 
-	struct percpu_ref	mq_usage_counter;
+	struct percpu_ref	q_usage_counter;
 	struct list_head	all_q_node;
 
 	struct blk_mq_tag_set	*tag_set;
