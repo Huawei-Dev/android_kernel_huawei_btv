@@ -949,7 +949,6 @@ static struct spi_driver spinand_driver = {
 	.driver = {
 		.name		= "mt29f",
 		.bus		= &spi_bus_type,
-		.owner		= THIS_MODULE,
 		.of_match_table	= spinand_dt,
 	},
 	.probe		= spinand_probe,

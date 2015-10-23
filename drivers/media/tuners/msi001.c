@@ -493,7 +493,6 @@ MODULE_DEVICE_TABLE(spi, msi001_id);
 static struct spi_driver msi001_driver = {
 	.driver = {
 		.name	= "msi001",
-		.owner	= THIS_MODULE,
 	},
 	.probe		= msi001_probe,
 	.remove		= msi001_remove,

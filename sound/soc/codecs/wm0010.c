@@ -999,7 +999,6 @@ static struct spi_driver wm0010_spi_driver = {
 	.driver = {
 		.name	= "wm0010",
 		.bus 	= &spi_bus_type,
-		.owner	= THIS_MODULE,
 	},
 	.probe		= wm0010_spi_probe,
 	.remove		= wm0010_spi_remove,

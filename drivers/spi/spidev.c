@@ -1098,7 +1098,6 @@ static struct spi_driver spidev_spi_driver43 = {
 static struct spi_driver spidev_spi_driver = {
 	.driver = {
 		.name =		"spidev",
-		.owner =	THIS_MODULE,
 		.of_match_table = of_match_ptr(spidev_dt_ids),
 	},
 	.probe =	spidev_probe,
