@@ -119,12 +119,6 @@ static int ccp_platform_probe(struct platform_device *pdev)
 	}
 	ccp->io_regs = ccp->io_map;
 
-	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
-	if (ret) {
-		dev_err(dev, "dma_set_mask_and_coherent failed (%d)\n", ret);
-		goto e_err;
-	}
-
 	attr = device_get_dma_attr(dev);
 	if (attr == DEV_DMA_NOT_SUPPORTED) {
 		dev_err(dev, "DMA is not supported");
@@ -136,6 +130,12 @@ static int ccp_platform_probe(struct platform_device *pdev)
 		ccp->axcache = CACHE_WB_NO_ALLOC;
 	else
 		ccp->axcache = CACHE_NONE;
+
+	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
+	if (ret) {
+		dev_err(dev, "dma_set_mask_and_coherent failed (%d)\n", ret);
+		goto e_err;
+	}
 
 	dev_set_drvdata(dev, ccp);
 

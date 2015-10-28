@@ -238,7 +238,7 @@ static int xgbe_probe(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 	struct resource *res;
 	const char *phy_mode;
-	unsigned int i;
+	unsigned int i, phy_memnum, phy_irqnum;
 	enum dev_dma_attr attr;
 	int ret;
 
