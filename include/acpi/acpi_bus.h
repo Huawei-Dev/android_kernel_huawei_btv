@@ -381,6 +381,17 @@ struct acpi_device {
 	void (*remove)(struct acpi_device *);
 };
 
+/* Non-device subnode */
+struct acpi_data_node {
+	const char *name;
+	acpi_handle handle;
+	struct fwnode_handle fwnode;
+	struct acpi_device_data data;
+	struct list_head sibling;
+	struct kobject kobj;
+	struct completion kobj_done;
+};
+
 static inline bool is_acpi_node(struct fwnode_handle *fwnode)
 {
 	return fwnode && fwnode->type == FWNODE_ACPI;
