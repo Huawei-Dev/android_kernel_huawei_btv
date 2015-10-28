@@ -84,7 +84,7 @@ enum armv8_a57_perf_types {
 };
 
 /* PMUv3 HW events mapping. */
-static const unsigned armv8_pmuv3_perf_map[PERF_COUNT_HW_MAX] = {
+const unsigned armv8_pmuv3_perf_map[PERF_COUNT_HW_MAX] = {
 	PERF_MAP_ALL_UNSUPPORTED,
 	[PERF_COUNT_HW_CPU_CYCLES]		= ARMV8_PMUV3_PERFCTR_CLOCK_CYCLES,
 /*
@@ -120,7 +120,7 @@ static const unsigned armv8_a57_perf_map[PERF_COUNT_HW_MAX] = {
 	[PERF_COUNT_HW_BUS_CYCLES]		= ARMV8_PMUV3_PERFCTR_BUS_CYCLES,
 };
 
-static const unsigned armv8_pmuv3_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
+const unsigned armv8_pmuv3_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
 						[PERF_COUNT_HW_CACHE_OP_MAX]
 						[PERF_COUNT_HW_CACHE_RESULT_MAX] = {
 	PERF_CACHE_MAP_ALL_UNSUPPORTED,

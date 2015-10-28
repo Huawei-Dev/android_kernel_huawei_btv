@@ -111,7 +111,10 @@ struct arm_pmu {
 
 #define to_arm_pmu(p) (container_of(p, struct arm_pmu, pmu))
 
-int armpmu_register(struct arm_pmu *armpmu, int type);
+extern const unsigned armv8_pmuv3_perf_map[PERF_COUNT_HW_MAX];
+extern const unsigned armv8_pmuv3_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
+						[PERF_COUNT_HW_CACHE_OP_MAX]
+						[PERF_COUNT_HW_CACHE_RESULT_MAX];
 
 u64 armpmu_event_update(struct perf_event *event);
 
