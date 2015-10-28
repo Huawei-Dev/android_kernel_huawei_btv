@@ -94,6 +94,7 @@ static int ccp_platform_probe(struct platform_device *pdev)
 	struct ccp_device *ccp;
 	struct ccp_platform *ccp_platform;
 	struct device *dev = &pdev->dev;
+	enum dev_dma_attr attr;
 	struct resource *ior;
 	int ret;
 
@@ -124,7 +125,13 @@ static int ccp_platform_probe(struct platform_device *pdev)
 		goto e_err;
 	}
 
-	ccp_platform->coherent = device_dma_is_coherent(ccp->dev);
+	attr = device_get_dma_attr(dev);
+	if (attr == DEV_DMA_NOT_SUPPORTED) {
+		dev_err(dev, "DMA is not supported");
+		goto e_err;
+	}
+
+	ccp_platform->coherent = (attr == DEV_DMA_COHERENT);
 	if (ccp_platform->coherent)
 		ccp->axcache = CACHE_WB_NO_ALLOC;
 	else

@@ -174,6 +174,10 @@ struct property_set {
 
 void device_add_property_set(struct device *dev, struct property_set *pset);
 
+bool device_dma_supported(struct device *dev);
+
+enum dev_dma_attr device_get_dma_attr(struct device *dev);
+
 int device_get_phy_mode(struct device *dev);
 
 void *device_get_mac_address(struct device *dev, char *addr, int alen);
