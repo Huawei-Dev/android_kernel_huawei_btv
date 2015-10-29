@@ -2467,9 +2467,6 @@ static int ext4_mknod(struct inode *dir, struct dentry *dentry,
 	struct inode *inode;
 	int err, credits, retries = 0;
 
-	if (!new_valid_dev(rdev))
-		return -EINVAL;
-
 	err = dquot_initialize(dir);
 	if (err)
 		return err;
