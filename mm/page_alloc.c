@@ -1846,6 +1846,7 @@ static struct page *__rmqueue(struct zone *zone, unsigned int order,
 	return page;
 }
 
+#ifdef CONFIG_CMA
 static struct page *__rmqueue_cma(struct zone *zone, unsigned int order)
 {
 	struct page *page = 0;
@@ -1855,6 +1856,12 @@ static struct page *__rmqueue_cma(struct zone *zone, unsigned int order)
 	trace_mm_page_alloc_zone_locked(page, order, MIGRATE_CMA);
 	return page;
 }
+#else
+static inline struct page *__rmqueue_cma(struct zone *zone, unsigned int order)
+{
+	return NULL;
+}
+#endif
 
 /*
  * Obtain a specified number of elements from the buddy allocator, all under
