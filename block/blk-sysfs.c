@@ -333,6 +333,34 @@ queue_rq_affinity_store(struct request_queue *q, const char *page, size_t count)
 	return ret;
 }
 
+static ssize_t queue_poll_show(struct request_queue *q, char *page)
+{
+	return queue_var_show(test_bit(QUEUE_FLAG_POLL, &q->queue_flags), page);
+}
+
+static ssize_t queue_poll_store(struct request_queue *q, const char *page,
+				size_t count)
+{
+	unsigned long poll_on;
+	ssize_t ret;
+
+	if (!q->mq_ops || !q->mq_ops->poll)
+		return -EINVAL;
+
+	ret = queue_var_store(&poll_on, page, count);
+	if (ret < 0)
+		return ret;
+
+	spin_lock_irq(q->queue_lock);
+	if (poll_on)
+		queue_flag_set(QUEUE_FLAG_POLL, q);
+	else
+		queue_flag_clear(QUEUE_FLAG_POLL, q);
+	spin_unlock_irq(q->queue_lock);
+
+	return ret;
+}
+
 #ifdef CONFIG_WBT
 static ssize_t queue_wb_win_show(struct request_queue *q, char *page)
 {
@@ -603,6 +631,12 @@ static struct queue_sysfs_entry queue_random_entry = {
 	.store = queue_store_random,
 };
 
+static struct queue_sysfs_entry queue_poll_entry = {
+	.attr = {.name = "io_poll", .mode = S_IRUGO | S_IWUSR },
+	.show = queue_poll_show,
+	.store = queue_poll_store,
+};
+
 #ifdef CONFIG_WBT
 static struct queue_sysfs_entry queue_wc_entry = {
 	.attr = {.name = "write_cache", .mode = S_IRUGO | S_IWUSR },
@@ -610,12 +644,10 @@ static struct queue_sysfs_entry queue_wc_entry = {
 	.store = queue_wc_store,
 };
 
-/*lint -save -e785*/
 static struct queue_sysfs_entry queue_stats_entry = {
 	.attr = {.name = "stats", .mode = S_IRUGO },
 	.show = queue_stats_show,
 };
-/*lint -restore*/
 
 static struct queue_sysfs_entry queue_wb_lat_entry = {
 	.attr = {.name = "wb_lat_usec", .mode = S_IRUGO | S_IWUSR },
@@ -636,12 +668,10 @@ static struct queue_sysfs_entry queue_wb_ok_cnt_entry = {
 };
 #endif
 
-/*lint -save -e785*/
 static struct queue_sysfs_entry queue_avg_perf_entry = {
 	.attr = {.name = "average_perf", .mode = S_IRUGO },
 	.show = queue_avg_perf_show,
 };
-/*lint restore*/
 
 static struct attribute *default_attrs[] = {
 	&queue_requests_entry.attr,
@@ -667,6 +697,7 @@ static struct attribute *default_attrs[] = {
 	&queue_rq_affinity_entry.attr,
 	&queue_iostats_entry.attr,
 	&queue_random_entry.attr,
+	&queue_poll_entry.attr,
 #ifdef CONFIG_WBT
 	&queue_wc_entry.attr,
 	&queue_stats_entry.attr,

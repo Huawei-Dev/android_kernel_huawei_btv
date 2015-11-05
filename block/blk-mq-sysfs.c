@@ -174,6 +174,11 @@ static ssize_t blk_mq_sysfs_rq_list_show(struct blk_mq_ctx *ctx, char *page)
 	return ret;
 }
 
+static ssize_t blk_mq_hw_sysfs_poll_show(struct blk_mq_hw_ctx *hctx, char *page)
+{
+	return sprintf(page, "invoked=%lu, success=%lu\n", hctx->poll_invoked, hctx->poll_success);
+}
+
 static ssize_t blk_mq_hw_sysfs_queued_show(struct blk_mq_hw_ctx *hctx,
 					   char *page)
 {
@@ -346,6 +351,11 @@ static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_cpus = {
 	.attr = {.name = "cpu_list", .mode = S_IRUGO },
 	.show = blk_mq_hw_sysfs_cpus_show,
 };
+static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_poll = {
+	.attr = {.name = "io_poll", .mode = S_IRUGO },
+	.show = blk_mq_hw_sysfs_poll_show,
+};
+
 #ifdef CONFIG_WBT
 static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_stat = {
 	.attr = {.name = "stats", .mode = S_IRUGO | S_IWUSR },
@@ -362,6 +372,7 @@ static struct attribute *default_hw_ctx_attrs[] = {
 	&blk_mq_hw_sysfs_tags.attr,
 	&blk_mq_hw_sysfs_cpus.attr,
 	&blk_mq_hw_sysfs_active.attr,
+	&blk_mq_hw_sysfs_poll.attr,
 #ifdef CONFIG_WBT
 	&blk_mq_hw_sysfs_stat.attr,
 #endif
