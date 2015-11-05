@@ -2441,7 +2441,7 @@ static void pkt_make_request_write(struct request_queue *q, struct bio *bio)
 	}
 }
 
-static void pkt_make_request(struct request_queue *q, struct bio *bio)
+static blk_qc_t pkt_make_request(struct request_queue *q, struct bio *bio)
 {
 	struct pktcdvd_device *pd;
 	char b[BDEVNAME_SIZE];
@@ -2463,7 +2463,7 @@ static void pkt_make_request(struct request_queue *q, struct bio *bio)
 	 */
 	if (bio_data_dir(bio) == READ) {
 		pkt_make_request_read(pd, bio);
-		return;
+		return BLK_QC_T_NONE;
 	}
 
 	if (!test_bit(PACKET_WRITABLE, &pd->flags)) {
@@ -2497,31 +2497,10 @@ static void pkt_make_request(struct request_queue *q, struct bio *bio)
 		pkt_make_request_write(q, split);
 	} while (split != bio);
 
-	return;
+	return BLK_QC_T_NONE;
 end_io:
 	bio_io_error(bio);
-}
-
-
-
-static int pkt_merge_bvec(struct request_queue *q, struct bvec_merge_data *bmd,
-			  struct bio_vec *bvec)
-{
-	struct pktcdvd_device *pd = q->queuedata;
-	sector_t zone = get_zone(bmd->bi_sector, pd);
-	int used = ((bmd->bi_sector - zone) << 9) + bmd->bi_size;
-	int remaining = (pd->settings.size << 9) - used;
-	int remaining2;
-
-	/*
-	 * A bio <= PAGE_SIZE must be allowed. If it crosses a packet
-	 * boundary, pkt_make_request() will split the bio.
-	 */
-	remaining2 = PAGE_SIZE - bmd->bi_size;
-	remaining = max(remaining, remaining2);
-
-	BUG_ON(remaining < 0);
-	return remaining;
+	return BLK_QC_T_NONE;
 }
 
 static void pkt_init_queue(struct pktcdvd_device *pd)

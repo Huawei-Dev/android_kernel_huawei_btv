@@ -288,6 +288,30 @@ enum rq_flag_bits {
 #define REQ_MQ_INFLIGHT		(1ULL << __REQ_MQ_INFLIGHT)
 #define REQ_NO_TIMEOUT		(1ULL << __REQ_NO_TIMEOUT)
 
+typedef unsigned int blk_qc_t;
+#define BLK_QC_T_NONE	-1U
+#define BLK_QC_T_SHIFT	16
+
+static inline bool blk_qc_t_valid(blk_qc_t cookie)
+{
+	return cookie != BLK_QC_T_NONE;
+}
+
+static inline blk_qc_t blk_tag_to_qc_t(unsigned int tag, unsigned int queue_num)
+{
+	return tag | (queue_num << BLK_QC_T_SHIFT);
+}
+
+static inline unsigned int blk_qc_t_to_queue_num(blk_qc_t cookie)
+{
+	return cookie >> BLK_QC_T_SHIFT;
+}
+
+static inline unsigned int blk_qc_t_to_tag(blk_qc_t cookie)
+{
+	return cookie & 0xffff;
+}
+
 struct blk_rq_stat {
 	s64 mean;
 	u64 min;
@@ -308,5 +332,4 @@ struct blk_rq_stat {
 #define REQ_DELAY_WARNING_MQ_REQ_FREE				(500)
 
 static inline void bio_latency_check(struct bio *bio,enum bio_process_stage_enum bio_stage){}
-
 #endif /* __LINUX_BLK_TYPES_H */
