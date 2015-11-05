@@ -375,7 +375,6 @@ static void blk_mq_stat_add(struct request *rq)
 {
 	struct blk_rq_stat *stat;
 
-	/*lint -save -e514*/
 	stat = &rq->mq_ctx->stat[rq_data_dir(rq)];
 
 	blk_stat_add(stat, rq);
@@ -384,11 +383,10 @@ static void blk_mq_stat_add(struct request *rq)
 		stat = &rq->mq_ctx->stat[2 + rq_data_dir(rq)];
 		blk_stat_add(stat, rq);
 	}
-	/*lint -restore*/
 }
 #endif
 
-void __blk_mq_complete_request(struct request *rq)
+static void __blk_mq_complete_request(struct request *rq)
 {
 	struct request_queue *q = rq->q;
 
