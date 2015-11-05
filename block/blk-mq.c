@@ -1265,7 +1265,7 @@ static struct request *blk_mq_map_request(struct request_queue *q,
 	return rq;
 }
 
-static int blk_mq_direct_issue_request(struct request *rq)
+static int blk_mq_direct_issue_request(struct request *rq, blk_qc_t *cookie)
 {
 	int ret;
 	struct request_queue *q = rq->q;
@@ -1276,9 +1276,7 @@ static int blk_mq_direct_issue_request(struct request *rq)
 		.list = NULL,
 		.last = 1
 	};
-	struct request processing_rq;
-
-	req_latency_check(rq,REQ_PROC_STAGE_MQ_SYNC_DISPATCH);
+	blk_qc_t new_cookie = blk_tag_to_qc_t(rq->tag, hctx->queue_num);
 
 	/*
 	 * For OK queue, we are done. For error, kill it. Any other
@@ -1287,20 +1285,21 @@ static int blk_mq_direct_issue_request(struct request *rq)
 	 */
 	ret = q->mq_ops->queue_rq(hctx, &bd);
 
-	if (ret == BLK_MQ_RQ_QUEUE_OK){
+	if (likely(ret == BLK_MQ_RQ_QUEUE_OK)) {
+		*cookie = new_cookie;
 		return 0;
 	}
-	else {
-		__blk_mq_requeue_request(rq);
 
-		if (ret == BLK_MQ_RQ_QUEUE_ERROR) {
-			rq->errors = -EIO;
-			blk_mq_end_request(rq, rq->errors);
-			return 0;
-		}
-		req_latency_check(rq,REQ_PROC_STAGE_MQ_REQUEUE);
-		return -1;
+	__blk_mq_requeue_request(rq);
+
+	if (unlikely(ret == BLK_MQ_RQ_QUEUE_ERROR)) {
+		*cookie = BLK_QC_T_NONE;
+		rq->errors = -EIO;
+		blk_mq_end_request(rq, rq->errors);
+		return 0;
 	}
+
+	return -1;
 }
 
 /*
@@ -1317,7 +1316,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
 	unsigned int request_count = 0;
 	struct blk_plug *plug = NULL;
 	struct request *same_queue_rq = NULL;
-	unsigned long rq_start_jiffies = jiffies;
+	blk_qc_t cookie;
 	bool wb_acct;
 
 	blk_queue_bounce(q, &bio);
@@ -1346,6 +1345,8 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
 	if (unlikely(wb_acct))
 		wbt_mark_tracked(&rq->wb_stat);
 
+	cookie = blk_tag_to_qc_t(rq->tag, data.hctx->queue_num);
+
 	if (unlikely(is_flush_fua)) {
 		blk_mq_bio_to_request(rq, bio);
 		blk_insert_flush(rq);
@@ -1362,6 +1363,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
 	if (((plug && !blk_queue_nomerges(q)) || is_sync) &&
 	    !(data.hctx->flags & BLK_MQ_F_DEFER_ISSUE)) {
 		struct request *old_rq = NULL;
+
 		blk_mq_bio_to_request(rq, bio);
 
 		/*
@@ -1385,9 +1387,9 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
 		blk_mq_put_ctx(data.ctx);
 		if (!old_rq)
 			goto done;
-		if (!blk_mq_direct_issue_request(old_rq))
-			goto done;
-		blk_mq_insert_request(old_rq, false, true, true);
+		if (test_bit(BLK_MQ_S_STOPPED, &data.hctx->state) ||
+			blk_mq_direct_issue_request(old_rq, &cookie) != 0)
+			blk_mq_insert_request(old_rq, false, true, true);
 		goto done;
 	}
 
@@ -1401,9 +1403,9 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
 run_queue:
 		blk_mq_run_hw_queue(data.hctx, !is_sync || is_flush_fua);
 	}
-done:
 	blk_mq_put_ctx(data.ctx);
-	return BLK_QC_T_NONE;
+done:
+	return cookie;
 }
 
 /*
@@ -1418,6 +1420,7 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
 	unsigned int request_count = 0;
 	struct blk_map_ctx data;
 	struct request *rq;
+	blk_qc_t cookie;
 	bool wb_acct;
 
 	blk_queue_bounce(q, &bio);
@@ -1443,6 +1446,8 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
 	if (wb_acct)
 		wbt_mark_tracked(&rq->wb_stat);
 
+	cookie = blk_tag_to_qc_t(rq->tag, data.hctx->queue_num);
+
 	if (unlikely(is_flush_fua)) {
 		blk_mq_bio_to_request(rq, bio);
 		blk_insert_flush(rq);
@@ -1465,7 +1470,7 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
 		}
 		list_add_tail(&rq->queuelist, &plug->mq_list);
 		blk_mq_put_ctx(data.ctx);
-		return BLK_QC_T_NONE;
+		return cookie;
 	}
 
 	if (!blk_mq_merge_queue_io(data.hctx, data.ctx, rq, bio)) {
@@ -1480,7 +1485,7 @@ run_queue:
 	}
 
 	blk_mq_put_ctx(data.ctx);
-	return BLK_QC_T_NONE;
+	return cookie;
 }
 
 /*
