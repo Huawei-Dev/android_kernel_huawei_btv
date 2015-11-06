@@ -500,6 +500,9 @@ struct mm_struct {
 	/* address of the bounds directory */
 	void __user *bd_addr;
 #endif
+#ifdef CONFIG_HUGETLB_PAGE
+	atomic_long_t hugetlb_usage;
+#endif
 	struct work_struct async_put_work;
 };
 
