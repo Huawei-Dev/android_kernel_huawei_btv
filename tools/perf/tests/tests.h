@@ -68,7 +68,7 @@ int test__fdarray__add(void);
 int test__kmod_path__parse(void);
 int test__thread_map(void);
 int test__llvm(void);
-int test__insn_x86(void);
+int test__bpf(void);
 int test_session_topology(void);
 
 #if defined(__x86_64__) || defined(__i386__) || defined(__arm__) || defined(__aarch64__)

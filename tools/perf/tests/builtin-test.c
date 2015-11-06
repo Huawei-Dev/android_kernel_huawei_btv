@@ -185,13 +185,16 @@ static struct test generic_tests[] = {
 #if defined(__x86_64__) || defined(__i386__)
 	{
 		.desc = "Test x86 instruction decoder - new instructions",
-		.func = test__insn_x86,
 	},
 #endif
 #endif
 	{
 		.desc = "Test topology in session",
 		.func = test_session_topology,
+	},
+	{
+		.desc = "Test BPF filter",
+		.func = test__bpf,
 	},
 	{
 		.func = NULL,
