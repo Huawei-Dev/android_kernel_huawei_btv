@@ -1034,8 +1034,7 @@ int proc_watchdog_thresh(struct ctl_table *table, int write,
 		goto out;
 
 	/*
-	 * Update the sample period.
-	 * Restore 'watchdog_thresh' on failure.
+	 * Update the sample period. Restore on failure.
 	 */
 	new = ACCESS_ONCE(watchdog_thresh);
 	if (old == new)
@@ -1043,8 +1042,10 @@ int proc_watchdog_thresh(struct ctl_table *table, int write,
 
 	set_sample_period();
 	err = proc_watchdog_update();
-	if (err)
+	if (err) {
 		watchdog_thresh = old;
+		set_sample_period();
+	}
 out:
 	mutex_unlock(&watchdog_proc_mutex);
 	return err;
