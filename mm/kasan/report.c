@@ -204,27 +204,7 @@ static void print_shadow_for_address(const void *addr)
 
 static DEFINE_SPINLOCK(report_lock);
 
-void kasan_report_error(struct kasan_access_info *info)
-{
-	unsigned long flags;
-
-	/*
-	 * Make sure we don't end up in loop.
-	 */
-	kasan_disable_current();
-	spin_lock_irqsave(&report_lock, flags);
-	pr_err("================================="
-		"=================================\n");
-	print_error_description(info);
-	print_address_description(info);
-	print_shadow_for_address(info->first_bad_addr);
-	pr_err("================================="
-		"=================================\n");
-	spin_unlock_irqrestore(&report_lock, flags);
-	kasan_enable_current();
-}
-
-void kasan_report_user_access(struct kasan_access_info *info)
+static void kasan_report_error(struct kasan_access_info *info)
 {
 	unsigned long flags;
 	const char *bug_type;
@@ -244,7 +224,7 @@ void kasan_report_user_access(struct kasan_access_info *info)
 			bug_type = "user-memory-access";
 		else
 			bug_type = "wild-memory-access";
-		pr_err("BUG: KASAN: %s on address %p\n",
+		pr_err("BUG: KASan: %s on address %p\n",
 			bug_type, info->access_addr);
 		pr_err("%s of size %zu by task %s/%d\n",
 			info->is_write ? "Write" : "Read",
