@@ -974,6 +974,7 @@ static int proc_watchdog_common(int which, struct ctl_table *table, int write,
 	int err, old, new;
 	int *watchdog_param = (int *)table->data;
 
+	get_online_cpus();
 	mutex_lock(&watchdog_proc_mutex);
 
 	if (watchdog_suspended) {
@@ -1028,6 +1029,7 @@ static int proc_watchdog_common(int which, struct ctl_table *table, int write,
 	}
 out:
 	mutex_unlock(&watchdog_proc_mutex);
+	put_online_cpus();
 	return err;
 }
 
@@ -1069,6 +1071,7 @@ int proc_watchdog_thresh(struct ctl_table *table, int write,
 {
 	int err, old, new;
 
+	get_online_cpus();
 	mutex_lock(&watchdog_proc_mutex);
 
 	if (watchdog_suspended) {
@@ -1098,6 +1101,7 @@ int proc_watchdog_thresh(struct ctl_table *table, int write,
 	}
 out:
 	mutex_unlock(&watchdog_proc_mutex);
+	put_online_cpus();
 	return err;
 }
 
@@ -1112,6 +1116,7 @@ int proc_watchdog_cpumask(struct ctl_table *table, int write,
 {
 	int err;
 
+	get_online_cpus();
 	mutex_lock(&watchdog_proc_mutex);
 
 	if (watchdog_suspended) {
@@ -1139,6 +1144,7 @@ int proc_watchdog_cpumask(struct ctl_table *table, int write,
 	}
 out:
 	mutex_unlock(&watchdog_proc_mutex);
+	put_online_cpus();
 	return err;
 }
 
