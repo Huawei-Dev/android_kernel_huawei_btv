@@ -1632,7 +1632,7 @@ static void *__vmalloc_area_node(struct vm_struct *area, gfp_t gfp_mask,
 		}
 		area->pages[i] = page;
 		page_tracker_set_type(page, TRACK_VMALLOC, order);
-		if (gfp_mask & __GFP_WAIT)
+		if (gfpflags_allow_blocking(gfp_mask))
 			cond_resched();
 	}
 

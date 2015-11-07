@@ -39,7 +39,7 @@
 /*lint -save -e84 -e737*/
 
 static gfp_t high_order_gfp_flags = (GFP_USER | __GFP_NOWARN |
-				     __GFP_NORETRY) & ~__GFP_WAIT;
+				     __GFP_NORETRY) & ~__GFP_DIRECT_RECLAIM;
 static gfp_t low_order_gfp_flags  = GFP_USER;
 
 static const unsigned int orders[] = {8, 4, 0};
