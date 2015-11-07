@@ -1104,8 +1104,8 @@ static int mgc_apply_recover_logs(struct obd_device *mgc,
 	LASSERT(cfg->cfg_instance != NULL);
 	LASSERT(cfg->cfg_sb == cfg->cfg_instance);
 
-	inst = kzalloc(PAGE_CACHE_SIZE, GFP_NOFS);
-	if (inst == NULL)
+	inst = kzalloc(PAGE_CACHE_SIZE, GFP_KERNEL);
+	if (!inst)
 		return -ENOMEM;
 
 	if (!IS_SERVER(lsi)) {
@@ -1311,14 +1311,14 @@ static int mgc_process_recover_log(struct obd_device *obd,
 	if (cfg->cfg_last_idx == 0) /* the first time */
 		nrpages = CONFIG_READ_NRPAGES_INIT;
 
-	pages = kcalloc(nrpages, sizeof(*pages), GFP_NOFS);
+	pages = kcalloc(nrpages, sizeof(*pages), GFP_KERNEL);
 	if (pages == NULL) {
 		rc = -ENOMEM;
 		goto out;
 	}
 
 	for (i = 0; i < nrpages; i++) {
-		pages[i] = alloc_page(GFP_IOFS);
+		pages[i] = alloc_page(GFP_KERNEL);
 		if (pages[i] == NULL) {
 			rc = -ENOMEM;
 			goto out;
@@ -1469,8 +1469,8 @@ static int mgc_process_cfg_log(struct obd_device *mgc,
 	if (cld->cld_cfg.cfg_sb)
 		lsi = s2lsi(cld->cld_cfg.cfg_sb);
 
-	env = kzalloc(sizeof(*env), GFP_NOFS);
-	if (env == NULL)
+	env = kzalloc(sizeof(*env), GFP_KERNEL);
+	if (!env)
 		return -ENOMEM;
 
 	rc = lu_env_init(env, LCT_MG_THREAD);
