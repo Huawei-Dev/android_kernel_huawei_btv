@@ -63,6 +63,8 @@ enum {
 	MIGRATE_TYPES
 };
 
+#define MIGRATE_PCPTYPES (MIGRATE_RECLAIMABLE+1)
+
 #ifdef CONFIG_CMA
 #  define is_migrate_cma(migratetype) unlikely((migratetype) == MIGRATE_CMA)
 #else
@@ -430,12 +432,6 @@ struct zone {
 	unsigned long		present_pages;
 
 	const char		*name;
-
-	/*
-	 * Number of MIGRATE_RESERVE page block. To maintain for just
-	 * optimization. Protected by zone->lock.
-	 */
-	int			nr_migrate_reserve_block;
 
 #ifdef CONFIG_MEMORY_ISOLATION
 	/*
