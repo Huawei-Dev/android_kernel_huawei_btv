@@ -309,7 +309,7 @@ static inline unsigned int blk_qc_t_to_queue_num(blk_qc_t cookie)
 
 static inline unsigned int blk_qc_t_to_tag(blk_qc_t cookie)
 {
-	return cookie & 0xffff;
+	return cookie & ((1u << BLK_QC_T_SHIFT) - 1);
 }
 
 struct blk_rq_stat {
