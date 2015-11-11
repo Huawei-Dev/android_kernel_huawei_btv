@@ -2543,7 +2543,7 @@ static int tpacket_snd(struct packet_sock *po, struct msghdr *msg)
 		tp_len = tpacket_fill_skb(po, skb, ph, dev, size_max, proto,
 					  addr, hlen);
 		if (likely(tp_len >= 0) &&
-		    tp_len > dev->mtu + reserve &&
+		    tp_len > dev->mtu + dev->hard_header_len &&
 		    !packet_extra_vlan_len_allowed(dev, skb))
 			tp_len = -EMSGSIZE;
 
