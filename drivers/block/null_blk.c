@@ -45,6 +45,7 @@ static LIST_HEAD(nullb_list);
 static struct mutex lock;
 static int null_major;
 static int nullb_indexes;
+static struct kmem_cache *ppa_cache;
 
 struct completion_queue {
 	struct llist_head list;
@@ -436,6 +437,125 @@ static void null_del_dev(struct nullb *nullb)
 	kfree(nullb);
 }
 
+#ifdef CONFIG_NVM
+
+static void null_lnvm_end_io(struct request *rq, int error)
+{
+	struct nvm_rq *rqd = rq->end_io_data;
+	struct nvm_dev *dev = rqd->dev;
+
+	dev->mt->end_io(rqd, error);
+
+	blk_put_request(rq);
+}
+
+static int null_lnvm_submit_io(struct request_queue *q, struct nvm_rq *rqd)
+{
+	struct request *rq;
+	struct bio *bio = rqd->bio;
+
+	rq = blk_mq_alloc_request(q, bio_rw(bio), GFP_KERNEL, 0);
+	if (IS_ERR(rq))
+		return -ENOMEM;
+
+	rq->cmd_type = REQ_TYPE_DRV_PRIV;
+	rq->__sector = bio->bi_iter.bi_sector;
+	rq->ioprio = bio_prio(bio);
+
+	if (bio_has_data(bio))
+		rq->nr_phys_segments = bio_phys_segments(q, bio);
+
+	rq->__data_len = bio->bi_iter.bi_size;
+	rq->bio = rq->biotail = bio;
+
+	rq->end_io_data = rqd;
+
+	blk_execute_rq_nowait(q, NULL, rq, 0, null_lnvm_end_io);
+
+	return 0;
+}
+
+static int null_lnvm_id(struct request_queue *q, struct nvm_id *id)
+{
+	sector_t size = gb * 1024 * 1024 * 1024ULL;
+	struct nvm_id_group *grp;
+
+	id->ver_id = 0x1;
+	id->vmnt = 0;
+	id->cgrps = 1;
+	id->cap = 0x3;
+	id->dom = 0x1;
+	id->ppat = NVM_ADDRMODE_LINEAR;
+
+	do_div(size, bs); /* convert size to pages */
+	grp = &id->groups[0];
+	grp->mtype = 0;
+	grp->fmtype = 1;
+	grp->num_ch = 1;
+	grp->num_lun = 1;
+	grp->num_pln = 1;
+	grp->num_blk = size / 256;
+	grp->num_pg = 256;
+	grp->fpg_sz = bs;
+	grp->csecs = bs;
+	grp->trdt = 25000;
+	grp->trdm = 25000;
+	grp->tprt = 500000;
+	grp->tprm = 500000;
+	grp->tbet = 1500000;
+	grp->tbem = 1500000;
+	grp->mpos = 0x010101; /* single plane rwe */
+	grp->cpar = hw_queue_depth;
+
+	return 0;
+}
+
+static void *null_lnvm_create_dma_pool(struct request_queue *q, char *name)
+{
+	mempool_t *virtmem_pool;
+
+	virtmem_pool = mempool_create_slab_pool(64, ppa_cache);
+	if (!virtmem_pool) {
+		pr_err("null_blk: Unable to create virtual memory pool\n");
+		return NULL;
+	}
+
+	return virtmem_pool;
+}
+
+static void null_lnvm_destroy_dma_pool(void *pool)
+{
+	mempool_destroy(pool);
+}
+
+static void *null_lnvm_dev_dma_alloc(struct request_queue *q, void *pool,
+				gfp_t mem_flags, dma_addr_t *dma_handler)
+{
+	return mempool_alloc(pool, mem_flags);
+}
+
+static void null_lnvm_dev_dma_free(void *pool, void *entry,
+							dma_addr_t dma_handler)
+{
+	mempool_free(entry, pool);
+}
+
+static struct nvm_dev_ops null_lnvm_dev_ops = {
+	.identity		= null_lnvm_id,
+	.submit_io		= null_lnvm_submit_io,
+
+	.create_dma_pool	= null_lnvm_create_dma_pool,
+	.destroy_dma_pool	= null_lnvm_destroy_dma_pool,
+	.dev_dma_alloc		= null_lnvm_dev_dma_alloc,
+	.dev_dma_free		= null_lnvm_dev_dma_free,
+
+	/* Simulate nvme protocol restriction */
+	.max_phys_sect		= 64,
+};
+#else
+static struct nvm_dev_ops null_lnvm_dev_ops;
+#endif /* CONFIG_NVM */
+
 static int null_open(struct block_device *bdev, fmode_t mode)
 {
 	return 0;
@@ -625,6 +745,18 @@ static int __init null_init(void)
 		bs = PAGE_SIZE;
 	}
 
+	if (use_lightnvm && bs != 4096) {
+		pr_warn("null_blk: LightNVM only supports 4k block size\n");
+		pr_warn("null_blk: defaults block size to 4k\n");
+		bs = 4096;
+	}
+
+	if (use_lightnvm && queue_mode != NULL_Q_MQ) {
+		pr_warn("null_blk: LightNVM only supported for blk-mq\n");
+		pr_warn("null_blk: defaults queue mode to blk-mq\n");
+		queue_mode = NULL_Q_MQ;
+	}
+
 	if (queue_mode == NULL_Q_MQ && use_per_node_hctx) {
 		if (submit_queues < nr_online_nodes) {
 			pr_warn("null_blk: submit_queues param is set to %u.",
@@ -655,15 +787,27 @@ static int __init null_init(void)
 	if (null_major < 0)
 		return null_major;
 
+	if (use_lightnvm) {
+		ppa_cache = kmem_cache_create("ppa_cache", 64 * sizeof(u64),
+								0, 0, NULL);
+		if (!ppa_cache) {
+			pr_err("null_blk: unable to create ppa cache\n");
+			return -ENOMEM;
+		}
+	}
+
 	for (i = 0; i < nr_devices; i++) {
 		if (null_add_dev()) {
 			unregister_blkdev(null_major, "nullb");
-			return -EINVAL;
+			goto err_ppa;
 		}
 	}
 
 	pr_info("null: module loaded\n");
 	return 0;
+err_ppa:
+	kmem_cache_destroy(ppa_cache);
+	return -EINVAL;
 }
 
 static void __exit null_exit(void)
@@ -678,6 +822,8 @@ static void __exit null_exit(void)
 		null_del_dev(nullb);
 	}
 	mutex_unlock(&lock);
+
+	kmem_cache_destroy(ppa_cache);
 }
 
 module_init(null_init);
