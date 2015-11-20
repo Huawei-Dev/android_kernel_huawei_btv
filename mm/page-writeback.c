@@ -1538,7 +1538,10 @@ static void balance_dirty_pages(struct address_space *mapping,
 	for (;;) {
 		unsigned long now = jiffies;
 		unsigned long dirty, thresh, bg_thresh;
-		unsigned long m_dirty, m_thresh, m_bg_thresh;
+		unsigned long m_dirty = 0;	/* stop bogus uninit warnings */
+		unsigned long m_thresh = 0;
+		unsigned long m_bg_thresh = 0;
+
 #ifdef CONFIG_BLK_DEV_THROTTLING
 		struct blkcg_gq *blkg;
 		unsigned int weight;
@@ -1553,6 +1556,7 @@ static void balance_dirty_pages(struct address_space *mapping,
 					     mapping->host->i_sb->s_bdev);
 		task_blkg_inc_writer(blkg);
 #endif
+
 		/*
 		 * Unstable writes are a feature of certain networked
 		 * filesystems (i.e. NFS) in which data may have been
