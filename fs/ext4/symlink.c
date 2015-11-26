@@ -55,7 +55,7 @@ static const char *ext4_follow_link(struct dentry *dentry, void **cookie)
 	/* Symlink is encrypted */
 	sd = (struct ext4_encrypted_symlink_data *)caddr;
 	cstr.name = sd->encrypted_path;
-	cstr.len  = le32_to_cpu(sd->len);
+	cstr.len  = le16_to_cpu(sd->len);
 	if ((cstr.len +
 	     sizeof(struct ext4_encrypted_symlink_data) - 1) >
 	    max_size) {
