@@ -978,6 +978,7 @@ static struct sock *tcp_v6_syn_recv_sock(const struct sock *sk, struct sk_buff *
 	struct inet_request_sock *ireq;
 	struct ipv6_pinfo *newnp;
 	const struct ipv6_pinfo *np = inet6_sk(sk);
+	struct ipv6_txoptions *opt;
 	struct tcp6_sock *newtcp6sk;
 	struct ipv6_txoptions *opt;
 	struct inet_sock *newinet;
