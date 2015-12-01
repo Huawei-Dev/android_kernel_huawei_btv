@@ -5,6 +5,7 @@
  */
 
 #include <asm-generic/vmlinux.lds.h>
+#include <asm/cache.h>
 #include <asm/kernel-pgtable.h>
 #include <asm/thread_info.h>
 #include <asm/memory.h>
@@ -152,7 +153,7 @@ SECTIONS
 		ARM_EXIT_KEEP(EXIT_DATA)
 	}
 
-	PERCPU_SECTION(64)
+	PERCPU_SECTION(L1_CACHE_BYTES)
 
 	. = ALIGN(PAGE_SIZE);
 	__init_end = .;
@@ -177,7 +178,7 @@ SECTIONS
 	. = ALIGN(PAGE_SIZE);
 	_data = .;
 	_sdata = .;
-	RW_DATA_SECTION(64, PAGE_SIZE, THREAD_SIZE)
+	RW_DATA_SECTION(L1_CACHE_BYTES, PAGE_SIZE, THREAD_SIZE)
 	PECOFF_EDATA_PADDING
 	_edata = .;
 
