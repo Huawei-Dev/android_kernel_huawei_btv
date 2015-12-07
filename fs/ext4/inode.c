@@ -5032,6 +5032,7 @@ int ext4_setattr(struct dentry *dentry, struct iattr *attr)
 		up_write(&EXT4_I(inode)->i_mmap_sem);
 		if (shrink)
 			ext4_truncate(inode);
+		up_write(&EXT4_I(inode)->i_mmap_sem);
 	}
 
 	if (!rc) {
