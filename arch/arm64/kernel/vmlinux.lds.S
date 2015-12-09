@@ -154,9 +154,6 @@ SECTIONS
 
 	PERCPU_SECTION(L1_CACHE_BYTES)
 
-	. = ALIGN(PAGE_SIZE);
-	__init_end = .;
-
 	. = ALIGN(32);
 	__start_hwlog_tag = .;
 	__start_hwlog_tag : {
@@ -175,6 +172,8 @@ SECTIONS
 	}
 
 	. = ALIGN(PAGE_SIZE);
+	__init_end = .;
+
 	_data = .;
 	_sdata = .;
 	RW_DATA_SECTION(L1_CACHE_BYTES, PAGE_SIZE, THREAD_SIZE)
