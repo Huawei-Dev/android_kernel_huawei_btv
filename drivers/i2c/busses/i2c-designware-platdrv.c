@@ -235,10 +235,6 @@ static int dw_i2c_plat_probe(struct platform_device *pdev)
 	ACPI_COMPANION_SET(&adap->dev, ACPI_COMPANION(&pdev->dev));
 	adap->dev.of_node = pdev->dev.of_node;
 
-	r = i2c_dw_probe(dev);
-	if (r)
-		return r;
-
 	if (dev->pm_runtime_disabled) {
 		pm_runtime_forbid(&pdev->dev);
 	} else {
@@ -248,14 +244,11 @@ static int dw_i2c_plat_probe(struct platform_device *pdev)
 		pm_runtime_enable(&pdev->dev);
 	}
 
-	r = i2c_add_numbered_adapter(adap);
-	if (r) {
-		dev_err(&pdev->dev, "failure adding adapter\n");
+	r = i2c_dw_probe(dev);
+	if (r && !dev->pm_runtime_disabled)
 		pm_runtime_disable(&pdev->dev);
-		return r;
-	}
 
-	return 0;
+	return r;
 }
 
 static int dw_i2c_plat_remove(struct platform_device *pdev)
@@ -270,7 +263,8 @@ static int dw_i2c_plat_remove(struct platform_device *pdev)
 
 	pm_runtime_dont_use_autosuspend(&pdev->dev);
 	pm_runtime_put_sync(&pdev->dev);
-	pm_runtime_disable(&pdev->dev);
+	if (!dev->pm_runtime_disabled)
+		pm_runtime_disable(&pdev->dev);
 
 	return 0;
 }
