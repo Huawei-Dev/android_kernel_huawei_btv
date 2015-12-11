@@ -2,6 +2,7 @@
  * drivers/staging/android/ion/ion_priv.h
  *
  * Copyright (C) 2011 Google, Inc.
+ * Copyright (c) 2011-2016, The Linux Foundation. All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -461,6 +462,7 @@ struct ion_page_pool *ion_page_pool_create(gfp_t gfp_mask, unsigned int order,
 			bool graphic_buffer_flag);
 void ion_page_pool_destroy(struct ion_page_pool *);
 struct page *ion_page_pool_alloc(struct ion_page_pool *);
+void *ion_page_pool_alloc_pool_only(struct ion_page_pool *);
 void ion_page_pool_free(struct ion_page_pool *, struct page *);
 void ion_page_pool_free_immediate(struct ion_page_pool *, struct page *);
 
