@@ -1088,6 +1088,12 @@ tx_aborted:
 #endif
 		complete(&dev->cmd_complete);
 	}
+	else if (unlikely(dev->accessor_flags & ACCESS_INTR_MASK)) {
+		/* workaround to trigger pending interrupt */
+		stat = dw_readl(dev, DW_IC_INTR_MASK);
+		i2c_dw_disable_int(dev);
+		dw_writel(dev, stat, DW_IC_INTR_MASK);
+	}
 #if defined CONFIG_HISI_I2C_DESIGNWARE
 	controller->irq_is_run = 0;
 #endif
