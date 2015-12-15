@@ -331,10 +331,10 @@ int main(int argc, char *argv[])
 			syslog(LOG_ERR, "Illegal op:%d\n", op);
 		}
 		vss_msg->error = error;
-		len = netlink_send(fd, incoming_cn_msg);
-		if (len < 0) {
-			syslog(LOG_ERR, "net_link send failed; error:%d %s",
-					errno, strerror(errno));
+		len = write(vss_fd, vss_msg, sizeof(struct hv_vss_msg));
+		if (len != sizeof(struct hv_vss_msg)) {
+			syslog(LOG_ERR, "write failed; error: %d %s", errno,
+			       strerror(errno));
 			exit(EXIT_FAILURE);
 		}
 	}
