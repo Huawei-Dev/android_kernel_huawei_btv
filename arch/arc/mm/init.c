@@ -41,8 +41,24 @@ early_param("mem", setup_mem_sz);
 
 void __init early_init_dt_add_memory_arch(u64 base, u64 size)
 {
-	arc_mem_sz = size & PAGE_MASK;
-	pr_info("Memory size set via devicetree %ldM\n", TO_MB(arc_mem_sz));
+	int in_use = 0;
+
+	if (!low_mem_sz) {
+		if (base != low_mem_start)
+			panic("CONFIG_LINUX_LINK_BASE != DT memory { }");
+
+		low_mem_sz = size;
+		in_use = 1;
+	} else {
+#ifdef CONFIG_HIGHMEM
+		high_mem_start = base;
+		high_mem_sz = size;
+		in_use = 1;
+#endif
+	}
+
+	pr_info("Memory @ %llx [%lldM] %s\n",
+		base, TO_MB(size), !in_use ? "Not used":"");
 }
 
 #ifdef CONFIG_BLK_DEV_INITRD
