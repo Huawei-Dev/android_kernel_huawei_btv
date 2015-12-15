@@ -545,4 +545,5 @@ config DM_HISI_SHA_USE_SOFT
 	bool "use soft hash"
 	---help---
 	  use soft hash
+
 endif # MD
