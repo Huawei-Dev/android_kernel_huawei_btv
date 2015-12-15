@@ -18,6 +18,7 @@
 #include <linux/kasan.h>
 #include <linux/kernel.h>
 #include <linux/export.h>
+#include <linux/ftrace.h>
 #include <linux/sched.h>
 #include <linux/stacktrace.h>
 
@@ -70,6 +71,19 @@ int notrace unwind_frame(struct task_struct *tsk, struct stackframe *frame)
 	frame->pc = READ_ONCE_NOCHECK(*(unsigned long *)(fp + 8));
 
 	kasan_enable_current();
+
+#ifdef CONFIG_FUNCTION_GRAPH_TRACER
+	if (tsk && tsk->ret_stack &&
+			(frame->pc == (unsigned long)return_to_handler)) {
+		/*
+		 * This is a case where function graph tracer has
+		 * modified a return address (LR) in a stack frame
+		 * to hook a function return.
+		 * So replace it to an original value.
+		 */
+		frame->pc = tsk->ret_stack[frame->graph--].ret;
+	}
+#endif /* CONFIG_FUNCTION_GRAPH_TRACER */
 
 	/*
 	 * Check whether we are going to walk through from interrupt stack
@@ -163,6 +177,9 @@ void save_stack_trace_tsk(struct task_struct *tsk, struct stack_trace *trace)
 		frame.sp = current_stack_pointer;
 		frame.pc = (unsigned long)save_stack_trace_tsk;
 	}
+#ifdef CONFIG_FUNCTION_GRAPH_TRACER
+	frame.graph = tsk->curr_ret_stack;
+#endif
 
 	walk_stackframe(tsk, &frame, save_trace, &data);
 	if (trace->nr_entries < trace->max_entries)
