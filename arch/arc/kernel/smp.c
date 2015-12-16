@@ -129,8 +129,12 @@ void start_kernel_secondary(void)
 
 	pr_info("## CPU%u LIVE ##: Executing Code...\n", cpu);
 
-	if (machine_desc->init_smp)
-		machine_desc->init_smp(cpu);
+	/* Some SMP H/w setup - for each cpu */
+	if (plat_smp_ops.init_per_cpu)
+		plat_smp_ops.init_per_cpu(cpu);
+
+	if (machine_desc->init_cpu_smp)
+		machine_desc->init_cpu_smp(cpu);
 
 	arc_local_timer_setup();
 

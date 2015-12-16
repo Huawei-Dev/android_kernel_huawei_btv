@@ -161,6 +161,14 @@ void mcip_init_early_smp(void)
 		panic("kernel trying to use non-existent GRTC\n");
 }
 
+struct plat_smp_ops plat_smp_ops = {
+	.info		= smp_cpuinfo_buf,
+	.init_early_smp	= mcip_probe_n_setup,
+	.init_per_cpu	= mcip_setup_per_cpu,
+	.ipi_send	= mcip_ipi_send,
+	.ipi_clear	= mcip_ipi_clear,
+};
+
 /***************************************************************************
  * ARCv2 Interrupt Distribution Unit (IDU)
  *
