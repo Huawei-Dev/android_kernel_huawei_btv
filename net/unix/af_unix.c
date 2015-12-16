@@ -2284,11 +2284,6 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state)
 	else
 		skip = 0;
 
-	if (flags & MSG_PEEK)
-		skip = sk_peek_offset(sk, flags);
-	else
-		skip = 0;
-
 	do {
 		int chunk;
 		bool drop_skb;
