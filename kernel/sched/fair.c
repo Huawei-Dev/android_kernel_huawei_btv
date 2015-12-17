@@ -5334,7 +5334,9 @@ static void throttle_cfs_rq(struct cfs_rq *cfs_rq)
 		if (dequeue)
 			dequeue_entity(qcfs_rq, se, DEQUEUE_SLEEP);
 		qcfs_rq->h_nr_running -= task_delta;
+#ifdef CONFIG_SCHED_HMP
 		dec_throttled_cfs_rq_hmp_stats(&qcfs_rq->hmp_stats, cfs_rq);
+#endif
 
 		if (qcfs_rq->load.weight)
 			dequeue = 0;
@@ -5342,7 +5344,9 @@ static void throttle_cfs_rq(struct cfs_rq *cfs_rq)
 
 	if (!se) {
 		sub_nr_running(rq, task_delta);
+#ifdef CONFIG_SCHED_HMP
 		dec_throttled_cfs_rq_hmp_stats(&rq->hmp_stats, cfs_rq);
+#endif
 	}
 
 	cfs_rq->throttled = 1;
@@ -5407,7 +5411,9 @@ void unthrottle_cfs_rq(struct cfs_rq *cfs_rq)
 		if (enqueue)
 			enqueue_entity(cfs_rq, se, ENQUEUE_WAKEUP);
 		cfs_rq->h_nr_running += task_delta;
+#ifdef CONFIG_SCHED_HMP
 		inc_throttled_cfs_rq_hmp_stats(&cfs_rq->hmp_stats, tcfs_rq);
+#endif
 
 		if (cfs_rq_throttled(cfs_rq))
 			break;
@@ -5415,7 +5421,9 @@ void unthrottle_cfs_rq(struct cfs_rq *cfs_rq)
 
 	if (!se) {
 		add_nr_running(rq, task_delta);
+#ifdef CONFIG_SCHED_HMP
 		inc_throttled_cfs_rq_hmp_stats(&rq->hmp_stats, tcfs_rq);
+#endif
 	}
 
 	/* determine whether we need to wake up potentially idle cpu */
