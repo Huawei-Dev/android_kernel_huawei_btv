@@ -23,8 +23,7 @@
  * @dt_compat:		Array of device tree 'compatible' strings
  * 			(XXX: although only 1st entry is looked at)
  * @init_early:		Very early callback [called from setup_arch()]
- * @init_irq:		setup external IRQ controllers [called from init_IRQ()]
- * @init_smp:		for each CPU (e.g. setup IPI)
+ * @init_per_cpu:	for each CPU as it is coming up (SMP as well as UP)
  * 			[(M):init_IRQ(), (o):start_kernel_secondary()]
  * @init_time:		platform specific clocksource/clockevent registration
  * 			[called from time_init()]
@@ -41,6 +40,7 @@ struct machine_desc {
 	void			(*init_irq)(void);
 #ifdef CONFIG_SMP
 	void			(*init_smp)(unsigned int);
+	void			(*init_per_cpu)(unsigned int);
 #endif
 	void			(*init_time)(void);
 	void			(*init_machine)(void);
