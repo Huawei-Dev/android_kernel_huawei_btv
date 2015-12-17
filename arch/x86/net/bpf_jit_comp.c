@@ -199,6 +199,8 @@ struct jit_context {
 #define BPF_MAX_INSN_SIZE	128
 #define BPF_INSN_SAFETY		64
 
+#define PROLOGUE_SIZE 48
+
 static int do_jit(struct bpf_prog *bpf_prog, int *addrs, u8 *image,
 		  int oldproglen, struct jit_context *ctx)
 {
@@ -240,11 +242,15 @@ static int do_jit(struct bpf_prog *bpf_prog, int *addrs, u8 *image,
 	/* mov qword ptr [rbp-X],r15 */
 	EMIT3_off32(0x4C, 0x89, 0xBD, -stacksize + 24);
 
-	/* clear A and X registers */
-	EMIT2(0x31, 0xc0); /* xor eax, eax */
-	EMIT3(0x4D, 0x31, 0xED); /* xor r13, r13 */
+	/* Clear the tail call counter (tail_call_cnt): for eBPF tail calls
+	 * we need to reset the counter to 0. It's done in two instructions,
+	 * resetting rax register to 0 (xor on eax gets 0 extended), and
+	 * moving it to the counter location.
+	 */
 
-	/* clear tail_cnt: mov qword ptr [rbp-X], rax */
+	/* xor eax, eax */
+	EMIT2(0x31, 0xc0);
+	/* mov qword ptr [rbp-X], rax */
 	EMIT3_off32(0x48, 0x89, 0x85, -STACKSIZE + 32);
 
 	BUILD_BUG_ON(cnt != PROLOGUE_SIZE);
