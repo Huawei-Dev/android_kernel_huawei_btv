@@ -1849,11 +1849,6 @@ int azx_bus_create(struct azx *chip, const char *model)
 	if (chip->driver_caps & AZX_DCAPS_CORBRP_SELF_CLEAR)
 		bus->core.corbrp_self_clear = true;
 
-	if (chip->driver_caps & AZX_DCAPS_RIRB_DELAY) {
-		dev_dbg(chip->card->dev, "Enable delay in RIRB handling\n");
-		bus->needs_damn_long_delay = 1;
-	}
-
 	if (chip->driver_caps & AZX_DCAPS_4K_BDLE_BOUNDARY)
 		bus->core.align_bdle_4k = true;
 

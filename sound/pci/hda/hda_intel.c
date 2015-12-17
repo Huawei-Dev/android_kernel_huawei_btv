@@ -334,7 +334,7 @@ enum {
 
 /* quirks for Nvidia */
 #define AZX_DCAPS_PRESET_NVIDIA \
-	(AZX_DCAPS_RIRB_DELAY | AZX_DCAPS_NO_MSI | /*AZX_DCAPS_ALIGN_BUFSIZE |*/ \
+	(AZX_DCAPS_NO_MSI | /*AZX_DCAPS_ALIGN_BUFSIZE |*/ \
 	 AZX_DCAPS_NO_64BIT | AZX_DCAPS_CORBRP_SELF_CLEAR |\
 	 AZX_DCAPS_SNOOP_TYPE(NVIDIA))
 
@@ -1570,6 +1570,18 @@ static int azx_create(struct snd_card *card, struct pci_dev *pci,
 		}
 	}
 	chip->bdl_pos_adj = bdl_pos_adj;
+
+	err = azx_bus_init(chip, model[dev], &pci_hda_io_ops);
+	if (err < 0) {
+		kfree(hda);
+		pci_disable_device(pci);
+		return err;
+	}
+
+	if (chip->driver_type == AZX_DRIVER_NVIDIA) {
+		dev_dbg(chip->card->dev, "Enable delay in RIRB handling\n");
+		chip->bus.needs_damn_long_delay = 1;
+	}
 
 	err = snd_device_new(card, SNDRV_DEV_LOWLEVEL, chip, &ops);
 	if (err < 0) {
