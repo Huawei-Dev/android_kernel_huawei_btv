@@ -1784,14 +1784,14 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
 	unsigned int request_count = 0;
 	bool wb_acct;
 
-	blk_queue_split(q, &bio, q->bio_split);
-
 	/*
 	 * low level driver can indicate that it wants pages above a
 	 * certain limit bounced to low memory (ie for highmem, or even
 	 * ISA dma in theory)
 	 */
 	blk_queue_bounce(q, &bio);
+
+	blk_queue_split(q, &bio, q->bio_split);
 
 	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
 		bio->bi_error = -EIO;
