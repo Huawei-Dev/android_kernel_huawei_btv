@@ -1256,6 +1256,28 @@ TRACE_EVENT(sched_wake_idle_without_ipi,
 	TP_printk("cpu=%d", __entry->cpu)
 );
 
+TRACE_EVENT(sched_get_nr_running_avg,
+
+	TP_PROTO(int avg, int big_avg, int iowait_avg),
+
+	TP_ARGS(avg, big_avg, iowait_avg),
+
+	TP_STRUCT__entry(
+		__field( int,	avg			)
+		__field( int,	big_avg			)
+		__field( int,	iowait_avg		)
+	),
+
+	TP_fast_assign(
+		__entry->avg		= avg;
+		__entry->big_avg	= big_avg;
+		__entry->iowait_avg	= iowait_avg;
+	),
+
+	TP_printk("avg=%d big_avg=%d iowait_avg=%d",
+		__entry->avg, __entry->big_avg, __entry->iowait_avg)
+);
+
 TRACE_EVENT(sched_contrib_scale_f,
 
 	TP_PROTO(int cpu, unsigned long freq_scale_factor,
@@ -1457,26 +1479,34 @@ TRACE_EVENT(sched_tune_boostgroup_update,
 		__entry->cpu, __entry->variation, __entry->max_boost)
 );
 
-TRACE_EVENT(sched_get_nr_running_avg,
+/*
+ * Tracepoint for accounting task boosted utilization
+ */
+TRACE_EVENT(sched_boost_task,
 
-	TP_PROTO(int avg, int big_avg, int iowait_avg),
+	TP_PROTO(struct task_struct *tsk, unsigned long util, unsigned long margin),
 
-	TP_ARGS(avg, big_avg, iowait_avg),
+	TP_ARGS(tsk, util, margin),
 
 	TP_STRUCT__entry(
-		__field( int,	avg			)
-		__field( int,	big_avg			)
-		__field( int,	iowait_avg		)
+		__array( char,	comm,	TASK_COMM_LEN		)
+		__field( pid_t,		pid			)
+		__field( unsigned long,	util			)
+		__field( unsigned long,	margin			)
+
 	),
 
 	TP_fast_assign(
-		__entry->avg		= avg;
-		__entry->big_avg	= big_avg;
-		__entry->iowait_avg	= iowait_avg;
+		memcpy(__entry->comm, tsk->comm, TASK_COMM_LEN);
+		__entry->pid	= tsk->pid;
+		__entry->util	= util;
+		__entry->margin	= margin;
 	),
 
-	TP_printk("avg=%d big_avg=%d iowait_avg=%d",
-		__entry->avg, __entry->big_avg, __entry->iowait_avg)
+	TP_printk("comm=%s pid=%d util=%lu margin=%lu",
+		  __entry->comm, __entry->pid,
+		  __entry->util,
+		  __entry->margin)
 );
 
 #endif /* _TRACE_SCHED_H */
