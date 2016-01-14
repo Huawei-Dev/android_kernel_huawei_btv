@@ -4,6 +4,7 @@
 #ifdef CONFIG_CGROUP_SCHEDTUNE
 
 extern int schedtune_cpu_boost(int cpu);
+int schedtune_task_boost(struct task_struct *tsk);
 
 extern void schedtune_enqueue_task(struct task_struct *p, int cpu);
 extern void schedtune_dequeue_task(struct task_struct *p, int cpu);
