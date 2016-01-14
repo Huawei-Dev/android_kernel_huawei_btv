@@ -17,7 +17,7 @@
 
 static void *zcomp_lz4_create(void)
 {
-	return kzalloc(LZ4_MEM_COMPRESS, GFP_KERNEL);
+	return kzalloc(LZ4_MEM_COMPRESS, GFP_NOIO);
 }
 
 static void zcomp_lz4_destroy(void *private)
