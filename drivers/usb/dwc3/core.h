@@ -205,6 +205,7 @@
 #define DWC3_GUSB3PIPECTL_RX_DETOPOLL	(1 << 8)
 #define DWC3_GUSB3PIPECTL_TX_DEEPH_MASK	DWC3_GUSB3PIPECTL_TX_DEEPH(3)
 #define DWC3_GUSB3PIPECTL_TX_DEEPH(n)	((n) << 1)
+#define DWC3_GUSB3PIPECTL_ELASTIC_BUF_MODE	(1 << 0)
 
 /* Global TX Fifo Size Register */
 #define DWC3_GTXFIFOSIZ_TXFDEF(n)	((n) & 0xffff)
@@ -888,6 +889,9 @@ struct dwc3 {
 
 	unsigned		tx_de_emphasis_quirk:1;
 	unsigned		tx_de_emphasis:2;
+
+	unsigned		nominal_elastic_buffer:1;
+
 	unsigned		gadget_pullup:1;
 	unsigned		pcd_suspended:1;
 };
