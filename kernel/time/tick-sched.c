@@ -959,9 +959,6 @@ static void tick_nohz_switch_to_nohz(void)
 	if (tick_switch_to_oneshot(tick_nohz_handler))
 		return;
 
-	tick_nohz_active = 1;
-	ts->nohz_mode = NOHZ_MODE_LOWRES;
-
 	/*
 	 * Recycle the hrtimer in ts, so we can share the
 	 * hrtimer_forward with the highres code.
@@ -970,9 +967,10 @@ static void tick_nohz_switch_to_nohz(void)
 	/* Get the next period */
 	next = tick_init_jiffy_update();
 
-	hrtimer_forward_now(&ts->sched_timer, tick_period);
 	hrtimer_set_expires(&ts->sched_timer, next);
-	tick_program_event(next, 1);
+	hrtimer_forward_now(&ts->sched_timer, tick_period);
+	tick_program_event(hrtimer_get_expires(&ts->sched_timer), 1);
+	tick_nohz_activate(ts, NOHZ_MODE_LOWRES);
 }
 
 /*
