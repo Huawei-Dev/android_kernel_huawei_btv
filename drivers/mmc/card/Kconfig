@@ -78,27 +78,14 @@ config MMC_TEST
 	  This driver is only of interest to those developing or
 	  testing a host driver. Most people should say N here.
 
-config MMC_FFU
-	bool "FFU SUPPORT"
-	depends on MMC != n
-	help
-	  This is an option to run firmware update on eMMC 5.0.
-	  Field firmware updates (FFU) enables features enhancment
-	  in the field.
-
-config MMC_FFU_SAMSUNG45
-	bool "FFU SUPPORT for Samsung eMMC 4.5."
-	depends on MMC_FFU
-	default n
-	help
-	  This is an option to run firmware update on Samsung eMMC 4.5.
-	  Field firmware updates (FFU) enables features enhancment
-	  in the field.
-
-config SD_SCHEDULER_CFQ_ONLY
-	tristate "SD use cfq when io scheduler is row"
+config MMC_SIMULATE_MAX_SPEED
+	bool "Turn on maximum speed control per block device"
 	depends on MMC_BLOCK
-	default n
 	help
-	  This is an option to change sd io scheduler to cfq when
-	  block io scheduler is row.
+	  Say Y here to enable MMC device speed limiting. Used to test and
+	  simulate the behavior of the system when confronted with a slow MMC.
+
+	  Enables max_read_speed, max_write_speed and cache_size attributes to
+	  control the write or read maximum KB/second speed behaviors.
+
+	  If unsure, say N here.
