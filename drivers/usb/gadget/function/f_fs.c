@@ -689,6 +689,9 @@ static ssize_t ffs_epfile_io(struct file *file, struct ffs_io_data *io_data)
 	ssize_t ret, data_len = -EINVAL;
 	int halt;
 
+	if (atomic_read(&epfile->error))
+		return -ENODEV;
+
 	/* Are we still active? */
 	if (WARN_ON(epfile->ffs->state != FFS_ACTIVE)) {
 		ret = -ENODEV;
@@ -1013,6 +1016,7 @@ ffs_epfile_release(struct inode *inode, struct file *file)
 
 	atomic_set(&epfile->error, 1);
 	ffs_data_closed(epfile->ffs);
+	file->private_data = NULL;
 
 	return 0;
 }
@@ -1639,6 +1643,10 @@ static void ffs_func_eps_disable(struct ffs_function *func)
 
 	spin_lock_irqsave(&func->ffs->eps_lock, flags);
 	do {
+
+		if (epfile)
+			atomic_set(&epfile->error, 1);
+
 		/* pending requests get nuked */
 		if (likely(ep->ep))
 			usb_ep_disable(ep->ep);
