@@ -223,6 +223,9 @@ config USB_F_ACC
 config USB_F_DIAG
 	tristate
 
+config USB_F_GSI
+	tristate
+
 config USB_F_BALONG_ACM
 	tristate
 
@@ -545,6 +548,13 @@ config USB_CONFIGFS_F_DIAG
 	help
 	  Diag function driver enables support for Qualcomm diagnostics
 	  port over USB.
+
+config USB_CONFIGFS_F_GSI
+	bool "USB GSI function"
+	select USB_F_GSI
+	depends on USB_CONFIGFS
+	help
+	  Generic function driver to support h/w acceleration to IPA over GSI.
 
 config USB_CONFIGFS_BALONG_ACM
 	bool "HUAWEI BALONG ACM function"
