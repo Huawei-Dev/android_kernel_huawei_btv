@@ -4628,7 +4628,7 @@ EXPORT_SYMBOL(__napi_schedule_irqoff);
 
 void __napi_complete(struct napi_struct *n)
 {
-	struct softnet_data *sd = &__get_cpu_var(softnet_data);
+	struct softnet_data *sd = this_cpu_ptr(&softnet_data);
 
 	BUG_ON(!test_bit(NAPI_STATE_SCHED, &n->state));
 
@@ -4787,17 +4787,16 @@ void netif_napi_del(struct napi_struct *napi)
 }
 EXPORT_SYMBOL(netif_napi_del);
 
-static int napi_poll(struct napi_struct *n, struct list_head *repoll)
 
 struct napi_struct *get_current_napi_context(void)
 {
-	struct softnet_data *sd = &__get_cpu_var(softnet_data);
+	struct softnet_data *sd = this_cpu_ptr(&softnet_data);
 
 	return sd->current_napi;
 }
 EXPORT_SYMBOL(get_current_napi_context);
 
-static void net_rx_action(struct softirq_action *h)
+static int napi_poll(struct napi_struct *n, struct list_head *repoll)
 {
 	void *have;
 	int work, weight;
@@ -4816,6 +4815,8 @@ static void net_rx_action(struct softirq_action *h)
 	 */
 	work = 0;
 	if (test_bit(NAPI_STATE_SCHED, &n->state)) {
+		struct softnet_data *sd = this_cpu_ptr(&softnet_data);
+
 		sd->current_napi = n;
 		work = n->poll(n, weight);
 		trace_napi_poll(n);
