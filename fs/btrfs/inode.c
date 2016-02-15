@@ -7938,6 +7938,7 @@ static void btrfs_endio_direct_read(struct bio *bio)
 
 	kfree(dip);
 
+	dio_bio->bi_error = bio->bi_error;
 	dio_end_io(dio_bio, bio->bi_error);
 
 	if (io_bio->end_io)
@@ -7983,6 +7984,7 @@ out_test:
 
 	kfree(dip);
 
+	dio_bio->bi_error = bio->bi_error;
 	dio_end_io(dio_bio, bio->bi_error);
 	bio_put(bio);
 }
