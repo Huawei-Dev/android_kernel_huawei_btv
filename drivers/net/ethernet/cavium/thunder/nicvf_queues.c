@@ -1372,15 +1372,12 @@ void nicvf_update_sq_stats(struct nicvf *nic, int sq_idx)
 }
 
 /* Check for errors in the receive cmp.queue entry */
-int nicvf_check_cqe_rx_errs(struct nicvf *nic,
-			    struct cmp_queue *cq, struct cqe_rx_t *cqe_rx)
+int nicvf_check_cqe_rx_errs(struct nicvf *nic, struct cqe_rx_t *cqe_rx)
 {
-	struct cmp_queue_stats *stats = &cq->stats;
+	struct nicvf_hw_stats *stats = &nic->hw_stats;
 
-	if (!cqe_rx->err_level && !cqe_rx->err_opcode) {
-		stats->rx.errop.good++;
+	if (!cqe_rx->err_level && !cqe_rx->err_opcode)
 		return 0;
-	}
 
 	if (netif_msg_rx_err(nic))
 		netdev_err(nic->netdev,
