@@ -918,6 +918,11 @@ int nicvf_stop(struct net_device *netdev)
 
 	nicvf_unregister_interrupts(nic);
 
+	nicvf_free_cq_poll(nic);
+
+	/* Clear multiqset info */
+	nic->pnicvf = nic;
+
 	return 0;
 }
 
