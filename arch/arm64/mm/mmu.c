@@ -466,10 +466,18 @@ static void __init map_mem(pgd_t *pgd)
 #ifdef CONFIG_DEBUG_RODATA
 void mark_rodata_ro(void)
 {
-	create_mapping_late(__pa(_stext), (unsigned long)_stext,
-				(unsigned long)_etext - (unsigned long)_stext,
-				PAGE_KERNEL_ROX);
+	unsigned long section_size;
 
+	section_size = (unsigned long)__start_rodata - (unsigned long)_stext;
+	create_mapping_late(__pa(_stext), (unsigned long)_stext,
+			    section_size, PAGE_KERNEL_ROX);
+	/*
+	 * mark .rodata as read only. Use _etext rather than __end_rodata to
+	 * cover NOTES and EXCEPTION_TABLE.
+	 */
+	section_size = (unsigned long)_etext - (unsigned long)__start_rodata;
+	create_mapping_late(__pa(__start_rodata), (unsigned long)__start_rodata,
+			    section_size, PAGE_KERNEL_RO);
 }
 #endif
 
@@ -498,8 +506,8 @@ static void __init map_kernel_chunk(pgd_t *pgd, void *va_start, void *va_end,
  */
 static void __init map_kernel(pgd_t *pgd)
 {
-
-	map_kernel_chunk(pgd, _stext, _etext, PAGE_KERNEL_EXEC);
+	map_kernel_chunk(pgd, _stext, __start_rodata, PAGE_KERNEL_EXEC);
+	map_kernel_chunk(pgd, __start_rodata, _etext, PAGE_KERNEL);
 	map_kernel_chunk(pgd, __init_begin, __init_end, PAGE_KERNEL_EXEC);
 	map_kernel_chunk(pgd, _data, _end, PAGE_KERNEL);
 
