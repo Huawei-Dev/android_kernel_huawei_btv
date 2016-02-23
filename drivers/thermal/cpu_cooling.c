@@ -120,6 +120,7 @@ struct cpufreq_cooling_device {
 	int dyn_power_table_entries;
 	struct device *cpu_dev;
 	get_static_t plat_get_static_power;
+	struct cpu_cooling_ops *plat_ops;
 };
 static DEFINE_IDR(cpufreq_idr);
 static DEFINE_MUTEX(cooling_cpufreq_lock);
@@ -553,8 +554,13 @@ static int cpufreq_get_cur_state(struct thermal_cooling_device *cdev,
 				 unsigned long *state)
 {
 	struct cpufreq_cooling_device *cpufreq_device = cdev->devdata;
+	unsigned int cpu = cpumask_any(&cpufreq_device->allowed_cpus);
 
-	*state = cpufreq_device->cpufreq_state;
+	if (cpufreq_device->plat_ops
+			&& cpufreq_device->plat_ops->get_cur_state)
+		cpufreq_device->plat_ops->get_cur_state(cpu, state);
+	else
+		*state = cpufreq_device->cpufreq_state;
 
 	return 0;
 }
@@ -595,7 +601,18 @@ static int cpufreq_set_cur_state(struct thermal_cooling_device *cdev,
 	cur_cluster = topology_physical_package_id(cpu);
 	g_ipa_freq_limit[cur_cluster] = clip_freq;
 #endif
-	cpufreq_update_policy(cpu);
+
+	/* Check if the device has a platform mitigation function that
+	 * can handle the CPU freq mitigation, if not, notify cpufreq
+	 * framework.
+	 */
+	if (cpufreq_device->plat_ops) {
+		if (cpufreq_device->plat_ops->ceil_limit)
+			cpufreq_device->plat_ops->ceil_limit(cpu,
+						clip_freq);
+	} else {
+		cpufreq_update_policy(cpu);
+	}
 
 	return 0;
 }
@@ -934,6 +951,9 @@ EXPORT_SYMBOL(get_profile_cpu_freq);
  * @capacitance: dynamic power coefficient for these cpus
  * @plat_static_func: function to calculate the static power consumed by these
  *                    cpus (optional)
+ * @plat_mitig_func: function that does the mitigation by changing the
+ *                   frequencies (Optional). By default, cpufreq framweork will
+ *                   be notified of the new limits.
  *
  * This interface function registers the cpufreq cooling device with the name
  * "thermal-cpufreq-%x". This api can support multiple instances of cpufreq
@@ -946,7 +966,8 @@ EXPORT_SYMBOL(get_profile_cpu_freq);
 static struct thermal_cooling_device *
 __cpufreq_cooling_register(struct device_node *np,
 			const struct cpumask *clip_cpus, u32 capacitance,
-			get_static_t plat_static_func)
+			get_static_t plat_static_func,
+			struct cpu_cooling_ops *plat_ops)
 {
 	struct thermal_cooling_device *cool_dev;
 	struct cpufreq_cooling_device *cpufreq_dev;
@@ -1016,6 +1037,8 @@ __cpufreq_cooling_register(struct device_node *np,
 			goto free_table;
 		}
 	}
+
+	cpufreq_dev->plat_ops = plat_ops;
 
 	ret = get_idr(&cpufreq_idr, &cpufreq_dev->id);
 	if (ret) {
@@ -1096,7 +1119,7 @@ free_cdev:
 struct thermal_cooling_device *
 cpufreq_cooling_register(const struct cpumask *clip_cpus)
 {
-	return __cpufreq_cooling_register(NULL, clip_cpus, 0, NULL);
+	return __cpufreq_cooling_register(NULL, clip_cpus, 0, NULL, NULL);
 }
 EXPORT_SYMBOL_GPL(cpufreq_cooling_register);
 
@@ -1120,7 +1143,7 @@ of_cpufreq_cooling_register(struct device_node *np,
 	if (!np)
 		return ERR_PTR(-EINVAL);
 
-	return __cpufreq_cooling_register(np, clip_cpus, 0, NULL);
+	return __cpufreq_cooling_register(np, clip_cpus, 0, NULL, NULL);
 }
 EXPORT_SYMBOL_GPL(of_cpufreq_cooling_register);
 
@@ -1150,9 +1173,29 @@ cpufreq_power_cooling_register(const struct cpumask *clip_cpus, u32 capacitance,
 			       get_static_t plat_static_func)
 {
 	return __cpufreq_cooling_register(NULL, clip_cpus, capacitance,
-				plat_static_func);
+				plat_static_func, NULL);
 }
 EXPORT_SYMBOL(cpufreq_power_cooling_register);
+
+/**
+ * cpufreq_platform_cooling_register() - create cpufreq cooling device with
+ * additional platform specific mitigation function.
+ *
+ * @clip_cpus: cpumask of cpus where the frequency constraints will happen
+ * @plat_ops: the platform mitigation functions that will be called insted of
+ * cpufreq, if provided.
+ *
+ * Return: a valid struct thermal_cooling_device pointer on success,
+ * on failure, it returns a corresponding ERR_PTR().
+ */
+struct thermal_cooling_device *
+cpufreq_platform_cooling_register(const struct cpumask *clip_cpus,
+				struct cpu_cooling_ops *plat_ops)
+{
+	return __cpufreq_cooling_register(NULL, clip_cpus, 0, NULL,
+						plat_ops);
+}
+EXPORT_SYMBOL(cpufreq_platform_cooling_register);
 
 /**
  * of_cpufreq_power_cooling_register() - create cpufreq cooling device with power extensions
@@ -1187,7 +1230,7 @@ of_cpufreq_power_cooling_register(struct device_node *np,
 		return ERR_PTR(-EINVAL);
 
 	return __cpufreq_cooling_register(np, clip_cpus, capacitance,
-				plat_static_func);
+				plat_static_func, NULL);
 }
 EXPORT_SYMBOL(of_cpufreq_power_cooling_register);
 
