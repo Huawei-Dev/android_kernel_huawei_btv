@@ -35,6 +35,8 @@
 #include <linux/timer.h>
 #include <linux/wakeup_reason.h>
 
+#include <asm/current.h>
+
 #if defined CONFIG_LOG_JANK
 #include <huawei_platform/log/log_jank.h>
 #endif
@@ -1438,7 +1440,7 @@ static int __device_suspend(struct device *dev, pm_message_t state, bool async)
 		goto Complete;
 	
 	data.dev = dev;
-	data.tsk = get_current();
+	data.tsk = current;
 	init_timer_on_stack(&timer);
 	timer.expires = jiffies + HZ * 12;
 	timer.function = dpm_drv_timeout;
