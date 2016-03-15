@@ -40,6 +40,7 @@
 #include <linux/mmu_notifier.h>
 #include <linux/page_idle.h>
 #include <linux/backing-dev.h>
+#include <linux/page_owner.h>
 
 #include <asm/tlbflush.h>
 
@@ -669,6 +670,8 @@ void migrate_page_copy(struct page *newpage, struct page *page)
 	 */
 	if (PageWriteback(newpage))
 		end_page_writeback(newpage);
+
+	copy_page_owner(page, newpage);
 }
 EXPORT_SYMBOL(migrate_page_copy);
 
