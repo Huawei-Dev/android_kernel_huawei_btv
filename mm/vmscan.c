@@ -3547,10 +3547,12 @@ static int kswapd(void *p)
 		 * While we were reclaiming, there might have been another
 		 * wakeup, so check the values.
 		 */
-		new_order = pgdat->kswapd_max_order;
-		new_classzone_idx = pgdat->classzone_idx;
-		pgdat->kswapd_max_order =  0;
-		pgdat->classzone_idx = pgdat->nr_zones - 1;
+		if (balanced_order == new_order) {
+			new_order = pgdat->kswapd_max_order;
+			new_classzone_idx = pgdat->classzone_idx;
+			pgdat->kswapd_max_order =  0;
+			pgdat->classzone_idx = pgdat->nr_zones - 1;
+		}
 
 		if (order < new_order || classzone_idx > new_classzone_idx) {
 			/*
