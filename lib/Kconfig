@@ -531,4 +531,8 @@ config ARCH_HAS_PMEM_API
 config WBT
 	bool "buffered writeback throttling"
 
+config STACKDEPOT
+	bool
+	select STACKTRACE
+
 endmenu
