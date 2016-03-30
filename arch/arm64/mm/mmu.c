@@ -488,7 +488,7 @@ void fixup_init(void)
 			PAGE_KERNEL);
 }
 
-static void __init map_kernel_chunk(pgd_t *pgd, void *va_start, void *va_end,
+static void __init map_kernel_segment(pgd_t *pgd, void *va_start, void *va_end,
 				    pgprot_t prot)
 {
 	phys_addr_t pa_start = __pa(va_start);
@@ -506,10 +506,10 @@ static void __init map_kernel_chunk(pgd_t *pgd, void *va_start, void *va_end,
  */
 static void __init map_kernel(pgd_t *pgd)
 {
-	map_kernel_chunk(pgd, _stext, __start_rodata, PAGE_KERNEL_EXEC);
-	map_kernel_chunk(pgd, __start_rodata, _etext, PAGE_KERNEL);
-	map_kernel_chunk(pgd, __init_begin, __init_end, PAGE_KERNEL_EXEC);
-	map_kernel_chunk(pgd, _data, _end, PAGE_KERNEL);
+	map_kernel_segment(pgd, _stext, __start_rodata, PAGE_KERNEL_EXEC);
+	map_kernel_segment(pgd, __start_rodata, _etext, PAGE_KERNEL);
+	map_kernel_segment(pgd, __init_begin, __init_end, PAGE_KERNEL_EXEC);
+	map_kernel_segment(pgd, _data, _end, PAGE_KERNEL);
 
 	/*
 	 * The fixmap falls in a separate pgd to the kernel, and doesn't live
