@@ -133,15 +133,16 @@ static int mlx5_ib_query_device(struct ib_device *ibdev,
 	max_sq_sg = (gen->max_sq_desc_sz - sizeof(struct mlx5_wqe_ctrl_seg)) /
 		sizeof(struct mlx5_wqe_data_seg);
 	props->max_sge = min(max_rq_sg, max_sq_sg);
-	props->max_cq		   = 1 << gen->log_max_cq;
-	props->max_cqe		   = gen->max_cqes - 1;
-	props->max_mr		   = 1 << gen->log_max_mkey;
-	props->max_pd		   = 1 << gen->log_max_pd;
-	props->max_qp_rd_atom	   = 1 << gen->log_max_ra_req_qp;
-	props->max_qp_init_rd_atom = 1 << gen->log_max_ra_res_qp;
-	props->max_srq		   = 1 << gen->log_max_srq;
-	props->max_srq_wr	   = gen->max_srq_wqes - 1;
-	props->local_ca_ack_delay  = gen->local_ca_ack_delay;
+	props->max_sge_rd	   = MLX5_MAX_SGE_RD;
+	props->max_cq		   = 1 << MLX5_CAP_GEN(mdev, log_max_cq);
+	props->max_cqe = (1 << MLX5_CAP_GEN(mdev, log_max_cq_sz)) - 1;
+	props->max_mr		   = 1 << MLX5_CAP_GEN(mdev, log_max_mkey);
+	props->max_pd		   = 1 << MLX5_CAP_GEN(mdev, log_max_pd);
+	props->max_qp_rd_atom	   = 1 << MLX5_CAP_GEN(mdev, log_max_ra_req_qp);
+	props->max_qp_init_rd_atom = 1 << MLX5_CAP_GEN(mdev, log_max_ra_res_qp);
+	props->max_srq		   = 1 << MLX5_CAP_GEN(mdev, log_max_srq);
+	props->max_srq_wr = (1 << MLX5_CAP_GEN(mdev, log_max_srq_sz)) - 1;
+	props->local_ca_ack_delay  = MLX5_CAP_GEN(mdev, local_ca_ack_delay);
 	props->max_res_rd_atom	   = props->max_qp_rd_atom * props->max_qp;
 	props->max_srq_sge	   = max_rq_sg - 1;
 	props->max_fast_reg_page_list_len = (unsigned int)-1;

@@ -313,10 +313,14 @@ enum {
 };
 
 enum {
-	HCA_CAP_OPMOD_GET_MAX	= 0,
-	HCA_CAP_OPMOD_GET_CUR	= 1,
-	HCA_CAP_OPMOD_GET_ODP_MAX = 4,
-	HCA_CAP_OPMOD_GET_ODP_CUR = 5
+	/*
+	 * Max wqe size for rdma read is 512 bytes, so this
+	 * limits our max_sge_rd as the wqe needs to fit:
+	 * - ctrl segment (16 bytes)
+	 * - rdma segment (16 bytes)
+	 * - scatter elements (16 bytes each)
+	 */
+	MLX5_MAX_SGE_RD	= (512 - 16 - 16) / 16
 };
 
 struct mlx5_inbox_hdr {
