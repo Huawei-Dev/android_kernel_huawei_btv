@@ -104,7 +104,7 @@ static void flush_tlb_func(void *info)
 
 	inc_irq_stat(irq_tlb_count);
 
-	if (f->flush_mm != this_cpu_read(cpu_tlbstate.active_mm))
+	if (f->flush_mm && f->flush_mm != this_cpu_read(cpu_tlbstate.active_mm))
 		return;
 	if (!f->flush_end)
 		f->flush_end = f->flush_start + PAGE_SIZE;
