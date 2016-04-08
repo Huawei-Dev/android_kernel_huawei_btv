@@ -2396,6 +2396,7 @@ static void snd_usb_mixer_interrupt_v2(struct usb_mixer_interface *mixer,
 	__u8 unitid = (index >> 8) & 0xff;
 	__u8 control = (value >> 8) & 0xff;
 	__u8 channel = value & 0xff;
+	unsigned int count = 0;
 
 	if (channel >= MAX_CHANNELS) {
 		usb_audio_dbg(mixer->chip,
@@ -2404,6 +2405,12 @@ static void snd_usb_mixer_interrupt_v2(struct usb_mixer_interface *mixer,
 		return;
 	}
 
+	for (list = mixer->id_elems[unitid]; list; list = list->next_id_elem)
+		count++;
+
+	if (count == 0)
+		return;
+
 	for (list = mixer->id_elems[unitid]; list; list = list->next_id_elem) {
 		struct usb_mixer_elem_info *info;
 
@@ -2411,7 +2418,7 @@ static void snd_usb_mixer_interrupt_v2(struct usb_mixer_interface *mixer,
 			continue;
 
 		info = (struct usb_mixer_elem_info *)list;
-		if (info->control != control)
+		if (count > 1 && info->control != control)
 			continue;
 
 		switch (attribute) {
