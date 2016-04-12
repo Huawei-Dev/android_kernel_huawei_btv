@@ -3396,6 +3396,9 @@ void dwc3_gadget_exit(struct dwc3 *dwc)
 
 int dwc3_gadget_suspend(struct dwc3 *dwc)
 {
+	if (!dwc->gadget_driver)
+		return 0;
+
 	dwc3_gadget_disable_irq(dwc);
 	dwc3_gadget_disconnect_interrupt(dwc);
 	dwc3_gadget_run_stop(dwc, false, true);
@@ -3414,6 +3417,9 @@ int dwc3_gadget_resume(struct dwc3 *dwc)
 {
 	struct dwc3_ep		*dep;
 	int			ret;
+
+	if (!dwc->gadget_driver)
+		return 0;
 
 	/* ep0 may be at wrong state, here reset ep0 */
 	(void)__dwc3_gadget_exit(dwc);
