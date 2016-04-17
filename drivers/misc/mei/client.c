@@ -1302,7 +1302,22 @@ void mei_cl_complete(struct mei_cl *cl, struct mei_cl_cb *cb)
 			wake_up_interruptible_all(&cl->rx_wait);
 		else
 			mei_cl_bus_rx_event(cl);
+		break;
 
+	case MEI_FOP_CONNECT:
+	case MEI_FOP_DISCONNECT:
+	case MEI_FOP_NOTIFY_STOP:
+	case MEI_FOP_NOTIFY_START:
+		if (waitqueue_active(&cl->wait))
+			wake_up(&cl->wait);
+
+		break;
+	case MEI_FOP_DISCONNECT_RSP:
+		mei_io_cb_free(cb);
+		mei_cl_set_disconnected(cl);
+		break;
+	default:
+		BUG_ON(0);
 	}
 }
 

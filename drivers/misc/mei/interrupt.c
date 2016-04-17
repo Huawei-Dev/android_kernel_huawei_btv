@@ -180,10 +180,7 @@ static int mei_cl_irq_disconnect_rsp(struct mei_cl *cl, struct mei_cl_cb *cb,
 		return -EMSGSIZE;
 
 	ret = mei_hbm_cl_disconnect_rsp(dev, cl);
-
-	cl->state = MEI_FILE_DISCONNECTED;
-	cl->status = 0;
-	mei_io_cb_free(cb);
+	list_move_tail(&cb->list, &cmpl_list->list);
 
 	return ret;
 }
