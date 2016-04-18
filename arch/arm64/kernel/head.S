@@ -219,13 +219,11 @@ ENTRY(stext)
 	 * On return, the CPU will be ready for the MMU to be turned on and
 	 * the TCR will have been set.
 	 */
-	ldr	x27, 0f				// address to jump to after
-	neg	x27, x27			// MMU has been enabled
-	adr_l	lr, __enable_mmu		// return (PIC) address
-	b	__cpu_setup			// initialise processor
+	bl	__cpu_setup			// initialise processor
+	adr_l	x27, __primary_switch		// address to jump to after
+						// MMU has been enabled
+	b	__enable_mmu
 ENDPROC(stext)
-	.align	3
-0:	.quad	(_text - TEXT_OFFSET) - __mmap_switched - KIMAGE_VADDR
 
 /*
  * Preserve the arguments passed by the bootloader in x0 .. x3
@@ -416,8 +414,9 @@ ENDPROC(__create_page_tables)
 /*
  * The following fragment of code is executed with the MMU enabled.
  */
-        .set    initial_sp, init_thread_union + THREAD_START_SP
-__mmap_switched:
+	.set	initial_sp, init_thread_union + THREAD_START_SP
+__primary_switched:
+	mov	x28, lr				// preserve LR
 	adr_l	x8, vectors			// load VBAR_EL1 with virtual
 	msr	vbar_el1, x8			// vector table address
 	isb
@@ -441,7 +440,7 @@ __mmap_switched:
 	bl	kasan_early_init
 #endif
 	b	start_kernel
-ENDPROC(__mmap_switched)
+ENDPROC(__primary_switched)
 
 /*
  * end early head section, begin head code that is also used for
@@ -667,6 +666,11 @@ __no_granule_support:
 	wfe
 	b __no_granule_support
 ENDPROC(__no_granule_support)
+
+__primary_switch:
+	ldr	x8, =__primary_switched
+	br	x8
+ENDPROC(__primary_switch)
 
 __secondary_switch:
 	ldr	x8, =__secondary_switched
