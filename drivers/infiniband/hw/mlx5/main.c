@@ -203,39 +203,17 @@ int mlx5_ib_query_port(struct ib_device *ibdev, u8 port,
 	}
 
 
-	props->lid		= be16_to_cpup((__be16 *)(out_mad->data + 16));
-	props->lmc		= out_mad->data[34] & 0x7;
-	props->sm_lid		= be16_to_cpup((__be16 *)(out_mad->data + 18));
-	props->sm_sl		= out_mad->data[36] & 0xf;
-	props->state		= out_mad->data[32] & 0xf;
-	props->phys_state	= out_mad->data[33] >> 4;
-	props->port_cap_flags	= be32_to_cpup((__be32 *)(out_mad->data + 20));
-	props->gid_tbl_len	= out_mad->data[50];
-	props->max_msg_sz	= 1 << gen->log_max_msg;
-	props->pkey_tbl_len	= gen->port[port - 1].pkey_table_len;
-	props->bad_pkey_cntr	= be16_to_cpup((__be16 *)(out_mad->data + 46));
-	props->qkey_viol_cntr	= be16_to_cpup((__be16 *)(out_mad->data + 48));
-	props->active_width	= out_mad->data[31] & 0xf;
-	props->active_speed	= out_mad->data[35] >> 4;
-	props->max_mtu		= out_mad->data[41] & 0xf;
-	props->active_mtu	= out_mad->data[36] >> 4;
-	props->subnet_timeout	= out_mad->data[51] & 0x1f;
-	props->max_vl_num	= out_mad->data[37] >> 4;
-	props->init_type_reply	= out_mad->data[41] >> 4;
-
-	/* Check if extended speeds (EDR/FDR/...) are supported */
-	if (props->port_cap_flags & IB_PORT_EXTENDED_SPEEDS_SUP) {
-		ext_active_speed = out_mad->data[62] >> 4;
-
-		switch (ext_active_speed) {
-		case 1:
-			props->active_speed = 16; /* FDR */
-			break;
-		case 2:
-			props->active_speed = 32; /* EDR */
-			break;
-		}
-	}
+static int mlx5_query_hca_port(struct ib_device *ibdev, u8 port,
+			       struct ib_port_attr *props)
+{
+	struct mlx5_ib_dev *dev = to_mdev(ibdev);
+	struct mlx5_core_dev *mdev = dev->mdev;
+	struct mlx5_hca_vport_context *rep;
+	u16 max_mtu;
+	u16 oper_mtu;
+	int err;
+	u8 ib_link_width_oper;
+	u8 vl_hw_cap;
 
 	/* If reported active speed is QDR, check if is FDR-10 */
 	if (props->active_speed == 4) {
