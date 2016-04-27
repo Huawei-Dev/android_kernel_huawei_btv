@@ -1,14 +1,8 @@
 #ifndef __ASM_SUSPEND_H
 #define __ASM_SUSPEND_H
 
-#include <linux/suspend.h>
-
-#ifndef CONFIG_HIBERNATION
 #define NR_CTX_REGS 11
-#else
-#define NR_CTX_REGS 10
 #define NR_CALLEE_SAVED_REGS 12
-#endif
 
 /*
  * struct cpu_suspend_ctx must be 16-byte aligned since it is allocated on
@@ -23,14 +17,11 @@ struct cpu_suspend_ctx {
 	u64 sp;
 } __aligned(16);
 
-#ifndef CONFIG_HIBERNATION
 struct sleep_save_sp {
 	phys_addr_t *save_ptr_stash;
 	phys_addr_t save_ptr_stash_phys;
 };
-#endif
 
-#ifdef CONFIG_HIBERNATION
 /*
  * Memory to save the cpu state is allocated on the stack by
  * __cpu_suspend_enter()'s caller, and populated by __cpu_suspend_enter().
@@ -48,18 +39,15 @@ struct sleep_stack_data {
 	unsigned long		callee_saved_regs[NR_CALLEE_SAVED_REGS];
 };
 
-extern int swsusp_arch_suspend(void);
-extern int swsusp_arch_resume(void);
-int swsusp_arch_suspend_enter(struct cpu_suspend_ctx *ptr);
-void __noreturn swsusp_arch_suspend_exit(phys_addr_t tmp_pg_dir,
-					 phys_addr_t swapper_pg_dir,
-					 void *kernel_start, void *kernel_end);
-#endif
-
 extern int cpu_suspend(unsigned long arg, int (*fn)(unsigned long));
 extern void cpu_resume(void);
-#ifdef CONFIG_HIBERNATION
 int __cpu_suspend_enter(struct sleep_stack_data *state);
-void __cpu_suspend_exit(struct mm_struct *mm);
-#endif
+void __cpu_suspend_exit(void);
+void _cpu_resume(void);
+
+int swsusp_arch_suspend(void);
+int swsusp_arch_resume(void);
+int arch_hibernation_header_save(void *addr, unsigned int max_size);
+int arch_hibernation_header_restore(void *addr);
+
 #endif

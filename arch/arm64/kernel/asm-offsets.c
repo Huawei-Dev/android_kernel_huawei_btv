@@ -179,6 +179,7 @@ int main(void)
 #endif
 #endif
 #ifdef CONFIG_HIBERNATION
+  BLANK();
   DEFINE(HIBERN_PBE_ORIG,	offsetof(struct pbe, orig_address));
   DEFINE(HIBERN_PBE_ADDR,	offsetof(struct pbe, address));
   DEFINE(HIBERN_PBE_NEXT,	offsetof(struct pbe, next));

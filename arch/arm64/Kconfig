@@ -1047,6 +1047,11 @@ source "kernel/power/Kconfig"
 
 config ARCH_HIBERNATION_POSSIBLE
 	def_bool y
+	depends on CPU_PM
+
+config ARCH_HIBERNATION_HEADER
+	def_bool y
+	depends on HIBERNATION
 
 config ARCH_SUSPEND_POSSIBLE
 	def_bool y
