@@ -207,8 +207,8 @@ void clear_irq_vector(int irq, struct irq_cfg *cfg)
 	int cpu, vector;
 	unsigned long flags;
 
-	raw_spin_lock_irqsave(&vector_lock, flags);
-	BUG_ON(!cfg->vector);
+	if (!data->cfg.vector)
+		return;
 
 	vector = cfg->vector;
 	for_each_cpu_and(cpu, cfg->domain, cpu_online_mask)
