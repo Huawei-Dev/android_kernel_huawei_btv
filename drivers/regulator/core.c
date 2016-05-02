@@ -145,14 +145,6 @@ static bool have_full_constraints(void)
 	return has_full_constraints || of_have_populated_dt();
 }
 
-static inline struct regulator_dev *rdev_get_supply(struct regulator_dev *rdev)
-{
-	if (rdev && rdev->supply)
-		return rdev->supply->rdev;
-
-	return NULL;
-}
-
 /**
  * regulator_lock_supply - lock a regulator and its supplies
  * @rdev:         regulator source
@@ -161,7 +153,7 @@ static void regulator_lock_supply(struct regulator_dev *rdev)
 {
 	int i;
 
-	for (i = 0; rdev->supply; rdev = rdev_get_supply(rdev), i++)
+	for (i = 0; rdev->supply; rdev = rdev->supply->rdev, i++)
 		mutex_lock_nested(&rdev->mutex, i);
 }
 
