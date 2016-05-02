@@ -551,12 +551,14 @@ static ssize_t mtp_read(struct file *fp, char __user *buf,
 	struct mtp_dev *dev = fp->private_data;
 	struct usb_composite_dev *cdev = dev->cdev;
 	struct usb_request *req;
-	ssize_t r = count;
-	unsigned xfer;
+	ssize_t r = count, xfer, len;
 	int ret = 0;
-	size_t len = 0;
 
 	DBG(cdev, "mtp_read(%zu)\n", count);
+
+	len = ALIGN(count, dev->ep_out->maxpacket);
+	if (len > dev->bulk_buffer_size)
+		return -EINVAL;
 
 	/* we will block until we're online */
 	DBG(cdev, "mtp_read: waiting for online state\n");
