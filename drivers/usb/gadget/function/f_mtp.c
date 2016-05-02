@@ -556,10 +556,6 @@ static ssize_t mtp_read(struct file *fp, char __user *buf,
 
 	DBG(cdev, "mtp_read(%zu)\n", count);
 
-	len = ALIGN(count, dev->ep_out->maxpacket);
-	if (len > dev->bulk_buffer_size)
-		return -EINVAL;
-
 	/* we will block until we're online */
 	DBG(cdev, "mtp_read: waiting for online state\n");
 	ret = wait_event_interruptible(dev->read_wq,
@@ -568,15 +564,12 @@ static ssize_t mtp_read(struct file *fp, char __user *buf,
 		r = ret;
 		goto done;
 	}
-	spin_lock_irq(&dev->lock);
-	if (dev->ep_out->desc) {
-		len = usb_ep_align_maybe(cdev->gadget, dev->ep_out, count);
-		if (len > MTP_BULK_BUFFER_SIZE) {
-			spin_unlock_irq(&dev->lock);
-			return -EINVAL;
-		}
-	}
 
+	len = ALIGN(count, dev->ep_out->maxpacket);
+	if (len > dev->bulk_buffer_size)
+		return -EINVAL;
+
+	spin_lock_irq(&dev->lock);
 	if (dev->state == STATE_CANCELED) {
 		/* report cancelation to userspace */
 		dev->state = STATE_READY;
