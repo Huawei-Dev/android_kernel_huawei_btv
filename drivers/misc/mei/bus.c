@@ -353,15 +353,25 @@ inline ssize_t __mei_cl_send(struct mei_cl *cl, u8 *buf, size_t length)
 
 ssize_t mei_cl_send(struct mei_cl_device *device, u8 *buf, size_t length)
 {
-	struct mei_cl *cl = device->cl;
+	struct mei_cl_device *cldev;
+	struct mei_device *bus;
 
-	if (cl == NULL)
-		return -ENODEV;
+	cldev = container_of(work, struct mei_cl_device, event_work);
+
+	bus = cldev->bus;
+
+	if (cldev->event_cb)
+		cldev->event_cb(cldev, cldev->events, cldev->event_context);
 
 	if (device->ops && device->ops->send)
 		return device->ops->send(device, buf, length);
 
-	return __mei_cl_send(cl, buf, length);
+	/* Prepare for the next read */
+	if (cldev->events_mask & BIT(MEI_CL_EVENT_RX)) {
+		mutex_lock(&bus->device_lock);
+		mei_cl_read_start(cldev->cl, 0, NULL);
+		mutex_unlock(&bus->device_lock);
+	}
 }
 EXPORT_SYMBOL_GPL(mei_cl_send);
 
@@ -397,7 +407,10 @@ static void mei_bus_event_work(struct work_struct *work)
 int mei_cl_register_event_cb(struct mei_cl_device *device,
 			  mei_cl_event_cb_t event_cb, void *context)
 {
-	if (device->event_cb)
+	struct mei_device *bus = cldev->bus;
+	int ret;
+
+	if (cldev->event_cb)
 		return -EALREADY;
 
 	device->events = 0;
@@ -405,7 +418,21 @@ int mei_cl_register_event_cb(struct mei_cl_device *device,
 	device->event_context = context;
 	INIT_WORK(&device->event_work, mei_bus_event_work);
 
-	mei_cl_read_start(device->cl, 0, NULL);
+	if (cldev->events_mask & BIT(MEI_CL_EVENT_RX)) {
+		mutex_lock(&bus->device_lock);
+		ret = mei_cl_read_start(cldev->cl, 0, NULL);
+		mutex_unlock(&bus->device_lock);
+		if (ret && ret != -EBUSY)
+			return ret;
+	}
+
+	if (cldev->events_mask & BIT(MEI_CL_EVENT_NOTIF)) {
+		mutex_lock(&bus->device_lock);
+		ret = mei_cl_notify_request(cldev->cl, NULL, event_cb ? 1 : 0);
+		mutex_unlock(&bus->device_lock);
+		if (ret)
+			return ret;
+	}
 
 	return 0;
 }
