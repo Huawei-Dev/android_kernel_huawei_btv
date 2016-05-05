@@ -1903,7 +1903,9 @@ unknown:
 			}
 
 			if (value < 0) {
-				pr_err("non-support control req%02x.%02x v%04x i%04x l%d\n",
+				DBG(cdev, "%s: unhandled os desc request\n",
+						__func__);
+				DBG(cdev, "req%02x.%02x v%04x i%04x l%d\n",
 					ctrl->bRequestType, ctrl->bRequest,
 					w_value, w_index, w_length);
 				return value;
