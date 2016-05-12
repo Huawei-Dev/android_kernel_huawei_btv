@@ -333,8 +333,7 @@ struct mmc_card {
 #define MMC_QUIRK_INAND_DATA_TIMEOUT  (1<<13)   /* For incorrect data timeout */
 #define MMC_QUIRK_BROKEN_HPI (1 << 14)		/* For devices which gets */
 						/* broken due to HPI feature */
-#define MMC_QUIRK_CACHE_DISABLE (1 << 14)	/* prevent cache enable */
-
+#define MMC_QUIRK_CACHE_DISABLE (1 << 15)	/* prevent cache enable */
 
 	unsigned int		erase_size;	/* erase size in sectors */
  	unsigned int		erase_shift;	/* if erase unit is power 2 */

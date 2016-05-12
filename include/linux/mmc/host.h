@@ -385,10 +385,10 @@ struct mmc_host {
 /* Allows Asynchronous SDIO irq while card is in 4-bit mode */
 #define MMC_CAP2_ASYNC_SDIO_IRQ_4BIT_MODE (1 << 21)
 
-#define MMC_CAP2_CMD_QUEUE     	(1 << 19)       /* support eMMC command queue */
-#define MMC_CAP2_ENHANCED_STROBE		(1 << 20)
-#define MMC_CAP2_CACHE_FLUSH_BARRIER	(1 << 21)
-#define MMC_CAP2_BKOPS_AUTO_CTRL		(1 << 22)	/* Allow background operations auto enable control */
+#define MMC_CAP2_CMD_QUEUE     	(1 << 22)       /* support eMMC command queue */
+#define MMC_CAP2_ENHANCED_STROBE		(1 << 23)
+#define MMC_CAP2_CACHE_FLUSH_BARRIER	(1 << 24)
+#define MMC_CAP2_BKOPS_AUTO_CTRL		(1 << 25)	/* Allow background operations auto enable control */
 
 #define MMC_CAP2_SUPPORT_VIA_MODEM		(1 << 26)	/* host is connected by via modem through sdio */
 #define MMC_CAP2_SUPPORT_WIFI        		(1 << 27)	/* host is connected by wifi through sdio */
