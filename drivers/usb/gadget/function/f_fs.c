@@ -3025,14 +3025,12 @@ static int _ffs_func_bind(struct usb_configuration *c,
 				vla_ptr(vlabuf, d, ext_compat) + i * 16;
 			INIT_LIST_HEAD(&desc->ext_prop);
 		}
-		/* Do ffs_do_os_descs while c->cdev->use_os_string is true,
-		 * otherwise, it will cause panic when ffs->ms_os_descs_count
-		 * is not 0. */
 		ret = ffs_do_os_descs(ffs->ms_os_descs_count,
-				vla_ptr(vlabuf, d, raw_descs) +
-				fs_len + hs_len + ss_len,
-				d_raw_descs__sz - fs_len - hs_len - ss_len,
-				__ffs_func_bind_do_os_desc, func);
+				      vla_ptr(vlabuf, d, raw_descs) +
+				      fs_len + hs_len + ss_len,
+				      d_raw_descs__sz - fs_len - hs_len -
+				      ss_len,
+				      __ffs_func_bind_do_os_desc, func);
 		if (unlikely(ret < 0))
 			goto error;
 	}
