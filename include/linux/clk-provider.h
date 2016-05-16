@@ -13,6 +13,8 @@
 
 #include <linux/io.h>
 #include <linux/of.h>
+#include <linux/mutex.h>
+#include <linux/regulator/consumer.h>
 
 #ifdef CONFIG_COMMON_CLK
 
@@ -36,6 +38,13 @@ struct clk;
 struct clk_hw;
 struct clk_core;
 struct dentry;
+
+struct clk_handoff_vdd {
+	struct list_head list;
+	struct clk_vdd_class *vdd_class;
+};
+
+static LIST_HEAD(clk_handoff_vdd_list);
 
 /***    private data structures    ***/
 
@@ -74,6 +83,9 @@ struct clk_core {
 	struct hlist_node	debug_node;
 #endif
 	struct kref		ref;
+	struct clk_vdd_class	*vdd_class;
+	unsigned long		*rate_max;
+	int			num_rate_max;
 };
 
 struct clk {
@@ -283,6 +295,9 @@ struct clk_ops {
  * @parent_names: array of string names for all possible parents
  * @num_parents: number of possible parents
  * @flags: framework-level hints and quirks
+ * @vdd_class: voltage scaling requirement class
+ * @rate_max: maximum clock rate in Hz supported at each voltage level
+ * @num_rate_max: number of maximum voltage level supported
  */
 struct clk_init_data {
 	const char		*name;
@@ -290,7 +305,68 @@ struct clk_init_data {
 	const char		* const *parent_names;
 	u8			num_parents;
 	unsigned long		flags;
+	struct clk_vdd_class	*vdd_class;
+	unsigned long		*rate_max;
+	int			num_rate_max;
 };
+
+struct regulator;
+
+/**
+ * struct clk_vdd_class - Voltage scaling class
+ * @class_name: name of the class
+ * @regulator: array of regulators
+ * @num_regulators: size of regulator array. Standard regulator APIs will be
+			used if this field > 0
+ * @set_vdd: function to call when applying a new voltage setting
+ * @vdd_uv: sorted 2D array of legal voltage settings. Indexed by level, then
+		regulator
+ * @level_votes: array of votes for each level
+ * @num_levels: specifies the size of level_votes array
+ * @cur_level: the currently set voltage level
+ * @lock: lock to protect this struct
+ */
+struct clk_vdd_class {
+	const char *class_name;
+	struct regulator **regulator;
+	int num_regulators;
+	int (*set_vdd)(struct clk_vdd_class *v_class, int level);
+	int *vdd_uv;
+	int *level_votes;
+	int num_levels;
+	unsigned long cur_level;
+	struct mutex lock;
+};
+
+#define DEFINE_VDD_CLASS(_name, _set_vdd, _num_levels) \
+	struct clk_vdd_class _name = { \
+		.class_name = #_name, \
+		.set_vdd = _set_vdd, \
+		.level_votes = (int [_num_levels]) {}, \
+		.num_levels = _num_levels, \
+		.cur_level = _num_levels, \
+		.lock = __MUTEX_INITIALIZER(_name.lock) \
+	}
+
+#define DEFINE_VDD_REGULATORS(_name, _num_levels, _num_regulators, _vdd_uv) \
+	struct clk_vdd_class _name = { \
+		.class_name = #_name, \
+		.vdd_uv = _vdd_uv, \
+		.regulator = (struct regulator * [_num_regulators]) {}, \
+		.num_regulators = _num_regulators, \
+		.level_votes = (int [_num_levels]) {}, \
+		.num_levels = _num_levels, \
+		.cur_level = _num_levels, \
+		.lock = __MUTEX_INITIALIZER(_name.lock) \
+	}
+
+#define DEFINE_VDD_REGS_INIT(_name, _num_regulators) \
+	struct clk_vdd_class _name = { \
+		.class_name = #_name, \
+		.regulator = (struct regulator * [_num_regulators]) {}, \
+		.num_regulators = _num_regulators, \
+		.lock = __MUTEX_INITIALIZER(_name.lock) \
+	}
 
 /**
  * struct clk_hw - handle for traversing from a struct clk to its corresponding
