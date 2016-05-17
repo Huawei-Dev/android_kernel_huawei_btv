@@ -35,8 +35,6 @@
 #include <linux/timer.h>
 #include <linux/wakeup_reason.h>
 
-#include <asm/current.h>
-
 #if defined CONFIG_LOG_JANK
 #include <huawei_platform/log/log_jank.h>
 #endif
