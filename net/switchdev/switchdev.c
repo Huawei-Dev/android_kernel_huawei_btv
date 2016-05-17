@@ -1175,6 +1175,7 @@ int switchdev_fib_ipv4_add(u32 dst, int dst_len, struct fib_info *fi,
 		.obj.id = SWITCHDEV_OBJ_ID_IPV4_FIB,
 		.dst = dst,
 		.dst_len = dst_len,
+		.fi = fi,
 		.tos = tos,
 		.type = type,
 		.nlflags = nlflags,
@@ -1182,8 +1183,6 @@ int switchdev_fib_ipv4_add(u32 dst, int dst_len, struct fib_info *fi,
 	};
 	struct net_device *dev;
 	int err = 0;
-
-	memcpy(&ipv4_fib.fi, fi, sizeof(ipv4_fib.fi));
 
 	/* Don't offload route if using custom ip rules or if
 	 * IPv4 FIB offloading has been disabled completely.
@@ -1228,6 +1227,7 @@ int switchdev_fib_ipv4_del(u32 dst, int dst_len, struct fib_info *fi,
 		.obj.id = SWITCHDEV_OBJ_ID_IPV4_FIB,
 		.dst = dst,
 		.dst_len = dst_len,
+		.fi = fi,
 		.tos = tos,
 		.type = type,
 		.nlflags = 0,
@@ -1235,8 +1235,6 @@ int switchdev_fib_ipv4_del(u32 dst, int dst_len, struct fib_info *fi,
 	};
 	struct net_device *dev;
 	int err = 0;
-
-	memcpy(&ipv4_fib.fi, fi, sizeof(ipv4_fib.fi));
 
 	if (!(fi->fib_flags & RTNH_F_OFFLOAD))
 		return 0;
