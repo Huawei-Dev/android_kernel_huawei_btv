@@ -98,10 +98,6 @@ void interrupt_end(void)
 		tracehook_notify_resume(&current->thread.regs);
 }
 
-void exit_thread(void)
-{
-}
-
 int get_current_pid(void)
 {
 	return task_pid_nr(current);

@@ -1,5 +1,6 @@
 config MN10300
 	def_bool y
+	select HAVE_EXIT_THREAD
 	select HAVE_OPROFILE
 	select GENERIC_IRQ_SHOW
 	select ARCH_WANT_IPC_PARSE_VERSION
