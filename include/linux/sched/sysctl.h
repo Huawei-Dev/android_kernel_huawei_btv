@@ -160,11 +160,6 @@ static inline unsigned int get_sysctl_sched_cfs_boost(void)
 extern unsigned int sysctl_sched_autogroup_enabled;
 #endif
 
-#ifdef CONFIG_SCHEDSTATS
-extern unsigned int sysctl_sched_latency_panic_threshold;
-extern unsigned int sysctl_sched_latency_warn_threshold;
-#endif
-
 extern int sched_rr_timeslice;
 
 extern int sched_rr_handler(struct ctl_table *table, int write,
