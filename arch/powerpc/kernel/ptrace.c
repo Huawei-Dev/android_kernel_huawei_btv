@@ -1763,9 +1763,62 @@ long arch_ptrace(struct task_struct *child, long request,
 	return ret;
 }
 
-/*
- * We must return the syscall number to actually look up in the table.
- * This can be -1L to skip running any syscall at all.
+#ifdef CONFIG_SECCOMP
+static int do_seccomp(struct pt_regs *regs)
+{
+	if (!test_thread_flag(TIF_SECCOMP))
+		return 0;
+
+	/*
+	 * The ABI we present to seccomp tracers is that r3 contains
+	 * the syscall return value and orig_gpr3 contains the first
+	 * syscall parameter. This is different to the ptrace ABI where
+	 * both r3 and orig_gpr3 contain the first syscall parameter.
+	 */
+	regs->gpr[3] = -ENOSYS;
+
+	/*
+	 * We use the __ version here because we have already checked
+	 * TIF_SECCOMP. If this fails, there is nothing left to do, we
+	 * have already loaded -ENOSYS into r3, or seccomp has put
+	 * something else in r3 (via SECCOMP_RET_ERRNO/TRACE).
+	 */
+	if (__secure_computing(NULL))
+		return -1;
+
+	/*
+	 * The syscall was allowed by seccomp, restore the register
+	 * state to what ptrace and audit expect.
+	 * Note that we use orig_gpr3, which means a seccomp tracer can
+	 * modify the first syscall parameter (in orig_gpr3) and also
+	 * allow the syscall to proceed.
+	 */
+	regs->gpr[3] = regs->orig_gpr3;
+
+	return 0;
+}
+#else
+static inline int do_seccomp(struct pt_regs *regs) { return 0; }
+#endif /* CONFIG_SECCOMP */
+
+/**
+ * do_syscall_trace_enter() - Do syscall tracing on kernel entry.
+ * @regs: the pt_regs of the task to trace (current)
+ *
+ * Performs various types of tracing on syscall entry. This includes seccomp,
+ * ptrace, syscall tracepoints and audit.
+ *
+ * The pt_regs are potentially visible to userspace via ptrace, so their
+ * contents is ABI.
+ *
+ * One or more of the tracers may modify the contents of pt_regs, in particular
+ * to modify arguments or even the syscall number itself.
+ *
+ * It's also possible that a tracer can choose to reject the system call. In
+ * that case this function will return an illegal syscall number, and will put
+ * an appropriate return value in regs->r3.
+ *
+ * Return: the (possibly changed) syscall number.
  */
 long do_syscall_trace_enter(struct pt_regs *regs)
 {
