@@ -325,7 +325,7 @@ extern char ___assert_task_state[1 - 2*!!(
 	smp_store_mb(current->state, (state_value))
 
 #endif
-
+enum task_event {
 /* Task command name length */
 #define TASK_COMM_LEN 16
 
