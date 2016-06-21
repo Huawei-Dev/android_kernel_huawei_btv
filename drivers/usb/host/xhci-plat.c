@@ -294,6 +294,7 @@ static int xhci_plat_remove(struct platform_device *dev)
 	xhci_remove_debug_file();
 
 	device_remove_file(&dev->dev, &dev_attr_config_imod);
+	xhci->xhc_state |= XHCI_STATE_REMOVING;
 	usb_remove_hcd(xhci->shared_hcd);
 	usb_phy_shutdown(hcd->usb_phy);
 
