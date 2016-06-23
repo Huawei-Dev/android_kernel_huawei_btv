@@ -415,14 +415,14 @@ void create_mapping_late(phys_addr_t phys, unsigned long virt,
 static void __init __map_memblock(pgd_t *pgd, phys_addr_t start, phys_addr_t end)
 {
 	unsigned long kernel_start = __pa(_text);
-	unsigned long kernel_end = __pa(_end);
+	unsigned long kernel_end = __pa(__init_begin);
 
 	/*
 	 * The kernel itself is mapped at page granularity. Map all other
 	 * memory, making sure we don't overwrite the existing kernel mappings.
 	 */
 
-	/* No overlap with the kernel. */
+	/* No overlap with the kernel text/rodata */
 	if (end < kernel_start || start >= kernel_end) {
 		__create_pgd_mapping(pgd, start, __phys_to_virt(start),
 				     end - start, PAGE_KERNEL,
@@ -431,8 +431,8 @@ static void __init __map_memblock(pgd_t *pgd, phys_addr_t start, phys_addr_t end
 	}
 
 	/*
-	 * This block overlaps the kernel mapping. Map the portion(s) which
-	 * don't overlap.
+	 * This block overlaps the kernel text/rodata mappings.
+	 * Map the portion(s) which don't overlap.
 	 */
 	if (start < kernel_start)
 		__create_pgd_mapping(pgd, start,
@@ -467,14 +467,14 @@ void mark_rodata_ro(void)
 {
 	unsigned long section_size;
 
-	section_size = (unsigned long)__start_rodata - (unsigned long)_text;
+	section_size = (unsigned long)_etext - (unsigned long)_text;
 	create_mapping_late(__pa(_text), (unsigned long)_text,
 			    section_size, PAGE_KERNEL_ROX);
 	/*
-	 * mark .rodata as read only. Use _etext rather than __end_rodata to
-	 * cover NOTES and EXCEPTION_TABLE.
+	 * mark .rodata as read only. Use __init_begin rather than __end_rodata
+	 * to cover NOTES and EXCEPTION_TABLE.
 	 */
-	section_size = (unsigned long)_etext - (unsigned long)__start_rodata;
+	section_size = (unsigned long)__init_begin - (unsigned long)__start_rodata;
 	create_mapping_late(__pa(__start_rodata), (unsigned long)__start_rodata,
 			    section_size, PAGE_KERNEL_RO);
 }
@@ -505,8 +505,8 @@ static void __init map_kernel_segment(pgd_t *pgd, void *va_start, void *va_end,
  */
 static void __init map_kernel(pgd_t *pgd)
 {
-	map_kernel_segment(pgd, _text, __start_rodata, PAGE_KERNEL_EXEC);
-	map_kernel_segment(pgd, __start_rodata, _etext, PAGE_KERNEL);
+	map_kernel_segment(pgd, _text, _etext, PAGE_KERNEL_EXEC);
+	map_kernel_segment(pgd, __start_rodata, __init_begin, PAGE_KERNEL);
 	map_kernel_segment(pgd, __init_begin, __init_end, PAGE_KERNEL_EXEC);
 	map_kernel_segment(pgd, _data, _end, PAGE_KERNEL);
 
