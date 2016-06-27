@@ -152,7 +152,7 @@ static int i2c_mux_reg_probe_dt(struct regmux *mux,
 		mux->data.idle_in_use = true;
 
 	/* map address from "reg" if exists */
-	if (of_address_to_resource(np, 0, &res)) {
+	if (of_address_to_resource(np, 0, &res) == 0) {
 		mux->data.reg_size = resource_size(&res);
 		if (mux->data.reg_size > 4) {
 			dev_err(&pdev->dev, "Invalid address size\n");
