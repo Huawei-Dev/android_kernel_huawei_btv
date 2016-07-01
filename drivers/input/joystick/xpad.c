@@ -678,6 +678,56 @@ exit:
 			__func__, retval);
 }
 
+/* Callers must hold xpad->odata_lock spinlock */
+static bool xpad_prepare_next_out_packet(struct usb_xpad *xpad)
+{
+	struct xpad_output_packet *pkt, *packet = NULL;
+	int i;
+
+	for (i = 0; i < XPAD_NUM_OUT_PACKETS; i++) {
+		if (++xpad->last_out_packet >= XPAD_NUM_OUT_PACKETS)
+			xpad->last_out_packet = 0;
+
+		pkt = &xpad->out_packets[xpad->last_out_packet];
+		if (pkt->pending) {
+			dev_dbg(&xpad->intf->dev,
+				"%s - found pending output packet %d\n",
+				__func__, xpad->last_out_packet);
+			packet = pkt;
+			break;
+		}
+	}
+
+	if (packet) {
+		memcpy(xpad->odata, packet->data, packet->len);
+		xpad->irq_out->transfer_buffer_length = packet->len;
+		packet->pending = false;
+		return true;
+	}
+
+	return false;
+}
+
+/* Callers must hold xpad->odata_lock spinlock */
+static int xpad_try_sending_next_out_packet(struct usb_xpad *xpad)
+{
+	int error;
+
+	if (!xpad->irq_out_active && xpad_prepare_next_out_packet(xpad)) {
+		error = usb_submit_urb(xpad->irq_out, GFP_ATOMIC);
+		if (error) {
+			dev_err(&xpad->intf->dev,
+				"%s - usb_submit_urb failed with result %d\n",
+				__func__, error);
+			return -EIO;
+		}
+
+		xpad->irq_out_active = true;
+	}
+
+	return 0;
+}
+
 static void xpad_irq_out(struct urb *urb)
 {
 	struct usb_xpad *xpad = urb->context;
@@ -689,7 +739,8 @@ static void xpad_irq_out(struct urb *urb)
 	switch (status) {
 	case 0:
 		/* success */
-		return;
+		xpad->irq_out_active = xpad_prepare_next_out_packet(xpad);
+		break;
 
 	case -ECONNRESET:
 	case -ENOENT:
