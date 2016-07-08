@@ -177,18 +177,16 @@ bool __kprobes aarch64_insn_is_branch(u32 insn)
 {
 	/* b, bl, cb*, tb*, b.cond, br, blr */
 
-	return aarch64_insn_is_b_bl_cb_tb(insn) ||
-		aarch64_insn_is_br_blr(insn) ||
+	return aarch64_insn_is_b(insn) ||
+		aarch64_insn_is_bl(insn) ||
+		aarch64_insn_is_cbz(insn) ||
+		aarch64_insn_is_cbnz(insn) ||
+		aarch64_insn_is_tbz(insn) ||
+		aarch64_insn_is_tbnz(insn) ||
 		aarch64_insn_is_ret(insn) ||
+		aarch64_insn_is_br(insn) ||
+		aarch64_insn_is_blr(insn) ||
 		aarch64_insn_is_bcond(insn);
-}
-
-bool __kprobes aarch64_insn_is_daif_access(u32 insn)
-{
-	/* msr daif, mrs daif, msr daifset, msr daifclr */
-
-	return aarch64_insn_is_rd_wr_daif(insn) ||
-		aarch64_insn_is_set_clr_daif(insn);
 }
 
 /*
@@ -1143,6 +1141,14 @@ u32 aarch64_set_branch_offset(u32 insn, s32 offset)
 
 	/* Unhandled instruction */
 	BUG();
+}
+
+/*
+ * Extract the Op/CR data from a msr/mrs instruction.
+ */
+u32 aarch64_insn_extract_system_reg(u32 insn)
+{
+	return (insn & 0x1FFFE0) >> 5;
 }
 
 bool aarch32_insn_is_wide(u32 insn)
