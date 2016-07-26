@@ -8606,9 +8606,6 @@ struct lb_env {
 	struct list_head	tasks;
 };
 
-static DEFINE_PER_CPU(bool, dbs_boost_needed);
-static DEFINE_PER_CPU(int, dbs_boost_load_moved);
-
 /*
  * Is this task likely cache-hot:
  */
@@ -8849,7 +8846,6 @@ static struct task_struct *detach_one_task(struct lb_env *env)
 		 * inside detach_tasks().
 		 */
 		schedstat_inc(env->sd, lb_gained[env->idle]);
-		per_cpu(dbs_boost_load_moved, env->dst_cpu) += pct_task_load(p);
 
 		return p;
 	}
@@ -8922,7 +8918,6 @@ redo:
 
 		detached++;
 		env->imbalance -= load;
-		per_cpu(dbs_boost_load_moved, env->dst_cpu) += pct_task_load(p);
 
 #ifdef CONFIG_PREEMPT
 		/*
@@ -8976,8 +8971,6 @@ static void attach_task(struct rq *rq, struct task_struct *p)
 	activate_task(rq, p, 0);
 	p->on_rq = TASK_ON_RQ_QUEUED;
 	check_preempt_curr(rq, p, 0);
-	if (task_notify_on_migrate(p))
-		per_cpu(dbs_boost_needed, task_cpu(p)) = true;
 }
 
 /*
@@ -10421,7 +10414,6 @@ static int load_balance(int this_cpu, struct rq *this_rq,
 
 	cpumask_copy(cpus, cpu_active_mask);
 
-	per_cpu(dbs_boost_load_moved, this_cpu) = 0;
 	schedstat_inc(sd, lb_count[idle]);
 
 redo:
@@ -10621,20 +10613,6 @@ no_move:
 		}
 	} else {
 		sd->nr_balance_failed = 0;
-		if (per_cpu(dbs_boost_needed, this_cpu)) {
-			struct migration_notify_data mnd;
-
-			mnd.src_cpu = cpu_of(busiest);
-			mnd.dest_cpu = this_cpu;
-			mnd.load = per_cpu(dbs_boost_load_moved, this_cpu);
-			if (mnd.load > 100)
-				mnd.load = 100;
-			atomic_notifier_call_chain(&migration_notifier_head,
-						   0, (void *)&mnd);
-			per_cpu(dbs_boost_needed, this_cpu) = false;
-			per_cpu(dbs_boost_load_moved, this_cpu) = 0;
-
-		}
 
 		/* Assumes one 'busiest' cpu that we pulled tasks from */
 		if (!same_freq_domain(this_cpu, cpu_of(busiest))) {
@@ -10883,8 +10861,6 @@ static int active_load_balance_cpu_stop(void *data)
 
 	raw_spin_lock_irq(&busiest_rq->lock);
 
-	per_cpu(dbs_boost_load_moved, target_cpu) = 0;
-
 	/* make sure the requested cpu hasn't gone down in the meantime */
 	if (unlikely(busiest_cpu != smp_processor_id() ||
 		     !busiest_rq->active_balance))
@@ -10967,20 +10943,6 @@ out_unlock:
 		check_for_freq_change(target_rq, true, false);
 	}
 
-	if (per_cpu(dbs_boost_needed, target_cpu)) {
-		struct migration_notify_data mnd;
-
-		mnd.src_cpu = cpu_of(busiest_rq);
-		mnd.dest_cpu = target_cpu;
-		mnd.load = per_cpu(dbs_boost_load_moved, target_cpu);
-		if (mnd.load > 100)
-			mnd.load = 100;
-		atomic_notifier_call_chain(&migration_notifier_head,
-					   0, (void *)&mnd);
-
-		per_cpu(dbs_boost_needed, target_cpu) = false;
-		per_cpu(dbs_boost_load_moved, target_cpu) = 0;
-	}
 	return 0;
 }
 
