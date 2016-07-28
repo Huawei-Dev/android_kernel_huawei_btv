@@ -1103,7 +1103,6 @@ extern void init_new_task_load(struct task_struct *p);
 
 extern struct mutex policy_mutex;
 extern unsigned int sched_ravg_window;
-extern unsigned int sched_use_pelt;
 extern unsigned int sched_disable_window_stats;
 extern unsigned int sched_enable_hmp;
 extern unsigned int max_possible_freq;
@@ -1118,7 +1117,6 @@ extern unsigned int max_possible_capacity;
 extern unsigned int min_max_possible_capacity;
 extern unsigned int sched_upmigrate;
 extern unsigned int sched_downmigrate;
-extern unsigned int sched_init_task_load_pelt;
 extern unsigned int sched_init_task_load_windows;
 extern unsigned int up_down_migrate_scale_factor;
 extern unsigned int sysctl_sched_restrict_cluster_spill;
@@ -1235,9 +1233,6 @@ static inline u64 scale_load_to_cpu(u64 task_load, int cpu)
 
 static inline unsigned int task_load(struct task_struct *p)
 {
-	if (sched_use_pelt)
-		return p->se.avg.runnable_avg_sum_scaled;
-
 	return p->ravg.demand;
 }
 
@@ -1258,8 +1253,7 @@ inc_cumulative_runnable_avg(struct hmp_sched_stats *stats,
 	if (!sched_enable_hmp || sched_disable_window_stats)
 		return;
 
-	task_load = sched_use_pelt ? p->se.avg.runnable_avg_sum_scaled :
-			(sched_disable_window_stats ? 0 : p->ravg.demand);
+	task_load = sched_disable_window_stats ? 0 : p->ravg.demand;
 
 	stats->cumulative_runnable_avg += task_load;
 	set_pred_demands_sum(stats, stats->pred_demands_sum +
@@ -1275,8 +1269,7 @@ dec_cumulative_runnable_avg(struct hmp_sched_stats *stats,
 	if (!sched_enable_hmp || sched_disable_window_stats)
 		return;
 
-	task_load = sched_use_pelt ? p->se.avg.runnable_avg_sum_scaled :
-			(sched_disable_window_stats ? 0 : p->ravg.demand);
+	task_load = sched_disable_window_stats ? 0 : p->ravg.demand;
 
 	stats->cumulative_runnable_avg -= task_load;
 
@@ -1347,8 +1340,6 @@ struct related_thread_group *task_related_thread_group(struct task_struct *p)
 }
 
 #else	/* CONFIG_SCHED_HMP */
-
-#define sched_use_pelt 0
 
 struct hmp_sched_stats;
 struct related_thread_group;
