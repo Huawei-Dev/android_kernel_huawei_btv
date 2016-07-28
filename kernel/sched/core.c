@@ -797,24 +797,6 @@ void sched_avg_update(struct rq *rq)
 	}
 }
 
-/*
- * Note C-state for (idle) cpus.
- *
- * @cstate = cstate index, 0 -> active state
- * @wakeup_energy = energy spent in waking up cpu
- * @wakeup_latency = latency to wakeup from cstate
- *
- */
-void
-sched_set_cpu_cstate(int cpu, int cstate, int wakeup_energy, int wakeup_latency)
-{
-	struct rq *rq = cpu_rq(cpu);
-
-	rq->cstate = cstate; /* C1, C2 etc */
-	rq->wakeup_energy = wakeup_energy;
-	rq->wakeup_latency = wakeup_latency;
-}
-
 #endif /* CONFIG_SMP */
 
 #ifdef CONFIG_SCHED_HMP
@@ -871,6 +853,24 @@ static inline void set_task_last_switch_out(struct task_struct *p,
 					    u64 wallclock)
 {
 	p->last_switch_out_ts = wallclock;
+}
+
+/*
+ * Note C-state for (idle) cpus.
+ *
+ * @cstate = cstate index, 0 -> active state
+ * @wakeup_energy = energy spent in waking up cpu
+ * @wakeup_latency = latency to wakeup from cstate
+ *
+ */
+void
+sched_set_cpu_cstate(int cpu, int cstate, int wakeup_energy, int wakeup_latency)
+{
+	struct rq *rq = cpu_rq(cpu);
+
+	rq->cstate = cstate; /* C1, C2 etc */
+	rq->wakeup_energy = wakeup_energy;
+	rq->wakeup_latency = wakeup_latency;
 }
 
 /*
@@ -11273,6 +11273,9 @@ void __init sched_init(void)
 		rq->static_cpu_pwr_cost = 0;
 		rq->cc.cycles = SCHED_MIN_FREQ;
 		rq->cc.time = 1;
+		rq->cstate = 0;
+		rq->wakeup_latency = 0;
+		rq->wakeup_energy = 0;
 
 		/*
 		 * All cpus part of same cluster by default. This avoids the
@@ -11291,8 +11294,6 @@ void __init sched_init(void)
 #endif
 #endif
 		rq->max_idle_balance_cost = sysctl_sched_migration_cost;
-		rq->cstate = 0;
-		rq->wakeup_latency = 0;
 #ifdef CONFIG_SCHED_WALT
 		rq->cur_irqload = 0;
 		rq->avg_irqload = 0;
