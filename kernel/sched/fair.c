@@ -2738,10 +2738,9 @@ void set_hmp_defaults(void)
 
 	update_up_down_migrate();
 
-#ifdef CONFIG_SCHED_FREQ_INPUT
 	sched_major_task_runtime =
 		mult_frac(sched_ravg_window, MAJOR_TASK_PCT, 100);
-#endif
+
 	sched_init_task_load_windows =
 		div64_u64((u64)sysctl_sched_init_task_load_pct *
 			  (u64)sched_ravg_window, 100);
@@ -3678,7 +3677,7 @@ static void reset_hmp_stats(struct hmp_sched_stats *stats, int reset_cra)
 	stats->nr_big_tasks = 0;
 	if (reset_cra) {
 		stats->cumulative_runnable_avg = 0;
-		set_pred_demands_sum(stats, 0);
+		stats->pred_demands_sum = 0;
 	}
 }
 
@@ -3954,7 +3953,6 @@ void post_big_task_count_change(const struct cpumask *cpus)
 
 DEFINE_MUTEX(policy_mutex);
 
-#ifdef CONFIG_SCHED_FREQ_INPUT
 static inline int invalid_value_freq_input(unsigned int *data)
 {
 	if (data == &sysctl_sched_migration_fixup)
@@ -3965,12 +3963,6 @@ static inline int invalid_value_freq_input(unsigned int *data)
 
 	return 0;
 }
-#else
-static inline int invalid_value_freq_input(unsigned int *data)
-{
-	return 0;
-}
-#endif
 
 static inline int invalid_value(unsigned int *data)
 {
@@ -4761,12 +4753,6 @@ dec_rq_hmp_stats(struct rq *rq, struct task_struct *p, int change_cra) { }
 
 #ifdef CONFIG_SCHED_HMP
 
-#ifdef CONFIG_SCHED_FREQ_INPUT
-#define clear_ravg_pred_demand() (p->ravg.pred_demand = 0)
-#else
-#define clear_ravg_pred_demand()
-#endif
-
 void init_new_task_load(struct task_struct *p)
 {
 	int i;
@@ -4784,7 +4770,7 @@ void init_new_task_load(struct task_struct *p)
 			  (u64)sched_ravg_window, 100);
 
 	p->ravg.demand = init_load_windows;
-	clear_ravg_pred_demand();
+	p->ravg.pred_demand = 0;
 	for (i = 0; i < RAVG_HIST_SIZE_MAX; ++i)
 		p->ravg.sum_history[i] = init_load_windows;
 }
@@ -4815,7 +4801,7 @@ static void init_cfs_rq_hmp_stats(struct cfs_rq *cfs_rq)
 {
 	cfs_rq->hmp_stats.nr_big_tasks = 0;
 	cfs_rq->hmp_stats.cumulative_runnable_avg = 0;
-	set_pred_demands_sum(&cfs_rq->hmp_stats, 0);
+	cfs_rq->hmp_stats.pred_demands_sum = 0;
 }
 
 static void inc_cfs_rq_hmp_stats(struct cfs_rq *cfs_rq,
@@ -4840,8 +4826,7 @@ static void inc_throttled_cfs_rq_hmp_stats(struct hmp_sched_stats *stats,
 	stats->nr_big_tasks += cfs_rq->hmp_stats.nr_big_tasks;
 	stats->cumulative_runnable_avg +=
 				cfs_rq->hmp_stats.cumulative_runnable_avg;
-	set_pred_demands_sum(stats, stats->pred_demands_sum +
-			     cfs_rq->hmp_stats.pred_demands_sum);
+	stats->pred_demands_sum += cfs_rq->hmp_stats.pred_demands_sum;
 }
 
 static void dec_throttled_cfs_rq_hmp_stats(struct hmp_sched_stats *stats,
@@ -4850,8 +4835,7 @@ static void dec_throttled_cfs_rq_hmp_stats(struct hmp_sched_stats *stats,
 	stats->nr_big_tasks -= cfs_rq->hmp_stats.nr_big_tasks;
 	stats->cumulative_runnable_avg -=
 				cfs_rq->hmp_stats.cumulative_runnable_avg;
-	set_pred_demands_sum(stats, stats->pred_demands_sum -
-			     cfs_rq->hmp_stats.pred_demands_sum);
+	stats->pred_demands_sum -= cfs_rq->hmp_stats.pred_demands_sum;
 
 	BUG_ON(stats->nr_big_tasks < 0 ||
 		(s64)stats->cumulative_runnable_avg < 0);
