@@ -8639,7 +8639,7 @@ static void detach_task(struct task_struct *p, struct lb_env *env)
 	deactivate_task(env->src_rq, p, 0);
 	double_lock_balance(env->src_rq, env->dst_rq);
 	set_task_cpu(p, env->dst_cpu);
-	if (rcu_access_pointer(p->grp))
+	if (task_in_related_thread_group(p))
 		env->flags |= LBF_MOVED_RELATED_THREAD_GROUP_TASK;
 	double_unlock_balance(env->src_rq, env->dst_rq);
 }
