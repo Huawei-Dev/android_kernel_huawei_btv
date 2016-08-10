@@ -13,6 +13,7 @@
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 #include <linux/platform_device.h>
 #include <linux/dma-mapping.h>
+#include <linux/workqueue.h>
 #include <linux/libnvdimm.h>
 #include <linux/vmalloc.h>
 #include <linux/device.h>
@@ -1022,6 +1023,30 @@ static int nfit_test_probe(struct platform_device *pdev)
 	acpi_desc->nvdimm_bus = nvdimm_bus_register(&pdev->dev, nd_desc);
 	if (!acpi_desc->nvdimm_bus)
 		return -ENXIO;
+
+	INIT_LIST_HEAD(&acpi_desc->spa_maps);
+	INIT_LIST_HEAD(&acpi_desc->spas);
+	INIT_LIST_HEAD(&acpi_desc->dcrs);
+	INIT_LIST_HEAD(&acpi_desc->bdws);
+	INIT_LIST_HEAD(&acpi_desc->idts);
+	INIT_LIST_HEAD(&acpi_desc->flushes);
+	INIT_LIST_HEAD(&acpi_desc->memdevs);
+	INIT_LIST_HEAD(&acpi_desc->dimms);
+	mutex_init(&acpi_desc->spa_map_mutex);
+	mutex_init(&acpi_desc->init_mutex);
+
+	rc = acpi_nfit_init(acpi_desc, nfit_test->nfit_size);
+	if (rc) {
+		nvdimm_bus_unregister(acpi_desc->nvdimm_bus);
+		return rc;
+	}
+
+	if (nfit_test->setup != nfit_test0_setup)
+		return 0;
+
+	flush_work(&acpi_desc->work);
+	nfit_test->setup_hotplug = 1;
+	nfit_test->setup(nfit_test);
 
 	rc = acpi_nfit_init(acpi_desc, nfit_test->nfit_size);
 	if (rc) {
