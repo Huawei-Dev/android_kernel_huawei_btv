@@ -399,6 +399,7 @@ struct sched_cluster {
 	bool freq_init_done;
 	int dstate, dstate_wakeup_latency, dstate_wakeup_energy;
 	unsigned int static_cluster_pwr_cost;
+	int notifier_sent;
 };
 
 extern unsigned long all_cluster_ids[];
@@ -784,7 +785,6 @@ struct rq {
 	struct task_struct *ed_task;
 	struct cpu_cycle cc;
 	u64 old_busy_time, old_busy_time_group;
-	int notifier_sent;
 	u64 old_estimated_time;
 #endif
 
