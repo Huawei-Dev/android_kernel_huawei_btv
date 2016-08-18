@@ -9533,6 +9533,7 @@ static int find_first_block_group(struct btrfs_root *root,
 			} else {
 				ret = 0;
 			}
+			free_extent_map(em);
 			goto out;
 		}
 		path->slots[0]++;
