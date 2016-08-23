@@ -1,13 +1,11 @@
 /*
- * Allwinner A23 SoCs pinctrl driver.
+ * Allwinner a33 SoCs pinctrl driver.
  *
- * Copyright (C) 2014 Chen-Yu Tsai
+ * Copyright (C) 2015 Vishnu Patekar <vishnupatekar0510@gmail.com>
  *
- * Chen-Yu Tsai <wens@csie.org>
- *
- * Copyright (C) 2014 Maxime Ripard
- *
- * Maxime Ripard <maxime.ripard@free-electrons.com>
+ * Based on pinctrl-sun8i-a23.c, which is:
+ * Copyright (C) 2014 Chen-Yu Tsai <wens@csie.org>
+ * Copyright (C) 2014 Maxime Ripard <maxime.ripard@free-electrons.com>
  *
  * This file is licensed under the terms of the GNU General Public
  * License version 2.  This program is licensed "as is" without any
@@ -22,92 +20,54 @@
 
 #include "pinctrl-sunxi.h"
 
-static const struct sunxi_desc_pin sun8i_a23_pins[] = {
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(A, 0),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "spi1"),		/* CS */
-		  SUNXI_FUNCTION(0x3, "jtag"),		/* MS0 */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 0)),	/* PA_EINT0 */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(A, 1),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "spi1"),		/* CLK */
-		  SUNXI_FUNCTION(0x3, "jtag"),		/* CKO */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 1)),	/* PA_EINT1 */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(A, 2),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "spi1"),		/* MOSI */
-		  SUNXI_FUNCTION(0x3, "jtag"),		/* DOO */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 2)),	/* PA_EINT2 */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(A, 3),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "spi1"),		/* MISO */
-		  SUNXI_FUNCTION(0x3, "jtag"),		/* DIO */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 3)),	/* PA_EINT3 */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(A, 4),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "uart4"),		/* TX */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 4)),	/* PA_EINT4 */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(A, 5),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "uart4"),		/* RX */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 5)),	/* PA_EINT5 */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(A, 6),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "uart4"),		/* RTS */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 6)),	/* PA_EINT6 */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(A, 7),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "uart4"),		/* CTS */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 7)),	/* PA_EINT7 */
+static const struct sunxi_desc_pin sun8i_a33_pins[] = {
 	/* Hole */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(B, 0),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "uart2"),		/* TX */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 0)),	/* PB_EINT0 */
+		  SUNXI_FUNCTION(0x3, "uart0"),		/* TX */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 0)),	/* PB_EINT0 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(B, 1),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "uart2"),		/* RX */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 1)),	/* PB_EINT1 */
+		  SUNXI_FUNCTION(0x3, "uart0"),		/* RX */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 1)),	/* PB_EINT1 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(B, 2),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "uart2"),		/* RTS */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 2)),	/* PB_EINT2 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 2)),	/* PB_EINT2 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(B, 3),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "uart2"),		/* CTS */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 3)),	/* PB_EINT3 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 3)),	/* PB_EINT3 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(B, 4),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "i2s0"),		/* SYNC */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 4)),	/* PB_EINT4 */
+		  SUNXI_FUNCTION(0x3, "aif2"),		/* SYNC */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 4)),	/* PB_EINT4 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(B, 5),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "i2s0"),		/* DOUT */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 5)),	/* PB_EINT5 */
+		  SUNXI_FUNCTION(0x2, "i2s0"),		/* BCLK */
+		  SUNXI_FUNCTION(0x3, "aif2"),		/* BCLK */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 5)),	/* PB_EINT5 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(B, 6),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "i2s0"),		/* DIN */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 6)),	/* PB_EINT6 */
+		  SUNXI_FUNCTION(0x2, "i2s0"),		/* DOUT */
+		  SUNXI_FUNCTION(0x3, "aif2"),		/* DOUT */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 6)),	/* PB_EINT6 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(B, 7),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x3, "i2s0"),		/* DI */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 7)),	/* PB_EINT7 */
+		  SUNXI_FUNCTION(0x2, "i2s0"),		/* DIN */
+		  SUNXI_FUNCTION(0x3, "aif2"),		/* DIN */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 0, 7)),	/* PB_EINT7 */
 	/* Hole */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(C, 0),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
@@ -192,23 +152,7 @@ static const struct sunxi_desc_pin sun8i_a23_pins[] = {
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "nand"),		/* DQS */
 		  SUNXI_FUNCTION(0x3, "mmc2")),		/* RST */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(C, 17),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "nand0")),	/* CE2 */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(C, 18),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "nand0")),	/* CE3 */
 	/* Hole */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(D, 0),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "lcd0")),		/* D0 */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(D, 1),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "lcd0")),		/* D1 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(D, 2),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
@@ -239,16 +183,6 @@ static const struct sunxi_desc_pin sun8i_a23_pins[] = {
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "lcd0"),		/* D7 */
 		  SUNXI_FUNCTION(0x3, "mmc1")),		/* D3 */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(D, 8),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "lcd0"),		/* D8 */
-		  SUNXI_FUNCTION(0x3, "uart3")),	/* TX */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(D, 9),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "lcd0"),		/* D9 */
-		  SUNXI_FUNCTION(0x3, "uart3")),	/* RX */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(D, 10),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
@@ -272,33 +206,21 @@ static const struct sunxi_desc_pin sun8i_a23_pins[] = {
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(D, 14),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "lcd0"),		/* D14 */
-		  SUNXI_FUNCTION(0x3, "i2s1")),		/* SYNC */
+		  SUNXI_FUNCTION(0x2, "lcd0")),		/* D14 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(D, 15),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "lcd0"),		/* D15 */
-		  SUNXI_FUNCTION(0x3, "i2s1")),		/* CLK */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(D, 16),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "lcd0"),		/* D16 */
-		  SUNXI_FUNCTION(0x3, "i2s1")),		/* DOUT */
-	SUNXI_PIN(SUNXI_PINCTRL_PIN(D, 17),
-		  SUNXI_FUNCTION(0x0, "gpio_in"),
-		  SUNXI_FUNCTION(0x1, "gpio_out"),
-		  SUNXI_FUNCTION(0x2, "lcd0"),		/* D17 */
-		  SUNXI_FUNCTION(0x3, "i2s1")),		/* DIN */
+		  SUNXI_FUNCTION(0x2, "lcd0")),		/* D15 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(D, 18),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "lcd0"),		/* D18 */
-		  SUNXI_FUNCTION(0x3, "lvds0")),	/* VN0 */
+		  SUNXI_FUNCTION(0x3, "lvds0")),	/* VP0 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(D, 19),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "lcd0"),		/* D19 */
-		  SUNXI_FUNCTION(0x3, "lvds0")),	/* VP0 */
+		  SUNXI_FUNCTION(0x3, "lvds0")),	/* VN0 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(D, 20),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
@@ -446,72 +368,72 @@ static const struct sunxi_desc_pin sun8i_a23_pins[] = {
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "mmc1"),		/* CLK */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 2, 0)),	/* PG_EINT0 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 0)),	/* PG_EINT0 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(G, 1),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "mmc1"),		/* CMD */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 2, 1)),	/* PG_EINT1 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 1)),	/* PG_EINT1 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(G, 2),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "mmc1"),		/* D0 */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 2, 2)),	/* PG_EINT2 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 2)),	/* PG_EINT2 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(G, 3),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "mmc1"),		/* D1 */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 2, 3)),	/* PG_EINT3 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 3)),	/* PG_EINT3 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(G, 4),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "mmc1"),		/* D2 */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 2, 4)),	/* PG_EINT4 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 4)),	/* PG_EINT4 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(G, 5),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "mmc1"),		/* D3 */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 2, 5)),	/* PG_EINT5 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 5)),	/* PG_EINT5 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(G, 6),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "uart1"),		/* TX */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 2, 6)),	/* PG_EINT6 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 6)),	/* PG_EINT6 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(G, 7),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "uart1"),		/* RX */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 2, 7)),	/* PG_EINT7 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 7)),	/* PG_EINT7 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(G, 8),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "uart1"),		/* RTS */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 2, 8)),	/* PG_EINT8 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 8)),	/* PG_EINT8 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(G, 9),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "uart1"),		/* CTS */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 2, 9)),	/* PG_EINT9 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 9)),	/* PG_EINT9 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(G, 10),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "i2s1"),		/* SYNC */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 2, 10)),	/* PG_EINT10 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 10)),	/* PG_EINT10 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(G, 11),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "i2s1"),		/* CLK */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 2, 11)),	/* PG_EINT11 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 11)),	/* PG_EINT11 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(G, 12),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "i2s1"),		/* DOUT */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 2, 12)),	/* PG_EINT12 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 12)),	/* PG_EINT12 */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(G, 13),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
 		  SUNXI_FUNCTION(0x1, "gpio_out"),
 		  SUNXI_FUNCTION(0x2, "i2s1"),		/* DIN */
-		  SUNXI_FUNCTION_IRQ_BANK(0x4, 2, 13)),	/* PG_EINT13 */
+		  SUNXI_FUNCTION_IRQ_BANK(0x4, 1, 13)),	/* PG_EINT13 */
 	/* Hole */
 	SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 0),
 		  SUNXI_FUNCTION(0x0, "gpio_in"),
@@ -559,34 +481,34 @@ static const struct sunxi_desc_pin sun8i_a23_pins[] = {
 		  SUNXI_FUNCTION(0x3, "uart3")),	/* CTS */
 };
 
-static const struct sunxi_pinctrl_desc sun8i_a23_pinctrl_data = {
-	.pins = sun8i_a23_pins,
-	.npins = ARRAY_SIZE(sun8i_a23_pins),
-	.irq_banks = 3,
+static const struct sunxi_pinctrl_desc sun8i_a33_pinctrl_data = {
+	.pins = sun8i_a33_pins,
+	.npins = ARRAY_SIZE(sun8i_a33_pins),
+	.irq_banks = 2,
+	.irq_bank_base = 1,
 };
 
-static int sun8i_a23_pinctrl_probe(struct platform_device *pdev)
+static int sun8i_a33_pinctrl_probe(struct platform_device *pdev)
 {
 	return sunxi_pinctrl_init(pdev,
-				  &sun8i_a23_pinctrl_data);
+				  &sun8i_a33_pinctrl_data);
 }
 
-static const struct of_device_id sun8i_a23_pinctrl_match[] = {
-	{ .compatible = "allwinner,sun8i-a23-pinctrl", },
+static const struct of_device_id sun8i_a33_pinctrl_match[] = {
+	{ .compatible = "allwinner,sun8i-a33-pinctrl", },
 	{}
 };
-MODULE_DEVICE_TABLE(of, sun8i_a23_pinctrl_match);
+MODULE_DEVICE_TABLE(of, sun8i_a33_pinctrl_match);
 
-static struct platform_driver sun8i_a23_pinctrl_driver = {
-	.probe	= sun8i_a23_pinctrl_probe,
+static struct platform_driver sun8i_a33_pinctrl_driver = {
+	.probe	= sun8i_a33_pinctrl_probe,
 	.driver	= {
-		.name		= "sun8i-a23-pinctrl",
-		.of_match_table	= sun8i_a23_pinctrl_match,
+		.name		= "sun8i-a33-pinctrl",
+		.of_match_table	= sun8i_a33_pinctrl_match,
 	},
 };
-module_platform_driver(sun8i_a23_pinctrl_driver);
+module_platform_driver(sun8i_a33_pinctrl_driver);
 
-MODULE_AUTHOR("Chen-Yu Tsai <wens@csie.org>");
-MODULE_AUTHOR("Maxime Ripard <maxime.ripard@free-electrons.com");
-MODULE_DESCRIPTION("Allwinner A23 pinctrl driver");
+MODULE_AUTHOR("Vishnu Patekar <vishnupatekar0510@gmail.com>");
+MODULE_DESCRIPTION("Allwinner a33 pinctrl driver");
 MODULE_LICENSE("GPL");
