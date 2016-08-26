@@ -773,6 +773,9 @@ struct ufs_hba {
 #endif
 	bool is_sys_suspended;
 
+	int			latency_hist_enabled;
+	struct io_latency_state io_lat_s;
+
 	struct ufs_unique_number unique_number;
 
 	uint16_t manufacturer_id;
