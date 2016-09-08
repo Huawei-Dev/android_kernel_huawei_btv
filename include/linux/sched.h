@@ -348,8 +348,6 @@ enum migrate_types {
 	GROUP_TO_GROUP,
 };
 
-extern const char *migrate_type_names[];
-
 #include <linux/spinlock.h>
 
 /*
