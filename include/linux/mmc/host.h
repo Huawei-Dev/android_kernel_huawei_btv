@@ -537,8 +537,10 @@ struct mmc_host {
 	} clk_scaling;
 	enum dev_state dev_status;
 
+#ifdef CONFIG_BLOCK
 	int			latency_hist_enabled;
 	struct io_latency_state io_lat_s;
+#endif
 
 	unsigned long		private[0] ____cacheline_aligned;
 };
