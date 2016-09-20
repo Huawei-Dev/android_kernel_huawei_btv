@@ -272,7 +272,7 @@ void __show_regs(struct pt_regs *regs)
 #ifdef CONFIG_HISI_BB
 		if (!(g_cpu_in_ipi_stop & mask))
 #endif
-		show_extra_register_data(regs, 256);
+		show_extra_register_data(regs, 64);
 	printk("\n");
 #ifdef CONFIG_HISI_BB
 	put_cpu();
