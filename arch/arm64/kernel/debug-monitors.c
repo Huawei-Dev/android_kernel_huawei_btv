@@ -265,7 +265,7 @@ static int single_step_handler(unsigned long addr, unsigned int esr,
 	} else {
 #ifdef	CONFIG_KPROBES
 		if (kprobe_single_step_handler(regs, esr) == DBG_HOOK_HANDLED)
-			handler_found = true;
+			return 0;
 #endif
 		if (call_step_hook(regs, esr) == DBG_HOOK_HANDLED)
 			handler_found = true;

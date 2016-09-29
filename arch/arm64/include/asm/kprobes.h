@@ -36,9 +36,7 @@ struct prev_kprobe {
 
 /* Single step context for kprobe */
 struct kprobe_step_ctx {
-#define KPROBES_STEP_NONE	0x0
-#define KPROBES_STEP_PENDING	0x1
-	unsigned long ss_status;
+	unsigned long ss_pending;
 	unsigned long match_addr;
 };
 
