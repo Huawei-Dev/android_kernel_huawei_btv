@@ -8623,6 +8623,23 @@ static void btrfs_invalidatepage(struct page *page, unsigned int offset,
 		}
 	}
 
+	/*
+	 * Qgroup reserved space handler
+	 * Page here will be either
+	 * 1) Already written to disk
+	 *    In this case, its reserved space is released from data rsv map
+	 *    and will be freed by delayed_ref handler finally.
+	 *    So even we call qgroup_free_data(), it won't decrease reserved
+	 *    space.
+	 * 2) Not written to disk
+	 *    This means the reserved space should be freed here. However,
+	 *    if a truncate invalidates the page (by clearing PageDirty)
+	 *    and the page is accounted for while allocating extent
+	 *    in btrfs_check_data_free_space() we let delayed_ref to
+	 *    free the entire extent.
+	 */
+	if (PageDirty(page))
+		btrfs_qgroup_free_data(inode, page_start, PAGE_SIZE);
 	if (!inode_evicting) {
 		clear_extent_bit(tree, page_start, page_end,
 				 EXTENT_LOCKED | EXTENT_DIRTY |
