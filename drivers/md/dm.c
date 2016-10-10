@@ -2282,6 +2282,8 @@ static void cleanup_mapped_device(struct mapped_device *md)
 	if (md->queue)
 		blk_cleanup_queue(md->queue);
 
+	cleanup_srcu_struct(&md->io_barrier);
+
 	if (md->bdev) {
 		bdput(md->bdev);
 		md->bdev = NULL;
