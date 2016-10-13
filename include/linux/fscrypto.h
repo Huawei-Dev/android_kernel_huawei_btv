@@ -15,14 +15,11 @@
 #include <linux/mm.h>
 #include <linux/bio.h>
 #include <linux/dcache.h>
-#include <crypto/aead.h>
+#include <crypto/skcipher.h>
 #include <uapi/linux/fs.h>
 
-#define FS_KEY_DERIVATION_NONCE_SIZE		64
-#define FS_KEY_DERIVATION_IV_SIZE		16
-#define FS_KEY_DERIVATION_TAG_SIZE		16
-#define FS_KEY_DERIVATION_CIPHER_SIZE		(64 + 16) /* nonce + tag */
-#define FS_ENCRYPTION_CONTEXT_FORMAT_V2		2
+#define FS_KEY_DERIVATION_NONCE_SIZE		16
+#define FS_ENCRYPTION_CONTEXT_FORMAT_V1		1
 
 #define FS_POLICY_FLAGS_PAD_4		0x00
 #define FS_POLICY_FLAGS_PAD_8		0x01
@@ -42,13 +39,12 @@
  * Encryption context for inode
  *
  * Protector format:
- *  1 byte: Protector format (2 = this version)
+ *  1 byte: Protector format (1 = this version)
  *  1 byte: File contents encryption mode
  *  1 byte: File names encryption mode
  *  1 byte: Flags
  *  8 bytes: Master Key descriptor
- *  80 bytes: Encryption Key derivation nonce (encrypted)
- *  16 bytes: IV
+ *  16 bytes: Encryption Key derivation nonce
  */
 struct fscrypt_context {
 	u8 format;
@@ -56,8 +52,7 @@ struct fscrypt_context {
 	u8 filenames_encryption_mode;
 	u8 flags;
 	u8 master_key_descriptor[FS_KEY_DESCRIPTOR_SIZE];
-	u8 nonce[FS_KEY_DERIVATION_CIPHER_SIZE];
-	u8 iv[FS_KEY_DERIVATION_IV_SIZE];
+	u8 nonce[FS_KEY_DERIVATION_NONCE_SIZE];
 } __packed;
 
 /* Encryption parameters */
@@ -83,55 +78,10 @@ struct fscrypt_info {
 	u8 ci_data_mode;
 	u8 ci_filename_mode;
 	u8 ci_flags;
-	struct crypto_ablkcipher *ci_ctfm;
+	struct crypto_skcipher *ci_ctfm;
 	struct key *ci_keyring_key;
 	u8 ci_master_key[FS_KEY_DESCRIPTOR_SIZE];
-	void *ci_key;
-	int ci_key_len;
 };
-
-static inline void *fscrypt_ci_key(struct inode *inode)
-{
-#if IS_ENABLED(CONFIG_FS_ENCRYPTION)
-	return inode->i_crypt_info->ci_key;
-#else
-	return NULL;
-#endif
-}
-
-static inline int fscrypt_ci_key_len(struct inode *inode)
-{
-#if IS_ENABLED(CONFIG_FS_ENCRYPTION)
-	return inode->i_crypt_info->ci_key_len;
-#else
-	return 0;
-#endif
-}
-
-static inline void fscrypt_swap_at_16b(u8 *data, u32 len)
-{
-	int i, j;
-	u8 tmp;
-
-	for(i = 0; i < len; i += 16) {
-		for(j = 0; j < (16 / 2); j++) {
-			tmp = data[i + j];
-			data[i + j] = data[i + 16 - 1 - j];
-			data[i + 16 - 1 - j] = tmp;
-		}
-	}
-}
-
-static inline void fscrypt_swap_cpy_at_32b(u8 *dst, u8 *src, u32 len)
-{
-	int i, j;
-
-	for(i = 0; i < len; i += 32) {
-		for(j = 0; j < 32; j++) {
-			dst[i + j] = src[i + 32 - 1 - j];
-		}
-	}
-}
 
 #define FS_CTX_REQUIRES_FREE_ENCRYPT_FL		0x00000001
 #define FS_WRITE_PATH_FL			0x00000002
@@ -230,8 +180,6 @@ struct fscrypt_operations {
 	int (*set_context)(struct inode *, const void *, size_t, void *);
 	int (*dummy_context)(struct inode *);
 	bool (*is_encrypted)(struct inode *);
-	bool (*is_inline_encrypted)(struct inode *);
-	bool (*is_force_no_inline_enc)(struct inode *);
 	bool (*empty_dir)(struct inode *);
 	unsigned (*max_namelen)(struct inode *);
 };
@@ -326,15 +274,12 @@ extern void fscrypt_restore_control_page(struct page *);
 extern int fscrypt_zeroout_range(struct inode *, pgoff_t, sector_t,
 						unsigned int);
 /* policy.c */
-extern int fscrypt_process_policy(struct inode *,
-					const struct fscrypt_policy *);
+extern int fscrypt_process_policy(struct file *, const struct fscrypt_policy *);
 extern int fscrypt_get_policy(struct inode *, struct fscrypt_policy *);
 extern int fscrypt_has_permitted_context(struct inode *, struct inode *);
 extern int fscrypt_inherit_context(struct inode *, struct inode *,
 					void *, bool);
 /* keyinfo.c */
-extern int derive_aes_gcm_key(u8 *, u8 *, u8 *, u8 *, int);
-extern struct key *fscrypt_request_key(u8 *, u8 *, int);
 extern int get_crypt_info(struct inode *);
 extern int fscrypt_get_encryption_info(struct inode *);
 extern void fscrypt_put_encryption_info(struct inode *, struct fscrypt_info *);
@@ -399,7 +344,7 @@ static inline int fscrypt_notsupp_zeroout_range(struct inode *i, pgoff_t p,
 }
 
 /* policy.c */
-static inline int fscrypt_notsupp_process_policy(struct inode *i,
+static inline int fscrypt_notsupp_process_policy(struct file *f,
 				const struct fscrypt_policy *p)
 {
 	return -EOPNOTSUPP;

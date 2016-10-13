@@ -101,6 +101,7 @@ struct f2fs_super_block {
 /*
  * For checkpoint
  */
+#define CP_CRC_RECOVERY_FLAG	0x00000040
 #define CP_FASTBOOT_FLAG	0x00000020
 #define CP_FSCK_FLAG		0x00000010
 #define CP_ERROR_FLAG		0x00000008
@@ -263,7 +264,7 @@ struct f2fs_node {
 /*
  * For NAT entries
  */
-#define NAT_ENTRY_PER_BLOCK (PAGE_CACHE_SIZE / sizeof(struct f2fs_nat_entry))
+#define NAT_ENTRY_PER_BLOCK (PAGE_SIZE / sizeof(struct f2fs_nat_entry))
 
 struct f2fs_nat_entry {
 	__u8 version;		/* latest version of cached nat entry */
@@ -283,7 +284,7 @@ struct f2fs_nat_block {
  * Not allow to change this.
  */
 #define SIT_VBLOCK_MAP_SIZE 64
-#define SIT_ENTRY_PER_BLOCK (PAGE_CACHE_SIZE / sizeof(struct f2fs_sit_entry))
+#define SIT_ENTRY_PER_BLOCK (PAGE_SIZE / sizeof(struct f2fs_sit_entry))
 
 /*
  * Note that f2fs_sit_entry->vblocks has the following bit-field information.
@@ -508,5 +509,7 @@ enum {
 	F2FS_FT_SYMLINK,
 	F2FS_FT_MAX
 };
+
+#define S_SHIFT 12
 
 #endif  /* _LINUX_F2FS_FS_H */
