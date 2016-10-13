@@ -561,13 +561,17 @@ __i915_gem_userptr_get_pages_worker(struct work_struct *_work)
 		pvec = drm_malloc_ab(num_pages, sizeof(struct page *));
 	if (pvec != NULL) {
 		struct mm_struct *mm = obj->userptr.mm->mm;
+		unsigned int flags = 0;
+
+		if (!obj->userptr.read_only)
+			flags |= FOLL_WRITE;
 
 		down_read(&mm->mmap_sem);
 		while (pinned < num_pages) {
 			ret = get_user_pages(work->task, mm,
 					     obj->userptr.ptr + pinned * PAGE_SIZE,
-					     num_pages - pinned,
-					     !obj->userptr.read_only, 0,
+					     npages - pinned,
+					     flags,
 					     pvec + pinned, NULL);
 			if (ret < 0)
 				break;

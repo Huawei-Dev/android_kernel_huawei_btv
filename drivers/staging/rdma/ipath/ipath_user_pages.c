@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006, 2007, 2008, 2009 QLogic Corporation. All rights reserved.
+ * Copyright (c) 2006, 2007 QLogic Corporation. All rights reserved.
  * Copyright (c) 2003, 2004, 2005, 2006 PathScale, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
@@ -33,26 +33,27 @@
 
 #include <linux/mm.h>
 #include <linux/device.h>
+#include <linux/slab.h>
 
-#include "qib.h"
+#include "ipath_kernel.h"
 
-static void __qib_release_user_pages(struct page **p, size_t num_pages,
-				     int dirty)
+static void __ipath_release_user_pages(struct page **p, size_t num_pages,
+				   int dirty)
 {
 	size_t i;
 
 	for (i = 0; i < num_pages; i++) {
+		ipath_cdbg(MM, "%lu/%lu put_page %p\n", (unsigned long) i,
+			   (unsigned long) num_pages, p[i]);
 		if (dirty)
 			set_page_dirty_lock(p[i]);
 		put_page(p[i]);
 	}
 }
 
-/*
- * Call with current->mm->mmap_sem held.
- */
-static int __qib_get_user_pages(unsigned long start_page, size_t num_pages,
-				struct page **p)
+/* call with current->mm->mmap_sem held */
+static int __ipath_get_user_pages(unsigned long start_page, size_t num_pages,
+				  struct page **p)
 {
 	unsigned long lock_limit;
 	size_t got;
@@ -60,16 +61,18 @@ static int __qib_get_user_pages(unsigned long start_page, size_t num_pages,
 
 	lock_limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
 
-	if (num_pages > lock_limit && !capable(CAP_IPC_LOCK)) {
+	if (num_pages > lock_limit) {
 		ret = -ENOMEM;
 		goto bail;
 	}
 
+	ipath_cdbg(VERBOSE, "pin %lx pages from vaddr %lx\n",
+		   (unsigned long) num_pages, start_page);
+
 	for (got = 0; got < num_pages; got += ret) {
 		ret = get_user_pages(current, current->mm,
 				     start_page + got * PAGE_SIZE,
-				     num_pages - got,
-				     FOLL_WRITE | FOLL_FORCE,
+				     num_pages - got, FOLL_WRITE | FOLL_FORCE,
 				     p + got, NULL);
 		if (ret < 0)
 			goto bail_release;
@@ -81,13 +84,13 @@ static int __qib_get_user_pages(unsigned long start_page, size_t num_pages,
 	goto bail;
 
 bail_release:
-	__qib_release_user_pages(p, got, 0);
+	__ipath_release_user_pages(p, got, 0);
 bail:
 	return ret;
 }
 
 /**
- * qib_map_page - a safety wrapper around pci_map_page()
+ * ipath_map_page - a safety wrapper around pci_map_page()
  *
  * A dma_addr of all 0's is interpreted by the chip as "disabled".
  * Unfortunately, it can also be a valid dma_addr returned on some
@@ -99,31 +102,51 @@ bail:
  *
  * I'm sure we won't be so lucky with other iommu's, so FIXME.
  */
-int qib_map_page(struct pci_dev *hwdev, struct page *page, dma_addr_t *daddr)
+dma_addr_t ipath_map_page(struct pci_dev *hwdev, struct page *page,
+	unsigned long offset, size_t size, int direction)
 {
 	dma_addr_t phys;
 
-	phys = pci_map_page(hwdev, page, 0, PAGE_SIZE, PCI_DMA_FROMDEVICE);
-	if (pci_dma_mapping_error(hwdev, phys))
-		return -ENOMEM;
+	phys = pci_map_page(hwdev, page, offset, size, direction);
 
-	if (!phys) {
-		pci_unmap_page(hwdev, phys, PAGE_SIZE, PCI_DMA_FROMDEVICE);
-		phys = pci_map_page(hwdev, page, 0, PAGE_SIZE,
-				    PCI_DMA_FROMDEVICE);
-		if (pci_dma_mapping_error(hwdev, phys))
-			return -ENOMEM;
+	if (phys == 0) {
+		pci_unmap_page(hwdev, phys, size, direction);
+		phys = pci_map_page(hwdev, page, offset, size, direction);
 		/*
 		 * FIXME: If we get 0 again, we should keep this page,
 		 * map another, then free the 0 page.
 		 */
 	}
-	*daddr = phys;
-	return 0;
+
+	return phys;
 }
 
 /**
- * qib_get_user_pages - lock user pages into memory
+ * ipath_map_single - a safety wrapper around pci_map_single()
+ *
+ * Same idea as ipath_map_page().
+ */
+dma_addr_t ipath_map_single(struct pci_dev *hwdev, void *ptr, size_t size,
+	int direction)
+{
+	dma_addr_t phys;
+
+	phys = pci_map_single(hwdev, ptr, size, direction);
+
+	if (phys == 0) {
+		pci_unmap_single(hwdev, phys, size, direction);
+		phys = pci_map_single(hwdev, ptr, size, direction);
+		/*
+		 * FIXME: If we get 0 again, we should keep this page,
+		 * map another, then free the 0 page.
+		 */
+	}
+
+	return phys;
+}
+
+/**
+ * ipath_get_user_pages - lock user pages into memory
  * @start_page: the start page
  * @num_pages: the number of pages
  * @p: the output page structures
@@ -134,29 +157,72 @@ int qib_map_page(struct pci_dev *hwdev, struct page *page, dma_addr_t *daddr)
  * (because caller is doing expected sends on a single virtually contiguous
  * buffer, so we can do all pages at once).
  */
-int qib_get_user_pages(unsigned long start_page, size_t num_pages,
-		       struct page **p)
+int ipath_get_user_pages(unsigned long start_page, size_t num_pages,
+			 struct page **p)
 {
 	int ret;
 
 	down_write(&current->mm->mmap_sem);
 
-	ret = __qib_get_user_pages(start_page, num_pages, p);
+	ret = __ipath_get_user_pages(start_page, num_pages, p);
 
 	up_write(&current->mm->mmap_sem);
 
 	return ret;
 }
 
-void qib_release_user_pages(struct page **p, size_t num_pages)
+void ipath_release_user_pages(struct page **p, size_t num_pages)
 {
-	if (current->mm) /* during close after signal, mm can be NULL */
-		down_write(&current->mm->mmap_sem);
+	down_write(&current->mm->mmap_sem);
 
-	__qib_release_user_pages(p, num_pages, 1);
+	__ipath_release_user_pages(p, num_pages, 1);
 
-	if (current->mm) {
-		current->mm->pinned_vm -= num_pages;
-		up_write(&current->mm->mmap_sem);
-	}
+	current->mm->pinned_vm -= num_pages;
+
+	up_write(&current->mm->mmap_sem);
+}
+
+struct ipath_user_pages_work {
+	struct work_struct work;
+	struct mm_struct *mm;
+	unsigned long num_pages;
+};
+
+static void user_pages_account(struct work_struct *_work)
+{
+	struct ipath_user_pages_work *work =
+		container_of(_work, struct ipath_user_pages_work, work);
+
+	down_write(&work->mm->mmap_sem);
+	work->mm->pinned_vm -= work->num_pages;
+	up_write(&work->mm->mmap_sem);
+	mmput(work->mm);
+	kfree(work);
+}
+
+void ipath_release_user_pages_on_close(struct page **p, size_t num_pages)
+{
+	struct ipath_user_pages_work *work;
+	struct mm_struct *mm;
+
+	__ipath_release_user_pages(p, num_pages, 1);
+
+	mm = get_task_mm(current);
+	if (!mm)
+		return;
+
+	work = kmalloc(sizeof(*work), GFP_KERNEL);
+	if (!work)
+		goto bail_mm;
+
+	INIT_WORK(&work->work, user_pages_account);
+	work->mm = mm;
+	work->num_pages = num_pages;
+
+	queue_work(ib_wq, &work->work);
+	return;
+
+bail_mm:
+	mmput(mm);
+	return;
 }
