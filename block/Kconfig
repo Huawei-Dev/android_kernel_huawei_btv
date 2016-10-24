@@ -33,7 +33,7 @@ config LBDAF
 	  This option is required to support the full capacity of large
 	  (2TB+) block devices, including RAID, disk, Network Block Device,
 	  Logical Volume Manager (LVM) and loopback.
-	
+
 	  This option also enables support for single files larger than
 	  2TB.
 
@@ -110,11 +110,13 @@ config BLK_CMDLINE_PARSER
 	partitions on a block device.
 
 	See Documentation/block/cmdline-partition.txt for more information.
-
-config BLOCK_COMPAT
-        bool
-        depends on BLOCK && COMPAT
-        default y
+	
+config BLOCK_PERF_FRAMEWORK
+	bool "Enable Block device performance measurement framework"
+	default n
+	---help---
+	Enabling this option allows you to measure the performance at the
+	block layer.
 
 config HISI_BLOCK_FREQUENCE_CONTROL
         bool "add ddr frequence request base on block layer."
@@ -178,14 +180,17 @@ config HISI_BLK_INLINE_CRYPTO
 
 	 If unsure, say N, hehe!
 
-source block/Kconfig.iosched
-
-endif # BLOCK
-
 menu "Partition Types"
 
 source "block/partitions/Kconfig"
 
 endmenu
+
+endif # BLOCK
+
+config BLOCK_COMPAT
+        bool
+        depends on BLOCK && COMPAT
+        default y
 
 source block/Kconfig.iosched
