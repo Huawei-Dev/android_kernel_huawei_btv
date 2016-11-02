@@ -1802,6 +1802,7 @@ static void group_load_in_freq_domain(struct cpumask *cpus,
 	}
 }
 
+static inline u64 freq_policy_load(struct rq *rq, u64 load);
 /*
  * Should scheduler alert governor for changing frequency?
  *
@@ -1852,6 +1853,7 @@ static int send_notification(struct rq *rq, int check_pred, int check_groups)
 			_group_load_in_cpu(cpu_of(rq), &group_load, NULL);
 
 		new_load = rq->prev_runnable_sum + group_load;
+		new_load = freq_policy_load(rq, new_load);
 
 		raw_spin_unlock_irqrestore(&rq->lock, flags);
 		read_unlock(&related_thread_group_lock);
@@ -3300,7 +3302,7 @@ void sched_get_cpus_busy(struct sched_load *busy,
 				 0);
 
 		account_load_subtractions(rq);
-		load[i] = rq->old_busy_time = rq->prev_runnable_sum;
+		load[i] = rq->prev_runnable_sum;
 		nload[i] = rq->nt_prev_runnable_sum;
 		pload[i] = rq->hmp_stats.pred_demands_sum;
 		rq->old_estimated_time = pload[i];
@@ -3363,6 +3365,8 @@ void sched_get_cpus_busy(struct sched_load *busy,
 		nload[i] += ngload[i];
 
 		load[i] = freq_policy_load(rq, load[i]);
+		rq->old_busy_time = load[i];
+
 		/*
 		 * Scale load in reference to cluster max_possible_freq.
 		 *
