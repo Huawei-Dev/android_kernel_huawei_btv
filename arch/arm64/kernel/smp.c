@@ -16,6 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifdef CONFIG_HISI_FIQ
+#include <linux/hisi/hisi_fiq.h>
+#endif
+
 #include <linux/mmc/rpmb.h>
 #include <linux/acpi.h>
 #include <linux/delay.h>
@@ -58,9 +62,8 @@
 #define CREATE_TRACE_POINTS
 #include <trace/events/ipi.h>
 
-#ifdef CONFIG_HISI_FIQ
-#include <linux/hisi/hisi_fiq.h>
-#endif
+DEFINE_PER_CPU_READ_MOSTLY(int, cpu_number);
+EXPORT_PER_CPU_SYMBOL(cpu_number);
 
 /*
  * as from 2.5, kernels no longer have an init_tasks structure
@@ -624,6 +627,8 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
 	for_each_possible_cpu(cpu) {
 		if (max_cpus == 0)
 			break;
+
+		per_cpu(cpu_number, cpu) = cpu;
 
 		if (cpu == smp_processor_id())
 			continue;
