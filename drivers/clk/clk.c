@@ -2378,6 +2378,7 @@ EXPORT_SYMBOL_GPL(clk_set_rate_nolock);
 
 static struct dentry *rootdir;
 static int inited = 0;
+static u32 debug_suspend;
 static DEFINE_MUTEX(clk_debug_lock);
 static HLIST_HEAD(clk_debug_list);
 
@@ -2969,6 +2970,19 @@ struct dentry *clk_debugfs_add_file(struct clk_hw *hw, char *name, umode_t mode,
 }
 EXPORT_SYMBOL_GPL(clk_debugfs_add_file);
 
+/*
+ * Print the names of all enabled clocks and their parents if
+ * debug_suspend is set from debugfs.
+ */
+void clock_debug_print_enabled(void)
+{
+	if (likely(!debug_suspend))
+		return;
+
+	clock_debug_print_enabled_clocks(NULL);
+}
+EXPORT_SYMBOL_GPL(clock_debug_print_enabled);
+
 /**
  * clk_debug_init - lazily populate the debugfs clk directory
  *
@@ -3016,6 +3030,12 @@ static int __init clk_debug_init(void)
 	if (!d)
 		return -ENOMEM;
 #endif
+
+
+	d = debugfs_create_u32("debug_suspend", S_IRUGO | S_IWUSR,
+						rootdir, &debug_suspend);
+	if (!d)
+		return -ENOMEM;
 
 	mutex_lock(&clk_debug_lock);
 	hlist_for_each_entry(core, &clk_debug_list, debug_node)
