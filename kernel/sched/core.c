@@ -8414,6 +8414,9 @@ void __init sched_init(void)
 		atomic_set(&rq->nr_iowait, 0);
 	}
 
+	i = alloc_related_thread_groups();
+	BUG_ON(i);
+
 	set_hmp_defaults();
 
 	set_load_weight(&init_task);
