@@ -924,11 +924,13 @@ static void netlink_skb_set_owner_r(struct sk_buff *skb, struct sock *sk)
 	sk_mem_charge(sk, skb->truesize);
 }
 
-static void __netlink_sock_destruct(struct sock *sk)
+static void netlink_sock_destruct(struct sock *sk)
 {
 	struct netlink_sock *nlk = nlk_sk(sk);
 
 	if (nlk->cb_running) {
+		if (nlk->cb.done)
+			nlk->cb.done(&nlk->cb);
 		module_put(nlk->cb.module);
 		kfree_skb(nlk->cb.skb);
 	}
@@ -962,21 +964,7 @@ static void netlink_sock_destruct_work(struct work_struct *work)
 	struct netlink_sock *nlk = container_of(work, struct netlink_sock,
 						work);
 
-	nlk->cb.done(&nlk->cb);
-	__netlink_sock_destruct(&nlk->sk);
-}
-
-static void netlink_sock_destruct(struct sock *sk)
-{
-	struct netlink_sock *nlk = nlk_sk(sk);
-
-	if (nlk->cb_running && nlk->cb.done) {
-		INIT_WORK(&nlk->work, netlink_sock_destruct_work);
-		schedule_work(&nlk->work);
-		return;
-	}
-
-	__netlink_sock_destruct(sk);
+	sk_free(&nlk->sk);
 }
 
 /* This lock without WQ_FLAG_EXCLUSIVE is good on UP and it is _very_ bad on
@@ -1284,6 +1272,23 @@ out_module:
 	goto out;
 }
 
+static void deferred_put_nlk_sk(struct rcu_head *head)
+{
+	struct netlink_sock *nlk = container_of(head, struct netlink_sock, rcu);
+	struct sock *sk = &nlk->sk;
+
+	if (!atomic_dec_and_test(&sk->sk_refcnt))
+		return;
+
+	if (nlk->cb_running && nlk->cb.done) {
+		INIT_WORK(&nlk->work, netlink_sock_destruct_work);
+		schedule_work(&nlk->work);
+		return;
+	}
+
+	sk_free(sk);
+}
+
 static int netlink_release(struct socket *sock)
 {
 	struct sock *sk = sock->sk;
@@ -1356,19 +1361,7 @@ static int netlink_release(struct socket *sock)
 	local_bh_disable();
 	sock_prot_inuse_add(sock_net(sk), &netlink_proto, -1);
 	local_bh_enable();
-	if (nlk->cb_running) {
-		mutex_lock(nlk->cb_mutex);
-		if (nlk->cb_running) {
-			if (nlk->cb.done)
-				nlk->cb.done(&nlk->cb);
-
-			module_put(nlk->cb.module);
-			kfree_skb(nlk->cb.skb);
-			nlk->cb_running = false;
-		}
-		mutex_unlock(nlk->cb_mutex);
-	}
-	sock_put(sk);
+	call_rcu(&nlk->rcu, deferred_put_nlk_sk);
 	return 0;
 }
 
