@@ -5796,6 +5796,7 @@ int do_isolation_work_cpu_stop(void *data)
 	 */
 	nohz_balance_clear_nohz_mask(cpu);
 
+	clear_hmp_request(cpu);
 	local_irq_enable();
 	return 0;
 }
@@ -5920,7 +5921,6 @@ int sched_isolate_cpu(int cpu)
 
 	migrate_sync_cpu(cpu, cpumask_first(&avail_cpus));
 	stop_cpus(cpumask_of(cpu), do_isolation_work_cpu_stop, 0);
-	clear_hmp_request(cpu);
 
 	calc_load_migrate(rq);
 	update_max_interval();
