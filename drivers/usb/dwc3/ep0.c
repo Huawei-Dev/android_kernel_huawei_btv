@@ -39,20 +39,13 @@ static const char *dwc3_ep0_state_string(enum dwc3_ep0_state state)
 	}
 }
 
-static int dwc3_ep0_start_trans(struct dwc3 *dwc, u8 epnum, dma_addr_t buf_dma,
-		u32 len, u32 type, bool chain)
+static void dwc3_ep0_prepare_one_trb(struct dwc3 *dwc, u8 epnum,
+		dma_addr_t buf_dma, u32 len, u32 type, bool chain)
 {
-	struct dwc3_gadget_ep_cmd_params params;
 	struct dwc3_trb			*trb;
 	struct dwc3_ep			*dep;
 
-	int				ret;
-
 	dep = dwc->eps[epnum];
-	if (dep->flags & DWC3_EP_BUSY) {
-		dwc3_trace(trace_dwc3_ep0, "%s still busy", dep->name);
-		return 0;
-	}
 
 	trb = &dwc->ep0_trb[dep->free_slot];
 
@@ -73,37 +66,27 @@ static int dwc3_ep0_start_trans(struct dwc3 *dwc, u8 epnum, dma_addr_t buf_dma,
 		trb->ctrl |= (DWC3_TRB_CTRL_IOC
 				| DWC3_TRB_CTRL_LST);
 
-	if (chain)
+	trace_dwc3_prepare_trb(dep, trb);
+}
+
+static int dwc3_ep0_start_trans(struct dwc3 *dwc, u8 epnum, dma_addr_t buf_dma,
+		u32 len, u32 type, bool chain)
+{
+	struct dwc3_gadget_ep_cmd_params params;
+	struct dwc3_ep			*dep;
+	int				ret;
+
+	dep = dwc->eps[epnum];
+	if (dep->flags & DWC3_EP_BUSY) {
+		dwc3_trace(trace_dwc3_ep0, "%s still busy", dep->name);
 		return 0;
-	/* If software wants to indicate a transfer completion to the host by
-	 * sending a zero-length packet after a multiple of MaxPacketSize, it
-	 * must set up a zero-length TRB following the last TRB in the transfer
-	 */
-	if ((epnum == 1) && (len != 0) &&
-			IS_ALIGNED(len, dep->endpoint.maxpacket)) {
-		trb->ctrl = type;
-		trb->ctrl |= (DWC3_TRB_CTRL_HWO
-				| DWC3_TRB_CTRL_CHN);
-
-		pr_info("%s: ep0 in send zero length packet!\n", __func__);
-		trb++;
-
-		trb->bpl = lower_32_bits(dwc->ctrl_req_addr);
-		trb->bph = upper_32_bits(dwc->ctrl_req_addr);
-		trb->size = dep->direction ? 0 : dep->endpoint.maxpacket;
-		trb->ctrl = DWC3_TRBCTL_NORMAL;
-
-		trb->ctrl |= (DWC3_TRB_CTRL_HWO
-				| DWC3_TRB_CTRL_LST
-				| DWC3_TRB_CTRL_IOC
-				| DWC3_TRB_CTRL_ISP_IMI);
 	}
+
+	dwc3_ep0_prepare_one_trb(dwc, epnum, buf_dma, len, type, chain);
 
 	memset(&params, 0, sizeof(params));
 	params.param0 = upper_32_bits(dwc->ep0_trb_addr);
 	params.param1 = lower_32_bits(dwc->ep0_trb_addr);
-
-	trace_dwc3_prepare_trb(dep, trb);
 
 	ret = dwc3_send_gadget_ep_cmd(dwc, dep->number,
 			DWC3_DEPCMD_STARTTRANSFER, &params);
