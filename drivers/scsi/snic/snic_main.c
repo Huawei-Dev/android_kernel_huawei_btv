@@ -594,6 +594,7 @@ snic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (!pool) {
 		SNIC_HOST_ERR(shost, "dflt sgl pool creation failed\n");
 
+		ret = -ENOMEM;
 		goto err_free_res;
 	}
 
@@ -604,6 +605,7 @@ snic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (!pool) {
 		SNIC_HOST_ERR(shost, "max sgl pool creation failed\n");
 
+		ret = -ENOMEM;
 		goto err_free_dflt_sgl_pool;
 	}
 
@@ -614,6 +616,7 @@ snic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (!pool) {
 		SNIC_HOST_ERR(shost, "snic tmreq info pool creation failed.\n");
 
+		ret = -ENOMEM;
 		goto err_free_max_sgl_pool;
 	}
 
