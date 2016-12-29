@@ -140,6 +140,9 @@ static bool clk_core_is_enabled(struct clk_core *core)
 	return core->ops->is_enabled(core->hw);
 }
 
+static void clk_core_unprepare(struct clk_core *core);
+static void clk_core_disable(struct clk_core *core);
+
 static void clk_unprepare_unused_subtree(struct clk_core *core)
 {
 	struct clk_core *child;
@@ -159,7 +162,7 @@ static void clk_unprepare_unused_subtree(struct clk_core *core)
 	 */
 	if (core->need_handoff_prepare) {
 		core->need_handoff_prepare = false;
-		core->prepare_count--;
+		clk_core_unprepare(core);
 	}
 
 	if (core->prepare_count)
@@ -198,7 +201,9 @@ static void clk_disable_unused_subtree(struct clk_core *core)
 	 */
 	if (core->need_handoff_enable) {
 		core->need_handoff_enable = false;
-		core->enable_count--;
+		flags = clk_enable_lock();
+		clk_core_disable(core);
+		clk_enable_unlock(flags);
 	}
 
 	flags = clk_enable_lock();
