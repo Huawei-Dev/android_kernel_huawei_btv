@@ -2613,9 +2613,8 @@ int xhci_mem_init(struct xhci_hcd *xhci, gfp_t flags)
 
 	INIT_LIST_HEAD(&xhci->cmd_list);
 
-	/* init command timeout timer */
-	setup_timer(&xhci->cmd_timer, xhci_handle_command_timeout,
-		    (unsigned long)xhci);
+	/* init command timeout work */
+	INIT_DELAYED_WORK(&xhci->cmd_timer, xhci_handle_command_timeout);
 
 	page_size = readl(&xhci->op_regs->page_size);
 	xhci_dbg_trace(xhci, trace_xhci_dbg_init,
