@@ -150,8 +150,8 @@ enum {
 	SWP_FILE	= (1 << 7),	/* set after swap_activate success */
 	SWP_AREA_DISCARD = (1 << 8),	/* single-time swap area discards */
 	SWP_PAGE_DISCARD = (1 << 9),	/* freed swap page-cluster discards */
+	SWP_STABLE_WRITES = (1 << 10),	/* no overwrite PG_writeback pages */
 					/* add others here before... */
-	SWP_FAST	= (1 << 10),	/* blkdev access is fast and cheap */
 	SWP_SCANNING	= (1 << 11),	/* refcount in scan_swap_map */
 };
 
@@ -417,18 +417,10 @@ extern struct page *swapin_readahead(swp_entry_t, gfp_t,
 /* linux/mm/swapfile.c */
 extern atomic_long_t nr_swap_pages;
 extern long total_swap_pages;
-extern bool is_swap_fast(swp_entry_t entry);
 
 /* Swap 50% full? Release swapcache more aggressively.. */
 static inline bool vm_swap_full(struct swap_info_struct *si)
 {
-	/*
-	 * If the swap device is fast, return true
-	 * not to delay swap free.
-	 */
-	if (si->flags & SWP_FAST)
-		return true;
-
 	return atomic_long_read(&nr_swap_pages) * 2 < total_swap_pages;
 }
 
