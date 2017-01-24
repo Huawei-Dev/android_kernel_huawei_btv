@@ -415,6 +415,9 @@ static int verity_handle_err(struct dm_verity *v, enum verity_block_type type,
 		return 0;
 
 	if (v->mode == DM_VERITY_MODE_RESTART) {
+#ifdef CONFIG_DM_VERITY_AVB
+		dm_verity_avb_error_handler();
+#endif
 #if defined (CONFIG_DM_VERITY_HW_RETRY)
 		int value = verity_read_nv();
 		if (value < 0) {
