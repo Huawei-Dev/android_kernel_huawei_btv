@@ -792,7 +792,7 @@
 		interrupts = <0 65 0>;
 		clocks = <&clock CLK_TMU>;
 		clock-names = "tmu_apbif";
-		#include "exynos4412-tmu-sensor-conf.dtsi"
+		#include "exynos5420-tmu-sensor-conf.dtsi"
 	};
 
 	tmu_cpu1: tmu@10064000 {
@@ -801,7 +801,7 @@
 		interrupts = <0 183 0>;
 		clocks = <&clock CLK_TMU>;
 		clock-names = "tmu_apbif";
-		#include "exynos4412-tmu-sensor-conf.dtsi"
+		#include "exynos5420-tmu-sensor-conf.dtsi"
 	};
 
 	tmu_cpu2: tmu@10068000 {
@@ -810,7 +810,7 @@
 		interrupts = <0 184 0>;
 		clocks = <&clock CLK_TMU>, <&clock CLK_TMU>;
 		clock-names = "tmu_apbif", "tmu_triminfo_apbif";
-		#include "exynos4412-tmu-sensor-conf.dtsi"
+		#include "exynos5420-tmu-sensor-conf.dtsi"
 	};
 
 	tmu_cpu3: tmu@1006c000 {
@@ -819,7 +819,7 @@
 		interrupts = <0 185 0>;
 		clocks = <&clock CLK_TMU>, <&clock CLK_TMU_GPU>;
 		clock-names = "tmu_apbif", "tmu_triminfo_apbif";
-		#include "exynos4412-tmu-sensor-conf.dtsi"
+		#include "exynos5420-tmu-sensor-conf.dtsi"
 	};
 
 	tmu_gpu: tmu@100a0000 {
@@ -828,7 +828,7 @@
 		interrupts = <0 215 0>;
 		clocks = <&clock CLK_TMU_GPU>, <&clock CLK_TMU>;
 		clock-names = "tmu_apbif", "tmu_triminfo_apbif";
-		#include "exynos4412-tmu-sensor-conf.dtsi"
+		#include "exynos5420-tmu-sensor-conf.dtsi"
 	};
 
 	thermal-zones {
