@@ -71,6 +71,8 @@ int notrace unwind_frame(struct task_struct *tsk, struct stackframe *frame)
 
 	kasan_enable_current();
 
+	kasan_enable_current();
+
 #ifdef CONFIG_FUNCTION_GRAPH_TRACER
 	if (tsk && tsk->ret_stack &&
 			(frame->pc == (unsigned long)return_to_handler)) {
