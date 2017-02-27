@@ -2647,10 +2647,44 @@ static long btrfs_fallocate(struct file *file, int mode,
 		if (ret < 0)
 			break;
 
-		cur_offset = last_byte;
-		if (cur_offset >= alloc_end) {
-			ret = 0;
-			break;
+	/*
+	 * If ret is still 0, means we're OK to fallocate.
+	 * Or just cleanup the list and exit.
+	 */
+	list_for_each_entry_safe(range, tmp, &reserve_list, list) {
+		if (!ret)
+			ret = btrfs_prealloc_file_range(inode, mode,
+					range->start,
+					range->len, i_blocksize(inode),
+					offset + len, &alloc_hint);
+		list_del(&range->list);
+		kfree(range);
+	}
+	if (ret < 0)
+		goto out_unlock;
+
+	if (actual_end > inode->i_size &&
+	    !(mode & FALLOC_FL_KEEP_SIZE)) {
+		struct btrfs_trans_handle *trans;
+		struct btrfs_root *root = BTRFS_I(inode)->root;
+
+		/*
+		 * We didn't need to allocate any more space, but we
+		 * still extended the size of the file so we need to
+		 * update i_size and the inode item.
+		 */
+		trans = btrfs_start_transaction(root, 1);
+		if (IS_ERR(trans)) {
+			ret = PTR_ERR(trans);
+		} else {
+			inode->i_ctime = CURRENT_TIME;
+			i_size_write(inode, actual_end);
+			btrfs_ordered_update_i_size(inode, actual_end, NULL);
+			ret = btrfs_update_inode(trans, root, inode);
+			if (ret)
+				btrfs_end_transaction(trans, root);
+			else
+				ret = btrfs_end_transaction(trans, root);
 		}
 	}
 	unlock_extent_cached(&BTRFS_I(inode)->io_tree, alloc_start, locked_end,
