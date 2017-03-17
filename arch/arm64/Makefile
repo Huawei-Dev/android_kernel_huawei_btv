@@ -89,6 +89,10 @@ else
 all:	$(KBUILD_IMAGE) $(KBUILD_DTBS)
 endif
 
+ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
+export DTC_FLAGS := -@
+endif
+
 boot := arch/arm64/boot
 
 Image: vmlinux
