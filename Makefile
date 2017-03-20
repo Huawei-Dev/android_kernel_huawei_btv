@@ -669,6 +669,27 @@ endif
 # Tell gcc to never replace conditional load with a non-conditional one
 KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
 
+# check for 'asm goto'
+ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
+	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
+	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
+endif
+
+ifeq ($(SET_SYSTEM_PARTITION), oversea)
+    KBUILD_CFLAGS += -DCONFIG_MARKET_OVERSEA
+endif
+ifeq ($(SET_SYSTEM_PARTITION), internal)
+    KBUILD_CFLAGS += -DCONFIG_MARKET_INTERNAL
+endif
+ifeq ($(COMPILE_FEIMA3),true)
+    KBUILD_CFLAGS += -DCONFIG_VENDORIMAGE_FILE_SYSTEM_TYPE
+endif
+
+#release version complie
+ifeq (true,$(OBB_PRODUCT_FINAL_RELEASE))
+	KBUILD_CFLAGS += -DFINAL_RELEASE_MODE
+endif
+
 ifdef CONFIG_READABLE_ASM
 # Disable optimizations that make assembler listings hard to read.
 # reorder blocks reorders the control in the function
@@ -823,27 +844,6 @@ KBUILD_CFLAGS   += $(call cc-option,-Werror=strict-prototypes)
 
 # use the deterministic mode of AR if available
 KBUILD_ARFLAGS := $(call ar-option,D)
-
-# check for 'asm goto'
-ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
-	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
-	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
-endif
-
-ifeq ($(SET_SYSTEM_PARTITION), oversea)
-    KBUILD_CFLAGS += -DCONFIG_MARKET_OVERSEA
-endif
-ifeq ($(SET_SYSTEM_PARTITION), internal)
-    KBUILD_CFLAGS += -DCONFIG_MARKET_INTERNAL
-endif
-ifeq ($(COMPILE_FEIMA3),true)
-    KBUILD_CFLAGS += -DCONFIG_VENDORIMAGE_FILE_SYSTEM_TYPE
-endif
-
-#release version complie
-ifeq (true,$(OBB_PRODUCT_FINAL_RELEASE))
-	KBUILD_CFLAGS += -DFINAL_RELEASE_MODE
-endif
 
 include scripts/Makefile.kasan
 include scripts/Makefile.extrawarn
