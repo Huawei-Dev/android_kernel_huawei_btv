@@ -186,9 +186,7 @@ static void __init smp_build_mpidr_hash(void)
 	 */
 	if (mpidr_hash_size() > 4 * num_possible_cpus())
 		pr_warn("Large number of MPIDR hash buckets detected\n");
-#ifndef CONFIG_HIBERNATION
 	__flush_dcache_area(&mpidr_hash, sizeof(struct mpidr_hash));
-#endif
 }
 
 static void __init setup_machine_fdt(phys_addr_t dt_phys)
