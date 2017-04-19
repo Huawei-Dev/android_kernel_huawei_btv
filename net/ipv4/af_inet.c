@@ -89,6 +89,7 @@
 #include <linux/netfilter_ipv4.h>
 #include <linux/random.h>
 #include <linux/slab.h>
+#include <linux/netfilter/xt_qtaguid.h>
 
 #include <asm/uaccess.h>
 
@@ -423,6 +424,10 @@ int inet_release(struct socket *sock)
 
 #ifdef CONFIG_HUAWEI_BASTET
 		bastet_inet_release(sk);
+#endif
+
+#ifdef CONFIG_NETFILTER_XT_MATCH_QTAGUID
+		qtaguid_untag(sock, true);
 #endif
 		/* Applications forget to leave groups before exiting */
 		ip_mc_drop_socket(sk);
