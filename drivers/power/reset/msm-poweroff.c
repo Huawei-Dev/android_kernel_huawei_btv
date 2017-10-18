@@ -23,6 +23,7 @@
 #include <linux/pm.h>
 
 static void __iomem *msm_ps_hold;
+
 static int do_msm_restart(struct notifier_block *nb, unsigned long action,
 			   void *data)
 {
