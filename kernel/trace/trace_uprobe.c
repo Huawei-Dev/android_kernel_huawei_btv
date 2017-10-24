@@ -1124,6 +1124,9 @@ static void __uprobe_perf_func(struct trace_uprobe *tu,
 	int size, esize;
 	int rctx;
 
+	if (bpf_prog_array_valid(call) && !trace_call_bpf(call, regs))
+		return;
+
 	esize = SIZEOF_TRACE_ENTRY(is_ret_probe(tu));
 
 	size = esize + tu->tp.size + dsize;
