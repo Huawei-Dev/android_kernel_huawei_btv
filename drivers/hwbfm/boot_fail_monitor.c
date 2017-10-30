@@ -37,7 +37,7 @@ static int __init early_parse_HW_BFM_MODE_cmdline(char *p)
 {
 	if (p) {
 		if (!strncmp(p, "1", strlen("1"))) {
-                   g_hw_bfm_enable = 1;
+                   g_hw_bfm_enable = 0;
           }else {
 			g_hw_bfm_enable = 0;
             }
