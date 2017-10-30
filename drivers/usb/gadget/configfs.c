@@ -96,6 +96,7 @@ struct gadget_info {
 	struct usb_composite_driver composite;
 	struct usb_composite_dev cdev;
 	bool use_os_desc;
+	bool unbinding;
 	char b_vendor_code;
 	char qw_sign[OS_STRING_QW_SIGN_LEN];
 #ifdef CONFIG_USB_CONFIGFS_UEVENT
@@ -295,9 +296,11 @@ static int unregister_gadget(struct gadget_info *gi)
 	if (!gi->udc_name)
 		return -ENODEV;
 
+	gi->unbinding = true;
 	ret = usb_gadget_unregister_driver(&gi->composite.gadget_driver);
 	if (ret)
 		return ret;
+	gi->unbinding = false;
 	kfree(gi->udc_name);
 	gi->udc_name = NULL;
 	return 0;
@@ -1670,6 +1673,7 @@ static void android_disconnect(struct usb_gadget *gadget)
 #ifdef CONFIG_HISI_USB_CONFIGFS
 	if (!gadget->is_removing_driver)
 #endif
+	if (!gi->unbinding)
 		schedule_work(&gi->work);
 
 	composite_disconnect(gadget);
