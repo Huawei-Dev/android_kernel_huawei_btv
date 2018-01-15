@@ -286,6 +286,7 @@
 #define H_SET_MODE_RESOURCE_LE			4
 
 #ifndef __ASSEMBLY__
+#include <linux/types.h>
 
 /**
  * plpar_hcall_norets: - Make a pseries hypervisor call with no return arguments
