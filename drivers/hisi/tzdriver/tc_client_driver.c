@@ -2341,10 +2341,13 @@ static int tc_client_open(struct inode *inode, struct file *file)
 	int ret = TEEC_ERROR_GENERIC;
 	TC_NS_DEV_File *dev = NULL;
 
-	if (check_teecd_access(current)) {
+	/* Meticulus: ignore checking by path?
+	 */
+
+	/*if (check_teecd_access(current)) {
 		TCERR(KERN_ERR "tc_client_open ca verification failed\n");
 		return -EPERM;
-	}
+	}*/
 
 	if (!g_teecd_task) {
 		g_teecd_task = current->group_leader;
