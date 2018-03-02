@@ -370,10 +370,15 @@ err:
 	return ret;
 }
 
-
-static int readpage_strip(void *data, struct page *page)
+/* readpage_strip is called either directly from readpage() or by the VFS from
+ * within read_cache_pages(), to add one more page to be read. It will try to
+ * collect as many contiguous pages as posible. If a discontinuity is
+ * encountered, or it runs out of resources, it will submit the previous segment
+ * and will start a new collection. Eventually caller must submit the last
+ * segment if present.
+ */
+static int __readpage_strip(struct page_collect *pcol, struct page *page)
 {
-	struct page_collect *pcol = data;
 	struct inode *inode = pcol->inode;
 	struct exofs_i_info *oi = exofs_i(inode);
 	loff_t i_size = i_size_read(inode);
@@ -464,6 +469,13 @@ fail:
 	return ret;
 }
 
+static int readpage_strip(struct file *data, struct page *page)
+{
+	struct page_collect *pcol = (struct page_collect *)data;
+
+	return __readpage_strip(pcol, page);
+}
+
 static int exofs_readpages(struct file *file, struct address_space *mapping,
 			   struct list_head *pages, unsigned nr_pages)
 {
@@ -493,7 +505,7 @@ static int _readpage(struct page *page, bool read_4_write)
 	_pcol_init(&pcol, 1, page->mapping->host);
 
 	pcol.read_4_write = read_4_write;
-	ret = readpage_strip(&pcol, page);
+	ret = __readpage_strip(&pcol, page);
 	if (ret) {
 		EXOFS_ERR("_readpage => %d\n", ret);
 		return ret;
