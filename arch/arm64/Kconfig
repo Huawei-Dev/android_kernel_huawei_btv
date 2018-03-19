@@ -199,6 +199,16 @@ config NEED_SG_DMA_LENGTH
 config SMP
 	def_bool y
 
+config HOTPLUG_SIZE_BITS
+	int "Memory hotplug block size(28 => 256MB 30 => 1GB)"
+	depends on SPARSEMEM
+	default 30
+	help
+	 Selects granularity of hotplug memory. Block
+	 size for memory hotplug is represent as a power
+	 of 2.
+	 If unsure, stick with default value.
+
 config SWIOTLB
 	def_bool y
 
