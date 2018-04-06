@@ -1755,6 +1755,9 @@ megasas_build_syspd_fusion(struct megasas_instance *instance,
 				MEGASAS_REQ_DESCRIPT_FLAGS_TYPE_SHIFT);
 		pRAID_Context->timeoutValue = cpu_to_le16(os_timeout_value);
 	} else {
+		if (os_timeout_value)
+			os_timeout_value++;
+
 		/* system pd Fast Path */
 		io_request->Function = MPI2_FUNCTION_SCSI_IO_REQUEST;
 		pRAID_Context->regLockFlags = 0;
