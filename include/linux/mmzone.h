@@ -177,6 +177,7 @@ enum zone_stat_item {
 	NR_IONCACHE_PAGES,
 	NR_MALI_PAGES,
 	NR_SWAPCACHE,
+	NR_INDIRECTLY_RECLAIMABLE_BYTES, /* measured in bytes */
 	NR_VM_ZONE_STAT_ITEMS };
 
 /*
