@@ -80,6 +80,13 @@ static int meminfo_proc_show(struct seq_file *m, void *v)
 		     min(global_page_state(NR_SLAB_RECLAIMABLE) / 2, wmark_low);
 
 	/*
+	 * Part of the kernel memory, which can be released under memory
+	 * pressure.
+	 */
+	available += global_page_state(NR_INDIRECTLY_RECLAIMABLE_BYTES) >>
+		PAGE_SHIFT;
+
+	/*
 	 * Add the ioncache pool pages
 	 */
 	available += global_page_state(NR_IONCACHE_PAGES);
