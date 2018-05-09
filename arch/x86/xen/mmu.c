@@ -1213,8 +1213,6 @@ void xen_flush_tlb_all(void)
 	struct mmuext_op *op;
 	struct multicall_space mcs;
 
-	trace_xen_mmu_flush_tlb_all(0);
-
 	preempt_disable();
 
 	mcs = xen_mc_entry(sizeof(*op));
@@ -1231,8 +1229,6 @@ static void xen_flush_tlb(void)
 {
 	struct mmuext_op *op;
 	struct multicall_space mcs;
-
-	trace_xen_mmu_flush_tlb(0);
 
 	preempt_disable();
 
