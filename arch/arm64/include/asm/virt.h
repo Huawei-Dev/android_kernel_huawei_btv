@@ -72,6 +72,9 @@
 
 #ifndef __ASSEMBLY__
 
+#include <asm/ptrace.h>
+#include <asm/sections.h>
+
 /*
  * __boot_cpu_mode records what mode CPUs were booted in.
  * A correctly-implemented bootloader must start all CPUs in the same mode:
