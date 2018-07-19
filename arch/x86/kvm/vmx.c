@@ -6661,6 +6661,8 @@ static int handle_vmon(struct kvm_vcpu *vcpu)
 		     HRTIMER_MODE_REL);
 	vmx->nested.preemption_timer.function = vmx_preemption_timer_fn;
 
+	vmx->nested.vpid02 = allocate_vpid();
+
 	vmx->nested.vmxon = true;
 
 	skip_emulated_instruction(vcpu);
