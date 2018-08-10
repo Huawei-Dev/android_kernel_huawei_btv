@@ -228,7 +228,7 @@ static void davinci_spi_chipselect(struct spi_device *spi, int value)
 	}
 
 	/* program delay transfers if tx_delay is non zero */
-	if (spicfg->wdelay)
+	if (spicfg && spicfg->wdelay)
 		spidat1 |= SPIDAT1_WDEL;
 
 	/*
