@@ -16,6 +16,7 @@
  */
 #define pr_fmt(fmt) "[ION: ]" fmt
 
+#include <linux/atomic.h>
 #include <linux/device.h>
 #include <linux/err.h>
 #include <linux/file.h>
