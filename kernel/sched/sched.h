@@ -1643,7 +1643,9 @@ static inline struct sched_cluster *rq_cluster(struct rq *rq)
 	return NULL;
 }
 
-static inline void init_new_task_load(struct task_struct *p) { }
+static inline void init_new_task_load(struct task_struct *p)
+{
+}
 
 static inline u64 scale_load_to_cpu(u64 load, int cpu)
 {
