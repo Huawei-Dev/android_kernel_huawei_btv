@@ -690,6 +690,121 @@ static int mlx4_ib_dealloc_ucontext(struct ib_ucontext *ibcontext)
 	return 0;
 }
 
+static void  mlx4_ib_vma_open(struct vm_area_struct *area)
+{
+	/* vma_open is called when a new VMA is created on top of our VMA.
+	 * This is done through either mremap flow or split_vma (usually due
+	 * to mlock, madvise, munmap, etc.). We do not support a clone of the
+	 * vma, as this VMA is strongly hardware related. Therefore we set the
+	 * vm_ops of the newly created/cloned VMA to NULL, to prevent it from
+	 * calling us again and trying to do incorrect actions. We assume that
+	 * the original vma size is exactly a single page that there will be no
+	 * "splitting" operations on.
+	 */
+	area->vm_ops = NULL;
+}
+
+static void  mlx4_ib_vma_close(struct vm_area_struct *area)
+{
+	struct mlx4_ib_vma_private_data *mlx4_ib_vma_priv_data;
+
+	/* It's guaranteed that all VMAs opened on a FD are closed before the
+	 * file itself is closed, therefore no sync is needed with the regular
+	 * closing flow. (e.g. mlx4_ib_dealloc_ucontext) However need a sync
+	 * with accessing the vma as part of mlx4_ib_disassociate_ucontext.
+	 * The close operation is usually called under mm->mmap_sem except when
+	 * process is exiting.  The exiting case is handled explicitly as part
+	 * of mlx4_ib_disassociate_ucontext.
+	 */
+	mlx4_ib_vma_priv_data = (struct mlx4_ib_vma_private_data *)
+				area->vm_private_data;
+
+	/* set the vma context pointer to null in the mlx4_ib driver's private
+	 * data to protect against a race condition in mlx4_ib_dissassociate_ucontext().
+	 */
+	mlx4_ib_vma_priv_data->vma = NULL;
+}
+
+static const struct vm_operations_struct mlx4_ib_vm_ops = {
+	.open = mlx4_ib_vma_open,
+	.close = mlx4_ib_vma_close
+};
+
+static void mlx4_ib_disassociate_ucontext(struct ib_ucontext *ibcontext)
+{
+	int i;
+	int ret = 0;
+	struct vm_area_struct *vma;
+	struct mlx4_ib_ucontext *context = to_mucontext(ibcontext);
+	struct task_struct *owning_process  = NULL;
+	struct mm_struct   *owning_mm       = NULL;
+
+	owning_process = get_pid_task(ibcontext->tgid, PIDTYPE_PID);
+	if (!owning_process)
+		return;
+
+	owning_mm = get_task_mm(owning_process);
+	if (!owning_mm) {
+		pr_info("no mm, disassociate ucontext is pending task termination\n");
+		while (1) {
+			/* make sure that task is dead before returning, it may
+			 * prevent a rare case of module down in parallel to a
+			 * call to mlx4_ib_vma_close.
+			 */
+			put_task_struct(owning_process);
+			msleep(1);
+			owning_process = get_pid_task(ibcontext->tgid,
+						      PIDTYPE_PID);
+			if (!owning_process ||
+			    owning_process->state == TASK_DEAD) {
+				pr_info("disassociate ucontext done, task was terminated\n");
+				/* in case task was dead need to release the task struct */
+				if (owning_process)
+					put_task_struct(owning_process);
+				return;
+			}
+		}
+	}
+
+	/* need to protect from a race on closing the vma as part of
+	 * mlx4_ib_vma_close().
+	 */
+	down_write(&owning_mm->mmap_sem);
+	if (!mmget_still_valid(owning_mm))
+		goto skip_mm;
+	for (i = 0; i < HW_BAR_COUNT; i++) {
+		vma = context->hw_bar_info[i].vma;
+		if (!vma)
+			continue;
+
+		ret = zap_vma_ptes(context->hw_bar_info[i].vma,
+				   context->hw_bar_info[i].vma->vm_start,
+				   PAGE_SIZE);
+		if (ret) {
+			pr_err("Error: zap_vma_ptes failed for index=%d, ret=%d\n", i, ret);
+			BUG_ON(1);
+		}
+
+		context->hw_bar_info[i].vma->vm_flags &=
+			~(VM_SHARED | VM_MAYSHARE);
+		/* context going to be destroyed, should not access ops any more */
+		context->hw_bar_info[i].vma->vm_ops = NULL;
+	}
+
+skip_mm:
+	up_write(&owning_mm->mmap_sem);
+	mmput(owning_mm);
+	put_task_struct(owning_process);
+}
+
+static void mlx4_ib_set_vma_data(struct vm_area_struct *vma,
+				 struct mlx4_ib_vma_private_data *vma_private_data)
+{
+	vma_private_data->vma = vma;
+	vma->vm_private_data = vma_private_data;
+	vma->vm_ops =  &mlx4_ib_vm_ops;
+}
+
 static int mlx4_ib_mmap(struct ib_ucontext *context, struct vm_area_struct *vma)
 {
 	struct mlx4_ib_dev *dev = to_mdev(context->device);
