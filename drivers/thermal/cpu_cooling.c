@@ -693,12 +693,7 @@ static int cpufreq_get_requested_power(struct thermal_cooling_device *cdev,
 			load = 0;
 
 		total_load += load;
-
-#ifdef CONFIG_HISI_IPA_THERMAL
 		if (load_cpu)
-#else
-		if (trace_thermal_power_cpu_limit_enabled() && load_cpu)
-#endif
 			load_cpu[i] = load;
 
 		i++;
