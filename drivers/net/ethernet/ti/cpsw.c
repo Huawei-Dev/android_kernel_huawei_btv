@@ -769,8 +769,8 @@ static irqreturn_t cpsw_rx_interrupt(int irq, void *dev_id)
 {
 	struct cpsw_priv *priv = dev_id;
 
-	cpdma_ctlr_eoi(priv->dma, CPDMA_EOI_RX);
 	writel(0, &priv->wr_regs->rx_en);
+	cpdma_ctlr_eoi(priv->dma, CPDMA_EOI_RX);
 
 	napi_schedule(&priv->napi_rx);
 	return IRQ_HANDLED;
