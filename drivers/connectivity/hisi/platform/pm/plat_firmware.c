@@ -2405,7 +2405,7 @@ int32 firmware_cfg_init(void)
 {
     int32  l_ret;
     uint32 i;
-    int32  firmware_in_boot = 1;
+    int32  firmware_in_boot = 0;
 
     l_ret = get_cust_conf_int32(INI_MODU_PLAT, "firmware_buildin", &firmware_in_boot);
     if (l_ret < 0)
