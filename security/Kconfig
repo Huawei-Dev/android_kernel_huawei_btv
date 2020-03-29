@@ -169,8 +169,6 @@ config DEFAULT_SECURITY
 	default "" if DEFAULT_SECURITY_DAC
 
 source security/hwselinux/Kconfig
-source security/check_root/Kconfig
-source security/hw_root_scan/Kconfig
 source security/kernel_harden/Kconfig
 
 endmenu
