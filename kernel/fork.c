@@ -96,10 +96,6 @@
 #include "cgroup_huawei/cgroup_pids.h"
 #endif
 
-#ifdef CONFIG_HUAWEI_KERNEL_STACK_NX
-#include <chipset_common/kernel_harden/kaslr.h>
-#endif
-
 /*
  * Minimum number of threads to boot the kernel
  */
@@ -352,9 +348,6 @@ static struct task_struct *dup_task_struct(struct task_struct *orig)
 	if (!ti)
 		goto free_tsk;
 
-#ifdef CONFIG_HUAWEI_KERNEL_STACK_NX
-	set_task_stack_nx(ti);
-#endif
 	err = arch_dup_task_struct(tsk, orig);
 	if (err)
 		goto free_ti;

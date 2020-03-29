@@ -60,10 +60,6 @@
 #include <linux/hisi/hisi_fiq.h>
 #endif
 
-#ifdef CONFIG_HUAWEI_KERNEL_STACK_RANDOMIZE
-#include <chipset_common/kernel_harden/kaslr.h>
-#endif
-
 /*
  * as from 2.5, kernels no longer have an init_tasks structure
  * so we need some other way of telling a new secondary core
@@ -106,11 +102,7 @@ int __cpu_up(unsigned int cpu, struct task_struct *idle)
 	 * We need to tell the secondary core where to find its stack and the
 	 * page tables.
 	 */
-#ifdef CONFIG_HUAWEI_KERNEL_STACK_RANDOMIZE
-	secondary_data.stack = task_stack_page(idle) + THREAD_START_SP - kstack_offset;
-#else
 	secondary_data.stack = task_stack_page(idle) + THREAD_START_SP;
-#endif
 	__flush_dcache_area(&secondary_data, sizeof(secondary_data));
 
 	/*
