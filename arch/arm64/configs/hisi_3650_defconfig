@@ -4439,11 +4439,6 @@ CONFIG_DEFAULT_SECURITY="selinux"
 CONFIG_HUAWEI_SELINUX_DSM=y
 
 #
-# Huawei root scanner
-#
-CONFIG_HW_ROOT_SCAN=y
-
-#
 # Huawei Kernel Harden
 #
 # CONFIG_HUAWEI_KERNEL_STACK_RANDOMIZE is not set
