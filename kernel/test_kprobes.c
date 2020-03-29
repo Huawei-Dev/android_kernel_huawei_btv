@@ -227,112 +227,6 @@ static int test_jprobes(void)
 
 	return 0;
 }
-#ifdef CONFIG_KRETPROBES
-static u32 krph_val;
-
-static int entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
-{
-	krph_val = (rand1 / div_factor);
-	return 0;
-}
-
-static int return_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
-{
-	unsigned long ret = regs_return_value(regs);
-
-	if (ret != (rand1 / div_factor)) {
-		handler_errors++;
-		pr_err("incorrect value in kretprobe handler\n");
-	}
-	if (krph_val == 0) {
-		handler_errors++;
-		pr_err("call to kretprobe entry handler failed\n");
-	}
-
-	krph_val = rand1;
-	return 0;
-}
-
-static struct kretprobe rp = {
-	.handler	= return_handler,
-	.entry_handler  = entry_handler,
-	.kp.symbol_name = "kprobe_target"
-};
-
-static int test_kretprobe(void)
-{
-	int ret;
-
-	ret = register_kretprobe(&rp);
-	if (ret < 0) {
-		pr_err("register_kretprobe returned %d\n", ret);
-		return ret;
-	}
-
-	ret = target(rand1);
-	unregister_kretprobe(&rp);
-	if (krph_val != rand1) {
-		pr_err("kretprobe handler not called\n");
-		handler_errors++;
-	}
-
-	return 0;
-}
-
-static int return_handler2(struct kretprobe_instance *ri, struct pt_regs *regs)
-{
-	unsigned long ret = regs_return_value(regs);
-
-	if (ret != (rand1 / div_factor) + 1) {
-		handler_errors++;
-		pr_err("incorrect value in kretprobe handler2\n");
-	}
-	if (krph_val == 0) {
-		handler_errors++;
-		pr_err("call to kretprobe entry handler failed\n");
-	}
-
-	krph_val = rand1;
-	return 0;
-}
-
-static struct kretprobe rp2 = {
-	.handler	= return_handler2,
-	.entry_handler  = entry_handler,
-	.kp.symbol_name = "kprobe_target2"
-};
-
-static int test_kretprobes(void)
-{
-	int ret;
-	struct kretprobe *rps[2] = {&rp, &rp2};
-
-	/* addr and flags should be cleard for reusing kprobe. */
-	rp.kp.addr = NULL;
-	rp.kp.flags = 0;
-	ret = register_kretprobes(rps, 2);
-	if (ret < 0) {
-		pr_err("register_kretprobe returned %d\n", ret);
-		return ret;
-	}
-
-	krph_val = 0;
-	ret = target(rand1);
-	if (krph_val != rand1) {
-		pr_err("kretprobe handler not called\n");
-		handler_errors++;
-	}
-
-	krph_val = 0;
-	ret = target2(rand1);
-	if (krph_val != rand1) {
-		pr_err("kretprobe handler2 not called\n");
-		handler_errors++;
-	}
-	unregister_kretprobes(rps, 2);
-	return 0;
-}
-#endif /* CONFIG_KRETPROBES */
 
 int init_test_probes(void)
 {
@@ -365,18 +259,6 @@ int init_test_probes(void)
 	ret = test_jprobes();
 	if (ret < 0)
 		errors++;
-
-#ifdef CONFIG_KRETPROBES
-	num_tests++;
-	ret = test_kretprobe();
-	if (ret < 0)
-		errors++;
-
-	num_tests++;
-	ret = test_kretprobes();
-	if (ret < 0)
-		errors++;
-#endif /* CONFIG_KRETPROBES */
 
 	if (errors)
 		pr_err("BUG: %d out of %d tests failed\n", errors, num_tests);

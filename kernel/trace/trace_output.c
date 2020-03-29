@@ -269,22 +269,10 @@ int ftrace_output_call(struct trace_iterator *iter, char *name, char *fmt, ...)
 }
 EXPORT_SYMBOL_GPL(ftrace_output_call);
 
-#ifdef CONFIG_KRETPROBES
-static inline const char *kretprobed(const char *name)
-{
-	static const char tramp_name[] = "kretprobe_trampoline";
-	int size = sizeof(tramp_name);
-
-	if (strncmp(tramp_name, name, size) == 0)
-		return "[unknown/kretprobe'd]";
-	return name;
-}
-#else
 static inline const char *kretprobed(const char *name)
 {
 	return name;
 }
-#endif /* CONFIG_KRETPROBES */
 
 static void
 seq_print_sym_short(struct trace_seq *s, const char *fmt, unsigned long address)
