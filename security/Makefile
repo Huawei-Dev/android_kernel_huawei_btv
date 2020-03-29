@@ -27,7 +27,3 @@ obj-$(CONFIG_CGROUP_DEVICE)		+= device_cgroup.o
 # Object integrity file lists
 subdir-$(CONFIG_INTEGRITY)		+= integrity
 obj-$(CONFIG_INTEGRITY)			+= integrity/
-
-# HW Object
-subdir-$(CONFIG_HUAWEI_SELINUX_DSM)	+= hwselinux
-obj-$(CONFIG_HUAWEI_SELINUX_DSM)	+= hwselinux/
