@@ -71,20 +71,11 @@ register unsigned long current_stack_pointer asm ("sp");
  */
 static inline struct thread_info *current_thread_info(void) __attribute_const__;
 
-#ifdef CONFIG_HUAWEI_KERNEL_STACK_RANDOMIZE_STRONG
-extern unsigned long kti_offset;
-static inline struct thread_info *current_thread_info(void)
-{
-	return (struct thread_info *)
-		((current_stack_pointer & ~(THREAD_SIZE - 1)) + kti_offset);
-}
-#else
 static inline struct thread_info *current_thread_info(void)
 {
 	return (struct thread_info *)
 		(current_stack_pointer & ~(THREAD_SIZE - 1));
 }
-#endif
 
 #define thread_saved_pc(tsk)	\
 	((unsigned long)(tsk->thread.cpu_context.pc))

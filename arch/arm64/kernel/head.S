@@ -444,11 +444,7 @@ ENDPROC(__create_page_tables)
 /*
  * The following fragment of code is executed with the MMU enabled.
  */
-#ifdef CONFIG_HUAWEI_KERNEL_STACK_RANDOMIZE
-	.set	initial_sp, init_thread_union + THREAD_SIZE - 16
-#else
         .set    initial_sp, init_thread_union + THREAD_START_SP
-#endif
 __mmap_switched:
 	adr_l	x6, __bss_start
 	adr_l	x7, __bss_stop

@@ -88,12 +88,6 @@
 #include <asm/sections.h>
 #include <asm/cacheflush.h>
 
-#if (defined CONFIG_HUAWEI_KERNEL_STACK_RANDOMIZE) || \
-	(defined CONFIG_HUAWEI_KERNEL_STACK_RANDOMIZE_STRONG) || \
-(defined CONFIG_HUAWEI_KERNEL_STACK_NX)
-#include <chipset_common/kernel_harden/kaslr.h>
-#endif
-
 static int kernel_init(void *);
 
 extern void init_IRQ(void);
@@ -502,16 +496,6 @@ asmlinkage __visible void __init start_kernel(void)
 	 * lockdep hash:
 	 */
 	lockdep_init();
-#ifdef CONFIG_HUAWEI_KERNEL_STACK_RANDOMIZE
-	kstack_randomize_init();
-#endif
-#ifdef CONFIG_HUAWEI_KERNEL_STACK_RANDOMIZE_STRONG
-	kti_randomize_init();
-	set_init_thread_info((unsigned long)&init_stack);
-#endif
-#ifdef CONFIG_HUAWEI_KERNEL_STACK_NX
-	set_init_stack_nx(&init_thread_info);
-#endif
 	set_task_stack_end_magic(&init_task);
 	smp_setup_processor_id();
 	debug_objects_early_init();

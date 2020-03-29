@@ -2835,12 +2835,7 @@ static inline void threadgroup_unlock(struct task_struct *tsk) {}
 
 #ifndef __HAVE_THREAD_FUNCTIONS
 
-#ifdef CONFIG_HUAWEI_KERNEL_STACK_RANDOMIZE_STRONG
-#include <chipset_common/kernel_harden/kaslr.h>
-#define task_thread_info(task)	((struct thread_info *)((task)->stack + kti_offset))
-#else
 #define task_thread_info(task)	((struct thread_info *)(task)->stack)
-#endif
 
 #define task_stack_page(task)	((task)->stack)
 

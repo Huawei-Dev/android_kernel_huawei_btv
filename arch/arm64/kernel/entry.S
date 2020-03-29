@@ -170,12 +170,6 @@
 	.macro	get_thread_info, rd
 	mov	\rd, sp
 	and	\rd, \rd, #~(THREAD_SIZE - 1)	// top of stack
-#ifdef CONFIG_HUAWEI_KERNEL_STACK_RANDOMIZE_STRONG
-	stp	x23, x24, [sp, #-16]!
-	ldr_l	x23, kti_offset, x24
-	add	\rd, \rd, x23
-	ldp	x23, x24, [sp], #16
-#endif
 	.endm
 
 /*

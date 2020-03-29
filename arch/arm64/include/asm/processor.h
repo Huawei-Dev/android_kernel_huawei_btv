@@ -138,14 +138,8 @@ static inline void cpu_relax(void)
 extern struct task_struct *cpu_switch_to(struct task_struct *prev,
 					 struct task_struct *next);
 
-#ifdef CONFIG_HUAWEI_KERNEL_STACK_RANDOMIZE
-extern unsigned int kstack_offset;
-#define task_pt_regs(p) \
-	((struct pt_regs *)(THREAD_START_SP - kstack_offset + task_stack_page(p)) - 1)
-#else
 #define task_pt_regs(p) \
 	((struct pt_regs *)(THREAD_START_SP + task_stack_page(p)) - 1)
-#endif
 
 #define KSTK_EIP(tsk)	((unsigned long)task_pt_regs(tsk)->pc)
 #define KSTK_ESP(tsk)	user_stack_pointer(task_pt_regs(tsk))

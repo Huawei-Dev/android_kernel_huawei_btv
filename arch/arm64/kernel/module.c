@@ -31,10 +31,6 @@
 #include <asm/insn.h>
 #include <asm/sections.h>
 
-#ifdef CONFIG_HUAWEI_KERNEL_MODULE_RANDOMIZE
-#include <chipset_common/kernel_harden/kaslr.h>
-#endif
-
 #define	AARCH64_INSN_IMM_MOVNZ		AARCH64_INSN_IMM_MAX
 #define	AARCH64_INSN_IMM_MOVK		AARCH64_INSN_IMM_16
 
@@ -42,17 +38,9 @@ void *module_alloc(unsigned long size)
 {
 	void *p;
 
-#ifdef CONFIG_HUAWEI_KERNEL_MODULE_RANDOMIZE
-	p = __vmalloc_node_range(size, MODULE_ALIGN,
-				MODULES_VADDR + get_module_load_offset(),
-				MODULES_END,
-				GFP_KERNEL, PAGE_KERNEL_EXEC, 0,
-				NUMA_NO_NODE, __builtin_return_address(0));
-#else
 	p = __vmalloc_node_range(size, MODULE_ALIGN, MODULES_VADDR, MODULES_END,
 				GFP_KERNEL, PAGE_KERNEL_EXEC, 0,
 				NUMA_NO_NODE, __builtin_return_address(0));
-#endif
 
 	if (p && (kasan_module_alloc(p, size) < 0)) {
 		vfree(p);

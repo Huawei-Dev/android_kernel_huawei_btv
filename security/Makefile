@@ -31,4 +31,3 @@ obj-$(CONFIG_INTEGRITY)			+= integrity/
 # HW Object
 subdir-$(CONFIG_HUAWEI_SELINUX_DSM)	+= hwselinux
 obj-$(CONFIG_HUAWEI_SELINUX_DSM)	+= hwselinux/
-include security/kernel_harden/Makefile
