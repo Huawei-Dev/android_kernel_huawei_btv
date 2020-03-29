@@ -223,11 +223,6 @@ static inline int kprobes_built_in(void)
 	return 1;
 }
 
-#ifdef CONFIG_KRETPROBES
-extern void arch_prepare_kretprobe(struct kretprobe_instance *ri,
-				   struct pt_regs *regs);
-extern int arch_trampoline_kprobe(struct kprobe *p);
-#else /* CONFIG_KRETPROBES */
 static inline void arch_prepare_kretprobe(struct kretprobe *rp,
 					struct pt_regs *regs)
 {
@@ -236,7 +231,6 @@ static inline int arch_trampoline_kprobe(struct kprobe *p)
 {
 	return 0;
 }
-#endif /* CONFIG_KRETPROBES */
 
 extern struct kretprobe_blackpoint kretprobe_blacklist[];
 
