@@ -2405,7 +2405,7 @@ int32 firmware_cfg_init(void)
 {
     int32  l_ret;
     uint32 i;
-    int32  firmware_in_boot = 0;
+    /*int32  firmware_in_boot = 0;
 
     l_ret = get_cust_conf_int32(INI_MODU_PLAT, "firmware_buildin", &firmware_in_boot);
     if (l_ret < 0)
@@ -2423,9 +2423,8 @@ int32 firmware_cfg_init(void)
     {
         PS_PRINT_INFO("Hi110x firmware is not buildin\n");
         g_auc_cfg_path = g_auc_cfg_in_system_path;
-    }
+    }*/
 
-    /*½âÎöcfgÎÄ¼þ*/
     for (i = 0; i < CFG_FILE_TOTAL; i++)
     {
         l_ret = firmware_get_cfg(g_auc_cfg_path[i], i);
