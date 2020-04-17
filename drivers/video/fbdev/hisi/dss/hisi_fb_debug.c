@@ -17,68 +17,100 @@
 ** for debug, S_IRUGO
 ** /sys/module/hisifb/parameters
 */
+/*lint -save -e21 -e846 -e514 -e528 -e708 -e753 -e778 -e866 -e84 -e753 -e528*/
+unsigned hisi_fb_msg_level = 7;
+
+int g_debug_mmu_error = 0;
+
+int g_debug_ldi_underflow = 0;
+
+int g_debug_ldi_underflow_clear = 1;
+
+int g_debug_set_reg_val = 0;
+
+int g_debug_online_vsync = 0;
+
+int g_debug_online_vactive = 0;
+
+int g_debug_ovl_online_composer = 0;
+
+int g_debug_ovl_online_composer_hold = 0;
+
+int g_debug_ovl_online_composer_return = 0;
+
+int g_debug_ovl_online_composer_timediff = 0;
+
+int g_debug_ovl_online_composer_time_threshold = 6000;  //us
+
+int g_debug_ovl_offline_composer = 0;
+
+int g_debug_ovl_block_composer = 0;
+
+int g_debug_ovl_offline_composer_hold = 0;
+
+int g_debug_ovl_offline_composer_timediff = 0;
+
+int g_debug_ovl_offline_composer_time_threshold = 12000;  //us
+
+int g_debug_ovl_offline_block_num = -1;
+
+int g_debug_ovl_copybit_composer_hold = 0;
+
+int g_debug_ovl_copybit_composer_timediff = 0;
+
+int g_debug_ovl_copybit_composer_time_threshold = 12000;  //us
+
+int g_debug_ovl_copybit_composer = 0;
+
+int g_debug_ovl_mediacommon_composer = 0;
+
+int g_debug_ovl_cmdlist = 0;
+
+int g_dump_cmdlist_content = 0;
+
+int g_enable_ovl_cmdlist_online = 1;
+
+int g_enable_l3_cache = 0;
+
+int g_smmu_global_bypass = 0;
+
+int g_enable_ovl_cmdlist_offline = 1;
+
+int g_rdma_stretch_threshold = RDMA_STRETCH_THRESHOLD;
+
+int g_enable_dirty_region_updt = 1;
+
+int g_debug_dirty_region_updt = 0;
+
+int g_enable_crc_debug = 0;
+
+int g_ldi_data_gate_en = 1;
+
+int g_debug_ovl_credit_step = 0;
+
+int g_debug_layerbuf_sync = 0;
+
+int g_enable_dss_idle = 1;
+
+unsigned int g_dss_smmu_outstanding = DSS_SMMU_OUTSTANDING_VAL + 1;
+
+int g_debug_dump_mmbuf = 0;
+
+uint32_t g_underflow_stop_perf_stat = 0;
+
+
+uint32_t g_mmbuf_addr_test = 0;
+/* lint -restore */
+
+
 //lint -e305, -e514, -e84, -e21, -e846, -e778, -e866, -e708
 int g_dss_effect_sharpness1D_en = 1;
-#ifdef CONFIG_FB_DEBUG_USED
-module_param_named(dss_effect_sharpness1D_en, g_dss_effect_sharpness1D_en, int, 0644);
-MODULE_PARM_DESC(dss_effect_sharpness1D_en, "hisi dss display effect sharpness1D");
-#endif
 
 int g_dss_effect_sharpness2D_en = 0;
-#ifdef CONFIG_FB_DEBUG_USED
-module_param_named(dss_effect_sharpness2D_en, g_dss_effect_sharpness2D_en, int, 0644);
-MODULE_PARM_DESC(dss_effect_sharpness2D_en, "hisi dss display effect sharpness2D");
-#endif
 
 int g_dss_effect_acm_ce_en = 1;
-#ifdef CONFIG_FB_DEBUG_USED
-module_param_named(dss_effect_acm_ce_en, g_dss_effect_acm_ce_en, int, 0644);
-MODULE_PARM_DESC(dss_effect_acm_ce_en, "hisi dss display effect acm ce");
-#endif
-
-int g_enable_effect = 3; // 1 -- enable hiace; 2 -- enable bl
-#ifdef CONFIG_FB_DEBUG_USED
-module_param_named(enable_effect, g_enable_effect, int, 0644);
-MODULE_PARM_DESC(enable_effect, "hisi dss display effect features enable");
-#endif
-
-int g_enable_effect_hiace = 1;
-#ifdef CONFIG_FB_DEBUG_USED
-module_param_named(enable_effect_hiace, g_enable_effect_hiace, int, 0644);
-MODULE_PARM_DESC(enable_effect_hiace, "hisi dss display effect hiace enable");
-#endif
-
-int g_debug_effect = 0; // 1 -- Trace entrance; 2 -- Count average delay of each step; 4 -- Trace every frame; 8 -- Print metadata
-#ifdef CONFIG_FB_DEBUG_USED
-module_param_named(debug_effect, g_debug_effect, int, 0644);
-MODULE_PARM_DESC(debug_effect, "hisi dss display effect debug level");
-#endif
-
-int g_enable_effect_bl = 1;
-#ifdef CONFIG_FB_DEBUG_USED
-module_param_named(enable_effect_bl, g_enable_effect_bl, int, 0644);
-MODULE_PARM_DESC(enable_effect_bl, "hisi dss display effect backlight enable");
-#endif
 //lint +e305, +e514, +e84, +e21, +e846, +e778, +e866, +e708
 
-void dss_underflow_stop_perf_state_online(struct hisi_fb_data_type *hisifd)
-{
-#ifdef DSS_DEVMEM_PERF_BASE
-	void __iomem * perf_stat_base;
-
-	if (inp32(hisifd->peri_crg_base + CRG_PERIPH_APB_PERRSTSTAT0_REG) & (1 << CRG_PERIPH_APB_IP_RST_PERF_STAT_BIT)) {
-		HISI_FB_INFO("Failed : perf might not be used");
-		return ;
-	}
-
-	perf_stat_base = ioremap(DSS_DEVMEM_PERF_BASE, DEVMEM_PERF_SIZE);
-	outp32(perf_stat_base + PERF_SAMPSTOP_REG, 0x1);
-	iounmap(perf_stat_base);
-	HISI_FB_INFO("OK : perf state stop succ");
-#endif
-}
-
-#if defined (CONFIG_HUAWEI_DSM)
 
 static struct dsm_dev dsm_lcd = {
 	.name = "dsm_lcd",
@@ -125,7 +157,7 @@ void dss_underflow_debug_func(struct work_struct *work)
 	if (work) {
 		hisifd = container_of(work, struct hisi_fb_data_type, dss_underflow_debug_work);
 		if (g_underflow_stop_perf_stat) {
-			dumpDssOverlay(hisifd, &hisifd->ov_req, false);
+			dumpDssOverlay(hisifd, &hisifd->ov_req);
 		}
 	} else {
 		HISI_FB_ERR("Get hisifd failed");
@@ -149,16 +181,20 @@ void dss_underflow_debug_func(struct work_struct *work)
 		}
 	}
 }
-#endif
 
 void hisifb_debug_register(struct platform_device *pdev)
 {
-#if defined (CONFIG_HUAWEI_DSM)
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 
 	// dsm lcd
 	if(!lcd_dclient) {
@@ -172,16 +208,19 @@ void hisifb_debug_register(struct platform_device *pdev)
 	} else {
 		INIT_WORK(&hisifd->dss_underflow_debug_work, dss_underflow_debug_func);
 	}
-#endif
 }
 
 void hisifb_debug_unregister(struct platform_device *pdev)
 {
-#if defined (CONFIG_HUAWEI_DSM)
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
-#endif
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 }

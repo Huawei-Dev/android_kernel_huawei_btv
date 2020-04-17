@@ -38,11 +38,9 @@ static struct hisi_fb_panel_data g_panel_data;
 static int g_debug_enable = 0;
 static int g_cabc_mode = 1;
 
-#ifdef CONFIG_HUAWEI_TS
 #define TP_RS_CALL 1
 extern bool gesture_func;
 extern bool g_lcd_control_tp_power;
-#endif
 
 extern unsigned int g_led_rg_para1;
 extern unsigned int g_led_rg_para2;
@@ -473,12 +471,10 @@ static int mipi_lg_panel_on(struct platform_device *pdev)
 	struct hisi_panel_info *pinfo = NULL;
 	char __iomem *mipi_dsi0_base = NULL;
 	int error = 0;
-#if defined (CONFIG_HUAWEI_DSM)
 	static struct lcd_reg_read_t lcd_status_reg[] = {
 		{0x0A, 0x1C, 0xFF, "lcd power state"},
 		{0x0E, 0x80, 0xC1, "lcd signal mode"},
 	};
-#endif
 
 	BUG_ON(pdev == NULL);
 	hisifd = platform_get_drvdata(pdev);
@@ -525,13 +521,11 @@ static int mipi_lg_panel_on(struct platform_device *pdev)
 
 		pinfo->lcd_init_step = LCD_INIT_MIPI_LP_SEND_SEQUENCE;
 	} else if (pinfo->lcd_init_step == LCD_INIT_MIPI_LP_SEND_SEQUENCE) {
-#ifdef CONFIG_HUAWEI_TS
 		if (TP_RS_CALL != g_debug_enable_lcd_sleep_in) { //control touch timing
 			HISI_FB_INFO("TP resume and after resume\n");
 			error = ts_power_control_notify(TS_RESUME_DEVICE, SHORT_SYNC_TIMEOUT);
 			error = ts_power_control_notify(TS_AFTER_RESUME, NO_SYNC_TIMEOUT);
 		}
-#endif
 
 		//init code
 		mipi_dsi_cmds_tx(lg_display_on_cmds, \
@@ -551,10 +545,8 @@ static int mipi_lg_panel_on(struct platform_device *pdev)
 				ARRAY_SIZE(pwm_out_on_cmds), mipi_dsi0_base);
 		}
 		g_cabc_mode = 1;
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_check_status_and_report_by_dsm(lcd_status_reg, \
 			ARRAY_SIZE(lcd_status_reg), mipi_dsi0_base);
-#endif
 		HISI_FB_INFO("enable bl_en gpio.\n");
 		// lcd gpio normal
 		gpio_cmds_tx(lcd_gpio_normal_cmds_sub2, \
@@ -634,7 +626,6 @@ static int mipi_lg_panel_off(struct platform_device *pdev)
 				pinctrl_cmds_tx(pdev, lcd_pinctrl_normal_cmds,
 					ARRAY_SIZE(lcd_pinctrl_normal_cmds));
 			}
-#ifdef CONFIG_HUAWEI_TS
 			//if g_debug_enable_lcd_sleep_in == 1, it means don't turn off TP/LCD power
 			//but only let lcd get into sleep.
 			if (TP_RS_CALL != g_debug_enable_lcd_sleep_in) {
@@ -642,7 +633,6 @@ static int mipi_lg_panel_off(struct platform_device *pdev)
 				error = ts_power_control_notify(TS_BEFORE_SUSPEND, SHORT_SYNC_TIMEOUT);
 				error = ts_power_control_notify(TS_SUSPEND_DEVICE, SHORT_SYNC_TIMEOUT);
 			}
-#endif
 		}else {
 			HISI_FB_INFO("display shutting down(regulator disabling).\n");
 			// lcd gpio lowpower
@@ -659,9 +649,7 @@ static int mipi_lg_panel_off(struct platform_device *pdev)
 			// lcd vcc disable
 			vcc_cmds_tx(pdev, lcd_vcc_disable_cmds,
 				ARRAY_SIZE(lcd_vcc_disable_cmds));
-#ifdef CONFIG_HUAWEI_TS
 			ts_thread_stop_notify();
-#endif
 		}
 
 	} else {
@@ -1069,11 +1057,9 @@ static ssize_t mipi_lg_panel_lcd_bist_check_show(struct platform_device *pdev,
 	mipi_dsi0_base = hisifd->dss_base + DSS_MIPI_DSI0_OFFSET;
 	hisifd->lcd_self_testing = true;
 
-#ifdef CONFIG_HUAWEI_TS
 	error = ts_power_control_notify(TS_BEFORE_SUSPEND, SHORT_SYNC_TIMEOUT);
 	error_pw = ts_power_control_notify(TS_SUSPEND_DEVICE, SHORT_SYNC_TIMEOUT);
 	HISI_FB_INFO("Disable touchscreen during test.\n");
-#endif
 
 	// lcd display off sequence
 	mipi_dsi_cmds_tx(lg_display_off_cmds, \
@@ -1157,13 +1143,11 @@ err_gpio_request:
 	mdelay(500);
 
 	hisifd->on_fnc(hisifd);
-#ifdef CONFIG_HUAWEI_TS
 	if (!error_pw)
 		error_pw = ts_power_control_notify(TS_RESUME_DEVICE, SHORT_SYNC_TIMEOUT);
 	if (!error)
 		error = ts_power_control_notify(TS_AFTER_RESUME, SHORT_SYNC_TIMEOUT);
 	HISI_FB_INFO("Enable touchscreen after test.\n");
-#endif
 
 	mipi_lg_panel_set_backlight(pdev, hisifd->bl_level);
 	hisifd->lcd_self_testing = false;
@@ -1222,9 +1206,6 @@ static ssize_t mipi_lg_panel_lcd_sleep_ctrl_store(struct platform_device *pdev, 
 }
 
 /*for esd check*/
-#if 0
-static int error_cnt = 0;	//esd test
-#endif
 static int mipi_lg_panel_check_esd(struct platform_device* pdev)
 {
 	int ret = 0;
@@ -1258,17 +1239,6 @@ static int mipi_lg_panel_check_esd(struct platform_device* pdev)
 	ret = mipi_dsi_read_compare(&data, hisifd->mipi_dsi0_base);
 	HISI_FB_DEBUG("fb%d, -.\n", hisifd->index);
 
-#if 0
-	error_cnt = (error_cnt + 1) % 5;
-	if ( error_cnt == 0) {
-		HISI_FB_INFO("error_cnt = %d!!!!!++++++++++++++++++++++\n", error_cnt);
-		return 1;
-	}
-	else {
-		HISI_FB_INFO("error_cnt = %d!!!!!-----------------------\n", error_cnt);
-		return 0;
-	}
-#endif
 
 	return ret;
 }
@@ -1367,7 +1337,7 @@ static ssize_t mipi_lg_panel_lcd_test_config_store(struct platform_device *pdev,
 		HISI_FB_INFO("current test cmd:%s\n", lcd_cmd_now);
 	} else {
 		memcpy(lcd_cmd_now, "INVALID", strlen("INVALID") + 1);
-		HISI_FB_INFO("invalid test cmd:%s\n");
+		HISI_FB_INFO("invalid test cmd:%s\n", lcd_cmd_now);
 	}
 
 	return count;
@@ -1590,9 +1560,7 @@ static int mipi_lg_probe(struct platform_device *pdev)
 	struct hisi_panel_info *pinfo = NULL;
 	struct device_node *np = NULL;
 	uint32_t bl_type = 0;
-#ifdef CONFIG_HUAWEI_TS
 	g_lcd_control_tp_power = true;	//not use fb_notify to control touch timing.
-#endif
 	panel_lcd_id = (int)simple_strtol(panel_lcd_id_buf, NULL, 0);
 
 	np = of_find_compatible_node(NULL, NULL, DTS_COMP_LG_R69006_5P5);
@@ -1648,16 +1616,10 @@ static int mipi_lg_probe(struct platform_device *pdev)
 	if (pinfo->bl_set_type == BL_SET_BY_BLPWM)
 		pinfo->blpwm_input_ena = 1;
 
-#ifdef CONFIG_BACKLIGHT_10000
 	pinfo->bl_min = 117;
 	pinfo->bl_max = 9960;
 	pinfo->bl_default = 4000;
 	pinfo->blpwm_precision_type = BLPWM_PRECISION_10000_TYPE;
-#else
-	pinfo->bl_min = 3;
-	pinfo->bl_max = 255;
-	pinfo->bl_default = 102;
-#endif
 
 	pinfo->frc_enable = 0;
 	pinfo->esd_enable = 1;

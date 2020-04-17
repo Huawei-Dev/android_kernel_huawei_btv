@@ -145,7 +145,7 @@ static struct dsi_cmd_desc jdi_display_effect_on_cmds[] = {
 	{DTYPE_DCS_WRITE1, 0, 10, WAIT_TYPE_US,
 		sizeof(cabc_set_mode_UI), cabc_set_mode_UI},
 	{DTYPE_DCS_LWRITE, 0, 10, WAIT_TYPE_US,
-		sizeof(ce_off), ce_off},
+		sizeof(ce_set_mode_SRGB), ce_set_mode_SRGB},
 };
 
 static struct dsi_cmd_desc jdi_cabc_off_cmds[] = {

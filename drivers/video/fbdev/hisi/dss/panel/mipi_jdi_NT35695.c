@@ -1689,16 +1689,10 @@ static int mipi_jdi_probe(struct platform_device *pdev)
 	if (pinfo->bl_set_type == BL_SET_BY_BLPWM)
 		pinfo->blpwm_input_ena = 0;
 
-#ifdef CONFIG_BACKLIGHT_10000
 	pinfo->bl_min = 157;
 	pinfo->bl_max = 9960;
 	pinfo->bl_default = 4000;
 	pinfo->blpwm_precision_type = BLPWM_PRECISION_10000_TYPE;
-#else
-	pinfo->bl_min = 1;
-	pinfo->bl_max = 255;
-	pinfo->bl_default = 102;
-#endif
 
 	pinfo->type = lcd_display_type;
 	pinfo->ifbc_type = lcd_ifbc_type;

@@ -26,9 +26,15 @@ static int hisi_offlinecompser_panel_on(struct platform_device *pdev)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("index=%d, enter!\n", hisifd->index);
 
@@ -42,9 +48,15 @@ static int hisi_offlinecompser_panel_off(struct platform_device *pdev)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("index=%d, enter!\n", hisifd->index);
 
@@ -58,9 +70,15 @@ static int hisi_offlinecompser_panel_remove(struct platform_device *pdev)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	/*BUG_ON(hisifd == NULL);*/
+	/*if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}*/
 
 	if (!hisifd) {
 		return 0;
@@ -97,7 +115,10 @@ static int hisi_offlinecompser_probe(struct platform_device *pdev)
 
 	HISI_FB_DEBUG("+.\n");
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 
 	pdev->id = 1;
 	pinfo = hisi_offlinecomposer_panel_data.panel_info;

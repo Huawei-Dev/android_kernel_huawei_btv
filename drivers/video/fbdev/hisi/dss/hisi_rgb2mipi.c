@@ -346,8 +346,14 @@ static int rgb2mipi_spi_cmds_tx(struct spi_device *spi_dev,
 	char buf_data[2] = {0};
 	int i = 0;
 
-	BUG_ON(spi_dev == NULL);
-	BUG_ON(cmds == NULL);
+	if (NULL == spi_dev) {
+		HISI_FB_ERR("spi_dev is NULL");
+		return -EINVAL;
+	}
+	if (NULL == cmds) {
+		HISI_FB_ERR("cmds is NULL");
+		return -EINVAL;
+	}
 
 	for (i = 0; i < cnt; i++) {
 		gpio_direction_output(BR_SPI_CS, 0);
@@ -388,65 +394,20 @@ static int rgb2mipi_spi_cmds_tx(struct spi_device *spi_dev,
 	return 0;
 }
 
-#if 0
-static int rgb2mipi_spi_cmds_rx(struct spi_device *spi_dev,
-	struct rgb2mipi_spi_cmd_desc *cmds, int cnt)
-{
-	char buf_addr[3] = {0};
-	char buf_wdata[1] = {0};
-	char buf_rdata[1] = {0};
-	int i = 0;
-
-	BUG_ON(spi_dev == NULL);
-	BUG_ON(cmds == NULL);
-
-	for(i = 0; i < cnt; i++) {
-		gpio_direction_output(BR_SPI_CS, 0);
-
-		/* address set */
-		buf_addr[0] = 0x40;
-		buf_addr[1] = cmds[i].reg >> 8;
-		buf_addr[2] = cmds[i].reg & 0xff;
-		spi_write(spi_dev, buf_addr, 3);
-
-		udelay(50);
-		gpio_direction_output(BR_SPI_CS, 1);
-
-		mdelay(1);
-
-		gpio_direction_output(BR_SPI_CS, 0);
-
-		/* write then read command */
-		buf_wdata[0] = 0xc0;
-		spi_write_then_read(spi_dev, buf_wdata, 1, buf_rdata, 1);
-
-		cmds[i].value = buf_rdata[0];
-
-		mdelay(1);
-		gpio_direction_output(BR_SPI_CS, 1);
-		mdelay(1);
-
-		if (cmds[i].delay) {
-			if (cmds[i].delaytype == WAIT_TYPE_US)
-				udelay(cmds[i].delay);
-			else if (cmds[i].delaytype == WAIT_TYPE_MS)
-				mdelay(cmds[i].delay);
-			else
-				mdelay(cmds[i].delay * 1000);
-		}
-	}
-
-	return 0;
-}
-#endif
 
 static int rgb2mipi_swrite(struct spi_device *spi_dev, struct dsi_cmd_desc *cm)
 {
 	int dataLength = 0;
 	uint16_t cmds = 0;
 
-	BUG_ON(spi_dev == NULL);
-	BUG_ON(cm == NULL);
+	if (NULL == spi_dev) {
+		HISI_FB_ERR("spi_dev is NULL");
+		return -EINVAL;
+	}
+	if (NULL == cm) {
+		HISI_FB_ERR("cm is NULL");
+		return -EINVAL;
+	}
 
 	dataLength = cm->dlen;
 	if (dataLength == 1) {
@@ -501,7 +462,7 @@ static int rgb2mipi_swrite(struct spi_device *spi_dev, struct dsi_cmd_desc *cm)
 		rgb2mipi_spi_cmds_tx(spi_dev, packet_trans_cmds,
 			ARRAY_SIZE(packet_trans_cmds));
 	} else {
-		BUG_ON(1);
+		return -EINVAL;
 	}
 
 	/* Wait until packet sending finish */
@@ -516,10 +477,19 @@ static int rgb2mipi_lwrite(struct spi_device *spi_dev, struct dsi_cmd_desc *cm)
 	int i = 0;
 	uint16_t cmds = 0;
 
-	BUG_ON(spi_dev == NULL);
-	BUG_ON(cm == NULL);
+	if (NULL == spi_dev) {
+		HISI_FB_ERR("spi_dev is NULL");
+		return -EINVAL;
+	}
+	if (NULL == cm) {
+		HISI_FB_ERR("cm is NULL");
+		return -EINVAL;
+	}
 	dataLength = cm->dlen;
-	BUG_ON(dataLength <= 2);
+	if (dataLength <= 2) {
+		HISI_FB_ERR("dataLength is invalid");
+		return -EINVAL;
+	}
 
 	if ((dataLength > 2) && (dataLength <= 8)) {
 		/* DCS Short Write (upto 8 parameters) */
@@ -582,8 +552,14 @@ static int rgb2mipi_cmd_add(struct spi_device *spi_dev, struct dsi_cmd_desc *cm)
 {
 	int len = 0;
 
-	BUG_ON(spi_dev == NULL);
-	BUG_ON(cm == NULL);
+	if (NULL == spi_dev) {
+		HISI_FB_ERR("spi_dev is NULL");
+		return -EINVAL;
+	}
+	if (NULL == cm) {
+		HISI_FB_ERR("cm is NULL");
+		return -EINVAL;
+	}
 
 	switch (cm->dtype) {
 	case DTYPE_GEN_WRITE:
@@ -612,8 +588,14 @@ int rgb2mipi_cmds_tx(struct spi_device *spi_dev,
 	struct dsi_cmd_desc *cm = NULL;
 	int i = 0;
 
-	BUG_ON(spi_dev == NULL);
-	BUG_ON(cmds == NULL);
+	if (NULL == spi_dev) {
+		HISI_FB_ERR("spi_dev is NULL");
+		return -EINVAL;
+	}
+	if (NULL == cmds) {
+		HISI_FB_ERR("cmds is NULL");
+		return -EINVAL;
+	}
 
 	cm = cmds;
 
@@ -643,9 +625,15 @@ static int rgb2mipi_init(struct hisi_fb_data_type *hisifd)
 	struct spi_device *spi_dev = NULL;
 	int ret = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	spi_dev = hisifd->panel_info.spi_dev;
-	BUG_ON(spi_dev == NULL);
+	if (NULL == spi_dev) {
+		HISI_FB_ERR("spi_dev is NULL");
+		return -EINVAL;
+	}
 
 	/* spi setup */
 	spi_dev->mode = SPI_MODE_0;
@@ -681,9 +669,15 @@ static int rgb2mipi_prep4Rec(struct hisi_fb_data_type *hisifd)
 {
 	struct spi_device *spi_dev = NULL;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	spi_dev = hisifd->panel_info.spi_dev;
-	BUG_ON(spi_dev == NULL);
+	if (NULL == spi_dev) {
+		HISI_FB_ERR("spi_dev is NULL");
+		return -EINVAL;
+	}
 
 	/* TC358763XBG Preparation for receiving DPI input */
 	rgb2mipi_spi_cmds_tx(spi_dev, prep4rec_dpi_input_setting_cmds,
@@ -698,9 +692,15 @@ static int rgb2mipi_deinit(struct hisi_fb_data_type *hisifd)
 {
 	struct spi_device *spi_dev = NULL;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	spi_dev = hisifd->panel_info.spi_dev;
-	BUG_ON(spi_dev == NULL);
+	if (NULL == spi_dev) {
+		HISI_FB_ERR("spi_dev is NULL");
+		return -EINVAL;
+	}
 
 	rgb2mipi_spi_cmds_tx(spi_dev, display_stop_cmds,
 		ARRAY_SIZE(display_stop_cmds));
@@ -723,9 +723,15 @@ static int rgb2mipi_set_fastboot(struct platform_device *pdev)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -741,9 +747,15 @@ static int rgb2mipi_on(struct platform_device *pdev)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -772,9 +784,15 @@ static int rgb2mipi_off(struct platform_device *pdev)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -792,9 +810,15 @@ static int rgb2mipi_remove(struct platform_device *pdev)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -810,9 +834,15 @@ static int rgb2mipi_set_backlight(struct platform_device *pdev, uint32_t bl_leve
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -828,9 +858,15 @@ static int rgb2mipi_vsync_ctrl(struct platform_device *pdev, int enable)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -846,9 +882,15 @@ static int rgb2mipi_esd_handle(struct platform_device *pdev)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -866,10 +908,19 @@ static int rgb2mipi_probe(struct platform_device *pdev)
 	struct hisi_fb_panel_data *pdata = NULL;
 	int ret = 0;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
-	BUG_ON(hisifd->panel_info.spi_dev == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == hisifd->panel_info.spi_dev) {
+		HISI_FB_ERR("spi_dev is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 

@@ -1570,6 +1570,11 @@ int hisi_atfisp_probe(struct platform_device *pdev)
     isp_share_para = (struct rproc_shared_para *)dev->shrdmem->a7mapping[A7SHARED].apva;
 	dev->sec_isp_share_para = isp_share_para;
 
+    if ((dev->domain = hisi_ion_enable_iommu(NULL)) == NULL) {
+        pr_err("[%s] Failed : iommu_domain_alloc.%pK\n", __func__, dev->domain);
+        return -ENODEV;
+    }
+
     if ((dev->domain = iommu_domain_alloc(device->bus)) == NULL) {
         pr_err("[%s] Failed : iommu_domain_alloc.%pK\n", __func__, dev->domain);
         return -ENODEV;

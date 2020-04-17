@@ -366,9 +366,7 @@ static int mipi_fake_probe(struct platform_device *pdev)
 		goto err_probe_defer;
 	}
 
-	HISI_FB_DEBUG("+.\n");
-
-	HISI_FB_INFO("%s\n", DTS_COMP_MIPI_FAKE_PANEL);
+	HISI_FB_INFO("%s +.\n", DTS_COMP_MIPI_FAKE_PANEL);
 
 	np = of_find_compatible_node(NULL, NULL, DTS_COMP_MIPI_FAKE_PANEL);
 	if (!np) {
@@ -378,7 +376,7 @@ static int mipi_fake_probe(struct platform_device *pdev)
 
 	ret = of_property_read_string_index(np, "lcd-bl-ic-name", 0, &lcd_bl_ic_name);
 	if (ret != 0) {
-		memcpy(lcd_bl_ic_name_buf, "INVALID", strlen("INVALID"));
+		memcpy(lcd_bl_ic_name_buf, "INVALID", strlen("INVALID") + 1);
 	} else {
 		memcpy(lcd_bl_ic_name_buf, lcd_bl_ic_name, strlen(lcd_bl_ic_name) + 1);
 	}
@@ -414,16 +412,10 @@ static int mipi_fake_probe(struct platform_device *pdev)
 		pinfo->blpwm_precision_type = BLPWM_PRECISION_2048_TYPE;
 		pinfo->bl_ic_ctrl_mode = REG_ONLY_MODE;
 	} else {
-#ifdef CONFIG_BACKLIGHT_10000
 		pinfo->bl_min = 157;
 		pinfo->bl_max = 9960;
 		pinfo->bl_default = 4000;
 		pinfo->blpwm_precision_type = BLPWM_PRECISION_10000_TYPE;
-#else
-		pinfo->bl_min = 1;
-		pinfo->bl_max = 255;
-		pinfo->bl_default = 102;
-#endif
 	}
 
 	pinfo->frc_enable = 0;
@@ -459,6 +451,7 @@ static int mipi_fake_probe(struct platform_device *pdev)
 	pinfo->mipi.burst_mode = 0;
 
 	pinfo->mipi.dsi_bit_clk = 480;
+	pinfo->mipi.dsi_bit_clk_upt = pinfo->mipi.dsi_bit_clk;
 
 	pinfo->pxl_clk_rate = 146 * 1000000;
 

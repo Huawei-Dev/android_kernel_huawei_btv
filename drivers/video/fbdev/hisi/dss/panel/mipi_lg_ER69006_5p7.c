@@ -52,7 +52,6 @@ static int mipi_lcd_panel_on(struct platform_device *pdev)
 	struct hisi_panel_info *pinfo = NULL;
 	char __iomem *mipi_dsi0_base = NULL;
 	int error = 0;
-#if defined (CONFIG_HUAWEI_DSM)
 	static struct lcd_reg_read_t lcd_status_reg[] = {
 		{0x0A, 0x1C, 0xFF, "lcd power state"},
 		{0x0E, 0x80, 0xC1, "lcd signal mode"},
@@ -78,7 +77,6 @@ static int mipi_lcd_panel_on(struct platform_device *pdev)
 		{0x0A, 0x18, 0xFF, "lcd power 0x18 state",true},
 		{0xAB, 0x00, 0xFF, "mipi_error_report",true},
 	};
-#endif
 
 	if (pdev == NULL) {
 		return -1;
@@ -125,7 +123,6 @@ static int mipi_lcd_panel_on(struct platform_device *pdev)
 
 		pinfo->lcd_init_step = LCD_INIT_MIPI_LP_SEND_SEQUENCE;
 	} else if (pinfo->lcd_init_step == LCD_INIT_MIPI_LP_SEND_SEQUENCE) {
-#ifdef CONFIG_HUAWEI_TS
 		/* control touch timing */
 		if (TP_RS_CALL != g_debug_enable_lcd_sleep_in) {
 			HISI_FB_INFO("TP resume and after resume\n");
@@ -139,25 +136,20 @@ static int mipi_lcd_panel_on(struct platform_device *pdev)
 				HISI_FB_ERR("ts resume device err\n");
 			}
 		}
-#endif
 
 		if (pinfo->panel_effect_support) {
 			mipi_dsi_cmds_tx(lcd_display_effect_on_cmd, \
 				ARRAY_SIZE(lcd_display_effect_on_cmd), mipi_dsi0_base);
 		}
 
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_check_status_and_report_by_dsm(check_reg_before_11, \
 			ARRAY_SIZE(check_reg_before_11), mipi_dsi0_base);
-#endif
 
 		mipi_dsi_cmds_tx(lcd_display_on_cmd, \
 			ARRAY_SIZE(lcd_display_on_cmd), mipi_dsi0_base);
 
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_check_status_and_report_by_dsm(check_reg_between_11_29, \
 			ARRAY_SIZE(check_reg_between_11_29), mipi_dsi0_base);
-#endif
 
 		mipi_dsi_cmds_tx(lcd_display_on_29_cmd, \
 			ARRAY_SIZE(lcd_display_on_29_cmd), mipi_dsi0_base);
@@ -170,10 +162,8 @@ static int mipi_lcd_panel_on(struct platform_device *pdev)
 
 		g_cabc_mode = 1;
 
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_check_status_and_report_by_dsm(lcd_status_reg, \
 			ARRAY_SIZE(lcd_status_reg), mipi_dsi0_base);
-#endif
 
 		pinfo->lcd_init_step = LCD_INIT_MIPI_HS_SEND_SEQUENCE;
 	} else if (pinfo->lcd_init_step == LCD_INIT_MIPI_HS_SEND_SEQUENCE) {
@@ -246,7 +236,6 @@ static int mipi_lcd_panel_off(struct platform_device *pdev)
 					ARRAY_SIZE(lcd_pinctrl_normal_cmds));
 		}
 
-#ifdef CONFIG_HUAWEI_TS
 			/*if g_debug_enable_lcd_sleep_in == 1,
 			**it means don't turn off TP/LCD power
 			**but only let lcd get into sleep.
@@ -266,7 +255,6 @@ static int mipi_lcd_panel_off(struct platform_device *pdev)
 			}
 			/* delay 200ms to make sure 1.8V completely to 0 */
 			mdelay(200);
-#endif
 		}else {
 			HISI_FB_INFO("display shutting down(regulator disabling).\n");
 
@@ -285,9 +273,7 @@ static int mipi_lcd_panel_off(struct platform_device *pdev)
 			/* delay 200ms to make sure 1.8V completely to 0 */
 			mdelay(200);
 
-#ifdef CONFIG_HUAWEI_TS
 			ts_thread_stop_notify();
-#endif
 		}
 
 	} else {
@@ -746,7 +732,6 @@ static int mipi_lcd_panel_check_esd(struct platform_device* pdev)
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = mipi_dsi_read_compare(&data, hisifd->mipi_dsi0_base);
-#if defined (CONFIG_HUAWEI_DSM)
 	if (ret) {
 		HISI_FB_ERR("ESD ERROR:ret = %d\n", ret);
 		ret = dsm_client_ocuppy(lcd_dclient);
@@ -757,7 +742,6 @@ static int mipi_lcd_panel_check_esd(struct platform_device* pdev)
 			HISI_FB_ERR("dsm_client_ocuppy ERROR:retVal = %d\n", ret);
 		}
 	}
-#endif
 	HISI_FB_DEBUG("fb%d, -.\n", hisifd->index);
 
 	return ret;
@@ -922,10 +906,8 @@ static int mipi_lcd_probe(struct platform_device *pdev)
 	uint32_t lcd_display_type = 0;
 	uint32_t support_mode = 0;
 
-#ifdef CONFIG_HUAWEI_TS
 	/* not use fb_notify to control touch timing. */
 	g_lcd_control_tp_power = true;
-#endif
 
 	np = of_find_compatible_node(NULL, NULL, DTS_COMP_LG_ER69006_FHD);
 	if (!np) {
@@ -978,7 +960,6 @@ static int mipi_lcd_probe(struct platform_device *pdev)
 	if (pinfo->bl_set_type == BL_SET_BY_BLPWM)
 		pinfo->blpwm_input_ena = 1;
 
-#ifdef CONFIG_BACKLIGHT_2048
 	/* 10000stage 48,2048stage 435 for 3~4nit */
 	pinfo->bl_min = 48;
 	/* 10000stage 5942,2048stage 1875 for 450nit */
@@ -986,11 +967,6 @@ static int mipi_lcd_probe(struct platform_device *pdev)
 	pinfo->bl_default = 4000;
 	pinfo->blpwm_precision_type = BLPWM_PRECISION_2048_TYPE;
 	pinfo->bl_ic_ctrl_mode = REG_ONLY_MODE;
-#else
-	pinfo->bl_min = 4;
-	pinfo->bl_max = 255;
-	pinfo->bl_default = 102;
-#endif
 
 	pinfo->frc_enable = 0;
 	pinfo->esd_enable = 0;

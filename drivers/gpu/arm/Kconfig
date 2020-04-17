@@ -12,13 +12,12 @@
 #
 #
 
+config MALI_PLATFORM_HI6250
+        tristate "6250 Mali configs"
+        default n
 
 config MALI_PLATFORM_HI3650
         tristate "3650 Mali configs"
-        default n
-
-config MALI_PLATFORM_HI6250
-        tristate "6250 Mali configs"
         default n
 
 config MALI_PLATFORM_HI3660
@@ -31,20 +30,18 @@ config MALI_PLATFORM_KIRIN970
 
 menu "ARM GPU Configuration"
 
-if MALI_PLATFORM_HI3650
-source "drivers/gpu/arm/r12p1-04bet0/Kconfig"
+if MALI_PLATFORM_HI6250
+source "drivers/gpu/arm/r20p0-01rel0/Kconfig"
 endif
 
-if MALI_PLATFORM_HI6250
-source "drivers/gpu/arm/r12p1-04bet0/Kconfig"
+if MALI_PLATFORM_HI3650
+source "drivers/gpu/arm/r20p0-01rel0/Kconfig"
 endif
 
 if MALI_PLATFORM_HI3660
-source "drivers/gpu/arm/bifrost-r2p0-02dev0/Kconfig"
 endif
 
 if MALI_PLATFORM_KIRIN970
-source "drivers/gpu/arm/bifrost-r0p0-06rel0/Kconfig"
 endif
 
 endmenu

@@ -34,10 +34,8 @@ static int g_acl_ctrl = 2;
 
 #define AMOLED_CHECK_INT
 
-#ifdef CONFIG_HUAWEI_TS
 #define TP_RS_CALL 1
 extern bool g_lcd_control_tp_power;
-#endif
 
 enum {
 	HBM_DEBUG = 0,
@@ -1039,11 +1037,9 @@ static int mipi_samsung_S6E3HA3X02_panel_on(struct platform_device *pdev)
 		{DTYPE_DCS_WRITE1, 0, 200, WAIT_TYPE_US,
 			sizeof(acl_mode_sel), acl_mode_sel},
 	};
-#if defined (CONFIG_HUAWEI_DSM)
 	static struct lcd_reg_read_t lcd_status_reg[] = {
 		{0x0A, 0xB4, 0xFF, "lcd power state"},
 	};
-#endif
 
 	if (NULL == pdev) {
 		HISI_FB_ERR("NULL Pointer!\n");
@@ -1065,6 +1061,7 @@ static int mipi_samsung_S6E3HA3X02_panel_on(struct platform_device *pdev)
 
 
 	if (pinfo->lcd_init_step == LCD_INIT_POWER_ON) {
+		LOG_JANK_D(JLID_KERNEL_LCD_POWER_ON, "%s", "JL_KERNEL_LCD_POWER_ON");
 		HISI_FB_INFO("Init power on.\n");
 		/* lcd pinctrl normal */
 		pinctrl_cmds_tx(pdev, lcd_pinctrl_normal_cmds,
@@ -1088,13 +1085,11 @@ static int mipi_samsung_S6E3HA3X02_panel_on(struct platform_device *pdev)
 	} else if (pinfo->lcd_init_step == LCD_INIT_MIPI_LP_SEND_SEQUENCE) {
 		HISI_FB_INFO("Init lcd_init_step is lp send mode.\n");
 
-#ifdef CONFIG_HUAWEI_TS
 		if (TP_RS_CALL != g_debug_enable_lcd_sleep_in) { //control touch timing
 			HISI_FB_INFO("TP resume and after resume\n");
 			error = ts_power_control_notify(TS_RESUME_DEVICE, SHORT_SYNC_TIMEOUT);
 			error = ts_power_control_notify(TS_AFTER_RESUME, NO_SYNC_TIMEOUT);
 		}
-#endif
 		/* lcd gpio normal */
 		mdelay(10);
 		gpio_cmds_tx(lcd_gpio_reset_cmds, \
@@ -1111,10 +1106,8 @@ static int mipi_samsung_S6E3HA3X02_panel_on(struct platform_device *pdev)
 			g_acl_ctrl = 0;
 		}
 
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_check_status_and_report_by_dsm(lcd_status_reg, \
 			ARRAY_SIZE(lcd_status_reg), mipi_dsi0_base);
-#endif
 		g_debug_enable = true;
 		pinfo->lcd_init_step = LCD_INIT_MIPI_HS_SEND_SEQUENCE;
 	} else if (pinfo->lcd_init_step == LCD_INIT_MIPI_HS_SEND_SEQUENCE) {
@@ -1195,6 +1188,7 @@ static int mipi_samsung_S6E3HA3X02_panel_off(struct platform_device *pdev)
 #endif
 
 	if (pinfo->lcd_uninit_step == LCD_UNINIT_MIPI_HS_SEND_SEQUENCE) {
+		LOG_JANK_D(JLID_KERNEL_LCD_POWER_OFF, "%s", "JL_KERNEL_LCD_POWER_OFF");
 		HISI_FB_INFO("display off(download display off sequence).\n");
 		/* backlight off */
 		/* hisi_lcd_backlight_off(pdev); */
@@ -1245,7 +1239,6 @@ static int mipi_samsung_S6E3HA3X02_panel_off(struct platform_device *pdev)
 				ARRAY_SIZE(lcd_pinctrl_lowpower_cmds));
 		}
 
-#ifdef CONFIG_HUAWEI_TS
 			/*if g_debug_enable_lcd_sleep_in == 1, it means don't turn off TP/LCD power
 			but only let lcd get into sleep.*/
 			if (TP_RS_CALL != g_debug_enable_lcd_sleep_in) {
@@ -1253,7 +1246,6 @@ static int mipi_samsung_S6E3HA3X02_panel_off(struct platform_device *pdev)
 				error = ts_power_control_notify(TS_BEFORE_SUSPEND, SHORT_SYNC_TIMEOUT);
 				error = ts_power_control_notify(TS_SUSPEND_DEVICE, SHORT_SYNC_TIMEOUT);
 			}
-#endif
 
 	} else {
 		HISI_FB_ERR("failed to uninit lcd!\n");
@@ -1324,6 +1316,7 @@ static int mipi_samsung_S6E3HA3X02_panel_set_backlight(struct platform_device *p
 
 	if (unlikely(g_debug_enable)) {
 		HISI_FB_INFO("Power on, First set brightness to %d\n", bl_level);
+		LOG_JANK_D(JLID_KERNEL_LCD_BACKLIGHT_ON, "JL_KERNEL_LCD_BACKLIGHT_ON,%u", bl_level);
 		g_debug_enable = false;
 	}
 
@@ -2295,9 +2288,7 @@ static int mipi_samsung_S6E3HA3X02_probe(struct platform_device *pdev)
 	uint32_t lcd_display_type = 0;
 	int support_mode = 0;
 
-#ifdef CONFIG_HUAWEI_TS
 	g_lcd_control_tp_power = true;	//not use fb_notify to control touch timing.
-#endif
 
 	np = of_find_compatible_node(NULL, NULL, DTS_COMP_SAMSUNG_S6E3HA3X02);
 	if (!np) {

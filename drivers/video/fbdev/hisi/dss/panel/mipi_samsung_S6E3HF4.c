@@ -19,11 +19,13 @@
 
 #define DTS_COMP_SAMSUNG_S6E3HF4 "hisilicon,mipi_samsung_S6E3HF4"
 
+//#define AMOLED_CHECK_INT
+
 static struct hisi_fb_panel_data samsung_s6e3hf4_panel_data;
 static bool g_debug_enable = false;
 extern int fastboot_set_needed;
 static int g_hbm_mode = 0;
-static bool lcd_rs_poweroff = false;
+static bool lcd_rs_poweroff = true;
 
 static bool g_display_on = false;
 static struct hisi_fb_panel_data g_panel_data;
@@ -132,15 +134,18 @@ static struct dsi_cmd_desc display_on_cmds[] = {
 /*dsc setting*/
 	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
 		sizeof(test_key_enable_0), test_key_enable_0},
-/*errflag setting*/
-	{DTYPE_DCS_WRITE1, 0, 200, WAIT_TYPE_US,
-		sizeof(errflag_setting), errflag_setting},
 	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
 		sizeof(test_key_enable_1), test_key_enable_1},
-	{DTYPE_GEN_LWRITE, 0, 10, WAIT_TYPE_MS,
+	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
 		sizeof(pps_setting), pps_setting},
 	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
 		sizeof(compression_mode_enable), compression_mode_enable},
+	{DTYPE_DCS_WRITE1, 0, 200, WAIT_TYPE_US,
+		sizeof(errflag_setting), errflag_setting},
+	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
+		sizeof(test_key_disable_1), test_key_disable_1},
+	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
+		sizeof(test_key_disable_0), test_key_disable_0},
 	{DTYPE_DCS_WRITE, 0, 10, WAIT_TYPE_MS,
 		sizeof(exit_sleep), exit_sleep},
 	{DTYPE_DCS_WRITE1, 0, 200, WAIT_TYPE_US,
@@ -149,16 +154,12 @@ static struct dsi_cmd_desc display_on_cmds[] = {
 		sizeof(dimming_ctrl), dimming_ctrl},
 	{DTYPE_DCS_WRITE1, 0, 115, WAIT_TYPE_MS,
 		sizeof(bl_disable), bl_disable},
-	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
-		sizeof(test_key_disable_1), test_key_disable_1},
-	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
-		sizeof(test_key_disable_0), test_key_disable_0},
 	{DTYPE_GEN_LWRITE, 0, 120, WAIT_TYPE_US,
 		sizeof(acl_mode), acl_mode},	
 };
 
 static struct dsi_cmd_desc display_on_cmd[] = {
-	{DTYPE_DCS_WRITE, 0, 20, WAIT_TYPE_MS,
+	{DTYPE_DCS_WRITE, 0, 500, WAIT_TYPE_US,
 		sizeof(display_on), display_on},
 };
 
@@ -201,7 +202,7 @@ static struct vcc_desc lcd_vcc_enable_cmds[] = {
 	/* vci enable */
 	{DTYPE_VCC_ENABLE, VCC_LCDANALOG_NAME, &vcc_lcdanalog, 0, 0, WAIT_TYPE_MS, 3},
 	/* vddio enable */
-	{DTYPE_VCC_ENABLE, VCC_LCDIO_NAME, &vcc_lcdio, 0, 0, WAIT_TYPE_MS, 3},
+	{DTYPE_VCC_ENABLE, VCC_LCDIO_NAME, &vcc_lcdio, 0, 0, WAIT_TYPE_MS, 12},
 };
 
 static struct vcc_desc lcd_vcc_disable_cmds[] = {
@@ -270,26 +271,21 @@ static struct gpio_desc lcd_gpio_free_cmds[] = {
 
 static struct gpio_desc lcd_gpio_normal_cmds[] = {
 	/* reset */
-	{DTYPE_GPIO_OUTPUT, WAIT_TYPE_MS, 15,
-		GPIO_LCD_RESET_NAME, &gpio_lcd_reset, 1},
-	{DTYPE_GPIO_OUTPUT, WAIT_TYPE_MS, 5,
+	{DTYPE_GPIO_OUTPUT, WAIT_TYPE_MS, 2,
 		GPIO_LCD_RESET_NAME, &gpio_lcd_reset, 0},
-	{DTYPE_GPIO_OUTPUT, WAIT_TYPE_MS, 15,
+	{DTYPE_GPIO_OUTPUT, WAIT_TYPE_MS, 12,
 		GPIO_LCD_RESET_NAME, &gpio_lcd_reset, 1},
 	/* id */
-	{DTYPE_GPIO_INPUT, WAIT_TYPE_MS, 1,
+	{DTYPE_GPIO_INPUT, WAIT_TYPE_US, 0,
 		GPIO_LCD_ID0_NAME, &gpio_lcd_id0, 0},
 	/*err flag*/
-	{DTYPE_GPIO_INPUT, WAIT_TYPE_MS, 1,
+	{DTYPE_GPIO_INPUT, WAIT_TYPE_US, 0,
 		GPIO_LCD_ERR_FLAG_NAME, &gpio_lcd_err_flag, 0},
 };
 
 static struct gpio_desc lcd_gpio_lowpower_cmds[] = {
 	/* reset */
-	{DTYPE_GPIO_OUTPUT, WAIT_TYPE_MS, 10,
-		GPIO_LCD_RESET_NAME, &gpio_lcd_reset, 0},
-	/* reset input */
-	{DTYPE_GPIO_INPUT, WAIT_TYPE_US, 100,
+	{DTYPE_GPIO_OUTPUT, WAIT_TYPE_MS, 2,
 		GPIO_LCD_RESET_NAME, &gpio_lcd_reset, 0},
 };
 
@@ -305,6 +301,10 @@ static struct gpio_desc lcd_gpio_sleep_request_cmds[] = {
 		GPIO_LCD_ID0_NAME, &gpio_lcd_id0, 0},
 };
 
+static struct work_struct errflag_detect_work;
+
+
+
 /*******************************************************************************
 **
 */
@@ -316,7 +316,7 @@ static int mipi_samsung_s6e3hf4_set_fastboot(struct platform_device *pdev)
 	hisifd = platform_get_drvdata(pdev);
 	BUG_ON(hisifd == NULL);
 
-	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
+	HISI_FB_INFO("fb%d, +.\n", hisifd->index);
  
 	// lcd pinctrl normal
 	pinctrl_cmds_tx(pdev, lcd_pinctrl_normal_cmds,
@@ -329,7 +329,7 @@ static int mipi_samsung_s6e3hf4_set_fastboot(struct platform_device *pdev)
 	// backlight on
 	hisi_lcd_backlight_on(pdev);
 
-	HISI_FB_DEBUG("fb%d, -.\n", hisifd->index);
+	HISI_FB_INFO("fb%d, -.\n", hisifd->index);
 
 	return 0;
 }
@@ -339,15 +339,19 @@ static int mipi_samsung_s6e3hf4_on(struct platform_device *pdev)
 	struct hisi_fb_data_type *hisifd = NULL;
 	struct hisi_panel_info *pinfo = NULL;
 	char __iomem *mipi_dsi0_base = NULL;
-#if defined (CONFIG_HUAWEI_DSM)
 	struct lcd_reg_read_t lcd_status_reg[] = {
 		{0x0A, 0x98, 0xFF, "lcd power state"},
 	};
-#endif	
-	BUG_ON(pdev == NULL);
-	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if(pdev == NULL) {
+		HISI_FB_ERR("pdev is NULL!\n");
+		return -1;
+	}
 
+	hisifd = platform_get_drvdata(pdev);
+	if(hisifd == NULL){
+		HISI_FB_ERR("hisifd is NULL!\n");
+		return -1;
+	}
 	HISI_FB_INFO("fb%d, +!\n", hisifd->index);
 
 	pinfo = &(hisifd->panel_info);
@@ -370,10 +374,6 @@ static int mipi_samsung_s6e3hf4_on(struct platform_device *pdev)
 		pinctrl_cmds_tx(pdev, lcd_pinctrl_normal_cmds,
 			ARRAY_SIZE(lcd_pinctrl_normal_cmds));
 
-		// lcd gpio request
-		gpio_cmds_tx(lcd_gpio_request_cmds, \
-			ARRAY_SIZE(lcd_gpio_request_cmds));
-
 		// lcd gpio normal
 		gpio_cmds_tx(lcd_gpio_normal_cmds, \
 			ARRAY_SIZE(lcd_gpio_normal_cmds));
@@ -383,13 +383,10 @@ static int mipi_samsung_s6e3hf4_on(struct platform_device *pdev)
 
 		g_debug_enable = true;
 		
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_check_status_and_report_by_dsm(lcd_status_reg, \
 			ARRAY_SIZE(lcd_status_reg), mipi_dsi0_base);
-#endif
 		pinfo->lcd_init_step = LCD_INIT_MIPI_HS_SEND_SEQUENCE;
 	} else if (pinfo->lcd_init_step == LCD_INIT_MIPI_HS_SEND_SEQUENCE) {
-
 	} else {
 		HISI_FB_ERR("failed to init lcd!\n");
 	}
@@ -407,14 +404,18 @@ static int mipi_samsung_s6e3hf4_off(struct platform_device *pdev)
 	struct hisi_fb_data_type *hisifd = NULL;
 	struct hisi_panel_info *pinfo = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (pdev == NULL) {
+		HISI_FB_ERR("pdev is NULL!\n");
+		return -1;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
-#if defined (CONFIG_HUAWEI_DSM)
+	if(hisifd == NULL){
+		HISI_FB_ERR("hisifd is NULL!\n");
+		return -1;
+	}
 	struct lcd_reg_read_t lcd_mipi_detect[] = {
 		{0x05, 0x00, 0xFF, "lcd mipi detect"},
 	};
-#endif
 	HISI_FB_INFO("fb%d, +!\n", hisifd->index);
 
 	pinfo = &(hisifd->panel_info);
@@ -422,10 +423,8 @@ static int mipi_samsung_s6e3hf4_off(struct platform_device *pdev)
 	if (pinfo->lcd_uninit_step == LCD_UNINIT_MIPI_HS_SEND_SEQUENCE) {
 		LOG_JANK_D(JLID_KERNEL_LCD_POWER_OFF, "%s", "JL_KERNEL_LCD_POWER_OFF");
 		HISI_FB_INFO("display off(download display off sequence).\n");
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_status_report_by_dsm(lcd_mipi_detect, \
 			ARRAY_SIZE(lcd_mipi_detect), hisifd->mipi_dsi0_base, 10);
-#endif
 		/* backlight off */
 		hisi_lcd_backlight_off(pdev);
 
@@ -442,15 +441,11 @@ static int mipi_samsung_s6e3hf4_off(struct platform_device *pdev)
 			gpio_cmds_tx(lcd_gpio_lowpower_cmds, \
 				ARRAY_SIZE(lcd_gpio_lowpower_cmds));
 
-			// lcd gpio free
-			gpio_cmds_tx(lcd_gpio_free_cmds, \
-				ARRAY_SIZE(lcd_gpio_free_cmds));
-
-			// lcd pinctrl lowpower
-			pinctrl_cmds_tx(pdev, lcd_pinctrl_lowpower_cmds,
-				ARRAY_SIZE(lcd_pinctrl_lowpower_cmds));
-
 			if (lcd_rs_poweroff) {
+				// lcd pinctrl lowpower
+				pinctrl_cmds_tx(pdev, lcd_pinctrl_lowpower_cmds,
+					ARRAY_SIZE(lcd_pinctrl_lowpower_cmds));
+
 				HISI_FB_INFO("display off(regulator disabling).\n");
 				vcc_cmds_tx(pdev, lcd_vcc_disable_cmds, \
 					ARRAY_SIZE(lcd_vcc_disable_cmds));
@@ -462,6 +457,7 @@ static int mipi_samsung_s6e3hf4_off(struct platform_device *pdev)
 			// lcd gpio lowpower
 			gpio_cmds_tx(lcd_gpio_lowpower_cmds, \
 				ARRAY_SIZE(lcd_gpio_lowpower_cmds));
+
 			// lcd gpio free
 			gpio_cmds_tx(lcd_gpio_free_cmds, \
 				ARRAY_SIZE(lcd_gpio_free_cmds));
@@ -472,8 +468,8 @@ static int mipi_samsung_s6e3hf4_off(struct platform_device *pdev)
 
 			vcc_cmds_tx(pdev, lcd_vcc_disable_cmds, \
 				ARRAY_SIZE(lcd_vcc_disable_cmds));
+			ts_thread_stop_notify();
 		}
-
 	} else {
 		HISI_FB_ERR("failed to uninit lcd!\n");
 	}
@@ -486,7 +482,10 @@ static int mipi_samsung_s6e3hf4_remove(struct platform_device *pdev)
 {
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (!pdev){
+		HISI_FB_INFO("pdev is NULL.\n");
+		return 0;
+	}
 	hisifd = platform_get_drvdata(pdev);
 
 	if (!hisifd) {
@@ -535,6 +534,10 @@ static int mipi_samsung_s6e3hf4_set_brightness(struct platform_device *pdev, uin
 		mipi_dsi_cmds_tx(display_on_cmd, \
 			ARRAY_SIZE(display_on_cmd), hisifd->mipi_dsi0_base);
 		g_display_on = true;
+	}
+
+	if (bl_level == 0) {
+		HISI_FB_INFO("Set brightness to 0!\n");
 	}
 
 	if (unlikely(g_debug_enable)) {
@@ -591,7 +594,8 @@ static ssize_t mipi_samsung_s6e3hf4_sleep_ctrl_show(struct platform_device *pdev
 	return ret;
 }
 
-static ssize_t mipi_samsung_s6e3hf4_sleep_ctrl_store(struct platform_device *pdev, char *buf)
+static ssize_t mipi_samsung_s6e3hf4_sleep_ctrl_store(struct platform_device *pdev,
+	const char *buf, size_t count)
 {
 	ssize_t ret = 0;
 	unsigned long val = 0;
@@ -657,26 +661,13 @@ static ssize_t mipi_samsung_S6E3HF4_panel_acl_ctrl_store(struct platform_device 
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 	char __iomem *mipi_dsi0_base = NULL;
-	unsigned int value[100];
+	unsigned int value[10] = {0};
 	char *token, *cur;
 	int i = 0;
-	char payload_acl_para[6] = {0};
-	struct dsi_cmd_desc acl_debug_cmd[] = {
-		{DTYPE_GEN_LWRITE, 0, 10, WAIT_TYPE_US,
-			sizeof(test_key_enable_0), test_key_enable_0},
-		{DTYPE_GEN_LWRITE, 0, 10, WAIT_TYPE_US,
-			sizeof(payload_acl_para), payload_acl_para},
-		{DTYPE_GEN_LWRITE, 0, 10, WAIT_TYPE_US,
-			sizeof(test_key_disable_0), test_key_disable_0},
-	};
 	char payload_acl_switch[2] = {0};
 	struct dsi_cmd_desc acl_switch_cmd[] = {
-		{DTYPE_GEN_LWRITE, 0, 10, WAIT_TYPE_US,
-			sizeof(test_key_enable_0), test_key_enable_0},
 		{DTYPE_DCS_WRITE1, 0, 10, WAIT_TYPE_US,
 			sizeof(payload_acl_switch), payload_acl_switch},
-		{DTYPE_GEN_LWRITE, 0, 10, WAIT_TYPE_US,
-			sizeof(test_key_disable_0), test_key_disable_0},
 	};
 
 	if (NULL == pdev) {
@@ -700,38 +691,36 @@ static ssize_t mipi_samsung_S6E3HF4_panel_acl_ctrl_store(struct platform_device 
 	cur = buf;
 	while (token = strsep(&cur, ",")) {
 		value[i++] = simple_strtol(token, NULL, 0);
+		if(i >= 10) {
+			HISI_FB_ERR("out of range of value[10] buf!\n");
+			return count;
+		}
 	}
 
 	if (ACL_DEBUG == value[0]) { /* debug */
-		acl_debug_cmd[1].payload[0] = 0xb4;
-		acl_debug_cmd[1].payload[1] = 0x50;
-		acl_debug_cmd[1].payload[2] = value[1];
-		acl_debug_cmd[1].payload[3] = value[2];
-		acl_debug_cmd[1].payload[4] = value[3];
-		acl_debug_cmd[1].payload[5] = value[4];
-		mipi_dsi_cmds_tx(acl_debug_cmd, ARRAY_SIZE(acl_debug_cmd), mipi_dsi0_base);
+
 	} else if (ACL_SETTING == value[0]) {
 		if (ACL_OFF == value[1]) {
-			acl_switch_cmd[1].payload[0] = 0x55;
-			acl_switch_cmd[1].payload[1] = ACL_OFF;
+			acl_switch_cmd[0].payload[0] = 0x55;
+			acl_switch_cmd[0].payload[1] = ACL_OFF;
 			mipi_dsi_cmds_tx(acl_switch_cmd, ARRAY_SIZE(acl_switch_cmd), mipi_dsi0_base);
 			g_acl_ctrl = ACL_OFF;
 			HISI_FB_INFO("ACL OFF\n");
 		} else if (ACL_OFFSET1_ON == value[1]) {
-			acl_switch_cmd[1].payload[0] = 0x55;
-			acl_switch_cmd[1].payload[1] = ACL_OFFSET1_ON;
+			acl_switch_cmd[0].payload[0] = 0x55;
+			acl_switch_cmd[0].payload[1] = ACL_OFFSET1_ON;
 			mipi_dsi_cmds_tx(acl_switch_cmd, ARRAY_SIZE(acl_switch_cmd), mipi_dsi0_base);
 			g_acl_ctrl = ACL_OFFSET1_ON;
 			HISI_FB_INFO("ACL OFFSET 1 ON\n");
 		} else if (ACL_OFFSET2_ON == value[1]) {
-			acl_switch_cmd[1].payload[0] = 0x55;
-			acl_switch_cmd[1].payload[1] = ACL_OFFSET2_ON;
+			acl_switch_cmd[0].payload[0] = 0x55;
+			acl_switch_cmd[0].payload[1] = ACL_OFFSET2_ON;
 			mipi_dsi_cmds_tx(acl_switch_cmd, ARRAY_SIZE(acl_switch_cmd), mipi_dsi0_base);
 			g_acl_ctrl = ACL_OFFSET2_ON;
 			HISI_FB_INFO("ACL OFFSET 2 ON\n");
 		} else if (ACL_OFFSET3_ON == value[1]) {
-			acl_switch_cmd[1].payload[0] = 0x55;
-			acl_switch_cmd[1].payload[1] = ACL_OFFSET3_ON;
+			acl_switch_cmd[0].payload[0] = 0x55;
+			acl_switch_cmd[0].payload[1] = ACL_OFFSET3_ON;
 			mipi_dsi_cmds_tx(acl_switch_cmd, ARRAY_SIZE(acl_switch_cmd), mipi_dsi0_base);
 			g_acl_ctrl = ACL_OFFSET3_ON;
 			HISI_FB_INFO("ACL OFFSET 3 ON\n");
@@ -754,7 +743,11 @@ static ssize_t mipi_samsung_s6e3hf4_errflag_check(struct platform_device *pdev,
 
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if(pdev == NULL){
+		HISI_FB_ERR("pdev is null\n");
+		return -1;
+	}
+
 	hisifd = platform_get_drvdata(pdev);
 
 	if (!hisifd) {
@@ -1424,6 +1417,7 @@ static int mipi_samsung_s6e3hf4_probe(struct platform_device *pdev)
 		HISI_FB_ERR("platform_device_add_data failed!\n");
 		goto err_device_put;
 	}
+
 
 	hisi_fb_add_device(pdev);
 

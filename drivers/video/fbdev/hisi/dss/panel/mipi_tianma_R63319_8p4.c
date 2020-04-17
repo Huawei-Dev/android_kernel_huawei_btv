@@ -1243,11 +1243,9 @@ static int mipi_tianma_R63319_8p4_panel_on(struct platform_device *pdev)
 	char __iomem *acm_base = NULL;
 
 
-#if defined (CONFIG_HUAWEI_DSM)
 	static struct lcd_reg_read_t lcd_status_reg[] = {
 		{0x0A, 0x0C, 0xFF, "lcd power state"},
 	};
-#endif
 
 	if (NULL == pdev) {
 		HISI_FB_ERR("NULL Pointer!\n");
@@ -1286,9 +1284,7 @@ static int mipi_tianma_R63319_8p4_panel_on(struct platform_device *pdev)
 		lp8556_btv_init();
 		mipi_dsi_cmds_tx(lcd_init_display_on_cmds_otp, ARRAY_SIZE(lcd_init_display_on_cmds_otp), mipi_dsi0_base);
 		g_cabc_mode = CABC_UI_MODE;
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_check_status_and_report_by_dsm(lcd_status_reg, ARRAY_SIZE(lcd_status_reg), mipi_dsi0_base);
-#endif
 		g_debug_enable = 1;
 		pinfo->lcd_init_step = LCD_INIT_MIPI_HS_SEND_SEQUENCE;
 	} else if (pinfo->lcd_init_step == LCD_INIT_MIPI_HS_SEND_SEQUENCE) {
@@ -1851,17 +1847,11 @@ static int mipi_tianma_R63319_8p4_probe(struct platform_device *pdev)
 		pinfo->blpwm_input_ena = 1;
 
 
-#ifdef CONFIG_BACKLIGHT_10000
 	pinfo->bl_min = 157;
 	pinfo->bl_max = 9960;
 	pinfo->bl_default = 4000;
 	pinfo->blpwm_precision_type = BLPWM_PRECISION_10000_TYPE;
 	pinfo->blpwm_out_div_value = 7;//(18K/(7+1) = 2.25K)
-#else
-	pinfo->bl_min = 4;
-	pinfo->bl_max = 255;
-	pinfo->bl_default = 102;
-#endif
 
 	pinfo->vsync_ctrl_type = 0;// (VSYNC_CTRL_ISR_OFF | VSYNC_CTRL_MIPI_ULPS);
 

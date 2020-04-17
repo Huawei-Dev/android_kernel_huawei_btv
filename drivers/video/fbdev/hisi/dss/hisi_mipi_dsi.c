@@ -37,7 +37,6 @@ struct dsi_phy_seq_info dphy_seq_info[] = {
 	{750, 1500, 0, 0}
 };
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 static void get_dsi_phy_ctrl(struct hisi_fb_data_type *hisifd,
 	struct mipi_dsi_phy_ctrl *phy_ctrl)
 {
@@ -53,6 +52,8 @@ static void get_dsi_phy_ctrl(struct hisi_fb_data_type *hisifd,
 	uint32_t m_n =0;
 	uint32_t m_n_int =0;
 	uint64_t lane_clock = 0;
+	uint32_t m_pll_remainder[3] = {0};
+	uint32_t temp_min;
 
 	uint32_t accuracy = 0;
 	uint32_t unit_tx_byte_clk_hs = 0;
@@ -76,12 +77,19 @@ static void get_dsi_phy_ctrl(struct hisi_fb_data_type *hisifd,
 	uint32_t data_post_delay_reality = 0;
 	uint32_t data_pre_delay_reality = 0;
 
-	BUG_ON(phy_ctrl == NULL);
-	BUG_ON(hisifd == NULL);
+	if (NULL == phy_ctrl) {
+		HISI_FB_ERR("phy_ctrl is NULL");
+		return;
+	}
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 	pinfo = &(hisifd->panel_info);
 
 	dsi_bit_clk = pinfo->mipi.dsi_bit_clk_upt;
 	lane_clock = 2 * dsi_bit_clk;
+	HISI_FB_INFO("Expected : dsi_bit_clk = %d M, lane_clock = %d M\n", dsi_bit_clk, lane_clock);
 
 	// PLL parameters calculation
 	seq_info_count = ARRAY_SIZE(dphy_seq_info);
@@ -109,37 +117,54 @@ static void get_dsi_phy_ctrl(struct hisi_fb_data_type *hisifd,
 		q_pll = 1;
 		break;
 	}
-
-	m_n_int = lane_clock * q_pll * 1000000UL / DEFAULT_MIPI_CLK_RATE;
-	m_n = ((lane_clock * q_pll * 1000000UL * 1000UL / DEFAULT_MIPI_CLK_RATE) % 1000) * 10 / 1000;
-
-	if (m_n_int % 2 == 0) {
-		if (m_n * 6 >= 50) {
-			n_pll = 2;
-			m_pll = (m_n_int + 1) * n_pll;
-		} else if (m_n * 6 >= 30) {
-			n_pll = 3;
-			m_pll = m_n_int * n_pll + 2;
-		} else {
-			n_pll = 1;
-			m_pll = m_n_int * n_pll;
+	if(pinfo->mipi.phy_m_n_count_update) {
+		for (i = 0;i < 3;i++) {
+			n_pll = i + 1;
+			m_pll_remainder[i] = ((n_pll * lane_clock * 1000000UL * 1000UL / DEFAULT_MIPI_CLK_RATE) % 1000) * 10 / 1000;
 		}
+		temp_min = m_pll_remainder[0];
+		n_pll = 1;
+		for (i =1;i < 3;i++) {
+			if (temp_min > m_pll_remainder[i]) {
+				temp_min = m_pll_remainder[i];
+				n_pll = i + 1;
+			}
+		}
+		m_pll = n_pll * lane_clock * q_pll * 1000000UL / DEFAULT_MIPI_CLK_RATE;
+		HISI_FB_DEBUG("m_pll = %d n_pll  =  %d \n", m_pll,n_pll);
+
 	} else {
-		if (m_n * 6 >= 50) {
-			n_pll = 1;
-			m_pll = (m_n_int + 1) * n_pll;
-		} else if (m_n * 6 >= 30) {
-			n_pll = 1;
-			m_pll = (m_n_int + 1) * n_pll;
-		} else if (m_n * 6 >= 10) {
-			n_pll = 3;
-			m_pll = m_n_int * n_pll + 1;
+
+		m_n_int = lane_clock * q_pll * 1000000UL / DEFAULT_MIPI_CLK_RATE;
+		m_n = ((lane_clock * q_pll * 1000000UL * 1000UL / DEFAULT_MIPI_CLK_RATE) % 1000) * 10 / 1000;
+
+		if (m_n_int % 2 == 0) {
+			if (m_n * 6 >= 50) {
+				n_pll = 2;
+				m_pll = (m_n_int + 1) * n_pll;
+			} else if (m_n * 6 >= 30) {
+				n_pll = 3;
+				m_pll = m_n_int * n_pll + 2;
+			} else {
+				n_pll = 1;
+				m_pll = m_n_int * n_pll;
+			}
 		} else {
-			n_pll = 2;
-			m_pll = m_n_int * n_pll;
+			if (m_n * 6 >= 50) {
+				n_pll = 1;
+				m_pll = (m_n_int + 1) * n_pll;
+			} else if (m_n * 6 >= 30) {
+				n_pll = 1;
+				m_pll = (m_n_int + 1) * n_pll;
+			} else if (m_n * 6 >= 10) {
+				n_pll = 3;
+				m_pll = m_n_int * n_pll + 1;
+			} else {
+				n_pll = 2;
+				m_pll = m_n_int * n_pll;
+			}
 		}
 	}
-
 	if (m_pll <= 8) {
 		phy_ctrl->rg_pll_fbd_s = 1;
 		phy_ctrl->rg_pll_enswc = 0;
@@ -175,6 +200,7 @@ static void get_dsi_phy_ctrl(struct hisi_fb_data_type *hisifd,
 	phy_ctrl->rg_pll_pre_p = n_pll;
 
 	lane_clock = m_pll * (DEFAULT_MIPI_CLK_RATE / n_pll / q_pll);
+	HISI_FB_INFO("Config : lane_clock = %d\n", lane_clock);
 
 	accuracy = 10;
 	ui =  10 * 1000000000UL * accuracy / lane_clock;
@@ -271,12 +297,22 @@ static void get_dsi_phy_ctrl(struct hisi_fb_data_type *hisifd,
 	data_post_delay_reality = phy_ctrl->data_post_delay + 4;
 
 	phy_ctrl->clk_post_delay = phy_ctrl->data_t_hs_trial + ROUND1(clk_post, unit_tx_byte_clk_hs);
-	phy_ctrl->data_pre_delay = clk_pre_delay_reality + phy_ctrl->clk_t_lpx +
-		phy_ctrl->clk_t_hs_prepare + clk_t_hs_zero_reality + ROUND1(clk_pre, unit_tx_byte_clk_hs) ;
 
-	//
+	//if use 1080 X 2160 resolution panel,need reduce the lp11 time,and disable noncontinue mode
+	if(MIPI_SHORT_LP11 == pinfo->mipi.lp11_flag) {
+		phy_ctrl->data_pre_delay = 0;
+	} else {
+		phy_ctrl->data_pre_delay = clk_pre_delay_reality + phy_ctrl->clk_t_lpx +
+		phy_ctrl->clk_t_hs_prepare + clk_t_hs_zero_reality + ROUND1(clk_pre, unit_tx_byte_clk_hs) ;
+	}
 	clk_post_delay_reality = phy_ctrl->clk_post_delay + 4;
-	data_pre_delay_reality = phy_ctrl->data_pre_delay + 2;
+
+	//if use 1080 X 2160 resolution panel,need reduce the lp11 time,and disable noncontinue mode
+	if(MIPI_SHORT_LP11 == pinfo->mipi.lp11_flag) {
+		data_pre_delay_reality = 0;
+	} else {
+		data_pre_delay_reality = phy_ctrl->data_pre_delay + 2;
+	}
 
 	phy_ctrl->clk_lane_lp2hs_time = clk_pre_delay_reality + phy_ctrl->clk_t_lpx +
 		phy_ctrl->clk_t_hs_prepare + clk_t_hs_zero_reality + 3;
@@ -284,10 +320,16 @@ static void get_dsi_phy_ctrl(struct hisi_fb_data_type *hisifd,
 	phy_ctrl->data_lane_lp2hs_time = data_pre_delay_reality + phy_ctrl->data_t_lpx +
 		phy_ctrl->data_t_hs_prepare + data_t_hs_zero_reality + 3;
 	phy_ctrl->data_lane_hs2lp_time = data_post_delay_reality + phy_ctrl->data_t_hs_trial + 3;
-	phy_ctrl->phy_stop_wait_time = clk_post_delay_reality +
-		phy_ctrl->clk_t_hs_trial + ROUND1(clk_t_hs_exit, unit_tx_byte_clk_hs) -
-		(data_post_delay_reality + phy_ctrl->data_t_hs_trial) + 3;
 
+	//if use 1080 X 2160 resolution panel,need reduce the lp11 time,and disable noncontinue mode
+	if(MIPI_SHORT_LP11 == pinfo->mipi.lp11_flag) {
+		phy_ctrl->phy_stop_wait_time = phy_ctrl->clk_t_hs_trial + ROUND1(clk_t_hs_exit, unit_tx_byte_clk_hs) -
+			(data_post_delay_reality + phy_ctrl->data_t_hs_trial);
+	} else {
+		phy_ctrl->phy_stop_wait_time = clk_post_delay_reality +
+			phy_ctrl->clk_t_hs_trial + ROUND1(clk_t_hs_exit, unit_tx_byte_clk_hs) -
+			(data_post_delay_reality + phy_ctrl->data_t_hs_trial) + 3;
+	}
 	phy_ctrl->lane_byte_clk = lane_clock / 8;
 	phy_ctrl->clk_division = (((phy_ctrl->lane_byte_clk / 2) % pinfo->mipi.max_tx_esc_clk) > 0) ?
 		(phy_ctrl->lane_byte_clk / 2 / pinfo->mipi.max_tx_esc_clk + 1) :
@@ -335,178 +377,151 @@ static void get_dsi_phy_ctrl(struct hisi_fb_data_type *hisifd,
 		phy_ctrl->data_lane_hs2lp_time,
 		phy_ctrl->phy_stop_wait_time);
 }
-#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-static void get_dsi_phy_ctrl(struct hisi_fb_data_type *hisifd,
-	struct mipi_dsi_phy_ctrl *phy_ctrl)
+/*lint -e834 */
+static uint32_t get_data_t_hs_prepare(struct hisi_fb_data_type *hisifd, uint32_t accuracy, uint32_t ui)
 {
-	struct hisi_panel_info *pinfo = NULL;
-	uint32_t dsi_bit_clk = 0;
+	struct hisi_panel_info *pinfo;
+	uint32_t data_t_hs_prepare = 0;
 
-	uint32_t ui = 0;
-	uint32_t m_pll = 0;
-	uint32_t n_pll = 0;
-	uint32_t m_n_fract =0;
-	uint32_t m_n_int =0;
-	uint64_t lane_clock = 0;
+	if ( NULL == hisifd) {
+		HISI_FB_ERR("hisifd is null.\n");
+		return 0;
+	}
+	pinfo = &(hisifd->panel_info);
+
+	if ( NULL == pinfo) {
+		HISI_FB_ERR("pinfo is null.\n");
+		return 0;
+	}
+
+	if (pinfo->mipi.data_t_hs_prepare_adjust == 0)
+		pinfo->mipi.data_t_hs_prepare_adjust = 35;
+
+	data_t_hs_prepare = ((400  * accuracy + 4 * ui + pinfo->mipi.data_t_hs_prepare_adjust * ui) <= (850 * accuracy + 6 * ui - 8 * ui)) ?
+		(400  * accuracy + 4 * ui + pinfo->mipi.data_t_hs_prepare_adjust * ui) : (850 * accuracy + 6 * ui - 8 * ui);
+
+	return data_t_hs_prepare;
+}
+
+static uint32_t get_data_pre_delay(uint32_t lp11_flag, struct mipi_dsi_phy_ctrl *phy_ctrl, uint32_t clk_pre)
+{
+	uint32_t data_pre_delay = 0;
+	//if use 1080 X 2160 resolution panel,need reduce the lp11 time,and disable noncontinue mode
+	if (MIPI_SHORT_LP11 != lp11_flag) {
+		data_pre_delay = phy_ctrl->clk_pre_delay + 2 + phy_ctrl->clk_t_lpx +
+			phy_ctrl->clk_t_hs_prepare + phy_ctrl->clk_t_hs_zero + 8 + clk_pre ;
+	}
+	return data_pre_delay;
+}
+
+static uint32_t get_data_pre_delay_reality(uint32_t lp11_flag, struct mipi_dsi_phy_ctrl *phy_ctrl)
+{
+	uint32_t data_pre_delay_reality = 0;
+	//if use 1080 X 2160 resolution panel,need reduce the lp11 time,and disable noncontinue mode
+	if (MIPI_SHORT_LP11 != lp11_flag) {
+		data_pre_delay_reality = phy_ctrl->data_pre_delay + 5;
+	}
+	return data_pre_delay_reality;
+}
+
+static uint32_t get_clk_post_delay_reality(uint32_t lp11_flag, struct mipi_dsi_phy_ctrl *phy_ctrl)
+{
+	uint32_t clk_post_delay_reality = 0;
+	//if use 1080 X 2160 resolution panel,need reduce the lp11 time,and disable noncontinue mode
+	if (MIPI_SHORT_LP11 != lp11_flag) {
+		clk_post_delay_reality = phy_ctrl->clk_post_delay + 4;
+	}
+	return clk_post_delay_reality;
+}
+
+static void get_dsi_dphy_ctrl(struct hisi_fb_data_type *hisifd, struct mipi_dsi_phy_ctrl *phy_ctrl)
+{
+	struct hisi_panel_info *pinfo;
+	uint32_t dsi_bit_clk;
+
+	uint32_t ui;
+	uint32_t m_pll;
+	uint32_t n_pll;
+	uint64_t lane_clock;
 	uint64_t vco_div = 1;
 
-	uint32_t accuracy = 0;
-	uint32_t unit_tx_byte_clk_hs = 0;
-	uint32_t clk_post = 0;
-	uint32_t clk_pre =0;
-	uint32_t clk_t_hs_exit = 0;
-	uint32_t clk_pre_delay = 0;
-	uint32_t clk_t_hs_prepare = 0;
-	uint32_t clk_t_lpx = 0;
-	uint32_t clk_t_hs_zero = 0;
-	uint32_t clk_t_hs_trial = 0;
-	uint32_t data_post_delay = 0;
-	uint32_t data_t_hs_prepare = 0;
-	uint32_t data_t_hs_zero = 0;
-	uint32_t data_t_hs_trial = 0;
-	uint32_t data_t_lpx = 0;
-	uint32_t clk_pre_delay_reality = 0;
-	uint32_t clk_t_hs_zero_reality = 0;
-	uint32_t clk_post_delay_reality = 0;
-	uint32_t data_t_hs_zero_reality = 0;
-	uint32_t data_post_delay_reality = 0;
-	uint32_t data_pre_delay_reality = 0;
+	uint32_t accuracy;
+	uint32_t unit_tx_byte_clk_hs;
+	uint32_t clk_post;
+	uint32_t clk_pre;
+	uint32_t clk_t_hs_exit;
+	uint32_t clk_pre_delay;
+	uint32_t clk_t_hs_prepare;
+	uint32_t clk_t_lpx;
+	uint32_t clk_t_hs_zero;
+	uint32_t clk_t_hs_trial;
+	uint32_t data_post_delay;
+	uint32_t data_t_hs_prepare;
+	uint32_t data_t_hs_zero;
+	uint32_t data_t_hs_trial;
+	uint32_t data_t_lpx;
 
-	BUG_ON(phy_ctrl == NULL);
-	BUG_ON(hisifd == NULL);
+	if (NULL == phy_ctrl || NULL == hisifd) {
+		HISI_FB_ERR("hisifd or phyctrl is null.\n");
+		return;
+	}
 	pinfo = &(hisifd->panel_info);
 
 	dsi_bit_clk = pinfo->mipi.dsi_bit_clk_upt;
-	lane_clock = 2 * dsi_bit_clk;
-	HISI_FB_DEBUG("Expected : lane_clock = %llu M\n", lane_clock);
+	lane_clock = (uint64_t)(2 * dsi_bit_clk);
+	HISI_FB_INFO("Expected : lane_clock = %llu M\n", lane_clock);
 
 	/************************  PLL parameters config  *********************/
 	//chip spec :
 	//If the output data rate is below 320 Mbps, RG_BNAD_SEL should be set to 1.
 	//At this mode a post divider of 1/4 will be applied to VCO.
 	if ((320 <= lane_clock) && (lane_clock <= 2500)) {
-		phy_ctrl->rg_band_sel = 0;	//0x1E[2]
+		phy_ctrl->rg_band_sel = 0;
 		vco_div = 1;
-	} else if ((80 <= lane_clock) && (lane_clock <320)) {
+	} else if ((80 <= lane_clock) && (lane_clock < 320)) {
 		phy_ctrl->rg_band_sel = 1;
 		vco_div = 4;
 	} else {
 		HISI_FB_ERR("80M <= lane_clock< = 2500M, not support lane_clock = %llu M\n", lane_clock);
 	}
 
-	m_n_int = lane_clock * vco_div * 1000000UL / DEFAULT_MIPI_CLK_RATE;
-	m_n_fract = ((lane_clock * vco_div * 1000000UL * 1000UL / DEFAULT_MIPI_CLK_RATE) % 1000) * 10 / 1000;
-
-	if (m_n_int % 2 == 0) {
-		if (m_n_fract * 6 >= 50) {
-			n_pll = 2;
-			m_pll = (m_n_int + 1) * n_pll;
-		} else if (m_n_fract * 6 >= 30) {
-			n_pll = 3;
-			m_pll = m_n_int * n_pll + 2;
-		} else {
-			n_pll = 1;
-			m_pll = m_n_int * n_pll;
-		}
-	} else {
-		if (m_n_fract * 6 >= 50) {
-			n_pll = 1;
-			m_pll = (m_n_int + 1) * n_pll;
-		} else if (m_n_fract * 6 >= 30) {
-			n_pll = 1;
-			m_pll = (m_n_int + 1) * n_pll;
-		} else if (m_n_fract * 6 >= 10) {
-			n_pll = 3;
-			m_pll = m_n_int * n_pll + 1;
-		} else {
-			n_pll = 2;
-			m_pll = m_n_int * n_pll;
-		}
-	}
-
-	//if set rg_pll_enswc=1, rg_pll_fbd_s can't be 0
-	if (m_pll <= 8) {
-		phy_ctrl->rg_pll_fbd_s = 1;
-		phy_ctrl->rg_pll_enswc = 0;
-
-		if (m_pll % 2 == 0) {
-			phy_ctrl->rg_pll_fbd_p = m_pll / 2;
-		} else {
-			if (n_pll == 1) {
-				n_pll *= 2;
-				phy_ctrl->rg_pll_fbd_p = (m_pll  * 2) / 2;
-			} else {
-				HISI_FB_ERR("phy m_pll not support!m_pll = %d\n", m_pll);
-				return;
-			}
-		}
-	} else if (m_pll <= 300) {
-		if (m_pll % 2 == 0)
-			phy_ctrl->rg_pll_enswc = 0;
-		else
-			phy_ctrl->rg_pll_enswc = 1;
-
-		phy_ctrl->rg_pll_fbd_s = 1;
-		phy_ctrl->rg_pll_fbd_p = m_pll / 2;
-	} else if (m_pll <= 315) {
-		phy_ctrl->rg_pll_fbd_p = 150;
-		phy_ctrl->rg_pll_fbd_s = m_pll - 2 * phy_ctrl->rg_pll_fbd_p;
-		phy_ctrl->rg_pll_enswc = 1;
-	} else {
-		HISI_FB_ERR("phy m_pll not support!m_pll = %d\n", m_pll);
-		return;
-	}
-
-	phy_ctrl->rg_pll_pre_p = n_pll;
+	n_pll = 2;
+	m_pll = (uint32_t)(lane_clock * vco_div * n_pll * 1000000UL / DEFAULT_MIPI_CLK_RATE);
 
 	lane_clock = m_pll * (DEFAULT_MIPI_CLK_RATE / n_pll) / vco_div;
-	HISI_FB_DEBUG("Config : lane_clock = %llu\n", lane_clock);
+	if (lane_clock > 750000000) {
+		phy_ctrl->rg_cp = 3;
+	} else if ((80000000 <= lane_clock) && (lane_clock <= 750000000)) {
+		phy_ctrl->rg_cp = 1;
+	} else {
+		HISI_FB_ERR("80M <= lane_clock< = 2500M, not support lane_clock = %llu M.\n", lane_clock);
+	}
 
-	//FIXME :
-	phy_ctrl->rg_pll_cp = 1;		//0x16[7:5]
-	phy_ctrl->rg_pll_cp_p = 3;		//0x1E[7:5]
+	//chip spec :
+	phy_ctrl->rg_pre_div = n_pll - 1;
+	phy_ctrl->rg_div = m_pll;
+	phy_ctrl->rg_0p8v = 0;
+	phy_ctrl->rg_2p5g = 1;
+	phy_ctrl->rg_320m = 0;
+	phy_ctrl->rg_lpf_r = 0;
 
-	//test_code_0x14 other parameters config
-	phy_ctrl->rg_pll_enbwt = 0;	//0x14[2]
-	phy_ctrl->rg_pll_chp = 0;		//0x14[1:0]
-
-	//test_code_0x16 other parameters config,  0x16[3:2] reserved
-	phy_ctrl->rg_pll_lpf_cs = 0;	//0x16[4]
-	phy_ctrl->rg_pll_refsel = 1;	//0x16[1:0]
-
-	//test_code_0x1E other parameters config
-	phy_ctrl->reload_sel = 1;			//0x1E[4]
-	phy_ctrl->rg_phase_gen_en = 1;	//0x1E[3]
-	phy_ctrl->pll_power_down = 0;		//0x1E[1]
-	phy_ctrl->pll_register_override = 1;	//0x1E[0]
-
-	//HSTX select VCM VREF
-	phy_ctrl->rg_vrefsel_vcm = 0x55;
-	if (pinfo->mipi.rg_vrefsel_vcm_clk_adjust != 0)
-		phy_ctrl->rg_vrefsel_vcm = (phy_ctrl->rg_vrefsel_vcm & 0x0F) |
-			((pinfo->mipi.rg_vrefsel_vcm_clk_adjust & 0x0F) << 4);
-
-	if (pinfo->mipi.rg_vrefsel_vcm_data_adjust != 0)
-		phy_ctrl->rg_vrefsel_vcm = (phy_ctrl->rg_vrefsel_vcm & 0xF0) |
-			(pinfo->mipi.rg_vrefsel_vcm_data_adjust & 0x0F);
-
-	//if reload_sel = 1, need to set load_command
-	phy_ctrl->load_command = 0x5A;
+	//TO DO HSTX select VCM VREF
+	phy_ctrl->rg_vrefsel_vcm = 0x5d;
 
 	/********************  clock/data lane parameters config  ******************/
 	accuracy = 10;
-	ui =  10 * 1000000000UL * accuracy / lane_clock;
+	ui =  (uint32_t)(10 * 1000000000UL * accuracy / lane_clock);
 	//unit of measurement
 	unit_tx_byte_clk_hs = 8 * ui;
 
 	// D-PHY Specification : 60ns + 52*UI <= clk_post
-	clk_post = 600 * accuracy + 52 * ui + pinfo->mipi.clk_post_adjust * ui;
+	clk_post = 600 * accuracy + 52 * ui + unit_tx_byte_clk_hs + pinfo->mipi.clk_post_adjust * ui;
 
 	// D-PHY Specification : clk_pre >= 8*UI
-	clk_pre = 8 * ui + pinfo->mipi.clk_pre_adjust * ui;
+	clk_pre = 8 * ui + unit_tx_byte_clk_hs + pinfo->mipi.clk_pre_adjust * ui;
 
 	// D-PHY Specification : clk_t_hs_exit >= 100ns
-	clk_t_hs_exit = 1000 * accuracy + pinfo->mipi.clk_t_hs_exit_adjust * ui;
+	clk_t_hs_exit = 1000 * accuracy + 100 * accuracy + pinfo->mipi.clk_t_hs_exit_adjust * ui;
 
 	// clocked by TXBYTECLKHS
 	clk_pre_delay = 0 + pinfo->mipi.clk_pre_delay_adjust * ui;
@@ -517,11 +532,7 @@ static void get_dsi_phy_ctrl(struct hisi_fb_data_type *hisifd,
 
 	// D-PHY Specification : 38ns <= clk_t_hs_prepare <= 95ns
 	// clocked by TXBYTECLKHS
-	if (pinfo->mipi.clk_t_hs_prepare_adjust == 0)
-		pinfo->mipi.clk_t_hs_prepare_adjust = 43;
-
-	clk_t_hs_prepare = ((380 * accuracy + pinfo->mipi.clk_t_hs_prepare_adjust * ui) <= (950 * accuracy - 8 * ui)) ?
-		(380 * accuracy + pinfo->mipi.clk_t_hs_prepare_adjust * ui) : (950 * accuracy - 8 * ui);
+	clk_t_hs_prepare = 660 * accuracy;
 
 	// clocked by TXBYTECLKHS
 	data_post_delay = 0 + pinfo->mipi.data_post_delay_adjust * ui;
@@ -533,32 +544,25 @@ static void get_dsi_phy_ctrl(struct hisi_fb_data_type *hisifd,
 
 	// D-PHY Specification : 40ns + 4*UI <= data_t_hs_prepare <= 85ns + 6*UI
 	// clocked by TXBYTECLKHS
-	if (pinfo->mipi.data_t_hs_prepare_adjust == 0)
-		pinfo->mipi.data_t_hs_prepare_adjust = 35;
-
-	data_t_hs_prepare = ((400  * accuracy + 4 * ui + pinfo->mipi.data_t_hs_prepare_adjust * ui) <= (850 * accuracy + 6 * ui - 8 * ui)) ?
-		(400  * accuracy + 4 * ui + pinfo->mipi.data_t_hs_prepare_adjust * ui) : (850 * accuracy + 6 * ui - 8 * ui);
-
+	data_t_hs_prepare = get_data_t_hs_prepare(hisifd, accuracy, ui);
 	// D-PHY chip spec : clk_t_lpx + clk_t_hs_prepare > 200ns
 	// D-PHY Specification : clk_t_lpx >= 50ns
 	// clocked by TXBYTECLKHS
-	clk_t_lpx = (((2000 * accuracy - clk_t_hs_prepare) >= 500 * accuracy) ?
-		((2000 * accuracy - clk_t_hs_prepare)) : (500 * accuracy)) +
-		pinfo->mipi.clk_t_lpx_adjust * ui;
+	clk_t_lpx = (uint32_t)(2000 * accuracy + 10 * accuracy + pinfo->mipi.clk_t_lpx_adjust * ui - clk_t_hs_prepare);
 
 	// D-PHY Specification : clk_t_hs_zero + clk_t_hs_prepare >= 300 ns
 	// clocked by TXBYTECLKHS
-	clk_t_hs_zero = 3000 * accuracy - clk_t_hs_prepare + 3 * unit_tx_byte_clk_hs + pinfo->mipi.clk_t_hs_zero_adjust * ui;
+	clk_t_hs_zero = (uint32_t)(3000 * accuracy + 3 * unit_tx_byte_clk_hs + pinfo->mipi.clk_t_hs_zero_adjust * ui - clk_t_hs_prepare);
 
 	// D-PHY chip spec : data_t_lpx + data_t_hs_prepare > 200ns
 	// D-PHY Specification : data_t_lpx >= 50ns
 	// clocked by TXBYTECLKHS
-	data_t_lpx = clk_t_lpx + pinfo->mipi.data_t_lpx_adjust * ui; //2000 * accuracy - data_t_hs_prepare;
+	data_t_lpx = (uint32_t)(2000 * accuracy + 10 * accuracy + pinfo->mipi.data_t_lpx_adjust * ui - data_t_hs_prepare);
 
 	// D-PHY Specification : data_t_hs_zero + data_t_hs_prepare >= 145ns + 10*UI
 	// clocked by TXBYTECLKHS
-	data_t_hs_zero = 1450 * accuracy + 10 * ui - data_t_hs_prepare +
-		3 * unit_tx_byte_clk_hs + pinfo->mipi.data_t_hs_zero_adjust * ui;
+	data_t_hs_zero = (uint32_t)(1450 * accuracy + 10 * ui +
+		3 * unit_tx_byte_clk_hs + pinfo->mipi.data_t_hs_zero_adjust * ui - data_t_hs_prepare);
 
 	phy_ctrl->clk_pre_delay = ROUND1(clk_pre_delay, unit_tx_byte_clk_hs);
 	phy_ctrl->clk_t_hs_prepare = ROUND1(clk_t_hs_prepare, unit_tx_byte_clk_hs);
@@ -571,39 +575,29 @@ static void get_dsi_phy_ctrl(struct hisi_fb_data_type *hisifd,
 	phy_ctrl->data_t_lpx = ROUND1(data_t_lpx, unit_tx_byte_clk_hs);
 	phy_ctrl->data_t_hs_zero = ROUND1(data_t_hs_zero, unit_tx_byte_clk_hs);
 	phy_ctrl->data_t_hs_trial = ROUND1(data_t_hs_trial, unit_tx_byte_clk_hs);
-	phy_ctrl->data_t_ta_go = 4;
-	phy_ctrl->data_t_ta_get = 5;
-
-	//
-	clk_pre_delay_reality = phy_ctrl->clk_pre_delay + 2;
-	clk_t_hs_zero_reality = phy_ctrl->clk_t_hs_zero + 8;
-	data_t_hs_zero_reality = phy_ctrl->data_t_hs_zero + 4;
-	data_post_delay_reality = phy_ctrl->data_post_delay + 4;
 
 	phy_ctrl->clk_post_delay = phy_ctrl->data_t_hs_trial + ROUND1(clk_post, unit_tx_byte_clk_hs);
-	phy_ctrl->data_pre_delay = clk_pre_delay_reality + phy_ctrl->clk_t_lpx +
-		phy_ctrl->clk_t_hs_prepare + clk_t_hs_zero_reality + ROUND1(clk_pre, unit_tx_byte_clk_hs) ;
+	phy_ctrl->data_pre_delay = get_data_pre_delay(pinfo->mipi.lp11_flag, phy_ctrl, ROUND1(clk_pre, unit_tx_byte_clk_hs));
 
-	//
-	clk_post_delay_reality = phy_ctrl->clk_post_delay + 4;
-	data_pre_delay_reality = phy_ctrl->data_pre_delay + 2;
+	phy_ctrl->clk_lane_lp2hs_time = phy_ctrl->clk_pre_delay + phy_ctrl->clk_t_lpx + phy_ctrl->clk_t_hs_prepare +
+		phy_ctrl->clk_t_hs_zero + 5 + 7;
+	phy_ctrl->clk_lane_hs2lp_time = phy_ctrl->clk_t_hs_trial + phy_ctrl->clk_post_delay + 8 + 4;
+	phy_ctrl->data_lane_lp2hs_time = get_data_pre_delay_reality(pinfo->mipi.lp11_flag, phy_ctrl) + phy_ctrl->data_t_lpx + phy_ctrl->data_t_hs_prepare +
+		phy_ctrl->data_t_hs_zero + 7;
+	phy_ctrl->data_lane_hs2lp_time = phy_ctrl->data_t_hs_trial + 8 + 5;
 
-	phy_ctrl->clk_lane_lp2hs_time = clk_pre_delay_reality + phy_ctrl->clk_t_lpx +
-		phy_ctrl->clk_t_hs_prepare + clk_t_hs_zero_reality + 3;
-	phy_ctrl->clk_lane_hs2lp_time = clk_post_delay_reality + phy_ctrl->clk_t_hs_trial + 3;
-	phy_ctrl->data_lane_lp2hs_time = data_pre_delay_reality + phy_ctrl->data_t_lpx +
-		phy_ctrl->data_t_hs_prepare + data_t_hs_zero_reality + 3;
-	phy_ctrl->data_lane_hs2lp_time = data_post_delay_reality + phy_ctrl->data_t_hs_trial + 3;
-	phy_ctrl->phy_stop_wait_time = clk_post_delay_reality +
-		phy_ctrl->clk_t_hs_trial + ROUND1(clk_t_hs_exit, unit_tx_byte_clk_hs) -
-		(data_post_delay_reality + phy_ctrl->data_t_hs_trial) + 3;
+	phy_ctrl->phy_stop_wait_time = get_clk_post_delay_reality(pinfo->mipi.lp11_flag, phy_ctrl) + phy_ctrl->clk_t_hs_trial +
+		ROUND1(clk_t_hs_exit, unit_tx_byte_clk_hs) - (phy_ctrl->data_post_delay + 4 + phy_ctrl->data_t_hs_trial) + 3;
 
 	phy_ctrl->lane_byte_clk = lane_clock / 8;
 	phy_ctrl->clk_division = (((phy_ctrl->lane_byte_clk / 2) % pinfo->mipi.max_tx_esc_clk) > 0) ?
-		(phy_ctrl->lane_byte_clk / 2 / pinfo->mipi.max_tx_esc_clk + 1) :
-		(phy_ctrl->lane_byte_clk / 2 / pinfo->mipi.max_tx_esc_clk);
+		(uint32_t)(phy_ctrl->lane_byte_clk / 2 / pinfo->mipi.max_tx_esc_clk + 1) :
+		(uint32_t)(phy_ctrl->lane_byte_clk / 2 / pinfo->mipi.max_tx_esc_clk);
 
-	HISI_FB_DEBUG("PHY clock_lane and data_lane config : \n"
+	HISI_FB_INFO("DPHY clock_lane and data_lane config : \n"
+		"lane_clock = %llu, n_pll=%u, m_pll=%u\n"
+		"rg_cp=%u\n"
+		"rg_band_sel=%u\n"
 		"rg_vrefsel_vcm=%u\n"
 		"clk_pre_delay=%u\n"
 		"clk_post_delay=%u\n"
@@ -617,8 +611,14 @@ static void get_dsi_phy_ctrl(struct hisi_fb_data_type *hisifd,
 		"data_t_lpx=%u\n"
 		"data_t_hs_zero=%u\n"
 		"data_t_hs_trial=%u\n"
-		"data_t_ta_go=%u\n"
-		"data_t_ta_get=%u\n",
+		"clk_lane_lp2hs_time=%u\n"
+		"clk_lane_hs2lp_time=%u\n"
+		"data_lane_lp2hs_time=%u\n"
+		"data_lane_hs2lp_time=%u\n"
+		"phy_stop_wait_time=%u\n",
+		lane_clock, n_pll, m_pll,
+		pinfo->dsi_phy_ctrl.rg_cp,
+		pinfo->dsi_phy_ctrl.rg_band_sel,
 		phy_ctrl->rg_vrefsel_vcm,
 		phy_ctrl->clk_pre_delay,
 		phy_ctrl->clk_post_delay,
@@ -632,31 +632,146 @@ static void get_dsi_phy_ctrl(struct hisi_fb_data_type *hisifd,
 		phy_ctrl->data_t_lpx,
 		phy_ctrl->data_t_hs_zero,
 		phy_ctrl->data_t_hs_trial,
-		phy_ctrl->data_t_ta_go,
-		phy_ctrl->data_t_ta_get);
-	HISI_FB_DEBUG("clk_lane_lp2hs_time=%u\n"
-		"clk_lane_hs2lp_time=%u\n"
-		"data_lane_lp2hs_time=%u\n"
-		"data_lane_hs2lp_time=%u\n"
-		"phy_stop_wait_time=%u\n",
 		phy_ctrl->clk_lane_lp2hs_time,
 		phy_ctrl->clk_lane_hs2lp_time,
 		phy_ctrl->data_lane_lp2hs_time,
 		phy_ctrl->data_lane_hs2lp_time,
 		phy_ctrl->phy_stop_wait_time);
 }
-#endif
 
+static void get_dsi_cphy_ctrl(struct hisi_fb_data_type *hisifd, struct mipi_dsi_phy_ctrl *phy_ctrl)
+{
+	struct hisi_panel_info *pinfo;
+
+	uint32_t ui;
+	uint32_t m_pll;
+	uint32_t n_pll;
+	uint64_t lane_clock;
+	uint64_t vco_div = 1;
+
+	uint32_t accuracy;
+	uint32_t unit_tx_word_clk_hs;
+
+	if (NULL == hisifd || NULL == phy_ctrl) {
+		HISI_FB_ERR("hisifd or phy_ctrl is null.\n");
+		return;
+	}
+	pinfo = &(hisifd->panel_info);
+
+	lane_clock = pinfo->mipi.dsi_bit_clk_upt;
+	HISI_FB_INFO("Expected : lane_clock = %llu M\n", lane_clock);
+
+	/************************  PLL parameters config  *********************/
+	//chip spec :
+	//C PHY Data rate range is from 1500 Mbps to 40 Mbps
+	if ((320 <= lane_clock) && (lane_clock <= 1500)) {
+		phy_ctrl->rg_cphy_div = 0;
+		vco_div = 1;
+	} else if ((160 <= lane_clock) && (lane_clock < 320)) {
+		phy_ctrl->rg_cphy_div = 1;
+		vco_div = 2;
+	} else if ((80 <= lane_clock) && (lane_clock < 160)) {
+		phy_ctrl->rg_cphy_div = 2;
+		vco_div = 4;
+	} else if ((40 <= lane_clock) && (lane_clock < 80)) {
+		phy_ctrl->rg_cphy_div = 3;
+		vco_div = 8;
+	} else {
+		HISI_FB_ERR("40M <= lane_clock< = 1500M, not support lane_clock = %llu M\n", lane_clock);
+	}
+
+	n_pll = 2;
+	m_pll = (uint32_t)(lane_clock * vco_div * n_pll * 1000000UL / DEFAULT_MIPI_CLK_RATE);
+
+	lane_clock = m_pll * (DEFAULT_MIPI_CLK_RATE / n_pll) / vco_div;
+	if (lane_clock > 750000000) {
+		phy_ctrl->rg_cp = 3;
+	} else if ((40000000 <= lane_clock) && (lane_clock <= 750000000)) {
+		phy_ctrl->rg_cp = 1;
+	} else {
+		HISI_FB_ERR("40M <= lane_clock< = 1500M, not support lane_clock = %llu M.\n", lane_clock);
+	}
+
+	//chip spec :
+	phy_ctrl->rg_pre_div = n_pll - 1;
+	phy_ctrl->rg_div = m_pll;
+	phy_ctrl->rg_0p8v = 0;
+	phy_ctrl->rg_2p5g = 1;
+	phy_ctrl->rg_320m = 0;
+	phy_ctrl->rg_lpf_r = 0;
+
+	//TO DO HSTX select VCM VREF
+	phy_ctrl->rg_vrefsel_vcm = 0x51;
+
+	/********************  data lane parameters config  ******************/
+	accuracy = 10;
+	ui = (uint32_t)(10 * 1000000000UL * accuracy / lane_clock);
+	//unit of measurement
+	unit_tx_word_clk_hs = 7 * ui;
+
+	//CPHY Specification: 38ns <= t3_prepare <= 95ns
+	phy_ctrl->t_prepare = 650 * accuracy;//380 * accuracy - unit_tx_word_clk_hs;
+
+	//CPHY Specification: 50ns <= t_lpx
+	phy_ctrl->t_lpx = 600 * accuracy + 8 * ui - unit_tx_word_clk_hs;
+
+	//CPHY Specification: 7*UI <= t_prebegin <= 448UI
+	phy_ctrl->t_prebegin = 350 * ui - unit_tx_word_clk_hs;
+
+	//CPHY Specification: 7*UI <= t_post <= 224*UI
+	phy_ctrl->t_post = 224 * ui - unit_tx_word_clk_hs;//224 * ui;
+
+	phy_ctrl->t_prepare = ROUND1(phy_ctrl->t_prepare, unit_tx_word_clk_hs);
+	phy_ctrl->t_lpx = ROUND1(phy_ctrl->t_lpx, unit_tx_word_clk_hs);
+	phy_ctrl->t_prebegin = ROUND1(phy_ctrl->t_prebegin, unit_tx_word_clk_hs);
+	phy_ctrl->t_post = ROUND1(phy_ctrl->t_post, unit_tx_word_clk_hs);
+
+	phy_ctrl->data_lane_lp2hs_time = phy_ctrl->t_lpx + phy_ctrl->t_prepare + phy_ctrl->t_prebegin + 5 + 17;
+	phy_ctrl->data_lane_hs2lp_time = phy_ctrl->t_post + 8 + 5;
+
+	phy_ctrl->lane_word_clk = lane_clock / 7;
+	phy_ctrl->clk_division = (((phy_ctrl->lane_word_clk / 2) % pinfo->mipi.max_tx_esc_clk) > 0) ?
+		(uint32_t)(phy_ctrl->lane_word_clk / 2 / pinfo->mipi.max_tx_esc_clk + 1) :
+		(uint32_t)(phy_ctrl->lane_word_clk / 2 / pinfo->mipi.max_tx_esc_clk);
+
+	phy_ctrl->phy_stop_wait_time = phy_ctrl->t_post + 8 + 5;
+
+	HISI_FB_INFO("CPHY clock_lane and data_lane config : \n"
+		"lane_clock=%llu, n_pll=%u, m_pll=%u\n"
+		"rg_cphy_div=%u\n"
+		"rg_cp=%u\n"
+		"rg_vrefsel_vcm=%u\n"
+		"t_prepare=%u\n"
+		"t_lpx=%u\n"
+		"t_prebegin=%u\n"
+		"t_post=%u\n"
+		"lane_word_clk=%llu\n"
+		"data_lane_lp2hs_time=%u\n"
+		"data_lane_hs2lp_time=%u\n"
+		"clk_division=%u\n"
+		"phy_stop_wait_time=%u\n",
+		lane_clock, n_pll, m_pll,
+		phy_ctrl->rg_cphy_div,
+		phy_ctrl->rg_cp,
+		phy_ctrl->rg_vrefsel_vcm,
+		phy_ctrl->t_prepare,
+		phy_ctrl->t_lpx,
+		phy_ctrl->t_prebegin,
+		phy_ctrl->t_post,
+		phy_ctrl->lane_word_clk,
+		phy_ctrl->data_lane_lp2hs_time,
+		phy_ctrl->data_lane_hs2lp_time,
+		phy_ctrl->clk_division,
+		phy_ctrl->phy_stop_wait_time);
+}
+/* lint +e834 */
 static uint32_t mipi_pixel_clk(struct hisi_fb_data_type *hisifd)
 {
 	struct hisi_panel_info *pinfo = NULL;
+	pinfo = &(hisifd->panel_info);//lint !e838
 
-	BUG_ON(hisifd == NULL);
-
-	pinfo = &(hisifd->panel_info);
-
-	if (pinfo->pxl_clk_rate_div == 0) {
-		return pinfo->pxl_clk_rate;
+	if ((pinfo->pxl_clk_rate_div == 0) || (g_fpga_flag == 1)) {
+		return (uint32_t)pinfo->pxl_clk_rate;
 	}
 
 	if ((pinfo->ifbc_type == IFBC_TYPE_NONE) &&
@@ -664,7 +779,169 @@ static uint32_t mipi_pixel_clk(struct hisi_fb_data_type *hisifd)
 		pinfo->pxl_clk_rate_div = 1;
 	}
 
-	return pinfo->pxl_clk_rate / pinfo->pxl_clk_rate_div;
+	return (uint32_t)pinfo->pxl_clk_rate / pinfo->pxl_clk_rate_div;
+}
+/*lint -e715*/
+static void mipi_config_phy_test_code(char __iomem *mipi_dsi_base, uint32_t test_code_addr, uint32_t test_code_parameter)
+{
+	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, test_code_addr);
+	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
+	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, test_code_parameter);
+	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
+	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+}
+/*lint +e715*/
+static void mipi_config_cphy_spec1v0_parameter(char __iomem *mipi_dsi_base, struct hisi_panel_info *pinfo)
+{
+	uint32_t i;
+	uint32_t addr = 0;
+
+	for (i = 0; i <= pinfo->mipi.lane_nums; i++) {
+
+		//Lane Timing Control - DPHY: THS-PREPARE/CPHY: T3-PREPARE
+		addr = MIPIDSI_PHY_TST_DATA_PREPARE + (i << 5);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.t_prepare));
+
+		//Lane Timing Control - TLPX
+		addr = MIPIDSI_PHY_TST_DATA_TLPX + (i << 5);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.t_lpx));
+
+		//Lane Timing Control - DPHY: THS-ZERO/CPHY: T3-PREBEGIN
+		addr = MIPIDSI_PHY_TST_DATA_ZERO + (i << 5);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.t_prebegin));
+
+		//Lane Timing Control - DPHY: THS-TRAIL/CPHY: T3-POST
+		addr = MIPIDSI_PHY_TST_DATA_TRAIL + (i << 5);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.t_post));
+	}
+}
+
+static void mipi_config_dphy_spec1v2_parameter(char __iomem *mipi_dsi_base, struct hisi_panel_info *pinfo)
+{
+	uint32_t i;
+	uint32_t addr = 0;
+
+
+	//pre_delay of clock lane request setting
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_PRE_DELAY, DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_pre_delay));
+
+	//post_delay of clock lane request setting
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_POST_DELAY, DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_post_delay));
+
+	//clock lane timing ctrl - t_lpx
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_TLPX, DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_t_lpx));
+
+	//clock lane timing ctrl - t_hs_prepare
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_PREPARE, DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_t_hs_prepare));
+
+	//clock lane timing ctrl - t_hs_zero
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_ZERO, DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_t_hs_zero));
+
+	//clock lane timing ctrl - t_hs_trial
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_TRAIL, DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_t_hs_trial));
+
+	for (i = 0; i <= (pinfo->mipi.lane_nums + 1); i++) {//lint !e850
+		if (i == 2) {
+			i++;  //addr: lane0:0x60; lane1:0x80; lane2:0xC0; lane3:0xE0
+		}
+
+		//data lane pre_delay
+		addr = MIPIDSI_PHY_TST_DATA_PRE_DELAY + (i << 5);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.data_pre_delay));
+
+		//data lane post_delay
+		addr = MIPIDSI_PHY_TST_DATA_POST_DELAY + (i << 5);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.data_post_delay));
+
+		//data lane timing ctrl - t_lpx
+		addr = MIPIDSI_PHY_TST_DATA_TLPX + (i << 5);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.data_t_lpx));
+
+		//data lane timing ctrl - t_hs_prepare
+		addr = MIPIDSI_PHY_TST_DATA_PREPARE + (i << 5);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.data_t_hs_prepare));
+
+		//data lane timing ctrl - t_hs_zero
+		addr = MIPIDSI_PHY_TST_DATA_ZERO + (i << 5);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.data_t_hs_zero));
+
+		//data lane timing ctrl - t_hs_trial
+		addr = MIPIDSI_PHY_TST_DATA_TRAIL + (i << 5);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.data_t_hs_trial));
+
+		HISI_FB_INFO("DPHY spec1v2 config : \n"
+			"addr=0x%x\n"
+			"clk_pre_delay=%u\n"
+			"clk_t_hs_trial=%u\n"
+			"data_t_hs_zero=%u\n"
+			"data_t_lpx=%u\n"
+			"data_t_hs_prepare=%u\n",
+			addr,
+			pinfo->dsi_phy_ctrl.clk_pre_delay,
+			pinfo->dsi_phy_ctrl.clk_t_hs_trial,
+			pinfo->dsi_phy_ctrl.data_t_hs_zero,
+			pinfo->dsi_phy_ctrl.data_t_lpx,
+			pinfo->dsi_phy_ctrl.data_t_hs_prepare);
+	}
+}
+
+static void mipi_config_dphy_spec_parameter(char __iomem *mipi_dsi_base, struct hisi_panel_info *pinfo)
+{
+	uint32_t i;
+	uint32_t addr = 0;
+
+	//pre_delay of clock lane request setting
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_PRE_DELAY, DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_pre_delay));
+
+	//post_delay of clock lane request setting
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_POST_DELAY, DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_post_delay));
+
+	//clock lane timing ctrl - t_lpx
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_TLPX, DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_t_lpx));
+
+	//clock lane timing ctrl - t_hs_prepare
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_PREPARE, DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_t_hs_prepare));
+
+	//clock lane timing ctrl - t_hs_zero
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_ZERO, DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_t_hs_zero));
+
+	//clock lane timing ctrl - t_hs_trial
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_TRAIL, pinfo->dsi_phy_ctrl.clk_t_hs_trial);
+
+	for (i = 0; i <= pinfo->mipi.lane_nums; i++) {
+		//data lane pre_delay
+		addr = MIPIDSI_PHY_TST_DATA_PRE_DELAY + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.data_pre_delay));
+
+		//data lane post_delay
+		addr = MIPIDSI_PHY_TST_DATA_POST_DELAY + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.data_post_delay));
+
+		//data lane timing ctrl - t_lpx
+		addr = MIPIDSI_PHY_TST_DATA_TLPX + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.data_t_lpx));
+
+		//data lane timing ctrl - t_hs_prepare
+		addr = MIPIDSI_PHY_TST_DATA_PREPARE + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.data_t_hs_prepare));
+
+		//data lane timing ctrl - t_hs_zero
+		addr = MIPIDSI_PHY_TST_DATA_ZERO + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.data_t_hs_zero));
+
+		//data lane timing ctrl - t_hs_trial
+		addr = MIPIDSI_PHY_TST_DATA_TRAIL + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, pinfo->dsi_phy_ctrl.data_t_hs_trial);
+
+		//data lane timing ctrl - t_ta_go
+		addr = MIPIDSI_PHY_TST_DATA_TA_GO + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.data_t_ta_go));
+
+		//data lane timing ctrl - t_ta_get
+		addr = MIPIDSI_PHY_TST_DATA_TA_GET + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, addr, DSS_REDUCE(pinfo->dsi_phy_ctrl.data_t_ta_get));
+	}
 }
 
 static void mipi_init(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_base)
@@ -673,7 +950,6 @@ static void mipi_init(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_b
 	uint32_t hsa_time = 0;
 	uint32_t hbp_time = 0;
 	uint64_t pixel_clk = 0;
-	uint32_t i = 0;
 	unsigned long dw_jiffies = 0;
 	uint32_t tmp = 0;
 	bool is_ready = false;
@@ -681,10 +957,8 @@ static void mipi_init(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_b
 	dss_rect_t rect;
 	uint32_t cmp_stopstate_val = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(mipi_dsi_base == NULL);
 
-	pinfo = &(hisifd->panel_info);
+	pinfo = &(hisifd->panel_info);//lint !e838
 
 	if (pinfo->mipi.max_tx_esc_clk == 0) {
 		HISI_FB_ERR("fb%d, max_tx_esc_clk is invalid!", hisifd->index);
@@ -692,16 +966,25 @@ static void mipi_init(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_b
 	}
 
 	memset(&(pinfo->dsi_phy_ctrl), 0, sizeof(struct mipi_dsi_phy_ctrl));
-	get_dsi_phy_ctrl(hisifd, &(pinfo->dsi_phy_ctrl));
+
+	if (g_dss_version_tag & FB_ACCEL_KIRIN970) {
+		if (pinfo->mipi.phy_mode == CPHY_MODE) {
+			get_dsi_cphy_ctrl(hisifd, &(pinfo->dsi_phy_ctrl));
+		} else {
+			get_dsi_dphy_ctrl(hisifd, &(pinfo->dsi_phy_ctrl));
+		}
+	} else {
+		get_dsi_phy_ctrl(hisifd, &(pinfo->dsi_phy_ctrl));
+	}
 
 	rect.x = 0;
 	rect.y = 0;
-	rect.w = pinfo->xres;
-	rect.h = pinfo->yres;
+	rect.w = pinfo->xres;//lint !e713
+	rect.h = pinfo->yres;//lint !e713
 
 	mipi_ifbc_get_rect(hisifd, &rect);
 
-	/*************************Configure the DPHY start*************************/
+	/*************************Configure the PHY start*************************/
 
 	set_reg(mipi_dsi_base + MIPIDSI_PHY_IF_CFG_OFFSET, pinfo->mipi.lane_nums, 2, 0);
 	set_reg(mipi_dsi_base + MIPIDSI_CLKMGR_CFG_OFFSET, pinfo->dsi_phy_ctrl.clk_division, 8, 0);
@@ -713,239 +996,93 @@ static void mipi_init(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_b
 	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000001);
 	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
-	// physical configuration I, Q
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010010);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		(pinfo->dsi_phy_ctrl.rg_hstx_ckg_sel << 1));
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-#endif
+	if (g_dss_version_tag & FB_ACCEL_KIRIN970) {
+		if (pinfo->mipi.phy_mode == CPHY_MODE) {
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010001, 0x3f);
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010042, 0x21);
 
-	// physical configuration PLL I
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010014);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		(pinfo->dsi_phy_ctrl.rg_pll_fbd_s << 4) + (pinfo->dsi_phy_ctrl.rg_pll_enswc << 3) +
-		(pinfo->dsi_phy_ctrl.rg_pll_enbwt << 2) + pinfo->dsi_phy_ctrl.rg_pll_chp);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+			//PLL configuration I
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010046, pinfo->dsi_phy_ctrl.rg_cp + (pinfo->dsi_phy_ctrl.rg_lpf_r << 4));
 
-	// physical configuration PLL II, M
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010015);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		pinfo->dsi_phy_ctrl.rg_pll_fbd_p);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+			//PLL configuration II
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010048, pinfo->dsi_phy_ctrl.rg_0p8v + (pinfo->dsi_phy_ctrl.rg_2p5g << 1) +
+				(pinfo->dsi_phy_ctrl.rg_320m << 2) + (pinfo->dsi_phy_ctrl.rg_band_sel << 3) + (pinfo->dsi_phy_ctrl.rg_cphy_div << 4));
 
-#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	// physical configuration PLL III
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010016);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		(pinfo->dsi_phy_ctrl.rg_pll_cp << 5) + (pinfo->dsi_phy_ctrl.rg_pll_lpf_cs << 4) +
-		pinfo->dsi_phy_ctrl.rg_pll_refsel);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-#endif
+			//PLL configuration III
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010049, pinfo->dsi_phy_ctrl.rg_pre_div);
 
-	// physical configuration PLL IV, N
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010017);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		pinfo->dsi_phy_ctrl.rg_pll_pre_p);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+			//PLL configuration IV
+			mipi_config_phy_test_code(mipi_dsi_base, 0x0001004A, pinfo->dsi_phy_ctrl.rg_div);
 
-	// sets the analog characteristic of V reference in D-PHY TX
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x0001001D);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		pinfo->dsi_phy_ctrl.rg_vrefsel_vcm);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+			mipi_config_phy_test_code(mipi_dsi_base, 0x0001004F, 0xf0);
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010052, 0xa8);
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010053, 0xc2);
 
-#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	// MISC AFE Configuration
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x0001001E);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		(pinfo->dsi_phy_ctrl.rg_pll_cp_p << 5) + (pinfo->dsi_phy_ctrl.reload_sel << 4) +
-		(pinfo->dsi_phy_ctrl.rg_phase_gen_en << 3) + 	(pinfo->dsi_phy_ctrl.rg_band_sel << 2) +
-		(pinfo->dsi_phy_ctrl.pll_power_down << 1) + pinfo->dsi_phy_ctrl.pll_register_override);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+			if ((g_fpga_flag==0) && (g_dss_version_tag & FB_ACCEL_KIRIN970)) {
+				/*enable BTA*/
+				mipi_config_phy_test_code(mipi_dsi_base, 0x00010054, 0x07);
+			}
+			//PLL update control
+			mipi_config_phy_test_code(mipi_dsi_base, 0x0001004B, 0x1);
 
-	//reload_command
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x0001001F);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		pinfo->dsi_phy_ctrl.load_command);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-#endif
+			//set cphy spec parameter
+			mipi_config_cphy_spec1v0_parameter(mipi_dsi_base, pinfo);
+		} else {
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010042, 0x21);
+			//PLL configuration I
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010046, pinfo->dsi_phy_ctrl.rg_cp + (pinfo->dsi_phy_ctrl.rg_lpf_r << 4));
 
-#if defined(CONFIG_HISI_FB_3660)
-	//set LPTX analog test_mode
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010012);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00000030);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-#endif
+			//PLL configuration II
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010048, pinfo->dsi_phy_ctrl.rg_0p8v + (pinfo->dsi_phy_ctrl.rg_2p5g << 1) +
+				(pinfo->dsi_phy_ctrl.rg_320m << 2) + (pinfo->dsi_phy_ctrl.rg_band_sel << 3));
 
-	// pre_delay of clock lane request setting
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010020);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_pre_delay));
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+			//PLL configuration III
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010049, pinfo->dsi_phy_ctrl.rg_pre_div);
 
-	// post_delay of clock lane request setting
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010021);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_post_delay));
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+			//PLL configuration IV
+			mipi_config_phy_test_code(mipi_dsi_base, 0x0001004A, pinfo->dsi_phy_ctrl.rg_div);
 
-	// clock lane timing ctrl - t_lpx
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010022);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_t_lpx));
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+			mipi_config_phy_test_code(mipi_dsi_base, 0x0001004F, 0xf0);
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010050, 0xc0);
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010051, 0x22);
 
-	// clock lane timing ctrl - t_hs_prepare
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010023);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_t_hs_prepare));
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010053, pinfo->dsi_phy_ctrl.rg_vrefsel_vcm);
 
-	// clock lane timing ctrl - t_hs_zero
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010024);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		DSS_REDUCE(pinfo->dsi_phy_ctrl.clk_t_hs_zero));
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+			if ((g_fpga_flag==0) && (g_dss_version_tag & FB_ACCEL_KIRIN970)) {
+				/*enable BTA*/
+				mipi_config_phy_test_code(mipi_dsi_base, 0x00010054, 0x03);
+			}
+			//PLL update control
+			mipi_config_phy_test_code(mipi_dsi_base, 0x0001004B, 0x1);
+			//set dphy spec parameter
+			mipi_config_dphy_spec1v2_parameter(mipi_dsi_base, pinfo);
+		}
+	} else {
+		//physical configuration I, Q
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010010, pinfo->dsi_phy_ctrl.rg_hstx_ckg_sel << 1);
 
-	// clock lane timing ctrl - t_hs_trial
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010025);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		pinfo->dsi_phy_ctrl.clk_t_hs_trial);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		//physical configuration PLL I
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010014, (pinfo->dsi_phy_ctrl.rg_pll_fbd_s << 4) +
+			(pinfo->dsi_phy_ctrl.rg_pll_enswc << 3) + (pinfo->dsi_phy_ctrl.rg_pll_enbwt << 2) + pinfo->dsi_phy_ctrl.rg_pll_chp);
 
-	for (i = 0; i <= pinfo->mipi.lane_nums; i++) {
-		// data lane pre_delay
-		tmp = 0x10030 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-			DSS_REDUCE(pinfo->dsi_phy_ctrl.data_pre_delay));
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		//physical configuration PLL II, M
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010015, pinfo->dsi_phy_ctrl.rg_pll_fbd_p);
 
-		//data lane post_delay
-		tmp = 0x10031 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-			DSS_REDUCE(pinfo->dsi_phy_ctrl.data_post_delay));
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
 
-		// data lane timing ctrl - t_lpx
-		tmp = 0x10032 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-			DSS_REDUCE(pinfo->dsi_phy_ctrl.data_t_lpx));
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		//physical configuration PLL IV, N
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010017, pinfo->dsi_phy_ctrl.rg_pll_pre_p);
 
-		// data lane timing ctrl - t_hs_prepare
-		tmp = 0x10033 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-			DSS_REDUCE(pinfo->dsi_phy_ctrl.data_t_hs_prepare));
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		//sets the analog characteristic of V reference in D-PHY TX
+		mipi_config_phy_test_code(mipi_dsi_base, 0x0001001D, pinfo->dsi_phy_ctrl.rg_vrefsel_vcm);
 
-		// data lane timing ctrl - t_hs_zero
-		tmp = 0x10034 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-			DSS_REDUCE(pinfo->dsi_phy_ctrl.data_t_hs_zero));
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
 
-		// data lane timing ctrl - t_hs_trial
-		tmp = 0x10035 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-			pinfo->dsi_phy_ctrl.data_t_hs_trial);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
 
-		// data lane timing ctrl - t_ta_go
-		tmp = 0x10036 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-			DSS_REDUCE(pinfo->dsi_phy_ctrl.data_t_ta_go));
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		//set dphy spec parameter
+		mipi_config_dphy_spec_parameter(mipi_dsi_base, pinfo);
 
-		// data lane timing ctrl - t_ta_get
-		tmp = 0x10037 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-			DSS_REDUCE(pinfo->dsi_phy_ctrl.data_t_ta_get));
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
 	}
 
-#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	outp32(mipi_dsi_base + MIPIDSI_PHY_RSTZ_OFFSET, 0x0000000F);
-#else
 	outp32(mipi_dsi_base + MIPIDSI_PHY_RSTZ_OFFSET, 0x00000007);
-#endif
 
 	is_ready = false;
 	dw_jiffies = jiffies + HZ / 2;
@@ -987,7 +1124,7 @@ static void mipi_init(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_b
 			hisifd->index, tmp);
 	}
 
-	/*************************Configure the DPHY end*************************/
+	/*************************Configure the PHY end*************************/
 
 	if (is_mipi_cmd_panel(hisifd)) {
 		// config to command mode
@@ -1024,11 +1161,9 @@ static void mipi_init(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_b
 	set_reg(mipi_dsi_base + MIPIDSI_DPI_CFG_POL_OFFSET, 0x0, 1, 3);
 	set_reg(mipi_dsi_base + MIPIDSI_DPI_CFG_POL_OFFSET, 0x0, 1, 4);
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	if (pinfo->bpp == LCD_RGB666) {
 		set_reg(mipi_dsi_base + MIPIDSI_DPI_COLOR_CODING_OFFSET, 0x1, 1, 8);
 	}
-#endif
 
 	/*
 	** 3. Select the Video Transmission Mode:
@@ -1036,7 +1171,13 @@ static void mipi_init(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_b
 	** transported through the DSI link.
 	*/
 	// video mode: low power mode
-	set_reg(mipi_dsi_base + MIPIDSI_VID_MODE_CFG_OFFSET, 0x3f, 6, 8);
+	if (MIPI_DISABLE_LP11 == pinfo->mipi.lp11_flag) {
+		set_reg(mipi_dsi_base + MIPIDSI_VID_MODE_CFG_OFFSET, 0x0f, 6, 8);
+		HISI_FB_INFO("set_reg MIPIDSI_VID_MODE_CFG_OFFSET 0x0f \n");
+	} else {
+		set_reg(mipi_dsi_base + MIPIDSI_VID_MODE_CFG_OFFSET, 0x3f, 6, 8);
+		HISI_FB_INFO("set_reg MIPIDSI_VID_MODE_CFG_OFFSET 0x3f \n");
+	}
 	/* set_reg(mipi_dsi_base + MIPIDSI_VID_MODE_CFG_OFFSET, 0x0, 1, 14); */
 	if (is_mipi_video_panel(hisifd)) {
 		// TODO: fix blank display bug when set backlight
@@ -1073,10 +1214,23 @@ static void mipi_init(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_b
 	** Hline_time = (HSA+HBP+HACT+HFP)*(PCLK period/Clk Lane Byte Period);
 	*/
 	pixel_clk = mipi_pixel_clk(hisifd);
-	hsa_time = pinfo->ldi.h_pulse_width * pinfo->dsi_phy_ctrl.lane_byte_clk / pixel_clk;
-	hbp_time = pinfo->ldi.h_back_porch * pinfo->dsi_phy_ctrl.lane_byte_clk / pixel_clk;
-	hline_time = (pinfo->ldi.h_pulse_width + pinfo->ldi.h_back_porch +
-		rect.w + pinfo->ldi.h_front_porch) * pinfo->dsi_phy_ctrl.lane_byte_clk / pixel_clk;
+	HISI_FB_INFO("pixel_clk = %ld\n", pixel_clk);
+
+/*lint -e737 -e776 -e712*/
+	if (pinfo->mipi.phy_mode == DPHY_MODE) {
+		hsa_time = pinfo->ldi.h_pulse_width * pinfo->dsi_phy_ctrl.lane_byte_clk / pixel_clk;
+		hbp_time = pinfo->ldi.h_back_porch * pinfo->dsi_phy_ctrl.lane_byte_clk / pixel_clk;
+		hline_time = (pinfo->ldi.h_pulse_width + pinfo->ldi.h_back_porch +
+			rect.w + pinfo->ldi.h_front_porch) * pinfo->dsi_phy_ctrl.lane_byte_clk / pixel_clk;
+	} else {
+		hsa_time = pinfo->ldi.h_pulse_width * pinfo->dsi_phy_ctrl.lane_word_clk / pixel_clk;
+		hbp_time = pinfo->ldi.h_back_porch * pinfo->dsi_phy_ctrl.lane_word_clk / pixel_clk;
+		hline_time = (pinfo->ldi.h_pulse_width + pinfo->ldi.h_back_porch +
+			rect.w + pinfo->ldi.h_front_porch) * pinfo->dsi_phy_ctrl.lane_word_clk / pixel_clk;
+	}
+	HISI_FB_INFO("hsa_time = %d, hbp_time = %d, hline_time = %d \n", hsa_time, hbp_time, hline_time);
+/*lint +e737 +e776 +e712*/
+
 	set_reg(mipi_dsi_base + MIPIDSI_VID_HSA_TIME_OFFSET, hsa_time, 12, 0);
 	set_reg(mipi_dsi_base + MIPIDSI_VID_HBP_TIME_OFFSET, hbp_time, 12, 0);
 	set_reg(mipi_dsi_base + MIPIDSI_VID_HLINE_TIME_OFFSET, hline_time, 15, 0);
@@ -1091,7 +1245,6 @@ static void mipi_init(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_b
 	// Configure core's phy parameters
 	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_LPCLK_CFG_OFFSET, pinfo->dsi_phy_ctrl.clk_lane_lp2hs_time, 10, 0);
 	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_LPCLK_CFG_OFFSET, pinfo->dsi_phy_ctrl.clk_lane_hs2lp_time, 10, 16);
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	if (is_mipi_cmd_panel(hisifd)) {
 		set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_CFG_OFFSET, 0xFFF, 15, 0);
 	} else {
@@ -1099,38 +1252,8 @@ static void mipi_init(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_b
 	}
 	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_CFG_OFFSET, pinfo->dsi_phy_ctrl.data_lane_lp2hs_time, 8, 16);
 	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_CFG_OFFSET, pinfo->dsi_phy_ctrl.data_lane_hs2lp_time, 8, 24);
-#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_RD_CFG_OFFSET, 0x7FFF, 15, 0);
-	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_CFG_OFFSET, pinfo->dsi_phy_ctrl.data_lane_lp2hs_time, 10, 0);
-	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_CFG_OFFSET, pinfo->dsi_phy_ctrl.data_lane_hs2lp_time, 10, 16);
-#endif
-
-#if defined(CONFIG_HISI_FB_970)
-	//16~19bit:pclk_en, pclk_sel, dpipclk_en, dpipclk_sel
-	set_reg(mipi_dsi_base + MIPIDSI_CLKMGR_CFG_OFFSET, 0x5, 4, 16);
-	if (is_mipi_cmd_panel(hisifd)) {
-		pinfo->dsi_phy_ctrl.auto_ulps_mode = 1;
-		pinfo->dsi_phy_ctrl.pll_off_ulps = pinfo->mipi.non_continue_en ? 1 : 0;
-		//(t_dpipclk*(ldi_hsw+ldi_hbp+ldi_hact+ldi_hfp))*1.5
-		pinfo->dsi_phy_ctrl.auto_ulps_enter_delay = hline_time * 3 / 2;
-		pinfo->dsi_phy_ctrl.twakeup_clk_div = 1;
-		if (g_fpga_flag == 1) {
-			//twakeup_cnt*twakeup_clk_div*t_apb_clk>1ms
-			pinfo->dsi_phy_ctrl.twakeup_cnt = hisifd->dss_clk_rate.dss_pclk_dss_rate / 1000 * 3 / 2;
-		} else {
-			//twakeup_cnt*twakeup_clk_div*t_lanebyteclk>1ms
-			pinfo->dsi_phy_ctrl.twakeup_cnt = pinfo->dsi_phy_ctrl.lane_byte_clk / 1000 * 3 / 2;
-		}
-		set_reg(mipi_dsi_base + AUTO_ULPS_MODE, pinfo->dsi_phy_ctrl.auto_ulps_mode, 1, 0);
-		set_reg(mipi_dsi_base + AUTO_ULPS_MODE, pinfo->dsi_phy_ctrl.pll_off_ulps, 1, 16);
-		set_reg(mipi_dsi_base + AUTO_ULPS_ENTER_DELAY, pinfo->dsi_phy_ctrl.auto_ulps_enter_delay, 32, 0);
-		set_reg(mipi_dsi_base + AUTO_ULPS_WAKEUP_TIME, pinfo->dsi_phy_ctrl.twakeup_clk_div, 16, 0);
-		set_reg(mipi_dsi_base + AUTO_ULPS_WAKEUP_TIME, pinfo->dsi_phy_ctrl.twakeup_cnt, 16, 16);
-	}
-	//0:dphy; 1:cphy
-	set_reg(mipi_dsi_base + PHY_MODE, 0x0, 1, 0);
-#endif
-
+/*lint -e712*/
+	/*lint +e712*/
 	// Waking up Core
 	set_reg(mipi_dsi_base + MIPIDSI_PWR_UP_OFFSET, 0x1, 1, 0);
 }
@@ -1140,7 +1263,10 @@ int mipi_dsi_clk_enable(struct hisi_fb_data_type *hisifd)
 	int ret = 0;
 	struct clk *clk_tmp = NULL;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	if (hisifd->index == PRIMARY_PANEL_IDX) {
 		clk_tmp = hisifd->dss_dphy0_ref_clk;
@@ -1195,24 +1321,6 @@ int mipi_dsi_clk_enable(struct hisi_fb_data_type *hisifd)
 		}
 	}
 
-#ifdef CONFIG_PCLK_PCTRL_USED
-	clk_tmp = hisifd->dss_pclk_pctrl_clk;
-	if (clk_tmp) {
-		ret = clk_prepare(clk_tmp);
-		if (ret) {
-			HISI_FB_ERR("fb%d dss_pclk_pctrl_clk clk_prepare failed, error=%d!\n",
-				hisifd->index, ret);
-			return -EINVAL;
-		}
-
-		ret = clk_enable(clk_tmp);
-		if (ret) {
-			HISI_FB_ERR("fb%d dss_pclk_pctrl_clk clk_enable failed, error=%d!\n",
-				hisifd->index, ret);
-			return -EINVAL;
-		}
-	}
-#endif
 
 	if (is_dual_mipi_panel(hisifd) || (hisifd->index == EXTERNAL_PANEL_IDX)) {
 		clk_tmp = hisifd->dss_dphy1_ref_clk;
@@ -1274,7 +1382,10 @@ int mipi_dsi_clk_disable(struct hisi_fb_data_type *hisifd)
 {
 	struct clk *clk_tmp = NULL;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	if (hisifd->index == PRIMARY_PANEL_IDX) {
 		clk_tmp = hisifd->dss_dphy0_ref_clk;
@@ -1296,13 +1407,6 @@ int mipi_dsi_clk_disable(struct hisi_fb_data_type *hisifd)
 		}
 	}
 
-#ifdef CONFIG_PCLK_PCTRL_USED
-	clk_tmp = hisifd->dss_pclk_pctrl_clk;
-	if (clk_tmp) {
-		clk_disable(clk_tmp);
-		clk_unprepare(clk_tmp);
-	}
-#endif
 
 	if (is_dual_mipi_panel(hisifd) || (hisifd->index == EXTERNAL_PANEL_IDX)) {
 		clk_tmp = hisifd->dss_dphy1_ref_clk;
@@ -1331,227 +1435,21 @@ int mipi_dsi_clk_disable(struct hisi_fb_data_type *hisifd)
 /*******************************************************************************
 **
 */
-#ifdef CONFIG_HISI_FB_3660
-static int mipi_dsi_pll_status_check_ec(struct hisi_fb_data_type *hisifd,
-	char __iomem *mipi_dsi_base)
-{
-	uint32_t tmp;
-	uint32_t cmp_ulpsactivenot_val = 0;
-	uint32_t cmp_stopstate_val = 0;
-	uint32_t try_times;
-	struct timeval tv0;
-	struct timeval tv1;
-	uint32_t redo_count = 0;
-
-	BUG_ON(hisifd == NULL);
-	BUG_ON(mipi_dsi_base == NULL);
-
-	HISI_FB_DEBUG("fb%d, +!\n", hisifd->index);
-
-	hisifb_get_timestamp(&tv0);
-
-	////////////////////////////////////////////////////////////////////////////
-	//
-	// enter ulps
-	//
-	if (hisifd->panel_info.mipi.lane_nums >= DSI_4_LANES) {
-		cmp_ulpsactivenot_val = (BIT(5) | BIT(8) | BIT(10) | BIT(12));
-		cmp_stopstate_val = (BIT(4) | BIT(7) | BIT(9) | BIT(11));
-	} else if (hisifd->panel_info.mipi.lane_nums >= DSI_3_LANES) {
-		cmp_ulpsactivenot_val = (BIT(5) | BIT(8) | BIT(10));
-		cmp_stopstate_val = (BIT(4) | BIT(7) | BIT(9));
-	} else if (hisifd->panel_info.mipi.lane_nums >= DSI_2_LANES) {
-		cmp_ulpsactivenot_val = (BIT(5) | BIT(8));
-		cmp_stopstate_val = (BIT(4) | BIT(7));
-	} else {
-		cmp_ulpsactivenot_val = (BIT(5));
-		cmp_stopstate_val = (BIT(4));
-	}
-
-
-REDO:
-	if (redo_count > 100)
-		return 0;
-	redo_count ++;
-
-	// check DPHY data and clock lane stopstate
-	try_times = 0;
-	tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET);
-	while ((tmp & cmp_stopstate_val) != cmp_stopstate_val) {
-		udelay(10); //lint !e774  !e747  !e778
-		if (++try_times > 100) {
-			HISI_FB_INFO("fb%d, check1, check DPHY data and clock lane stopstate, MIPIDSI_PHY_STATUS=0x%x!\n",
-				hisifd->index, tmp);
-
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_ULPS_CTRL_OFFSET, 0x0, 32, 0);
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_RSTZ_OFFSET, 0x0, 1, 0);
-			udelay(5); //lint !e774  !e747  !e778
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_RSTZ_OFFSET, 0x1, 1, 0);
-			goto REDO;
-		}
-
-		tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET); //lint !e732
-	}
-
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
-	//pctrl_dphytx_ulpsexit0, pctrl_dphytx_ulpsexit1
-	if (mipi_dsi_base == hisifd->mipi_dsi0_base) {
-		//pctrl_dphytx_ulpsexit0 = 0
-		set_reg(hisifd->pctrl_base + PERI_CTRL23, 0x0, 1, 3);
-	} else {
-		//pctrl_dphytx_ulpsexit1 = 0
-		set_reg(hisifd->pctrl_base + PERI_CTRL23, 0x0, 1, 4);
-	}
-#endif
-
-	// disable DPHY clock lane's Hight Speed Clock
-	//set_reg(mipi_dsi_base + MIPIDSI_LPCLK_CTRL_OFFSET, 0x0, 1, 0);
-
-	// request that data lane enter ULPS
-	set_reg(mipi_dsi_base + MIPIDSI_PHY_ULPS_CTRL_OFFSET, 0x4, 4, 0);
-
-	//check DPHY data lane ulpsactivenot_status
-	try_times = 0;
-	tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET); //lint !e732
-	while ((tmp & cmp_ulpsactivenot_val) != 0) {
-		if (++try_times > 4) {
-			HISI_FB_INFO("fb%d, check2, check DPHY data lane ulpsactivenot_status, MIPIDSI_PHY_STATUS=0x%x!\n",
-				hisifd->index, tmp);
-
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_ULPS_CTRL_OFFSET, 0x0, 32, 0);
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_RSTZ_OFFSET, 0x0, 1, 0);
-			udelay(5); //lint !e774  !e747  !e778
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_RSTZ_OFFSET, 0x1, 1, 0);
-			goto REDO;
-		}
-
-		udelay(5); //lint !e774  !e747  !e778
-		tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET); //lint !e732
-	}
-
-#if defined(CONFIG_HISI_FB_3660)
-	// enable DPHY PLL, force_pll = 1
-	outp32(mipi_dsi_base + MIPIDSI_PHY_RSTZ_OFFSET, 0xF);
-#endif
-
-	////////////////////////////////////////////////////////////////////////////
-	//
-	// exit ulps
-	//
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
-	if (mipi_dsi_base == hisifd->mipi_dsi0_base) {
-		// enable dphy0 refclk and cfgclk
-		//pctrl_dphytx_ulpsexit0 = 1
-		set_reg(hisifd->pctrl_base + PERI_CTRL23, 0x1, 1, 3);
-	} else {
-		// enable dphy1 refclk and cfgclk
-		// pctrl_dphytx_ulpsexit1 = 1
-		set_reg(hisifd->pctrl_base + PERI_CTRL23, 0x1, 1, 4);
-	}
-#endif
-
-	// request that data lane  exit ULPS
-	outp32(mipi_dsi_base + MIPIDSI_PHY_ULPS_CTRL_OFFSET, 0xC);
-	try_times= 0;
-	tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET); //lint !e732
-	while ((tmp & cmp_ulpsactivenot_val) != cmp_ulpsactivenot_val) {
-		udelay(10); //lint !e774  !e747  !e778
-		if (++try_times > 3) {
-			HISI_FB_INFO("fb%d, check3, request that data lane and clock lane exit ULPS, MIPIDSI_PHY_STATUS=0x%x!\n",
-				hisifd->index, tmp);
-
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_ULPS_CTRL_OFFSET, 0x0, 32, 0);
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_RSTZ_OFFSET, 0x0, 1, 0);
-			udelay(5); //lint !e774  !e747  !e778
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_RSTZ_OFFSET, 0x1, 1, 0);
-			goto REDO;
-		}
-
-		tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET); //lint !e732
-	}
-
-	// mipi spec
-	//mdelay(1);
-
-	// clear PHY_ULPS_CTRL
-	outp32(mipi_dsi_base + MIPIDSI_PHY_ULPS_CTRL_OFFSET, 0x0);
-
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
-	//clear pctrl_dphytx_ulpsexit0, pctrl_dphytx_ulpsexit1
-	if (mipi_dsi_base == hisifd->mipi_dsi0_base) {
-		//clear pctrl_dphytx_ulpsexit0
-		set_reg(hisifd->pctrl_base + PERI_CTRL23, 0x0, 1, 3);
-	} else {
-		//clear pctrl_dphytx_ulpsexit1
-		set_reg(hisifd->pctrl_base + PERI_CTRL23, 0x0, 1, 4);
-	}
-
-	// wait DPHY PLL Lock
-	try_times = 0;
-	tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET);
-	while ((tmp & BIT(0)) != 0x1) {
-		udelay(10);
-		if (++try_times > 100) {
-			HISI_FB_INFO("fb%d, check4, wait DPHY PLL Lock check, MIPIDSI_PHY_STATUS=0x%x!\n",
-				hisifd->index, tmp);
-
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_ULPS_CTRL_OFFSET, 0x0, 32, 0);
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_RSTZ_OFFSET, 0x0, 1, 0);
-			udelay(5);
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_RSTZ_OFFSET, 0x1, 1, 0);
-			goto REDO;
-		}
-
-		tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET);
-	}
-#endif
-
-	try_times= 0;
-	tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET); //lint !e732
-	while ((tmp & cmp_stopstate_val) != cmp_stopstate_val) {
-		udelay(10); //lint !e774  !e747  !e778
-		if (++try_times > 3) {
-			HISI_FB_INFO("fb%d, check5, request that data lane and clock lane exit ULPS, MIPIDSI_PHY_STATUS=0x%x!\n",
-				hisifd->index, tmp);
-
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_ULPS_CTRL_OFFSET, 0x0, 32, 0);
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_RSTZ_OFFSET, 0x0, 1, 0);
-			udelay(5); //lint !e774  !e747  !e778
-			set_reg(mipi_dsi_base + MIPIDSI_PHY_RSTZ_OFFSET, 0x1, 1, 0);
-			goto REDO;
-		}
-
-		tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET); //lint !e732
-	}
-
-	//set LPTX analog normal_mode
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010012);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-
-	// enable DPHY clock lane's Hight Speed Clock
-	//set_reg(mipi_dsi_base + MIPIDSI_LPCLK_CTRL_OFFSET, 0x1, 1, 0);
-
-	hisifb_get_timestamp(&tv1);
-
-	HISI_FB_INFO("fb%d, redo_count=%d, TIMESTAMP_DIFF %u us!\n",
-		hisifd->index, redo_count, hisifb_timestamp_diff(&tv0, &tv1));
-
-	HISI_FB_DEBUG("fb%d, -!\n", hisifd->index);
-
-	return 0;
-}
-#endif
 
 static int mipi_dsi_on_sub1(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_base)
 {
-	BUG_ON(mipi_dsi_base == NULL);
+	if (NULL == hisifd || NULL == mipi_dsi_base) {
+		HISI_FB_ERR("hisifd or mipi_dsi_base is null.\n");
+		return 0;
+	}
 
 	/* mipi init */
 	mipi_init(hisifd, mipi_dsi_base);
+
+	/* dsi memory init */
+	if (g_dss_version_tag == FB_ACCEL_KIRIN970) {
+		outp32(mipi_dsi_base + DSI_MEM_CTRL, 0x02600008);
+	}
 
 	/* switch to cmd mode */
 	set_reg(mipi_dsi_base + MIPIDSI_MODE_CFG_OFFSET, 0x1, 1, 0);
@@ -1566,13 +1464,46 @@ static int mipi_dsi_on_sub1(struct hisi_fb_data_type *hisifd, char __iomem *mipi
 	return 0;
 }
 
-static int mipi_dsi_on_sub2(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_base)
+static void pctrl_dphytx_stopcnt_config(struct hisi_fb_data_type *hisifd)
 {
 	struct hisi_panel_info *pinfo = NULL;
 	uint64_t pctrl_dphytx_stopcnt = 0;
+	uint32_t stopcnt_div = 1;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(mipi_dsi_base == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd or mipi_dsi_base is null.\n");
+		return;
+	}
+	pinfo = &(hisifd->panel_info);
+
+	stopcnt_div = is_dual_mipi_panel(hisifd) ? 2 : 1;
+	// init: wait DPHY 4 data lane stopstate
+	if (is_mipi_video_panel(hisifd)) {
+		pctrl_dphytx_stopcnt = (uint64_t)(pinfo->ldi.h_back_porch +
+			pinfo->ldi.h_front_porch + pinfo->ldi.h_pulse_width + pinfo->xres / stopcnt_div + 5) *
+			hisifd->dss_clk_rate.dss_pclk_pctrl_rate / (pinfo->pxl_clk_rate / stopcnt_div);
+	} else {
+		pctrl_dphytx_stopcnt = (uint64_t)(pinfo->ldi.h_back_porch +
+			pinfo->ldi.h_front_porch + pinfo->ldi.h_pulse_width + 5) *
+			hisifd->dss_clk_rate.dss_pclk_pctrl_rate / (pinfo->pxl_clk_rate / stopcnt_div);
+	}
+	//FIXME:
+	outp32(hisifd->pctrl_base + PERI_CTRL29, (uint32_t)pctrl_dphytx_stopcnt);
+	if (is_dual_mipi_panel(hisifd)) {
+		outp32(hisifd->pctrl_base + PERI_CTRL32, (uint32_t)pctrl_dphytx_stopcnt);
+	}
+
+	return;
+}
+
+static int mipi_dsi_on_sub2(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_base)
+{
+	struct hisi_panel_info *pinfo = NULL;
+
+	if (NULL == hisifd || NULL == mipi_dsi_base) {
+		HISI_FB_ERR("hisifd or mipi_dsi_base is null.\n");
+		return 0;
+	}
 
 	pinfo = &(hisifd->panel_info);
 
@@ -1589,43 +1520,35 @@ static int mipi_dsi_on_sub2(struct hisi_fb_data_type *hisifd, char __iomem *mipi
 	}
 
 	/* enable EOTP TX */
-	set_reg(mipi_dsi_base + MIPIDSI_PCKHDL_CFG_OFFSET, 0x1, 1, 0);
+	if (pinfo->mipi.phy_mode == DPHY_MODE) {
+		set_reg(mipi_dsi_base + MIPIDSI_PCKHDL_CFG_OFFSET, 0x1, 1, 0);
+	}
 
 	/* enable generate High Speed clock, non continue */
-	if (pinfo->mipi.non_continue_en)
+	if (pinfo->mipi.non_continue_en) {
 		set_reg(mipi_dsi_base + MIPIDSI_LPCLK_CTRL_OFFSET, 0x3, 2, 0);
-	else
-		set_reg(mipi_dsi_base + MIPIDSI_LPCLK_CTRL_OFFSET, 0x1, 2, 0);
-#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	if ((pinfo->mipi.dsi_version == DSI_1_2_VERSION)
-		&& is_ifbc_vesa_panel(hisifd)) {
-		set_reg(mipi_dsi_base + MIPIDSI_DSC_PARAMETER_OFFSET, 0x01, 32, 0);
-	}
-#endif
-
-	// init: wait DPHY 4 data lane stopstate
-	if (is_mipi_video_panel(hisifd)) {
-		pctrl_dphytx_stopcnt = (uint64_t)(pinfo->ldi.h_back_porch +
-			pinfo->ldi.h_front_porch + pinfo->ldi.h_pulse_width + pinfo->xres + 5) *
-			hisifd->dss_clk_rate.dss_pclk_pctrl_rate / pinfo->pxl_clk_rate;
 	} else {
-		pctrl_dphytx_stopcnt = (uint64_t)(pinfo->ldi.h_back_porch +
-			pinfo->ldi.h_front_porch + pinfo->ldi.h_pulse_width + 5) *
-			hisifd->dss_clk_rate.dss_pclk_pctrl_rate / pinfo->pxl_clk_rate;
-	}
-	//FIXME:
-	outp32(hisifd->pctrl_base + PERI_CTRL29, (uint32_t)pctrl_dphytx_stopcnt);
-	if (is_dual_mipi_panel(hisifd)) {
-		outp32(hisifd->pctrl_base + PERI_CTRL32, (uint32_t)pctrl_dphytx_stopcnt);
+		set_reg(mipi_dsi_base + MIPIDSI_LPCLK_CTRL_OFFSET, 0x1, 2, 0);
 	}
 
+
+	pctrl_dphytx_stopcnt_config(hisifd);
 	return 0;
 }
 
 int mipi_dsi_off_sub(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_base)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON(mipi_dsi_base == NULL);
+	struct hisi_panel_info *pinfo = NULL;
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if(NULL == mipi_dsi_base){
+		HISI_FB_ERR("mipi_dsi_base is NULL");
+		return -EINVAL;
+	}
+
+	pinfo = &(hisifd->panel_info);
 
 	/* switch to cmd mode */
 	set_reg(mipi_dsi_base + MIPIDSI_MODE_CFG_OFFSET, 0x1, 1, 0);
@@ -1637,6 +1560,8 @@ int mipi_dsi_off_sub(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_ba
 	/* disable generate High Speed clock */
 	set_reg(mipi_dsi_base + MIPIDSI_LPCLK_CTRL_OFFSET, 0x0, 1, 0);
 
+	/* Delay 10us to make sure clk change to lp11 state */
+	udelay(pinfo->mipi.hs_clk_disable_delay);
 	/* shutdown d_phy */
 	set_reg(mipi_dsi_base +  MIPIDSI_PHY_RSTZ_OFFSET, 0x0, 3, 0);
 
@@ -1647,13 +1572,15 @@ int mipi_dsi_off_sub(struct hisi_fb_data_type *hisifd, char __iomem *mipi_dsi_ba
 static int mipi_dsi_ulps_enter(struct hisi_fb_data_type *hisifd,
 	char __iomem *mipi_dsi_base)
 {
-	uint32_t tmp = 0;
+	uint32_t tmp;
 	uint32_t cmp_ulpsactivenot_val = 0;
 	uint32_t cmp_stopstate_val = 0;
-	uint32_t try_times = 0;
+	uint32_t try_times;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(mipi_dsi_base == NULL);
+	if (NULL == hisifd || NULL == mipi_dsi_base) {
+		HISI_FB_ERR("hisifd or mipi_dsi_base is NULL.\n");
+		return 0;
+	}
 
 	HISI_FB_DEBUG("fb%d, +!\n", hisifd->index);
 
@@ -1671,8 +1598,10 @@ static int mipi_dsi_ulps_enter(struct hisi_fb_data_type *hisifd,
 		cmp_stopstate_val = (BIT(4));
 	}
 
-	if (inp32(mipi_dsi_base + MIPIDSI_LPCLK_CTRL_OFFSET) & (BIT(1)))
+	tmp = inp32(mipi_dsi_base + MIPIDSI_LPCLK_CTRL_OFFSET) & BIT(1);
+	if (tmp && (hisifd->panel_info.mipi.phy_mode == DPHY_MODE)) {
 		cmp_stopstate_val |= (BIT(2));
+	}
 
 	// check DPHY data and clock lane stopstate
 	try_times = 0;
@@ -1680,7 +1609,7 @@ static int mipi_dsi_ulps_enter(struct hisi_fb_data_type *hisifd,
 	while ((tmp & cmp_stopstate_val) != cmp_stopstate_val) {
 		udelay(10);
 		if (++try_times > 100) {
-			HISI_FB_ERR("fb%d, check DPHY data and clock lane stopstate failed! MIPIDSI_PHY_STATUS=0x%x.\n",
+			HISI_FB_ERR("fb%d, check phy data and clk lane stop state failed! PHY_STATUS=0x%x.\n",
 				hisifd->index, tmp);
 			return 0;
 		}
@@ -1688,7 +1617,6 @@ static int mipi_dsi_ulps_enter(struct hisi_fb_data_type *hisifd,
 		tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET);
 	}
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	//pctrl_dphytx_ulpsexit0, pctrl_dphytx_ulpsexit1
 	if (mipi_dsi_base == hisifd->mipi_dsi0_base) {
 		//pctrl_dphytx_ulpsexit0 = 0
@@ -1697,7 +1625,6 @@ static int mipi_dsi_ulps_enter(struct hisi_fb_data_type *hisifd,
 		//pctrl_dphytx_ulpsexit1 = 0
 		set_reg(hisifd->pctrl_base + PERI_CTRL23, 0x0, 1, 4);
 	}
-#endif
 
 	// disable DPHY clock lane's Hight Speed Clock
 	set_reg(mipi_dsi_base + MIPIDSI_LPCLK_CTRL_OFFSET, 0x0, 1, 0);
@@ -1711,7 +1638,7 @@ static int mipi_dsi_ulps_enter(struct hisi_fb_data_type *hisifd,
 	while ((tmp & cmp_ulpsactivenot_val) != 0) {
 		udelay(10);
 		if (++try_times > 100) {
-			HISI_FB_ERR("fb%d, check DPHY data lane ulpsactivenot_status failed! MIPIDSI_PHY_STATUS=0x%x.\n",
+			HISI_FB_ERR("fb%d, request phy data lane enter ulps failed! PHY_STATUS=0x%x.\n",
 				hisifd->index, tmp);
 			break;
 		}
@@ -1720,28 +1647,25 @@ static int mipi_dsi_ulps_enter(struct hisi_fb_data_type *hisifd,
 	}
 
 	// request that clock lane enter ULPS
-	set_reg(mipi_dsi_base + MIPIDSI_PHY_ULPS_CTRL_OFFSET, 0x5, 4, 0);
+	if (hisifd->panel_info.mipi.phy_mode == DPHY_MODE) {
+		set_reg(mipi_dsi_base + MIPIDSI_PHY_ULPS_CTRL_OFFSET, 0x5, 4, 0);
 
-	// check DPHY clock lane ulpsactivenot_status
-	try_times = 0;
-	tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET);
-	while ((tmp & BIT(3)) != 0) {
-		udelay(10);
-		if (++try_times > 100) {
-			HISI_FB_ERR("fb%d, check DPHY clock lane ulpsactivenot_status failed! MIPIDSI_PHY_STATUS=0x%x.\n",
-				hisifd->index, tmp);
-			break;
-		}
-
+		// check DPHY clock lane ulpsactivenot_status
+		try_times = 0;
 		tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET);
+		while ((tmp & BIT(3)) != 0) {
+			udelay(10);
+			if (++try_times > 100) {
+				HISI_FB_ERR("fb%d, request phy clk lane enter ulps failed! PHY_STATUS=0x%x.\n",
+					hisifd->index, tmp);
+				break;
+			}
+
+			tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET);
+		}
 	}
-#if defined(CONFIG_HISI_FB_3660)
-	//bit13 lock sel enable (dual_mipi_panel bit29 set 1) ,colse clock gate
-	set_reg(hisifd->pctrl_base + PERI_CTRL30, 0x1, 1, 13);
-	if (is_dual_mipi_panel(hisifd)) {
-		set_reg(hisifd->pctrl_base + PERI_CTRL30, 0x1, 1, 29);
-	}
-#endif
+
+
 
 	HISI_FB_DEBUG("fb%d, -!\n", hisifd->index);
 
@@ -1755,9 +1679,16 @@ static int mipi_dsi_ulps_exit(struct hisi_fb_data_type *hisifd,
 	uint32_t cmp_ulpsactivenot_val = 0;
 	uint32_t cmp_stopstate_val = 0;
 	uint32_t try_times = 0;
+	uint32_t need_pll_retry = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(mipi_dsi_base == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if(NULL == mipi_dsi_base){
+		HISI_FB_ERR("mipi_dsi_base is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +!\n", hisifd->index);
 
@@ -1774,8 +1705,11 @@ static int mipi_dsi_ulps_exit(struct hisi_fb_data_type *hisifd,
 		cmp_ulpsactivenot_val = (BIT(3) | BIT(5));
 		cmp_stopstate_val = (BIT(2) | BIT(4));
 	}
+	if (hisifd->panel_info.mipi.phy_mode == CPHY_MODE) {
+		cmp_ulpsactivenot_val &= (~ BIT(3));
+		cmp_stopstate_val &= (~ BIT(2));
+	}
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	if (mipi_dsi_base == hisifd->mipi_dsi0_base) {
 		// enable dphy0 refclk and cfgclk
 		//pctrl_dphytx_ulpsexit0 = 1
@@ -1785,17 +1719,8 @@ static int mipi_dsi_ulps_exit(struct hisi_fb_data_type *hisifd,
 		// pctrl_dphytx_ulpsexit1 = 1
 		set_reg(hisifd->pctrl_base + PERI_CTRL23, 0x1, 1, 4);
 	}
-#endif
 
-#if defined(CONFIG_HISI_FB_3660)
-	//wait pll clk
-	udelay(100);
-	//bit13 lock sel enable (dual_mipi_panel bit29 set 0) ,open clock gate
-	set_reg(hisifd->pctrl_base + PERI_CTRL30, 0x0, 1, 13);
-	if (is_dual_mipi_panel(hisifd)) {
-		set_reg(hisifd->pctrl_base + PERI_CTRL30, 0x0, 1, 29);
-	}
-#endif
+
 	// enable DPHY PLL, force_pll = 1
 	//outp32(mipi_dsi_base + MIPIDSI_PHY_RSTZ_OFFSET, 0xF); ???
 
@@ -1806,8 +1731,9 @@ static int mipi_dsi_ulps_exit(struct hisi_fb_data_type *hisifd,
 	while ((tmp & cmp_ulpsactivenot_val) != cmp_ulpsactivenot_val) {
 		udelay(10);
 		if (++try_times > 100) {
-			HISI_FB_ERR("fb%d, failed to request that data lane and clock lane exit ULPS!MIPIDSI_PHY_STATUS=0x%x.\n",
+			HISI_FB_ERR("fb%d, request data clock lane exit ulps fail!PHY_STATUS=0x%x.\n",
 				hisifd->index, tmp);
+			need_pll_retry = BIT(0);
 			break;
 		}
 
@@ -1820,7 +1746,6 @@ static int mipi_dsi_ulps_exit(struct hisi_fb_data_type *hisifd,
 	// clear PHY_ULPS_CTRL
 	outp32(mipi_dsi_base + MIPIDSI_PHY_ULPS_CTRL_OFFSET, 0x0);
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	//clear pctrl_dphytx_ulpsexit0, pctrl_dphytx_ulpsexit1
 	if (mipi_dsi_base == hisifd->mipi_dsi0_base) {
 		//clear pctrl_dphytx_ulpsexit0
@@ -1836,7 +1761,7 @@ static int mipi_dsi_ulps_exit(struct hisi_fb_data_type *hisifd,
 	while ((tmp & BIT(0)) != 0x1) {
 		udelay(10);
 		if (++try_times > 100) {
-			HISI_FB_ERR("fb%d, failed to wait DPHY PLL Lock!MIPIDSI_PHY_STATUS=0x%x.\n",
+			HISI_FB_ERR("fb%d, failed to wait phy pll lock!PHY_STATUS=0x%x.\n",
 				hisifd->index, tmp);
 			break;
 		}
@@ -1844,33 +1769,12 @@ static int mipi_dsi_ulps_exit(struct hisi_fb_data_type *hisifd,
 		tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET);
 	}
 	HISI_FB_DEBUG("cmp_stopstate_val=%d.\n", cmp_stopstate_val);
-#endif
 
-#if defined(CONFIG_HISI_FB_3660)
-//check DPHY data lane cmp_stopstate_val
-	try_times = 0;
-	tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET);
-	while ((tmp & cmp_stopstate_val) != cmp_stopstate_val) {
-		udelay(10);
-		if (++try_times > 100) {
-			HISI_FB_ERR("fb%d, check DPHY data lane cmp_stopstate_val failed! MIPIDSI_PHY_STATUS=0x%x.\n",
-				hisifd->index, tmp);
-			break;
-		}
 
-		tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET);
-	}
-#endif
+
 	// enable DPHY clock lane's Hight Speed Clock
 	set_reg(mipi_dsi_base + MIPIDSI_LPCLK_CTRL_OFFSET, 0x1, 1, 0);
 
-#if defined(CONFIG_HISI_FB_3660)
-	//reset dsi
-	outp32(mipi_dsi_base + MIPIDSI_PWR_UP_OFFSET, 0x0);
-	udelay(5);
-	// Power_up dsi
-	outp32(mipi_dsi_base + MIPIDSI_PWR_UP_OFFSET, 0x1);
-#endif
 	HISI_FB_DEBUG("fb%d, -!\n", hisifd->index);
 
 	return 0;
@@ -1881,7 +1785,10 @@ int mipi_dsi_ulps_cfg(struct hisi_fb_data_type *hisifd, int enable)
 {
 	int ret = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -1902,7 +1809,10 @@ int mipi_dsi_ulps_cfg(struct hisi_fb_data_type *hisifd, int enable)
 
 void mipi_dsi_reset(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 	set_reg(hisifd->mipi_dsi0_base + MIPIDSI_PWR_UP_OFFSET, 0x0, 1, 0);
 	msleep(2);
 	set_reg(hisifd->mipi_dsi0_base + MIPIDSI_PWR_UP_OFFSET, 0x1, 1, 0);
@@ -1970,7 +1880,10 @@ static struct gpio_desc mipi_dphy_gpio_lowpower_cmds[] = {
 
 static int mipi_dsi_dphy_fastboot_fpga(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	if (g_fpga_flag == 1) {
 		/* mpi dphy gpio request */
@@ -1983,7 +1896,10 @@ static int mipi_dsi_dphy_fastboot_fpga(struct hisi_fb_data_type *hisifd)
 
 static int mipi_dsi_dphy_on_fpga(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	if (hisifd->index == EXTERNAL_PANEL_IDX)
 		return 0;
@@ -2003,7 +1919,10 @@ static int mipi_dsi_dphy_on_fpga(struct hisi_fb_data_type *hisifd)
 
 static int mipi_dsi_dphy_off_fpga(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	if (hisifd->index == EXTERNAL_PANEL_IDX)
 		return 0;
@@ -2029,9 +1948,15 @@ static int mipi_dsi_set_fastboot(struct platform_device *pdev)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -2050,9 +1975,15 @@ static int mipi_dsi_on(struct platform_device *pdev)
 {
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -2082,16 +2013,8 @@ static int mipi_dsi_on(struct platform_device *pdev)
 		if (is_dual_mipi_panel(hisifd))
 			mipi_dsi_on_sub1(hisifd, hisifd->mipi_dsi1_base);
 
-	#if defined(CONFIG_HISI_FB_3660)
-		mipi_dsi_pll_status_check_ec(hisifd, hisifd->mipi_dsi0_base);
-		if (is_dual_mipi_panel(hisifd))
-			mipi_dsi_pll_status_check_ec(hisifd, hisifd->mipi_dsi1_base);
-	#endif
 	} else if (hisifd->index == EXTERNAL_PANEL_IDX) {
 		mipi_dsi_on_sub1(hisifd, hisifd->mipi_dsi1_base);
-	#if defined(CONFIG_HISI_FB_3660)
-		mipi_dsi_pll_status_check_ec(hisifd, hisifd->mipi_dsi1_base);
-	#endif
 	} else {
 		HISI_FB_ERR("fb%d, not supported!\n", hisifd->index);
 	}
@@ -2120,9 +2043,15 @@ static int mipi_dsi_off(struct platform_device *pdev)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -2176,9 +2105,15 @@ static int mipi_dsi_lp_ctrl(struct platform_device *pdev, bool lp_enter)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -2192,9 +2127,15 @@ static int mipi_dsi_remove(struct platform_device *pdev)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -2246,9 +2187,15 @@ static int mipi_dsi_set_backlight(struct platform_device *pdev, uint32_t bl_leve
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -2264,9 +2211,15 @@ static int mipi_dsi_vsync_ctrl(struct platform_device *pdev, int enable)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -2282,9 +2235,15 @@ static int mipi_dsi_lcd_fps_scence_handle(struct platform_device *pdev, uint32_t
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -2300,9 +2259,15 @@ static int mipi_dsi_lcd_fps_updt_handle(struct platform_device *pdev)
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +!\n", hisifd->index);
 
@@ -2324,9 +2289,15 @@ static int mipi_dsi_esd_handle(struct platform_device *pdev)
 	uint32_t try_times = 0;
 	struct hisi_panel_info *pinfo = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	mipi_dsi0_base = hisifd->mipi_dsi0_base;
 	pinfo = &(hisifd->panel_info);
 
@@ -2386,9 +2357,15 @@ static int mipi_dsi_set_display_region(struct platform_device *pdev, struct dss_
 	int ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL || dirty == NULL);
+	if (pdev == NULL || dirty == NULL) {
+		HISI_FB_ERR("pdev or firty is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("index=%d, enter!\n", hisifd->index);
 
@@ -2403,9 +2380,15 @@ static int mipi_dsi_get_lcd_id(struct platform_device *pdev)
 {
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	return panel_next_get_lcd_id(pdev);
 }
@@ -2415,12 +2398,19 @@ static ssize_t mipi_dsi_bit_clk_upt_store(struct platform_device *pdev,
 {
 	struct hisi_fb_data_type *hisifd = NULL;
 	struct hisi_panel_info *pinfo = NULL;
+	uint32_t dsi_bit_clk_upt_tmp = 0;
 	int n_str = 0;
 	int i = 0;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	pinfo = &(hisifd->panel_info);
 
 	for (i = 0; buf[i] != '\0' && buf[i] != '\n'; i++) {
@@ -2444,21 +2434,25 @@ static ssize_t mipi_dsi_bit_clk_upt_store(struct platform_device *pdev,
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
 	if (!strncmp(buf, MIPI_DSI_BIT_CLK_STR1, n_str)) {
-		pinfo->mipi.dsi_bit_clk_upt = pinfo->mipi.dsi_bit_clk_val1;
+		dsi_bit_clk_upt_tmp = pinfo->mipi.dsi_bit_clk_val1;
 	} else if (!strncmp(buf, MIPI_DSI_BIT_CLK_STR2, n_str)) {
-		pinfo->mipi.dsi_bit_clk_upt = pinfo->mipi.dsi_bit_clk_val2;
+		dsi_bit_clk_upt_tmp = pinfo->mipi.dsi_bit_clk_val2;
 	} else if (!strncmp(buf, MIPI_DSI_BIT_CLK_STR3, n_str)) {
-		pinfo->mipi.dsi_bit_clk_upt = pinfo->mipi.dsi_bit_clk_val3;
+		dsi_bit_clk_upt_tmp = pinfo->mipi.dsi_bit_clk_val3;
 	} else if (!strncmp(buf, MIPI_DSI_BIT_CLK_STR4, n_str)) {
-		pinfo->mipi.dsi_bit_clk_upt = pinfo->mipi.dsi_bit_clk_val4;
+		dsi_bit_clk_upt_tmp = pinfo->mipi.dsi_bit_clk_val4;
 	} else if (!strncmp(buf, MIPI_DSI_BIT_CLK_STR5, n_str)) {
-		pinfo->mipi.dsi_bit_clk_upt = pinfo->mipi.dsi_bit_clk_val5;
+		dsi_bit_clk_upt_tmp = pinfo->mipi.dsi_bit_clk_val5;
 	} else {
 		HISI_FB_ERR("fb%d, unknown dsi_bit_clk_index!\n", hisifd->index);
 	}
 
-	if (pinfo->mipi.dsi_bit_clk_upt == 0)
-		pinfo->mipi.dsi_bit_clk_upt = pinfo->mipi.dsi_bit_clk;
+	if (dsi_bit_clk_upt_tmp == 0) {
+		return count;
+	}
+	pinfo->mipi.dsi_bit_clk_upt = dsi_bit_clk_upt_tmp;
+
+	HISI_FB_INFO("switch mipi clk to %d.\n", pinfo->mipi.dsi_bit_clk_upt);
 
 	HISI_FB_DEBUG("fb%d, -.\n", hisifd->index);
 
@@ -2469,11 +2463,17 @@ static ssize_t mipi_dsi_bit_clk_upt_show(struct platform_device *pdev, char *buf
 {
 	struct hisi_fb_data_type *hisifd = NULL;
 	struct hisi_panel_info *pinfo = NULL;
-	ssize_t ret = -1;
+	ssize_t ret;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	pinfo = &(hisifd->panel_info);
 
 	if (!hisifd->panel_info.dsi_bit_clk_upt_support) {
@@ -2492,12 +2492,18 @@ static ssize_t mipi_dsi_bit_clk_upt_show(struct platform_device *pdev, char *buf
 
 static ssize_t mipi_dsi_lcd_model_show(struct platform_device *pdev, char *buf)
 {
-	ssize_t ret = -1;
+	ssize_t ret;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_model_show(pdev, buf);
@@ -2508,12 +2514,18 @@ static ssize_t mipi_dsi_lcd_model_show(struct platform_device *pdev, char *buf)
 
 static ssize_t mipi_dsi_lcd_check_reg_show(struct platform_device *pdev, char *buf)
 {
-	ssize_t ret = -1;
+	ssize_t ret;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_check_reg(pdev, buf);
@@ -2527,9 +2539,15 @@ static ssize_t mipi_dsi_lcd_mipi_detect_show(struct platform_device *pdev, char 
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_mipi_detect(pdev, buf);
@@ -2543,9 +2561,15 @@ static ssize_t mipi_dsi_lcd_hkadc_debug_show(struct platform_device *pdev, char 
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_hkadc_debug_show(pdev, buf);
@@ -2557,12 +2581,18 @@ static ssize_t mipi_dsi_lcd_hkadc_debug_show(struct platform_device *pdev, char 
 static ssize_t mipi_dsi_lcd_hkadc_debug_store(struct platform_device *pdev,
 	const char *buf, size_t count)
 {
-	ssize_t ret = -1;
+	ssize_t ret;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_hkadc_debug_store(pdev, buf, count);
@@ -2573,12 +2603,18 @@ static ssize_t mipi_dsi_lcd_hkadc_debug_store(struct platform_device *pdev,
 
 static ssize_t mipi_dsi_lcd_gram_check_show(struct platform_device *pdev, char *buf)
 {
-	ssize_t ret = -1;
+	ssize_t ret;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_gram_check_show(pdev, buf);
@@ -2587,15 +2623,20 @@ static ssize_t mipi_dsi_lcd_gram_check_show(struct platform_device *pdev, char *
 	return ret;
 }
 
-static ssize_t mipi_dsi_lcd_gram_check_store(struct platform_device *pdev,
-	const char *buf, size_t count)
+static ssize_t mipi_dsi_lcd_gram_check_store(struct platform_device *pdev, const char *buf, size_t count)
 {
-	ssize_t ret = -1;
+	ssize_t ret;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_gram_check_store(pdev, buf, count);
@@ -2609,9 +2650,15 @@ static ssize_t mipi_dsi_lcd_dynamic_sram_checksum_show(struct platform_device *p
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_dynamic_sram_checksum_show(pdev, buf);
@@ -2620,15 +2667,20 @@ static ssize_t mipi_dsi_lcd_dynamic_sram_checksum_show(struct platform_device *p
 	return ret;
 }
 
-static ssize_t mipi_dsi_lcd_dynamic_sram_checksum_store(struct platform_device *pdev,
-	const char *buf, size_t count)
+static ssize_t mipi_dsi_lcd_dynamic_sram_checksum_store(struct platform_device *pdev, const char *buf, size_t count)
 {
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_dynamic_sram_checksum_store(pdev, buf, count);
@@ -2638,15 +2690,20 @@ static ssize_t mipi_dsi_lcd_dynamic_sram_checksum_store(struct platform_device *
 }
 
 
-static ssize_t mipi_dsi_lcd_voltage_enable_store(struct platform_device *pdev,
-	const char *buf, size_t count)
+static ssize_t mipi_dsi_lcd_voltage_enable_store(struct platform_device *pdev,	const char *buf, size_t count)
 {
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_voltage_enable_store(pdev, buf, count);
@@ -2655,15 +2712,20 @@ static ssize_t mipi_dsi_lcd_voltage_enable_store(struct platform_device *pdev,
 	return ret;
 }
 
-static ssize_t mipi_dsi_lcd_bist_check(struct platform_device *pdev,
-	char *buf)
+static ssize_t mipi_dsi_lcd_bist_check(struct platform_device *pdev, char *buf)
 {
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_bist_check(pdev, buf);
@@ -2694,8 +2756,7 @@ static ssize_t mipi_dsi_lcd_amoled_vr_mode_show(struct platform_device *pdev, ch
 	return ret;
 }
 
-static ssize_t mipi_dsi_lcd_amoled_vr_mode_store(struct platform_device *pdev,
-	const char *buf, size_t count)
+static ssize_t mipi_dsi_lcd_amoled_vr_mode_store(struct platform_device *pdev, const char *buf, size_t count)
 {
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
@@ -2738,8 +2799,7 @@ static ssize_t mipi_dsi_lcd_acl_ctrl_show(struct platform_device *pdev, char *bu
 	return ret;
 }
 
-static ssize_t mipi_dsi_lcd_acl_ctrl_store(struct platform_device *pdev,
-	const char *buf, size_t count)
+static ssize_t mipi_dsi_lcd_acl_ctrl_store(struct platform_device *pdev, const char *buf, size_t count)
 {
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
@@ -2767,9 +2827,15 @@ static ssize_t mipi_dsi_lcd_sleep_ctrl_show(struct platform_device *pdev, char *
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_sleep_ctrl_show(pdev, buf);
@@ -2778,15 +2844,20 @@ static ssize_t mipi_dsi_lcd_sleep_ctrl_show(struct platform_device *pdev, char *
 	return ret;
 }
 
-static ssize_t mipi_dsi_lcd_sleep_ctrl_store(struct platform_device *pdev,
-	const char *buf, size_t count)
+static ssize_t mipi_dsi_lcd_sleep_ctrl_store(struct platform_device *pdev, const char *buf, size_t count)
 {
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_sleep_ctrl_store(pdev, buf, count);
@@ -2800,9 +2871,15 @@ static ssize_t mipi_dsi_lcd_test_config_show(struct platform_device *pdev, char 
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_test_config_show(pdev, buf);
@@ -2811,18 +2888,67 @@ static ssize_t mipi_dsi_lcd_test_config_show(struct platform_device *pdev, char 
 	return ret;
 }
 
-static ssize_t mipi_dsi_lcd_test_config_store(struct platform_device *pdev,
-	const char *buf, size_t count)
+static ssize_t mipi_dsi_lcd_test_config_store(struct platform_device *pdev,	const char *buf, size_t count)
 {
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_test_config_store(pdev, buf, count);
+	HISI_FB_DEBUG("fb%d, -.\n", hisifd->index);
+
+	return ret;
+}
+
+static ssize_t mipi_dsi_lcd_reg_read_show(struct platform_device *pdev, char *buf)
+{
+	ssize_t ret = -1;
+	struct hisi_fb_data_type *hisifd = NULL;
+
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
+	hisifd = platform_get_drvdata(pdev);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+
+	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
+	ret = panel_next_lcd_reg_read_show(pdev, buf);
+	HISI_FB_DEBUG("fb%d, -.\n", hisifd->index);
+
+	return ret;
+}
+
+static ssize_t mipi_dsi_lcd_reg_read_store(struct platform_device *pdev, const char *buf, size_t count)
+{
+	ssize_t ret = -1;
+	struct hisi_fb_data_type *hisifd = NULL;
+
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
+	hisifd = platform_get_drvdata(pdev);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+
+	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
+	ret = panel_next_lcd_reg_read_store(pdev, buf, count);
 	HISI_FB_DEBUG("fb%d, -.\n", hisifd->index);
 
 	return ret;
@@ -2833,9 +2959,15 @@ static ssize_t mipi_dsi_lcd_support_mode_show(struct platform_device *pdev, char
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_support_mode_show(pdev, buf);
@@ -2844,15 +2976,20 @@ static ssize_t mipi_dsi_lcd_support_mode_show(struct platform_device *pdev, char
 	return ret;
 }
 
-static ssize_t mipi_dsi_lcd_support_mode_store(struct platform_device *pdev,
-	const char *buf, size_t count)
+static ssize_t mipi_dsi_lcd_support_mode_store(struct platform_device *pdev, const char *buf, size_t count)
 {
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_support_mode_store(pdev, buf, count);
@@ -2866,9 +3003,15 @@ static ssize_t mipi_dsi_lcd_support_checkmode_show(struct platform_device *pdev,
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_support_checkmode_show(pdev, buf);
@@ -2882,9 +3025,15 @@ static ssize_t mipi_dsi_lcd_lp2hs_mipi_check_show(struct platform_device *pdev, 
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_lp2hs_mipi_check_show(pdev, buf);
@@ -2893,15 +3042,20 @@ static ssize_t mipi_dsi_lcd_lp2hs_mipi_check_show(struct platform_device *pdev, 
 	return ret;
 }
 
-static ssize_t mipi_dsi_lcd_lp2hs_mipi_check_store(struct platform_device *pdev,
-	const char *buf, size_t count)
+static ssize_t mipi_dsi_lcd_lp2hs_mipi_check_store(struct platform_device *pdev, const char *buf, size_t count)
 {
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_lcd_lp2hs_mipi_check_store(pdev, buf, count);
@@ -2910,27 +3064,25 @@ static ssize_t mipi_dsi_lcd_lp2hs_mipi_check_store(struct platform_device *pdev,
 	return ret;
 }
 
-static ssize_t mipi_dsi_amoled_pcd_errflag_check(struct platform_device *pdev,
-	char *buf)
+static ssize_t mipi_dsi_amoled_pcd_errflag_check(struct platform_device *pdev, char *buf)
 {
 	ssize_t ret = -1;
 	ret = panel_next_amoled_pcd_errflag_check(pdev, buf);
 	return ret;
 }
 
-static ssize_t mipi_dsi_lcd_ic_color_enhancement_mode_store(struct platform_device *pdev,
-	const char *buf, size_t count)
+static ssize_t mipi_dsi_lcd_ic_color_enhancement_mode_store(struct platform_device *pdev,	const char *buf, size_t count)
 {
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
 	if (NULL == pdev) {
-		HISI_FB_ERR("NULL Pointer");
+		HISI_FB_ERR("mipi dsi_lcd_ic_color_enhancement_mode_store pdev NULL Pointer");
 		return 0;
 	}
 	hisifd = platform_get_drvdata(pdev);
 	if (NULL == hisifd) {
-		HISI_FB_ERR("NULL Pointer");
+		HISI_FB_ERR("mipi dsi_lcd_ic_color_enhancement_mode_store hisifd NULL Pointer");
 		return 0;
 	}
 
@@ -2947,12 +3099,12 @@ static ssize_t mipi_dsi_lcd_ic_color_enhancement_mode_show(struct platform_devic
 	struct hisi_fb_data_type *hisifd = NULL;
 
 	if (NULL == pdev) {
-		HISI_FB_ERR("NULL Pointer");
+		HISI_FB_ERR("mipi_dsi_lcd_ic_color_enhancement_mode_show pdev NULL Pointer");
 		return 0;
 	}
 	hisifd = platform_get_drvdata(pdev);
 	if (NULL == hisifd) {
-		HISI_FB_ERR("NULL Pointer");
+		HISI_FB_ERR("mipi_dsi_lcd_ic_color_enhancement_mode_show hisifd NULL Pointer");
 		return 0;
 	}
 
@@ -2963,15 +3115,20 @@ static ssize_t mipi_dsi_lcd_ic_color_enhancement_mode_show(struct platform_devic
 	return ret;
 }
 
-static ssize_t mipi_dsi_sharpness2d_table_store(struct platform_device *pdev,
-	const char *buf, size_t count)
+static ssize_t mipi_dsi_sharpness2d_table_store(struct platform_device *pdev,	const char *buf, size_t count)
 {
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_sharpness2d_table_store(pdev, buf, count);
@@ -2980,15 +3137,20 @@ static ssize_t mipi_dsi_sharpness2d_table_store(struct platform_device *pdev,
 	return ret;
 }
 
-static ssize_t mipi_dsi_alpm_setting(struct platform_device *pdev,
-	const char *buf, size_t count)
+static ssize_t mipi_dsi_alpm_setting(struct platform_device *pdev, const char *buf, size_t count)
 {
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_alpm_setting_store(pdev, buf, count);
@@ -3002,9 +3164,15 @@ static ssize_t mipi_dsi_sharpness2d_table_show(struct platform_device *pdev, cha
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_sharpness2d_table_show(pdev, buf);
@@ -3018,9 +3186,15 @@ static ssize_t mipi_dsi_panel_info_show(struct platform_device *pdev, char *buf)
 	ssize_t ret = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = panel_next_panel_info_show(pdev, buf);
@@ -3029,7 +3203,28 @@ static ssize_t mipi_dsi_panel_info_show(struct platform_device *pdev, char *buf)
 	return ret;
 }
 
-/*lint -e838 */
+static int mipi_dsi_sbl_ctrl(struct platform_device *pdev, int enable)
+{
+	ssize_t ret = -1;
+	struct hisi_fb_data_type *hisifd = NULL;
+
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
+	hisifd = platform_get_drvdata(pdev);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+
+	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
+	ret = panel_next_sbl_ctrl(pdev, enable);
+	HISI_FB_DEBUG("fb%d, -.\n", hisifd->index);
+	return ret;
+}
+
+/*lint -e712 -e838 */
 // TODO: Only for dallas video mode
 static void mipi_dsi_bit_clk_upt_set_video(struct hisi_fb_data_type *hisifd,
 	char __iomem *mipi_dsi_base, struct mipi_dsi_phy_ctrl* phy_ctrl)
@@ -3064,168 +3259,70 @@ static void mipi_dsi_bit_clk_upt_set_video(struct hisi_fb_data_type *hisifd,
 
 	/*************************Configure the DPHY start*************************/
 	// physical configuration I, Q
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010010);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		(phy_ctrl->rg_hstx_ckg_sel << 1));
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+	mipi_config_phy_test_code(mipi_dsi_base, 0x00010010, phy_ctrl->rg_hstx_ckg_sel << 1);
 
 	// physical configuration PLL I
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010014);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		(phy_ctrl->rg_pll_fbd_s << 4) + (phy_ctrl->rg_pll_enswc << 3) +
-		(phy_ctrl->rg_pll_enbwt << 2) + phy_ctrl->rg_pll_chp);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+	mipi_config_phy_test_code(mipi_dsi_base, 0x00010014, (phy_ctrl->rg_pll_fbd_s << 4) +
+		(phy_ctrl->rg_pll_enswc << 3) + (phy_ctrl->rg_pll_enbwt << 2) + phy_ctrl->rg_pll_chp);
 
 	// physical configuration PLL II, M
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010015);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, phy_ctrl->rg_pll_fbd_p);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-
+	mipi_config_phy_test_code(mipi_dsi_base, 0x00010015, phy_ctrl->rg_pll_fbd_p);
 	// physical configuration PLL IV, N
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010017);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, phy_ctrl->rg_pll_pre_p);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+	mipi_config_phy_test_code(mipi_dsi_base, 0x00010017, phy_ctrl->rg_pll_pre_p);
 
 	// sets the analog characteristic of V reference in D-PHY TX
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x0001001D);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, phy_ctrl->rg_vrefsel_vcm);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+	mipi_config_phy_test_code(mipi_dsi_base, 0x0001001D, phy_ctrl->rg_vrefsel_vcm);
 
-	// pre_delay of clock lane request setting
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010020);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, DSS_REDUCE(phy_ctrl->clk_pre_delay));
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+	//pre_delay of clock lane request setting
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_PRE_DELAY, DSS_REDUCE(phy_ctrl->clk_pre_delay));
 
-	// post_delay of clock lane request setting
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010021);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, DSS_REDUCE(phy_ctrl->clk_post_delay));
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+	//post_delay of clock lane request setting
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_POST_DELAY, DSS_REDUCE(phy_ctrl->clk_post_delay));
 
-	// clock lane timing ctrl - t_lpx
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010022);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, DSS_REDUCE(phy_ctrl->clk_t_lpx));
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+	//clock lane timing ctrl - t_lpx
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_TLPX, DSS_REDUCE(phy_ctrl->clk_t_lpx));
 
-	// clock lane timing ctrl - t_hs_prepare
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010023);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, DSS_REDUCE(phy_ctrl->clk_t_hs_prepare));
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+	//clock lane timing ctrl - t_hs_prepare
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_PREPARE, DSS_REDUCE(phy_ctrl->clk_t_hs_prepare));
 
-	// clock lane timing ctrl - t_hs_zero
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010024);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, DSS_REDUCE(phy_ctrl->clk_t_hs_zero));
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+	//clock lane timing ctrl - t_hs_zero
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_ZERO, DSS_REDUCE(phy_ctrl->clk_t_hs_zero));
 
-	// clock lane timing ctrl - t_hs_trial
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010025);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, phy_ctrl->clk_t_hs_trial);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+	//clock lane timing ctrl - t_hs_trial
+	mipi_config_phy_test_code(mipi_dsi_base, MIPIDSI_PHY_TST_CLK_TRAIL, phy_ctrl->clk_t_hs_trial);
 
 	for (i = 0; i <= pinfo->mipi.lane_nums; i++) {
-		// data lane pre_delay
-		tmp = 0x10030 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, DSS_REDUCE(phy_ctrl->data_pre_delay));
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		//data lane pre_delay
+		tmp = MIPIDSI_PHY_TST_DATA_PRE_DELAY + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, tmp, DSS_REDUCE(phy_ctrl->data_pre_delay));
 
 		//data lane post_delay
-		tmp = 0x10031 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, DSS_REDUCE(phy_ctrl->data_post_delay));
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		tmp = MIPIDSI_PHY_TST_DATA_POST_DELAY + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, tmp, DSS_REDUCE(phy_ctrl->data_post_delay));
 
-		// data lane timing ctrl - t_lpx
-		tmp = 0x10032 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, DSS_REDUCE(phy_ctrl->data_t_lpx));
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		//data lane timing ctrl - t_lpx
+		tmp = MIPIDSI_PHY_TST_DATA_TLPX + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, tmp, DSS_REDUCE(phy_ctrl->data_t_lpx));
 
-		// data lane timing ctrl - t_hs_prepare
-		tmp = 0x10033 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, DSS_REDUCE(phy_ctrl->data_t_hs_prepare));
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		//data lane timing ctrl - t_hs_prepare
+		tmp = MIPIDSI_PHY_TST_DATA_PREPARE + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, tmp, DSS_REDUCE(phy_ctrl->data_t_hs_prepare));
 
-		// data lane timing ctrl - t_hs_zero
-		tmp = 0x10034 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, DSS_REDUCE(phy_ctrl->data_t_hs_zero));
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		//data lane timing ctrl - t_hs_zero
+		tmp = MIPIDSI_PHY_TST_DATA_ZERO + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, tmp, DSS_REDUCE(phy_ctrl->data_t_hs_zero));
 
-		// data lane timing ctrl - t_hs_trial
-		tmp = 0x10035 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, phy_ctrl->data_t_hs_trial);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		//data lane timing ctrl - t_hs_trial
+		tmp = MIPIDSI_PHY_TST_DATA_TRAIL + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, tmp, phy_ctrl->data_t_hs_trial);
 
-		// data lane timing ctrl - t_ta_go
-		tmp = 0x10036 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, DSS_REDUCE(phy_ctrl->data_t_ta_go));
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		//data lane timing ctrl - t_ta_go
+		tmp = MIPIDSI_PHY_TST_DATA_TA_GO + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, tmp, DSS_REDUCE(phy_ctrl->data_t_ta_go));
 
-		// data lane timing ctrl - t_ta_get
-		tmp = 0x10037 + (i << 4);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, tmp);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, DSS_REDUCE(phy_ctrl->data_t_ta_get));
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		//data lane timing ctrl - t_ta_get
+		tmp = MIPIDSI_PHY_TST_DATA_TA_GET + (i << 4);
+		mipi_config_phy_test_code(mipi_dsi_base, tmp, DSS_REDUCE(phy_ctrl->data_t_ta_get));
 	}
 
 	is_ready = false;
@@ -3260,6 +3357,7 @@ static void mipi_dsi_bit_clk_upt_set_video(struct hisi_fb_data_type *hisifd,
 	hbp_time = pinfo->ldi.h_back_porch * phy_ctrl->lane_byte_clk / pixel_clk;
 	hline_time = (pinfo->ldi.h_pulse_width + pinfo->ldi.h_back_porch +
 		rect.w + pinfo->ldi.h_front_porch) * phy_ctrl->lane_byte_clk / pixel_clk;
+
 	set_reg(mipi_dsi_base + MIPIDSI_VID_HSA_TIME_OFFSET, hsa_time, 12, 0);
 	set_reg(mipi_dsi_base + MIPIDSI_VID_HBP_TIME_OFFSET, hbp_time, 12, 0);
 	set_reg(mipi_dsi_base + MIPIDSI_VID_HLINE_TIME_OFFSET, hline_time, 15, 0);
@@ -3271,7 +3369,7 @@ static void mipi_dsi_bit_clk_upt_set_video(struct hisi_fb_data_type *hisifd,
 	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_CFG_OFFSET, phy_ctrl->data_lane_lp2hs_time, 8, 16);
 	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_CFG_OFFSET, phy_ctrl->data_lane_hs2lp_time, 8, 24);
 }
-/*lint +e838 */
+/*lint +e712 +e838 */
 
 static void mipi_dsi_bit_clk_upt_set_cmd(struct hisi_fb_data_type *hisifd,
 	char __iomem *mipi_dsi_base, struct mipi_dsi_phy_ctrl* phy_ctrl)
@@ -3291,95 +3389,290 @@ static void mipi_dsi_bit_clk_upt_set_cmd(struct hisi_fb_data_type *hisifd,
 	// config PLL M N Q
 	if (phy_ctrl->rg_pll_pre_p > pinfo->dsi_phy_ctrl.rg_pll_pre_p) {
 		// physical configuration PLL IV, N
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010017);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, phy_ctrl->rg_pll_pre_p);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010017, phy_ctrl->rg_pll_pre_p);
 
 		// physical configuration PLL II, M
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010015);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, phy_ctrl->rg_pll_fbd_p);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010015, phy_ctrl->rg_pll_fbd_p);
 	} else {
 		// physical configuration PLL II, M
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010015);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, phy_ctrl->rg_pll_fbd_p);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010015, phy_ctrl->rg_pll_fbd_p);
 
 		// physical configuration PLL IV, N
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010017);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, phy_ctrl->rg_pll_pre_p);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-		outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010017, phy_ctrl->rg_pll_pre_p);
 	}
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	// physical configuration I, Q
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010010);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, (phy_ctrl->rg_hstx_ckg_sel << 1));
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-#endif
+	mipi_config_phy_test_code(mipi_dsi_base, 0x00010010, phy_ctrl->rg_hstx_ckg_sel << 1);
 	// physical configuration PLL I
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x00010014);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		(phy_ctrl->rg_pll_fbd_s << 4) + (phy_ctrl->rg_pll_enswc << 3) +
-		(phy_ctrl->rg_pll_enbwt << 2) + phy_ctrl->rg_pll_chp);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
+	mipi_config_phy_test_code(mipi_dsi_base, 0x00010014, (phy_ctrl->rg_pll_fbd_s << 4) +
+		(phy_ctrl->rg_pll_enswc << 3) + (phy_ctrl->rg_pll_enbwt << 2) + phy_ctrl->rg_pll_chp);
 
-#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	//reload_command
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET, 0x0001001F);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL1_OFFSET,
-		pinfo->dsi_phy_ctrl.load_command);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000002);
-	outp32(mipi_dsi_base + MIPIDSI_PHY_TST_CTRL0_OFFSET, 0x00000000);
-#endif
+	// Configure core's phy parameters
+	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_LPCLK_CFG_OFFSET,
+			pinfo->dsi_phy_ctrl.clk_lane_lp2hs_time, 10, 0);
+	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_LPCLK_CFG_OFFSET,
+			pinfo->dsi_phy_ctrl.clk_lane_hs2lp_time, 10, 16);
+
+	if (is_mipi_cmd_panel(hisifd)) {
+		set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_CFG_OFFSET, 0xFFF, 15, 0);
+	} else {
+		set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_CFG_OFFSET, 0x7FFF, 15, 0);
+	}
+	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_CFG_OFFSET,
+			pinfo->dsi_phy_ctrl.data_lane_lp2hs_time, 8, 16);
+	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_CFG_OFFSET,
+			pinfo->dsi_phy_ctrl.data_lane_hs2lp_time, 8, 24);
+
+	// escape clock dividor
+	outp32(mipi_dsi_base + MIPIDSI_CLKMGR_CFG_OFFSET,
+		(phy_ctrl->clk_division + (phy_ctrl->clk_division << 8)));
+}
+
+static void mipi_dsi_set_cdphy_bit_clk_upt_cmd(struct hisi_fb_data_type *hisifd,
+	char __iomem *mipi_dsi_base, struct mipi_dsi_phy_ctrl* phy_ctrl)
+{
+	struct hisi_panel_info *pinfo;
+	unsigned long dw_jiffies;
+	bool is_ready ;
+	uint32_t tmp = 0;
+
+	if (NULL == hisifd || NULL == phy_ctrl) {
+		HISI_FB_ERR("hisifd or phy_ctrl is null.\n");
+		return;
+	}
+	HISI_FB_DEBUG("fb%d +.\n", hisifd->index);
+	pinfo = &(hisifd->panel_info);
+
+	//config parameter M, N, Q of PLL
+	if (pinfo->mipi.phy_mode == CPHY_MODE) {
+		if (phy_ctrl->rg_pre_div > pinfo->dsi_phy_ctrl.rg_pre_div) {
+			//PLL configuration III N
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010049, phy_ctrl->rg_pre_div);
+			//PLL configuration IV M
+			mipi_config_phy_test_code(mipi_dsi_base, 0x0001004A, phy_ctrl->rg_div);
+		} else {
+			//PLL configuration IV M
+			mipi_config_phy_test_code(mipi_dsi_base, 0x0001004A, phy_ctrl->rg_div);
+			//PLL configuration III N
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010049, phy_ctrl->rg_pre_div);
+		}
+		//PLL configuration II Q
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010048, phy_ctrl->rg_0p8v + (phy_ctrl->rg_2p5g << 1) +
+			(phy_ctrl->rg_320m << 2) + (phy_ctrl->rg_band_sel << 3) + (phy_ctrl->rg_cphy_div << 4));
+
+	} else {
+		if (phy_ctrl->rg_pre_div > pinfo->dsi_phy_ctrl.rg_pre_div) {
+			//PLL configuration III N
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010049, phy_ctrl->rg_pre_div);
+			//PLL configuration IV M
+			mipi_config_phy_test_code(mipi_dsi_base, 0x0001004A, phy_ctrl->rg_div);
+		} else {
+			//PLL configuration IV M
+			mipi_config_phy_test_code(mipi_dsi_base, 0x0001004A, phy_ctrl->rg_div);
+			//PLL configuration III N
+			mipi_config_phy_test_code(mipi_dsi_base, 0x00010049, phy_ctrl->rg_pre_div);
+		}
+		//PLL configuration II Q
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010048, phy_ctrl->rg_0p8v + (phy_ctrl->rg_2p5g << 1) +
+			(phy_ctrl->rg_320m << 2) + (phy_ctrl->rg_band_sel << 3));
+	}
+	//PLL update control
+	mipi_config_phy_test_code(mipi_dsi_base, 0x0001004B, 0x1);
 
 	// clk lane HS2LP/LP2HS
 	outp32(mipi_dsi_base + MIPIDSI_PHY_TMR_LPCLK_CFG_OFFSET,
 		(phy_ctrl->clk_lane_lp2hs_time + (phy_ctrl->clk_lane_hs2lp_time << 16)));
 	// data lane HS2LP/ LP2HS
 	outp32(mipi_dsi_base + MIPIDSI_PHY_TMR_CFG_OFFSET,
-		(4095 + (phy_ctrl->data_lane_lp2hs_time << 16) + (phy_ctrl->data_lane_hs2lp_time << 24)));
-	// escape clock dividor
-	outp32(mipi_dsi_base + MIPIDSI_CLKMGR_CFG_OFFSET,
-		(phy_ctrl->clk_division + (phy_ctrl->clk_division<<8)));
+		(phy_ctrl->data_lane_lp2hs_time + (phy_ctrl->data_lane_hs2lp_time << 16)));
 
+	// escape clock dividor
+	set_reg(mipi_dsi_base + MIPIDSI_CLKMGR_CFG_OFFSET,
+		(phy_ctrl->clk_division + (phy_ctrl->clk_division << 8)), 16, 0);
+	/*lint -e550 -e732*/
+	is_ready = false;
+	dw_jiffies = jiffies + HZ / 2;//500ms
+	do {
+		tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET);
+		if ((tmp & 0x00000001) == 0x00000001) {
+			is_ready = true;
+			break;
+		}
+	} while (time_after(dw_jiffies, jiffies));
+	if (!is_ready) {
+		HISI_FB_INFO("fb%d, phylock is not ready!MIPIDSI_PHY_STATUS_OFFSET=0x%x.\n",
+			hisifd->index, tmp);
+	}
+	/*lint +e550 +e732*/
+
+	HISI_FB_DEBUG("fb%d -.\n", hisifd->index);
+}
+
+static void mipi_dsi_set_cdphy_bit_clk_upt_video(struct hisi_fb_data_type *hisifd,
+	char __iomem *mipi_dsi_base, struct mipi_dsi_phy_ctrl* phy_ctrl)
+{
+
+	struct hisi_panel_info *pinfo;
+	uint32_t hline_time = 0;
+	uint32_t hsa_time = 0;
+	uint32_t hbp_time = 0;
+	uint32_t pixel_clk;
+	dss_rect_t rect;
+	unsigned long dw_jiffies;
+	uint32_t tmp;
+	bool is_ready;
+
+	if (NULL == hisifd || NULL == phy_ctrl) {
+		HISI_FB_ERR("hisifd or phy_ctrl is null.\n");
+		return;
+	}
+	HISI_FB_DEBUG("fb%d +.\n", hisifd->index);
+
+	pinfo = &(hisifd->panel_info);
+	pinfo->dsi_phy_ctrl = *phy_ctrl;
+
+	rect.x = 0;
+	rect.y = 0;
+	rect.w = pinfo->xres;//lint !e713
+	rect.h = pinfo->yres;//lint !e713
+
+	mipi_ifbc_get_rect(hisifd, &rect);
+
+	if (pinfo->mipi.phy_mode == CPHY_MODE) {
+		//PLL configuration I
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010046, phy_ctrl->rg_cp + (phy_ctrl->rg_lpf_r << 4));
+
+		//PLL configuration II
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010048, phy_ctrl->rg_0p8v + (phy_ctrl->rg_2p5g << 1) +
+			(phy_ctrl->rg_320m << 2) + (phy_ctrl->rg_band_sel << 3) + (phy_ctrl->rg_cphy_div << 4));
+
+		//PLL configuration III
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010049, phy_ctrl->rg_pre_div);
+
+		//PLL configuration IV
+		mipi_config_phy_test_code(mipi_dsi_base, 0x0001004A, phy_ctrl->rg_div);
+
+		//PLL update control
+		mipi_config_phy_test_code(mipi_dsi_base, 0x0001004B, 0x1);
+
+		//set cphy spec parameter
+		mipi_config_cphy_spec1v0_parameter(mipi_dsi_base, pinfo);
+	} else {
+		//PLL configuration I
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010046, phy_ctrl->rg_cp + (phy_ctrl->rg_lpf_r << 4));
+
+		//PLL configuration II
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010048, phy_ctrl->rg_0p8v + (phy_ctrl->rg_2p5g << 1) +
+			(phy_ctrl->rg_320m << 2) + (phy_ctrl->rg_band_sel << 3));
+
+		//PLL configuration III
+		mipi_config_phy_test_code(mipi_dsi_base, 0x00010049, phy_ctrl->rg_pre_div);
+
+		//PLL configuration IV
+		mipi_config_phy_test_code(mipi_dsi_base, 0x0001004A, phy_ctrl->rg_div);
+
+		//PLL update control
+		mipi_config_phy_test_code(mipi_dsi_base, 0x0001004B, 0x1);
+
+		//set dphy spec parameter
+		mipi_config_dphy_spec1v2_parameter(mipi_dsi_base, pinfo);
+	}
+	/*lint -e550 -e732*/
+	is_ready = false;
+	dw_jiffies = jiffies + HZ / 2;
+	do {
+		tmp = inp32(mipi_dsi_base + MIPIDSI_PHY_STATUS_OFFSET);
+		if ((tmp & 0x00000001) == 0x00000001) {
+			is_ready = true;
+			break;
+		}
+	} while (time_after(dw_jiffies, jiffies));
+
+	if (!is_ready) {
+		HISI_FB_ERR("fb%d, phylock is not ready!MIPIDSI_PHY_STATUS_OFFSET=0x%x.\n",
+			hisifd->index, tmp);
+	}
+	/*lint +e550 +e732*/
+	// phy_stop_wait_time
+	set_reg(mipi_dsi_base + MIPIDSI_PHY_IF_CFG_OFFSET, phy_ctrl->phy_stop_wait_time, 8, 8);
+
+	/* 4. Define the DPI Horizontal timing configuration:	*/
+
+	pixel_clk = mipi_pixel_clk(hisifd);
+	/*lint -e737 -e776 -e712*/
+	if (pinfo->mipi.phy_mode == DPHY_MODE) {
+		hsa_time = pinfo->ldi.h_pulse_width * phy_ctrl->lane_byte_clk / pixel_clk;
+		hbp_time = pinfo->ldi.h_back_porch * phy_ctrl->lane_byte_clk / pixel_clk;
+		hline_time = (pinfo->ldi.h_pulse_width + pinfo->ldi.h_back_porch +
+			rect.w + pinfo->ldi.h_front_porch) * phy_ctrl->lane_byte_clk / pixel_clk;
+	} else {
+		hsa_time = pinfo->ldi.h_pulse_width * phy_ctrl->lane_word_clk / pixel_clk;
+		hbp_time = pinfo->ldi.h_back_porch * phy_ctrl->lane_word_clk / pixel_clk;
+		hline_time = (pinfo->ldi.h_pulse_width + pinfo->ldi.h_back_porch +
+			rect.w + pinfo->ldi.h_front_porch) * phy_ctrl->lane_word_clk / pixel_clk;
+	}
+	/*lint +e737 +e776 +e712*/
+	set_reg(mipi_dsi_base + MIPIDSI_VID_HSA_TIME_OFFSET, hsa_time, 12, 0);
+	set_reg(mipi_dsi_base + MIPIDSI_VID_HBP_TIME_OFFSET, hbp_time, 12, 0);
+	set_reg(mipi_dsi_base + MIPIDSI_VID_HLINE_TIME_OFFSET, hline_time, 15, 0);
+
+	// Configure core's phy parameters
+	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_LPCLK_CFG_OFFSET, phy_ctrl->clk_lane_lp2hs_time, 10, 0);
+	set_reg(mipi_dsi_base + MIPIDSI_PHY_TMR_LPCLK_CFG_OFFSET, phy_ctrl->clk_lane_hs2lp_time, 10, 16);
+
+	outp32(mipi_dsi_base + MIPIDSI_PHY_TMR_CFG_OFFSET,
+		(phy_ctrl->data_lane_lp2hs_time + (phy_ctrl->data_lane_hs2lp_time << 16)));
+
+	HISI_FB_DEBUG("fb%d -.\n", hisifd->index);
+}
+
+static bool check_pctrl_trstop_flag(struct hisi_fb_data_type *hisifd)
+{
+	bool is_ready = false;
+	int count;
+	uint32_t tmp = 0;
+
+	if (is_dual_mipi_panel(hisifd)) {
+		for(count = 0; count < 40; count++) {
+			tmp = inp32(hisifd->pctrl_base + PERI_STAT0);
+			if ((tmp & 0xC0000000) == 0xC0000000) {
+				is_ready = true;
+				break;
+			}
+			udelay(2);
+		}
+	} else {
+		for(count = 0; count < 40; count++) {
+			tmp = inp32(hisifd->pctrl_base + PERI_STAT0);
+			if ((tmp & 0x80000000) == 0x80000000) {
+				is_ready = true;
+				break;
+			}
+			udelay(2);
+		}
+	}
+
+	return is_ready;
 }
 
 int mipi_dsi_bit_clk_upt_isr_handler(struct hisi_fb_data_type *hisifd)
 {
 	struct mipi_dsi_phy_ctrl phy_ctrl = {0};
-	struct hisi_panel_info *pinfo = NULL;
-	uint32_t dsi_bit_clk_upt = 0;
-	uint32_t tmp = 0;
-	bool is_ready = false;
-	int i = 0;
+	struct hisi_panel_info *pinfo;
+	uint32_t dsi_bit_clk_upt;
+	uint32_t stopstate_msk = 0;
+	bool is_ready;
+	uint8_t esd_enable;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is null!\n");
+		return 0;
+	}
 	pinfo = &(hisifd->panel_info);
 	dsi_bit_clk_upt = pinfo->mipi.dsi_bit_clk_upt;
 
 	if (hisifd->index != PRIMARY_PANEL_IDX) {
-		HISI_FB_ERR("fb%d, not support!", hisifd->index);
+		HISI_FB_ERR("fb%d, not support!\n", hisifd->index);
 		return 0;
 	}
 
@@ -3387,53 +3680,96 @@ int mipi_dsi_bit_clk_upt_isr_handler(struct hisi_fb_data_type *hisifd)
 		return 0;
 	}
 
+	esd_enable = pinfo->esd_enable;
 	if (is_mipi_video_panel(hisifd)) {
+		pinfo->esd_enable = 0;
 		disable_ldi(hisifd);
 	}
 
 	HISI_FB_DEBUG("fb%d +.\n", hisifd->index);
 
 	/* get new phy_ctrl value according to dsi_bit_clk_next */
-	get_dsi_phy_ctrl(hisifd, &phy_ctrl);
-
-	//1. wait stopstate cnt
-	//dphy_stopstate_cnt_en=1 (pctrl_dphy_ctrl[0])
-	set_reg(hisifd->pctrl_base + PERI_CTRL30, 1, 1, 0);
-	set_reg(hisifd->pctrl_base + PERI_CTRL30, 1, 1, 3);
-
-	for(i = 0; i < 40; i++) {
-		tmp = inp32(hisifd->pctrl_base + PERI_STAT0);
-		if ((tmp & 0x80000000) == 0x80000000) {
-			is_ready = true;
-			break;
+	if (g_dss_version_tag == FB_ACCEL_KIRIN970) {
+		if (hisifd->panel_info.mipi.lane_nums == DSI_4_LANES) {
+			stopstate_msk = BIT(0);
+		} else if (hisifd->panel_info.mipi.lane_nums == DSI_3_LANES) {
+			stopstate_msk = BIT(0) | BIT(4);
+		} else if (hisifd->panel_info.mipi.lane_nums == DSI_2_LANES) {
+			stopstate_msk = BIT(0) | BIT(3) | BIT(4);
+		} else {
+			stopstate_msk = BIT(0) | BIT(2) | BIT(3) | BIT(4);
 		}
-		udelay(1);
+		if (pinfo->mipi.phy_mode == CPHY_MODE) {
+			get_dsi_cphy_ctrl(hisifd, &phy_ctrl);
+		} else {
+			get_dsi_dphy_ctrl(hisifd, &phy_ctrl);
+		}
+		//1. wait stopstate cnt:dphy_stopstate_cnt_en=1 (pctrl_dphy_ctrl[0])
+		//PERI_CTRL33[0:15]-PHY0, PERI_CTRL30[16:31]-PHY1.
+		set_reg(hisifd->pctrl_base + PERI_CTRL33, 1, 1, 0);
+		set_reg(hisifd->pctrl_base + PERI_CTRL33, stopstate_msk, 5, 3);
+	} else {
+		get_dsi_phy_ctrl(hisifd, &phy_ctrl);
+		//1. wait stopstate cnt:dphy_stopstate_cnt_en=1 (pctrl_dphy_ctrl[0])
+		set_reg(hisifd->pctrl_base + PERI_CTRL30, 1, 1, 0);
+		set_reg(hisifd->pctrl_base + PERI_CTRL30, 1, 1, 3);
+		if (is_dual_mipi_panel(hisifd)) {
+			set_reg(hisifd->pctrl_base + PERI_CTRL30, 1, 1, 16);
+			set_reg(hisifd->pctrl_base + PERI_CTRL30, 1, 1, 19);
+		}
 	}
 
-	//dphy_stopstate_cnt_en=0 (pctrl_dphy_ctrl[0])
-	set_reg(hisifd->pctrl_base + PERI_CTRL30, 0, 1, 0);
+	is_ready = check_pctrl_trstop_flag(hisifd);
+
+	if (g_dss_version_tag == FB_ACCEL_KIRIN970) {
+		set_reg(hisifd->pctrl_base + PERI_CTRL33, 0, 1, 0);
+	} else {
+		set_reg(hisifd->pctrl_base + PERI_CTRL30, 0, 1, 0);
+		if (is_dual_mipi_panel(hisifd)) {
+			set_reg(hisifd->pctrl_base + PERI_CTRL30, 0, 1, 16);
+		}
+	}
 
 	if (!is_ready) {
-		HISI_FB_ERR("fb%d, stopstate cnt is not ready! PERI_STAT0=0x%x.\n",
-			hisifd->index, tmp);
 		if (is_mipi_video_panel(hisifd)) {
+			pinfo->esd_enable = esd_enable;
 			enable_ldi(hisifd);
 		}
+		HISI_FB_DEBUG("PERI_STAT0 is not ready.\n");
 		return 0;
 	}
 
-	if (is_mipi_cmd_panel(hisifd)) {
-		mipi_dsi_bit_clk_upt_set_cmd(hisifd, hisifd->mipi_dsi0_base, &phy_ctrl);
-		if (is_dual_mipi_panel(hisifd)) {
-			mipi_dsi_bit_clk_upt_set_cmd(hisifd, hisifd->mipi_dsi1_base, &phy_ctrl);
+	if (g_dss_version_tag == FB_ACCEL_KIRIN970) {
+		if (is_mipi_cmd_panel(hisifd)) {
+			mipi_dsi_set_cdphy_bit_clk_upt_cmd(hisifd, hisifd->mipi_dsi0_base, &phy_ctrl);
+			if (is_dual_mipi_panel(hisifd)) {
+				mipi_dsi_set_cdphy_bit_clk_upt_cmd(hisifd, hisifd->mipi_dsi1_base, &phy_ctrl);
+			}
+		} else {
+			mipi_dsi_set_cdphy_bit_clk_upt_video(hisifd, hisifd->mipi_dsi0_base, &phy_ctrl);
+			if (is_dual_mipi_panel(hisifd)) {
+				mipi_dsi_set_cdphy_bit_clk_upt_video(hisifd, hisifd->mipi_dsi1_base, &phy_ctrl);
+			}
+			pinfo->esd_enable = esd_enable;
+			enable_ldi(hisifd);
 		}
 	} else {
-		mipi_dsi_bit_clk_upt_set_video(hisifd, hisifd->mipi_dsi0_base, &phy_ctrl);
-		if (is_dual_mipi_panel(hisifd)) {
-			mipi_dsi_bit_clk_upt_set_video(hisifd, hisifd->mipi_dsi1_base, &phy_ctrl);
+		if (is_mipi_cmd_panel(hisifd)) {
+			mipi_dsi_bit_clk_upt_set_cmd(hisifd, hisifd->mipi_dsi0_base, &phy_ctrl);
+			if (is_dual_mipi_panel(hisifd)) {
+				mipi_dsi_bit_clk_upt_set_cmd(hisifd, hisifd->mipi_dsi1_base, &phy_ctrl);
+			}
+		} else {
+			mipi_dsi_bit_clk_upt_set_video(hisifd, hisifd->mipi_dsi0_base, &phy_ctrl);
+			if (is_dual_mipi_panel(hisifd)) {
+				mipi_dsi_bit_clk_upt_set_video(hisifd, hisifd->mipi_dsi1_base, &phy_ctrl);
+			}
+			pinfo->esd_enable = esd_enable;
+			enable_ldi(hisifd);
 		}
-		enable_ldi(hisifd);
 	}
+
+	HISI_FB_INFO("Mipi clk successfully changed from (%d)M switch to (%d)M.\n", pinfo->mipi.dsi_bit_clk, dsi_bit_clk_upt);
 
 	pinfo->dsi_phy_ctrl = phy_ctrl;
 	pinfo->mipi.dsi_bit_clk = dsi_bit_clk_upt;
@@ -3448,9 +3784,15 @@ static int mipi_dsi_clk_irq_setup(struct platform_device *pdev)
 	struct hisi_fb_data_type *hisifd = NULL;
 	int ret = 0;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	if (hisifd->index == PRIMARY_PANEL_IDX) {
 		hisifd->dss_dphy0_ref_clk = devm_clk_get(&pdev->dev, hisifd->dss_dphy0_ref_clk_name);
@@ -3490,37 +3832,18 @@ static int mipi_dsi_clk_irq_setup(struct platform_device *pdev)
 			ret = PTR_ERR(hisifd->dss_pclk_dsi0_clk);
 			return ret;
 		} else {
-		#if defined (CONFIG_HISI_FB_3650) || defined (CONFIG_HISI_FB_6250)
 			ret = clk_set_rate(hisifd->dss_pclk_dsi0_clk, DEFAULT_PCLK_DSI_RATE);
 			if (ret < 0) {
 				HISI_FB_ERR("fb%d dss_pclk_dsi0_clk clk_set_rate(%lu) failed, error=%d!\n",
 					hisifd->index, DEFAULT_PCLK_DSI_RATE, ret);
 				return -EINVAL;
 			}
-		#endif
 
 			HISI_FB_INFO("dss_pclk_dsi0_clk:[%lu]->[%lu].\n",
 				DEFAULT_PCLK_DSI_RATE, clk_get_rate(hisifd->dss_pclk_dsi0_clk));
 		}
 	}
 
-#ifdef CONFIG_PCLK_PCTRL_USED
-	hisifd->dss_pclk_pctrl_clk = devm_clk_get(&pdev->dev, hisifd->dss_pclk_pctrl_name);
-	if (IS_ERR(hisifd->dss_pclk_pctrl_clk)) {
-		ret = PTR_ERR(hisifd->dss_pclk_pctrl_clk);
-		return ret;
-	} else {
-		ret = clk_set_rate(hisifd->dss_pclk_pctrl_clk, DEFAULT_PCLK_PCTRL_RATE);
-		if (ret < 0) {
-			HISI_FB_ERR("fb%d dss_pclk_pctrl clk_set_rate(%lu) failed, error=%d!\n",
-				hisifd->index, DEFAULT_PCLK_PCTRL_RATE, ret);
-			return -EINVAL;
-		}
-
-		HISI_FB_INFO("dss_pclk_pctrl_clk:[%lu]->[%lu].\n",
-			DEFAULT_PCLK_PCTRL_RATE, clk_get_rate(hisifd->dss_pclk_pctrl_clk));
-	}
-#endif
 
 	if (is_dual_mipi_panel(hisifd) || (hisifd->index == EXTERNAL_PANEL_IDX)) {
 		hisifd->dss_dphy1_ref_clk = devm_clk_get(&pdev->dev, hisifd->dss_dphy1_ref_clk_name);
@@ -3560,14 +3883,12 @@ static int mipi_dsi_clk_irq_setup(struct platform_device *pdev)
 			ret = PTR_ERR(hisifd->dss_pclk_dsi1_clk);
 			return ret;
 		} else {
-		#if defined (CONFIG_HISI_FB_3650) || defined (CONFIG_HISI_FB_6250)
 			ret = clk_set_rate(hisifd->dss_pclk_dsi1_clk, DEFAULT_PCLK_DSI_RATE);
 			if (ret < 0) {
 				HISI_FB_ERR("fb%d dss_pclk_dsi1_clk clk_set_rate(%lu) failed, error=%d!\n",
 					hisifd->index, DEFAULT_PCLK_DSI_RATE, ret);
 				return -EINVAL;
 			}
-		#endif
 
 			HISI_FB_INFO("dss_pclk_dsi1_clk:[%lu]->[%lu].\n",
 				DEFAULT_PCLK_DSI_RATE, clk_get_rate(hisifd->dss_pclk_dsi1_clk));
@@ -3584,9 +3905,15 @@ static int mipi_dsi_probe(struct platform_device *pdev)
 	struct hisi_fb_panel_data *pdata = NULL;
 	int ret = 0;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -3649,6 +3976,8 @@ static int mipi_dsi_probe(struct platform_device *pdev)
 	pdata->lcd_amoled_vr_mode_store = mipi_dsi_lcd_amoled_vr_mode_store;
 	pdata->lcd_test_config_show = mipi_dsi_lcd_test_config_show;
 	pdata->lcd_test_config_store = mipi_dsi_lcd_test_config_store;
+	pdata->lcd_reg_read_show = mipi_dsi_lcd_reg_read_show;
+	pdata->lcd_reg_read_store = mipi_dsi_lcd_reg_read_store;
 	pdata->lcd_support_mode_show = mipi_dsi_lcd_support_mode_show;
 	pdata->lcd_support_mode_store = mipi_dsi_lcd_support_mode_store;
 	pdata->lcd_support_checkmode_show = mipi_dsi_lcd_support_checkmode_show;
@@ -3662,6 +3991,7 @@ static int mipi_dsi_probe(struct platform_device *pdev)
 	pdata->panel_info_show = mipi_dsi_panel_info_show;
 	pdata->get_lcd_id = mipi_dsi_get_lcd_id;
 	pdata->amoled_alpm_setting_store = mipi_dsi_alpm_setting;
+	pdata->sbl_ctrl = mipi_dsi_sbl_ctrl;
 	pdata->next = pdev;
 
 	/* get/set panel info */

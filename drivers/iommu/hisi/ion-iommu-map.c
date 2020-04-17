@@ -310,23 +310,29 @@ phys_addr_t hisi_iommu_domain_iova_to_phys(unsigned long iova)
 }
 EXPORT_SYMBOL_GPL(hisi_iommu_domain_iova_to_phys);
 
-int hisi_ion_enable_iommu(struct platform_device *pdev)
+struct iommu_domain *hisi_ion_enable_iommu(struct platform_device *pdev)
 {
 	int ret;
 	struct device *dev = &pdev->dev;
 	struct hisi_iommu_domain *hisi_domain;
+	
+	pr_info("in %s start\n", __func__);
+	if (m_hisi_domain) {
+		pr_err("ion domain already init return domain\n");
+		return m_hisi_domain->domain;
+	}
 
 	pr_info("in %s start\n", __func__);
 	hisi_domain = kzalloc(sizeof(*hisi_domain), GFP_KERNEL);
 	if (!hisi_domain) {
 		dbg("alloc hisi_domain object fail\n");
-		return -ENOMEM;
+		return NULL;
 	}
 
 	if (!iommu_present(dev->bus)) {
 		dbg("iommu not found\n");
 		kfree(hisi_domain);
-		return 0;
+		return NULL;
 	}
 
 	/* create iommu domain */
@@ -352,7 +358,7 @@ int hisi_ion_enable_iommu(struct platform_device *pdev)
 	m_hisi_domain = hisi_domain;
 
 	dbg("in %s end\n", __func__);
-	return 0;
+	return m_hisi_domain->domain;
 
 error:
 	WARN(1, "hisi_iommu_domain_init failed!\n");
@@ -361,7 +367,9 @@ error:
 	if (hisi_domain->domain)
 		iommu_domain_free(hisi_domain->domain);
 	kfree(hisi_domain);
+	
+	m_hisi_domain = NULL;
 
-	return ret;
+	return NULL;
 }
 EXPORT_SYMBOL(hisi_ion_enable_iommu);

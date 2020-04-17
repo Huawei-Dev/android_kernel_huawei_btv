@@ -473,11 +473,9 @@ static int mipi_samsung_s6e3ha3x01_on(struct platform_device *pdev)
 	struct hisi_panel_info *pinfo = NULL;
 	char __iomem *mipi_dsi0_base = NULL;
 
-#if defined (CONFIG_HUAWEI_DSM)
 	static struct lcd_reg_read_t lcd_status_reg[] = {
 		{0x0A, 0x9C, 0xFF, "lcd power state"},
 	};
-#endif
 
 	BUG_ON(pdev == NULL);
 	hisifd = platform_get_drvdata(pdev);
@@ -516,10 +514,8 @@ static int mipi_samsung_s6e3ha3x01_on(struct platform_device *pdev)
 		mipi_dsi_cmds_tx(display_on_cmds, \
 			ARRAY_SIZE(display_on_cmds), mipi_dsi0_base);
 
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_check_status_and_report_by_dsm(lcd_status_reg, \
 			ARRAY_SIZE(lcd_status_reg), mipi_dsi0_base);
-#endif
 		pinfo->lcd_init_step = LCD_INIT_MIPI_HS_SEND_SEQUENCE;
 	} else if (pinfo->lcd_init_step == LCD_INIT_MIPI_HS_SEND_SEQUENCE) {
 		/* backlight on */
@@ -717,34 +713,6 @@ static int mipi_samsung_s6e3ha3x01_set_display_region(struct platform_device *pd
 	return 0;
 }
 
-#if 0
-static ssize_t mipi_samsung_s6e3ha3x01_check_reg_show(struct platform_device *pdev, char *buf)
-{
-	struct hisi_fb_data_type *hisifd = NULL;
-	char lcd_reg_CC[] = {0xCC};
-	int read_value = 0;
-	ssize_t ret = 0;
-	char __iomem *mipi_dsi0_base = NULL;
-
-	struct dsi_cmd_desc lcd_check_reg[] = {
-		{DTYPE_DCS_READ, 0, 10, WAIT_TYPE_US,
-			sizeof(lcd_reg_CC), lcd_reg_CC},
-	};
-
-	BUG_ON(pdev == NULL || dirty == NULL);
-	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
-
-	mipi_dsi0_base = hisifd->mipi_dsi0_base;
-
-	ret = mipi_dsi_cmds_rx(&read_value, lcd_check_reg, ARRAY_SIZE(lcd_check_reg), mipi_dsi0_base);
-
-	HISI_FB_ERR("lcd_reg_CC: %d", read_value);
-	ret = snprintf(buf, PAGE_SIZE, "lcd_reg_CC: %d", read_value);
-
-	return ret ;
-}
-#endif
 
 static struct hisi_panel_info samsung_s6e3ha3x01_panel_info = {0};
 static struct hisi_fb_panel_data samsung_s6e3ha3x01_panel_data = {
@@ -891,21 +859,6 @@ static int mipi_samsung_s6e3ha3x01_probe(struct platform_device *pdev)
 		goto err_return;
 	}
 
-#if 0 //AMOLED_CHECK_INT
-	ret = request_threaded_irq(gpio_to_irq(gpio_pcd), NULL, pcd_irq_isr_func,
-			IRQF_ONESHOT | IRQF_TRIGGER_FALLING,
-			"pcd_irq", (void *)pdev);
-	if (ret != 0) {
-		HISI_FB_ERR("request_irq failed, irq_no=%d error=%d!\n", gpio_to_irq(gpio_pcd), ret);
-	}
-
-	ret = request_threaded_irq(gpio_to_irq(gpio_err_flag), NULL, errflag_irq_isr_func,
-			IRQF_ONESHOT | IRQF_TRIGGER_RISING,
-			"errflag_irq", (void *)pdev);
-	if (ret != 0) {
-		HISI_FB_ERR("request_irq failed, irq_no=%d error=%d!\n", gpio_to_irq(gpio_err_flag), ret);
-	}
-#endif
 
 	/* pinctrl init */
 	ret = pinctrl_cmds_tx(pdev, samsung_s6e3ha3x01_pinctrl_init_cmds,

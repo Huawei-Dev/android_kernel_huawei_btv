@@ -434,9 +434,15 @@ static int mipi_sharp_panel_set_fastboot(struct platform_device *pdev)
 {
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -472,9 +478,15 @@ static int mipi_sharp_panel_on(struct platform_device *pdev)
 	uint32_t try_times = 0;
 #endif
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_INFO("fb%d, +!\n", hisifd->index);
 
@@ -574,9 +586,15 @@ static int mipi_sharp_panel_off(struct platform_device *pdev)
 	struct hisi_fb_data_type *hisifd = NULL;
 	char __iomem *mipi_dsi0_base = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_INFO("fb%d, +!\n", hisifd->index);
 	mipi_dsi0_base = hisifd->mipi_dsi0_base;
@@ -625,7 +643,10 @@ static int mipi_sharp_panel_remove(struct platform_device *pdev)
 {
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
 
 	if (!hisifd) {
@@ -665,9 +686,15 @@ static int mipi_sharp_panel_set_backlight(struct platform_device *pdev, uint32_t
 		sizeof(bl_level_adjust), bl_level_adjust},
 	};
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -719,9 +746,15 @@ static int mipi_sharp_panel_set_display_region(struct platform_device *pdev,
 	char __iomem *mipi_dsi0_base = NULL;
 	struct hisi_panel_info *pinfo = NULL;
 
-	BUG_ON(pdev == NULL || dirty == NULL);
+	if (pdev == NULL || dirty == NULL) {
+		HISI_FB_ERR("pdev or dirty is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	mipi_dsi0_base = hisifd->mipi_dsi0_base;
 
@@ -734,7 +767,7 @@ static int mipi_sharp_panel_set_display_region(struct platform_device *pdev,
 		HISI_FB_ERR("dirty_region(%d,%d, %d,%d) not support!\n",
 		dirty->x, dirty->y, dirty->w, dirty->h);
 
-		BUG_ON(1);
+		return -EINVAL;
 	}
 
 	lcd_disp_x[1] = (dirty->x >> 8) & 0xff;
@@ -851,16 +884,10 @@ static int mipi_sharp_probe(struct platform_device *pdev)
 	if (pinfo->bl_set_type == BL_SET_BY_BLPWM)
 		pinfo->blpwm_input_ena = 0;
 
-#ifdef CONFIG_BACKLIGHT_10000
 	pinfo->bl_min = 157;
 	pinfo->bl_max = 9960;
 	pinfo->bl_default = 4000;
 	pinfo->blpwm_precision_type = BLPWM_PRECISION_10000_TYPE;
-#else
-	pinfo->bl_min = 1;
-	pinfo->bl_max = 255;
-	pinfo->bl_default = 102;
-#endif
 
 	pinfo->type = lcd_display_type;
 

@@ -24,11 +24,17 @@ static int  hisifb_write_file(char *filename, char *buf, uint32_t buf_len)
 {
 	ssize_t write_len = 0;
 	struct file *fd = NULL;
-	mm_segment_t old_fs;
 	loff_t pos = 0;
+	mm_segment_t old_fs;
 
-	BUG_ON(filename == NULL);
-	BUG_ON(buf == NULL);
+	if (NULL == filename) {
+		HISI_FB_ERR("filename is NULL");
+		return -EINVAL;
+	}
+	if (NULL == buf) {
+		HISI_FB_ERR("buf is NULL");
+		return -EINVAL;
+	}
 
 	fd = filp_open(filename, O_CREAT|O_RDWR, 0644);
 	if (IS_ERR(fd)) {
@@ -77,9 +83,15 @@ int hisi_sh_blpwm_set_backlight(struct hisi_fb_data_type *hisifd, uint32_t bl_le
 {
 	int ret = 0;
 	struct hisi_panel_info *pinfo = NULL;
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	pinfo = &(hisifd->panel_info);
-	BUG_ON(pinfo == NULL);
+	if (NULL == pinfo) {
+		HISI_FB_ERR("pinfo is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("BLPWM fb%d, bl_level=%d.\n", hisifd->index, bl_level);
 	if( !pinfo->bl_max ) {
@@ -95,7 +107,10 @@ int hisi_sh_blpwm_set_backlight(struct hisi_fb_data_type *hisifd, uint32_t bl_le
 int hisi_sh_blpwm_on(struct platform_device *pdev)
 {
 	int ret = 0;
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 
 	if (g_blpwm_on == 1)
 		return 0;
@@ -111,7 +126,10 @@ int hisi_sh_blpwm_on(struct platform_device *pdev)
 int hisi_sh_blpwm_off(struct platform_device *pdev)
 {
 	int ret = 0;
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 
 	if (g_blpwm_on == 0)
 		return 0;

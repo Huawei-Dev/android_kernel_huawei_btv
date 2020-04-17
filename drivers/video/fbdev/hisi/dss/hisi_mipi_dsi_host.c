@@ -13,6 +13,7 @@
 
 #include "hisi_mipi_dsi.h"
 
+static void mipi_dsi_sread_request(struct dsi_cmd_desc *cm, char __iomem *dsi_base);
 
 /*
  * mipi dsi short write with 0, 1 2 parameters
@@ -30,7 +31,10 @@ int mipi_dsi_swrite(struct dsi_cmd_desc *cm, char __iomem *dsi_base)
 		return 0;
 	}
 
-	BUG_ON(cm->dlen > 2);
+	if (cm->dlen > 2) {
+		HISI_FB_ERR("cm->dlen is invalid");
+		return -EINVAL;
+	}
 	len = cm->dlen;
 
 	//len = (cm->dlen > 2) ? 2 : cm->dlen;
@@ -162,6 +166,43 @@ void mipi_dsi_lread(uint32_t *out, char __iomem *dsi_base)
 	/* do something here*/
 }
 
+int mipi_dsi_lread_reg(uint32_t *out, struct dsi_cmd_desc *cm, uint32_t len, char *dsi_base)
+{
+	int ret = 0;
+	int i = 0;
+	struct dsi_cmd_desc packet_size_cmd_set;
+
+	if (cm == NULL) {
+		HISI_FB_ERR("cmds is NULL!\n");
+		return -1;
+	}
+	if (dsi_base == NULL) {
+		HISI_FB_ERR("dsi_base is NULL!\n");
+		return -1;
+	}
+
+	if (cm->dtype == DTYPE_GEN_READ || cm->dtype == DTYPE_GEN_READ1 || cm->dtype == DTYPE_GEN_READ2) {
+		packet_size_cmd_set.dtype = DTYPE_MAX_PKTSIZE;
+		packet_size_cmd_set.vc = 0;
+		packet_size_cmd_set.dlen = len;
+		mipi_dsi_max_return_packet_size(&packet_size_cmd_set, dsi_base);
+		mipi_dsi_sread_request(cm, dsi_base);
+		for (i = 0; i < (len + 3)/4; i++) {
+			if (!mipi_dsi_read(out, dsi_base)) {
+				ret = -1;
+				HISI_FB_ERR("Read register 0x%X timeout\n", cm->payload[0]);
+				break;
+			}
+			out++;
+		}
+	} else {
+		ret = -1;
+		HISI_FB_ERR("dtype=%x NOT supported!\n", cm->dtype);
+	}
+
+	return ret;
+}
+
 /*
  * prepare cmd buffer to be txed
  */
@@ -169,8 +210,14 @@ int mipi_dsi_cmd_add(struct dsi_cmd_desc *cm, char __iomem *dsi_base)
 {
 	int len = 0;
 
-	BUG_ON(cm == NULL);
-	BUG_ON(dsi_base == NULL);
+	if (NULL == cm) {
+		HISI_FB_ERR("cm is NULL");
+		return -EINVAL;
+	}
+	if (NULL == dsi_base) {
+		HISI_FB_ERR("dsi_base is NULL");
+		return -EINVAL;
+	}
 
 	switch (cm->dtype) {
 	case DTYPE_GEN_WRITE:
@@ -200,8 +247,14 @@ int mipi_dsi_cmds_tx(struct dsi_cmd_desc *cmds, int cnt, char __iomem *dsi_base)
 	struct dsi_cmd_desc *cm = NULL;
 	int i = 0;
 
-	BUG_ON(cmds == NULL);
-	BUG_ON(dsi_base == NULL);
+	if (NULL == cmds) {
+		HISI_FB_ERR("cmds is NULL");
+		return -EINVAL;
+	}
+	if (NULL == dsi_base) {
+		HISI_FB_ERR("dsi_base is NULL");
+		return -EINVAL;
+	}
 
 	cm = cmds;
 
@@ -211,10 +264,15 @@ int mipi_dsi_cmds_tx(struct dsi_cmd_desc *cmds, int cnt, char __iomem *dsi_base)
 		if (cm->wait) {
 			if (cm->waittype == WAIT_TYPE_US)
 				udelay(cm->wait);
-			else if (cm->waittype == WAIT_TYPE_MS)
-				mdelay(cm->wait);
+			else if (cm->waittype == WAIT_TYPE_MS) {
+				if (cm->wait <= 10) {
+					mdelay(cm->wait);
+				} else {
+					msleep(cm->wait);
+				}
+			}
 			else
-				mdelay(cm->wait * 1000);
+				msleep(cm->wait * 1000);
 		}
 		cm++;
 	}
@@ -260,8 +318,14 @@ static int mipi_dsi_read_add(uint32_t *out, struct dsi_cmd_desc *cm, char __iome
 	int is_timeout = 1;
 	int ret = 0;
 
-	BUG_ON(cm == NULL);
-	BUG_ON(dsi_base == NULL);
+	if (NULL == cm) {
+		HISI_FB_ERR("cm is NULL");
+		return -EINVAL;
+	}
+	if (NULL == dsi_base) {
+		HISI_FB_ERR("dsi_base is NULL");
+		return -EINVAL;
+	}
 
 	if (cm->dtype == DTYPE_DCS_READ) {
 		mipi_dsi_sread_request(cm, dsi_base);
@@ -334,8 +398,14 @@ int mipi_dsi_cmds_rx(uint32_t *out, struct dsi_cmd_desc *cmds, int cnt,
 	int i = 0;
 	int err_num = 0;
 
-	BUG_ON(cmds == NULL);
-	BUG_ON(dsi_base == NULL);
+	if (NULL == cmds) {
+		HISI_FB_ERR("cmds is NULL");
+		return -EINVAL;
+	}
+	if (NULL == dsi_base) {
+		HISI_FB_ERR("dsi_base is NULL");
+		return -EINVAL;
+	}
 
 	cm = cmds;
 
@@ -347,10 +417,15 @@ int mipi_dsi_cmds_rx(uint32_t *out, struct dsi_cmd_desc *cmds, int cnt,
 		if (cm->wait) {
 			if (cm->waittype == WAIT_TYPE_US)
 				udelay(cm->wait);
-			else if (cm->waittype == WAIT_TYPE_MS)
-				mdelay(cm->wait);
+			else if (cm->waittype == WAIT_TYPE_MS) {
+				if (cm->wait <= 10) {
+					mdelay(cm->wait);
+				} else {
+					msleep(cm->wait);
+				}
+			}
 			else
-				mdelay(cm->wait * 1000);
+				msleep(cm->wait * 1000);
 		}
 		cm++;
 	}
@@ -373,8 +448,14 @@ int mipi_dsi_read_compare(struct mipi_dsi_read_compare_data *data,
 	int ret = 0;
 	int i;
 
-	BUG_ON(data == NULL);
-	BUG_ON(dsi_base == NULL);
+	if (NULL == data) {
+		HISI_FB_ERR("data is NULL");
+		return -EINVAL;
+	}
+	if (NULL == dsi_base) {
+		HISI_FB_ERR("dsi_base is NULL");
+		return -EINVAL;
+	}
 
 	read_value = data->read_value;
 	expected_value = data->expected_value;

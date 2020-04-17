@@ -967,14 +967,12 @@ static int mipi_jdi_panel_on(struct platform_device *pdev)
 	struct hisi_fb_data_type *hisifd = NULL;
 	struct hisi_panel_info *pinfo = NULL;
 	char __iomem *mipi_dsi0_base = NULL;
-#if defined (CONFIG_HUAWEI_DSM)
 	static struct lcd_reg_read_t lcd_status_reg[] = {
 		{0x0A, 0x9C, 0xFF, "lcd power state"},
 		{0x0E, 0x80, 0xC1, "lcd signal mode"},
 		{0x05, 0x00, 0xFF, "mipi dsi error number"},
 		{0xDA, 0x00, 0x00, "RDID1"},
 	};
-#endif
 
 	BUG_ON(pdev == NULL);
 	hisifd = platform_get_drvdata(pdev);
@@ -1043,10 +1041,8 @@ static int mipi_jdi_panel_on(struct platform_device *pdev)
 			ARRAY_SIZE(lcd_display_on_cmds), mipi_dsi0_base);
 
 		g_cabc_mode = 1;
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_check_status_and_report_by_dsm(lcd_status_reg, \
 			ARRAY_SIZE(lcd_status_reg), mipi_dsi0_base);
-#endif
 
 		pinfo->lcd_init_step = LCD_INIT_MIPI_HS_SEND_SEQUENCE;
 	} else if (pinfo->lcd_init_step == LCD_INIT_MIPI_HS_SEND_SEQUENCE) {
@@ -1647,16 +1643,10 @@ static ssize_t mipi_jdi_panel_lcd_bist_check_show(struct platform_device *pdev,
 	BUG_ON(hisifd == NULL);
 	mipi_dsi0_base = hisifd->dss_base + DSS_MIPI_DSI0_OFFSET;
 	hisifd->lcd_self_testing = true;
-#ifdef CONFIG_HUAWEI_TS
 	error = ts_power_control_notify(TS_BEFORE_SUSPEND, SHORT_SYNC_TIMEOUT);
 	HISI_FB_INFO("Disable touchscreen during test.\n");
-#endif
 
-#ifdef LAST_4_STEPS_ONLY_FOR_BIST_CHECK
 	j = 0;
-#else
-	j = 5;
-#endif
 	for (i = j; i<ARRAY_SIZE(jdi_display_bist_check_cmds); i++) {
 		HISI_FB_INFO("TEST %d\n", i+1);
 		mipi_dsi_cmds_tx(jdi_display_bist_check_cmds[i], \
@@ -1676,11 +1666,9 @@ static ssize_t mipi_jdi_panel_lcd_bist_check_show(struct platform_device *pdev,
 	mipi_dsi_cmds_tx(jdi_display_bist_check_end, \
 		ARRAY_SIZE(jdi_display_bist_check_end), mipi_dsi0_base);
 
-#ifdef CONFIG_HUAWEI_TS
 	if (!error)
 		error = ts_power_control_notify(TS_AFTER_RESUME, SHORT_SYNC_TIMEOUT);
 	HISI_FB_INFO("Enable touchscreen after test.\n");
-#endif
 	hisifd->lcd_self_testing = false;
 
 	return final_ret;
@@ -1863,16 +1851,10 @@ static int mipi_jdi_probe(struct platform_device *pdev)
 	if (pinfo->bl_set_type == BL_SET_BY_BLPWM)
 		pinfo->blpwm_input_ena = 1;
 
-#ifdef CONFIG_BACKLIGHT_10000
 	pinfo->bl_min = 157;
 	pinfo->bl_max = 9960;
 	pinfo->bl_default = 4000;
 	pinfo->blpwm_precision_type = BLPWM_PRECISION_10000_TYPE;
-#else
-	pinfo->bl_min = 1;
-	pinfo->bl_max = 255;
-	pinfo->bl_default = 102;
-#endif
 
 	pinfo->frc_enable = 0;
 	pinfo->esd_enable = 0;

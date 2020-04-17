@@ -23,6 +23,8 @@
 #endif
 #include <governor.h>
 
+#include <linux/hisi/hisi_devfreq.h>
+
 #ifdef CONFIG_HUAWEI_BDAT
 #include <huawei_platform/power/bdat/bdat.h>
 #endif
@@ -42,6 +44,13 @@
 #define DFMO_MIN_ANIMATION_BOOST_FREQ	(120000000)
 #define DFMO_MAX_ANIMATION_BOOST_FREQ	(680000000)
 #define DFMO_DEFAULT_ANIMATION_BOOST_FREQ	(480000000)
+
+#define DFMO_OPENCL_BOOST_ON		(1)
+#define DFMO_OPENCL_BOOST_DN		(0)
+#define DFMO_MIN_OPENCL_BOOST_FREQ	(332000000)
+#define DFMO_MAX_OPENCL_BOOST_FREQ	(667000000)
+#define DFMO_DEFAULT_OPENCL_BOOST_FREQ	(415000000)
+
 #define DFMO_MIN_HISPEED_FREQ		(120000000)
 #define DFMO_MAX_HISPEED_FREQ		(680000000)
 #define DFMO_DEFAULT_HISPEED_FREQ	(480000000)
@@ -69,6 +78,8 @@ struct devfreq_mali_ondemand_data {
 	int utilisation;
 	int animation_boost;
 	unsigned int animation_boost_freq;
+	int cl_boost;
+	unsigned int cl_boost_freq;
 	unsigned int hispeed_freq;
 #ifdef DFMO_REQUEST_QOS_CPU_DMA_LATENCY
 	struct pm_qos_request qos_cpu_dma_latency_request;
@@ -89,6 +100,7 @@ static int devfreq_mali_ondemand_func(struct devfreq *df,
 	unsigned int dfso_upthreshold = DFMO_VSYNC_UPTHRESHOLD;
 	unsigned int dfso_downdifferential = DFMO_VSYNC_DOWNDIFFERENCTIAL;
 	struct devfreq_mali_ondemand_data *data = df->data;
+	struct hisi_devfreq_data *priv_data = stat.private_data;
 	unsigned long max = (df->max_freq) ? df->max_freq : UINT_MAX;
 
 #ifdef CONFIG_HUAWEI_BDAT
@@ -98,34 +110,33 @@ static int devfreq_mali_ondemand_func(struct devfreq *df,
 
 	if (err)
 		return err;
+		
+	/* Assume MAX if it is going to be divided by zero  &&
+	   Set MAX if we do not know the initial frequency */
+	if (unlikely(stat.total_time == 0 || stat.current_frequency == 0)) {
+		*freq = max;
+		return 0;
+	}
 
-	if(data == NULL)
+	if(NULL == data || NULL == priv_data)
 		return -EINVAL;
 
-	if (data) {
-		data->vsync = stat.private_data ? 1 : 0;
-		data->utilisation = stat.busy_time * 100 / stat.total_time;
+	data->vsync = priv_data->vsync_hit ? 1 : 0;
+	data->utilisation = stat.busy_time * 100 / stat.total_time;
+	data->cl_boost= priv_data->cl_boost ? 1 : 0;
 
-		if (data->vsync) {
+	if (data->vsync) {
 			dfso_upthreshold = data->vsync_upthreshold;
 			dfso_downdifferential = data->vsync_downdifferential;
 		} else {
 			dfso_upthreshold = data->no_vsync_upthreshold;
 			dfso_downdifferential = data->no_vsync_downdifferential;
-		}
 	}
 	if (dfso_upthreshold > 100 ||
 	    dfso_upthreshold < dfso_downdifferential) {
 		pr_err("%s: invalid performance parameter, upth[%d], diff[%d]\n",
 			__func__, dfso_upthreshold, dfso_downdifferential);
 		return -EINVAL;
-	}
-
-	/* Assume MAX if it is going to be divided by zero  &&
-	   Set MAX if we do not know the initial frequency */
-	if (unlikely(stat.total_time == 0 || stat.current_frequency == 0)) {
-		*freq = max;
-		return 0;
 	}
 
 	/* Prevent overflow */
@@ -161,6 +172,10 @@ check_barrier:
 	if (data && data->animation_boost &&
 		(*freq < data->animation_boost_freq))
 		*freq = (unsigned long)data->animation_boost_freq;
+		
+	/* Not less than cl_boost_freq, if necessary. */
+	if (data && data->cl_boost && (*freq < data->cl_boost_freq))
+		*freq = (unsigned long)data->cl_boost_freq;
 
 	if (df->min_freq && *freq < df->min_freq)
 		*freq = df->min_freq;
@@ -209,7 +224,7 @@ static ssize_t store_##object						\
 {										\
 	struct devfreq *devfreq = to_devfreq(dev);				\
 	struct devfreq_mali_ondemand_data *data;				\
-	unsigned int input;							\
+	int input;							\
 	int ret = 0;								\
 	ret = sscanf(buf, "%u", &input);					\
 	if (ret != 1 || input > max || input < min)				\
@@ -225,12 +240,23 @@ static ssize_t store_##object						\
 }
 
 store_one(vsync_upthreshold, DFMO_MIN_UPTHRESHOLD, DFMO_MAX_UPTHRESHOLD)
+
 store_one(vsync_downdifferential, DFMO_MIN_DOWNDIFFERENCTIAL, DFMO_MAX_DOWNDIFFERENCTIAL)
+
 store_one(no_vsync_upthreshold, DFMO_MIN_UPTHRESHOLD, DFMO_MAX_UPTHRESHOLD)
+
 store_one(no_vsync_downdifferential, DFMO_MIN_DOWNDIFFERENCTIAL, DFMO_MAX_DOWNDIFFERENCTIAL)
+
 store_one(animation_boost, DFMO_ANIMATION_BOOST_DN, DFMO_ANIMATION_BOOST_ON)
+
 store_one(animation_boost_freq, DFMO_MIN_ANIMATION_BOOST_FREQ, DFMO_MAX_ANIMATION_BOOST_FREQ)
+
+store_one(cl_boost, DFMO_OPENCL_BOOST_DN, DFMO_OPENCL_BOOST_ON)
+
+store_one(cl_boost_freq, DFMO_MIN_OPENCL_BOOST_FREQ, DFMO_MAX_OPENCL_BOOST_FREQ)
+
 store_one(hispeed_freq, DFMO_MIN_HISPEED_FREQ, DFMO_MAX_HISPEED_FREQ)
+
 #ifdef DFMO_REQUEST_QOS_CPU_DMA_LATENCY
 store_one(qos_cpu_dma_latency_request_freq, DFMO_MIN_FREQ_FOR_QOS_CPU_DMA_LATENCY, DFMO_MAX_FREQ_FOR_QOS_CPU_DMA_LATENCY)
 store_one(qos_cpu_dma_latency_request_value, DFMO_MIN_QOS_CPU_DMA_LATENCY_REQUEST_VALUE, DFMO_MAX_QOS_CPU_DMA_LATENCY_REQUEST_VALUE)
@@ -260,6 +286,8 @@ show_one(vsync)
 show_one(utilisation)
 show_one(animation_boost)
 show_one(animation_boost_freq)
+show_one(cl_boost)
+show_one(cl_boost_freq)
 show_one(hispeed_freq)
 #ifdef DFMO_REQUEST_QOS_CPU_DMA_LATENCY
 show_one(qos_cpu_dma_latency_request_freq)
@@ -276,6 +304,8 @@ MALI_ONDEMAND_ATTR_RW(no_vsync_upthreshold);
 MALI_ONDEMAND_ATTR_RW(no_vsync_downdifferential);
 MALI_ONDEMAND_ATTR_RW(animation_boost);
 MALI_ONDEMAND_ATTR_RW(animation_boost_freq);
+MALI_ONDEMAND_ATTR_RW(cl_boost);
+MALI_ONDEMAND_ATTR_RW(cl_boost_freq);
 MALI_ONDEMAND_ATTR_RW(hispeed_freq);
 #ifdef DFMO_REQUEST_QOS_CPU_DMA_LATENCY
 MALI_ONDEMAND_ATTR_RW(qos_cpu_dma_latency_request_freq);
@@ -299,6 +329,8 @@ static struct attribute *dev_entries[] = {
 	&dev_attr_utilisation.attr,
 	&dev_attr_animation_boost.attr,
 	&dev_attr_animation_boost_freq.attr,
+	&dev_attr_cl_boost.attr,
+	&dev_attr_cl_boost_freq.attr,
 	&dev_attr_hispeed_freq.attr,
 #ifdef DFMO_REQUEST_QOS_CPU_DMA_LATENCY
 	&dev_attr_qos_cpu_dma_latency_request_freq.attr,
@@ -333,6 +365,8 @@ static int mali_ondemand_init(struct devfreq *devfreq)
 		data->no_vsync_downdifferential = DFMO_NO_VSYNC_DOWNDIFFERENCTIAL;
 		data->animation_boost = DFMO_ANIMATION_BOOST_DN;
 		data->animation_boost_freq = DFMO_DEFAULT_ANIMATION_BOOST_FREQ;
+		data->cl_boost = DFMO_OPENCL_BOOST_DN;
+		data->cl_boost_freq = DFMO_DEFAULT_OPENCL_BOOST_FREQ;
 		data->hispeed_freq = DFMO_DEFAULT_HISPEED_FREQ;
 #ifdef DFMO_REQUEST_QOS_CPU_DMA_LATENCY
 		pm_qos_add_request(&data->qos_cpu_dma_latency_request,

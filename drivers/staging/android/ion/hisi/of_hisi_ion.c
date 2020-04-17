@@ -36,6 +36,8 @@
 #include <soc_sctrl_interface.h>
 #include <soc_acpu_baseaddr_interface.h>
 
+#include <linux/hisi/hisi-iommu.h>
+
 #ifdef CONFIG_HISI_SMARTPOOL_OPT
 #include "hisi/hisi_ion_smart_pool.h"
 #endif
@@ -427,8 +429,6 @@ static long __attribute__((unused)) compat_hisi_ion_custom_ioctl(
 
 #endif
 
-extern int hisi_ion_enable_iommu(struct platform_device *pdev);
-
 static int get_type_by_name(const char *name, enum ion_heap_type *type)
 {
 	int i;
@@ -599,7 +599,7 @@ static int hisi_ion_probe(struct platform_device *pdev)
 	}
 
 	/* FIXME will move to iommu driver*/
-	if (hisi_ion_enable_iommu(pdev)) {
+	if (!hisi_ion_enable_iommu(pdev)) {
 		dev_info(&pdev->dev, "enable iommu fail \n");
 		err = -EINVAL;
 		goto err_free_idev;

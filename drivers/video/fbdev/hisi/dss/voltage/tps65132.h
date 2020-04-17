@@ -59,4 +59,10 @@ struct tps65132_configure_info {
 	int vneg_cmd;
 };
 
+#ifdef CONFIG_HISI_FB_6250
+extern int is_normal_lcd(void);
+extern int get_vsp_voltage(void);
+extern int get_vsn_voltage(void);
+#endif
+
 #endif

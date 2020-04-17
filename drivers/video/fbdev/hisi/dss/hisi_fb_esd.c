@@ -13,32 +13,21 @@
 
 #include "hisi_fb.h"
 
-#define HISI_ESD_RECOVER_MAX_COUNT   (5)
+#define HISI_ESD_RECOVER_MAX_COUNT   (10)
 #define HISI_ESD_CHECK_MAX_COUNT     (3)
 
 extern unsigned int g_esd_recover_disable;
 
-static int hisifb_esd_handle_thread(void *data)
+static void hisifb_frame_refresh_for_esd(struct hisi_fb_data_type *hisifd)
 {
-	struct hisi_fb_data_type *hisifd = (struct hisi_fb_data_type *)data;
-	uint32_t old_esd_status = 0;
-	int ret = 0;
+	char *envp[2];
+	char buf[64];
+	snprintf(buf, sizeof(buf), "ESD_HAPPENDED=1");
+	envp[0] = buf;
+	envp[1] = NULL;
+	kobject_uevent_env(&(hisifd->fbi->dev->kobj), KOBJ_CHANGE, envp);
 
-	while (!kthread_should_stop()) {
-		ret = wait_event_interruptible(hisifd->esd_ctrl.esd_handle_wait, (hisifd->esd_happened != old_esd_status));
-		if (!ret && (hisifd->esd_happened == 1)) {
-			char *envp[2];
-			char buf[64];
-			snprintf(buf, sizeof(buf), "ESD_HAPPENDED=1");
-			envp[0] = buf;
-			envp[1] = NULL;
-			kobject_uevent_env(&(hisifd->fbi->dev->kobj), KOBJ_CHANGE, envp);
-
-			HISI_FB_INFO("ESD_HAPPENDED=1!\n");
-		}
-		old_esd_status = hisifd->esd_happened;
-	}
-	return 0;
+	HISI_FB_INFO("ESD_HAPPENDED=1!\n");
 }
 
 static void hisifb_esd_recover(struct hisi_fb_data_type *hisifd)
@@ -56,41 +45,27 @@ static void hisifb_esd_recover(struct hisi_fb_data_type *hisifd)
 		return;
 	}
 
-	down(&hisifd->blank_sem);
-	if (!hisifd->panel_power_on) {
-		HISI_FB_ERR("panel is off\n");
-		up(&hisifd->blank_sem);
-		return ;
-	}
 	down(&hisifd->brightness_esd_sem);
 	bl_level_cur = hisifd->bl_level;
 	hisifb_set_backlight(hisifd, 0);
 	up(&hisifd->brightness_esd_sem);
 
-	hisifb_activate_vsync(hisifd);
 	/*lcd panel off*/
-	ret = panel_next_off(hisifd->pdev);
+	ret = hisi_fb_blank_sub(FB_BLANK_POWERDOWN, hisifd->fbi);
 	if (ret != 0) {
 		HISI_FB_ERR("fb%d, blank_mode(%d) failed!\n", hisifd->index, FB_BLANK_POWERDOWN);
 	}
 	/*lcd panel on*/
-	ret = panel_next_on(hisifd->pdev);
+	ret = hisi_fb_blank_sub(FB_BLANK_UNBLANK, hisifd->fbi);
 	if (ret != 0) {
 		HISI_FB_ERR("fb%d, blank_mode(%d) failed!\n", hisifd->index, FB_BLANK_UNBLANK);
 	}
-	/*cmd panel need to update frame*/
-	if (is_mipi_cmd_panel(hisifd)) {
-		single_frame_update(hisifd);
-	}
-	hisifb_deactivate_vsync(hisifd);
-
+	hisifb_frame_refresh_for_esd(hisifd);
 	/*backlight on*/
-	mdelay(100);
+	msleep(100);
 	down(&hisifd->brightness_esd_sem);
-	hisifb_set_backlight(hisifd, bl_level_cur);
+	hisifb_set_backlight(hisifd, bl_level_cur? bl_level_cur:hisifd->bl_level);
 	up(&hisifd->brightness_esd_sem);
-	up(&hisifd->blank_sem);
-
 	return ;
 }
 
@@ -103,9 +78,15 @@ static void hisifb_esd_check_wq_handler(struct work_struct *work)
 	int esd_check_count = 0;
 
 	esd_ctrl = container_of(work, struct hisifb_esd, esd_check_work);
-	BUG_ON(esd_ctrl == NULL);
+	if (NULL == esd_ctrl) {
+		HISI_FB_ERR("esd_ctrl is NULL");
+		return;
+	}
 	hisifd = esd_ctrl->hisifd;
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 
 	if (!hisifd->panel_info.esd_enable || g_esd_recover_disable) {
 		if (g_esd_recover_disable) {
@@ -128,15 +109,9 @@ static void hisifb_esd_check_wq_handler(struct work_struct *work)
 			if (ret || (ESD_RECOVER_STATE_START == hisifd->esd_recover_state)) {
 				esd_check_count++;
 				hisifd->esd_happened = 1;
-				if (hisifd->panel_info.dirty_region_updt_support) {
-					wake_up_interruptible_all(&(esd_ctrl->esd_handle_wait));
-				}
 				HISI_FB_INFO("esd check abnormal, esd_check_count:%d!\n", esd_check_count);
 			} else {
 				hisifd->esd_happened = 0;
-				if (hisifd->panel_info.dirty_region_updt_support) {
-					wake_up_interruptible_all(&(esd_ctrl->esd_handle_wait));
-				}
 				break;
 			}
 		}
@@ -164,9 +139,15 @@ static enum hrtimer_restart hisifb_esd_hrtimer_fnc(struct hrtimer *timer)
 	struct hisifb_esd *esd_ctrl = NULL;
 
 	esd_ctrl = container_of(timer, struct hisifb_esd, esd_hrtimer);
-	BUG_ON(esd_ctrl == NULL);
+	if (NULL == esd_ctrl) {
+		HISI_FB_ERR("esd_ctrl is NULL");
+		return HRTIMER_NORESTART;
+	}
 	hisifd = esd_ctrl->hisifd;
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return HRTIMER_NORESTART;
+	}
 
 	if (hisifd->panel_info.esd_enable) {
 		if (esd_ctrl->esd_check_wq) {
@@ -179,69 +160,26 @@ static enum hrtimer_restart hisifb_esd_hrtimer_fnc(struct hrtimer *timer)
 	return HRTIMER_NORESTART;
 }
 
-#ifdef CONFIG_HUAWEI_OCP
-#include <huawei_platform/ocp/hw_ocp_ext.h>
-
-int hisi_lcd_ocp_recover(struct notifier_block *nb,
-	unsigned long event, void *data)
-{
-	int ret = 0;
-	unsigned int lcd_is_recover = 0;
-
-	struct hisi_fb_data_type *hisifd = hisifd_list[PRIMARY_PANEL_IDX];
-	if (hisifd == NULL) {
-		HISI_FB_ERR("hisifd is null");
-		return -1;
-	}
-
-	if (event == HW_OCP_LCD_EVENT && g_fastboot_already_set) {
-		lcd_is_recover = *(unsigned int*)data;
-		if (!lcd_is_recover) {
-			down(&hisifd->blank_sem);
-			if (!hisifd->panel_power_on) {
-				HISI_FB_ERR("panel is off\n");
-				up(&hisifd->blank_sem);
-				return -1;
-			}
-			hisifb_activate_vsync(hisifd);
-			/*lcd panel off*/
-			ret = panel_next_off(hisifd->pdev);
-			if (ret != 0) {
-				HISI_FB_ERR("fb%d, blank_mode(%d) failed!\n", hisifd->index, FB_BLANK_POWERDOWN);
-			}
-			/*close esd check*/
-			if (hisifd->panel_info.esd_enable) {
-				hrtimer_cancel(&hisifd->esd_ctrl.esd_hrtimer);
-				hisifd->panel_info.esd_enable = 0;
-			}
-			hisifb_deactivate_vsync(hisifd);
-			up(&hisifd->blank_sem);
-		} else {
-			hisifb_esd_recover(hisifd);
-		}
-
-	#if defined (CONFIG_HUAWEI_DSM)
-		if (lcd_dclient && !dsm_client_ocuppy(lcd_dclient)) {
-			dsm_client_record(lcd_dclient, "lcd happen ocp.\n");
-			dsm_client_notify(lcd_dclient, DSM_LCD_ESD_OCP_RECOVERY_NO);
-		}
-	#endif
-	}
-
-	return ret;
-}
-#endif
 
 void hisifb_esd_register(struct platform_device *pdev)
 {
 	struct hisi_fb_data_type *hisifd = NULL;
 	struct hisifb_esd *esd_ctrl = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 	esd_ctrl = &(hisifd->esd_ctrl);
-	BUG_ON(esd_ctrl == NULL);
+	if (NULL == esd_ctrl) {
+		HISI_FB_ERR("esd_ctrl is NULL");
+		return;
+	}
 
 	if (esd_ctrl->esd_inited) {
 		return;
@@ -265,14 +203,6 @@ void hisifb_esd_register(struct platform_device *pdev)
 		hrtimer_start(&esd_ctrl->esd_hrtimer, ktime_set(ESD_CHECK_TIME_PERIOD / 1000,
 			(ESD_CHECK_TIME_PERIOD % 1000) * 1000000), HRTIMER_MODE_REL);
 
-		if (hisifd->panel_info.dirty_region_updt_support) {
-			init_waitqueue_head(&(esd_ctrl->esd_handle_wait));
-			esd_ctrl->esd_handle_thread = kthread_run(hisifb_esd_handle_thread, hisifd, "esd_handle");
-			if (IS_ERR(esd_ctrl->esd_handle_thread)) {
-				esd_ctrl->esd_handle_thread = NULL;
-				HISI_FB_ERR("failed to run esd recover thread!\n");
-			}
-		}
 		esd_ctrl->esd_inited = 1;
 	}
 }
@@ -282,21 +212,26 @@ void hisifb_esd_unregister(struct platform_device *pdev)
 	struct hisi_fb_data_type *hisifd = NULL;
 	struct hisifb_esd *esd_ctrl = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 	esd_ctrl = &(hisifd->esd_ctrl);
-	BUG_ON(esd_ctrl == NULL);
+	if (NULL == esd_ctrl) {
+		HISI_FB_ERR("esd_ctrl is NULL");
+		return;
+	}
 
 	if (!esd_ctrl->esd_inited)
 		return;
 
 	if (hisifd->panel_info.esd_enable) {
 		hrtimer_cancel(&esd_ctrl->esd_hrtimer);
-
-		if (esd_ctrl->esd_handle_thread) {
-			kthread_stop(esd_ctrl->esd_handle_thread);
-		}
 	}
 
 	esd_ctrl->esd_inited = 0;

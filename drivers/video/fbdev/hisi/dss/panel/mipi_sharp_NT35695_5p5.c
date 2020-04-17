@@ -55,11 +55,9 @@ static int g_cabc_mode = 2;
 static bool g_lp2hs_mipi_test = false;
 static bool g_lp2hs_mipi_test_result = false;
 
-#ifdef CONFIG_HUAWEI_TS
 #define TP_RS_CALL 1
 extern bool gesture_func;
 extern bool g_lcd_control_tp_power;
-#endif
 extern unsigned int g_led_rg_para1;
 extern unsigned int g_led_rg_para2;
 
@@ -164,23 +162,6 @@ static char non_reload[] = {
 	0x01,
 };
 
-#if 0
-//cut3.1 does no need software solution for snow defect any more
-static char page_E_select[] = {
-	0XFF,
-	0xE0,
-};
-
-static char sram_solution[] = {
-	0XB8,
-	0xAD,
-};
-
-static char page_1_select[] = {
-	0XFF,
-	0x10,
-};
-#endif
 static char mipi_crc_ecc_cmd[] = {
 	0xB0,
 	0x03,
@@ -271,20 +252,6 @@ static struct dsi_cmd_desc lcd_display_on_cmds[] = {
 		sizeof(mipi_crc_ecc_cmd), mipi_crc_ecc_cmd},
 	{DTYPE_DCS_WRITE1, 0,10, WAIT_TYPE_US,
 		sizeof(set_display_mode), set_display_mode},
-#if 0
-	{DTYPE_DCS_WRITE1, 0, 200, WAIT_TYPE_US,
-		sizeof(set_page3), set_page3},
-	{DTYPE_DCS_LWRITE, 0,10, WAIT_TYPE_US,
-		sizeof(non_reload), non_reload},
-	{DTYPE_DCS_WRITE1, 0, 10, WAIT_TYPE_US,
-		sizeof(set_pwm_freq), set_pwm_freq},
-	{DTYPE_DCS_WRITE1, 0, 200, WAIT_TYPE_US,
-		sizeof(set_page0), set_page0},
-	{DTYPE_DCS_LWRITE, 0,10, WAIT_TYPE_US,
-		sizeof(non_reload), non_reload},
-	{DTYPE_DCS_WRITE1, 0, 10, WAIT_TYPE_US,
-		sizeof(lane_nums), lane_nums},
-#endif
 	{DTYPE_DCS_WRITE1, 0, 200, WAIT_TYPE_US,
 		sizeof(bl_enable), bl_enable},
 	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
@@ -609,9 +576,15 @@ static int mipi_sharp_panel_set_fastboot(struct platform_device *pdev)
 {
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -637,12 +610,10 @@ static int mipi_sharp_panel_on(struct platform_device *pdev)
 	struct hisi_panel_info *pinfo = NULL;
 	char __iomem *mipi_dsi0_base = NULL;
 	int error = 0;
-#if defined (CONFIG_HUAWEI_DSM)
 	static struct lcd_reg_read_t lcd_status_reg[] = {
 		{0x0A, 0x9C, 0xFF, "lcd power state"},
 		{0x0E, 0x80, 0xC1, "lcd signal mode"},
 	};
-#endif
 	u32 lp2hs_mipi_check_read_value[1] = {0};
 	u32 lp2hs_mipi_check_expected_value[1] = {0x08};
 	u32 lp2hs_mipi_check_read_mask[1] = {0xFF};
@@ -664,9 +635,15 @@ static int mipi_sharp_panel_on(struct platform_device *pdev)
 		.cnt = ARRAY_SIZE(lp2hs_mipi_check_lcd_check_reg),
 	};
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_INFO("fb%d, +!\n", hisifd->index);
 
@@ -709,13 +686,11 @@ static int mipi_sharp_panel_on(struct platform_device *pdev)
 
 		pinfo->lcd_init_step = LCD_INIT_MIPI_LP_SEND_SEQUENCE;
 	} else if (pinfo->lcd_init_step == LCD_INIT_MIPI_LP_SEND_SEQUENCE) {
-#ifdef CONFIG_HUAWEI_TS
 		if (TP_RS_CALL != g_debug_enable_lcd_sleep_in) {
 			HISI_FB_INFO("TP resume and after resume\n");
 			error = ts_power_control_notify(TS_RESUME_DEVICE, SHORT_SYNC_TIMEOUT);
 			error = ts_power_control_notify(TS_AFTER_RESUME, NO_SYNC_TIMEOUT);
 		}
-#endif
 		//update mipi lane numbers
 		lane_nums[1] = pinfo->mipi.lane_nums;
 
@@ -746,10 +721,8 @@ static int mipi_sharp_panel_on(struct platform_device *pdev)
 				ARRAY_SIZE(pwm_out_on_cmds), mipi_dsi0_base);
 		}
 		g_cabc_mode = 2;
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_check_status_and_report_by_dsm(lcd_status_reg, \
 			ARRAY_SIZE(lcd_status_reg), mipi_dsi0_base);
-#endif
 
 		HISI_FB_INFO("enable bl_en gpio.\n");
 		gpio_cmds_tx(lcd_gpio_normal_cmds_sub2, \
@@ -786,15 +759,19 @@ static int mipi_sharp_panel_off(struct platform_device *pdev)
 	struct hisi_fb_data_type *hisifd = NULL;
 	struct hisi_panel_info *pinfo = NULL;
 	int error = 0;
-#if defined (CONFIG_HUAWEI_DSM)
 	static struct lcd_reg_read_t lcd_esd_detect[] = {
 		{0x05, 0x00, 0xFF, "lcd esd detect"},
 	};
-#endif
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_INFO("fb%d, +!\n", hisifd->index);
 
@@ -803,10 +780,8 @@ static int mipi_sharp_panel_off(struct platform_device *pdev)
 	if (pinfo->lcd_uninit_step == LCD_UNINIT_MIPI_HS_SEND_SEQUENCE) {
 		LOG_JANK_D(JLID_KERNEL_LCD_POWER_OFF, "%s", "JL_KERNEL_LCD_POWER_OFF");
 		HISI_FB_INFO("display off(download display off sequence).\n");
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_status_report_by_dsm(lcd_esd_detect, \
 			ARRAY_SIZE(lcd_esd_detect), hisifd->mipi_dsi0_base, 10);
-#endif
 		/* backlight off */
 		hisi_lcd_backlight_off(pdev);
 
@@ -819,13 +794,11 @@ static int mipi_sharp_panel_off(struct platform_device *pdev)
 		pinfo->lcd_uninit_step = LCD_UNINIT_POWER_OFF;
 	} else if (pinfo->lcd_uninit_step == LCD_UNINIT_POWER_OFF) {
 		if (!hisifd->fb_shutdown)  {
-#ifdef CONFIG_HUAWEI_TS
 			if (TP_RS_CALL != g_debug_enable_lcd_sleep_in) {
 				HISI_FB_INFO("TP before suspend and suspend\n");
 				error = ts_power_control_notify(TS_BEFORE_SUSPEND, SHORT_SYNC_TIMEOUT);
 				error = ts_power_control_notify(TS_SUSPEND_DEVICE, SHORT_SYNC_TIMEOUT);
 			}
-#endif
 			if (!gesture_func && !g_debug_enable_lcd_sleep_in) {	//lcd panel shutdown
 				HISI_FB_INFO("display off(regulator disabling).\n");
 				// bl_en,vsn,vsp disable
@@ -866,9 +839,7 @@ static int mipi_sharp_panel_off(struct platform_device *pdev)
 					ARRAY_SIZE(lcd_pinctrl_normal_cmds));
 			}
 		}else {
-#ifdef CONFIG_HUAWEI_TS
 			ts_thread_stop_notify();					//tp shutdown
-#endif
 			HISI_FB_INFO("display shutting down(regulator disabling).\n");				//lcd panel shutdown
 			// bl_en,vsn,vsp disable
 			gpio_cmds_tx(lcd_gpio_lowpower_cmd1, \
@@ -909,7 +880,10 @@ static int mipi_sharp_panel_remove(struct platform_device *pdev)
 {
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
 
 	if (!hisifd) {
@@ -947,9 +921,15 @@ static int mipi_sharp_panel_set_backlight(struct platform_device *pdev, uint32_t
 			sizeof(bl_level_adjust), bl_level_adjust},
 	};
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -1028,9 +1008,15 @@ static ssize_t mipi_sharp_panel_lcd_model_show(struct platform_device *pdev,
 	struct hisi_fb_data_type *hisifd = NULL;
 	ssize_t ret = 0;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -1056,9 +1042,15 @@ static ssize_t mipi_sharp_panel_lcd_cabc_mode_store(struct platform_device *pdev
 	struct hisi_fb_data_type *hisifd = NULL;
 	char __iomem *mipi_dsi0_base = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -1134,9 +1126,15 @@ static ssize_t mipi_sharp_panel_lcd_check_reg_show(struct platform_device *pdev,
 		.cnt = ARRAY_SIZE(lcd_check_reg),
 	};
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	mipi_dsi0_base = hisifd->mipi_dsi0_base;
 
@@ -1190,9 +1188,15 @@ static ssize_t mipi_sharp_panel_lcd_mipi_detect_show(struct platform_device *pde
 		.cnt = ARRAY_SIZE(lcd_check_reg),
 	};
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	mipi_dsi0_base = hisifd->mipi_dsi0_base;
 
@@ -1214,9 +1218,15 @@ static ssize_t mipi_sharp_panel_lcd_hkadc_debug_show(struct platform_device *pde
 	ssize_t ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = snprintf(buf, PAGE_SIZE, "%d\n", hkadc_buf*4);
@@ -1232,9 +1242,15 @@ static ssize_t mipi_sharp_panel_lcd_hkadc_debug_store(struct platform_device *pd
 	int channel = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -1286,9 +1302,15 @@ static ssize_t mipi_sharp_panel_lcd_gram_check_show(struct platform_device *pdev
 		return ret;
 	}
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	mipi_dsi0_base = hisifd->mipi_dsi0_base;
 
@@ -1362,9 +1384,15 @@ static ssize_t mipi_sharp_panel_lcd_gram_check_store(struct platform_device *pde
 			sizeof(cmd1_page0_select), cmd1_page0_select},
 	};
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	pinfo = &(hisifd->panel_info);
 	mipi_dsi0_base = hisifd->mipi_dsi0_base;
@@ -1462,9 +1490,15 @@ static ssize_t mipi_sharp_panel_lcd_dynamic_sram_checksum_show(struct platform_d
 		return ret;
 	}
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	mipi_dsi0_base = hisifd->mipi_dsi0_base;
 
@@ -1535,9 +1569,15 @@ static ssize_t mipi_sharp_panel_lcd_dynamic_sram_checksum_store(struct platform_
 			sizeof(reload_cmd1), reload_cmd1},
 	};
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	pinfo = &(hisifd->panel_info);
 	mipi_dsi0_base = hisifd->mipi_dsi0_base;
@@ -1581,9 +1621,15 @@ static int bist_read_and_check(struct platform_device *pdev, int step)
 	u32 D8_value = 0xFF, D9_value = 0xFF, BC_value = 0xFF;
 	int ret = LCD_BIST_CHECK_PASS;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	mipi_dsi0_base = hisifd->dss_base + DSS_MIPI_DSI0_OFFSET;
 
 	outp32(mipi_dsi0_base + MIPIDSI_GEN_HDR_OFFSET, 0xD806);
@@ -1647,9 +1693,15 @@ static ssize_t mipi_sharp_panel_lcd_bist_check_show(struct platform_device *pdev
 			sizeof(lcd_pattern_packet), lcd_pattern_packet},
 	};
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	pinfo = &(hisifd->panel_info);
 	mipi_dsi0_base = hisifd->dss_base + DSS_MIPI_DSI0_OFFSET;
@@ -1657,10 +1709,8 @@ static ssize_t mipi_sharp_panel_lcd_bist_check_show(struct platform_device *pdev
 	remain_pixels = pinfo->xres * pinfo->yres;
 	disp_rect.w = pinfo->xres;
 	disp_rect.h = pinfo->yres;
-#ifdef CONFIG_HUAWEI_TS
 	error = ts_power_control_notify(TS_BEFORE_SUSPEND, SHORT_SYNC_TIMEOUT);
 	HISI_FB_INFO("Disable touchscreen during test.\n");
-#endif
 
 	// lcd display off sequence
 	mipi_dsi_cmds_tx(lcd_display_off_cmds, \
@@ -1710,11 +1760,9 @@ static ssize_t mipi_sharp_panel_lcd_bist_check_show(struct platform_device *pdev
 	gpio_cmds_tx(lcd_gpio_bl_enable_cmds, \
 		ARRAY_SIZE(lcd_gpio_bl_enable_cmds));
 
-#ifdef CONFIG_HUAWEI_TS
 	if (!error)
 		error = ts_power_control_notify(TS_AFTER_RESUME, SHORT_SYNC_TIMEOUT);
 	HISI_FB_INFO("Enable touchscreen after test.\n");
-#endif
 	hisifd->lcd_self_testing = false;
 
 	return ret;
@@ -1725,9 +1773,15 @@ static ssize_t mipi_sharp_panel_lcd_sleep_ctrl_show(struct platform_device *pdev
 	ssize_t ret = 0;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = snprintf(buf, PAGE_SIZE, "enable_lcd_sleep_in=%d\n", g_debug_enable_lcd_sleep_in);
@@ -1790,9 +1844,15 @@ static int mipi_sharp_panel_check_esd(struct platform_device* pdev)
 		.cnt = ARRAY_SIZE(lcd_check_reg),
 	};
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = (struct hisi_fb_data_type*)platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	ret = mipi_dsi_read_compare(&data, hisifd->mipi_dsi0_base);
@@ -1823,9 +1883,15 @@ static int mipi_sharp_panel_set_display_region(struct platform_device *pdev,
 {
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL || dirty == NULL);
+	if (pdev == NULL || dirty == NULL) {
+		HISI_FB_ERR("pdev or dirty is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	lcd_disp_x[1] = (dirty->x >> 8) & 0xff;
 	lcd_disp_x[2] = dirty->x & 0xff;
@@ -1925,9 +1991,15 @@ static ssize_t mipi_sharp_panel_lcd_test_config_store(struct platform_device *pd
 	struct hisi_fb_data_type *hisifd = NULL;
 	char __iomem *mipi_dsi0_base = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	mipi_dsi0_base =hisifd->mipi_dsi0_base;
 
 	if (strlen(buf) < LCD_CMD_NAME_MAX) {
@@ -1935,7 +2007,7 @@ static ssize_t mipi_sharp_panel_lcd_test_config_store(struct platform_device *pd
 		HISI_FB_INFO("current test cmd:%s\n", lcd_cmd_now);
 	} else {
 		memcpy(lcd_cmd_now, "INVALID", strlen("INVALID") + 1);
-		HISI_FB_INFO("invalid test cmd:%s\n");
+		HISI_FB_INFO("invalid test cmd:\n");
 	}
 
 	return count;
@@ -1948,9 +2020,15 @@ static ssize_t mipi_sharp_panel_lcd_support_mode_show(struct platform_device *pd
 	struct hisi_fb_data_type *hisifd = NULL;
 	ssize_t ret = 0;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -1968,9 +2046,15 @@ static ssize_t mipi_sharp_panel_lcd_support_mode_store(struct platform_device *p
 	unsigned long val = 0;
 	int flag = -1;
 	struct hisi_fb_data_type *hisifd = NULL;
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	ret = strict_strtoul(buf, 0, &val);
 	if (ret)
@@ -1993,9 +2077,15 @@ static ssize_t mipi_sharp_panel_lcd_support_checkmode_show(struct platform_devic
 	struct hisi_fb_data_type *hisifd = NULL;
 	ssize_t ret = 0;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -2027,9 +2117,15 @@ static ssize_t mipi_sharp_panel_lp2hs_mipi_check_store(struct platform_device *p
 	struct hisi_fb_data_type *hisifd = NULL;
 	char __iomem *mipi_dsi0_base = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	mipi_dsi0_base = hisifd->mipi_dsi0_base;
 
 	ret = strict_strtoul(buf, 0, &val);
@@ -2058,9 +2154,15 @@ static ssize_t mipi_sharp_panel_sharpness2d_table_store(struct platform_device *
 	struct hisi_fb_data_type *hisifd = NULL;
 	sharp2d_t* sharp2d;
 	int i = 0;
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -2085,9 +2187,15 @@ static ssize_t mipi_sharp_panel_sharpness2d_table_show(struct platform_device *p
 	int i = 0;
 	int buf_len = 0;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 	if (hisifd->panel_info.sharp2d_table && buf) {
@@ -2212,9 +2320,7 @@ static int mipi_sharp_probe(struct platform_device *pdev)
 	uint32_t lcd_ifbc_type = 0;
 
 	panel_lcd_id = (int)simple_strtol(panel_lcd_id_buf, NULL, 0);
-#ifdef CONFIG_HUAWEI_TS
 	g_lcd_control_tp_power = true;	//not use fb_notify to control touch timing.
-#endif
 	np = of_find_compatible_node(NULL, NULL, DTS_COMP_SHARP_NT35695_5P5);
 	if (!np) {
 		HISI_FB_ERR("not found device node %s!\n", DTS_COMP_SHARP_NT35695_5P5);
@@ -2282,16 +2388,10 @@ static int mipi_sharp_probe(struct platform_device *pdev)
 	if (pinfo->bl_set_type == BL_SET_BY_BLPWM)
 		pinfo->blpwm_input_ena = 1;
 
-#ifdef CONFIG_BACKLIGHT_10000
 	pinfo->bl_min = 117;
 	pinfo->bl_max = 9960;
 	pinfo->bl_default = 4000;
 	pinfo->blpwm_precision_type = BLPWM_PRECISION_10000_TYPE;
-#else
-	pinfo->bl_min = 3;
-	pinfo->bl_max = 255;
-	pinfo->bl_default = 102;
-#endif
 
 	pinfo->type = lcd_display_type;
 	pinfo->ifbc_type = IFBC_TYPE_NONE;

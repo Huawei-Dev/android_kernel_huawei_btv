@@ -122,12 +122,6 @@ static char adrsft15[] = {
 	0x6F,
 	0x3D,
 };
-#if 0
-static char adrsft16[] = {
-	0x35,
-	0x02,
-};
-#endif
 static char adrsft17[] = {
 	0x36,
 	0x52,
@@ -231,9 +225,6 @@ static struct dsi_cmd_desc lcd_display_init_cmd[] = {
 	{DTYPE_DCS_WRITE1, 0, 10, WAIT_TYPE_US, sizeof(adrsft13), adrsft13},
 	{DTYPE_DCS_WRITE1, 0, 10, WAIT_TYPE_US, sizeof(adrsft14), adrsft14},
 	{DTYPE_DCS_WRITE1, 0, 10, WAIT_TYPE_US, sizeof(adrsft15), adrsft15},
-#if 0
-	{DTYPE_DCS_WRITE1, 0, 10, WAIT_TYPE_US, sizeof(adrsft16), adrsft16},
-#endif
 	{DTYPE_DCS_WRITE1, 0, 10, WAIT_TYPE_US, sizeof(adrsft17), adrsft17},
 	{DTYPE_DCS_WRITE1, 0, 10, WAIT_TYPE_US, sizeof(adrsft18), adrsft18},
 	{DTYPE_DCS_WRITE1, 0, 10, WAIT_TYPE_US, sizeof(adrsft19), adrsft19},
@@ -918,16 +909,10 @@ static int mipi_auo_probe(struct platform_device *pdev)
 	if (pinfo->bl_set_type == BL_SET_BY_BLPWM)
 		pinfo->blpwm_input_ena = 0;
 
-#ifdef CONFIG_BACKLIGHT_10000
 	pinfo->bl_min = 157;
 	pinfo->bl_max = 9960;
 	pinfo->bl_default = 4000;
 	pinfo->blpwm_precision_type = BLPWM_PRECISION_10000_TYPE;
-#else
-	pinfo->bl_min = 1;
-	pinfo->bl_max = 255;
-	pinfo->bl_default = 102;
-#endif
 
 	pinfo->type = lcd_display_type;
 

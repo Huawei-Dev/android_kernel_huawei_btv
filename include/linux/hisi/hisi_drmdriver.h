@@ -17,11 +17,16 @@
 #define ACCESS_REGISTER_FN_SUB_ID_DDR_PASR      (0x55bbcce6)
 #define ACCESS_REGISTER_FN_SUB_ID_MASTER_SECURITY_CONFIG    (0x55bbcce7)
 #define ACCESS_REGISTER_FN_SUB_ID_DDR_DRM_SET (0x55bbcce8UL)
+#define ACCESS_REGISTER_FN_SUB_ID_DDR_MODEM_SEC (0x55bbcce9UL)
 #define ACCESS_REGISTER_FN_SUB_ID_DDR_DRM_CLR         (0x55bbcceaUL)
 #define ACCESS_REGISTER_FN_SUB_ID_DDR_ISP_SEC_OPEN    (0x55bbcceb)
 #define ACCESS_REGISTER_FN_SUB_ID_DDR_ISP_SEC_CLOSE   (0x55bbccec)
 #define ACCESS_REGISTER_FN_SUB_ID_DDR_KERNEL_CODE_PROTECT  (0x55bbcced)
-#define ACCESS_REGISTER_FN_SUB_ID_DDR_ISP_IRIS_SET  (0x55bbcceeUL)
+#define ACCESS_REGISTER_FN_SUB_ID_DDR_HIFI_SEC_OPEN   (0x55bbcceeUL)
+#define ACCESS_REGISTER_FN_SUB_ID_DDR_HIFI_SEC_CLOSE  (0x55bbccefUL)
+#define ACCESS_REGISTER_FN_SUB_ID_SECS_POWER_CTRL   (0x55bbccf0UL)
+
+#define DRMDRIVER_MODULE_INIT_SUCCESS_FLG (0x12345678)
 
 typedef enum _master_id_type_ {
 	MASTER_VDEC_ID = 0,
@@ -46,6 +51,8 @@ typedef enum master_dss_op_type {
 typedef enum compose_mode {
 	ONLINE_COMPOSE_MODE,
 	OFFLINE_COMPOSE_MODE,
+	OVL1_ONLINE_COMPOSE_MODE,
+	OVL3_OFFLINE_COMPOSE_MODE,
 	MAX_COMPOSE_MODE,
 } COMPOSE_MODE;
 
@@ -57,9 +64,10 @@ typedef enum _dynamic_ddr_sec_type {
 }DYNAMIC_DDR_SEC_TYPE;
 
 typedef struct tag_atfd_data {
-    phys_addr_t  buf_phy_addr;
-    unsigned char *buf_virt_addr;
-    struct mutex atfd_mutex;
+	phys_addr_t  buf_phy_addr;
+	unsigned char *buf_virt_addr;
+	struct mutex atfd_mutex;
+	unsigned int module_init_success_flg;
 } ATFD_DATA;
 
 typedef struct {

@@ -48,10 +48,8 @@ static bool g_display_on = false;
 
 #define AMOLED_CHECK_INT
 
-#ifdef CONFIG_HUAWEI_TS
 #define TP_RS_CALL 1
 extern bool g_lcd_control_tp_power;
-#endif
 
 #define	DISPLAY_DEBUG_ON(param)	\
 	if (NULL == param){\
@@ -72,12 +70,6 @@ static char delay_te[] = {
 	0x44,
 	0x00, 0x00,
 };
-#if 0
-static char seed_off[]={
-	0xEE,
-	0x01,
-};
-#endif
 //brightness contrl
 static char bl_enable[] = {
 	0x53,
@@ -162,43 +154,6 @@ static char test_key_disable[] = {
 	0xA5, 0xA5,
 };
 
-#if 0
-/*normal H, when pcd happened,trigle to L, and always L*/
-static char setting_pcd[] = {
-	0xCC,
-	0x5C, 0x51,
-};
-
-static char setting_errflag_mipi_err[] = {
-	0xED,
-	0x44,
-};
-
-static char setting_sdc[] = {
-	0xC0,
-	0x40, 0x00, 0x9c, 0x9c,
-};
-
-static char level3_unlock_setting[] = {
-	0xFC,
-	0x5A, 0x5A,
-};
-
-static char setting_avc1[] = {
-	0xB0,
-	0x1E,
-};
-
-static char setting_avc2[] = {
-	0xFD,
-	0x9E,
-};
-
-static char level3_lock_setting[] = {
-	0xFC,
-	0xA5, 0xA5,
-};
-#endif	
 
 static char pwd_open_unlock[] = {
 	0xF0, 0x5A, 0x5A,
@@ -335,32 +290,6 @@ static struct dsi_cmd_desc display_on_cmds[] = {
 		sizeof(tear_on), tear_on},
 	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
 		sizeof(delay_te), delay_te},
-#if 0
-	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
-		sizeof(unlock_setting), unlock_setting},
-	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
-		sizeof(seed_off), seed_off},	
-	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
-		sizeof(lock_setting), lock_setting},		
-#endif
-#if 0
-	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
-		sizeof(setting_pcd), setting_pcd},
-	{DTYPE_DCS_WRITE1, 0, 200, WAIT_TYPE_US,
-		sizeof(setting_errflag_mipi_err), setting_errflag_mipi_err},
-	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
-		sizeof(setting_sdc), setting_sdc},
-	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
-		sizeof(lock_setting), lock_setting},
-	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
-		sizeof(level3_unlock_setting), level3_unlock_setting},
-	{DTYPE_DCS_WRITE1, 0, 200, WAIT_TYPE_US,
-		sizeof(setting_avc1), setting_avc1},
-	{DTYPE_DCS_WRITE1, 0, 200, WAIT_TYPE_US,
-		sizeof(setting_avc2), setting_avc2},
-	{DTYPE_GEN_LWRITE, 0, 200, WAIT_TYPE_US,
-		sizeof(level3_lock_setting), level3_lock_setting},
-#endif
 	{DTYPE_DCS_WRITE1, 0, 200, WAIT_TYPE_US,
 		sizeof(bl_setting), bl_setting},
 	{DTYPE_DCS_WRITE1, 0, 200, WAIT_TYPE_US,
@@ -971,11 +900,9 @@ static int mipi_samsung_D53G6EA8064T_panel_on(struct platform_device *pdev)
 	struct hisi_panel_info *pinfo = NULL;
 	char __iomem *mipi_dsi0_base = NULL;
 	int error = 0;
-#if defined (CONFIG_HUAWEI_DSM)
 	static struct lcd_reg_read_t lcd_status_reg[] = {
 		{0x0A, 0x98, 0xFF, "lcd power state"},
 	};
-#endif
 	u32 lp2hs_mipi_check_read_value[1] = {0};
 	u32 lp2hs_mipi_check_expected_value[1] = {0x20};
 	u32 lp2hs_mipi_check_read_mask[1] = {0xFF};
@@ -1043,13 +970,11 @@ static int mipi_samsung_D53G6EA8064T_panel_on(struct platform_device *pdev)
 				gpio_cmds_tx(lcd_gpio_normal_cmds, \
 						ARRAY_SIZE(lcd_gpio_normal_cmds));
 			}
-#ifdef CONFIG_HUAWEI_TS
 		if (TP_RS_CALL != g_debug_enable_lcd_sleep_in) { //control touch timing
 			HISI_FB_INFO("TP resume and after resume\n");
 			error = ts_power_control_notify(TS_RESUME_DEVICE, NO_SYNC_TIMEOUT);
 			error = ts_power_control_notify(TS_AFTER_RESUME, NO_SYNC_TIMEOUT);
 		}
-#endif
 		mipi_dsi_cmds_tx(display_on_cmds, \
 			ARRAY_SIZE(display_on_cmds), mipi_dsi0_base);
 
@@ -1081,10 +1006,8 @@ static int mipi_samsung_D53G6EA8064T_panel_on(struct platform_device *pdev)
 			}
 		}
 
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_check_status_and_report_by_dsm(lcd_status_reg, \
 			ARRAY_SIZE(lcd_status_reg), mipi_dsi0_base);
-#endif
 		g_debug_enable = true;
 		pinfo->lcd_init_step = LCD_INIT_MIPI_HS_SEND_SEQUENCE;
 	} else if (pinfo->lcd_init_step == LCD_INIT_MIPI_HS_SEND_SEQUENCE) {
@@ -1180,7 +1103,6 @@ static int mipi_samsung_D53G6EA8064T_panel_off(struct platform_device *pdev)
 				pinctrl_cmds_tx(pdev, lcd_pinctrl_normal_cmds,
 					ARRAY_SIZE(lcd_pinctrl_normal_cmds));
 			}
-#ifdef CONFIG_HUAWEI_TS
 			//if g_debug_enable_lcd_sleep_in == 1, it means don't turn off TP/LCD power
 			//but only let lcd get into sleep.
 			if (TP_RS_CALL != g_debug_enable_lcd_sleep_in) {
@@ -1188,7 +1110,6 @@ static int mipi_samsung_D53G6EA8064T_panel_off(struct platform_device *pdev)
 				error = ts_power_control_notify(TS_BEFORE_SUSPEND, SHORT_SYNC_TIMEOUT);
 				error = ts_power_control_notify(TS_SUSPEND_DEVICE, SHORT_SYNC_TIMEOUT);
 			}
-#endif
 		}else {
 			HISI_FB_INFO("display shutting down(regulator disabling).\n");
 			HISI_FB_INFO("display off(regulator disabling).\n");
@@ -1204,9 +1125,7 @@ static int mipi_samsung_D53G6EA8064T_panel_off(struct platform_device *pdev)
 				ARRAY_SIZE(lcd_pinctrl_lowpower_cmds));
 
 			mipi_samsung_D53G6EA8064T_panel_regulator_off(pdev);
-#ifdef CONFIG_HUAWEI_TS
 			ts_thread_stop_notify();
-#endif
 		}
 #ifdef AMOLED_CHECK_INT
 		amoled_irq_disable();
@@ -1610,7 +1529,7 @@ static ssize_t mipi_samsung_D53G6EA8064T_panel_test_config_store(struct platform
 		HISI_FB_INFO("current test cmd:%s\n", lcd_cmd_now);
 	} else {
 		memcpy(lcd_cmd_now, "INVALID", strlen("INVALID") + 1);
-		HISI_FB_INFO("invalid test cmd:%s\n");
+		HISI_FB_INFO("invalid test cmd:\n");
 	}
 
 	return count;
@@ -2183,9 +2102,7 @@ static int mipi_samsung_D53G6EA8064T_probe(struct platform_device *pdev)
 	struct hisi_panel_info *pinfo = NULL;
 	struct device_node *np = NULL;
 	uint32_t bl_type = 0;
-#ifdef CONFIG_HUAWEI_TS
 	g_lcd_control_tp_power = true;	//not use fb_notify to control touch timing.
-#endif
 	np = of_find_compatible_node(NULL, NULL, DTS_COMP_SAMSUNG_D53G6EA8064T);
 	if (!np) {
 		HISI_FB_ERR("NOT FOUND device node %s!\n", DTS_COMP_SAMSUNG_D53G6EA8064T);
@@ -2225,16 +2142,9 @@ static int mipi_samsung_D53G6EA8064T_probe(struct platform_device *pdev)
 	if (pinfo->bl_set_type == BL_SET_BY_BLPWM)
 		pinfo->blpwm_input_ena = 1;
 
-#ifndef CONFIG_BACKLIGHT_10000
-	pinfo->bl_min = 157;
-	pinfo->bl_max = 9960;
-	pinfo->bl_default = 4000;
-	pinfo->blpwm_precision_type = BLPWM_PRECISION_10000_TYPE;
-#else
 	pinfo->bl_min = 2;
 	pinfo->bl_max = 255;
 	pinfo->bl_default = 102;
-#endif
 
 	pinfo->frc_enable = 0;
 	pinfo->esd_enable = 1;

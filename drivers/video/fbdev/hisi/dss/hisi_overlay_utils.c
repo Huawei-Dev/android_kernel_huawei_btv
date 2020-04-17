@@ -1,5 +1,16 @@
-
-/*lint -e778 -e732 -e845 -e774*/
+/* Copyright (c) 2013-2014, Hisilicon Tech. Co., Ltd. All rights reserved.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License version 2 and
+* only version 2 as published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+* GNU General Public License for more details.
+*
+*/
+/*lint -e778 -e732 -e845 -e774 -e838*/
 
 #include "hisi_overlay_utils.h"
 #include "hisi_display_effect.h"
@@ -7,9 +18,8 @@
 // 128 bytes
 #define SMMU_RW_ERR_ADDR_SIZE	(128)
 
-/* mmbuf gen pool */
-static struct gen_pool *g_mmbuf_gen_pool = NULL;
-static dss_mmbuf_t g_pre_online_mmbuf[DSS_CHN_MAX_DEFINE] = {{0,0}};
+static struct dss_comm_mmbuf_info g_primary_online_mmbuf[DSS_CHN_MAX_DEFINE] = {{0}};
+static struct dss_comm_mmbuf_info g_external_online_mmbuf[DSS_CHN_MAX_DEFINE] = {{0}};
 static uint32_t vactive_timeout_count = 0;
 
 static inline bool hisi_dss_is_sharpness_support(int32_t width, int32_t height)
@@ -21,33 +31,6 @@ static inline bool hisi_dss_is_sharpness_support(int32_t width, int32_t height)
 /*******************************************************************************
 **
 */
-static int32_t hisi_transform2degree(uint32_t transform) {
-	int ret = 0;
-
-	switch(transform) {
-		case HISI_FB_TRANSFORM_NOP:
-		case HISI_FB_TRANSFORM_FLIP_H:
-		case HISI_FB_TRANSFORM_FLIP_V:
-			ret = 0;
-			break;
-		case HISI_FB_TRANSFORM_ROT_90:
-			ret = 90;
-			break;
-		case HISI_FB_TRANSFORM_ROT_180:
-			ret = 180;
-			break;
-		case HISI_FB_TRANSFORM_ROT_270:
-			ret = 270;
-			break;
-		default:
-			ret = -1;
-			HISI_FB_ERR("not support transform(%d)!", transform);
-			break;
-	}
-
-	return ret;
-}
-
 #define DUMP_BUF_SIZE	SZ_256K
 
 struct dss_dump_data_type {
@@ -59,32 +42,32 @@ struct dss_dump_data_type {
 	uint32_t scene_buf_len;
 	char scene_filename[256];
 
-	char image_bin_filename[MAX_DSS_SRC_NUM][256];
+	char image_bin_filename[OVL_LAYER_NUM_MAX][256];
 };
 
-void dumpDssOverlay(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req, bool isNeedSaveFile)
+void dumpDssOverlay(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req)
 {
 	uint32_t i = 0;
 	uint32_t k = 0;
 	dss_layer_t const *layer = NULL;
 	dss_wb_layer_t const *wb_layer = NULL;
-	struct timeval tv;
 	dss_overlay_block_t *pov_h_block_infos = NULL;
 	dss_overlay_block_t *pov_block_info = NULL;
 
 	struct dss_dump_data_type *dumpDss = NULL;
-	char *image_src_addr = NULL;
-	struct ion_handle *ionhnd = NULL;
 
-	static const char *const layer_format[] = {
-		"RGB565", "RGBX4444", "RGBA4444", "RGBX5551", "RGBA5551", "RGBX8888", "RGBA8888",
-		"BGR565", "BGRX4444", "BGRA4444", "BGRX5551", "BGRA5551", "BGRX8888", "BGRA8888",
-		"YCbYCr", "", "", "NV12", "NV21", "", "", "", "YV12", "", ""
-	};
-
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
-	BUG_ON((pov_req->ovl_idx < DSS_OVL0) || (pov_req->ovl_idx >= DSS_OVL_IDX_MAX));
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
+	if (NULL == pov_req) {
+		HISI_FB_ERR("pov_req is NULL");
+		return;
+	}
+	if ((pov_req->ovl_idx < DSS_OVL0) || (pov_req->ovl_idx >= DSS_OVL_IDX_MAX)) {
+		HISI_FB_ERR("ovl_idx is invalid");
+		return;
+	}
 
 	dumpDss = kmalloc(sizeof(struct dss_dump_data_type), GFP_KERNEL);
 	if (IS_ERR_OR_NULL(dumpDss)) {
@@ -92,23 +75,6 @@ void dumpDssOverlay(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req, bo
 		goto alloc_dump_dss_data_err;
 	}
 	memset(dumpDss, 0, sizeof(struct dss_dump_data_type));
-
-	if (isNeedSaveFile) {
-		hisifb_get_timestamp(&tv);
-		snprintf(dumpDss->scene_filename, sizeof(dumpDss->scene_filename),
-			"/data/dssdump/Scene_%ld.sce", tv.tv_sec);
-		snprintf(dumpDss->dss_filename, sizeof(dumpDss->dss_filename),
-			"/data/dssdump/Dss_%ld.txt", tv.tv_sec);
-
-		//scene buffer
-		dumpDss->scene_buf_len = 0;
-		dumpDss->scene_buf = kmalloc(DUMP_BUF_SIZE, GFP_KERNEL);
-		if (IS_ERR_OR_NULL(dumpDss->scene_buf)) {
-			HISI_FB_ERR("alloc scene_buf failed!\n");
-			goto alloc_scene_buf_err;
-		}
-		memset(dumpDss->scene_buf, 0, DUMP_BUF_SIZE);
-	}
 
 	dumpDss->dss_buf_len = 0;
 	dumpDss->dss_buf = kmalloc(DUMP_BUF_SIZE, GFP_KERNEL);
@@ -189,6 +155,11 @@ void dumpDssOverlay(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req, bo
 				"mmbuf_base=0x%x\n"
 				"mmbuf_size=%d\n"
 				"mmu_enable=%d\n"
+				"hfbc_header_stride0=0x%x\n"
+				"hfbc_payload_stride0=0x%x\n"
+				"hfbc_header_stride1=0x%x\n"
+				"hfbc_payload_stride1=0x%x\n"
+				"hfbc_scramble_mode=%d\n"
 				"csc_mode=%d\n"
 				"secure_mode=%d\n"
 				"shared_fd=%d\n"
@@ -220,6 +191,11 @@ void dumpDssOverlay(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req, bo
 				layer->img.mmbuf_base,
 				layer->img.mmbuf_size,
 				layer->img.mmu_enable,
+				layer->img.hfbc_header_stride0,
+				layer->img.hfbc_payload_stride0,
+				layer->img.hfbc_header_stride1,
+				layer->img.hfbc_payload_stride1,
+				layer->img.hfbc_scramble_mode,
 				layer->img.csc_mode,
 				layer->img.secure_mode,
 				layer->img.shared_fd,
@@ -243,89 +219,6 @@ void dumpDssOverlay(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req, bo
 				layer->chn_idx,
 				layer->need_cap,
 				layer->acquire_fence);
-
-			////////////////////////////////////////////////////////////////////////
-			if (isNeedSaveFile) {
-				if (layer->dst_rect.y < pov_block_info->ov_block_rect.y)
-					continue;
-
-				dumpDss->scene_buf_len += snprintf(dumpDss->scene_buf + dumpDss->scene_buf_len, SZ_1K,
-					"[BaseColor]=0x%x\n"
-					"[ScreenSize]=(%u,%u)\n\n"
-					"[BlendMode]=%d\n"
-					"[Caption]=\n"
-					"[Channel]=%u\n"
-					"[CropLoc]=(%u,%u)\n"
-					"[CropSize]=(%u,%u)\n"
-					"[FlipHV]=(%u,%u)\n"
-					"[Format]=%s\n"
-					"[GlobalAlpha]=%u\n",
-					hisifd->dss_module.ov[pov_req->ovl_idx].ovl_bg_color,
-					get_panel_xres(hisifd),
-					get_panel_yres(hisifd),
-					layer->blending,
-					layer->chn_idx,
-					0,
-					0,
-					layer->src_rect.w,
-					layer->src_rect.h,
-					(layer->transform & HISI_FB_TRANSFORM_FLIP_H),
-					(layer->transform & HISI_FB_TRANSFORM_FLIP_V),
-					layer_format[layer->img.format],
-					layer->glb_alpha);
-
-				if (layer->need_cap & (CAP_DIM | CAP_PURE_COLOR | CAP_BASE)) {
-					if (layer->need_cap & CAP_BASE) {
-						dumpDss->scene_buf_len += snprintf(dumpDss->scene_buf + dumpDss->scene_buf_len, SZ_1K,
-							"[BaseColor]=0x%x\n", layer->color);
-					} else if (layer->need_cap & CAP_PURE_COLOR) {
-						dumpDss->scene_buf_len += snprintf(dumpDss->scene_buf + dumpDss->scene_buf_len, SZ_1K,
-							"[Color]=0x%x\n", layer->color);
-					}
-				} else {
-					dumpDss->scene_buf_len += snprintf(dumpDss->scene_buf + dumpDss->scene_buf_len, SZ_1K,
-						"[ImageSource]=pic%d_%ld.bin\n", k, tv.tv_sec);
-				}
-
-				dumpDss->scene_buf_len += snprintf(dumpDss->scene_buf + dumpDss->scene_buf_len, SZ_1K,
-					"[Location]=(%u,%u)\n"
-					"[Rotate]=%u\n"
-					"[Scale]=(%u,%u)\n"
-					"[Size]=(%u,%u)\n\n",
-					layer->dst_rect.x,
-					layer->dst_rect.y,
-					hisi_transform2degree(layer->transform),
-					layer->dst_rect.w,
-					layer->dst_rect.h,
-					layer->dst_rect.w,
-					layer->dst_rect.h);
-
-				////////////////////////////////////////////////////////////////////
-				if (layer->need_cap & (CAP_DIM | CAP_PURE_COLOR | CAP_BASE))
-					continue;
-
-				if (layer->img.shared_fd < 0)
-					continue;
-
-				ionhnd = ion_import_dma_buf(hisifd->ion_client, layer->img.shared_fd);
-				if (IS_ERR(ionhnd)) {
-					HISI_FB_ERR("ion import dma buf err, share_fd %d, layer index %d",
-						layer->img.shared_fd, i);
-					continue;
-				}
-
-				snprintf(dumpDss->image_bin_filename[k], sizeof(dumpDss->image_bin_filename[k]),
-					"/data/dssdump/pic%d_%ld.bin", k, tv.tv_sec);
-
-				image_src_addr = ion_map_kernel(hisifd->ion_client, ionhnd);
-				if (image_src_addr) {
-					hisifb_save_file(dumpDss->image_bin_filename[k], image_src_addr, layer->img.buf_size);
-					ion_unmap_kernel(hisifd->ion_client, ionhnd);
-				}
-
-				ion_free(hisifd->ion_client, ionhnd);
-				ionhnd = NULL;
-			}
 		}
 	}
 
@@ -349,6 +242,11 @@ void dumpDssOverlay(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req, bo
 			"afbc_scramble_mode=%d\n"
 			"mmbuf_base=0x%x\n"
 			"mmbuf_size=%d\n"
+			"hfbc_header_stride0=0x%x\n"
+			"hfbc_payload_stride0=0x%x\n"
+			"hfbc_header_stride1=0x%x\n"
+			"hfbc_payload_stride1=0x%x\n"
+			"hfbc_scramble_mode=%d\n"
 			"mmu_enable=%d\n"
 			"csc_mode=%d\n"
 			"secure_mode=%d\n"
@@ -376,6 +274,11 @@ void dumpDssOverlay(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req, bo
 			wb_layer->dst.afbc_scramble_mode,
 			wb_layer->dst.mmbuf_base,
 			wb_layer->dst.mmbuf_size,
+			wb_layer->dst.hfbc_header_stride0,
+			wb_layer->dst.hfbc_payload_stride0,
+			wb_layer->dst.hfbc_header_stride1,
+			wb_layer->dst.hfbc_payload_stride1,
+			wb_layer->dst.hfbc_scramble_mode,
 			wb_layer->dst.mmu_enable,
 			wb_layer->dst.csc_mode,
 			wb_layer->dst.secure_mode,
@@ -402,14 +305,6 @@ void dumpDssOverlay(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req, bo
 		printk("%.255s", dumpDss->dss_buf + k);
 	}
 
-	if (isNeedSaveFile) {
-		if (dumpDss->scene_buf)
-			hisifb_save_file(dumpDss->scene_filename, dumpDss->scene_buf, dumpDss->scene_buf_len);
-
-		if (dumpDss->dss_buf)
-			hisifb_save_file(dumpDss->dss_filename, dumpDss->dss_buf, dumpDss->dss_buf_len);
-	}
-
 	if (dumpDss->dss_buf) {
 		kfree(dumpDss->dss_buf);
 		dumpDss->dss_buf = NULL;
@@ -423,8 +318,7 @@ alloc_dss_buf_err:
 		dumpDss->scene_buf_len = 0;
 	}
 
-alloc_scene_buf_err:
-	if (dumpDss) {
+       if (dumpDss) {
 		kfree(dumpDss);
 		dumpDss = NULL;
 	}
@@ -438,9 +332,15 @@ int hisifb_get_lcd_id(struct hisi_fb_data_type *hisifd)
 	int ret = 0;
 	struct hisi_fb_panel_data *pdata = NULL;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&hisifd->pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	if (pdata->get_lcd_id) {
 		ret = pdata->get_lcd_id(hisifd->pdev);
@@ -448,95 +348,24 @@ int hisifb_get_lcd_id(struct hisi_fb_data_type *hisifd)
 	return ret;
 }
 
-#if 0
-int hisi_dss_check_pure_layer(struct hisi_fb_data_type *hisifd, dss_overlay_block_t *pov_h_block,
-	void __user *argp)
-{
-	int ret = 0;
-	uint32_t i = 0;
-	uint32_t layer_info_alpha_val = 0;
-	uint32_t layer_info_srccolor_val = 0;
-	uint32_t alpha_flag = 0;
-	uint32_t color_flag = 0;
-	uint32_t color = 0;
-	char __iomem *ovl_base = NULL;
-	int32_t layer_index = 0;
-	int32_t ovl_idx = 0;
-	int offset = 0;
-	dss_overlay_t check_req;
-	dss_layer_t *layer = NULL;
-
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_h_block == NULL);
-	BUG_ON(argp == NULL);
-
-	ret = copy_from_user(&check_req, argp, sizeof(dss_overlay_t));
-	if (ret) {
-		HISI_FB_ERR("fb%d, copy_from_user failed!\n", hisifd->index);
-		return -EINVAL;
-	}
-
-	for (i = 0; i < pov_h_block->layer_nums; i++) {
-		layer = &(pov_h_block->layer_infos[i]);
-		layer_index = layer->layer_idx;
-	}
-
-	ovl_idx = hisifd->ov_req.ovl_idx;
-
-	ovl_base = hisifd->dss_base +
-		g_dss_module_ovl_base[ovl_idx][MODULE_OVL_BASE];
-	offset= layer_index * 0x2C;
-
-	if (!hisifd->panel_power_on) {
-		HISI_FB_DEBUG("fb%d panel is power off!", hisifd->index);
-		return -EINVAL;
-	}
-
-	if (ovl_idx == DSS_OVL0 || ovl_idx == DSS_OVL2) {
-		if (layer_index < 0 || layer_index >= OVL_6LAYER_NUM) {
-			HISI_FB_ERR("fb%d, invalid layer index: %d", hisifd->index, layer_index);
-			return -EINVAL;
-		}
-	} else {
-		if (layer_index < 0 || layer_index >= OVL_2LAYER_NUM) {
-			HISI_FB_ERR("fb%d, invalid layer index: %d", hisifd->index, layer_index);
-			return -EINVAL;
-		}
-	}
-
-	layer_info_alpha_val = inp32(ovl_base + OVL_LAYER0_INFO_ALPHA + offset);
-	layer_info_srccolor_val = inp32(ovl_base + OVL_LAYER0_INFO_SRCCOLOR + offset);
-
-	alpha_flag = (layer_info_alpha_val & BIT_OVL_LAYER_SRCALPHA_FLAG) ? 1 : 0;
-	color_flag = (layer_info_srccolor_val & BIT_OVL_LAYER_SRCCOLOR_FLAG) ? 1 : 0;
-	color = ((layer_info_alpha_val << 8) & 0xFF000000) | ((layer_info_srccolor_val >> 8) & 0x00FFFFFF);
-
-	if (alpha_flag && color_flag && (color == 0)) {
-		check_req.reserved0 = 1;
-	} else {
-		check_req.reserved0 = 0;
-	}
-
-	ret = copy_to_user((struct dss_overlay_t __user *)argp, &check_req,
-		sizeof(dss_overlay_t));
-	if (ret) {
-		HISI_FB_ERR("fb%d, copy_to_user failed!\n", hisifd->index);
-		return -EINVAL;
-	}
-
-	return 0;
-}
-#endif
-
 static int hisi_dss_lcd_refresh_direction_layer(struct hisi_fb_data_type *hisifd,
 	dss_overlay_t *pov_req, dss_layer_t *layer)
 {
 	struct hisi_panel_info *pinfo = NULL;
 	int ret = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
-	BUG_ON(layer == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == pov_req) {
+		HISI_FB_ERR("pov_req is NULL");
+		return -EINVAL;
+	}
+	if (NULL == layer) {
+		HISI_FB_ERR("layer is NULL");
+		return -EINVAL;
+	}
 
 	pinfo = &(hisifd->panel_info);
 
@@ -691,8 +520,14 @@ static int hisi_dss_lcd_refresh_direction_dirty_region(struct hisi_fb_data_type 
 	struct hisi_panel_info *pinfo = NULL;
 	int ret = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == pov_req) {
+		HISI_FB_ERR("pov_req is NULL");
+		return -EINVAL;
+	}
 
 	pinfo = &(hisifd->panel_info);
 
@@ -737,8 +572,14 @@ int hisi_dss_handle_cur_ovl_req(struct hisi_fb_data_type *hisifd,
 	int i = 0;
 	int m = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == pov_req) {
+		HISI_FB_ERR("pov_req is NULL");
+		return -EINVAL;
+	}
 	pinfo = &(hisifd->panel_info);
 
 	hisifd->resolution_rect = pov_req->res_updt_rect;
@@ -768,7 +609,10 @@ int hisi_get_hal_format(struct fb_info *info)
 	struct fb_var_screeninfo *var = NULL;
 	int hal_format = 0;
 
-	BUG_ON(info == NULL);
+	if (NULL == info) {
+		HISI_FB_ERR("info is NULL");
+		return -EINVAL;
+	}
 	var = &info->var;
 
 	switch (var->bits_per_pixel) {
@@ -821,7 +665,7 @@ err_return:
 	return -1;
 }
 
-static bool hal_format_has_alpha(uint32_t format)
+bool hal_format_has_alpha(uint32_t format)
 {
 	switch (format) {
 	case HISI_FB_PIXEL_FORMAT_RGBA_4444:
@@ -831,6 +675,42 @@ static bool hal_format_has_alpha(uint32_t format)
 	case HISI_FB_PIXEL_FORMAT_BGRA_4444:
 	case HISI_FB_PIXEL_FORMAT_BGRA_5551:
 	case HISI_FB_PIXEL_FORMAT_BGRA_8888:
+
+	case HISI_FB_PIXEL_FORMAT_RGBA_1010102:
+	case HISI_FB_PIXEL_FORMAT_BGRA_1010102:
+		return true;
+
+	default:
+		return false;
+	}
+}
+
+bool isPixel10Bit2dma (int format)
+{
+	switch (format) {
+	case DMA_PIXEL_FORMAT_RGBA_1010102:
+	case DMA_PIXEL_FORMAT_Y410_10BIT:
+	case DMA_PIXEL_FORMAT_YUV422_10BIT:
+	case DMA_PIXEL_FORMAT_YUV420_SP_10BIT:
+	case DMA_PIXEL_FORMAT_YUV422_SP_10BIT:
+	case DMA_PIXEL_FORMAT_YUV420_P_10BIT:
+	case DMA_PIXEL_FORMAT_YUV422_P_10BIT:
+		return true;
+
+	default:
+		return false;
+	}
+}
+
+bool isPixel10Bit2dfc (int format)
+{
+	switch (format) {
+	case DFC_PIXEL_FORMAT_BGRA_1010102:
+	case DFC_PIXEL_FORMAT_YUVA_1010102:
+	case DFC_PIXEL_FORMAT_UYVA_1010102:
+	case DFC_PIXEL_FORMAT_VUYA_1010102:
+	case DFC_PIXEL_FORMAT_YUYV_10:
+	case DFC_PIXEL_FORMAT_UYVY_10:
 		return true;
 
 	default:
@@ -846,6 +726,7 @@ bool isYUVPackage(uint32_t format)
 	case HISI_FB_PIXEL_FORMAT_YVYU_422_Pkg:
 	case HISI_FB_PIXEL_FORMAT_UYVY_422_Pkg:
 	case HISI_FB_PIXEL_FORMAT_VYUY_422_Pkg:
+	case HISI_FB_PIXEL_FORMAT_YUV422_10BIT:
 		return true;
 
 	default:
@@ -860,6 +741,9 @@ bool isYUVSemiPlanar(uint32_t format)
 	case HISI_FB_PIXEL_FORMAT_YCrCb_422_SP:
 	case HISI_FB_PIXEL_FORMAT_YCbCr_420_SP:
 	case HISI_FB_PIXEL_FORMAT_YCrCb_420_SP:
+	case HISI_FB_PIXEL_FORMAT_YCrCb420_SP_10BIT:
+	case HISI_FB_PIXEL_FORMAT_YCbCr420_SP_10BIT:
+	case HISI_FB_PIXEL_FORMAT_YCbCr422_SP_10BIT:
 		return true;
 
 	default:
@@ -874,6 +758,8 @@ bool isYUVPlanar(uint32_t format)
 	case HISI_FB_PIXEL_FORMAT_YCrCb_422_P:
 	case HISI_FB_PIXEL_FORMAT_YCbCr_420_P:
 	case HISI_FB_PIXEL_FORMAT_YCrCb_420_P:
+	case HISI_FB_PIXEL_FORMAT_YCbCr420_P_10BIT:
+	case HISI_FB_PIXEL_FORMAT_YCbCr422_P_10BIT:
 		return true;
 
 	default:
@@ -893,6 +779,8 @@ bool is_YUV_SP_420(uint32_t format)
 	switch (format) {
 	case HISI_FB_PIXEL_FORMAT_YCbCr_420_SP:
 	case HISI_FB_PIXEL_FORMAT_YCrCb_420_SP:
+	case HISI_FB_PIXEL_FORMAT_YCbCr420_SP_10BIT:
+	case HISI_FB_PIXEL_FORMAT_YCrCb420_SP_10BIT:
 		return true;
 
 	default:
@@ -917,6 +805,7 @@ bool is_YUV_P_420(uint32_t format)
 	switch (format) {
 	case HISI_FB_PIXEL_FORMAT_YCbCr_420_P:
 	case HISI_FB_PIXEL_FORMAT_YCrCb_420_P:
+	case HISI_FB_PIXEL_FORMAT_YCbCr420_P_10BIT:
 		return true;
 
 	default:
@@ -929,6 +818,7 @@ bool is_YUV_P_422(uint32_t format)
 	switch (format) {
 	case HISI_FB_PIXEL_FORMAT_YCbCr_422_P:
 	case HISI_FB_PIXEL_FORMAT_YCrCb_422_P:
+	case HISI_FB_PIXEL_FORMAT_YCbCr422_P_10BIT:
 		return true;
 
 	default:
@@ -966,32 +856,32 @@ static bool isNeedRectClip(dss_rect_ltrb_t clip_rect)
 
 static bool isSrcRectMasked(dss_layer_t *layer, int aligned_pixel)
 {
-	BUG_ON(layer == NULL);
+	if (NULL == layer) {
+		HISI_FB_ERR("layer is NULL");
+		return false;
+	}
 
 	return ((layer->src_rect_mask.w != 0) &&
 		(layer->src_rect_mask.h != 0) &&
 		(ALIGN_DOWN(layer->src_rect_mask.x + layer->src_rect_mask.w, aligned_pixel) > 1));
 }
 
-static uint32_t isNeedRdmaStretchBlt(struct hisi_fb_data_type *hisifd, dss_layer_t *layer)
+uint32_t isNeedRdmaStretchBlt(struct hisi_fb_data_type *hisifd, dss_layer_t *layer)
 {
 	uint32_t v_stretch_ratio_threshold = 0;
 	uint32_t v_stretch_ratio = 0;
 
-	BUG_ON(layer == NULL);
+	if (NULL == layer) {
+		HISI_FB_ERR("layer is NULL");
+		return 0;
+	}
 
-	if (layer->need_cap & CAP_AFBCD) {
-	#if 0
-		v_stretch_ratio = layer->src_rect.h / layer->dst_rect.h;
-		if (v_stretch_ratio < 2)
-			v_stretch_ratio = 0;
-	#else
+	if ((layer->need_cap & CAP_AFBCD) || (layer->need_cap & CAP_HFBCD)) {
 		v_stretch_ratio = 0;
-	#endif
 	} else {
 		if (is_YUV_SP_420(layer->img.format) || is_YUV_P_420(layer->img.format)) {
 			v_stretch_ratio_threshold = ((layer->src_rect.h + layer->dst_rect.h - 1) / layer->dst_rect.h);
-			v_stretch_ratio = ((layer->src_rect.h / layer->dst_rect.h) / 2) * 2;
+			v_stretch_ratio = (((layer->src_rect.h / layer->dst_rect.h) + 1) / 2) * 2;
 		} else {
 			v_stretch_ratio_threshold = ((layer->src_rect.h + layer->dst_rect.h - 1) / layer->dst_rect.h);
 			v_stretch_ratio = (layer->src_rect.h / layer->dst_rect.h);
@@ -1004,13 +894,30 @@ static uint32_t isNeedRdmaStretchBlt(struct hisi_fb_data_type *hisifd, dss_layer
 	return v_stretch_ratio;
 }
 
-static int hisi_adjust_clip_rect(dss_layer_t *layer, dss_rect_ltrb_t *clip_rect)
+void hisifb_dss_overlay_info_init(dss_overlay_t* ov_req)
+{
+	if (!ov_req)
+		return;
+
+	memset(ov_req, 0, sizeof(dss_overlay_t));
+	ov_req->release_fence = -1;
+	ov_req->retire_fence = -1;
+}
+
+
+int hisi_adjust_clip_rect(dss_layer_t *layer, dss_rect_ltrb_t *clip_rect)
 {
 	int ret = 0;
 	uint32_t temp = 0;
 
-	BUG_ON(layer == NULL);
-	BUG_ON(clip_rect == NULL);
+	if (NULL == layer) {
+		HISI_FB_ERR("layer is NULL");
+		return -EINVAL;
+	}
+	if (NULL == clip_rect) {
+		HISI_FB_ERR("clip_rect is NULL");
+		return -EINVAL;
+	}
 
 	if ((clip_rect->left < 0 || clip_rect->left > DFC_MAX_CLIP_NUM) ||
 		(clip_rect->right < 0 || clip_rect->right > DFC_MAX_CLIP_NUM) ||
@@ -1024,6 +931,7 @@ static int hisi_adjust_clip_rect(dss_layer_t *layer, dss_rect_ltrb_t *clip_rect)
 		// do nothing
 		break;
 	case HISI_FB_TRANSFORM_FLIP_H:
+	case HISI_FB_TRANSFORM_ROT_90:
 		{
 			temp = clip_rect->left;
 			clip_rect->left = clip_rect->right;
@@ -1031,6 +939,7 @@ static int hisi_adjust_clip_rect(dss_layer_t *layer, dss_rect_ltrb_t *clip_rect)
 		}
 		break;
 	case HISI_FB_TRANSFORM_FLIP_V:
+	case HISI_FB_TRANSFORM_ROT_270:
 		{
 			temp = clip_rect->top;
 			clip_rect->top = clip_rect->bottom;
@@ -1056,7 +965,7 @@ static int hisi_adjust_clip_rect(dss_layer_t *layer, dss_rect_ltrb_t *clip_rect)
 	return ret;
 }
 
-static int hisi_pixel_format_hal2dma(int format)
+int hisi_pixel_format_hal2dma(int format)
 {
 	int ret = 0;
 
@@ -1116,7 +1025,29 @@ static int hisi_pixel_format_hal2dma(int format)
 	case HISI_FB_PIXEL_FORMAT_YCrCb_420_SP:
 		ret = DMA_PIXEL_FORMAT_YUV_420_SP_HP;
 		break;
-
+	case HISI_FB_PIXEL_FORMAT_RGBA_1010102:
+	case HISI_FB_PIXEL_FORMAT_BGRA_1010102:
+		ret = DMA_PIXEL_FORMAT_RGBA_1010102;
+		break;
+	case HISI_FB_PIXEL_FORMAT_Y410_10BIT:
+		ret = DMA_PIXEL_FORMAT_Y410_10BIT;
+		break;
+	case HISI_FB_PIXEL_FORMAT_YUV422_10BIT:
+		ret = DMA_PIXEL_FORMAT_YUV422_10BIT;
+		break;
+	case HISI_FB_PIXEL_FORMAT_YCrCb420_SP_10BIT:
+	case HISI_FB_PIXEL_FORMAT_YCbCr420_SP_10BIT:
+		ret = DMA_PIXEL_FORMAT_YUV420_SP_10BIT;
+		break;
+	case HISI_FB_PIXEL_FORMAT_YCbCr422_SP_10BIT:
+		ret = DMA_PIXEL_FORMAT_YUV422_SP_10BIT;
+		break;
+	case HISI_FB_PIXEL_FORMAT_YCbCr420_P_10BIT:
+		ret = DMA_PIXEL_FORMAT_YUV420_P_10BIT;
+		break;
+	case HISI_FB_PIXEL_FORMAT_YCbCr422_P_10BIT:
+		ret = DMA_PIXEL_FORMAT_YUV422_P_10BIT;
+		break;
 	default:
 		HISI_FB_ERR("not support format(%d)!\n", format);
 		ret = -1;
@@ -1125,13 +1056,12 @@ static int hisi_pixel_format_hal2dma(int format)
 
 	return ret;
 }
-
-static int hisi_transform_hal2dma(int transform, int chn_idx)
+/*lint -e655*/
+int hisi_transform_hal2dma(int transform, int chn_idx)
 {
 	int ret = 0;
 
-	if (chn_idx < DSS_WCHN_W0 || chn_idx == DSS_RCHN_V2)
-	{
+	if (chn_idx < DSS_WCHN_W0 || chn_idx == DSS_RCHN_V2) {
 		switch(transform) {
 		case HISI_FB_TRANSFORM_NOP:
 			ret = DSS_TRANSFORM_NOP;
@@ -1145,21 +1075,12 @@ static int hisi_transform_hal2dma(int transform, int chn_idx)
 		case HISI_FB_TRANSFORM_ROT_180:
 			ret = DSS_TRANSFORM_FLIP_V |DSS_TRANSFORM_FLIP_H;
 			break;
-	#if 0
 		case HISI_FB_TRANSFORM_ROT_90:
-			ret = DSS_TRANSFORM_ROT | DSS_TRANSFORM_FLIP_V;
-			break;
-
-		case HISI_FB_TRANSFORM_ROT_270:
 			ret = DSS_TRANSFORM_ROT | DSS_TRANSFORM_FLIP_H;
 			break;
-		case (HISI_FB_TRANSFORM_ROT_90 | HISI_FB_TRANSFORM_FLIP_H):
-			ret =  DSS_TRANSFORM_ROT | DSS_TRANSFORM_FLIP_V | DSS_TRANSFORM_FLIP_H;
+		case HISI_FB_TRANSFORM_ROT_270:
+			ret = DSS_TRANSFORM_ROT | DSS_TRANSFORM_FLIP_V;
 			break;
-		case (HISI_FB_TRANSFORM_ROT_90 | HISI_FB_TRANSFORM_FLIP_V):
-			ret = DSS_TRANSFORM_ROT;
-			break;
-	#endif
 		default:
 			ret = -1;
 			HISI_FB_ERR("Transform %d is not supported", transform);
@@ -1205,7 +1126,9 @@ static int hisi_pixel_format_hal2dfc(int format)
 	case HISI_FB_PIXEL_FORMAT_RGBA_8888:
 		ret = DFC_PIXEL_FORMAT_ABGR_8888;
 		break;
-
+	case HISI_FB_PIXEL_FORMAT_RGBA_1010102:
+		ret = DFC_PIXEL_FORMAT_BGRA_1010102;
+		break;
 	case HISI_FB_PIXEL_FORMAT_BGR_565:
 		ret = DFC_PIXEL_FORMAT_BGR_565;
 		break;
@@ -1226,6 +1149,9 @@ static int hisi_pixel_format_hal2dfc(int format)
 		break;
 	case HISI_FB_PIXEL_FORMAT_BGRA_8888:
 		ret = DFC_PIXEL_FORMAT_ARGB_8888;
+		break;
+	case HISI_FB_PIXEL_FORMAT_BGRA_1010102:
+		ret = DFC_PIXEL_FORMAT_BGRA_1010102;
 		break;
 
 	case HISI_FB_PIXEL_FORMAT_YUV_422_I:
@@ -1264,6 +1190,17 @@ static int hisi_pixel_format_hal2dfc(int format)
 		ret = DFC_PIXEL_FORMAT_YVYU422;
 		break;
 
+	case HISI_FB_PIXEL_FORMAT_Y410_10BIT:
+		ret = DFC_PIXEL_FORMAT_UYVA_1010102;
+		break;
+	case HISI_FB_PIXEL_FORMAT_YCrCb420_SP_10BIT:
+	case HISI_FB_PIXEL_FORMAT_YUV422_10BIT:
+	case HISI_FB_PIXEL_FORMAT_YCbCr420_SP_10BIT:
+	case HISI_FB_PIXEL_FORMAT_YCbCr422_SP_10BIT:
+	case HISI_FB_PIXEL_FORMAT_YCbCr420_P_10BIT:
+	case HISI_FB_PIXEL_FORMAT_YCbCr422_P_10BIT:
+		ret = DFC_PIXEL_FORMAT_YUYV_10;
+		break;
 	default:
 		HISI_FB_ERR("not support format(%d)!\n", format);
 		ret = -1;
@@ -1272,7 +1209,7 @@ static int hisi_pixel_format_hal2dfc(int format)
 
 	return ret;
 }
-
+/*lint +e655*/
 static int hisi_rb_swap(int format)
 {
 	switch (format) {
@@ -1283,6 +1220,7 @@ static int hisi_rb_swap(int format)
 	case HISI_FB_PIXEL_FORMAT_BGRA_5551:
 	case HISI_FB_PIXEL_FORMAT_BGRX_8888:
 	case HISI_FB_PIXEL_FORMAT_BGRA_8888:
+	case HISI_FB_PIXEL_FORMAT_BGRA_1010102:
 		return 1;
 	default:
 		return 0;
@@ -1296,6 +1234,8 @@ static int hisi_uv_swap(int format)
 	case HISI_FB_PIXEL_FORMAT_YCrCb_420_SP:
 	case HISI_FB_PIXEL_FORMAT_YCrCb_422_P:
 	case HISI_FB_PIXEL_FORMAT_YCrCb_420_P:
+	case HISI_FB_PIXEL_FORMAT_YCrCb420_SP_10BIT:
+	case HISI_FB_PIXEL_FORMAT_YCrCb422_SP_10BIT:
 		return 1;
 
 	default:
@@ -1326,6 +1266,7 @@ static int hisi_dfc_get_bpp(int dfc_format)
 	case DFC_PIXEL_FORMAT_ARGB_8888:
 	case DFC_PIXEL_FORMAT_XBGR_8888:
 	case DFC_PIXEL_FORMAT_ABGR_8888:
+	case DFC_PIXEL_FORMAT_BGRA_1010102:
 		ret = 4;
 		break;
 
@@ -1338,9 +1279,12 @@ static int hisi_dfc_get_bpp(int dfc_format)
 	case DFC_PIXEL_FORMAT_YVYU422:
 	case DFC_PIXEL_FORMAT_VYUY422:
 	case DFC_PIXEL_FORMAT_UYVY422:
+	case DFC_PIXEL_FORMAT_YUYV_10:
 		ret = 2;
 		break;
-
+	case DFC_PIXEL_FORMAT_UYVA_1010102:
+		ret = 4;
+		break;
 	default:
 		HISI_FB_ERR("not support format(%d)!\n", dfc_format);
 		ret = -1;
@@ -1351,7 +1295,7 @@ static int hisi_dfc_get_bpp(int dfc_format)
 }
 
 static uint32_t hisi_calculate_display_addr(bool mmu_enable, dss_layer_t *layer,
-	dss_rect_ltrb_t *aligned_rect, int add_type)
+	dss_rect_ltrb_t *aligned_rect, int add_type, bool is_pixel_10bit)
 {
 	uint32_t addr = 0;
 	uint32_t src_addr = 0;
@@ -1379,6 +1323,9 @@ static uint32_t hisi_calculate_display_addr(bool mmu_enable, dss_layer_t *layer,
 		src_addr = mmu_enable ? (layer->img.vir_addr + offset) :
 			(layer->img.phy_addr + offset);
 		bpp = 1;
+		if (is_pixel_10bit) {
+			bpp = layer->img.bpp;//lint !e713
+		}
 
 		if (is_YUV_P_420(layer->img.format) || is_YUV_P_422(layer->img.format)) {
 			left /= 2;
@@ -1395,7 +1342,9 @@ static uint32_t hisi_calculate_display_addr(bool mmu_enable, dss_layer_t *layer,
 		src_addr = mmu_enable ? (layer->img.vir_addr + offset) :
 			(layer->img.phy_addr + offset);
 		bpp = 1;
-
+		if (is_pixel_10bit) {
+			bpp = layer->img.bpp;//lint !e713
+		}
 		if (is_YUV_P_420(layer->img.format) || is_YUV_P_422(layer->img.format)) {
 			left /= 2;
 			right /= 2;
@@ -1407,7 +1356,6 @@ static uint32_t hisi_calculate_display_addr(bool mmu_enable, dss_layer_t *layer,
 		}
 	} else {
 		HISI_FB_ERR("NOT SUPPORT this add_type(%d).\n", add_type);
-		BUG_ON(1);
 	}
 
 	switch(layer->transform) {
@@ -1423,20 +1371,6 @@ static uint32_t hisi_calculate_display_addr(bool mmu_enable, dss_layer_t *layer,
 	case HISI_FB_TRANSFORM_ROT_180:
 		addr = src_addr + bottom * stride + right * bpp;
 		break;
-#if 0
-	case HISI_FB_TRANSFORM_ROT_90:
-		addr = src_addr + bottom * stride + left * bpp;
-		break;
-	case HISI_FB_TRANSFORM_ROT_270:
-		addr = src_addr + top * stride + right * bpp;
-		break;
-	case (HISI_FB_TRANSFORM_ROT_90 | HISI_FB_TRANSFORM_FLIP_H):
-		addr = src_addr + bottom * stride + right * bpp;
-		break;
-	case (HISI_FB_TRANSFORM_ROT_90 | HISI_FB_TRANSFORM_FLIP_V):
-		addr = src_addr + top * stride + left * bpp;
-		break;
-#endif
 	default:
 		HISI_FB_ERR("not supported this transform(%d)!", layer->transform);
 		break;
@@ -1445,34 +1379,30 @@ static uint32_t hisi_calculate_display_addr(bool mmu_enable, dss_layer_t *layer,
 	return addr;
 }
 
-
-
 /*******************************************************************************
 ** DSS MIF
 */
-static void hisi_dss_mif_init(char __iomem *mif_ch_base,
+void hisi_dss_mif_init(char __iomem *mif_ch_base,
 	dss_mif_t *s_mif, int chn_idx)
 {
 	uint32_t rw_type = 0;
 
-	BUG_ON(mif_ch_base == NULL);
-	BUG_ON(s_mif == NULL);
+	if (NULL == mif_ch_base) {
+		HISI_FB_ERR("mif_ch_base is NULL");
+		return;
+	}
+	if (NULL == s_mif) {
+		HISI_FB_ERR("s_mif is NULL");
+		return;
+	}
 
 	memset(s_mif, 0, sizeof(dss_mif_t));
 
-#if 0
-	s_mif->mif_ctrl1 = inp32(mif_ch_base + MIF_CTRL1);
-	s_mif->mif_ctrl2 = inp32(mif_ch_base + MIF_CTRL2);
-	s_mif->mif_ctrl3 = inp32(mif_ch_base + MIF_CTRL3);
-	s_mif->mif_ctrl4 = inp32(mif_ch_base + MIF_CTRL4);
-	s_mif->mif_ctrl5 = inp32(mif_ch_base + MIF_CTRL5);
-#else
 	s_mif->mif_ctrl1 = 0x00000020;
 	s_mif->mif_ctrl2 = 0x0;
 	s_mif->mif_ctrl3 = 0x0;
 	s_mif->mif_ctrl4 = 0x0;
 	s_mif->mif_ctrl5 = 0x0;
-#endif
 
 	/*
 	if (chn_idx == DSS_RCHN_D2) {
@@ -1481,10 +1411,9 @@ static void hisi_dss_mif_init(char __iomem *mif_ch_base,
 		s_mif->mif_ctrl1 = set_bits32(s_mif->mif_ctrl1, chn_idx, 4, 0);
 	}
 	*/
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
-	if (g_dss_mif_sid_map[chn_idx] != 0)
+	if (g_dss_mif_sid_map[chn_idx] != 0) {
 		s_mif->mif_ctrl1 = set_bits32(s_mif->mif_ctrl1, g_dss_mif_sid_map[chn_idx], 4, 0);
-#endif
+	}
 	rw_type = (chn_idx < DSS_WCHN_W0 || chn_idx == DSS_RCHN_V2) ? 0x0 : 0x1;
 
 	s_mif->mif_ctrl1 = set_bits32(s_mif->mif_ctrl1, 0x0, 1, 5);
@@ -1494,9 +1423,20 @@ static void hisi_dss_mif_init(char __iomem *mif_ch_base,
 static void hisi_dss_mif_set_reg(struct hisi_fb_data_type *hisifd,
 	char __iomem *mif_ch_base, dss_mif_t *s_mif, int chn_idx)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON(mif_ch_base == NULL);
-	BUG_ON(s_mif == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return;
+	}
+
+	if (mif_ch_base == NULL) {
+		HISI_FB_DEBUG("mif_ch_base is NULL!\n");
+		return;
+	}
+
+	if (s_mif == NULL) {
+		HISI_FB_DEBUG("s_mif is NULL!\n");
+		return;
+	}
 
 	hisifd->set_reg(hisifd, mif_ch_base + MIF_CTRL1,
 		s_mif->mif_ctrl1, 32, 0);
@@ -1514,7 +1454,10 @@ void hisi_dss_mif_on(struct hisi_fb_data_type *hisifd)
 {
 	char __iomem *mif_base = NULL;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 
 	mif_base = hisifd->dss_base + DSS_MIF_OFFSET;
 
@@ -1533,7 +1476,6 @@ void hisi_dss_mif_on(struct hisi_fb_data_type *hisifd)
 	set_reg(hisifd->dss_base + MIF_CH8_OFFSET + MIF_CTRL0, 0x1, 1, 0);
 	set_reg(hisifd->dss_base + MIF_CH9_OFFSET + MIF_CTRL0, 0x1, 1, 0);
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	set_reg(hisifd->dss_base + MIF_CH0_OFFSET + MIF_CTRL1, g_dss_mif_sid_map[DSS_RCHN_D2], 4, 0);
 	set_reg(hisifd->dss_base + MIF_CH1_OFFSET + MIF_CTRL1, g_dss_mif_sid_map[DSS_RCHN_D3], 4, 0);
 	set_reg(hisifd->dss_base + MIF_CH2_OFFSET + MIF_CTRL1, g_dss_mif_sid_map[DSS_RCHN_V0], 4, 0);
@@ -1544,10 +1486,6 @@ void hisi_dss_mif_on(struct hisi_fb_data_type *hisifd)
 	set_reg(hisifd->dss_base + MIF_CH7_OFFSET + MIF_CTRL1, g_dss_mif_sid_map[DSS_RCHN_D1], 4, 0);
 	set_reg(hisifd->dss_base + MIF_CH8_OFFSET + MIF_CTRL1, 0x20000 | g_dss_mif_sid_map[DSS_WCHN_W0], 32, 0);
 	set_reg(hisifd->dss_base + MIF_CH9_OFFSET + MIF_CTRL1, 0x20000 | g_dss_mif_sid_map[DSS_WCHN_W1], 32, 0);
-#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	set_reg(hisifd->dss_base + MIF_CH10_OFFSET + MIF_CTRL0, 0x1, 1, 0);
-	set_reg(hisifd->dss_base + MIF_CH11_OFFSET + MIF_CTRL0, 0x1, 1, 0);
-#endif
 }
 
 int hisi_dss_mif_config(struct hisi_fb_data_type *hisifd,
@@ -1562,8 +1500,14 @@ int hisi_dss_mif_config(struct hisi_fb_data_type *hisifd,
 	uint32_t* semi_plane1 = NULL;
 	int v_scaling_factor = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON((layer == NULL) && (wb_layer == NULL));
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if ((layer == NULL) && (wb_layer == NULL)) {
+		HISI_FB_ERR("layer and wb_layer is NULL");
+		return -EINVAL;
+	}
 
 	if (wb_layer) {
 		img = &(wb_layer->dst);
@@ -1584,16 +1528,11 @@ int hisi_dss_mif_config(struct hisi_fb_data_type *hisifd,
 
 	semi_plane1 = &mif->mif_ctrl4;
 
-#ifdef CONFIG_HISI_FB_6250
-	if (wb_layer) {
-		semi_plane1 = &mif->mif_ctrl3;
-	}
-#endif
 
 	if (img->mmu_enable == 0) {
 		mif->mif_ctrl1 = set_bits32(mif->mif_ctrl1, 0x1, 1, 5);
 	} else {
-		if (need_cap & (CAP_AFBCD | CAP_AFBCE)) {
+		if (need_cap & (CAP_AFBCD | CAP_AFBCE | CAP_HFBCD | CAP_HFBCE)) {
 			invalid_sel = 0;
 		} else {
 			invalid_sel = hisi_dss_mif_get_invalid_sel(img,transform, v_scaling_factor, ((need_cap & CAP_TILE) ? 1 : 0), rdma_stretch_enable);
@@ -1610,13 +1549,8 @@ int hisi_dss_mif_config(struct hisi_fb_data_type *hisifd,
 			mif->mif_ctrl5 = set_bits32(mif->mif_ctrl5, 0x0, 20, 0);
 		} else if ((invalid_sel == 1) || (invalid_sel == 2)) {
 			if (img->stride > 0) {
-			#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 				mif->mif_ctrl2 = set_bits32(mif->mif_ctrl2,
 					((img->stride / MIF_STRIDE_UNIT) + (((img->stride % MIF_STRIDE_UNIT) > 0) ? 1: 0)), 20, 0);
-			#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-				mif->mif_ctrl5 = set_bits32(mif->mif_ctrl5,
-					((img->stride / MIF_STRIDE_UNIT) + (((img->stride % MIF_STRIDE_UNIT) > 0) ? 1: 0)), 20, 0);
-			#endif
 			}
 
 			if (isYUVSemiPlanar(img->format)) {
@@ -1625,7 +1559,6 @@ int hisi_dss_mif_config(struct hisi_fb_data_type *hisifd,
 						((img->stride_plane1 / MIF_STRIDE_UNIT) + (((img->stride_plane1 % MIF_STRIDE_UNIT) > 0) ? 1: 0)), 20, 0);
 				}
 			} else if (isYUVPlanar(img->format)) {
-			#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 				if (img->stride_plane1 > 0) {
 					mif->mif_ctrl3 = set_bits32(mif->mif_ctrl3,
 						((img->stride_plane1 / MIF_STRIDE_UNIT) + (((img->stride_plane1 % MIF_STRIDE_UNIT) > 0) ? 1: 0)), 20, 0);
@@ -1635,27 +1568,12 @@ int hisi_dss_mif_config(struct hisi_fb_data_type *hisifd,
 					mif->mif_ctrl4 = set_bits32(mif->mif_ctrl4,
 						((img->stride_plane2 / MIF_STRIDE_UNIT) + (((img->stride_plane2 % MIF_STRIDE_UNIT) > 0) ? 1: 0)), 20, 0);
 				}
-			#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-				if (img->stride_plane1 > 0) {
-					mif->mif_ctrl4= set_bits32(mif->mif_ctrl4,
-						((img->stride_plane1 / MIF_STRIDE_UNIT) + (((img->stride_plane1 % MIF_STRIDE_UNIT) > 0) ? 1: 0)), 20, 0);
-				}
-
-				if (img->stride_plane2 > 0) {
-					mif->mif_ctrl3 = set_bits32(mif->mif_ctrl3,
-						((img->stride_plane2 / MIF_STRIDE_UNIT) + (((img->stride_plane2 % MIF_STRIDE_UNIT) > 0) ? 1: 0)), 20, 0);
-				}
-			#endif
 			} else {
 				;
 			}
 		} else if (invalid_sel == 3) {
 			if (img->stride > 0) {
-			#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 				mif->mif_ctrl2 = set_bits32(mif->mif_ctrl2, DSS_MIF_CTRL2_INVAL_SEL3_STRIDE_MASK, 4, 16);
-			#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-				mif->mif_ctrl5 = set_bits32(mif->mif_ctrl5, DSS_MIF_CTRL2_INVAL_SEL3_STRIDE_MASK, 4, 16);
-			#endif
 			}
 			if (isYUVSemiPlanar(img->format)) {
 				if (img->stride_plane1 > 0)
@@ -1687,10 +1605,16 @@ int hisi_dss_mif_config(struct hisi_fb_data_type *hisifd,
 /*******************************************************************************
 ** DSS RDMA
 */
-static void hisi_dss_rdma_init(char __iomem *dma_base, dss_rdma_t *s_dma)
+void hisi_dss_rdma_init(char __iomem *dma_base, dss_rdma_t *s_dma)
 {
-	BUG_ON(dma_base == NULL);
-	BUG_ON(s_dma == NULL);
+	if (NULL == dma_base) {
+		HISI_FB_ERR("dma_base is NULL");
+		return;
+	}
+	if (NULL == s_dma) {
+		HISI_FB_ERR("s_dma is NULL");
+		return;
+	}
 
 	memset(s_dma, 0, sizeof(dss_rdma_t));
 
@@ -1727,19 +1651,23 @@ static void hisi_dss_rdma_init(char __iomem *dma_base, dss_rdma_t *s_dma)
 	s_dma->afbcd_input_header_stride = inp32(dma_base + AFBCD_INPUT_HEADER_STRIDE);
 	s_dma->afbcd_payload_stride = inp32(dma_base + AFBCD_PAYLOAD_STRIDE);
 	s_dma->afbcd_mm_base_0 = inp32(dma_base + AFBCD_MM_BASE_0);
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	s_dma->afbcd_mm_base_1 = inp32(dma_base + AFBCD_MM_BASE_1);
-#endif
 	s_dma->afbcd_afbcd_payload_pointer = inp32(dma_base + AFBCD_AFBCD_PAYLOAD_POINTER);
 	s_dma->afbcd_height_bf_str = inp32(dma_base + AFBCD_HEIGHT_BF_STR);
 	s_dma->afbcd_os_cfg = inp32(dma_base + AFBCD_OS_CFG);
 	s_dma->afbcd_mem_ctrl = inp32(dma_base + AFBCD_MEM_CTRL);
 }
 
-static void hisi_dss_rdma_u_init(char __iomem *dma_base, dss_rdma_t *s_dma)
+void hisi_dss_rdma_u_init(char __iomem *dma_base, dss_rdma_t *s_dma)
 {
-	BUG_ON(dma_base == NULL);
-	BUG_ON(s_dma == NULL);
+	if (NULL == dma_base) {
+		HISI_FB_ERR("dma_base is NULL");
+		return;
+	}
+	if (NULL == s_dma) {
+		HISI_FB_ERR("s_dma is NULL");
+		return;
+	}
 
 	s_dma->data_addr1 = inp32(dma_base + DMA_DATA_ADDR1);
 	s_dma->stride1 = inp32(dma_base + DMA_STRIDE1);
@@ -1747,10 +1675,16 @@ static void hisi_dss_rdma_u_init(char __iomem *dma_base, dss_rdma_t *s_dma)
 	s_dma->data_num1 = inp32(dma_base + DMA_DATA_NUM1);
 }
 
-static void hisi_dss_rdma_v_init(char __iomem *dma_base, dss_rdma_t *s_dma)
+void hisi_dss_rdma_v_init(char __iomem *dma_base, dss_rdma_t *s_dma)
 {
-	BUG_ON(dma_base == NULL);
-	BUG_ON(s_dma == NULL);
+	if (NULL == dma_base) {
+		HISI_FB_ERR("dma_base is NULL");
+		return;
+	}
+	if (NULL == s_dma) {
+		HISI_FB_ERR("s_dma is NULL");
+		return;
+	}
 
 	s_dma->data_addr2 = inp32(dma_base + DMA_DATA_ADDR2);
 	s_dma->stride2 = inp32(dma_base + DMA_STRIDE2);
@@ -1761,8 +1695,15 @@ static void hisi_dss_rdma_v_init(char __iomem *dma_base, dss_rdma_t *s_dma)
 void hisi_dss_chn_set_reg_default_value(struct hisi_fb_data_type *hisifd,
 	char __iomem *dma_base)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON(dma_base == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return;
+	}
+
+	if (dma_base == NULL) {
+		HISI_FB_DEBUG("dma_base is NULL!\n");
+		return;
+	}
 
 	hisifd->set_reg(hisifd, dma_base + CH_REG_DEFAULT, 0x1, 32, 0);
 	hisifd->set_reg(hisifd, dma_base + CH_REG_DEFAULT, 0x0, 32, 0);
@@ -1771,9 +1712,20 @@ void hisi_dss_chn_set_reg_default_value(struct hisi_fb_data_type *hisifd,
 static void hisi_dss_rdma_set_reg(struct hisi_fb_data_type *hisifd,
 	char __iomem *dma_base, dss_rdma_t *s_dma)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON(dma_base == NULL);
-	BUG_ON(s_dma == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return;
+	}
+
+	if (dma_base == NULL) {
+		HISI_FB_DEBUG("dma_base is NULL!\n");
+		return;
+	}
+
+	if (s_dma == NULL) {
+		HISI_FB_DEBUG("s_dma is NULL!\n");
+		return;
+	}
 
 	hisifd->set_reg(hisifd, dma_base + CH_REG_DEFAULT, 0x1, 32, 0);
 	hisifd->set_reg(hisifd, dma_base + CH_REG_DEFAULT, 0x0, 32, 0);
@@ -1813,25 +1765,33 @@ static void hisi_dss_rdma_set_reg(struct hisi_fb_data_type *hisifd,
 		hisifd->set_reg(hisifd, dma_base + AFBCD_INPUT_HEADER_STRIDE, s_dma->afbcd_input_header_stride, 32 , 0);
 		hisifd->set_reg(hisifd, dma_base + AFBCD_PAYLOAD_STRIDE, s_dma->afbcd_payload_stride, 32 , 0);
 		hisifd->set_reg(hisifd, dma_base + AFBCD_MM_BASE_0, s_dma->afbcd_mm_base_0, 32 , 0);
-	#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 		hisifd->set_reg(hisifd, dma_base + AFBCD_MM_BASE_1, s_dma->afbcd_mm_base_1, 32 , 0);
-	#endif
 		hisifd->set_reg(hisifd, dma_base + AFBCD_AFBCD_PAYLOAD_POINTER, s_dma->afbcd_afbcd_payload_pointer, 32 , 0);
 		hisifd->set_reg(hisifd, dma_base + AFBCD_HEIGHT_BF_STR, s_dma->afbcd_height_bf_str, 32 , 0);
 		hisifd->set_reg(hisifd, dma_base + AFBCD_OS_CFG, s_dma->afbcd_os_cfg, 32 , 0);
 		hisifd->set_reg(hisifd, dma_base + AFBCD_SCRAMBLE_MODE, s_dma->afbcd_scramble_mode, 32 , 0);
-		//hisifd->set_reg(hisifd, dma_base + AFBCD_MEM_CTRL, s_dma->afbcd_mem_ctrl, 32 , 0);
-		hisifd->set_reg(hisifd, dma_base + AFBCD_HEADER_POINTER_OFFSET,
-			s_dma->afbcd_header_pointer_offset, 32 , 0);
+		hisifd->set_reg(hisifd, dma_base + AFBCD_HEADER_POINTER_OFFSET, s_dma->afbcd_header_pointer_offset, 32 , 0);
 	}
+
 }
 
 static void hisi_dss_rdma_u_set_reg(struct hisi_fb_data_type *hisifd,
 	char __iomem *dma_base, dss_rdma_t *s_dma)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON(dma_base == NULL);
-	BUG_ON(s_dma == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return;
+	}
+
+	if (dma_base == NULL) {
+		HISI_FB_DEBUG("dma_base is NULL!\n");
+		return;
+	}
+
+	if (s_dma == NULL) {
+		HISI_FB_DEBUG("s_dma is NULL!\n");
+		return;
+	}
 
 	hisifd->set_reg(hisifd, dma_base + DMA_DATA_ADDR1, s_dma->data_addr1, 32 , 0);
 	hisifd->set_reg(hisifd, dma_base + DMA_STRIDE1, s_dma->stride1, 32, 0);
@@ -1842,9 +1802,20 @@ static void hisi_dss_rdma_u_set_reg(struct hisi_fb_data_type *hisifd,
 static void hisi_dss_rdma_v_set_reg(struct hisi_fb_data_type *hisifd,
 	char __iomem *dma_base, dss_rdma_t *s_dma)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON(dma_base == NULL);
-	BUG_ON(s_dma == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return;
+	}
+
+	if (s_dma == NULL) {
+		HISI_FB_DEBUG("s_dma is NULL!\n");
+		return;
+	}
+
+	if (dma_base == NULL) {
+		HISI_FB_DEBUG("dma_base is NULL!\n");
+		return;
+	}
 
 	hisifd->set_reg(hisifd, dma_base + DMA_DATA_ADDR2, s_dma->data_addr2, 32 , 0);
 	hisifd->set_reg(hisifd, dma_base + DMA_STRIDE2, s_dma->stride2, 32, 0);
@@ -1903,8 +1874,7 @@ int hisi_dss_rdma_config(struct hisi_fb_data_type *hisifd, int ovl_idx,
 	dss_rect_ltrb_t aligned_mask_rect = {0, 0, 0, 0};
 	dss_rect_t new_src_rect;
 
-	//uint32_t src_blk_num = 0;
-	//uint32_t dst_blk_num = 0;
+	bool is_pixel_10bit = false;
 	uint32_t afbcd_half_block_mode = 0;
 	uint32_t afbcd_stretch_acc = 0;
 	uint32_t afbcd_stretch_inc = 0;
@@ -1923,10 +1893,20 @@ int hisi_dss_rdma_config(struct hisi_fb_data_type *hisifd, int ovl_idx,
 	uint32_t mm_base_0 = 0;
 	uint32_t mm_base_1 = 0;
 	bool mm_alloc_needed = false;
+	int ret = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(layer == NULL);
-	BUG_ON((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX));
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == layer) {
+		HISI_FB_ERR("layer is NULL");
+		return -EINVAL;
+	}
+	if ((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX)) {
+		HISI_FB_ERR("ovl_idx is invalid");
+		return -EINVAL;
+	}
 
 	chn_idx = layer->chn_idx;
 	new_src_rect = layer->src_rect;
@@ -1950,7 +1930,12 @@ int hisi_dss_rdma_config(struct hisi_fb_data_type *hisifd, int ovl_idx,
 		return -EINVAL;
 	}
 
+	is_pixel_10bit = isPixel10Bit2dma(rdma_format);
+
 	bpp = (is_yuv_semi_planar || is_yuv_planar) ? 1 : layer->img.bpp;
+	if (is_pixel_10bit) {
+		bpp = layer->img.bpp;//lint !e713
+	}
 	aligned_pixel = DMA_ALIGN_BYTES / bpp;
 
 	src_rect_mask_enable = isSrcRectMasked(layer, aligned_pixel);
@@ -1970,12 +1955,19 @@ int hisi_dss_rdma_config(struct hisi_fb_data_type *hisifd, int ovl_idx,
 		//dma->vpp_mem_ctrl = set_bits32(dma->vpp_mem_ctrl , , , );
 	}
 
+	if (layer->need_cap & CAP_HFBCD) {
+		return 0;
+	}
+
 	if (layer->need_cap & CAP_AFBCD) {
 		if ((layer->img.mmbuf_base > 0) && (layer->img.mmbuf_size > 0)) {
 			mm_base_0 = layer->img.mmbuf_base;
 			mm_base_1 = layer->img.mmbuf_base + layer->img.mmbuf_size / 2;
 		} else {
-			BUG_ON(hisifd->mmbuf_info == NULL);
+			if (NULL == hisifd->mmbuf_info) {
+				HISI_FB_ERR("hisifd->mmbuf_info is NULL");
+				return -EINVAL;
+			}
 
 			if (ovl_idx <= DSS_OVL1) {
 				mm_alloc_needed = true;
@@ -1990,11 +1982,7 @@ int hisi_dss_rdma_config(struct hisi_fb_data_type *hisifd, int ovl_idx,
 				afbc_rect.left = ALIGN_DOWN(new_src_rect.x, MMBUF_ADDR_ALIGN);
 				afbc_rect.right = ALIGN_UP(new_src_rect.x - afbc_rect.left + new_src_rect.w, MMBUF_ADDR_ALIGN);
 
-			#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 				hisifd->mmbuf_info->mm_size[chn_idx] = afbc_rect.right * layer->img.bpp * MMBUF_LINE_NUM * 2;
-			#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-				hisifd->mmbuf_info->mm_size[chn_idx] = afbc_rect.right * layer->img.bpp * MMBUF_LINE_NUM;
-			#endif
 				hisifd->mmbuf_info->mm_base[chn_idx] = hisi_dss_mmbuf_alloc(g_mmbuf_gen_pool,
 					hisifd->mmbuf_info->mm_size[chn_idx]);
 				if (hisifd->mmbuf_info->mm_base[chn_idx] < MMBUF_BASE) {
@@ -2070,13 +2058,6 @@ int hisi_dss_rdma_config(struct hisi_fb_data_type *hisifd, int ovl_idx,
 			}
 		}
 
-	#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		if (layer->img.afbc_header_addr & (AFBC_SUPER_GRAPH_HEADER_ADDR_ALIGN - 1)) {
-			HISI_FB_ERR("layer%d super graph afbc_header_addr(0x%x) is not %d bytes aligned!\n",
-				layer->layer_idx, afbc_header_addr, AFBC_SUPER_GRAPH_HEADER_ADDR_ALIGN);
-			return -EINVAL;
-		}
-	#endif
 
 		// rdfc clip_rect
 		clip_rect->left = new_src_rect.x - aligned_rect.left;
@@ -2097,9 +2078,15 @@ int hisi_dss_rdma_config(struct hisi_fb_data_type *hisifd, int ovl_idx,
 			AFBCD_BOTTOM_CROP_MAX : clip_rect->bottom;
 
 		clip_rect->top -= afbcd_top_crop_num;
-		BUG_ON(clip_rect->top < 0);
+		if (clip_rect->top < 0) {
+			HISI_FB_ERR("clip_rect->top is invalid");
+			return -EINVAL;
+		}
 		clip_rect->bottom -= afbcd_bottom_crop_num;
-		BUG_ON(clip_rect->bottom < 0);
+		if (clip_rect->bottom < 0) {
+			HISI_FB_ERR("clip_rect->bottom is invalid");
+			return -EINVAL;
+		}
 
 		//adjust out_aligned_rect
 		out_aligned_rect->h -= (afbcd_top_crop_num + afbcd_bottom_crop_num);
@@ -2129,8 +2116,20 @@ int hisi_dss_rdma_config(struct hisi_fb_data_type *hisifd, int ovl_idx,
 			return -EINVAL;
 		}
 
-		BUG_ON((aligned_rect.left - afbc_rect.left) < 0);
+		if ((aligned_rect.left - afbc_rect.left) < 0) {
+			HISI_FB_ERR("aligned_rect.left(%d) small than  afbc_rect.left(%d) is err.\n",
+				aligned_rect.left, afbc_rect.left);
+			return -EINVAL;
+		};
+
 		afbc_header_start_pos = (aligned_rect.left - afbc_rect.left) / AFBC_BLOCK_ALIGN;
+		if (g_dss_version_tag & FB_ACCEL_KIRIN970) {
+			if (afbc_header_start_pos != 0) {
+				HISI_FB_ERR("aligned_rect.left(%d) no equal to afbc_rect.left(%d) is err.\n",
+					aligned_rect.left, afbc_rect.left);
+				return -EINVAL;
+			}
+		}
 
 		//payload
 		if (layer->img.bpp == 4) {
@@ -2192,8 +2191,14 @@ int hisi_dss_rdma_config(struct hisi_fb_data_type *hisifd, int ovl_idx,
 		dma->afbcd_ctl = set_bits32(dma->afbcd_ctl, afbcd_half_block_mode, 2, 6);
 		dma->afbcd_str = set_bits32(dma->afbcd_str,
 			(afbcd_stretch_acc << 8 | afbcd_stretch_inc), 12, 0);
-		dma->afbcd_line_crop = set_bits32(dma->afbcd_line_crop,
-			(afbcd_top_crop_num << 4 | afbcd_bottom_crop_num), 8, 0);
+
+		if (g_dss_version_tag & FB_ACCEL_KIRIN970) {
+			dma->afbcd_line_crop = set_bits32(dma->afbcd_line_crop,
+				(afbcd_top_crop_num << 8 | afbcd_bottom_crop_num), 16, 0);
+		} else {
+			dma->afbcd_line_crop = set_bits32(dma->afbcd_line_crop,
+				(afbcd_top_crop_num << 4 | afbcd_bottom_crop_num), 8, 0);
+		}
 		dma->afbcd_hreg_hdr_ptr_lo = set_bits32(dma->afbcd_hreg_hdr_ptr_lo,
 			afbc_header_addr, 32, 0);
 		dma->afbcd_input_header_stride = set_bits32(dma->afbcd_input_header_stride,
@@ -2201,9 +2206,7 @@ int hisi_dss_rdma_config(struct hisi_fb_data_type *hisifd, int ovl_idx,
 		dma->afbcd_payload_stride = set_bits32(dma->afbcd_payload_stride,
 			afbc_payload_stride, 20, 0);
 		dma->afbcd_mm_base_0 = set_bits32(dma->afbcd_mm_base_0, mm_base_0, 32, 0);
-	#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 		dma->afbcd_mm_base_1 = set_bits32(dma->afbcd_mm_base_1, mm_base_1, 32, 0);
-	#endif
 		dma->afbcd_afbcd_payload_pointer = set_bits32(dma->afbcd_afbcd_payload_pointer,
 			afbc_payload_addr, 32, 0);
 		dma->afbcd_height_bf_str = set_bits32(dma->afbcd_height_bf_str,
@@ -2329,7 +2332,7 @@ int hisi_dss_rdma_config(struct hisi_fb_data_type *hisifd, int ovl_idx,
 		return -EINVAL;
 	}
 
-	rdma_addr = hisi_calculate_display_addr(mmu_enable, layer, &aligned_rect, DSS_ADDR_PLANE0);
+	rdma_addr = hisi_calculate_display_addr(mmu_enable, layer, &aligned_rect, DSS_ADDR_PLANE0, is_pixel_10bit);
 	rdma_stride = layer->img.stride;
 	rdma_data_num = (rdma_oft_x1 - rdma_oft_x0 + 1) * (rdma_oft_y1- rdma_oft_y0 + 1);
 
@@ -2401,7 +2404,7 @@ int hisi_dss_rdma_config(struct hisi_fb_data_type *hisifd, int ovl_idx,
 			stretched_line_num /= 2;
 		}
 
-		rdma_addr = hisi_calculate_display_addr(mmu_enable, layer, &aligned_rect, DSS_ADDR_PLANE1);
+		rdma_addr = hisi_calculate_display_addr(mmu_enable, layer, &aligned_rect, DSS_ADDR_PLANE1, is_pixel_10bit);
 		rdma_stride = layer->img.stride_plane1;
 		rdma_data_num = (rdma_oft_x1 - rdma_oft_x0 + 1) * (rdma_oft_y1- rdma_oft_y0 + 1) * 2;
 
@@ -2421,7 +2424,7 @@ int hisi_dss_rdma_config(struct hisi_fb_data_type *hisifd, int ovl_idx,
 		dma->data_num1 = set_bits32(dma->data_num1, rdma_data_num, 30, 0);
 
 		if (is_yuv_planar) {
-			rdma_addr = hisi_calculate_display_addr(mmu_enable, layer, &aligned_rect, DSS_ADDR_PLANE2);
+			rdma_addr = hisi_calculate_display_addr(mmu_enable, layer, &aligned_rect, DSS_ADDR_PLANE2, is_pixel_10bit);
 			rdma_stride = layer->img.stride_plane2;
 
 			dma->data_addr2 = set_bits32(dma->data_addr2, rdma_addr, 32, 0);
@@ -2432,17 +2435,23 @@ int hisi_dss_rdma_config(struct hisi_fb_data_type *hisifd, int ovl_idx,
 		}
 	}
 
-	return 0;
+	return ret;
 }
 
 
 /*******************************************************************************
 ** DSS DFC
 */
-static void hisi_dss_dfc_init(char __iomem *dfc_base, dss_dfc_t *s_dfc)
+void hisi_dss_dfc_init(char __iomem *dfc_base, dss_dfc_t *s_dfc)
 {
-	BUG_ON(dfc_base == NULL);
-	BUG_ON(s_dfc == NULL);
+	if (NULL == dfc_base) {
+		HISI_FB_ERR("dfc_base is NULL");
+		return;
+	}
+	if (NULL == s_dfc) {
+		HISI_FB_ERR("s_dfc is NULL");
+		return;
+	}
 
 	memset(s_dfc, 0, sizeof(dss_dfc_t));
 
@@ -2460,9 +2469,20 @@ static void hisi_dss_dfc_init(char __iomem *dfc_base, dss_dfc_t *s_dfc)
 static void hisi_dss_dfc_set_reg(struct hisi_fb_data_type *hisifd,
 	char __iomem *dfc_base, dss_dfc_t *s_dfc)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON(dfc_base == NULL);
-	BUG_ON(s_dfc == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return;
+	}
+
+	if (dfc_base == NULL) {
+		HISI_FB_DEBUG("dfc_base is NULL!\n");
+		return;
+	}
+
+	if (s_dfc == NULL) {
+		HISI_FB_DEBUG("s_dfc is NULL!\n");
+		return;
+	}
 
 	hisifd->set_reg(hisifd, dfc_base + DFC_DISP_SIZE, s_dfc->disp_size, 32, 0);
 	hisifd->set_reg(hisifd, dfc_base + DFC_PIX_IN_NUM, s_dfc->pix_in_num, 32, 0);
@@ -2473,6 +2493,7 @@ static void hisi_dss_dfc_set_reg(struct hisi_fb_data_type *hisifd,
 	hisifd->set_reg(hisifd, dfc_base + DFC_ICG_MODULE, s_dfc->icg_module, 32, 0);
 	hisifd->set_reg(hisifd, dfc_base + DFC_DITHER_ENABLE, s_dfc->dither_enable, 32, 0);
 	hisifd->set_reg(hisifd, dfc_base + DFC_PADDING_CTL, s_dfc->padding_ctl, 32, 0);
+
 }
 
 int hisi_dss_rdfc_config(struct hisi_fb_data_type *hisifd, dss_layer_t *layer,
@@ -2488,9 +2509,16 @@ int hisi_dss_rdfc_config(struct hisi_fb_data_type *hisifd, dss_layer_t *layer,
 	int size_vrt = 0;
 	int dfc_hrz_clip = 0;
 	bool need_clip = false;
+	bool is_pixel_10bit = false;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(layer == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == layer) {
+		HISI_FB_ERR("layer is NULL");
+		return -EINVAL;
+	}
 
 	chn_idx = layer->chn_idx;
 
@@ -2502,6 +2530,8 @@ int hisi_dss_rdfc_config(struct hisi_fb_data_type *hisifd, dss_layer_t *layer,
 		HISI_FB_ERR("layer format (%d) not support !\n", layer->img.format);
 		return -EINVAL;
 	}
+
+	is_pixel_10bit = isPixel10Bit2dfc(dfc_fmt);
 
 	dfc_bpp = hisi_dfc_get_bpp(dfc_fmt);
 	if (dfc_bpp <= 0) {
@@ -2563,6 +2593,10 @@ int hisi_dss_rdfc_config(struct hisi_fb_data_type *hisifd, dss_layer_t *layer,
 		aligned_rect->h -= (clip_rect.top + clip_rect.bottom);
 	}
 
+	if (!is_pixel_10bit) {
+		dfc->bitext_ctl = set_bits32(dfc->bitext_ctl, 0x3, 32, 0);
+	}
+
 	return 0;
 }
 
@@ -2570,15 +2604,7 @@ int hisi_dss_rdfc_config(struct hisi_fb_data_type *hisifd, dss_layer_t *layer,
 /*******************************************************************************
 ** DSS SCF
 */
-
-/* Filter coefficients for SCF */
-#define PHASE_NUM	(66)
-#define TAP4	(4)
-#define TAP5	(5)
-#define TAP6	(6)
-#define COEF_LUT_NUM	(2)
-
-static const int COEF_LUT_TAP4[SCL_COEF_IDX_MAX][PHASE_NUM][TAP4] = {
+const int COEF_LUT_TAP4[SCL_COEF_IDX_MAX][PHASE_NUM][TAP4] = {
  	// YUV_COEF_IDX
 	{
 		{214, 599, 214, -3},
@@ -2720,7 +2746,7 @@ static const int COEF_LUT_TAP4[SCL_COEF_IDX_MAX][PHASE_NUM][TAP4] = {
  	}
 };
 
-static const int COEF_LUT_TAP5[SCL_COEF_IDX_MAX][PHASE_NUM][TAP5] = {
+const int COEF_LUT_TAP5[SCL_COEF_IDX_MAX][PHASE_NUM][TAP5] = {
 	// YUV_COEF_IDX
 	{
 		{  98, 415, 415,  98, -2},
@@ -2862,7 +2888,7 @@ static const int COEF_LUT_TAP5[SCL_COEF_IDX_MAX][PHASE_NUM][TAP5] = {
 	 }
  };
 
-static const int COEF_LUT_TAP6[SCL_COEF_IDX_MAX][PHASE_NUM][TAP6] = {
+const int COEF_LUT_TAP6[SCL_COEF_IDX_MAX][PHASE_NUM][TAP6] = {
 	// YUV_COEF_IDX
 	{
 		{ 2, 264, 500, 264, 2, -8},
@@ -3004,10 +3030,16 @@ static const int COEF_LUT_TAP6[SCL_COEF_IDX_MAX][PHASE_NUM][TAP6] = {
 	}
 };
 
-static void hisi_dss_scl_init(char __iomem *scl_base, dss_scl_t *s_scl)
+void hisi_dss_scl_init(char __iomem *scl_base, dss_scl_t *s_scl)
 {
-	BUG_ON(scl_base == NULL);
-	BUG_ON(s_scl == NULL);
+	if (NULL == scl_base) {
+		HISI_FB_ERR("scl_base is NULL");
+		return;
+	}
+	if (NULL == s_scl) {
+		HISI_FB_ERR("s_scl is NULL");
+		return;
+	}
 
 	memset(s_scl, 0, sizeof(dss_scl_t));
 
@@ -3074,8 +3106,14 @@ int hisi_dss_scl_write_coefs(struct hisi_fb_data_type *hisifd, bool enable_cmdli
 	int j = 0;
 	int k = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(addr == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == addr) {
+		HISI_FB_ERR("addr is NULL");
+		return -EINVAL;
+	}
 
 	if ((row != PHASE_NUM) || (col < TAP4 || col > TAP6)) {
 		HISI_FB_ERR("SCF filter coefficients is err, phase_num = %d, tap_num = %d\n", row, col);
@@ -3098,8 +3136,7 @@ int hisi_dss_scl_write_coefs(struct hisi_fb_data_type *hisifd, bool enable_cmdli
 		for (k = 0; k < valid_num; k++) {
 			if (enable_cmdlist) {
 				hisifd->set_reg(hisifd, addr + offset * i + k * sizeof(int), groups[k], 32, 0);
-			}
-			else {
+			} else {
 				set_reg(addr + offset * i + k * sizeof(int), groups[k], 32, 0);
 			}
 			groups[k] = 0;
@@ -3120,11 +3157,11 @@ int hisi_dss_chn_scl_load_filter_coef_set_reg(struct hisi_fb_data_type *hisifd, 
 	int ret = 0;
 	int chn_coef_idx = SCL_COEF_YUV_IDX;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
-#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	if (chn_idx != DSS_RCHN_V2)
-#endif
 		return 0;
 
 	if (isYUV(format)) {
@@ -3139,7 +3176,10 @@ int hisi_dss_chn_scl_load_filter_coef_set_reg(struct hisi_fb_data_type *hisifd, 
 	g_scf_lut_chn_coef_idx[chn_idx] = chn_coef_idx;
 
 	module_base = g_dss_module_base[chn_idx][MODULE_SCL_LUT];
-	BUG_ON(module_base == 0);
+	if (module_base == 0) {
+		HISI_FB_ERR("module_base is NULL");
+		return -EINVAL;
+	}
 
 	h0_y_addr = hisifd->dss_base + module_base + DSS_SCF_H0_Y_COEF_OFFSET;
 	y_addr = hisifd->dss_base + module_base +DSS_SCF_Y_COEF_OFFSET;
@@ -3164,7 +3204,6 @@ int hisi_dss_chn_scl_load_filter_coef_set_reg(struct hisi_fb_data_type *hisifd, 
 }
 /*lint -restore*/
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 int hisi_dss_post_scl_load_filter_coef(struct hisi_fb_data_type *hisifd, bool enable_cmdlist,
 	char __iomem *scl_lut_base, int coef_lut_idx)
 {
@@ -3173,8 +3212,14 @@ int hisi_dss_post_scl_load_filter_coef(struct hisi_fb_data_type *hisifd, bool en
 	char __iomem *uv_addr = NULL;
 	int ret = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(scl_lut_base == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == scl_lut_base) {
+		HISI_FB_ERR("scl_lut_base is NULL");
+		return -EINVAL;
+	}
 
 	h0_y_addr = scl_lut_base + DSS_SCF_H0_Y_COEF_OFFSET;
 	y_addr = scl_lut_base + DSS_SCF_Y_COEF_OFFSET;
@@ -3197,7 +3242,6 @@ int hisi_dss_post_scl_load_filter_coef(struct hisi_fb_data_type *hisifd, bool en
 
 	return ret;
 }
-#endif
 
 int hisi_dss_scl_coef_on(struct hisi_fb_data_type *hisifd, bool enable_cmdlist, int coef_lut_idx)
 {
@@ -3208,7 +3252,10 @@ int hisi_dss_scl_coef_on(struct hisi_fb_data_type *hisifd, bool enable_cmdlist, 
 	char __iomem *uv_addr = NULL;
 	int ret = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	for (i = 0; i < DSS_CHN_MAX_DEFINE; i++) {
 		module_base = g_dss_module_base[i][MODULE_SCL_LUT];
@@ -3224,12 +3271,6 @@ int hisi_dss_scl_coef_on(struct hisi_fb_data_type *hisifd, bool enable_cmdlist, 
 				HISI_FB_ERR("Error to write H0_Y_COEF coefficients.\n");
 			}
 
-		#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-			if (i == DSS_RCHN_V0) {
-				hisi_dss_arsr2p_coef_on(hisifd, enable_cmdlist);
-				continue;
-			}
-		#endif
 
 			ret = hisi_dss_scl_write_coefs(hisifd, enable_cmdlist, y_addr, (const int **)COEF_LUT_TAP5[coef_lut_idx], PHASE_NUM, TAP5);
 			if (ret < 0) {
@@ -3267,13 +3308,26 @@ int hisi_dss_scl_config(struct hisi_fb_data_type *hisifd,
 	uint32_t acc_hscl = 0;
 	uint32_t acc_vscl = 0;
 	uint32_t scf_en_vscl = 0;
+	uint32_t chn_idx_temp;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(layer == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == layer) {
+		HISI_FB_ERR("layer is NULL");
+		return -EINVAL;
+	}
+
+	if (hisifd->index == MEDIACOMMON_PANEL_IDX) {
+		return 0;
+	}
 
 	need_cap = layer->need_cap;
 	chn_idx = layer->chn_idx;
 	transform = layer->transform;
+	chn_idx_temp = DSS_RCHN_V0;
+
 	if (aligned_rect)
 		src_rect = *aligned_rect;
 	else
@@ -3281,22 +3335,13 @@ int hisi_dss_scl_config(struct hisi_fb_data_type *hisifd,
 	dst_rect = layer->dst_rect;
 	pblock_info = &(layer->block_info);
 
-#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	if (pblock_info && pblock_info->both_vscfh_arsr2p_used) {
-		dst_rect = pblock_info->arsr2p_in_rect;
-	}
-
-	if (chn_idx == DSS_RCHN_V0) {
-		dst_rect.h = src_rect.h;//set dst height to src height, disable vertical scaling in v0scf
-	}
-#endif
 
 	do {
-		if (chn_idx == DSS_RCHN_V0 && pblock_info->h_ratio_arsr2p && pblock_info->h_ratio) {
+		if (chn_idx == chn_idx_temp && pblock_info->h_ratio_arsr2p && pblock_info->h_ratio) {
 			h_ratio = pblock_info->h_ratio;
 			en_hscl = true; //v0 channel,  both scf and arsr2p are enabled
 			break;
-		} else if (chn_idx == DSS_RCHN_V0 && !pblock_info->h_ratio && pblock_info->h_ratio_arsr2p) {
+		} else if (chn_idx == chn_idx_temp && !pblock_info->h_ratio && pblock_info->h_ratio_arsr2p) {
 			break;   //v0 channel , vscf is not supported, just break;
 		}
 
@@ -3306,11 +3351,6 @@ int hisi_dss_scl_config(struct hisi_fb_data_type *hisifd,
 			break;
 		}
 
-	#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		if (chn_idx == DSS_RCHN_V0) {
-			dst_rect.w = (src_rect.w > dst_rect.w ? dst_rect.w : src_rect.w);  //disable horizental scaling up
-		}
-	#endif
 
 		if (src_rect.w == dst_rect.w)
 			break;
@@ -3361,7 +3401,6 @@ int hisi_dss_scl_config(struct hisi_fb_data_type *hisifd,
 	} while(0);
 
 	if (!en_hscl && !en_vscl) {
-	#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 		if ((hisifd->panel_info.prefix_ce_support == 1
 			&& g_dss_module_cap[chn_idx][MODULE_CAP_CE] == 1)
 			|| (((hisifd->panel_info.prefix_sharpness1D_support == 1
@@ -3379,7 +3418,6 @@ int hisi_dss_scl_config(struct hisi_fb_data_type *hisifd,
 			scl->output_width_height = set_bits32(scl->output_width_height,
 				DSS_WIDTH(dst_rect.w), 13, 16);
 		}
-	#endif
 
 		return 0;
 	}
@@ -3433,13 +3471,46 @@ int hisi_dss_scl_config(struct hisi_fb_data_type *hisifd,
 	return 0;
 }
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
+uint32_t get_rdma_stretch_line_num(dss_layer_t *layer)
+{
+	uint32_t v_stretch_ratio_threshold = 0;
+	uint32_t v_stretch_line_num = 0;
+
+	if ((layer->need_cap & CAP_AFBCD) || (layer->need_cap & CAP_HFBCD)) {
+		v_stretch_line_num = 0;
+	} else {
+		if (is_YUV_SP_420(layer->img.format) || is_YUV_P_420(layer->img.format)) {
+			v_stretch_ratio_threshold = ((layer->src_rect.h + layer->dst_rect.h - 1) / layer->dst_rect.h);
+			v_stretch_line_num = ((layer->src_rect.h / layer->dst_rect.h) / 2) * 2;
+		} else {
+			v_stretch_ratio_threshold = ((layer->src_rect.h + layer->dst_rect.h - 1) / layer->dst_rect.h);
+			v_stretch_line_num = (layer->src_rect.h / layer->dst_rect.h);
+		}
+
+		if (v_stretch_ratio_threshold <= g_rdma_stretch_threshold) {//lint !e574 !e737
+			v_stretch_line_num = 0;
+		}
+	}
+
+	return v_stretch_line_num;
+}
+
+
 static void hisi_dss_post_scf_init(char __iomem *dss_base,
 	char __iomem *post_scf_base, dss_scl_t *s_post_scf)
 {
-	BUG_ON(dss_base == NULL); //lint !e730
-	BUG_ON(post_scf_base == NULL);
-	BUG_ON(s_post_scf == NULL);
+	if (NULL == dss_base) {
+		HISI_FB_ERR("dss_base is NULL");
+		return;
+	}
+	if (NULL == post_scf_base) {
+		HISI_FB_ERR("post_scf_base is NULL");
+		return;
+	}
+	if (NULL == s_post_scf) {
+		HISI_FB_ERR("s_post_scf is NULL");
+		return;
+	}
 
 	memset(s_post_scf, 0, sizeof(dss_scl_t));
 }
@@ -3447,9 +3518,20 @@ static void hisi_dss_post_scf_init(char __iomem *dss_base,
 static void hisi_dss_post_scf_set_reg(struct hisi_fb_data_type *hisifd,
 	char __iomem *post_scf_base, dss_scl_t *s_post_scf)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON(post_scf_base == NULL);
-	BUG_ON(s_post_scf == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return;
+	}
+
+	if (post_scf_base == NULL) {
+		HISI_FB_DEBUG("post_scf_base is NULL!\n");
+		return;
+	}
+
+	if (s_post_scf == NULL) {
+		HISI_FB_DEBUG("s_post_scf is NULL!\n");
+		return;
+	}
 
 	hisifd->set_reg(hisifd, post_scf_base + SCF_EN_HSCL_STR, s_post_scf->en_hscl_str, 32, 0);
 	hisifd->set_reg(hisifd, post_scf_base + SCF_EN_VSCL_STR, s_post_scf->en_vscl_str, 32, 0);
@@ -3480,7 +3562,10 @@ int hisi_dss_post_scf_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *po
 	uint32_t acc_vscl = 0;
 	uint32_t scf_en_vscl = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	pinfo = &(hisifd->panel_info);
 
 	if (!HISI_DSS_SUPPORT_DPP_MODULE_BIT(DPP_MODULE_POST_SCF)) {
@@ -3488,33 +3573,34 @@ int hisi_dss_post_scf_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *po
 	}
 
 	if (pov_req) {
-		if ((pov_req->res_updt_rect.w <= 0) || (pov_req->res_updt_rect.h <= 0)) {
+		if ((pov_req->res_updt_rect.h <= 0) || (pov_req->res_updt_rect.w <= 0)) {
 			HISI_FB_DEBUG("fb%d, res_updt_rect[%d,%d, %d,%d] is invalid!\n", hisifd->index,
 				pov_req->res_updt_rect.x, pov_req->res_updt_rect.y,
 				pov_req->res_updt_rect.w, pov_req->res_updt_rect.h);
 			return 0;
 		}
 
-		if ((pov_req->res_updt_rect.w == hisifd->ov_req_prev.res_updt_rect.w)
-			&& (pov_req->res_updt_rect.h == hisifd->ov_req_prev.res_updt_rect.h)) {
+		if ((pov_req->res_updt_rect.h == hisifd->ov_req_prev.res_updt_rect.h)
+			&& (pov_req->res_updt_rect.w == hisifd->ov_req_prev.res_updt_rect.w)) {
 			return 0;
 		}
 
-		HISI_FB_DEBUG("fb%d, post scf res_updt_rect[%d, %d]->lcd_rect[%d, %d]\n",
+		HISI_FB_DEBUG("fb%d, post_scf res_updt_rect[%d, %d]->lcd_rect[%d, %d]\n",
 			hisifd->index,
-			pov_req->res_updt_rect.w, pov_req->res_updt_rect.h,
+			pov_req->res_updt_rect.w,
+			pov_req->res_updt_rect.h,
 			pinfo->xres, pinfo->yres);
 
 		src_rect = pov_req->res_updt_rect;
 	} else {
-		src_rect.x = 0;
 		src_rect.y = 0;
+		src_rect.x = 0;
 		src_rect.w = pinfo->xres;
 		src_rect.h = pinfo->yres;
 	}
 
-	dst_rect.x = 0;
 	dst_rect.y = 0;
+	dst_rect.x = 0;
 	dst_rect.w = pinfo->xres;
 	dst_rect.h = pinfo->yres;
 
@@ -3604,8 +3690,14 @@ int hisi_dss_post_scf_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *po
 static void hisi_dss_sharpness_init(char __iomem *sharpness_base,
 	dss_sharpness_t *s_sharpness)
 {
-	BUG_ON(sharpness_base == NULL);
-	BUG_ON(s_sharpness == NULL);
+	if (NULL == sharpness_base) {
+		HISI_FB_ERR("sharpness_base is NULL");
+		return;
+	}
+	if (NULL == s_sharpness) {
+		HISI_FB_ERR("s_sharpness is NULL");
+		return;
+	}
 
 	memset(s_sharpness, 0, sizeof(dss_sharpness_t));
 
@@ -3623,9 +3715,21 @@ static void hisi_dss_sharpness_init(char __iomem *sharpness_base,
 static int hisi_dss_sharpness_set_reg(struct hisi_fb_data_type *hisifd,
 	char __iomem *sharpness_base, dss_sharpness_t *s_sharpness, int chn_idx)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON(sharpness_base == NULL);
-	BUG_ON(s_sharpness == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return -1;
+	}
+
+	if (sharpness_base == NULL) {
+		HISI_FB_DEBUG("sharpness_base is NULL!\n");
+		return -1;
+	}
+
+	if (s_sharpness == NULL) {
+		HISI_FB_DEBUG("s_sharpness is NULL!\n");
+		return -1;
+	}
+
 
 	hisifd->set_reg(hisifd, sharpness_base + SHARPNESS_FILT_C, s_sharpness->filt_c, 32, 0);
 	hisifd->set_reg(hisifd, sharpness_base + SHARPNESS_MODE, s_sharpness->mode, 32, 0);
@@ -3661,8 +3765,14 @@ int hisi_dss_sharpness_config(struct hisi_fb_data_type *hisifd, dss_layer_t *lay
 	int sharpthd1 = 0, sharpthd1mul = 0, sharpamt1 = 0;
 	int edgethd1 = 0, edgethd1mul = 0, edgeamt1 = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(layer == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == layer) {
+		HISI_FB_ERR("layer is NULL");
+		return -EINVAL;
+	}
 
 	if (!isYUV(layer->img.format) || !hisi_dss_is_sharpness_support(layer->dst_rect.w, layer->dst_rect.h))
 		return 0;
@@ -3788,313 +3898,21 @@ int hisi_dss_sharpness_config(struct hisi_fb_data_type *hisifd, dss_layer_t *lay
 
 	return 0;
 }
-#else
-static void hisi_dss_post_scf_init(char __iomem *dss_base,
-	char __iomem *post_scf_base, dss_arsr1p_t *s_post_scf)
-{
-	BUG_ON(dss_base == NULL); //lint !e730
-	BUG_ON(post_scf_base == NULL);
-	BUG_ON(s_post_scf == NULL);
-
-	memset(s_post_scf, 0, sizeof(dss_arsr1p_t));
-
-	s_post_scf->dbuf_frm_size = inp32(dss_base + DSS_DBUF0_OFFSET + DBUF_FRM_SIZE);
-	s_post_scf->dbuf_frm_hsize = inp32(dss_base + DSS_DBUF0_OFFSET + DBUF_FRM_HSIZE);
-	s_post_scf->dpp_img_size_bef_sr = inp32(dss_base + DSS_DPP_OFFSET + DPP_IMG_SIZE_BEF_SR);
-	s_post_scf->dpp_img_size_aft_sr = inp32(dss_base + DSS_DPP_OFFSET + DPP_IMG_SIZE_AFT_SR);
-	s_post_scf->ihleft = inp32(post_scf_base + ARSR1P_IHLEFT);
-	s_post_scf->ihright = inp32(post_scf_base + ARSR1P_IHRIGHT);
-	s_post_scf->ihleft1 = inp32(post_scf_base + ARSR1P_IHLEFT1);
-	s_post_scf->ihright1 = inp32(post_scf_base + ARSR1P_IHRIGHT1);
-	s_post_scf->ivtop = inp32(post_scf_base + ARSR1P_IVTOP);
-	s_post_scf->ivbottom = inp32(post_scf_base + ARSR1P_IVBOTTOM);
-	s_post_scf->uv_offset = inp32(post_scf_base + ARSR1P_UV_OFFSET);
-	s_post_scf->ihinc = inp32(post_scf_base + ARSR1P_IHINC);
-	s_post_scf->ivinc = inp32(post_scf_base + ARSR1P_IVINC);
-	s_post_scf->mode = inp32(post_scf_base + ARSR1P_MODE);
-	s_post_scf->format = inp32(post_scf_base + ARSR1P_FORMAT);
-
-	s_post_scf->skin_thres_y = 512<<16 | 83<<8 | 75;
-	s_post_scf->skin_thres_u = 819<<16 | 10<<8 | 5;
-	s_post_scf->skin_thres_v = 682<<16 | 12<<8 | 6;
-	s_post_scf->skin_expected = 145<<16 | 113<<8 | 150;
-	s_post_scf->skin_cfg = 3<<16 | 10<<8 | 6;
-	s_post_scf->shoot_cfg1 = 2<<24 | 20;
-	s_post_scf->shoot_cfg2 = 512<<18 | (-16 & 0x1ff);
-	s_post_scf->sharp_cfg1 = 64<<24 | 48<<16 | 7<<8 | 3;
-	s_post_scf->sharp_cfg2 = 64<<24 | 48<<16 | 7<<8 | 3;
-	s_post_scf->sharp_cfg3 = 40<<16 | 0;
-	s_post_scf->sharp_cfg4 = 0<<16 | 0;
-	s_post_scf->sharp_cfg5 = 80<<16 | 0;
-	s_post_scf->sharp_cfg6 = 40<<24 | 24<<16 | 16<<8 | 6;
-	s_post_scf->sharp_cfg7 = 1<<24 | 80<<16 | 1<<9 | 16;
-	s_post_scf->sharp_cfg8 = 4<<21 | 640;
-	s_post_scf->sharp_cfg9 = 1<<24 | 5120;
-	s_post_scf->sharp_cfg10 = 0;
-	s_post_scf->sharp_cfg11 = 0;
-	s_post_scf->diff_ctrl = 20<<8 | 15;
-	s_post_scf->lsc_cfg1 = 15<<26 | 780<<13 | 1040;
-	s_post_scf->lsc_cfg2 = 0;
-	s_post_scf->lsc_cfg3 = 128<<16 | 1536;
-	s_post_scf->force_clk_on_cfg = 0;
-}
-
-static void hisi_dss_post_scf_set_reg(struct hisi_fb_data_type *hisifd,
-	char __iomem *post_scf_base, dss_arsr1p_t *s_post_scf)
-{
-	BUG_ON(hisifd == NULL);
-	BUG_ON(post_scf_base == NULL);
-	BUG_ON(s_post_scf == NULL);
-
-	if (s_post_scf->dbuf_used == 1) {
-		hisifd->set_reg(hisifd, hisifd->dss_base + DSS_DBUF0_OFFSET + DBUF_FRM_SIZE,
-			s_post_scf->dbuf_frm_size, 32, 0);
-		hisifd->set_reg(hisifd, hisifd->dss_base + DSS_DBUF0_OFFSET + DBUF_FRM_HSIZE,
-			s_post_scf->dbuf_frm_hsize, 32, 0);
-	}
-
-	if (s_post_scf->dpp_used == 1) {
-		hisifd->set_reg(hisifd, hisifd->dss_base + DSS_DPP_OFFSET + DPP_IMG_SIZE_BEF_SR,
-			s_post_scf->dpp_img_size_bef_sr, 32, 0);
-		hisifd->set_reg(hisifd, hisifd->dss_base + DSS_DPP_OFFSET + DPP_IMG_SIZE_AFT_SR,
-			s_post_scf->dpp_img_size_aft_sr, 32, 0);
-	}
-
-	outp32(post_scf_base + ARSR1P_IHLEFT, s_post_scf->ihleft);
-	outp32(post_scf_base + ARSR1P_IHRIGHT, s_post_scf->ihright);
-	outp32(post_scf_base + ARSR1P_IHLEFT1, s_post_scf->ihleft1);
-	outp32(post_scf_base + ARSR1P_IHRIGHT1, s_post_scf->ihright1);
-	outp32(post_scf_base + ARSR1P_IVTOP, s_post_scf->ivtop);
-	outp32(post_scf_base + ARSR1P_IVBOTTOM, s_post_scf->ivbottom);
-	outp32(post_scf_base + ARSR1P_UV_OFFSET, s_post_scf->uv_offset);
-	outp32(post_scf_base + ARSR1P_IHINC, s_post_scf->ihinc);
-	outp32(post_scf_base + ARSR1P_IVINC, s_post_scf->ivinc);
-	outp32(post_scf_base + ARSR1P_MODE, s_post_scf->mode);
-	outp32(post_scf_base + ARSR1P_FORMAT, s_post_scf->format);
-
-	outp32(post_scf_base + ARSR1P_SKIN_THRES_Y, s_post_scf->skin_thres_y);
-	outp32(post_scf_base + ARSR1P_SKIN_THRES_U, s_post_scf->skin_thres_u);
-	outp32(post_scf_base + ARSR1P_SKIN_THRES_V, s_post_scf->skin_thres_v);
-	outp32(post_scf_base + ARSR1P_SKIN_EXPECTED, s_post_scf->skin_expected);
-	outp32(post_scf_base + ARSR1P_SKIN_CFG, s_post_scf->skin_cfg);
-	outp32(post_scf_base + ARSR1P_SHOOT_CFG1, s_post_scf->shoot_cfg1);
-	outp32(post_scf_base + ARSR1P_SHOOT_CFG2, s_post_scf->shoot_cfg2);
-	outp32(post_scf_base + ARSR1P_SHARP_CFG1, s_post_scf->sharp_cfg1);
-	outp32(post_scf_base + ARSR1P_SHARP_CFG2, s_post_scf->sharp_cfg2);
-	outp32(post_scf_base + ARSR1P_SHARP_CFG3, s_post_scf->sharp_cfg3);
-	outp32(post_scf_base + ARSR1P_SHARP_CFG4, s_post_scf->sharp_cfg4);
-	outp32(post_scf_base + ARSR1P_SHARP_CFG5, s_post_scf->sharp_cfg5);
-	outp32(post_scf_base + ARSR1P_SHARP_CFG6, s_post_scf->sharp_cfg6);
-	outp32(post_scf_base + ARSR1P_SHARP_CFG7, s_post_scf->sharp_cfg7);
-	outp32(post_scf_base + ARSR1P_SHARP_CFG8, s_post_scf->sharp_cfg8);
-	outp32(post_scf_base + ARSR1P_SHARP_CFG9, s_post_scf->sharp_cfg9);
-	outp32(post_scf_base + ARSR1P_SHARP_CFG10, s_post_scf->sharp_cfg10);
-	outp32(post_scf_base + ARSR1P_SHARP_CFG11, s_post_scf->sharp_cfg11);
-	outp32(post_scf_base + ARSR1P_DIFF_CTRL, s_post_scf->diff_ctrl);
-	outp32(post_scf_base + ARSR1P_LSC_CFG1, s_post_scf->lsc_cfg1);
-	outp32(post_scf_base + ARSR1P_LSC_CFG2, s_post_scf->lsc_cfg2);
-	outp32(post_scf_base + ARSR1P_LSC_CFG3, s_post_scf->lsc_cfg3);
-	outp32(post_scf_base + ARSR1P_FORCE_CLK_ON_CFG, s_post_scf->force_clk_on_cfg);
-}
-
-int hisi_dss_post_scf_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req)
-{
-	struct hisi_panel_info *pinfo = NULL;
-	dss_rect_t src_rect = {0};
-	dss_rect_t dst_rect = {0};
-	dss_arsr1p_t *post_scf = NULL;
-
-	int32_t ihinc = 0;
-	int32_t ivinc = 0;
-	int32_t ihleft = 0;
-	int32_t ihright = 0;
-	int32_t ihleft1 = 0;
-	int32_t ihright1 = 0;
-	int32_t ivtop = 0;
-	int32_t ivbottom = 0;
-	int32_t extraw = 0;
-	int32_t extraw_left = 0;
-	int32_t extraw_right = 0;
-
-	BUG_ON(hisifd == NULL);
-	pinfo = &(hisifd->panel_info);
-
-	if (!HISI_DSS_SUPPORT_DPP_MODULE_BIT(DPP_MODULE_POST_SCF)) {
-		return 0;
-	}
-
-	if (pov_req) {
-		if ((pov_req->res_updt_rect.w <= 0) || (pov_req->res_updt_rect.h <= 0)) {
-			HISI_FB_DEBUG("fb%d, res_updt_rect[%d,%d, %d,%d] is invalid!\n", hisifd->index,
-				pov_req->res_updt_rect.x, pov_req->res_updt_rect.y,
-				pov_req->res_updt_rect.w, pov_req->res_updt_rect.h);
-			return  0;
-		}
-
-		if ((pov_req->res_updt_rect.w == hisifd->ov_req_prev.res_updt_rect.w)
-			&& (pov_req->res_updt_rect.h == hisifd->ov_req_prev.res_updt_rect.h)) {
-			return 0;
-		}
-		src_rect = pov_req->res_updt_rect;
-
-		HISI_FB_DEBUG("fb%d, post scf res_updt_rect[%d, %d]->lcd_rect[%d, %d]\n",
-			hisifd->index,
-			pov_req->res_updt_rect.w, pov_req->res_updt_rect.h,
-			pinfo->xres, pinfo->yres);
-	} else {
-		src_rect.x = 0;
-		src_rect.y = 0;
-		src_rect.w = pinfo->xres;
-		src_rect.h = pinfo->yres;
-	}
-
-	dst_rect.x = 0;
-	dst_rect.y = 0;
-	dst_rect.w = pinfo->xres;
-	dst_rect.h = pinfo->yres;
-
-	post_scf = &(hisifd->dss_module.post_scf);
-	hisifd->dss_module.post_scf_used = 1;
-
-	if ((src_rect.w < 16) || (src_rect.h < 16)
-		|| (src_rect.w > 3840) || (src_rect.h > 8192)
-		|| (dst_rect.w > 8192) || (dst_rect.h > 8192)) {
-		HISI_FB_ERR("invalid input size: src_rect(%d,%d,%d,%d) should be larger than 16*16, less than 3840*8192!\n"
-			"invalid output size: dst_rect(%d,%d,%d,%d) should be less than 8192*8192!\n",
-			src_rect.x, src_rect.y, src_rect.w, src_rect.h,
-			dst_rect.x, dst_rect.y, dst_rect.w, dst_rect.h);
-		//ARSR1P bypass
-		post_scf->mode = 0x1;
-		return 0;
-	}
-
-	ihinc = ARSR1P_INC_FACTOR * src_rect.w / dst_rect.w;
-	ivinc = ARSR1P_INC_FACTOR * src_rect.h / dst_rect.h;
-
-	if ((ihinc == ARSR1P_INC_FACTOR)
-		&& (ivinc == ARSR1P_INC_FACTOR)
-		&& (pinfo->arsr1p_sharpness_support != 1)) {
-		//ARSR1P bypass
-		post_scf->mode = 0x1;
-		return 0;
-	}
-
-	/* 0x2000<=ihinc<=0x80000; 0x2000<=ivinc<=0x80000; */
-	if ((ihinc < 0x2000) || (ihinc > ARSR1P_INC_FACTOR)
-		|| (ivinc < 0x2000) || (ivinc > ARSR1P_INC_FACTOR)) {
-		HISI_FB_ERR("invalid ihinc(0x%x), ivinc(0x%x)!\n", ihinc, ivinc);
-		//ARSR1P bypass
-		post_scf->mode = 0x1;
-		return -1;
-	}
-
-	if ((ihinc > ARSR1P_INC_FACTOR) ||  (ivinc > ARSR1P_INC_FACTOR)) {
-		//scaler down, not supported
-		HISI_FB_ERR("scaling down is not supported by ARSR1P, ihinc = 0x%x, ivinc = 0x%x\n", ihinc, ivinc);
-		//ARSR1P bypass
-		post_scf->mode = 0x1;
-		return -1;
-	}
-
-	//enable arsr1p
-	post_scf->mode = 0x0;
-
-	if (pinfo->arsr1p_sharpness_support) {
-		//enable sharp  skinctrl, shootdetect
-		post_scf->mode |= 0xe;
-	}
-
-	//enable direction
-	post_scf->mode |= 0x20;
-
-	if ((ihinc < ARSR1P_INC_FACTOR) ||  (ivinc < ARSR1P_INC_FACTOR)) {
-		//enable diintplen
-		post_scf->mode |= 0x10;
-	} else {
-		//only sharp, enable nointplen
-		post_scf->mode |= 0x40;
-	}
-
-	post_scf->dbuf_frm_size = set_bits32(post_scf->dbuf_frm_size, src_rect.w * src_rect.h, 27, 0);
-	post_scf->dbuf_frm_hsize = set_bits32(post_scf->dbuf_frm_hsize, DSS_WIDTH(src_rect.w), 13, 0);
-	post_scf->dbuf_used = 1;
-
-	post_scf->dpp_img_size_bef_sr = set_bits32(post_scf->dpp_img_size_bef_sr,
-		(DSS_HEIGHT((uint32_t)src_rect.h) << 16) | DSS_WIDTH((uint32_t)src_rect.w), 32, 0);
-	post_scf->dpp_img_size_aft_sr = set_bits32(post_scf->dpp_img_size_aft_sr,
-		(DSS_HEIGHT((uint32_t)dst_rect.h) << 16) | DSS_WIDTH((uint32_t)dst_rect.w), 32, 0);
-	post_scf->dpp_used = 1;
-
-	extraw = (8 * ARSR1P_INC_FACTOR) / ihinc;
-	extraw_left = (extraw % 2) ? (extraw + 1) : (extraw);
-	extraw = (2 * ARSR1P_INC_FACTOR) / ihinc;
-	extraw_right = (extraw % 2) ? (extraw + 1) : (extraw);
-
-	//ihleft1 = (startX_o * ihinc) - (ov_startX0 << 16)
-	ihleft1 = dst_rect.x * ihinc - src_rect.x * ARSR1P_INC_FACTOR;
-	if (ihleft1 < 0)
-		ihleft1 = 0;
-	//ihleft = ihleft1 - even(8 * 65536 / ihinc) * ihinc;
-	ihleft = ihleft1 - extraw_left * ihinc;
-	if (ihleft < 0)
-		ihleft = 0;
-
-	//ihright1 = ihleft1 + (oww-1) * ihinc
-	ihright1 = ihleft1 + (dst_rect.w - 1) * ihinc;
-	//ihright = ihright1 + even(2 * 65536/ihinc) * ihinc
-	ihright = ihright1 + extraw_right * ihinc;
-	//ihright >= img_width * ihinc
-	if (ihright >= src_rect.w * ARSR1P_INC_FACTOR)
-		ihright = src_rect.w * ARSR1P_INC_FACTOR - 1;
-
-	//ivtop = (startY_o * ivinc) - (ov_startY0<<16)
-	ivtop = dst_rect.y * ivinc - src_rect.y * ARSR1P_INC_FACTOR;
-	if (ivtop < 0)
-		ivtop = 0;
-	//ivbottom = ivtop + (ohh - 1) * ivinc
-	ivbottom = ivtop + (dst_rect.h - 1) * ivinc;
-	//ivbottom >= img_height * ivinc
-	if (ivbottom >= src_rect.h * ARSR1P_INC_FACTOR)
-		ivbottom = src_rect.h * ARSR1P_INC_FACTOR - 1;
-
-	//(ihleft1 - ihleft) % (ihinc) == 0;
-	if ((ihleft1 - ihleft) % (ihinc)) {
-		HISI_FB_ERR("(ihleft1(%d)-ihleft(%d))  ihinc(%d) != 0, invalid!\n",
-			ihleft1, ihleft, ihinc);
-		post_scf->mode = 0x1;
-		return -1;
-	}
-
-	//(ihright1 - ihleft1) % ihinc == 0;
-	if ((ihright1 - ihleft1) % ihinc) {
-		HISI_FB_ERR("(ihright1(%d)-ihleft1(%d))  ihinc(%d) != 0, invalid!\n",
-			ihright1, ihleft1, ihinc);
-		post_scf->mode = 0x1;
-		return -1;
-	}
-
-	post_scf->ihleft = set_bits32(post_scf->ihleft, ihleft, 32, 0);
-	post_scf->ihright = set_bits32(post_scf->ihright, ihright, 32, 0);
-	post_scf->ihleft1 = set_bits32(post_scf->ihleft1, ihleft1, 32, 0);
-	post_scf->ihright1 = set_bits32(post_scf->ihright1, ihright1, 32, 0);
-	post_scf->ivtop = set_bits32(post_scf->ivtop, ivtop, 32, 0);
-	post_scf->ivbottom = set_bits32(post_scf->ivbottom, ivbottom, 32, 0);
-	//post_scf->uv_offset = set_bits32(post_scf->uv_offset, , 32, 0);
-	post_scf->ihinc = set_bits32(post_scf->ihinc, ihinc, 32, 0);
-	post_scf->ivinc = set_bits32(post_scf->ivinc, ivinc, 32, 0);
-
-	return 0;
-}
-#endif
 
 /*******************************************************************************
 ** DSS POST_CLIP
 */
-static void hisi_dss_post_clip_init(char __iomem *post_clip_base,
+void hisi_dss_post_clip_init(char __iomem *post_clip_base,
 	dss_post_clip_t *s_post_clip)
 {
-	BUG_ON(post_clip_base == NULL);
-	BUG_ON(s_post_clip == NULL);
+	if (NULL == post_clip_base) {
+		HISI_FB_ERR("post_clip_base is NULL");
+		return;
+	}
+	if (NULL == s_post_clip) {
+		HISI_FB_ERR("s_post_clip is NULL");
+		return;
+	}
 
 	memset(s_post_clip, 0, sizeof(dss_post_clip_t));
 }
@@ -4108,14 +3926,14 @@ int hisi_dss_post_clip_config(struct hisi_fb_data_type *hisifd, dss_layer_t *lay
 	chn_idx = layer->chn_idx;
 	post_clip_rect = layer->dst_rect;
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
+	if (hisifd->index == MEDIACOMMON_PANEL_IDX) {
+		return 0;
+	}
+
 	if ((chn_idx >= DSS_RCHN_V0) && (chn_idx <= DSS_RCHN_G1))
-#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	if (((chn_idx >= DSS_RCHN_V0) && (chn_idx <= DSS_RCHN_G1)) || (chn_idx == DSS_RCHN_V2))
-#endif
 	{
 		post_clip = &(hisifd->dss_module.post_clip[chn_idx]);
-		hisifd->dss_module.post_cilp_used[chn_idx] = 1;
+		hisifd->dss_module.post_clip_used[chn_idx] = 1;
 
 		post_clip->disp_size = set_bits32(post_clip->disp_size, DSS_HEIGHT(post_clip_rect.h), 13, 0);
 		post_clip->disp_size = set_bits32(post_clip->disp_size, DSS_WIDTH(post_clip_rect.w), 13, 16);
@@ -4134,28 +3952,19 @@ int hisi_dss_post_clip_config(struct hisi_fb_data_type *hisifd, dss_layer_t *lay
 	return 0;
 }
 
-void hisi_dss_post_clip_set_reg(struct hisi_fb_data_type *hisifd,
-	char __iomem *post_clip_base, dss_post_clip_t *s_post_clip)
-{
-	BUG_ON(hisifd == NULL);
-	BUG_ON(post_clip_base == NULL);
-	BUG_ON(s_post_clip == NULL);
-
-	hisifd->set_reg(hisifd, post_clip_base + POST_CLIP_DISP_SIZE, s_post_clip->disp_size, 32, 0);
-	hisifd->set_reg(hisifd, post_clip_base + POST_CLIP_CTL_HRZ, s_post_clip->clip_ctl_hrz, 32, 0);
-	hisifd->set_reg(hisifd, post_clip_base + POST_CLIP_CTL_VRZ, s_post_clip->clip_ctl_vrz, 32, 0);
-	hisifd->set_reg(hisifd, post_clip_base + POST_CLIP_EN, s_post_clip->ctl_clip_en, 32, 0);
-}
-
-
 /*******************************************************************************
 ** DSS CE
 */
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 static void hisi_dss_ce_init(char __iomem *ce_base, dss_ce_t *s_ce)
 {
-	BUG_ON(ce_base == NULL);
-	BUG_ON(s_ce == NULL);
+	if (NULL == ce_base) {
+		HISI_FB_ERR("ce_base is NULL");
+		return;
+	}
+	if (NULL == s_ce) {
+		HISI_FB_ERR("s_ce is NULL");
+		return;
+	}
 
 	memset(s_ce, 0, sizeof(dss_ce_t));
 
@@ -4175,9 +3984,20 @@ static void hisi_dss_ce_set_reg(struct hisi_fb_data_type *hisifd,
 {
 	int i = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(ce_base == NULL);
-	BUG_ON(s_ce == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return;
+	}
+
+	if (ce_base == NULL) {
+		HISI_FB_DEBUG("ce_base is NULL!\n");
+		return;
+	}
+
+	if (s_ce == NULL) {
+		HISI_FB_DEBUG("s_ce is NULL!\n");
+		return;
+	}
 
 	hisifd->set_reg(hisifd, ce_base + CE_HIST_RESET, s_ce->hist_reset, 32,0);
 	hisifd->set_reg(hisifd, ce_base + CE_HIST_CTL, s_ce->hist_ctl, 32,0);
@@ -4204,8 +4024,14 @@ int hisi_dss_ce_config(struct hisi_fb_data_type *hisifd, dss_layer_t *layer)
 	dss_ce_t *s_ce = NULL;
 	int chn_idx = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(layer == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == layer) {
+		HISI_FB_ERR("layer is NULL");
+		return -EINVAL;
+	}
 
 	if (!isYUV(layer->img.format)
 			|| (hisifd->panel_info.prefix_ce_support == 0)
@@ -4214,7 +4040,10 @@ int hisi_dss_ce_config(struct hisi_fb_data_type *hisifd, dss_layer_t *layer)
 
 	chn_idx = layer->chn_idx;
 	ce_base = hisifd->dss_module.ce_base[chn_idx];
-	BUG_ON(ce_base == NULL);
+	if (NULL == ce_base) {
+		HISI_FB_ERR("ce_base is NULL");
+		return -EINVAL;
+	}
 	ce_ctrl = &(hisifd->ce_ctrl);
 	ce_info = &(hisifd->prefix_ce_info[chn_idx]);
 	s_ce = &(hisifd->dss_module.ce[chn_idx]);
@@ -4269,15 +4098,23 @@ static void rch_ce_config(struct hisi_fb_data_type *hisifd, int chn_idx)
 	char __iomem *ce_hist_prt_base = NULL;
 	int i = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(g_dss_module_cap[chn_idx][MODULE_CAP_CE] == 0);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
+	if (g_dss_module_cap[chn_idx][MODULE_CAP_CE] == 0) {
+		return;
+	}
 
 	if (!hisifd->panel_power_on) {
 		return;
 	}
 
 	ce_base = hisifd->dss_module.ce_base[chn_idx];
-	BUG_ON(ce_base == NULL);
+	if (NULL == ce_base) {
+		HISI_FB_ERR("ce_base is NULL");
+		return;
+	}
 	ce_info = &(hisifd->prefix_ce_info[chn_idx]);
 
 	if ((inp32(ce_base + CE_HIST_RPT_IND) & 0x1) == 0) {
@@ -4300,7 +4137,10 @@ void hisi_rch2_ce_end_handle_func(struct work_struct *work)
 	struct hisi_fb_data_type *hisifd = NULL;
 
 	hisifd = container_of(work, struct hisi_fb_data_type, rch2_ce_end_work);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 
 	if (hisifd->panel_info.prefix_ce_support == 0)
 		return;
@@ -4313,7 +4153,10 @@ void hisi_rch4_ce_end_handle_func(struct work_struct *work)
 	struct hisi_fb_data_type *hisifd = NULL;
 
 	hisifd = container_of(work, struct hisi_fb_data_type, rch4_ce_end_work);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 
 	if (hisifd->panel_info.prefix_ce_support == 0)
 		return;
@@ -4466,385 +4309,20 @@ static void hisi_dss_dpp_acm_gm_set_reg(struct hisi_fb_data_type *hisifd)
 
 	return;
 }
-#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-static void hisi_dss_dpp_acm_gm_set_reg(struct hisi_fb_data_type *hisifd) {
-	struct hisi_panel_info *pinfo = NULL;
-	char __iomem *dpp_base = NULL;
-	char __iomem *lcp_base = NULL;
-	char __iomem *acm_base = NULL;
-	char __iomem *gamma_base = NULL;
-	char __iomem *gamma_lut_base = NULL;
-	char __iomem *acm_lut_base = NULL;
-	static uint8_t last_gamma_type=0;
-	static uint32_t gamma_config_flag = 0;
-	uint32_t index = 0;
-	uint32_t i = 0;
-
-	uint32_t *local_gamma_lut_table_R = NULL;
-	uint32_t *local_gamma_lut_table_G = NULL;
-	uint32_t *local_gamma_lut_table_B = NULL;
-
-	uint32_t *local_acm_lut_hue_table = NULL;
-	uint32_t *local_acm_lut_sata_table = NULL;
-	uint32_t *local_acm_lut_satr0_table = NULL;
-	uint32_t *local_acm_lut_satr1_table = NULL;
-	uint32_t *local_acm_lut_satr2_table = NULL;
-	uint32_t *local_acm_lut_satr3_table = NULL;
-	uint32_t *local_acm_lut_satr4_table = NULL;
-	uint32_t *local_acm_lut_satr5_table = NULL;
-	uint32_t *local_acm_lut_satr6_table = NULL;
-	uint32_t *local_acm_lut_satr7_table = NULL;
-
-	if (NULL == hisifd) {
-		HISI_FB_ERR("hisifd, NUll pointer warning.\n");
-		goto func_exit;
-	}
-
-	pinfo = &(hisifd->panel_info);
-
-	if (0 == pinfo->gamma_support || 0 == pinfo->acm_support || 1 == pinfo->smart_color_mode_support) {
-		goto func_exit;
-	}
-
-	if (!HISI_DSS_SUPPORT_DPP_MODULE_BIT(DPP_MODULE_GAMA) || !HISI_DSS_SUPPORT_DPP_MODULE_BIT(DPP_MODULE_ACM)) {
-		HISI_FB_DEBUG("gamma or acm are not suppportted in this platform.\n");
-		goto func_exit;
-	}
-
-	if (PRIMARY_PANEL_IDX == hisifd->index) {
-		dpp_base = hisifd->dss_base + DSS_DPP_OFFSET;
-		lcp_base = hisifd->dss_base + DSS_DPP_LCP_OFFSET;
-		acm_base = hisifd->dss_base + DSS_DPP_ACM_OFFSET;
-		gamma_base = hisifd->dss_base + DSS_DPP_GAMA_OFFSET;
-		gamma_lut_base = hisifd->dss_base + DSS_DPP_GAMA_LUT_OFFSET;
-		acm_lut_base = hisifd->dss_base + DSS_DPP_ACM_LUT_OFFSET;
-	} else {
-		HISI_FB_ERR("fb%d, not support!\n", hisifd->index);
-		goto func_exit;
-	}
-
-	if (0 == gamma_config_flag) {
-		if (last_gamma_type != hisifd->panel_info.gamma_type) {
-			//disable acm
-			set_reg(acm_base + ACM_EN, 0x0, 1, 0);
-			//disable gamma
-			set_reg(gamma_base + GAMA_EN, 0x0, 1, 0);
-			//disable gmp
-			set_reg(lcp_base + LCP_GMP_BYPASS_EN, 0x1, 1, 0);
-			//disable xcc
-			set_reg(lcp_base + LCP_XCC_BYPASS_EN, 0x1, 1, 0);
-			gamma_config_flag = 1;
-			last_gamma_type = hisifd->panel_info.gamma_type;
-		}
-		goto func_exit;
-	}
-
-	if (1 == gamma_config_flag) {
-		if (1 == last_gamma_type) {
-			//set gamma cinema parameter
-			if (pinfo->cinema_gamma_lut_table_len > 0 && pinfo->cinema_gamma_lut_table_R
-				&& pinfo->cinema_gamma_lut_table_G && pinfo->cinema_gamma_lut_table_B) {
-					local_gamma_lut_table_R = pinfo->cinema_gamma_lut_table_R;
-					local_gamma_lut_table_G = pinfo->cinema_gamma_lut_table_G;
-					local_gamma_lut_table_B = pinfo->cinema_gamma_lut_table_B;
-			} else {
-				HISI_FB_ERR("can't get gamma cinema paramter from pinfo.\n");
-				goto func_exit;
-			}
-
-			//set acm cinema parameter
-			if (pinfo->acm_lut_hue_table_len > 0 && pinfo->cinema_acm_lut_hue_table
-				&& pinfo->acm_lut_sata_table_len > 0 && pinfo->cinema_acm_lut_sata_table
-				&& pinfo->acm_lut_satr0_table_len > 0 && pinfo->cinema_acm_lut_satr0_table
-				&& pinfo->acm_lut_satr1_table_len > 0 && pinfo->cinema_acm_lut_satr1_table
-				&& pinfo->acm_lut_satr2_table_len > 0 && pinfo->cinema_acm_lut_satr2_table
-				&& pinfo->acm_lut_satr3_table_len > 0 && pinfo->cinema_acm_lut_satr3_table
-				&& pinfo->acm_lut_satr4_table_len > 0 && pinfo->cinema_acm_lut_satr4_table
-				&& pinfo->acm_lut_satr5_table_len > 0 && pinfo->cinema_acm_lut_satr5_table
-				&& pinfo->acm_lut_satr7_table_len > 0 && pinfo->cinema_acm_lut_satr6_table
-				&& pinfo->acm_lut_satr6_table_len > 0 && pinfo->cinema_acm_lut_satr7_table) {
-				local_acm_lut_hue_table = pinfo->cinema_acm_lut_hue_table;
-				local_acm_lut_sata_table = pinfo->cinema_acm_lut_sata_table;
-				local_acm_lut_satr0_table = pinfo->cinema_acm_lut_satr0_table;
-				local_acm_lut_satr1_table = pinfo->cinema_acm_lut_satr1_table;
-				local_acm_lut_satr2_table = pinfo->cinema_acm_lut_satr2_table;
-				local_acm_lut_satr3_table = pinfo->cinema_acm_lut_satr3_table;
-				local_acm_lut_satr4_table = pinfo->cinema_acm_lut_satr4_table;
-				local_acm_lut_satr5_table = pinfo->cinema_acm_lut_satr5_table;
-				local_acm_lut_satr6_table = pinfo->cinema_acm_lut_satr6_table;
-				local_acm_lut_satr7_table = pinfo->cinema_acm_lut_satr7_table;
-			} else {
-				HISI_FB_ERR("can't get acm cinema paramter from pinfo.\n");
-				goto func_exit;
-			}
-		} else {
-			if (pinfo->gamma_lut_table_len > 0 && pinfo->gamma_lut_table_R
-				&& pinfo->gamma_lut_table_G && pinfo->gamma_lut_table_B) {
-				local_gamma_lut_table_R = pinfo->gamma_lut_table_R;
-				local_gamma_lut_table_G = pinfo->gamma_lut_table_G;
-				local_gamma_lut_table_B = pinfo->gamma_lut_table_B;
-			} else {
-				HISI_FB_ERR("can't get gamma normal parameter from pinfo.\n");
-				goto func_exit;
-			}
-
-			if (pinfo->acm_lut_hue_table_len > 0 && pinfo->acm_lut_hue_table
-				&& pinfo->acm_lut_sata_table_len > 0 && pinfo->acm_lut_sata_table
-				&& pinfo->acm_lut_satr0_table_len > 0 && pinfo->acm_lut_satr0_table
-				&& pinfo->acm_lut_satr1_table_len > 0 && pinfo->acm_lut_satr1_table
-				&& pinfo->acm_lut_satr2_table_len > 0 && pinfo->acm_lut_satr2_table
-				&& pinfo->acm_lut_satr3_table_len > 0 && pinfo->acm_lut_satr3_table
-				&& pinfo->acm_lut_satr4_table_len > 0 && pinfo->acm_lut_satr4_table
-				&& pinfo->acm_lut_satr5_table_len > 0 && pinfo->acm_lut_satr5_table
-				&& pinfo->acm_lut_satr6_table_len > 0 && pinfo->acm_lut_satr6_table
-				&& pinfo->acm_lut_satr7_table_len > 0 && pinfo->acm_lut_satr7_table) {
-				local_acm_lut_hue_table = pinfo->acm_lut_hue_table;
-				local_acm_lut_sata_table = pinfo->acm_lut_sata_table;
-				local_acm_lut_satr0_table = pinfo->acm_lut_satr0_table;
-				local_acm_lut_satr1_table = pinfo->acm_lut_satr1_table;
-				local_acm_lut_satr2_table = pinfo->acm_lut_satr2_table;
-				local_acm_lut_satr3_table = pinfo->acm_lut_satr3_table;
-				local_acm_lut_satr4_table = pinfo->acm_lut_satr4_table;
-				local_acm_lut_satr5_table = pinfo->acm_lut_satr5_table;
-				local_acm_lut_satr6_table = pinfo->acm_lut_satr6_table;
-				local_acm_lut_satr7_table = pinfo->acm_lut_satr7_table;
-			} else {
-				HISI_FB_ERR("can't get acm normal parameter from pinfo.\n");
-				goto func_exit;
-			}
-		}
-		//config regsiter use default or cinema parameter
-		for (index = 0; index < pinfo->gamma_lut_table_len / 2; index++) {
-			i = index << 1;
-			outp32(gamma_lut_base + (U_GAMA_R_COEF + index * 4), (local_gamma_lut_table_R[i] | (local_gamma_lut_table_R[i+1] << 16)));
-			outp32(gamma_lut_base + (U_GAMA_G_COEF + index * 4), (local_gamma_lut_table_G[i] | (local_gamma_lut_table_G[i+1] << 16)));
-			outp32(gamma_lut_base + (U_GAMA_B_COEF + index * 4), (local_gamma_lut_table_B[i] | (local_gamma_lut_table_B[i+1] << 16)));
-		}
-		outp32(gamma_lut_base + U_GAMA_R_LAST_COEF, local_gamma_lut_table_R[pinfo->gamma_lut_table_len - 1]);
-		outp32(gamma_lut_base + U_GAMA_G_LAST_COEF, local_gamma_lut_table_G[pinfo->gamma_lut_table_len - 1]);
-		outp32(gamma_lut_base + U_GAMA_B_LAST_COEF, local_gamma_lut_table_B[pinfo->gamma_lut_table_len - 1]);
-
-		acm_set_lut_hue(acm_lut_base + ACM_U_H_COEF, local_acm_lut_hue_table, pinfo->acm_lut_hue_table_len);
-		acm_set_lut(acm_lut_base + ACM_U_SATA_COEF, local_acm_lut_sata_table, pinfo->acm_lut_sata_table_len);
-		acm_set_lut(acm_lut_base + ACM_U_SATR0_COEF, local_acm_lut_satr0_table, pinfo->acm_lut_satr0_table_len);
-		acm_set_lut(acm_lut_base + ACM_U_SATR1_COEF, local_acm_lut_satr1_table, pinfo->acm_lut_satr1_table_len);
-		acm_set_lut(acm_lut_base + ACM_U_SATR2_COEF, local_acm_lut_satr2_table, pinfo->acm_lut_satr2_table_len);
-		acm_set_lut(acm_lut_base + ACM_U_SATR3_COEF, local_acm_lut_satr3_table, pinfo->acm_lut_satr3_table_len);
-		acm_set_lut(acm_lut_base + ACM_U_SATR4_COEF, local_acm_lut_satr4_table, pinfo->acm_lut_satr4_table_len);
-		acm_set_lut(acm_lut_base + ACM_U_SATR5_COEF, local_acm_lut_satr5_table, pinfo->acm_lut_satr5_table_len);
-		acm_set_lut(acm_lut_base + ACM_U_SATR6_COEF, local_acm_lut_satr6_table, pinfo->acm_lut_satr6_table_len);
-		acm_set_lut(acm_lut_base + ACM_U_SATR7_COEF, local_acm_lut_satr7_table, pinfo->acm_lut_satr7_table_len);
-	}
-	//enable gamma
-	set_reg(gamma_base + GAMA_EN, 0x0, 1, 0);
-	//enable gmp
-	set_reg(dpp_base + LCP_GMP_BYPASS_EN, 0x0, 1, 0);
-	//enable xcc
-	set_reg(lcp_base + LCP_XCC_BYPASS_EN, 0x0, 1, 0);
-
-	//enable acm
-	set_reg(acm_base + ACM_EN, 0x1, 1, 0);
-	gamma_config_flag = 0;
-func_exit:
-	return;
-}
-
-static void hisi_dss_dpp_acm_gmp_set_reg(struct hisi_fb_data_type *hisifd) {
-	struct hisi_panel_info *pinfo = NULL;
-	char __iomem *lcp_base = NULL;
-	char __iomem *acm_base = NULL;
-	char __iomem *acm_lut_base = NULL;
-	static int last_user_scene_mode = 0;
-	uint32_t lut_sel = 0;
-	bool need_update_acm = FALSE;
-
-	uint32_t local_r0_hh = 0;
-	uint32_t local_r0_lh = 0;
-	uint32_t local_r1_hh = 0;
-	uint32_t local_r1_lh = 0;
-	uint32_t local_r2_hh = 0;
-	uint32_t local_r2_lh = 0;
-	uint32_t local_r3_hh = 0;
-	uint32_t local_r3_lh = 0;
-	uint32_t local_r4_hh = 0;
-	uint32_t local_r4_lh = 0;
-	uint32_t local_r5_hh = 0;
-	uint32_t local_r5_lh = 0;
-	uint32_t local_r6_hh = 0;
-	uint32_t local_r6_lh = 0;
-	uint32_t *local_acm_lut_hue_table = NULL;
-	uint32_t *local_acm_lut_sata_table = NULL;
-	uint32_t *local_acm_lut_satr0_table = NULL;
-	uint32_t *local_acm_lut_satr1_table = NULL;
-	uint32_t *local_acm_lut_satr2_table = NULL;
-	uint32_t *local_acm_lut_satr3_table = NULL;
-	uint32_t *local_acm_lut_satr4_table = NULL;
-	uint32_t *local_acm_lut_satr5_table = NULL;
-	uint32_t *local_acm_lut_satr6_table = NULL;
-	uint32_t *local_acm_lut_satr7_table = NULL;
-
-	if (NULL == hisifd) {
-		HISI_FB_ERR("hisifd, NUll pointer warning.\n");
-		goto func_exit;
-	}
-
-	pinfo = &(hisifd->panel_info);
-
-	if ((0 == pinfo->gmp_support && 0 == pinfo->acm_support) || 0 == pinfo->smart_color_mode_support) {
-		goto func_exit;
-	}
-
-	if (!HISI_DSS_SUPPORT_DPP_MODULE_BIT(DPP_MODULE_LCP_GMP) || !HISI_DSS_SUPPORT_DPP_MODULE_BIT(DPP_MODULE_ACM)) {
-		HISI_FB_DEBUG("gmp or acm are not suppportted in this platform.\n");
-		goto func_exit;
-	}
-
-	if (PRIMARY_PANEL_IDX == hisifd->index) {
-		lcp_base = hisifd->dss_base + DSS_DPP_LCP_OFFSET;
-		acm_base = hisifd->dss_base + DSS_DPP_ACM_OFFSET;
-		acm_lut_base = hisifd->dss_base + DSS_DPP_ACM_LUT_OFFSET;
-	} else {
-		HISI_FB_ERR("fb%d, not support!\n", hisifd->index);
-		goto func_exit;
-	}
-
-	if (last_user_scene_mode != hisifd->user_scene_mode) {
-		last_user_scene_mode = hisifd->user_scene_mode;
-	} else {
-		goto func_exit;
-	}
-
-	if (pinfo->gmp_support) {
-		if (SCENE_MODE_GALLERY == hisifd->user_scene_mode || SCENE_MODE_DEFAULT == hisifd->user_scene_mode) {
-			//enable gmp
-			set_reg(lcp_base + LCP_GMP_BYPASS_EN, 0x0, 1, 0);
-		} else if (SCENE_MODE_VIDEO == hisifd->user_scene_mode) {
-			//disable gmp
-			set_reg(lcp_base + LCP_GMP_BYPASS_EN, 0x1, 1, 0);
-		}
-	}
-
-	if (pinfo->acm_support) {
-		if (SCENE_MODE_GALLERY == hisifd->user_scene_mode || SCENE_MODE_DEFAULT == hisifd->user_scene_mode) {
-			if (pinfo->acm_lut_hue_table_len > 0 && pinfo->acm_lut_hue_table
-				&& pinfo->acm_lut_sata_table_len > 0 && pinfo->acm_lut_sata_table
-				&& pinfo->acm_lut_satr0_table_len > 0 && pinfo->acm_lut_satr0_table
-				&& pinfo->acm_lut_satr1_table_len > 0 && pinfo->acm_lut_satr1_table
-				&& pinfo->acm_lut_satr2_table_len > 0 && pinfo->acm_lut_satr2_table
-				&& pinfo->acm_lut_satr3_table_len > 0 && pinfo->acm_lut_satr3_table
-				&& pinfo->acm_lut_satr4_table_len > 0 && pinfo->acm_lut_satr4_table
-				&& pinfo->acm_lut_satr5_table_len > 0 && pinfo->acm_lut_satr5_table
-				&& pinfo->acm_lut_satr6_table_len > 0 && pinfo->acm_lut_satr6_table
-				&& pinfo->acm_lut_satr7_table_len > 0 && pinfo->acm_lut_satr7_table) {
-				local_acm_lut_hue_table = pinfo->acm_lut_hue_table;
-				local_acm_lut_sata_table = pinfo->acm_lut_sata_table;
-				local_acm_lut_satr0_table = pinfo->acm_lut_satr0_table;
-				local_acm_lut_satr1_table = pinfo->acm_lut_satr1_table;
-				local_acm_lut_satr2_table = pinfo->acm_lut_satr2_table;
-				local_acm_lut_satr3_table = pinfo->acm_lut_satr3_table;
-				local_acm_lut_satr4_table = pinfo->acm_lut_satr4_table;
-				local_acm_lut_satr5_table = pinfo->acm_lut_satr5_table;
-				local_acm_lut_satr6_table = pinfo->acm_lut_satr6_table;
-				local_acm_lut_satr7_table = pinfo->acm_lut_satr7_table;
-				local_r0_hh = pinfo->r0_hh;
-				local_r0_lh = pinfo->r0_lh;
-				local_r1_hh = pinfo->r1_hh;
-				local_r1_lh = pinfo->r1_lh;
-				local_r2_hh = pinfo->r2_hh;
-				local_r2_lh = pinfo->r2_lh;
-				local_r3_hh = pinfo->r3_hh;
-				local_r3_lh = pinfo->r3_lh;
-				local_r4_hh = pinfo->r4_hh;
-				local_r4_lh = pinfo->r4_lh;
-				local_r5_hh = pinfo->r5_hh;
-				local_r5_lh = pinfo->r5_lh;
-				local_r6_hh = pinfo->r6_hh;
-				local_r6_lh = pinfo->r6_lh;
-				need_update_acm = TRUE;
-			} else {
-				HISI_FB_ERR("can't get acm normal parameter from pinfo.\n");
-				goto func_exit;
-			}
-		} else if (SCENE_MODE_VIDEO == hisifd->user_scene_mode) {
-			if (pinfo->acm_lut_hue_table_len > 0 && pinfo->video_acm_lut_hue_table
-				&& pinfo->acm_lut_sata_table_len > 0 && pinfo->video_acm_lut_sata_table
-				&& pinfo->acm_lut_satr0_table_len > 0 && pinfo->video_acm_lut_satr0_table
-				&& pinfo->acm_lut_satr1_table_len > 0 && pinfo->video_acm_lut_satr1_table
-				&& pinfo->acm_lut_satr2_table_len > 0 && pinfo->video_acm_lut_satr2_table
-				&& pinfo->acm_lut_satr3_table_len > 0 && pinfo->video_acm_lut_satr3_table
-				&& pinfo->acm_lut_satr4_table_len > 0 && pinfo->video_acm_lut_satr4_table
-				&& pinfo->acm_lut_satr5_table_len > 0 && pinfo->video_acm_lut_satr5_table
-				&& pinfo->acm_lut_satr6_table_len > 0 && pinfo->video_acm_lut_satr6_table
-				&& pinfo->acm_lut_satr7_table_len > 0 && pinfo->video_acm_lut_satr7_table) {
-				local_acm_lut_hue_table = pinfo->video_acm_lut_hue_table;
-				local_acm_lut_sata_table = pinfo->video_acm_lut_sata_table;
-				local_acm_lut_satr0_table = pinfo->video_acm_lut_satr0_table;
-				local_acm_lut_satr1_table = pinfo->video_acm_lut_satr1_table;
-				local_acm_lut_satr2_table = pinfo->video_acm_lut_satr2_table;
-				local_acm_lut_satr3_table = pinfo->video_acm_lut_satr3_table;
-				local_acm_lut_satr4_table = pinfo->video_acm_lut_satr4_table;
-				local_acm_lut_satr5_table = pinfo->video_acm_lut_satr5_table;
-				local_acm_lut_satr6_table = pinfo->video_acm_lut_satr6_table;
-				local_acm_lut_satr7_table = pinfo->video_acm_lut_satr7_table;
-				local_r0_hh = pinfo->video_r0_hh;
-				local_r0_lh = pinfo->video_r0_lh;
-				local_r1_hh = pinfo->video_r1_hh;
-				local_r1_lh = pinfo->video_r1_lh;
-				local_r2_hh = pinfo->video_r2_hh;
-				local_r2_lh = pinfo->video_r2_lh;
-				local_r3_hh = pinfo->video_r3_hh;
-				local_r3_lh = pinfo->video_r3_lh;
-				local_r4_hh = pinfo->video_r4_hh;
-				local_r4_lh = pinfo->video_r4_lh;
-				local_r5_hh = pinfo->video_r5_hh;
-				local_r5_lh = pinfo->video_r5_lh;
-				local_r6_hh = pinfo->video_r6_hh;
-				local_r6_lh = pinfo->video_r6_lh;
-				need_update_acm = TRUE;
-			} else {
-				HISI_FB_ERR("can't get acm video parameter from pinfo.\n");
-				goto func_exit;
-			}
-		}
-
-		if (need_update_acm) {
-			set_reg(acm_base + ACM_R0_H, ((local_r0_hh & 0x3ff) << 16) | (local_r0_lh & 0x3ff), 32, 0);
-			set_reg(acm_base + ACM_R1_H, ((local_r1_hh & 0x3ff) << 16) | (local_r1_lh & 0x3ff), 32, 0);
-			set_reg(acm_base + ACM_R2_H, ((local_r2_hh & 0x3ff) << 16) | (local_r2_lh & 0x3ff), 32, 0);
-			set_reg(acm_base + ACM_R3_H, ((local_r3_hh & 0x3ff) << 16) | (local_r3_lh & 0x3ff), 32, 0);
-			set_reg(acm_base + ACM_R4_H, ((local_r4_hh & 0x3ff) << 16) | (local_r4_lh & 0x3ff), 32, 0);
-			set_reg(acm_base + ACM_R5_H, ((local_r5_hh & 0x3ff) << 16) | (local_r5_lh & 0x3ff), 32, 0);
-			set_reg(acm_base + ACM_R6_H, ((local_r6_hh & 0x3ff) << 16) | (local_r6_lh & 0x3ff), 32, 0);
-			acm_set_lut_hue(acm_lut_base + ACM_U_H_COEF, local_acm_lut_hue_table, pinfo->acm_lut_hue_table_len);
-			acm_set_lut(acm_lut_base + ACM_U_SATA_COEF, local_acm_lut_sata_table, pinfo->acm_lut_sata_table_len);
-			acm_set_lut(acm_lut_base + ACM_U_SATR0_COEF, local_acm_lut_satr0_table, pinfo->acm_lut_satr0_table_len);
-			acm_set_lut(acm_lut_base + ACM_U_SATR1_COEF, local_acm_lut_satr1_table, pinfo->acm_lut_satr1_table_len);
-			acm_set_lut(acm_lut_base + ACM_U_SATR2_COEF, local_acm_lut_satr2_table, pinfo->acm_lut_satr2_table_len);
-			acm_set_lut(acm_lut_base + ACM_U_SATR3_COEF, local_acm_lut_satr3_table, pinfo->acm_lut_satr3_table_len);
-			acm_set_lut(acm_lut_base + ACM_U_SATR4_COEF, local_acm_lut_satr4_table, pinfo->acm_lut_satr4_table_len);
-			acm_set_lut(acm_lut_base + ACM_U_SATR5_COEF, local_acm_lut_satr5_table, pinfo->acm_lut_satr5_table_len);
-			acm_set_lut(acm_lut_base + ACM_U_SATR6_COEF, local_acm_lut_satr6_table, pinfo->acm_lut_satr6_table_len);
-			acm_set_lut(acm_lut_base + ACM_U_SATR7_COEF, local_acm_lut_satr7_table, pinfo->acm_lut_satr7_table_len);
-
-			lut_sel = inp32(acm_base + ACM_LUT_SEL);
-			set_reg(acm_base + ACM_LUT_SEL, (~lut_sel) & 0x3FF, 10, 0);
-			//enable acm
-			set_reg(acm_base + ACM_EN, 0x1, 1, 0);
-		}
-	}
-
-func_exit:
-	return;
-}
-#endif
 
 /*******************************************************************************
 ** DSS MCTL
 */
-static void hisi_dss_mctl_init(char __iomem *mctl_base, dss_mctl_t *s_mctl)
+void hisi_dss_mctl_init(char __iomem *mctl_base, dss_mctl_t *s_mctl)
 {
-	BUG_ON(mctl_base == NULL);
-	BUG_ON(s_mctl == NULL);
+	if (NULL == mctl_base) {
+		HISI_FB_ERR("mctl_base is NULL");
+		return;
+	}
+	if (NULL == s_mctl) {
+		HISI_FB_ERR("s_mctl is NULL");
+		return;
+	}
 
 	memset(s_mctl, 0, sizeof(dss_mctl_t));
 
@@ -4853,40 +4331,32 @@ static void hisi_dss_mctl_init(char __iomem *mctl_base, dss_mctl_t *s_mctl)
 
 static void hisi_dss_mctl_ch_starty_init(char __iomem *mctl_ch_starty_base, dss_mctl_ch_t *s_mctl_ch)
 {
-	BUG_ON(mctl_ch_starty_base == NULL);
-	BUG_ON(s_mctl_ch == NULL);
+	if (NULL == mctl_ch_starty_base) {
+		HISI_FB_ERR("mctl_ch_starty_base is NULL");
+		return;
+	}
+	if (NULL == s_mctl_ch) {
+		HISI_FB_ERR("s_mctl_ch is NULL");
+		return;
+	}
 
 	memset(s_mctl_ch, 0, sizeof(dss_mctl_ch_t));
 
 	s_mctl_ch->chn_starty = inp32(mctl_ch_starty_base);
 }
 
-static void hisi_dss_mctl_ch_mod_dbg_init(char __iomem *mctl_ch_dbg_base, dss_mctl_ch_t *s_mctl_ch)
+void hisi_dss_mctl_ch_mod_dbg_init(char __iomem *mctl_ch_dbg_base, dss_mctl_ch_t *s_mctl_ch)
 {
-	BUG_ON(mctl_ch_dbg_base == NULL);
-	BUG_ON(s_mctl_ch == NULL);
+	if (NULL == mctl_ch_dbg_base) {
+		HISI_FB_ERR("mctl_ch_dbg_base is NULL");
+		return;
+	}
+	if (NULL == s_mctl_ch) {
+		HISI_FB_ERR("s_mctl_ch is NULL");
+		return;
+	}
 
 	s_mctl_ch->chn_mod_dbg = inp32(mctl_ch_dbg_base);
-}
-
-static void hisi_dss_mctl_sys_init(char __iomem *mctl_sys_base, dss_mctl_sys_t *s_mctl_sys)
-{
-	int i = 0;
-
-	BUG_ON(mctl_sys_base == NULL);
-	BUG_ON(s_mctl_sys == NULL);
-
-	memset(s_mctl_sys, 0, sizeof(dss_mctl_sys_t));
-
-	for (i= 0; i < DSS_OVL_IDX_MAX; i++) {
-		//s_mctl_sys->chn_ov_sel[i] = inp32(mctl_sys_base + MCTL_RCH_OV0_SEL + i * 0x4);
-		s_mctl_sys->chn_ov_sel[i] = 0xFFFFFFFF;
-	}
-
-	for (i= 0; i < DSS_WCH_MAX; i++) {
-		//s_mctl_sys->wchn_ov_sel[i] = inp32(mctl_sys_base + MCTL_WCH_OV2_SEL + i * 0x4);
-		s_mctl_sys->wchn_ov_sel[i] = 0x0;
-	}
 }
 
 static void hisi_dss_mctl_sys_set_reg(struct hisi_fb_data_type *hisifd,
@@ -4894,25 +4364,41 @@ static void hisi_dss_mctl_sys_set_reg(struct hisi_fb_data_type *hisifd,
 {
 	int k = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(mctl_sys_base == NULL);
-	BUG_ON(s_mctl_sys == NULL);
-	BUG_ON((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX));
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return;
+	}
+
+	if (mctl_sys_base == NULL) {
+		HISI_FB_DEBUG("mctl_sys_base is NULL!\n");
+		return;
+	}
+
+	if (s_mctl_sys == NULL) {
+		HISI_FB_DEBUG("s_mctl_sys is NULL!\n");
+		return;
+	}
+
+	if ((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX)) {
+		HISI_FB_DEBUG("ovl_idx is out of the range!\n");
+		return;
+	}
 
 	if (s_mctl_sys->chn_ov_sel_used[ovl_idx]) {
-		hisifd->set_reg(hisifd, mctl_sys_base + MCTL_RCH_OV0_SEL + ovl_idx * 0x4,
+		hisifd->set_reg(hisifd, mctl_sys_base + MCTL_RCH_OV0_SEL + (ovl_idx * 0x4),
 			s_mctl_sys->chn_ov_sel[ovl_idx], 32, 0);
+
 	}
 
 	for (k = 0; k < DSS_WCH_MAX; k++) {
 		if (s_mctl_sys->wch_ov_sel_used[k]) {
-			hisifd->set_reg(hisifd, mctl_sys_base + MCTL_WCH_OV2_SEL + k * 0x4,
+			hisifd->set_reg(hisifd, mctl_sys_base + MCTL_WCH_OV2_SEL + (k * 0x4),
 				s_mctl_sys->wchn_ov_sel[k], 32, 0);
 		}
 	}
 
 	if (s_mctl_sys->ov_flush_en_used[ovl_idx]) {
-		hisifd->set_reg(hisifd, mctl_sys_base + MCTL_OV0_FLUSH_EN + ovl_idx * 0x4,
+		hisifd->set_reg(hisifd, mctl_sys_base + MCTL_OV0_FLUSH_EN + (ovl_idx * 0x4),
 			s_mctl_sys->ov_flush_en[ovl_idx], 32, 0);
 	}
 }
@@ -4920,58 +4406,106 @@ static void hisi_dss_mctl_sys_set_reg(struct hisi_fb_data_type *hisifd,
 static void hisi_dss_mctl_ov_set_reg(struct hisi_fb_data_type *hisifd,
 	char __iomem *mctl_base, dss_mctl_t *s_mctl, int ovl_idx, bool enable_cmdlist)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON(mctl_base == NULL);
-	BUG_ON(s_mctl == NULL);
-	BUG_ON((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX));
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return;
+	}
+
+	if (mctl_base == NULL) {
+		HISI_FB_DEBUG("mctl_base is NULL!\n");
+		return;
+	}
+
+	if (s_mctl == NULL) {
+		HISI_FB_DEBUG("s_mctl is NULL!\n");
+		return;
+	}
+
+	if ((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX)) {
+		HISI_FB_DEBUG("ovl_idx  is is out of the range !\n");
+		return;
+	}
 
 	if ((ovl_idx == DSS_OVL0) || (ovl_idx == DSS_OVL1)) {
 		hisifd->set_reg(hisifd, mctl_base+ MCTL_CTL_MUTEX_DBUF, s_mctl->ctl_mutex_dbuf, 32, 0);
-	#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 		hisifd->set_reg(hisifd, mctl_base+ MCTL_CTL_MUTEX_SCF, s_mctl->ctl_mutex_scf, 32, 0);
-	#endif
 		hisi_dss_mctl_ov_set_ctl_dbg_reg(hisifd, mctl_base, enable_cmdlist);
 	}
 
 	hisifd->set_reg(hisifd, mctl_base + MCTL_CTL_MUTEX_OV, s_mctl->ctl_mutex_ov, 32, 0);
 }
-
+/*lint -e715*/
 static void hisi_dss_mctl_ch_set_reg(struct hisi_fb_data_type *hisifd,
-	dss_mctl_ch_base_t *mctl_ch_base, dss_mctl_ch_t *s_mctl_ch, int32_t mctl_idx)
+	dss_mctl_ch_base_t *mctl_ch_base, dss_mctl_ch_t *s_mctl_ch, int32_t mctl_idx, int chn_idx)
 {
 	char __iomem *chn_mutex_base = NULL;
 	int i = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(mctl_ch_base == NULL);
-	BUG_ON(s_mctl_ch == NULL);
-	BUG_ON((mctl_idx < DSS_MCTL0) || (mctl_idx >= DSS_MCTL_IDX_MAX));
-
-	for (i = 0; i < DSS_MCTL_IDX_MAX; i++) {
-		if (g_dss_module_ovl_base[i][MODULE_MCTL_BASE] == 0) continue;
-		chn_mutex_base = mctl_ch_base->chn_mutex_base +
-                         g_dss_module_ovl_base[i][MODULE_MCTL_BASE];
-
-		if (i != mctl_idx) {
-			hisifd->set_reg(hisifd, chn_mutex_base, 0, 32, 0);
-		}
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return;
 	}
 
-	chn_mutex_base = mctl_ch_base->chn_mutex_base +
-		g_dss_module_ovl_base[mctl_idx][MODULE_MCTL_BASE];
-	BUG_ON(chn_mutex_base == NULL);
+	if (mctl_ch_base == NULL) {
+		HISI_FB_DEBUG("mctl_ch_base is NULL!\n");
+		return;
+	}
 
-	hisifd->set_reg(hisifd, chn_mutex_base, s_mctl_ch->chn_mutex, 32, 0);
+	if (s_mctl_ch == NULL) {
+		HISI_FB_DEBUG("s_mctl_chis NULL!\n");
+		return;
+	}
+
+	if ((mctl_idx < DSS_MCTL0) || (mctl_idx >= DSS_MCTL_IDX_MAX)) {
+		HISI_FB_DEBUG("mctl_idx is out of the range!\n");
+		return;
+	}
+
+	if (hisifd->index == MEDIACOMMON_PANEL_IDX) {
+		chn_mutex_base = mctl_ch_base->chn_mutex_base;
+		hisifd->set_reg(hisifd, chn_mutex_base, s_mctl_ch->chn_mutex, 32, 0);
+	} else {
+		for (i = 0; i < DSS_MCTL_IDX_MAX; i++) {
+			if (g_dss_module_ovl_base[i][MODULE_MCTL_BASE] == 0) continue;
+			chn_mutex_base = mctl_ch_base->chn_mutex_base +
+	                         g_dss_module_ovl_base[i][MODULE_MCTL_BASE];
+
+			if (i != mctl_idx) {
+				hisifd->set_reg(hisifd, chn_mutex_base, 0, 32, 0);
+			}
+		}
+
+		chn_mutex_base = mctl_ch_base->chn_mutex_base +
+			g_dss_module_ovl_base[mctl_idx][MODULE_MCTL_BASE];
+		if (NULL == chn_mutex_base) {
+			HISI_FB_DEBUG("chn_mutex_base is NULL!\n");
+			return;
+		}
+
+		hisifd->set_reg(hisifd, chn_mutex_base, s_mctl_ch->chn_mutex, 32, 0);
+	}
 }
+/*lint +e715*/
 
 static void hisi_dss_mctl_sys_ch_set_reg(struct hisi_fb_data_type *hisifd,
 	dss_mctl_ch_base_t *mctl_ch_base, dss_mctl_ch_t *s_mctl_ch, int chn_idx, bool normal)
 {
 	char __iomem *mctl_sys_base = NULL;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(mctl_ch_base == NULL);
-	BUG_ON(s_mctl_ch == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return;
+	}
+
+	if (mctl_ch_base == NULL) {
+		HISI_FB_DEBUG("mctl_ch_base is NULL!\n");
+		return;
+	}
+
+	if (s_mctl_ch == NULL) {
+		HISI_FB_DEBUG("s_mctl_ch is NULL!\n");
+		return;
+	}
 
 	//if (chn_idx < DSS_WCHN_W0) {
 		//hisifd->set_reg(hisifd, mctl_ch_base->chn_starty_base, s_mctl_ch->chn_starty, 32, 0);
@@ -4979,27 +4513,6 @@ static void hisi_dss_mctl_sys_ch_set_reg(struct hisi_fb_data_type *hisifd,
 
 	mctl_sys_base = hisifd->dss_base + DSS_MCTRL_SYS_OFFSET;
 
-#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	if (normal == true) {    //copybit
-		if (chn_idx == DSS_RCHN_V2) {
-			hisifd->set_reg(hisifd, mctl_sys_base + MCTL_MOD19_DBG, 0xA0000, 32, 0);
-		}
-
-		if (chn_idx == DSS_WCHN_W2) {
-			hisifd->set_reg(hisifd, mctl_sys_base + MCTL_MOD20_DBG, 0xA0000, 32, 0);
-		}
-	}
-
-	if (normal == false) {
-		if (chn_idx == DSS_RCHN_V2) {
-			hisifd->set_reg(hisifd, mctl_sys_base + MCTL_MOD19_DBG, 0xA0002, 32, 0);
-		}
-
-		if (chn_idx == DSS_WCHN_W2) {
-			hisifd->set_reg(hisifd, mctl_sys_base + MCTL_MOD20_DBG, 0xA0002, 32, 0);
-		}
-	}
-#endif
 
 	if (mctl_ch_base->chn_ov_en_base) {
 		hisifd->set_reg(hisifd, mctl_ch_base->chn_ov_en_base, s_mctl_ch->chn_ov_oen, 32, 0);
@@ -5013,8 +4526,14 @@ void hisi_dss_mctl_mutex_lock(struct hisi_fb_data_type *hisifd,
 {
 	char __iomem *mctl_base = NULL;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX));
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
+	if ((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX)) {
+		HISI_FB_ERR("ovl_idx is invalid");
+		return;
+	}
 
 	mctl_base = hisifd->dss_module.mctl_base[ovl_idx];
 
@@ -5026,8 +4545,14 @@ void hisi_dss_mctl_mutex_unlock(struct hisi_fb_data_type *hisifd,
 {
 	char __iomem *mctl_base = NULL;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX));
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
+	if ((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX)) {
+		HISI_FB_ERR("ovl_idx is invalid");
+		return;
+	}
 
 	mctl_base = hisifd->dss_module.mctl_base[ovl_idx];
 
@@ -5041,8 +4566,14 @@ void hisi_dss_mctl_on(struct hisi_fb_data_type *hisifd, int mctl_idx, bool enabl
 	int i  = 0;
 	int tmp = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON((mctl_idx < DSS_MCTL0) || (mctl_idx >= DSS_MCTL_IDX_MAX));
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
+	if ((mctl_idx < DSS_MCTL0) || (mctl_idx >= DSS_MCTL_IDX_MAX)) {
+		HISI_FB_ERR("mctl_idx is invalid");
+		return;
+	}
 
 	mctl_base = hisifd->dss_base +
 		g_dss_module_ovl_base[mctl_idx][MODULE_MCTL_BASE];
@@ -5054,39 +4585,35 @@ void hisi_dss_mctl_on(struct hisi_fb_data_type *hisifd, int mctl_idx, bool enabl
 		set_reg(mctl_base + MCTL_CTL_MUTEX_ITF, mctl_idx + 1, 32, 0);
 	}
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	if ((mctl_idx == DSS_MCTL2) || (mctl_idx == DSS_MCTL3)) {
 		set_reg(mctl_base + MCTL_CTL_DBG, 0x302600, 32, 0);
 	}
-#endif
 
 	if (enable_cmdlist) {
-	#ifdef CONFIG_FIX_DSS_WCH_ISR_BUG
-		if (mctl_idx >= DSS_MCTL2) {
-			outp32(hisifd->dss_base + DSS_CMDLIST_OFFSET + CMDLIST_CH0_INTE + DSS_CMDLIST_W0 * 0x40, 0x80);
-			outp32(hisifd->dss_base + DSS_CMDLIST_OFFSET + CMDLIST_CH0_INTE + DSS_CMDLIST_W1 * 0x40, 0x80);
-		#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-			outp32(hisifd->dss_base + DSS_CMDLIST_OFFSET + CMDLIST_CH0_INTE + DSS_CMDLIST_W2 * 0x40, 0x80);
-		#endif
-		}
-	#endif
 		tmp = MCTL_MOD_DBG_CH_NUM + MCTL_MOD_DBG_OV_NUM +
-			MCTL_MOD_DBG_DBUF_NUM + MCTL_MOD_DBG_SCF_NUM;
-		for (i = 0; i < tmp; i++) {
-			set_reg(mctl_sys_base + MCTL_MOD0_DBG + i * 0x4, 0xA0000, 32, 0);
+				MCTL_MOD_DBG_DBUF_NUM + MCTL_MOD_DBG_SCF_NUM;
+		if (g_dss_version_tag & FB_ACCEL_KIRIN970) {
+			for (i = 0; i < tmp; i++) {
+				if (i < MCTL_MOD_DBG_CH_NUM) {
+					set_reg(mctl_sys_base + MCTL_MOD0_DBG + i * 0x4, 0xA8000, 32, 0);
+				} else {
+					set_reg(mctl_sys_base + MCTL_MOD0_DBG + i * 0x4, 0xA0000, 32, 0);
+				}
+			}
+		} else {
+			for (i = 0; i < tmp; i++) {
+				set_reg(mctl_sys_base + MCTL_MOD0_DBG + i * 0x4, 0xA0000, 32, 0);//lint !e679
+			}
 		}
 
 		for (i = 0; i < MCTL_MOD_DBG_ITF_NUM; i++) {
-			set_reg(mctl_sys_base + MCTL_MOD17_DBG + i * 0x4, 0xA0F00, 32, 0);
+			set_reg(mctl_sys_base + MCTL_MOD17_DBG + i * 0x4, 0xA0F00, 32, 0);//lint !e679
 		}
 
 		if (!fastboot_enable) {
 			set_reg(mctl_base + MCTL_CTL_TOP, 0x1, 32, 0);
 		}
 	} else {
-	#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		set_reg(mctl_base + MCTL_CTL_DBG, 0xB13A00, 32, 0);
-	#endif
 
 		if (is_mipi_cmd_panel(hisifd)) {
 			set_reg(mctl_base + MCTL_CTL_TOP, 0x1, 32, 0);
@@ -5102,6 +4629,30 @@ void hisi_dss_mctl_on(struct hisi_fb_data_type *hisifd, int mctl_idx, bool enabl
 	}
 }
 
+void hisi_media_common_mctl_on(struct hisi_fb_data_type *hisifd)
+{
+	char __iomem *mctl_base = NULL;
+	char __iomem *mctl_sys_base = NULL;
+
+	if (NULL == hisifd) {
+		HISI_FB_ERR("NULL ptr.\n");
+		return;
+	}
+
+	mctl_base = hisifd->media_common_base + MCTL_MUTEX_OFFSET;
+	mctl_sys_base = hisifd->media_common_base + MCTL_SYS_OFFSET;
+
+	set_reg(mctl_base + MCTL_CTL_EN, 0x1, 32, 0);
+	/*clear ISP configuration*/
+	set_reg(mctl_base + MCTL_MUTEX_ISPIF, 0x0, 32, 0);
+	set_reg(mctl_sys_base + MCTL_SYS_ISP_WCH_SEL, 0x0, 32, 0);
+
+	set_reg(mctl_sys_base + MCTL_MOD2_DBG, 0xA8000, 32, 0);
+	set_reg(mctl_sys_base + MCTL_MOD9_DBG, 0xA8000, 32, 0);
+
+	set_reg(mctl_base + MCTL_CTL_TOP, 0x1, 32, 0);
+}
+
 int hisi_dss_mctl_ch_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req,
 	dss_layer_t *layer, dss_wb_layer_t *wb_layer, int ovl_idx, dss_rect_t *wb_ov_block_rect, bool has_base)
 {
@@ -5109,10 +4660,21 @@ int hisi_dss_mctl_ch_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov
 	int layer_idx = 0;
 	dss_mctl_ch_t *mctl_ch = NULL;
 	dss_mctl_sys_t *mctl_sys = NULL;
+	int ch_ov_sel_pattern = 8;
+	int chn_ov_sel_max_num = 7;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
-	BUG_ON((layer == NULL) && (wb_layer == NULL));
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == pov_req) {
+		HISI_FB_ERR("pov_req is NULL");
+		return -EINVAL;
+	}
+	if ((layer == NULL) && (wb_layer == NULL)) {
+		HISI_FB_ERR("layer and wb_layer is NULL");
+		return -EINVAL;
+	}
 
 	if (wb_layer) {
 		chn_idx = wb_layer->chn_idx;
@@ -5123,19 +4685,23 @@ int hisi_dss_mctl_ch_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov
 		mctl_ch = &(hisifd->dss_module.mctl_ch[chn_idx]);
 		hisifd->dss_module.mctl_ch_used[chn_idx] = 1;
 
-		if (chn_idx != DSS_WCHN_W2) {  // chicago copybit
-			mctl_ch->chn_ov_oen = set_bits32(mctl_ch->chn_ov_oen,
-				(ovl_idx - 1), 32, 0);
+		if (pov_req->wb_compose_type == DSS_WB_COMPOSE_MEDIACOMMON) {
+			mctl_ch->chn_ov_oen = set_bits32(mctl_ch->chn_ov_oen, 1, 32, 0);
+		} else {
+			if (chn_idx != DSS_WCHN_W2) {  // chicago copybit
+				mctl_ch->chn_ov_oen = set_bits32(mctl_ch->chn_ov_oen,
+					(ovl_idx - 1), 32, 0);
 
-			if (pov_req->wb_layer_nums == MAX_DSS_DST_NUM) {
-				mctl_sys->wchn_ov_sel[0] = set_bits32(mctl_sys->wchn_ov_sel[0], 3, 32, 0);
-				mctl_sys->wch_ov_sel_used[0] = 1;
-				mctl_sys->wchn_ov_sel[1] = set_bits32(mctl_sys->wchn_ov_sel[1], 3, 32, 0);
-				mctl_sys->wch_ov_sel_used[1] = 1;
-			} else {
-				mctl_sys->wchn_ov_sel[ovl_idx - DSS_OVL2] =
-					set_bits32(mctl_sys->wchn_ov_sel[ovl_idx - DSS_OVL2], (chn_idx - DSS_WCHN_W0 + 1), 32, 0);
-				mctl_sys->wch_ov_sel_used[ovl_idx - DSS_OVL2] = 1;
+				if (pov_req->wb_layer_nums == MAX_DSS_DST_NUM) {
+					mctl_sys->wchn_ov_sel[0] = set_bits32(mctl_sys->wchn_ov_sel[0], 3, 32, 0);
+					mctl_sys->wch_ov_sel_used[0] = 1;
+					mctl_sys->wchn_ov_sel[1] = set_bits32(mctl_sys->wchn_ov_sel[1], 3, 32, 0);
+					mctl_sys->wch_ov_sel_used[1] = 1;
+				} else {
+					mctl_sys->wchn_ov_sel[ovl_idx - DSS_OVL2] =
+						set_bits32(mctl_sys->wchn_ov_sel[ovl_idx - DSS_OVL2], (chn_idx - DSS_WCHN_W0 + 1), 32, 0);
+					mctl_sys->wch_ov_sel_used[ovl_idx - DSS_OVL2] = 1;
+				}
 			}
 		}
 
@@ -5160,10 +4726,17 @@ int hisi_dss_mctl_ch_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov
 		mctl_sys = &(hisifd->dss_module.mctl_sys);
 		hisifd->dss_module.mctl_sys_used = 1;
 
+		if (g_dss_version_tag & FB_ACCEL_KIRIN970) {
+			ch_ov_sel_pattern = 0xE;
+		}
+
 		if (layer->need_cap & (CAP_DIM | CAP_PURE_COLOR)) {
-			mctl_sys->chn_ov_sel[ovl_idx] = set_bits32(mctl_sys->chn_ov_sel[ovl_idx],
-				0x8, 4, (layer_idx + 1) * 4);
-			mctl_sys->chn_ov_sel_used[ovl_idx] = 1;
+			if (layer_idx < chn_ov_sel_max_num) {
+				mctl_sys->chn_ov_sel[ovl_idx] = set_bits32(mctl_sys->chn_ov_sel[ovl_idx],
+					ch_ov_sel_pattern, 4, (layer_idx + 1) * 4);
+				mctl_sys->chn_ov_sel_used[ovl_idx] = 1;
+			} else {
+			}
 		} else {
 			mctl_ch = &(hisifd->dss_module.mctl_ch[chn_idx]);
 			hisifd->dss_module.mctl_ch_used[chn_idx] = 1;
@@ -5171,9 +4744,18 @@ int hisi_dss_mctl_ch_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov
 			mctl_ch->chn_mutex = set_bits32(mctl_ch->chn_mutex, 0x1, 1, 0);
 			mctl_ch->chn_flush_en = set_bits32(mctl_ch->chn_flush_en, 0x1, 1, 0);
 
-			if (chn_idx != DSS_RCHN_V2) { // chicago copybit
-				mctl_ch->chn_ov_oen = set_bits32(mctl_ch->chn_ov_oen,
-					((1 << (layer_idx + 1)) | (0x100 << ovl_idx)), 32, 0);
+			if ((g_dss_version_tag == FB_ACCEL_KIRIN970)
+				|| (chn_idx != DSS_RCHN_V2)) {
+				if (g_dss_version_tag & FB_ACCEL_KIRIN970) {
+					if (hisifd->index == MEDIACOMMON_PANEL_IDX) {
+						mctl_ch->chn_ov_oen = set_bits32(mctl_ch->chn_ov_oen, 0x800, 32, 0);
+					} else {
+						mctl_ch->chn_ov_oen = set_bits32(mctl_ch->chn_ov_oen, 0x100 << ovl_idx, 32, 0);
+					}
+				} else {
+					mctl_ch->chn_ov_oen = set_bits32(mctl_ch->chn_ov_oen,
+						((1 << (layer_idx + 1)) | (0x100 << ovl_idx)), 32, 0);//lint !e701
+				}
 
 				if (wb_ov_block_rect) {
 					mctl_ch->chn_starty = set_bits32(mctl_ch->chn_starty,
@@ -5183,9 +4765,17 @@ int hisi_dss_mctl_ch_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov
 						(layer->dst_rect.y | (0x8 << 16)), 32, 0);
 				}
 
-				mctl_sys->chn_ov_sel[ovl_idx] = set_bits32(mctl_sys->chn_ov_sel[ovl_idx],
-					chn_idx, 4, (layer_idx + 1) * 4);
-				mctl_sys->chn_ov_sel_used[ovl_idx] = 1;
+				if ((g_dss_version_tag & FB_ACCEL_KIRIN970)
+					&& (chn_idx == DSS_RCHN_V2)) {
+					chn_idx = 0x8;
+				}
+
+				if (layer_idx < chn_ov_sel_max_num) {
+					mctl_sys->chn_ov_sel[ovl_idx] = set_bits32(mctl_sys->chn_ov_sel[ovl_idx],
+						chn_idx, 4, (layer_idx + 1) * 4);
+					mctl_sys->chn_ov_sel_used[ovl_idx] = 1;
+				} else {
+				}
 			}
 		}
 	}
@@ -5199,8 +4789,14 @@ int hisi_dss_mctl_ov_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov
 	dss_mctl_t *mctl = NULL;
 	dss_mctl_sys_t *mctl_sys = NULL;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX));
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if ((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX)) {
+		HISI_FB_ERR("ovl_idx is invalid");
+		return -EINVAL;
+	}
 
 	if (pov_req && pov_req->wb_layer_infos[0].chn_idx == DSS_WCHN_W2) { //chicago copybit no ovl
 		return 0;
@@ -5213,9 +4809,7 @@ int hisi_dss_mctl_ov_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov
 	if (ovl_idx == DSS_OVL0) {
 		mctl->ctl_mutex_itf = set_bits32(mctl->ctl_mutex_itf, 0x1, 2, 0);
 		mctl->ctl_mutex_dbuf = set_bits32(mctl->ctl_mutex_dbuf, 0x1, 2, 0);
-	#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 		mctl->ctl_mutex_scf = set_bits32(mctl->ctl_mutex_scf, 0x1, 1, 0);
-	#endif
 	} else if (ovl_idx == DSS_OVL1) {
 		mctl->ctl_mutex_itf = set_bits32(mctl->ctl_mutex_itf, 0x2, 2, 0);
 		mctl->ctl_mutex_dbuf = set_bits32(mctl->ctl_mutex_dbuf, 0x2, 2, 0);
@@ -5230,16 +4824,16 @@ int hisi_dss_mctl_ov_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov
 	hisifd->dss_module.mctl_sys_used = 1;
 
 	// ov base pattern
-	mctl_sys->chn_ov_sel[ovl_idx] = set_bits32(mctl_sys->chn_ov_sel[ovl_idx], 0x8, 4, 0);
+	if (g_dss_version_tag & FB_ACCEL_KIRIN970) {
+		mctl_sys->chn_ov_sel[ovl_idx] = set_bits32(mctl_sys->chn_ov_sel[ovl_idx], 0xE, 4, 0);
+	} else {
+		mctl_sys->chn_ov_sel[ovl_idx] = set_bits32(mctl_sys->chn_ov_sel[ovl_idx], 0x8, 4, 0);
+	}
 	mctl_sys->chn_ov_sel_used[ovl_idx] = 1;
 
 	if ((ovl_idx == DSS_OVL0) || (ovl_idx == DSS_OVL1)) {
 		if (is_first_ov_block) {
-		#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 			mctl_sys->ov_flush_en[ovl_idx] = set_bits32(mctl_sys->ov_flush_en[ovl_idx], 0xf, 4, 0);
-		#else
-			mctl_sys->ov_flush_en[ovl_idx] = set_bits32(mctl_sys->ov_flush_en[ovl_idx], 0xd, 4, 0);
-		#endif
 		} else {
 			mctl_sys->ov_flush_en[ovl_idx] = set_bits32(mctl_sys->ov_flush_en[ovl_idx], 0x1, 1, 0);
 		}
@@ -5297,7 +4891,10 @@ static uint32_t get_ovl_blending_mode(dss_overlay_t *pov_req, dss_layer_t *layer
 	uint32_t blend_mode = 0;
 	bool has_per_pixel_alpha = false;
 
-	BUG_ON(layer == NULL);
+	if (NULL == layer) {
+		HISI_FB_ERR("layer is NULL");
+		return EINVAL;
+	}
 
 	has_per_pixel_alpha = hal_format_has_alpha(layer->img.format);
 
@@ -5341,163 +4938,6 @@ static uint32_t get_ovl_blending_mode(dss_overlay_t *pov_req, dss_layer_t *layer
 	return blend_mode;
 }
 
-static void hisi_dss_ovl_init(char __iomem *ovl_base, dss_ovl_t *s_ovl, int ovl_idx)
-{
-	int i = 0;
-
-	BUG_ON(ovl_base == NULL);
-	BUG_ON(s_ovl == NULL);
-
-	memset(s_ovl, 0, sizeof(dss_ovl_t));
-
-	s_ovl->ovl_size = inp32(ovl_base + OVL_SIZE);
-	s_ovl->ovl_bg_color = inp32(ovl_base + OVL_BG_COLOR);
-	s_ovl->ovl_dst_startpos = inp32(ovl_base + OVL_DST_STARTPOS);
-	s_ovl->ovl_dst_endpos = inp32(ovl_base + OVL_DST_ENDPOS);
-	s_ovl->ovl_gcfg = inp32(ovl_base + OVL_GCFG);
-
-	if ((ovl_idx == DSS_OVL1) || (ovl_idx == DSS_OVL3)) {
-		for (i = 0; i < OVL_2LAYER_NUM; i++) {
-			s_ovl->ovl_layer[i].layer_pos =
-				inp32(ovl_base + OVL_LAYER0_POS + i * 0x3C);
-			s_ovl->ovl_layer[i].layer_size =
-				inp32(ovl_base + OVL_LAYER0_SIZE + i * 0x3C);
-			s_ovl->ovl_layer[i].layer_pattern =
-				inp32(ovl_base + OVL_LAYER0_PATTERN + i * 0x3C);
-			s_ovl->ovl_layer[i].layer_alpha =
-				inp32(ovl_base + OVL_LAYER0_ALPHA + i * 0x3C);
-			s_ovl->ovl_layer[i].layer_cfg =
-				inp32(ovl_base + OVL_LAYER0_CFG + i * 0x3C);
-
-			s_ovl->ovl_layer_pos[i].layer_pspos =
-				inp32(ovl_base + OVL_LAYER0_PSPOS + i * 0x3C);
-			s_ovl->ovl_layer_pos[i].layer_pepos =
-				inp32(ovl_base + OVL_LAYER0_PEPOS + i * 0x3C);
-		}
-
-		s_ovl->ovl_block_size = inp32(ovl_base + OVL2_BLOCK_SIZE);
-	} else {
-		for (i = 0; i < OVL_6LAYER_NUM; i++) {
-			s_ovl->ovl_layer[i].layer_pos =
-				inp32(ovl_base + OVL_LAYER0_POS + i * 0x3C);
-			s_ovl->ovl_layer[i].layer_size =
-				inp32(ovl_base + OVL_LAYER0_SIZE + i * 0x3C);
-			s_ovl->ovl_layer[i].layer_pattern =
-				inp32(ovl_base + OVL_LAYER0_PATTERN + i * 0x3C);
-			s_ovl->ovl_layer[i].layer_alpha =
-				inp32(ovl_base + OVL_LAYER0_ALPHA + i * 0x3C);
-			s_ovl->ovl_layer[i].layer_cfg =
-				inp32(ovl_base + OVL_LAYER0_CFG + i * 0x3C);
-
-			s_ovl->ovl_layer_pos[i].layer_pspos =
-				inp32(ovl_base + OVL_LAYER0_PSPOS + i * 0x3C);
-			s_ovl->ovl_layer_pos[i].layer_pepos =
-				inp32(ovl_base + OVL_LAYER0_PEPOS + i * 0x3C);
-		}
-
-		s_ovl->ovl_block_size = inp32(ovl_base + OVL6_BLOCK_SIZE);
-	}
-}
-
-static void hisi_dss_ovl_set_reg(struct hisi_fb_data_type *hisifd,
-	char __iomem *ovl_base, dss_ovl_t *s_ovl, int ovl_idx)
-{
-	int i = 0;
-
-	BUG_ON(hisifd == NULL);
-	BUG_ON(ovl_base == NULL);
-	BUG_ON(s_ovl == NULL);
-
-	if ((ovl_idx == DSS_OVL1) || (ovl_idx == DSS_OVL3)) {
-		hisifd->set_reg(hisifd, ovl_base + OVL2_REG_DEFAULT, 0x1, 32, 0);
-		hisifd->set_reg(hisifd, ovl_base + OVL2_REG_DEFAULT, 0x0, 32, 0);
-	} else {
-		hisifd->set_reg(hisifd, ovl_base + OVL6_REG_DEFAULT, 0x1, 32, 0);
-		hisifd->set_reg(hisifd, ovl_base + OVL6_REG_DEFAULT, 0x0, 32, 0);
-	}
-
-	hisifd->set_reg(hisifd, ovl_base + OVL_SIZE, s_ovl->ovl_size, 32, 0);
-	hisifd->set_reg(hisifd, ovl_base + OVL_BG_COLOR, s_ovl->ovl_bg_color, 32, 0);
-	hisifd->set_reg(hisifd, ovl_base + OVL_DST_STARTPOS, s_ovl->ovl_dst_startpos, 32, 0);
-	hisifd->set_reg(hisifd, ovl_base + OVL_DST_ENDPOS, s_ovl->ovl_dst_endpos, 32, 0);
-	hisifd->set_reg(hisifd, ovl_base + OVL_GCFG, s_ovl->ovl_gcfg, 32, 0);
-
-	if ((ovl_idx == DSS_OVL1) || (ovl_idx == DSS_OVL3)) {
-		for (i = 0; i < OVL_2LAYER_NUM; i++) {
-			if (s_ovl->ovl_layer_used[i] == 1) {
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_POS + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_pos, 32, 0);
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_SIZE + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_size, 32, 0);
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_PATTERN + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_pattern, 32, 0);
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_ALPHA + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_alpha, 32, 0);
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_CFG + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_cfg, 32, 0);
-
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_PSPOS + i * 0x3C,
-					s_ovl->ovl_layer_pos[i].layer_pspos, 32, 0);
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_PEPOS + i * 0x3C,
-					s_ovl->ovl_layer_pos[i].layer_pepos, 32, 0);
-			} else {
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_POS + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_pos, 32, 0);
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_SIZE + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_size, 32, 0);
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_CFG + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_cfg, 32, 0);
-			}
-		}
-
-		hisifd->set_reg(hisifd, ovl_base + OVL2_BLOCK_SIZE, s_ovl->ovl_block_size, 32, 0);
-	} else {
-		for (i = 0; i < OVL_6LAYER_NUM; i++) {
-			if (s_ovl->ovl_layer_used[i] == 1) {
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_POS + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_pos, 32, 0);
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_SIZE + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_size, 32, 0);
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_PATTERN + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_pattern, 32, 0);
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_ALPHA + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_alpha, 32, 0);
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_CFG + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_cfg, 32, 0);
-
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_PSPOS + i * 0x3C,
-					s_ovl->ovl_layer_pos[i].layer_pspos, 32, 0);
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_PEPOS + i * 0x3C,
-					s_ovl->ovl_layer_pos[i].layer_pepos, 32, 0);
-			} else {
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_POS + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_pos, 32, 0);
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_SIZE + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_size, 32, 0);
-				hisifd->set_reg(hisifd, ovl_base + OVL_LAYER0_CFG + i * 0x3C,
-					s_ovl->ovl_layer[i].layer_cfg, 32, 0);
-			}
-		}
-
-		hisifd->set_reg(hisifd, ovl_base + OVL6_BLOCK_SIZE, s_ovl->ovl_block_size, 32, 0);
-	}
-}
-
-void hisi_dss_ov_set_reg_default_value(struct hisi_fb_data_type *hisifd,
-	char __iomem *ovl_base, int ovl_idx)
-{
-	BUG_ON(hisifd == NULL);
-	BUG_ON(ovl_base == NULL);
-
-	if ((ovl_idx == DSS_OVL1) || (ovl_idx == DSS_OVL3)) {
-		hisifd->set_reg(hisifd, ovl_base + OVL2_REG_DEFAULT, 0x1, 32, 0);
-		hisifd->set_reg(hisifd, ovl_base + OVL2_REG_DEFAULT, 0x0, 32, 0);
-	} else {
-		hisifd->set_reg(hisifd, ovl_base + OVL6_REG_DEFAULT, 0x1, 32, 0);
-		hisifd->set_reg(hisifd, ovl_base + OVL6_REG_DEFAULT, 0x0, 32, 0);
-	}
-}
-
 int hisi_dss_ovl_base_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req,
 	  dss_overlay_block_t *pov_h_block, dss_rect_t *wb_ov_block_rect, int ovl_idx, int ov_h_block_idx)
 {
@@ -5508,6 +4948,7 @@ int hisi_dss_ovl_base_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *po
 	int temp = 0;
 	int i = 0;
 	int m = 0;
+	uint32_t ovl_bg_color;
 
 	dss_overlay_block_t *pov_h_block_infos_tmp = NULL;
 	dss_overlay_block_t *pov_h_block_tmp = NULL;
@@ -5516,8 +4957,14 @@ int hisi_dss_ovl_base_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *po
 	int layer_idx = 0;
 	bool has_base = false;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX));
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if ((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX)) {
+		HISI_FB_ERR("ovl_idx is invalid");
+		return -EINVAL;
+	}
 
 	if (pov_req && pov_req->wb_layer_infos[0].chn_idx == DSS_WCHN_W2) { //chicago copybit no ovl
 		return 0;
@@ -5543,11 +4990,11 @@ int hisi_dss_ovl_base_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *po
 	if (pov_h_block && pov_req && (pov_req->ov_block_nums != 0)) {
 		if (pov_req->ov_block_nums > 1) {
 			pov_h_block_infos_tmp = (dss_overlay_block_t *)(pov_req->ov_block_infos_ptr);
-			for (m = ov_h_block_idx; m < pov_req->ov_block_nums; m++) {
+			for (m = ov_h_block_idx; m < (pov_req->ov_block_nums); m++) {
 				pov_h_block_tmp = &(pov_h_block_infos_tmp[m]);
 				has_base = false;
 
-				for (i = 0; i < pov_h_block_tmp->layer_nums; i++) {
+				for (i = 0; i < (pov_h_block_tmp->layer_nums); i++) {
 					layer = &(pov_h_block_tmp->layer_infos[i]);
 					//layer_idx = layer->layer_idx;
 
@@ -5576,16 +5023,16 @@ int hisi_dss_ovl_base_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *po
 							ovl->ovl_layer[layer_idx].layer_pattern =
 								set_bits32(ovl->ovl_layer[layer_idx].layer_pattern, layer->color, 32, 0);
 							ovl->ovl_layer[layer_idx].layer_cfg =
-								set_bits32(ovl->ovl_layer[layer_idx].layer_cfg, 0x1, 1, 0);
+								set_bits32(ovl->ovl_layer[layer_idx].layer_cfg, 1, 1, 0);
 							ovl->ovl_layer[layer_idx].layer_cfg =
-								set_bits32(ovl->ovl_layer[layer_idx].layer_cfg, 0x1, 1, 8);
+								set_bits32(ovl->ovl_layer[layer_idx].layer_cfg, 1, 1, 8);
 						} else {
 								ovl->ovl_layer[layer_idx].layer_pattern =
-							set_bits32(ovl->ovl_layer[layer_idx].layer_pattern, 0x0, 32, 0);
+							set_bits32(ovl->ovl_layer[layer_idx].layer_pattern, 0, 32, 0);
 								ovl->ovl_layer[layer_idx].layer_cfg =
-							set_bits32(ovl->ovl_layer[layer_idx].layer_cfg, 0x1, 1, 0);
+							set_bits32(ovl->ovl_layer[layer_idx].layer_cfg, 1, 1, 0);
 								ovl->ovl_layer[layer_idx].layer_cfg =
-							set_bits32(ovl->ovl_layer[layer_idx].layer_cfg, 0x0, 1, 8);
+							set_bits32(ovl->ovl_layer[layer_idx].layer_cfg, 0, 1, 8);
 						}
 
 						ovl->ovl_layer_used[layer_idx] = 1;
@@ -5614,11 +5061,12 @@ int hisi_dss_ovl_base_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *po
 
 	ovl->ovl_size = set_bits32(ovl->ovl_size, DSS_WIDTH(img_width), 15, 0);
 	ovl->ovl_size = set_bits32(ovl->ovl_size, DSS_HEIGHT(img_height), 15, 16);
-#ifdef CONFIG_HISI_FB_OV_BASE_USED
-	ovl->ovl_bg_color= set_bits32(ovl->ovl_bg_color, 0xFFFF0000, 32, 0);
-#else
-	ovl->ovl_bg_color= set_bits32(ovl->ovl_bg_color, 0xFF000000, 32, 0);
-#endif
+
+	ovl_bg_color = (g_dss_version_tag & FB_ACCEL_KIRIN970) ?
+				0x00000000 : 0xFF000000;
+	ovl->ovl_bg_color= set_bits32(ovl->ovl_bg_color, ovl_bg_color, 32, 0);
+
+
 	ovl->ovl_dst_startpos = set_bits32(ovl->ovl_dst_startpos, 0x0, 32, 0);
 	ovl->ovl_dst_endpos = set_bits32(ovl->ovl_dst_endpos, DSS_WIDTH(img_width), 15, 0);
 	ovl->ovl_dst_endpos = set_bits32(ovl->ovl_dst_endpos, DSS_HEIGHT(img_height), 15, 16);
@@ -5629,6 +5077,7 @@ int hisi_dss_ovl_base_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *po
 	return 0;
 }
 
+/*lint -e676 -e644*/
 int hisi_dss_ovl_layer_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req,
 	dss_layer_t *layer, dss_rect_t *wb_ov_block_rect, bool has_base)
 {
@@ -5638,18 +5087,37 @@ int hisi_dss_ovl_layer_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *p
 	int blend_mode = 0;
 	dss_rect_t wb_ov_rect;
 	dss_rect_t dst_rect;
+	uint32_t glb_alpha;
+	uint32_t color_rgb;
+	uint32_t color_alpha;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(layer == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_ERR("hisifd is NULL Point.\n");
+		return -EINVAL;
+	}
+
+	if (layer == NULL) {
+		HISI_FB_ERR("layer is NULL Point.\n");
+		return -EINVAL;
+	}
 
 	ovl_idx = hisifd->ov_req.ovl_idx;
 	layer_idx = layer->layer_idx;
 
-	if (layer->chn_idx == DSS_RCHN_V2) { //chicago copybit
+	if (g_dss_version_tag == FB_ACCEL_HI366x) {
+		if (layer->chn_idx == DSS_RCHN_V2) { //chicago copybit
+			return 0;
+		}
+	}
+
+	if (hisifd->index == MEDIACOMMON_PANEL_IDX) {
 		return 0;
 	}
 
-	BUG_ON((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX));
+	if ((ovl_idx < DSS_OVL0) || (ovl_idx >= DSS_OVL_IDX_MAX)) {
+		HISI_FB_ERR("ovl_idx = %d is out of range!\n", ovl_idx);
+		return -EINVAL;
+	}
 
 	ovl = &(hisifd->dss_module.ov[ovl_idx]);
 	hisifd->dss_module.ov_used[ovl_idx] = 1;
@@ -5660,16 +5128,26 @@ int hisi_dss_ovl_layer_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *p
 		return 0;
 	}
 
-	if (layer->glb_alpha < 0) {
+	if ((layer->glb_alpha) < 0) {
 		layer->glb_alpha = 0;
 		HISI_FB_ERR("layer's glb_alpha(0x%x) is out of range!", layer->glb_alpha);
-	} else if (layer->glb_alpha > 0xFF) {
+	} else if ((layer->glb_alpha) > 0xFF) {
 		layer->glb_alpha = 0xFF;
 		HISI_FB_ERR("layer's glb_alpha(0x%x) is out of range!", layer->glb_alpha);
 	}
 
+	color_rgb = layer->color;
+	if (g_dss_version_tag & FB_ACCEL_KIRIN970) {
+		glb_alpha = layer->glb_alpha * OVL_PATTERN_RATIO;
+		color_alpha = (layer->color >> 24) * OVL_PATTERN_RATIO;
+		color_rgb = (layer->color & 0x01ffffff) * OVL_PATTERN_RATIO;
+	}
+
 	blend_mode = get_ovl_blending_mode(pov_req, layer);
-	BUG_ON((blend_mode < 0) || (blend_mode >= DSS_BLEND_MAX));
+	if ((blend_mode < 0) || (blend_mode >= DSS_BLEND_MAX)) {
+		HISI_FB_ERR("blend_mode = %d is out of range!\n", blend_mode);
+		return -EINVAL;
+	}
 
 	if (has_base) {
 		layer_idx -= 1;
@@ -5715,20 +5193,31 @@ int hisi_dss_ovl_layer_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *p
 			DSS_HEIGHT(dst_rect.y + dst_rect.h), 15, 16);
 	}
 
-	ovl->ovl_layer[layer_idx].layer_alpha = set_bits32(ovl->ovl_layer[layer_idx].layer_alpha,
-		((layer->glb_alpha << 0) |
-		(g_ovl_alpha[blend_mode].fix_mode << 8) |
-		(g_ovl_alpha[blend_mode].dst_pmode << 9) | (g_ovl_alpha[blend_mode].alpha_offdst << 10) |
-		(g_ovl_alpha[blend_mode].dst_gmode << 12) | (g_ovl_alpha[blend_mode].dst_amode << 14) |
-		(layer->glb_alpha << 16) |
-		(g_ovl_alpha[blend_mode].alpha_smode << 24) |
-		(g_ovl_alpha[blend_mode].src_pmode << 25) | (g_ovl_alpha[blend_mode].src_lmode << 26) |
-		(g_ovl_alpha[blend_mode].alpha_offdst << 27) | (g_ovl_alpha[blend_mode].src_gmode << 28) |
-		(g_ovl_alpha[blend_mode].src_amode << 30)), 32, 0);
+	if (g_dss_version_tag & FB_ACCEL_KIRIN970) {
+		ovl->ovl_layer[layer_idx].layer_alpha = set_bits32(ovl->ovl_layer[layer_idx].layer_alpha,
+			((g_ovl_alpha[blend_mode].fix_mode << 8) |
+			(g_ovl_alpha[blend_mode].dst_pmode << 9) | (g_ovl_alpha[blend_mode].alpha_offdst << 10) |
+			(g_ovl_alpha[blend_mode].dst_gmode << 12) | (g_ovl_alpha[blend_mode].dst_amode << 14) |
+			(g_ovl_alpha[blend_mode].alpha_smode << 24) |
+			(g_ovl_alpha[blend_mode].src_pmode << 25) | (g_ovl_alpha[blend_mode].src_lmode << 26) |
+			(g_ovl_alpha[blend_mode].alpha_offdst << 27) | (g_ovl_alpha[blend_mode].src_gmode << 28) |
+			(g_ovl_alpha[blend_mode].src_amode << 30)), 32, 0);
+	} else {
+		ovl->ovl_layer[layer_idx].layer_alpha = set_bits32(ovl->ovl_layer[layer_idx].layer_alpha,
+			((layer->glb_alpha << 0) |
+			(g_ovl_alpha[blend_mode].fix_mode << 8) |
+			(g_ovl_alpha[blend_mode].dst_pmode << 9) | (g_ovl_alpha[blend_mode].alpha_offdst << 10) |
+			(g_ovl_alpha[blend_mode].dst_gmode << 12) | (g_ovl_alpha[blend_mode].dst_amode << 14) |
+			(layer->glb_alpha << 16) |
+			(g_ovl_alpha[blend_mode].alpha_smode << 24) |
+			(g_ovl_alpha[blend_mode].src_pmode << 25) | (g_ovl_alpha[blend_mode].src_lmode << 26) |
+			(g_ovl_alpha[blend_mode].alpha_offdst << 27) | (g_ovl_alpha[blend_mode].src_gmode << 28) |
+			(g_ovl_alpha[blend_mode].src_amode << 30)), 32, 0);
+	}
 
 	if (layer->need_cap & (CAP_DIM | CAP_PURE_COLOR)) {
 		ovl->ovl_layer[layer_idx].layer_pattern =
-			set_bits32(ovl->ovl_layer[layer_idx].layer_pattern, layer->color, 32, 0);
+			set_bits32(ovl->ovl_layer[layer_idx].layer_pattern, color_rgb, 32, 0);
 		ovl->ovl_layer[layer_idx].layer_cfg =
 			set_bits32(ovl->ovl_layer[layer_idx].layer_cfg, 0x1, 1, 0);
 		ovl->ovl_layer[layer_idx].layer_cfg =
@@ -5755,7 +5244,7 @@ int hisi_dss_ovl_layer_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *p
 
 	return 0;
 }
-
+/*lint +e676 +e644*/
 
 /*******************************************************************************
 ** dirty_region_updt
@@ -5763,34 +5252,47 @@ int hisi_dss_ovl_layer_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *p
 static void hisi_dss_dirty_region_dbuf_set_reg(struct hisi_fb_data_type *hisifd,
 	char __iomem *dss_base, dirty_region_updt_t *s_dirty_region_updt)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON(dss_base == NULL);
-	BUG_ON(s_dirty_region_updt == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return;
+	}
+
+	if (dss_base == NULL) {
+		HISI_FB_DEBUG("dss_base is NULL!\n");
+		return;
+	}
+
+	if (s_dirty_region_updt == NULL) {
+		HISI_FB_DEBUG("s_dirty_region_updt is NULL!\n");
+		return;
+	}
 
 	hisifd->set_reg(hisifd, dss_base + DSS_DBUF0_OFFSET + DBUF_FRM_SIZE,
 		s_dirty_region_updt->dbuf_frm_size, 32, 0);
 	hisifd->set_reg(hisifd, dss_base + DSS_DBUF0_OFFSET + DBUF_FRM_HSIZE,
 		s_dirty_region_updt->dbuf_frm_hsize, 32, 0);
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	hisifd->set_reg(hisifd, dss_base + DSS_DPP_OFFSET + DPP_IMG_HRZ,
 		s_dirty_region_updt->dpp_img_hrz, 13, 0);
 	hisifd->set_reg(hisifd, dss_base + DSS_DPP_OFFSET + DPP_IMG_VRT,
 		s_dirty_region_updt->dpp_img_vrt, 13, 0);
-#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	hisifd->set_reg(hisifd, dss_base + DSS_DPP_OFFSET + DPP_IMG_SIZE_BEF_SR,
-		((s_dirty_region_updt->dpp_img_vrt_bef_sr << 16) | s_dirty_region_updt->dpp_img_hrz_bef_sr), 32, 0);
-	hisifd->set_reg(hisifd, dss_base + DSS_DPP_OFFSET + DPP_IMG_SIZE_AFT_SR,
-		((s_dirty_region_updt->dpp_img_vrt_aft_sr << 16) | s_dirty_region_updt->dpp_img_hrz_aft_sr), 32, 0);
-#endif
 }
 
 static void hisi_dss_dirty_region_updt_set_reg(struct hisi_fb_data_type *hisifd,
 	char __iomem *dss_base, dirty_region_updt_t *s_dirty_region_updt)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON(dss_base == NULL);
-	BUG_ON(s_dirty_region_updt == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
+	if (NULL == dss_base) {
+		HISI_FB_ERR("dss_base is NULL");
+		return;
+	}
+	if (NULL == s_dirty_region_updt) {
+		HISI_FB_ERR("s_dirty_region_updt is NULL");
+		return;
+	}
 
 	set_reg(dss_base + DSS_MIPI_DSI0_OFFSET + MIPIDSI_EDPI_CMD_SIZE_OFFSET,
 		s_dirty_region_updt->edpi_cmd_size, 32, 0);
@@ -5830,6 +5332,7 @@ static void hisi_dss_dirty_region_updt_set_reg(struct hisi_fb_data_type *hisifd,
 				s_dirty_region_updt->ifbc_size, 32, 0);
 		}
 	}
+
 }
 
 int hisi_dss_dirty_region_dbuf_config(struct hisi_fb_data_type *hisifd,
@@ -5839,7 +5342,10 @@ int hisi_dss_dirty_region_dbuf_config(struct hisi_fb_data_type *hisifd,
 	dirty_region_updt_t *dirty_region_updt = NULL;
 	struct dss_rect dirty = {0};
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	pinfo = &(hisifd->panel_info);
 
 	if ((hisifd->index != PRIMARY_PANEL_IDX) ||
@@ -5866,21 +5372,10 @@ int hisi_dss_dirty_region_dbuf_config(struct hisi_fb_data_type *hisifd,
 	dirty_region_updt = &(hisifd->dss_module.dirty_region_updt);
 	hisifd->dss_module.dirty_region_updt_used = 1;
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	dirty_region_updt->dpp_img_hrz = set_bits32(dirty_region_updt->dpp_img_hrz,
 		DSS_WIDTH(dirty.w), 13, 0);
 	dirty_region_updt->dpp_img_vrt = set_bits32(dirty_region_updt->dpp_img_vrt,
 		DSS_WIDTH(dirty.h), 13, 0);
-#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	dirty_region_updt->dpp_img_hrz_bef_sr= set_bits32(dirty_region_updt->dpp_img_hrz_bef_sr,
-		DSS_WIDTH(dirty.w), 13, 0);
-	dirty_region_updt->dpp_img_vrt_bef_sr= set_bits32(dirty_region_updt->dpp_img_vrt_bef_sr,
-		DSS_WIDTH(dirty.h), 13, 0);
-	dirty_region_updt->dpp_img_hrz_aft_sr= set_bits32(dirty_region_updt->dpp_img_hrz_aft_sr,
-		DSS_WIDTH(dirty.w), 13, 0);
-	dirty_region_updt->dpp_img_vrt_aft_sr= set_bits32(dirty_region_updt->dpp_img_vrt_aft_sr,
-		DSS_WIDTH(dirty.h), 13, 0);
-#endif
 
 	dirty_region_updt->dbuf_frm_size = set_bits32(dirty_region_updt->dbuf_frm_size,
 		dirty.w * dirty.h, 27, 0);
@@ -5906,9 +5401,15 @@ void hisi_dss_dirty_region_updt_config(struct hisi_fb_data_type *hisifd,
 	uint32_t h_front_porch = 0;
 	uint32_t h_back_porch= 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 	pdata = dev_get_platdata(&hisifd->pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return;
+	}
 	pinfo = &(hisifd->panel_info);
 
 	if ((hisifd->index != PRIMARY_PANEL_IDX) ||
@@ -5924,7 +5425,7 @@ void hisi_dss_dirty_region_updt_config(struct hisi_fb_data_type *hisifd,
 		dirty = pov_req->dirty_rect;
 	}
 
-	if (hisifd->panel_info.xres >= dirty.w) {
+	if ((hisifd->panel_info.xres) >= dirty.w) {
 		h_porch_pading = hisifd->panel_info.xres - dirty.w;
 	}
 
@@ -5957,24 +5458,27 @@ void hisi_dss_dirty_region_updt_config(struct hisi_fb_data_type *hisifd,
 		bits_per_pixel = 24;
 	else if (pinfo->bpp == LCD_RGB565)
 		bits_per_pixel = 16;
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	else if (pinfo->bpp == LCD_RGB666)
 		bits_per_pixel = 18;
-#endif
 	else
 		bits_per_pixel = 24;
 
 	if (pinfo->pxl_clk_rate_div == 0)
 		pinfo->pxl_clk_rate_div = 1;
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	//FIXME:
 	max_latency = pinfo->dsi_phy_ctrl.data_lane_lp2hs_time + (rect.w * bits_per_pixel / 8 + 1 + 6) / (pinfo->mipi.lane_nums + 1);
-#else
-	max_latency = (rect.w * bits_per_pixel / 8 + 1 + 6) / (pinfo->mipi.lane_nums + 1);
-#endif
 
-	h_front_porch_max = max_latency * (pinfo->pxl_clk_rate / pinfo->pxl_clk_rate_div) / pinfo->dsi_phy_ctrl.lane_byte_clk;
+	if (pinfo->mipi.phy_mode == DPHY_MODE) {
+		if (pinfo->dsi_phy_ctrl.lane_byte_clk != 0) {
+			h_front_porch_max = max_latency * (pinfo->pxl_clk_rate / pinfo->pxl_clk_rate_div) / pinfo->dsi_phy_ctrl.lane_byte_clk;
+		}
+	} else if (pinfo->mipi.phy_mode == CPHY_MODE) {
+		if (pinfo->dsi_phy_ctrl.lane_word_clk != 0) {
+			h_front_porch_max = max_latency * (pinfo->pxl_clk_rate / pinfo->pxl_clk_rate_div) / pinfo->dsi_phy_ctrl.lane_word_clk;
+		}
+	}
+
 	HISI_FB_DEBUG("bits_per_pixel = %d\n"
 		"data_lane_lp2hs_time = %d\n"
 		"max_latency = %d\n"
@@ -6036,6 +5540,7 @@ void hisi_dss_dirty_region_updt_config(struct hisi_fb_data_type *hisifd,
 		}
 	}
 
+
 	if (pdata && pdata->set_display_region) {
 		pdata->set_display_region(hisifd->pdev, &dirty);
 	}
@@ -6044,10 +5549,9 @@ void hisi_dss_dirty_region_updt_config(struct hisi_fb_data_type *hisifd,
 
 	hisi_dss_dirty_region_updt_set_reg(hisifd, hisifd->dss_base, &(hisifd->dss_module.dirty_region_updt));
 
-	if (g_debug_dirty_region_updt) {
-		HISI_FB_INFO("dirty_region(%d,%d, %d,%d), h_porch_pading=%d, v_porch_pading=%d.\n",
-			dirty.x, dirty.y, dirty.w, dirty.h, h_porch_pading, v_porch_pading);
-	}
+	HISI_FB_DEBUG("dirty_region(%d,%d, %d,%d), h_porch_pading=%d, v_porch_pading=%d.\n",
+		dirty.x, dirty.y, dirty.w, dirty.h, h_porch_pading, v_porch_pading);
+
 }
 
 
@@ -6082,7 +5586,6 @@ static uint32_t hisi_calculate_display_addr_wb(bool mmu_enable, dss_wb_layer_t *
 		top /= 2;
 	} else {
 		HISI_FB_ERR("NOT SUPPORT this add_type(%d).\n", add_type);
-		BUG_ON(1);
 	}
 
 	bpp = wb_layer->dst.bpp;
@@ -6110,6 +5613,7 @@ int hisi_dss_wdfc_config(struct hisi_fb_data_type *hisifd, dss_wb_layer_t *layer
 	int aligned_line = 0;
 	uint32_t dfc_w = 0;
 	int aligned_pixel = 0;
+	int dfc_aligned = 0;
 
 	uint32_t left_pad = 0;
 	uint32_t right_pad = 0;
@@ -6121,9 +5625,18 @@ int hisi_dss_wdfc_config(struct hisi_fb_data_type *hisifd, dss_wb_layer_t *layer
 	uint32_t bpp = 0;
 	bool mmu_enable = false;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(layer == NULL);
-	BUG_ON(aligned_rect == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == layer) {
+		HISI_FB_ERR("layer is NULL");
+		return -EINVAL;
+	}
+	if (NULL == aligned_rect) {
+		HISI_FB_ERR("aligned_rect is NULL");
+		return -EINVAL;
+	}
 
 	chn_idx = layer->chn_idx;
 
@@ -6157,13 +5670,24 @@ int hisi_dss_wdfc_config(struct hisi_fb_data_type *hisifd, dss_wb_layer_t *layer
 		dfc_w = 1;
 	}
 
-	dfc_pix_in_num = (layer->dst.bpp <= 2) ? 0x1 : 0x0;
+	dfc_aligned = 0x2;
+	if (layer->dst.bpp <= 2) {
+		dfc_pix_in_num = 0x1;
+		dfc_aligned = 0x4;
+	}
 
+	/*lint -e834 -e737 -e502*/
 	if (layer->need_cap & CAP_AFBCE) {
 		aligned_rect->x = ALIGN_DOWN(in_rect.x, aligned_pixel);
 		aligned_rect->w = ALIGN_UP(in_rect.x - aligned_rect->x + in_rect.w + dfc_w, aligned_pixel);
 		aligned_rect->y = ALIGN_DOWN(in_rect.y, aligned_pixel);
 		aligned_rect->h = ALIGN_UP(in_rect.y - aligned_rect->y + in_rect.h, aligned_pixel);
+
+		left_pad = in_rect.x - aligned_rect->x;
+		right_pad = aligned_rect->w - (in_rect.x - aligned_rect->x + in_rect.w + dfc_w);
+		top_pad = in_rect.y - aligned_rect->y;
+		bottom_pad = aligned_rect->h - (in_rect.y - aligned_rect->y + in_rect.h);
+	} else if (layer->need_cap & CAP_HFBCE) {
 
 		left_pad = in_rect.x - aligned_rect->x;
 		right_pad = aligned_rect->w - (in_rect.x - aligned_rect->x + in_rect.w + dfc_w);
@@ -6184,11 +5708,11 @@ int hisi_dss_wdfc_config(struct hisi_fb_data_type *hisifd, dss_wb_layer_t *layer
 
 		aligned_rect->x = in_rect.x;
 		aligned_rect->y = in_rect.y;
-		aligned_rect->w = size_hrz + 1;
+		aligned_rect->w = ALIGN_UP(size_hrz + 1, dfc_aligned);
 		aligned_rect->h = ALIGN_UP(in_rect.h + top_pad, aligned_line);
 
 		left_pad = 0;
-		right_pad = 0;
+		right_pad = aligned_rect->w - size_hrz - 1;
 		bottom_pad = aligned_rect->h - in_rect.h - top_pad;
 	} else {
 		aligned_rect->x = ALIGN_DOWN(in_rect.x, aligned_pixel);
@@ -6206,7 +5730,7 @@ int hisi_dss_wdfc_config(struct hisi_fb_data_type *hisifd, dss_wb_layer_t *layer
 		top_pad = 0;
 		bottom_pad = aligned_rect->h - in_rect.h;
 	}
-
+	/*lint +e834 +e737 +e502*/
 	dfc->disp_size = set_bits32(dfc->disp_size, (size_vrt | (size_hrz << 16)), 32, 0);
 	dfc->pix_in_num = set_bits32(dfc->pix_in_num, dfc_pix_in_num, 1, 0);
 	dfc->disp_fmt = set_bits32(dfc->disp_fmt, dfc_fmt, 5, 1);
@@ -6216,8 +5740,10 @@ int hisi_dss_wdfc_config(struct hisi_fb_data_type *hisifd, dss_wb_layer_t *layer
 	dfc->icg_module = set_bits32(dfc->icg_module, 0x1, 1, 0);
 	if (need_dither) {
 		dfc->dither_enable = set_bits32(dfc->dither_enable, 0x1, 1, 0);
+		dfc->bitext_ctl = set_bits32(dfc->bitext_ctl, 0x3, 32, 0);
 	} else {
 		dfc->dither_enable = set_bits32(dfc->dither_enable, 0x0, 1, 0);
+		dfc->bitext_ctl = set_bits32(dfc->bitext_ctl, 0x0, 32, 0);
 	}
 
 	if (left_pad || right_pad || top_pad || bottom_pad) {
@@ -6236,10 +5762,16 @@ int hisi_dss_wdfc_config(struct hisi_fb_data_type *hisifd, dss_wb_layer_t *layer
 	return 0;
 }
 
-static void hisi_dss_wdma_init(char __iomem *wdma_base, dss_wdma_t *s_wdma)
+void hisi_dss_wdma_init(char __iomem *wdma_base, dss_wdma_t *s_wdma)
 {
-	BUG_ON(wdma_base == NULL);
-	BUG_ON(s_wdma == NULL);
+	if (NULL == wdma_base) {
+		HISI_FB_ERR("wdma_base is NULL");
+		return;
+	}
+	if (NULL == s_wdma) {
+		HISI_FB_ERR("s_wdma is NULL");
+		return;
+	}
 
 	memset(s_wdma, 0, sizeof(dss_wdma_t));
 
@@ -6271,8 +5803,8 @@ static void hisi_dss_wdma_init(char __iomem *wdma_base, dss_wdma_t *s_wdma)
 
 	s_wdma->afbce_hreg_pic_blks = inp32(wdma_base + AFBCE_HREG_PIC_BLKS);
 	s_wdma->afbce_hreg_format = inp32(wdma_base + AFBCE_HREG_FORMAT);
-	s_wdma->afbce_hreg_hdr_ptr_lo = inp32(wdma_base + AFBCE_HREG_HDR_PTR_LO);
-	s_wdma->afbce_hreg_pld_ptr_lo = inp32(wdma_base + AFBCE_HREG_PLD_PTR_LO);
+	s_wdma->afbce_hreg_hdr_ptr_l0 = inp32(wdma_base + AFBCE_HREG_HDR_PTR_L0);
+	s_wdma->afbce_hreg_pld_ptr_l0 = inp32(wdma_base + AFBCE_HREG_PLD_PTR_L0);
 	s_wdma->afbce_picture_size = inp32(wdma_base + AFBCE_PICTURE_SIZE);
 	s_wdma->afbce_ctl = inp32(wdma_base + AFBCE_CTL);
 	s_wdma->afbce_header_srtide = inp32(wdma_base + AFBCE_HEADER_SRTIDE);
@@ -6284,9 +5816,20 @@ static void hisi_dss_wdma_init(char __iomem *wdma_base, dss_wdma_t *s_wdma)
 static void hisi_dss_wdma_set_reg(struct hisi_fb_data_type *hisifd,
 	char __iomem *wdma_base, dss_wdma_t *s_wdma)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON(wdma_base == NULL);
-	BUG_ON(s_wdma == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return;
+	}
+
+	if (wdma_base == NULL) {
+		HISI_FB_DEBUG("wdma_base is NULL!\n");
+		return;
+	}
+
+	if (s_wdma == NULL) {
+		HISI_FB_DEBUG("s_wdma is NULL!\n");
+		return;
+	}
 
 	hisifd->set_reg(hisifd, wdma_base + CH_REG_DEFAULT, 0x1, 32, 0);
 	hisifd->set_reg(hisifd, wdma_base + CH_REG_DEFAULT, 0x0, 32, 0);
@@ -6317,8 +5860,8 @@ static void hisi_dss_wdma_set_reg(struct hisi_fb_data_type *hisifd,
 	if (s_wdma->afbc_used == 1) {
 		hisifd->set_reg(hisifd, wdma_base + AFBCE_HREG_PIC_BLKS, s_wdma->afbce_hreg_pic_blks, 32, 0);
 		hisifd->set_reg(hisifd, wdma_base + AFBCE_HREG_FORMAT, s_wdma->afbce_hreg_format, 32, 0);
-		hisifd->set_reg(hisifd, wdma_base + AFBCE_HREG_HDR_PTR_LO, s_wdma->afbce_hreg_hdr_ptr_lo, 32, 0);
-		hisifd->set_reg(hisifd, wdma_base + AFBCE_HREG_PLD_PTR_LO, s_wdma->afbce_hreg_pld_ptr_lo, 32, 0);
+		hisifd->set_reg(hisifd, wdma_base + AFBCE_HREG_HDR_PTR_L0, s_wdma->afbce_hreg_hdr_ptr_l0, 32, 0);
+		hisifd->set_reg(hisifd, wdma_base + AFBCE_HREG_PLD_PTR_L0, s_wdma->afbce_hreg_pld_ptr_l0, 32, 0);
 		hisifd->set_reg(hisifd, wdma_base + AFBCE_PICTURE_SIZE, s_wdma->afbce_picture_size, 32, 0);
 		//hisifd->set_reg(hisifd, wdma_base + AFBCE_CTL, s_wdma->afbce_ctl, 32, 0);
 		hisifd->set_reg(hisifd, wdma_base + AFBCE_HEADER_SRTIDE, s_wdma->afbce_header_srtide, 32, 0);
@@ -6328,9 +5871,9 @@ static void hisi_dss_wdma_set_reg(struct hisi_fb_data_type *hisifd,
 		//hisifd->set_reg(hisifd, wdma_base + AFBCE_QOS_CFG, s_wdma->afbce_qos_cfg, 32, 0);
 		hisifd->set_reg(hisifd, wdma_base + AFBCE_THRESHOLD, s_wdma->afbce_threshold, 32, 0);
 		hisifd->set_reg(hisifd, wdma_base + AFBCE_SCRAMBLE_MODE, s_wdma->afbce_scramble_mode, 32, 0);
-		hisifd->set_reg(hisifd, wdma_base + AFBCE_HEADER_POINTER_OFFSET,
-			s_wdma->afbce_header_pointer_offset, 32, 0);
+		hisifd->set_reg(hisifd, wdma_base + AFBCE_HEADER_POINTER_OFFSET, s_wdma->afbce_header_pointer_offset, 32, 0);
 	}
+
 }
 
 int hisi_dss_wdma_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req,
@@ -6369,9 +5912,15 @@ int hisi_dss_wdma_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_re
 	uint32_t stride_align = 0;
 	uint32_t addr_align = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
-	BUG_ON(layer == NULL);
+	if (NULL == hisifd || NULL == pov_req || NULL == layer) {
+		HISI_FB_ERR("NULL ptr.\n");
+		return -EINVAL;
+	}
+
+	if (NULL == ov_block_rect) {
+		HISI_FB_ERR("NULL ptr.\n");
+		return -EINVAL;
+	}
 
 	chn_idx = layer->chn_idx;
 
@@ -6395,6 +5944,10 @@ int hisi_dss_wdma_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_re
 
 	mmu_enable = (layer->dst.mmu_enable == 1) ? true : false;
 	wdma_addr = mmu_enable ? layer->dst.vir_addr : layer->dst.phy_addr;
+
+	if (layer->need_cap & CAP_HFBCE) {
+		return 0;
+	}
 
 	if (layer->need_cap & CAP_AFBCE) {
 		wdma->afbc_used = 1;
@@ -6440,6 +5993,15 @@ int hisi_dss_wdma_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_re
 		if (afbc_header_start_pos < 0) {
 			HISI_FB_ERR("afbc_header_start_pos(%d) is invalid!\n", afbc_header_start_pos);
 			return -EINVAL;
+		}
+
+		if (g_dss_version_tag & FB_ACCEL_KIRIN970 ) {
+			if (afbc_header_start_pos != 0) {
+				HISI_FB_ERR("transform(%d), dst_rect.x(%d), afbc_header_rect.left(%d),"
+					"in_rect.x(%d), afbc_header_start_pos(%d)is err.\n",
+					layer->transform, layer->dst_rect.x, afbc_header_rect.left, in_rect.x, afbc_header_start_pos);
+				return -EINVAL;
+			}
 		}
 
 		afbce_hreg_pic_blks = (in_rect.w / AFBC_BLOCK_ALIGN) * (in_rect.h / AFBC_BLOCK_ALIGN) - 1;
@@ -6511,8 +6073,8 @@ int hisi_dss_wdma_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_re
 		//color transform
 		wdma->afbce_hreg_format = set_bits32(wdma->afbce_hreg_format,
 			(isYUVPackage(layer->dst.format) ? 0x0 : 0x1), 1, 21);
-		wdma->afbce_hreg_hdr_ptr_lo = set_bits32(wdma->afbce_hreg_hdr_ptr_lo, afbc_header_addr, 32, 0);
-		wdma->afbce_hreg_pld_ptr_lo = set_bits32(wdma->afbce_hreg_pld_ptr_lo, afbc_payload_addr, 32, 0);
+		wdma->afbce_hreg_hdr_ptr_l0 = set_bits32(wdma->afbce_hreg_hdr_ptr_l0, afbc_header_addr, 32, 0);
+		wdma->afbce_hreg_pld_ptr_l0 = set_bits32(wdma->afbce_hreg_pld_ptr_l0, afbc_payload_addr, 32, 0);
 		wdma->afbce_picture_size = set_bits32(wdma->afbce_picture_size,
 			((DSS_WIDTH(in_rect.w) << 16) | DSS_HEIGHT(in_rect.h)), 32, 0);
 		wdma->afbce_header_srtide = set_bits32(wdma->afbce_header_srtide,
@@ -6635,13 +6197,21 @@ int hisi_dss_wdma_config(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_re
 */
 int hisi_dss_module_init(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
-	memcpy(&(hisifd->dss_module), &(hisifd->dss_module_default), sizeof(dss_module_reg_t));
+	if (hisifd->index == MEDIACOMMON_PANEL_IDX) {
+		memcpy(&(hisifd->dss_module), &(hisifd->dss_mdc_module_default), sizeof(dss_module_reg_t));
+	} else {
+		memcpy(&(hisifd->dss_module), &(hisifd->dss_module_default), sizeof(dss_module_reg_t));
+	}
 
 	return 0;
 }
 
+/*lint -e661 -e662*/
 int hisi_dss_module_default(struct hisi_fb_data_type *hisifd)
 {
 	dss_module_reg_t *dss_module = NULL;
@@ -6649,9 +6219,15 @@ int hisi_dss_module_default(struct hisi_fb_data_type *hisifd)
 	char __iomem *dss_base = NULL;
 	int i = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	dss_base = hisifd->dss_base;
-	BUG_ON(dss_base == NULL);
+	if (NULL == dss_base) {
+		HISI_FB_ERR("dss_base is NULL");
+		return -EINVAL;
+	}
 
 	dss_module = &(hisifd->dss_module_default);
 	memset(dss_module, 0, sizeof(dss_module_reg_t));
@@ -6673,121 +6249,114 @@ int hisi_dss_module_default(struct hisi_fb_data_type *hisifd)
 	}
 
 	for (i = 0; i < DSS_CHN_MAX_DEFINE; i++) {
-		module_base = g_dss_module_base[i][MODULE_AIF0_CHN];
-		if (module_base != 0) {
-			dss_module->aif_ch_base[i] = dss_base + module_base;
-			hisi_dss_aif_init(dss_module->aif_ch_base[i], &(dss_module->aif[i]));
-		}
-
-		module_base = g_dss_module_base[i][MODULE_AIF1_CHN];
-		if (module_base != 0) {
-			dss_module->aif1_ch_base[i] = dss_base + module_base;
-			hisi_dss_aif_init(dss_module->aif1_ch_base[i], &(dss_module->aif1[i]));
-		}
-
-		module_base = g_dss_module_base[i][MODULE_MIF_CHN];
-		if (module_base != 0) {
-			dss_module->mif_ch_base[i] = dss_base + module_base;
-			hisi_dss_mif_init(dss_module->mif_ch_base[i], &(dss_module->mif[i]), i);
-		}
-
-		module_base = g_dss_module_base[i][MODULE_MCTL_CHN_MUTEX];
-		if (module_base != 0) {
-			dss_module->mctl_ch_base[i].chn_mutex_base = dss_base + module_base;
-		}
-
-		module_base = g_dss_module_base[i][MODULE_MCTL_CHN_FLUSH_EN];
-		if (module_base != 0) {
-			dss_module->mctl_ch_base[i].chn_flush_en_base = dss_base + module_base;
-		}
-
-		module_base = g_dss_module_base[i][MODULE_MCTL_CHN_OV_OEN];
-		if (module_base != 0) {
-			dss_module->mctl_ch_base[i].chn_ov_en_base = dss_base + module_base;
-		}
-
-		module_base = g_dss_module_base[i][MODULE_MCTL_CHN_STARTY];
-		if (module_base != 0) {
-			dss_module->mctl_ch_base[i].chn_starty_base = dss_base + module_base;
-			hisi_dss_mctl_ch_starty_init(dss_module->mctl_ch_base[i].chn_starty_base,
-				&(dss_module->mctl_ch[i]));
-		}
-
-		module_base = g_dss_module_base[i][MODULE_MCTL_CHN_MOD_DBG];
-		if (module_base != 0) {
-			dss_module->mctl_ch_base[i].chn_mod_dbg_base = dss_base + module_base;
-			hisi_dss_mctl_ch_mod_dbg_init(dss_module->mctl_ch_base[i].chn_mod_dbg_base,
-				&(dss_module->mctl_ch[i]));
-		}
-
-		module_base = g_dss_module_base[i][MODULE_DMA];
-		if (module_base != 0) {
-			dss_module->dma_base[i] = dss_base + module_base;
-			if (i < DSS_WCHN_W0 || i == DSS_RCHN_V2) {
-				hisi_dss_rdma_init(dss_module->dma_base[i], &(dss_module->rdma[i]));
-			} else {
-				hisi_dss_wdma_init(dss_module->dma_base[i], &(dss_module->wdma[i]));
+		if ((g_dss_version_tag & FB_ACCEL_KIRIN970)
+			&& (i == DSS_WCHN_W2)) {
+			continue;
+		} else {
+			module_base = g_dss_module_base[i][MODULE_AIF0_CHN];
+			if (module_base != 0) {
+				dss_module->aif_ch_base[i] = dss_base + module_base;
+				hisi_dss_aif_init(dss_module->aif_ch_base[i], &(dss_module->aif[i]));
 			}
 
-			if ((i == DSS_RCHN_V0) || (i == DSS_RCHN_V1) || (i == DSS_RCHN_V2)) {
-				hisi_dss_rdma_u_init(dss_module->dma_base[i], &(dss_module->rdma[i]));
-				hisi_dss_rdma_v_init(dss_module->dma_base[i], &(dss_module->rdma[i]));
+			module_base = g_dss_module_base[i][MODULE_AIF1_CHN];
+			if (module_base != 0) {
+				dss_module->aif1_ch_base[i] = dss_base + module_base;
+				hisi_dss_aif_init(dss_module->aif1_ch_base[i], &(dss_module->aif1[i]));
 			}
-		}
 
-		module_base = g_dss_module_base[i][MODULE_DFC];
-		if (module_base != 0) {
-			dss_module->dfc_base[i] = dss_base + module_base;
-			hisi_dss_dfc_init(dss_module->dfc_base[i], &(dss_module->dfc[i]));
-		}
+			module_base = g_dss_module_base[i][MODULE_MIF_CHN];
+			if (module_base != 0) {
+				dss_module->mif_ch_base[i] = dss_base + module_base;
+				hisi_dss_mif_init(dss_module->mif_ch_base[i], &(dss_module->mif[i]), i);
+			}
 
-		module_base = g_dss_module_base[i][MODULE_SCL];
-		if (module_base != 0) {
-			dss_module->scl_base[i] = dss_base + module_base;
-			hisi_dss_scl_init(dss_module->scl_base[i], &(dss_module->scl[i]));
-		}
+			module_base = g_dss_module_base[i][MODULE_MCTL_CHN_MUTEX];
+			if (module_base != 0) {
+				dss_module->mctl_ch_base[i].chn_mutex_base = dss_base + module_base;
+			}
 
-		module_base = DSS_POST_SCF_OFFSET;
-		if (module_base != 0) {
-			dss_module->post_scf_base = dss_base + module_base;
-			hisi_dss_post_scf_init(dss_base, dss_module->post_scf_base, &(dss_module->post_scf));
-		}
+			module_base = g_dss_module_base[i][MODULE_MCTL_CHN_FLUSH_EN];
+			if (module_base != 0) {
+				dss_module->mctl_ch_base[i].chn_flush_en_base = dss_base + module_base;
+			}
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
-		module_base = g_dss_module_base[i][MODULE_CE];
-		if (module_base != 0) {
-			dss_module->ce_base[i] = dss_base + module_base;
-			hisi_dss_ce_init(dss_module->ce_base[i], &(dss_module->ce[i]));
-		}
+			module_base = g_dss_module_base[i][MODULE_MCTL_CHN_OV_OEN];
 
-		module_base = g_dss_module_base[i][MODULE_SHARPNESS];
-		if (module_base != 0){
-			dss_module->sharp_base[i] = dss_base + module_base;
-			hisi_dss_sharpness_init(dss_module->sharp_base[i], &(dss_module->sharp[i]));
-		}
-#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		module_base = g_dss_module_base[i][MODULE_PCSC];
-		if (module_base != 0) {
-			dss_module->pcsc_base[i] = dss_base + module_base;
-			hisi_dss_csc_init(dss_module->pcsc_base[i], &(dss_module->pcsc[i]));
-		}
+			if (module_base != 0) {
+				dss_module->mctl_ch_base[i].chn_ov_en_base = dss_base + module_base;
+			}
 
-		module_base = g_dss_module_base[i][MODULE_ARSR2P];
-		if (module_base != 0) {
-			dss_module->arsr2p_base[i] = dss_base + module_base;
-			hisi_dss_arsr2p_init(dss_module->arsr2p_base[i], &(dss_module->arsr2p[i]));
-		}
-#endif
-		module_base = g_dss_module_base[i][MODULE_POST_CLIP];
-		if (module_base != 0){
-			dss_module->post_clip_base[i] = dss_base + module_base;
-			hisi_dss_post_clip_init(dss_module->post_clip_base[i], &(dss_module->post_clip[i]));
-		}
+			module_base = g_dss_module_base[i][MODULE_MCTL_CHN_STARTY];
+			if (module_base != 0) {
+				dss_module->mctl_ch_base[i].chn_starty_base = dss_base + module_base;
+				hisi_dss_mctl_ch_starty_init(dss_module->mctl_ch_base[i].chn_starty_base,
+					&(dss_module->mctl_ch[i]));
+			}
 
-		module_base = g_dss_module_base[i][MODULE_CSC];
-		if (module_base != 0) {
-			dss_module->csc_base[i] = dss_base + module_base;
-			hisi_dss_csc_init(dss_module->csc_base[i], &(dss_module->csc[i]));
+			module_base = g_dss_module_base[i][MODULE_MCTL_CHN_MOD_DBG];
+			if (module_base != 0) {
+				dss_module->mctl_ch_base[i].chn_mod_dbg_base = dss_base + module_base;
+				hisi_dss_mctl_ch_mod_dbg_init(dss_module->mctl_ch_base[i].chn_mod_dbg_base,
+					&(dss_module->mctl_ch[i]));
+			}
+
+			module_base = g_dss_module_base[i][MODULE_DMA];
+			if (module_base != 0) {
+				dss_module->dma_base[i] = dss_base + module_base;
+				if (i < DSS_WCHN_W0 || i == DSS_RCHN_V2) {
+					hisi_dss_rdma_init(dss_module->dma_base[i], &(dss_module->rdma[i]));
+				} else {
+					hisi_dss_wdma_init(dss_module->dma_base[i], &(dss_module->wdma[i]));
+				}
+
+				if ((i == DSS_RCHN_V0) || (i == DSS_RCHN_V1) || (i == DSS_RCHN_V2)) {
+					hisi_dss_rdma_u_init(dss_module->dma_base[i], &(dss_module->rdma[i]));
+					hisi_dss_rdma_v_init(dss_module->dma_base[i], &(dss_module->rdma[i]));
+				}
+			}
+
+			module_base = g_dss_module_base[i][MODULE_DFC];
+			if (module_base != 0) {
+				dss_module->dfc_base[i] = dss_base + module_base;
+				hisi_dss_dfc_init(dss_module->dfc_base[i], &(dss_module->dfc[i]));
+			}
+
+			module_base = g_dss_module_base[i][MODULE_SCL];
+			if (module_base != 0) {
+				dss_module->scl_base[i] = dss_base + module_base;
+				hisi_dss_scl_init(dss_module->scl_base[i], &(dss_module->scl[i]));
+			}
+
+			module_base = DSS_POST_SCF_OFFSET;
+			if (module_base != 0) {
+				dss_module->post_scf_base = dss_base + module_base;
+				hisi_dss_post_scf_init(dss_base, dss_module->post_scf_base, &(dss_module->post_scf));
+			}
+
+			module_base = g_dss_module_base[i][MODULE_CE];
+			if (module_base != 0) {
+				dss_module->ce_base[i] = dss_base + module_base;
+				hisi_dss_ce_init(dss_module->ce_base[i], &(dss_module->ce[i]));
+			}
+
+			module_base = g_dss_module_base[i][MODULE_SHARPNESS];
+			if (module_base != 0){
+				dss_module->sharp_base[i] = dss_base + module_base;
+				hisi_dss_sharpness_init(dss_module->sharp_base[i], &(dss_module->sharp[i]));
+			}
+
+			module_base = g_dss_module_base[i][MODULE_POST_CLIP];
+			if (module_base != 0){
+				dss_module->post_clip_base[i] = dss_base + module_base;
+				hisi_dss_post_clip_init(dss_module->post_clip_base[i], &(dss_module->post_clip[i]));
+			}
+
+			module_base = g_dss_module_base[i][MODULE_CSC];
+			if (module_base != 0) {
+				dss_module->csc_base[i] = dss_base + module_base;
+				hisi_dss_csc_init(dss_module->csc_base[i], &(dss_module->csc[i]));
+			}
 		}
 	}
 
@@ -6805,7 +6374,7 @@ int hisi_dss_module_default(struct hisi_fb_data_type *hisifd)
 
 	return 0;
 }
-
+/*lint +e661 +e662*/
 int hisi_dss_ch_module_set_regs(struct hisi_fb_data_type *hisifd, int32_t mctl_idx, int chn_idx, uint32_t wb_type, bool enable_cmdlist)
 {
 	dss_module_reg_t *dss_module = NULL;
@@ -6813,8 +6382,15 @@ int hisi_dss_ch_module_set_regs(struct hisi_fb_data_type *hisifd, int32_t mctl_i
 	int ret = 0;
 	uint32_t tmp = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON((chn_idx < 0) || (chn_idx >= DSS_CHN_MAX_DEFINE));
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return -1;
+	}
+
+	if ((chn_idx < 0) || (chn_idx >= DSS_CHN_MAX_DEFINE)) {
+		HISI_FB_DEBUG("chn_idx is out of the range!\n");
+		return -1;
+	}
 
 	dss_module = &(hisifd->dss_module);
 	i = chn_idx;
@@ -6823,7 +6399,7 @@ int hisi_dss_ch_module_set_regs(struct hisi_fb_data_type *hisifd, int32_t mctl_i
 		if (chn_idx == DSS_RCHN_V2) {  //chicago copybit
 			tmp = (0x1 << DSS_CMDLIST_V2);
 			hisifd->cmdlist_idx = DSS_CMDLIST_V2;
-		} else if (chn_idx == DSS_WCHN_W2){
+		} else if (chn_idx == DSS_WCHN_W2) {
 			tmp = (0x1 << DSS_CMDLIST_W2);
 			hisifd->cmdlist_idx = DSS_CMDLIST_W2;
 		} else {
@@ -6842,7 +6418,7 @@ int hisi_dss_ch_module_set_regs(struct hisi_fb_data_type *hisifd, int32_t mctl_i
 
 	if (dss_module->mctl_ch_used[i] == 1) {
 		hisi_dss_mctl_ch_set_reg(hisifd,
-			&(dss_module->mctl_ch_base[i]), &(dss_module->mctl_ch[i]), mctl_idx);
+			&(dss_module->mctl_ch_base[i]), &(dss_module->mctl_ch[i]), mctl_idx, i);
 	}
 
 	if (dss_module->smmu_used == 1) {
@@ -6883,29 +6459,17 @@ int hisi_dss_ch_module_set_regs(struct hisi_fb_data_type *hisifd, int32_t mctl_i
 		hisi_dss_scl_set_reg(hisifd, dss_module->scl_base[i], &(dss_module->scl[i]));
 	}
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	if (hisifd->dss_module.sharp_used[i]) {
 		hisi_dss_sharpness_set_reg(hisifd, dss_module->sharp_base[i], &(dss_module->sharp[i]), i);
 	}
-#endif
 
-	if (hisifd->dss_module.post_cilp_used[i]) {
-		hisi_dss_post_clip_set_reg( hisifd, dss_module->post_clip_base[i], &(dss_module->post_clip[i]));
+	if (hisifd->dss_module.post_clip_used[i]) {
+		hisi_dss_post_clip_set_reg( hisifd, dss_module->post_clip_base[i], &(dss_module->post_clip[i]), i);
 	}
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	if (hisifd->dss_module.ce_used[i] == 1) {
 		hisi_dss_ce_set_reg( hisifd, dss_module->ce_base[i], &(dss_module->ce[i]));
 	}
-#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	if (dss_module->pcsc_used[i] == 1) {
-		hisi_dss_csc_set_reg(hisifd, dss_module->pcsc_base[i], &(dss_module->pcsc[i]));
-	}
-
-	if (dss_module->arsr2p_used[i] == 1) {
-		hisi_dss_arsr2p_set_reg(hisifd, dss_module->arsr2p_base[i], &(dss_module->arsr2p[i]));
-	}
-#endif
 
 	if (dss_module->csc_used[i] == 1) {
 		hisi_dss_csc_set_reg(hisifd, dss_module->csc_base[i], &(dss_module->csc[i]));
@@ -6930,7 +6494,11 @@ int hisi_dss_ov_module_set_regs(struct hisi_fb_data_type *hisifd, dss_overlay_t 
 	int ret = 0;
 	uint32_t tmp = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_DEBUG("hisifd is NULL!\n");
+		return -1;
+	}
+
 
 	if (pov_req && pov_req->wb_layer_infos[0].chn_idx == DSS_WCHN_W2) { //chicago copybit no ovl
 		return 0;
@@ -6971,10 +6539,6 @@ int hisi_dss_ov_module_set_regs(struct hisi_fb_data_type *hisifd, dss_overlay_t 
 	if (is_first_ov_block) {
 		hisi_dss_dpp_acm_gm_set_reg(hisifd);
 		hisi_dss_dpp_ace_set_reg(hisifd);
-	#ifdef CONFIG_HISI_FB_3660
-		hisi_dss_dpp_hiace_set_reg(hisifd);
-		hisi_dss_dpp_acm_gmp_set_reg(hisifd);
-	#endif
 		hisi_dss_effect_set_reg(hisifd);
 	}
 
@@ -6988,8 +6552,73 @@ err_return:
 	return ret;
 }
 
+static void get_use_comm_mmbuf(int *use_comm_mmbuf,
+	dss_mmbuf_t *offline_mmbuf, struct dss_comm_mmbuf_info *online_mmbuf)
+{
+	int i = 0;
+	int j = 0;
+
+	for (i = 0; i < DSS_CHN_MAX_DEFINE; i++) {
+		for (j = 0; j < DSS_CHN_MAX_DEFINE; j++) {
+			if ((((offline_mmbuf[i].addr < online_mmbuf[j].mmbuf.addr + online_mmbuf[j].mmbuf.size) &&
+				(offline_mmbuf[i].addr >= online_mmbuf[j].mmbuf.addr))
+				|| ((online_mmbuf[j].mmbuf.addr < offline_mmbuf[i].addr + offline_mmbuf[i].size) &&
+				(online_mmbuf[j].mmbuf.addr >= offline_mmbuf[i].addr)))
+				&& offline_mmbuf[i].size) {
+				if (use_comm_mmbuf) {
+					*use_comm_mmbuf |= 1 << online_mmbuf[j].ov_idx;
+					online_mmbuf[j].mmbuf.addr = 0;
+					online_mmbuf[j].mmbuf.size = 0;
+					break;
+				}
+			}
+		}
+	}
+
+	if (g_debug_dump_mmbuf) {
+		for (i = 0; i < DSS_CHN_MAX_DEFINE; i++) {
+			HISI_FB_INFO("g_online_mmbuf[%d].addr=0x%x, size=%d!\n",
+			i, online_mmbuf[i].mmbuf.addr, online_mmbuf[i].mmbuf.size);
+		}
+	}
+}
+
+/*lint -e574 -e737*/
+static void hisi_dss_check_use_comm_mmbuf(uint32_t display_id,
+	int *use_comm_mmbuf, dss_mmbuf_t *offline_mmbuf, bool has_rot)
+{
+	int i = 0;
+
+	if (display_id == PRIMARY_PANEL_IDX) {
+		get_use_comm_mmbuf(use_comm_mmbuf, offline_mmbuf, g_primary_online_mmbuf);
+		get_use_comm_mmbuf(use_comm_mmbuf, offline_mmbuf, g_external_online_mmbuf);
+
+		if (!has_rot) {
+			memset(g_primary_online_mmbuf, 0x0, sizeof(g_primary_online_mmbuf));
+		}
+	}
+
+	if (display_id == EXTERNAL_PANEL_IDX) {
+		get_use_comm_mmbuf(use_comm_mmbuf, offline_mmbuf, g_external_online_mmbuf);
+		get_use_comm_mmbuf(use_comm_mmbuf, offline_mmbuf, g_primary_online_mmbuf);
+
+		if (!has_rot) {
+			memset(g_external_online_mmbuf, 0x0, sizeof(g_external_online_mmbuf));
+		}
+	}
+
+	if (g_debug_dump_mmbuf) {
+		for (i = 0; i < DSS_CHN_MAX_DEFINE; i++) {
+			HISI_FB_INFO("offline_mmbuf[%d].addr=0x%x, size=%d, *use_comm_mmbuf=%d!\n",
+			i, offline_mmbuf[i].addr, offline_mmbuf[i].size, *use_comm_mmbuf);
+		}
+	}
+}
+/*lint +e574 +e737*/
+
+/*lint -e438 -e550*/
 int hisi_dss_prev_module_set_regs(struct hisi_fb_data_type *hisifd,
-	dss_overlay_t *pov_req, uint32_t cmdlist_pre_idxs, bool enable_cmdlist, bool *use_comm_mmbuf)
+	dss_overlay_t *pov_req, uint32_t cmdlist_pre_idxs, bool enable_cmdlist, int *use_comm_mmbuf)
 {
 	dss_module_reg_t *dss_module = NULL;
 	dss_layer_t *layer = NULL;
@@ -6997,6 +6626,7 @@ int hisi_dss_prev_module_set_regs(struct hisi_fb_data_type *hisifd,
 	int32_t ovl_idx = 0;
 	int32_t layer_idx = 0;
 	int32_t mctl_idx = 0;
+	bool has_ovl = true;
 	int chn_idx = 0;
 	int i = 0;
 	int j = 0;
@@ -7006,35 +6636,36 @@ int hisi_dss_prev_module_set_regs(struct hisi_fb_data_type *hisifd,
 	int ret = 0;
 	uint32_t tmp = 0;
 	uint32_t cmdlist_idxs_temp = 0;
-#if defined (CONFIG_HISI_FB_3650) || defined (CONFIG_HISI_FB_6250)
 	char __iomem *chn_mutex_base = NULL;
-#endif
 	dss_overlay_block_t *pov_h_block_infos = NULL;
 	dss_overlay_block_t *pov_h_block = NULL;
 	dss_mmbuf_t offline_mmbuf[DSS_CHN_MAX_DEFINE];
 	bool has_rot = false;
+	uint32_t display_id = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == pov_req) {
+		HISI_FB_ERR("pov_req is NULL");
+		return -EINVAL;
+	}
 
 	ovl_idx = pov_req->ovl_idx;
 	dss_module = &(hisifd->dss_module);
 
 	if (enable_cmdlist) {
 		//clear prev chn cmdlist reg default
-	#if defined (CONFIG_HISI_FB_3650) || defined (CONFIG_HISI_FB_6250)
 		ret = hisi_cmdlist_add_new_node(hisifd, cmdlist_pre_idxs, 0, 0, 0, 0, 0);
-	#elif defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		if (pov_req->wb_enable) {
-			ret = hisi_cmdlist_add_new_node(hisifd, cmdlist_pre_idxs, 0, 1, 1, 1, 0);
-		} else {
-			ret = hisi_cmdlist_add_new_node(hisifd, cmdlist_pre_idxs, 0, 0, 0, 0, 0);
-		}
-	#endif
 		if(ret != 0) {
 			HISI_FB_ERR("fb%d, hisi_cmdlist_add_new_node err:%d \n", hisifd->index, ret);
 			goto err_return;
 		}
+	}
+
+	if (hisifd->index == MEDIACOMMON_PANEL_IDX) {
+		has_ovl = false;
 	}
 
 	memset(offline_mmbuf, 0x0, sizeof(offline_mmbuf));
@@ -7048,8 +6679,9 @@ int hisi_dss_prev_module_set_regs(struct hisi_fb_data_type *hisifd,
 			chn_idx = layer->chn_idx;
 			layer_idx = layer->layer_idx;
 
-			if (chn_idx == DSS_RCHN_V2) {  //chicago copybit
+			if ((chn_idx == DSS_RCHN_V2) && (g_dss_version_tag == FB_ACCEL_HI366x)) {  //chicago copybit
 				mctl_idx = DSS_MCTL5;
+				has_ovl = false;
 			} else {
 				mctl_idx = ovl_idx;
 			}
@@ -7061,18 +6693,24 @@ int hisi_dss_prev_module_set_regs(struct hisi_fb_data_type *hisifd,
 				continue;
 			}
 
-			if (ovl_idx == DSS_OVL0) {
-				if ((layer->need_cap & CAP_AFBCD) && (layer->dst_rect.y >= pov_h_block->ov_block_rect.y)) {
-					if (j < DSS_CHN_MAX_DEFINE) {
-						g_pre_online_mmbuf[j].addr = layer->img.mmbuf_base;
-						g_pre_online_mmbuf[j].size = layer->img.mmbuf_size;
-						j++;
+			if ((layer->need_cap & (CAP_AFBCD | CAP_HFBCD)) && (layer->dst_rect.y >= pov_h_block->ov_block_rect.y)) {
+				if (chn_idx < DSS_CHN_MAX_DEFINE) {
+					if (ovl_idx == DSS_OVL0) {
+						g_primary_online_mmbuf[chn_idx].mmbuf.addr = layer->img.mmbuf_base;
+						g_primary_online_mmbuf[chn_idx].mmbuf.size = layer->img.mmbuf_size;
+						g_primary_online_mmbuf[chn_idx].ov_idx = ovl_idx;
+					}
+
+					if (ovl_idx == DSS_OVL1) {
+						g_external_online_mmbuf[chn_idx].mmbuf.addr = layer->img.mmbuf_base;
+						g_external_online_mmbuf[chn_idx].mmbuf.size = layer->img.mmbuf_size;
+						g_external_online_mmbuf[chn_idx].ov_idx = ovl_idx;
 					}
 				}
 			}
 
 			if ((ovl_idx == DSS_OVL2) || (ovl_idx == DSS_OVL3)) {
-				if (layer->need_cap & CAP_AFBCD) {
+				if (layer->need_cap & (CAP_AFBCD | CAP_HFBCD)) {
 					if (j < DSS_CHN_MAX_DEFINE) {
 						offline_mmbuf[j].addr = layer->img.mmbuf_base;
 						offline_mmbuf[j].size = layer->img.mmbuf_size;
@@ -7081,7 +6719,7 @@ int hisi_dss_prev_module_set_regs(struct hisi_fb_data_type *hisifd,
 				}
 			}
 
-			if (chn_idx == DSS_RCHN_V2) {  //chicago copybit
+			if (chn_idx == DSS_RCHN_V2) {
 				tmp = (0x1 << DSS_CMDLIST_V2);
 				hisifd->cmdlist_idx = DSS_CMDLIST_V2;
 			} else {
@@ -7109,11 +6747,11 @@ int hisi_dss_prev_module_set_regs(struct hisi_fb_data_type *hisifd,
 
 			/* MCTL */
 			dss_module->mctl_ch[chn_idx].chn_mutex =
-				set_bits32(dss_module->mctl_ch[chn_idx].chn_mutex, 0x1, 1, 0);
+				set_bits32(dss_module->mctl_ch[chn_idx].chn_mutex, 1, 1, 0);
 			dss_module->mctl_ch[chn_idx].chn_flush_en =
-				set_bits32(dss_module->mctl_ch[chn_idx].chn_flush_en, 0x1, 1, 0);
+				set_bits32(dss_module->mctl_ch[chn_idx].chn_flush_en, 1, 1, 0);
 			dss_module->mctl_ch[chn_idx].chn_ov_oen =
-				set_bits32(dss_module->mctl_ch[chn_idx].chn_ov_oen, 0x0, 32, 0);
+				set_bits32(dss_module->mctl_ch[chn_idx].chn_ov_oen, 0, 32, 0);
 			dss_module->mctl_ch_used[chn_idx] = 1;
 
 			hisi_dss_mctl_sys_ch_set_reg(hisifd, &(dss_module->mctl_ch_base[chn_idx]),
@@ -7121,17 +6759,8 @@ int hisi_dss_prev_module_set_regs(struct hisi_fb_data_type *hisifd,
 		}
 	}
 
-	if (g_debug_dump_mmbuf) {
-		if (ovl_idx == DSS_OVL0) {
-			for (i = 0; i < DSS_CHN_MAX_DEFINE; i++) {
-				HISI_FB_INFO("g_pre_online_mmbuf[%d].addr=%d, size=%d, j=%d\n",
-					i, g_pre_online_mmbuf[i].addr, g_pre_online_mmbuf[i].size, j);
-			}
-		}
-	}
-
-	if (pov_req->wb_enable && ((ovl_idx > DSS_OVL1) || (mctl_idx == DSS_MCTL5))) {
-		if (mctl_idx != DSS_MCTL5) {
+	if (pov_req->wb_enable && ((ovl_idx > DSS_OVL1) || (!has_ovl))) {
+		if (has_ovl) {
 			hisifd->cmdlist_idx = DSS_CMDLIST_OV0 + ovl_idx;
 
 			// OV default
@@ -7141,8 +6770,10 @@ int hisi_dss_prev_module_set_regs(struct hisi_fb_data_type *hisifd,
 		for (k = 0; k < pov_req->wb_layer_nums; k++) {
 			wb_layer = &(pov_req->wb_layer_infos[k]);
 			chn_idx = wb_layer->chn_idx;
-			if (wb_layer->transform & HISI_FB_TRANSFORM_ROT_90)
+			display_id = wb_layer->dst.display_id;
+			if (wb_layer->transform & HISI_FB_TRANSFORM_ROT_90) {
 				has_rot = true;
+			}
 
 			if (chn_idx == DSS_WCHN_W2) {  //chicago copybit
 				hisifd->cmdlist_idx = DSS_CMDLIST_W2;
@@ -7170,7 +6801,7 @@ int hisi_dss_prev_module_set_regs(struct hisi_fb_data_type *hisifd,
 				&(dss_module->mctl_ch[chn_idx]), chn_idx, false);
 		}
 
-		if (mctl_idx != DSS_MCTL5) {    //chicago copybit
+		if (has_ovl) {    //chicago copybit
 			hisifd->cmdlist_idx = DSS_CMDLIST_OV0 + ovl_idx;
 
 			// MCTL ov
@@ -7182,13 +6813,8 @@ int hisi_dss_prev_module_set_regs(struct hisi_fb_data_type *hisifd,
 		}
 
 		//remove mctl ch & ov
-	#if defined (CONFIG_HISI_FB_3650) || defined (CONFIG_HISI_FB_6250)
 		if (enable_cmdlist) {
-		#ifdef CONFIG_HISI_DSS_CMDLIST_LAST_USED
 			ret = hisi_cmdlist_add_new_node(hisifd, cmdlist_pre_idxs, 0, 1, 1, 1, 0);
-		#else
-			ret = hisi_cmdlist_add_new_node(hisifd, cmdlist_pre_idxs, 1, 1, 1, 0, 0);
-		#endif
 			if (ret != 0) {
 				HISI_FB_ERR("hisi_cmdlist_add_new_node err:%d \n",ret);
 				goto err_return;
@@ -7197,7 +6823,7 @@ int hisi_dss_prev_module_set_regs(struct hisi_fb_data_type *hisifd,
 
 		for (i = 0; i < DSS_CHN_MAX_DEFINE; i++) {
 			if (dss_module->mctl_ch_used[i] == 1) {
-				if (i == DSS_RCHN_V2) {    //chicago copybit
+				if (i == DSS_RCHN_V2) {
 					hisifd->cmdlist_idx = DSS_CMDLIST_V2;
 				} else if (i == DSS_WCHN_W2) {
 					hisifd->cmdlist_idx = DSS_CMDLIST_W2;
@@ -7207,43 +6833,22 @@ int hisi_dss_prev_module_set_regs(struct hisi_fb_data_type *hisifd,
 
 				chn_mutex_base = dss_module->mctl_ch_base[i].chn_mutex_base +
 					g_dss_module_ovl_base[mctl_idx][MODULE_MCTL_BASE];
-				BUG_ON(chn_mutex_base == NULL);
+
+				if (chn_mutex_base == NULL) {
+					HISI_FB_DEBUG("chn_mutex_base is NULL!\n");
+					return -1;
+				}
 
 				hisifd->set_reg(hisifd, chn_mutex_base, 0, 32, 0);
 			}
 		}
 
-		if (mctl_idx != DSS_MCTL5) {    //chicago copybit
+		if (has_ovl) {    //chicago copybit
 			hisifd->cmdlist_idx = DSS_CMDLIST_OV0 + ovl_idx;
 			hisi_dss_mctl_ov_set_reg(hisifd, dss_module->mctl_base[ovl_idx], &(dss_module->mctl[ovl_idx]), ovl_idx, enable_cmdlist);
 		}
-	#endif
 
-		for (i = 0; i < DSS_CHN_MAX_DEFINE; i++) {
-			for (k = 0; k < DSS_CHN_MAX_DEFINE; k++) {
-				if ((((offline_mmbuf[i].addr < g_pre_online_mmbuf[k].addr + g_pre_online_mmbuf[k].size) &&
-					(offline_mmbuf[i].addr >= g_pre_online_mmbuf[k].addr))
-					|| ((g_pre_online_mmbuf[k].addr < offline_mmbuf[i].addr + offline_mmbuf[i].size) &&
-					(g_pre_online_mmbuf[k].addr >= offline_mmbuf[i].addr)))
-					&& offline_mmbuf[i].size) {
-					if (use_comm_mmbuf) {
-						*use_comm_mmbuf = true;
-						break;
-					}
-				}
-			}
-		}
-
-		if (g_debug_dump_mmbuf) {
-			for (i = 0; i < DSS_CHN_MAX_DEFINE; i++) {
-				HISI_FB_INFO("offline_mmbuf[%d].addr=%d, size=%d, use_comm_mmbuf=%d, j=%d\n",
-					i, offline_mmbuf[i].addr, offline_mmbuf[i].size, *use_comm_mmbuf, j);
-			}
-		}
-
-		if (!has_rot) {
-			memset(g_pre_online_mmbuf, 0x0, sizeof(g_pre_online_mmbuf));
-		}
+		hisi_dss_check_use_comm_mmbuf(display_id, use_comm_mmbuf, offline_mmbuf, has_rot);
 	}
 
 	return 0;
@@ -7251,15 +6856,18 @@ int hisi_dss_prev_module_set_regs(struct hisi_fb_data_type *hisifd,
 err_return:
 	return ret;
 }
+/*lint +e438 +e550*/
 
 void hisi_dss_unflow_handler(struct hisi_fb_data_type *hisifd,
 	dss_overlay_t *pov_req, bool unmask)
 {
 	uint32_t tmp = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	if (pov_req->ovl_idx == DSS_OVL0) {
 		tmp = inp32(hisifd->dss_base + GLB_GLB_CPU_ITF0_INT_MSK);
 		if (unmask) {
@@ -7280,28 +6888,6 @@ void hisi_dss_unflow_handler(struct hisi_fb_data_type *hisifd,
 	} else {
 		; /* do nothing */
 	}
-#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	if (pov_req->ovl_idx == DSS_OVL0) {
-		tmp = inp32(hisifd->dss_base + DSS_LDI0_OFFSET + LDI_CPU_ITF_INT_MSK);
-		if (unmask) {
-			tmp &= ~ BIT_LDI_UNFLOW;
-		} else {
-			tmp |= BIT_LDI_UNFLOW;
-		}
-		outp32(hisifd->dss_base + DSS_LDI0_OFFSET + LDI_CPU_ITF_INT_MSK, tmp);
-
-	} else if (pov_req->ovl_idx == DSS_OVL1) {
-		tmp = inp32(hisifd->dss_base + DSS_LDI1_OFFSET + LDI_CPU_ITF_INT_MSK);
-		if (unmask) {
-			tmp &= ~ BIT_LDI_UNFLOW;
-		} else {
-			tmp |= BIT_LDI_UNFLOW;
-		}
-		outp32(hisifd->dss_base + DSS_LDI1_OFFSET + LDI_CPU_ITF_INT_MSK, tmp);
-	} else {
-		; /* do nothing */
-	}
-#endif
 }
 
 
@@ -7324,12 +6910,30 @@ int hisi_ov_compose_handler(struct hisi_fb_data_type *hisifd,
 	int ret = 0;
 	int32_t mctl_idx = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_h_block == NULL);
-	BUG_ON(layer == NULL);
-	BUG_ON(clip_rect == NULL);
-	BUG_ON(aligned_rect == NULL);
-	BUG_ON(rdma_stretch_enable == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == pov_h_block) {
+		HISI_FB_ERR("pov_h_block is NULL");
+		return -EINVAL;
+	}
+	if (NULL == layer) {
+		HISI_FB_ERR("layer is NULL");
+		return -EINVAL;
+	}
+	if (NULL == clip_rect) {
+		HISI_FB_ERR("clip_rect is NULL");
+		return -EINVAL;
+	}
+	if (NULL == aligned_rect) {
+		HISI_FB_ERR("aligned_rect is NULL");
+		return -EINVAL;
+	}
+	if (NULL == rdma_stretch_enable) {
+		HISI_FB_ERR("rdma_stretch_enable is NULL");
+		return -EINVAL;
+	}
 
 	ret = hisi_dss_check_layer_par(hisifd, layer);
 	if (ret != 0) {
@@ -7450,19 +7054,11 @@ int hisi_ov_compose_handler(struct hisi_fb_data_type *hisifd,
 		goto err_return;
 	}
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	ret = hisi_dss_sharpness_config(hisifd, layer);
 	if (ret != 0) {
 		HISI_FB_ERR("hisi_dss_sharpness_config failed! ret = %d\n", ret);
 		goto err_return;
 	}
-#elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	ret = hisi_dss_arsr2p_config(hisifd, layer, aligned_rect, *rdma_stretch_enable);
-	if (ret != 0) {
-		HISI_FB_ERR("hisi_dss_arsr2p_config failed! ret = %d\n", ret);
-		goto err_return;
-	}
-#endif
 
 	ret = hisi_dss_post_clip_config(hisifd, layer);
 	if (ret != 0) {
@@ -7470,13 +7066,11 @@ int hisi_ov_compose_handler(struct hisi_fb_data_type *hisifd,
 		goto err_return;
 	}
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	ret = hisi_dss_ce_config(hisifd, layer);
 	if (ret != 0) {
 		HISI_FB_ERR("hisi_dss_ce_config failed! ret = %d\n", ret);
 		goto err_return;
 	}
-#endif
 
 	if (g_debug_ovl_online_composer || g_debug_ovl_offline_composer) {
 		HISI_FB_INFO("fb%d, scf output, clip_rect(%d,%d,%d,%d), aligned_rect(%d,%d,%d,%d), dst_rect(%d,%d,%d,%d).\n",
@@ -7505,7 +7099,7 @@ int hisi_ov_compose_handler(struct hisi_fb_data_type *hisifd,
 		goto err_return;
 	}
 
-	if (layer->chn_idx == DSS_RCHN_V2) {   //chicago copybit
+	if ((g_dss_version_tag == FB_ACCEL_HI366x) && (layer->chn_idx == DSS_RCHN_V2)) {   //copybit
 		mctl_idx = DSS_MCTL5;
 	} else {
 		mctl_idx = pov_req->ovl_idx;
@@ -7536,8 +7130,15 @@ int hisi_wb_compose_handler(struct hisi_fb_data_type *hisifd,
 	int32_t mctl_idx = 0;
 	dss_rect_t aligned_rect;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_ERR("hisifd is NULL Point!");
+		return -EINVAL;
+	}
+
+	if (pov_req == NULL) {
+		HISI_FB_ERR("pov_req is NULL Point!");
+		return -EINVAL;
+	}
 
 	if (csc_needed) {
 		ret = hisi_dss_csc_config(hisifd, NULL, wb_layer);
@@ -7552,6 +7153,11 @@ int hisi_wb_compose_handler(struct hisi_fb_data_type *hisifd,
 			hisifd->index,
 			wb_layer->src_rect.x, wb_layer->src_rect.y, wb_layer->src_rect.w, wb_layer->src_rect.h,
 			wb_layer->dst_rect.x, wb_layer->dst_rect.y, wb_layer->dst_rect.w, wb_layer->dst_rect.h);
+	}
+
+	if (ret != 0) {
+		HISI_FB_ERR("hisi_dss_wb_scl_config failed, ret = %d\n", ret);
+		goto err_return;
 	}
 
 	ret = hisi_dss_wdfc_config(hisifd, wb_layer, &aligned_rect, wb_ov_block_rect);
@@ -7645,14 +7251,17 @@ static void hisifb_dss_on(struct hisi_fb_data_type *hisifd, int enable_cmdlist)
 {
 	int prev_refcount = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
 	down(&hisi_dss_mmbuf_sem);
 
 	prev_refcount = dss_sr_refcount++;
-	if (!prev_refcount) {
+	if ((!prev_refcount) && (hisifd->index != MEDIACOMMON_PANEL_IDX)) {
 		// dss qos on
 		hisi_dss_qos_on(hisifd);
 		// mmbuf on
@@ -7662,7 +7271,7 @@ static void hisifb_dss_on(struct hisi_fb_data_type *hisifd, int enable_cmdlist)
 		// smmu on
 		hisi_dss_smmu_on(hisifd);
 		// scl coef load
-		hisi_dss_scl_coef_on(hisifd, false, SCL_COEF_YUV_IDX);
+		hisi_dss_scl_coef_on(hisifd, false, SCL_COEF_YUV_IDX);//lint !e747
 
 		if (enable_cmdlist) {
 			hisi_dss_cmdlist_qos_on(hisifd);
@@ -7679,13 +7288,18 @@ static void hisifb_dss_off(struct hisi_fb_data_type *hisifd, bool is_lp)
 	struct hisifb_mmbuf *node, *_node_;
 	int new_refcount = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
 	down(&hisi_dss_mmbuf_sem);
 	new_refcount = --dss_sr_refcount;
-	WARN_ON(new_refcount < 0);
+	if (new_refcount < 0) {
+		HISI_FB_ERR("dss new_refcount err");
+	}
 
 	if (is_lp) {
 		if (!new_refcount) {
@@ -7693,13 +7307,14 @@ static void hisifb_dss_off(struct hisi_fb_data_type *hisifd, bool is_lp)
 
 			memset(&(hisifd->ov_block_infos_prev_prev), 0,
 				HISI_DSS_OV_BLOCK_NUMS * sizeof(dss_overlay_block_t));
-			memset(&hisifd->ov_req_prev_prev, 0, sizeof(dss_overlay_t));
 			memset(&(hisifd->ov_block_infos_prev), 0,
 				HISI_DSS_OV_BLOCK_NUMS * sizeof(dss_overlay_block_t));
-			memset(&hisifd->ov_req_prev, 0, sizeof(dss_overlay_t));
 			memset(&(hisifd->ov_block_infos), 0,
 				HISI_DSS_OV_BLOCK_NUMS * sizeof(dss_overlay_block_t));
-			memset(&hisifd->ov_req, 0, sizeof(dss_overlay_t));
+
+			hisifb_dss_overlay_info_init(&hisifd->ov_req);
+			hisifb_dss_overlay_info_init(&hisifd->ov_req_prev);
+			hisifb_dss_overlay_info_init(&hisifd->ov_req_prev_prev);
 		}
 	}
 
@@ -7732,7 +7347,10 @@ void* hisi_dss_mmbuf_init(struct hisi_fb_data_type *hisifd)
 	uint32_t addr = MMBUF_BASE;
 	int prev_refcount = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return NULL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -7749,6 +7367,7 @@ void* hisi_dss_mmbuf_init(struct hisi_fb_data_type *hisifd)
 
 		if (gen_pool_add(pool, addr, size, 0) != 0) {
 			gen_pool_destroy(pool);
+			pool = NULL;
 			HISI_FB_ERR("fb%d, gen_pool_add failed!", hisifd->index);
 			goto err_out;
 		}
@@ -7758,12 +7377,15 @@ void* hisi_dss_mmbuf_init(struct hisi_fb_data_type *hisifd)
 		//mmbuf list
 		if (!g_mmbuf_list) {
 			g_mmbuf_list = kzalloc(sizeof(struct list_head), GFP_KERNEL);
-			BUG_ON(g_mmbuf_list == NULL);
+			if (NULL == g_mmbuf_list) {
+				HISI_FB_ERR("g_mmbuf_list is NULL");
+				up(&hisi_dss_mmbuf_sem);
+				return NULL;
+			}
 			INIT_LIST_HEAD(g_mmbuf_list);
 		}
 
 		//smmu
-	#ifdef CONFIG_SMMU_RWERRADDR_USED
 		if (!g_smmu_rwerraddr_virt) {
 			g_smmu_rwerraddr_virt = kmalloc(SMMU_RW_ERR_ADDR_SIZE, GFP_KERNEL|__GFP_DMA);
 			if (g_smmu_rwerraddr_virt) {
@@ -7772,7 +7394,6 @@ void* hisi_dss_mmbuf_init(struct hisi_fb_data_type *hisifd)
 				HISI_FB_ERR("kmalloc g_smmu_rwerraddr_virt fail.\n");
 			}
 		}
-    #endif
 	}
 
 	hisifd->mmbuf_gen_pool = g_mmbuf_gen_pool;
@@ -7790,7 +7411,10 @@ void hisi_dss_mmbuf_deinit(struct hisi_fb_data_type *hisifd)
 {
 	int new_refcount = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -7798,7 +7422,9 @@ void hisi_dss_mmbuf_deinit(struct hisi_fb_data_type *hisifd)
 
 	down(&hisi_dss_mmbuf_sem);
 	new_refcount = --mmbuf_refcount;
-	WARN_ON(new_refcount < 0);
+	if (new_refcount < 0) {
+		HISI_FB_ERR("dss new_refcount err");
+	}
 
 	if (!new_refcount) {
 		//mmbuf pool
@@ -7814,12 +7440,10 @@ void hisi_dss_mmbuf_deinit(struct hisi_fb_data_type *hisifd)
 		}
 
 		//smmu
-	#ifdef CONFIG_SMMU_RWERRADDR_USED
 		if (g_smmu_rwerraddr_virt) {
 			kfree(g_smmu_rwerraddr_virt);
 			g_smmu_rwerraddr_virt = NULL;
 		}
-	#endif
 	}
 
 	hisifd->mmbuf_gen_pool = NULL;
@@ -7832,6 +7456,7 @@ void hisi_dss_mmbuf_deinit(struct hisi_fb_data_type *hisifd)
 uint32_t hisi_dss_mmbuf_alloc(void *handle, uint32_t size)
 {
 	uint32_t addr = 0;
+	uint32_t mmbuf_size_max;
 	struct hisifb_mmbuf *node = NULL;
 	struct hisifb_mmbuf *mmbuf_node, *_node_;
 
@@ -7845,7 +7470,9 @@ uint32_t hisi_dss_mmbuf_alloc(void *handle, uint32_t size)
 		return addr;
 	}
 
-	if (size <= 0 || size > MMBUF_SIZE_MAX) {
+	mmbuf_size_max = MMBUF_SIZE_MAX;
+
+	if (size <= 0 || size > mmbuf_size_max) {
 		HISI_FB_ERR("mmbuf size is invalid, size=%d!\n", size);
 		return addr;
 	}
@@ -7915,8 +7542,14 @@ void hisi_dss_mmbuf_free(void *handle, uint32_t addr, uint32_t size)
 
 dss_mmbuf_info_t* hisi_dss_mmbuf_info_get(struct hisi_fb_data_type *hisifd, int idx)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON((idx < 0) || (idx >= HISI_DSS_CMDLIST_DATA_MAX));
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return NULL;
+	}
+	if ((idx < 0) || (idx >= HISI_DSS_CMDLIST_DATA_MAX)) {
+		HISI_FB_ERR("idx is invalid");
+		return NULL;
+	}
 
 	return &(hisifd->mmbuf_infos[idx]);
 }
@@ -7926,8 +7559,14 @@ void hisi_dss_mmbuf_info_clear(struct hisi_fb_data_type *hisifd, int idx)
 	int i = 0;
 	dss_mmbuf_info_t *mmbuf_info = NULL;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON((idx < 0) || (idx >= HISI_DSS_CMDLIST_DATA_MAX));
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
+	if ((idx < 0) || (idx >= HISI_DSS_CMDLIST_DATA_MAX)) {
+		HISI_FB_ERR("idx is invalid");
+		return;
+	}
 
 	//mmbuf
 	mmbuf_info = &(hisifd->mmbuf_infos[idx]);
@@ -7951,7 +7590,10 @@ void hisi_mmbuf_info_get_online(struct hisi_fb_data_type *hisifd)
 {
 	int tmp = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 
 	tmp = (hisifd->frame_count + 1) % HISI_DSS_CMDLIST_DATA_MAX;
 	hisi_dss_mmbuf_info_clear(hisifd, tmp);
@@ -7966,47 +7608,19 @@ void hisi_mmbuf_info_get_online(struct hisi_fb_data_type *hisifd)
 */
 void hisi_dss_mmbuf_on(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 
 	if (g_fpga_flag == 1) {
        //config according to set_pu_mmbuf
-    #if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 		outp32(hisifd->sctrl_base + SCPWREN, 0x8);  //mmbuf regulator enable
 		outp32(hisifd->sctrl_base + SCPEREN1, 0x3c00000);  //crg clock enable
 		outp32(hisifd->sctrl_base + SCPERRSTDIS1, 0x00001800);  //exit soft reset
 		outp32(hisifd->sctrl_base + SCISODIS, 0x8);   //iso enable
-    #elif defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	       //step 1: module mtcmos on
-		outp32(hisifd->sctrl_base + 0x60, 0x8);  //mmbuf regulator enable
-		udelay(200);     //at least 100us
-	       //step 2: module clk enable
-		outp32(hisifd->sctrl_base + 0x258, 0x00c000c0);  //crg clock enable
-		outp32(hisifd->sctrl_base + 0x170, 0x03c00000);
-		udelay(2);     //at least 1us
-  	       //step 3: module clk disable
-		outp32(hisifd->sctrl_base + 0x174, 0x03c00000);
-		outp32(hisifd->sctrl_base + 0x258, 0x00c00000);
-
-  	       //step 4: module iso disable
-		outp32(hisifd->sctrl_base + 0x44, 0x00000008);
-  	       //step 5: memory repair
-  	       //step 6: module unrst
-		outp32(hisifd->sctrl_base + 0x210, 0x00001800);
-
-  	       //step 7: module clk enable
-		outp32(hisifd->sctrl_base + 0x258, 0x00c000c0);
-		outp32(hisifd->sctrl_base + 0x170, 0x03c00000);
-  	       //step 8: bus idle clear
-    #endif
 	}
 
-#if 0
-	//mmbuf lowpower
-	outp32(hisifd->mmbuf_crg_base + SMC_LOCK, 0x5A5A5A5A);
-	// lp_exit_cycle >= 1;
-	// lp_enter_cycle >= lp_exit_cycle + 6
-	outp32(hisifd->mmbuf_crg_base + SMC_MEM_LP, 0x00000712);
-#endif
 }
 
 static int hisi_overlay_fastboot(struct hisi_fb_data_type *hisifd)
@@ -8016,7 +7630,10 @@ static int hisi_overlay_fastboot(struct hisi_fb_data_type *hisifd)
 	dss_overlay_block_t *pov_h_block = NULL;
 	dss_layer_t *layer = NULL;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +\n", hisifd->index);
 
@@ -8026,6 +7643,8 @@ static int hisi_overlay_fastboot(struct hisi_fb_data_type *hisifd)
 		pov_req_prev->ov_block_infos_ptr = (uint64_t)(&(hisifd->ov_block_infos_prev));
 		pov_req_prev->ov_block_nums = 1;
 		pov_req_prev->ovl_idx = DSS_OVL0;
+		pov_req_prev->release_fence = -1;
+		pov_req_prev->retire_fence = -1;
 
 		pov_h_block_infos = (dss_overlay_block_t *)pov_req_prev->ov_block_infos_ptr;
 		pov_h_block = &(pov_h_block_infos[0]);
@@ -8070,9 +7689,13 @@ int hisi_overlay_on(struct hisi_fb_data_type *hisifd, bool fastboot_enable)
 	int mctl_idx = 0;
 	uint32_t cmdlist_idxs = 0;
 	int enable_cmdlist = 0;
+	static uint32_t index = 0;
 	struct hisi_fb_panel_data *pdata = NULL;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +\n", hisifd->index);
 
@@ -8093,7 +7716,7 @@ int hisi_overlay_on(struct hisi_fb_data_type *hisifd, bool fastboot_enable)
 	hisifd->resolution_rect.w = hisifd->panel_info.xres;
 	hisifd->resolution_rect.h = hisifd->panel_info.yres;
 
-	memset(&hisifd->ov_req, 0, sizeof(dss_overlay_t));
+	hisifb_dss_overlay_info_init(&hisifd->ov_req);
 	hisifd->ov_req.frame_no = 0xFFFFFFFF;
 	memset(&hisifd->acm_ce_info, 0, sizeof(hisifd->acm_ce_info));
 	memset(&hisifd->prefix_ce_info, 0, sizeof(hisifd->prefix_ce_info));
@@ -8101,21 +7724,6 @@ int hisi_overlay_on(struct hisi_fb_data_type *hisifd, bool fastboot_enable)
 
 	g_offline_cmdlist_idxs = 0;
 
-#if 0
-	if (g_dss_module_resource_initialized == 0) {
-		hisi_dss_module_default(hisifd);
-		g_dss_module_resource_initialized = 1;
-		hisifd->dss_module_resource_initialized = true;
-	}
-
-	if (!hisifd->dss_module_resource_initialized) {
-		if (hisifd->index != PRIMARY_PANEL_IDX) {
-			memcpy(&(hisifd->dss_module_default),
-				&(hisifd_list[PRIMARY_PANEL_IDX]->dss_module_default), sizeof(dss_module_reg_t));
-		}
-		hisifd->dss_module_resource_initialized = true;
-	}
-#else
 	if ((hisifd->index == PRIMARY_PANEL_IDX) ||
 		(hisifd->index == EXTERNAL_PANEL_IDX)) {
 		hisifb_activate_vsync(hisifd);
@@ -8125,18 +7733,21 @@ int hisi_overlay_on(struct hisi_fb_data_type *hisifd, bool fastboot_enable)
 		hisi_dss_module_default(hisifd);
 		g_dss_module_resource_initialized = 1;
 		hisifd->dss_module_resource_initialized = true;
+		index = hisifd->index;
 	} else {
 		if (!hisifd->dss_module_resource_initialized) {
-			if (hisifd->index != PRIMARY_PANEL_IDX) {
-				if (hisifd_list[PRIMARY_PANEL_IDX]) {
-					memcpy(&(hisifd->dss_module_default),
-						&(hisifd_list[PRIMARY_PANEL_IDX]->dss_module_default), sizeof(dss_module_reg_t));
+			if (hisifd->index == MEDIACOMMON_PANEL_IDX) {
+			} else {
+				if (hisifd->index != index) {
+					if (hisifd_list[index]) {
+						memcpy(&(hisifd->dss_module_default),
+							&(hisifd_list[index]->dss_module_default), sizeof(dss_module_reg_t));
+					}
 				}
 			}
 			hisifd->dss_module_resource_initialized = true;
 		}
 	}
-#endif
 
 	enable_cmdlist = g_enable_ovl_cmdlist_online;
 	//dss on
@@ -8152,7 +7763,7 @@ int hisi_overlay_on(struct hisi_fb_data_type *hisifd, bool fastboot_enable)
 			mctl_idx = DSS_MCTL1;
 		}
 
-		if ((hisifd->index == EXTERNAL_PANEL_IDX) && hisifd->panel_info.fake_hdmi)
+		if ((hisifd->index == EXTERNAL_PANEL_IDX) && hisifd->panel_info.fake_external)
 			enable_cmdlist = 0;
 
 		ldi_data_gate(hisifd, true);
@@ -8215,7 +7826,7 @@ int hisi_overlay_on(struct hisi_fb_data_type *hisifd, bool fastboot_enable)
 			}
 
 			if (enable_cmdlist) {
-				hisi_cmdlist_flush_cache(hisifd, hisifd->ion_client, cmdlist_idxs);
+				hisi_cmdlist_flush_cache(hisifd, cmdlist_idxs);
 				hisi_cmdlist_config_start(hisifd, mctl_idx, cmdlist_idxs, 0);
 			} else {
 				hisi_dss_mctl_mutex_unlock(hisifd, ovl_idx);
@@ -8237,9 +7848,8 @@ int hisi_overlay_on(struct hisi_fb_data_type *hisifd, bool fastboot_enable)
 
 		hisi_dss_mctl_on(hisifd, DSS_MCTL2, enable_cmdlist, 0);
 		hisi_dss_mctl_on(hisifd, DSS_MCTL3, enable_cmdlist, 0);
-	#if defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		hisi_dss_mctl_on(hisifd, DSS_MCTL5, enable_cmdlist, 0);
-	#endif
+	} else if (hisifd->index == MEDIACOMMON_PANEL_IDX) {
+		hisi_media_common_mctl_on(hisifd);
 	} else {
 		HISI_FB_ERR("fb%d, not supported!", hisifd->index);
 	}
@@ -8258,12 +7868,14 @@ int hisi_overlay_off(struct hisi_fb_data_type *hisifd)
 	int enable_cmdlist = 0;
 	dss_overlay_t *pov_req_prev = NULL;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	pov_req_prev = &(hisifd->ov_req_prev);
 
 	HISI_FB_DEBUG("fb%d, +\n", hisifd->index);
-
 	if ((hisifd->index == PRIMARY_PANEL_IDX) ||
 		(hisifd->index == EXTERNAL_PANEL_IDX)) {
 		hisifb_activate_vsync(hisifd);
@@ -8274,7 +7886,7 @@ int hisi_overlay_off(struct hisi_fb_data_type *hisifd)
 			goto err_out;
 		}
 
-		if (hisifd->aod_function == 1) {
+		if ((hisifd->aod_function == 1) && (hisifd_list[EXTERNAL_PANEL_IDX] && !hisifd_list[EXTERNAL_PANEL_IDX]->panel_power_on)) {
 			HISI_FB_INFO("fb%d, aod mode,no base frame when overlay off\n", hisifd->index);
 			mdelay(50); //lint !e747
 			goto err_out;
@@ -8287,7 +7899,7 @@ int hisi_overlay_off(struct hisi_fb_data_type *hisifd)
 		}
 
 		enable_cmdlist = g_enable_ovl_cmdlist_online;
-		if ((hisifd->index == EXTERNAL_PANEL_IDX) && hisifd->panel_info.fake_hdmi)
+		if ((hisifd->index == EXTERNAL_PANEL_IDX) && hisifd->panel_info.fake_external)
 			enable_cmdlist = 0;
 
 		ret = hisi_dss_module_init(hisifd);
@@ -8360,7 +7972,7 @@ int hisi_overlay_off(struct hisi_fb_data_type *hisifd)
 			hisi_cmdlist_config_stop(hisifd, cmdlist_pre_idxs);
 
 			cmdlist_idxs |= cmdlist_pre_idxs;
-			hisi_cmdlist_flush_cache(hisifd, hisifd->ion_client, cmdlist_idxs);
+			hisi_cmdlist_flush_cache(hisifd, cmdlist_idxs);
 
 			if (g_debug_ovl_cmdlist) {
 				hisi_cmdlist_dump_all_node(hisifd, NULL, cmdlist_idxs);
@@ -8396,11 +8008,11 @@ int hisi_overlay_off(struct hisi_fb_data_type *hisifd)
 		hisifd->frame_count++;
 	err_out:
 		hisifb_deactivate_vsync(hisifd);
-	} else if (hisifd->index == AUXILIARY_PANEL_IDX) {
+	} else if ((hisifd->index == AUXILIARY_PANEL_IDX) || (hisifd->index == MEDIACOMMON_PANEL_IDX)) {
 		; //do nothing
 	} else {
 		HISI_FB_ERR("fb%d, not support !\n", hisifd->index);
-		BUG_ON(1);
+		return -EINVAL;
 	}
 
 	//dss off
@@ -8414,16 +8026,17 @@ int hisi_overlay_off(struct hisi_fb_data_type *hisifd)
 
 	memset(&(hisifd->ov_block_infos_prev_prev), 0,
 		HISI_DSS_OV_BLOCK_NUMS * sizeof(dss_overlay_block_t));
-	memset(&hisifd->ov_req_prev_prev, 0, sizeof(dss_overlay_t));
 	memset(&(hisifd->ov_block_infos_prev), 0,
 		HISI_DSS_OV_BLOCK_NUMS * sizeof(dss_overlay_block_t));
-	memset(&hisifd->ov_req_prev, 0, sizeof(dss_overlay_t));
 	memset(&(hisifd->ov_block_infos), 0,
 		HISI_DSS_OV_BLOCK_NUMS * sizeof(dss_overlay_block_t));
-	memset(&hisifd->ov_req, 0, sizeof(dss_overlay_t));
+
+	hisifb_dss_overlay_info_init(&hisifd->ov_req);
+	hisifb_dss_overlay_info_init(&hisifd->ov_req_prev);
+	hisifb_dss_overlay_info_init(&hisifd->ov_req_prev_prev);
+
 
 	HISI_FB_DEBUG("fb%d, -\n", hisifd->index);
-
 	return 0;
 }
 
@@ -8433,7 +8046,7 @@ int hisi_overlay_on_lp(struct hisi_fb_data_type *hisifd)
 	int enable_cmdlist = 0;
 
 	enable_cmdlist = g_enable_ovl_cmdlist_online;
-	if ((hisifd->index == EXTERNAL_PANEL_IDX) && hisifd->panel_info.fake_hdmi)
+	if ((hisifd->index == EXTERNAL_PANEL_IDX) && hisifd->panel_info.fake_external)
 		enable_cmdlist = 0;
 
 	if (hisifd->index == PRIMARY_PANEL_IDX) {
@@ -8455,18 +8068,7 @@ int hisi_overlay_on_lp(struct hisi_fb_data_type *hisifd)
 
 int hisi_overlay_off_lp(struct hisi_fb_data_type *hisifd)
 {
-	int ovl_idx = 0;
-	int enable_cmdlist = 0;
-
-	enable_cmdlist = g_enable_ovl_cmdlist_online;
-	if ((hisifd->index == EXTERNAL_PANEL_IDX) && hisifd->panel_info.fake_hdmi)
-		enable_cmdlist = 0;
-
-	if (hisifd->index == PRIMARY_PANEL_IDX) {
-		ovl_idx = DSS_OVL0;
-	} else if (hisifd->index == EXTERNAL_PANEL_IDX) {
-		ovl_idx = DSS_OVL1;
-	} else {
+	if ((hisifd->index != PRIMARY_PANEL_IDX) && (hisifd->index != EXTERNAL_PANEL_IDX)) {
 		HISI_FB_ERR("fb%d, not supported!", hisifd->index);
 		return -1;
 	}
@@ -8479,7 +8081,7 @@ int hisi_overlay_off_lp(struct hisi_fb_data_type *hisifd)
 bool hisi_dss_check_reg_reload_status(struct hisi_fb_data_type *hisifd)
 {
 	mdelay(50);
-
+	(void)hisifd;
 	return true;
 }
 
@@ -8488,7 +8090,10 @@ bool hisi_dss_check_crg_sctrl_status(struct hisi_fb_data_type *hisifd)
 	uint32_t crg_state_check = 0;
 	uint32_t sctrl_mmbuf_dss_check = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return false;
+	}
 
 	crg_state_check = inp32(hisifd->peri_crg_base + PERCLKEN3);
 	if ((crg_state_check & 0x23000) != 0x23000) {
@@ -8523,6 +8128,7 @@ bool hisi_dss_check_crg_sctrl_status(struct hisi_fb_data_type *hisifd)
 	return true;
 }
 
+/*lint -e30 -e142 -e438 -e550*/
 int hisi_overlay_ioctl_handler(struct hisi_fb_data_type *hisifd,
 	uint32_t cmd, void __user *argp)
 {
@@ -8563,13 +8169,6 @@ int hisi_overlay_ioctl_handler(struct hisi_fb_data_type *hisifd,
 					hisifd->bl_update(hisifd);
 				}
 			}
-		#if defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-			if (ret == 0) {
-				if ((pinfo->blpwm_input_ena || (hisifd->ce_ctrl.ctrl_ce_mode != CE_MODE_DISABLE && hisifd->bl_enable_ctrl.ctrl_bl_enable == 1)) && hisifd->cabc_update) {
-					hisifd->cabc_update(hisifd);
-				}
-			}
-		#endif
 		}
 		break;
 	case HISIFB_OV_OFFLINE_PLAY:
@@ -8590,19 +8189,34 @@ int hisi_overlay_ioctl_handler(struct hisi_fb_data_type *hisifd,
 			}
 		}
 		break;
+	case HISIFB_OV_MEDIA_COMMON_PLAY:
+		if (hisifd->ov_media_common_play) {
+			ret = hisifd->ov_media_common_play(hisifd, argp);
+			if (ret != 0) {
+				HISI_FB_ERR("fb%d ov_media_common_play failed!\n", hisifd->index);
+			}
+		}
+		break;
 	default:
 		break;
 	}
 
 	return ret;
 }
+/*lint +e30 +e142 +e438 +e550*/
 
 int hisi_overlay_init(struct hisi_fb_data_type *hisifd)
 {
 	char wq_name[128] = {0};
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(hisifd->dss_base == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == hisifd->dss_base) {
+		HISI_FB_ERR("hisifd->dss_base is NULL");
+		return -EINVAL;
+	}
 
 	hisifd->dss_module_resource_initialized = false;
 
@@ -8617,6 +8231,11 @@ int hisi_overlay_init(struct hisi_fb_data_type *hisifd)
 	hisifd->frame_update_flag = 0;
 
 	memset(&hisifd->ov_req, 0, sizeof(dss_overlay_t));
+	hisifd->ov_req.release_fence = -1;
+	hisifd->ov_req.retire_fence = -1;
+	memset(&hisifd->ov_req_prev, 0, sizeof(dss_overlay_t));
+	hisifd->ov_req_prev.release_fence = -1;
+	hisifd->ov_req_prev.retire_fence = -1;
 	memset(&hisifd->dss_module, 0, sizeof(dss_module_reg_t));
 	memset(&hisifd->dss_module_default, 0, sizeof(dss_module_reg_t));
 
@@ -8638,12 +8257,9 @@ int hisi_overlay_init(struct hisi_fb_data_type *hisifd)
 	hisifd->rch2_ce_end_wq = NULL;
 	hisifd->rch4_ce_end_wq = NULL;
 	hisifd->dpp_ce_end_wq = NULL;
-#ifdef CONFIG_HISI_FB_3660
-	hisifd->hiace_end_wq = NULL;
-#endif
 
 	if ((hisifd->index == PRIMARY_PANEL_IDX) ||
-		(hisifd->index == EXTERNAL_PANEL_IDX && !hisifd->panel_info.fake_hdmi)) {
+		(hisifd->index == EXTERNAL_PANEL_IDX && !hisifd->panel_info.fake_external) ){
 		snprintf(wq_name, 128, "fb%d_dss_debug", hisifd->index);
 		hisifd->dss_debug_wq = create_singlethread_workqueue(wq_name);
 		if (!hisifd->dss_debug_wq) {
@@ -8670,17 +8286,6 @@ int hisi_overlay_init(struct hisi_fb_data_type *hisifd)
 			INIT_WORK(&hisifd->dpp_ce_end_work, hisi_dpp_ace_end_handle_func);
 		}
 
-#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		if (hisifd->panel_info.hiace_support) {
-			snprintf(wq_name, 128, "fb%d_hiace_end", hisifd->index);
-			hisifd->hiace_end_wq = create_singlethread_workqueue(wq_name);
-			if (!hisifd->hiace_end_wq) {
-				HISI_FB_ERR("fb%d, create hiace end workqueue failed!\n", hisifd->index);
-				return -EINVAL;
-			}
-			INIT_WORK(&hisifd->hiace_end_work, hisi_dpp_hiace_end_handle_func);
-		}
-#else
 		if (hisifd->panel_info.prefix_ce_support) {
 			snprintf(wq_name, 128, "fb%d_rch2_ce_end", hisifd->index);
 			hisifd->rch2_ce_end_wq = create_singlethread_workqueue(wq_name);
@@ -8698,7 +8303,6 @@ int hisi_overlay_init(struct hisi_fb_data_type *hisifd)
 			}
 			INIT_WORK(&hisifd->rch4_ce_end_work, hisi_rch4_ce_end_handle_func);
 		}
-#endif
 	}
 
 	if (hisifd->index == PRIMARY_PANEL_IDX) {
@@ -8706,6 +8310,7 @@ int hisi_overlay_init(struct hisi_fb_data_type *hisifd)
 		hisifd->ov_online_play = hisi_ov_online_play;
 		hisifd->ov_offline_play = NULL;
 		hisifd->ov_copybit_play = NULL;
+		hisifd->ov_media_common_play = NULL;
 		hisifd->ov_wb_isr_handler = NULL;
 		hisifd->ov_vactive0_start_isr_handler = hisi_vactive0_start_isr_handler;
 
@@ -8717,6 +8322,7 @@ int hisi_overlay_init(struct hisi_fb_data_type *hisifd)
 		hisifd->ov_online_play = hisi_ov_online_play;
 		hisifd->ov_offline_play = NULL;
 		hisifd->ov_copybit_play = NULL;
+		hisifd->ov_media_common_play = NULL;
 		hisifd->ov_wb_isr_handler = NULL;
 		hisifd->ov_vactive0_start_isr_handler = hisi_vactive0_start_isr_handler;
 
@@ -8725,11 +8331,24 @@ int hisi_overlay_init(struct hisi_fb_data_type *hisifd)
 		hisifd->set_reg = hisi_cmdlist_set_reg;
 		hisifd->ov_online_play = NULL;
 		hisifd->ov_offline_play = hisi_ov_offline_play;
-	#if defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		hisifd->ov_copybit_play = hisi_ov_copybit_play;
-	#else
 		hisifd->ov_copybit_play = NULL;
-	#endif
+		hisifd->ov_media_common_play = NULL;
+		hisifd->ov_wb_isr_handler = NULL;
+		hisifd->ov_vactive0_start_isr_handler = NULL;
+
+		hisifd->crc_isr_handler = NULL;
+
+		if (!hisi_mdc_resource_init(hisifd, g_dss_version_tag)) {
+			HISI_FB_INFO("mdc channel manager init success!\n");
+		}
+
+	} else if (hisifd->index == MEDIACOMMON_PANEL_IDX) {
+		hisifd->set_reg = hisi_cmdlist_set_reg;
+		hisifd->ov_online_play = NULL;
+		hisifd->ov_offline_play = NULL;
+		hisifd->ov_copybit_play = NULL;
+		hisifd->ov_media_common_play = NULL;
+
 		hisifd->ov_wb_isr_handler = NULL;
 		hisifd->ov_vactive0_start_isr_handler = NULL;
 
@@ -8739,7 +8358,12 @@ int hisi_overlay_init(struct hisi_fb_data_type *hisifd)
 		return -EINVAL;
 	}
 
-	hisi_cmdlist_init(hisifd);
+	if (!(hisifd->index == EXTERNAL_PANEL_IDX && !hisifd->panel_info.fake_external)) {
+		if (hisi_cmdlist_init(hisifd)) {
+			HISI_FB_ERR("fb%d hisi_cmdlist_init failed!\n", hisifd->index);
+			return -EINVAL;
+		}
+	}
 
 	//mmbuf init
 	hisi_dss_mmbuf_init(hisifd);
@@ -8749,7 +8373,10 @@ int hisi_overlay_init(struct hisi_fb_data_type *hisifd)
 
 int hisi_overlay_deinit(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	if (hisifd->index == PRIMARY_PANEL_IDX) {
 		hisi_effect_deinit(hisifd);
@@ -8770,12 +8397,6 @@ int hisi_overlay_deinit(struct hisi_fb_data_type *hisifd)
 		hisifd->dpp_ce_end_wq = NULL;
 	}
 
-#ifdef CONFIG_HISI_FB_3660
-	if (hisifd->hiace_end_wq) {
-		destroy_workqueue(hisifd->hiace_end_wq);
-		hisifd->hiace_end_wq = NULL;
-	}
-#endif
 
 	if (hisifd->dss_debug_wq) {
 		destroy_workqueue(hisifd->dss_debug_wq);
@@ -8788,7 +8409,9 @@ int hisi_overlay_deinit(struct hisi_fb_data_type *hisifd)
 	}
 
 	//FIXME:
-	hisi_cmdlist_deinit(hisifd);
+	if (!(hisifd->index == EXTERNAL_PANEL_IDX && !hisifd->panel_info.fake_external)) {
+		hisi_cmdlist_deinit(hisifd);
+	}
 
 	//mmbuf deinit
 	hisi_dss_mmbuf_deinit(hisifd);
@@ -8798,7 +8421,13 @@ int hisi_overlay_deinit(struct hisi_fb_data_type *hisifd)
 
 void hisi_vactive0_start_isr_handler(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	struct hisifb_vsync *vsync_ctrl = NULL;
+	ktime_t pre_vactive_timestamp;
+
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 
 	if (is_mipi_cmd_panel(hisifd) && (hisifd->frame_update_flag == 0)) {
 		hisifd->vactive0_start_flag = 1;
@@ -8812,6 +8441,17 @@ void hisi_vactive0_start_isr_handler(struct hisi_fb_data_type *hisifd)
 	}
 
 	wake_up_interruptible_all(&hisifd->vactive0_start_wq);
+
+	if (g_debug_online_vactive) {
+		vsync_ctrl = &(hisifd->vsync_ctrl);
+
+		pre_vactive_timestamp = vsync_ctrl->vactive_timestamp;
+		vsync_ctrl->vactive_timestamp = ktime_get();
+
+		HISI_FB_INFO("fb%d, VACTIVE =%llu, time_diff=%llu.\n", hisifd->index,
+			ktime_to_ns(vsync_ctrl->vactive_timestamp),
+			(ktime_to_ns(vsync_ctrl->vactive_timestamp) - ktime_to_ns(pre_vactive_timestamp)));
+	}
 }
 
 int hisi_vactive0_start_config(struct hisi_fb_data_type *hisifd,
@@ -8836,7 +8476,6 @@ int hisi_vactive0_start_config(struct hisi_fb_data_type *hisifd,
 	uint32_t cmdlist_idxs_prev_prev = 0;
 	uint32_t read_value[4] = {0};
 	uint32_t ldi_vstate = 0;
-#if defined (CONFIG_HUAWEI_DSM)
 	uint32_t dmd_index = 0;
 	int dmd_ret = 0;
 	uint32_t dmd_vactive0_start_flag = 0;
@@ -8848,9 +8487,14 @@ int hisi_vactive0_start_config(struct hisi_fb_data_type *hisifd,
 	uint32_t dmd_cmdlist_idxs = 0;
 	static u32 s_vactive0_timeout_count = 0;
 	int lcd_id = 0;
-#endif
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == pov_req) {
+		HISI_FB_ERR("pov_req is NULL");
+		return -EINVAL;
+	}
 
 	pov_req_prev = &(hisifd->ov_req_prev);
 	pov_req_prev_prev = &(hisifd->ov_req_prev_prev);
@@ -8900,21 +8544,16 @@ int hisi_vactive0_start_config(struct hisi_fb_data_type *hisifd,
 				}
 
 				cmdlist_idxs = cmdlist_idxs_prev | cmdlist_idxs_prev_prev;
-
+				// cppcheck-suppress *
 				HISI_FB_ERR("fb%d, 1wait_for vactive0_start_flag timeout!ret=%d, "
 					"vactive0_start_flag=%d, pre_pre_frame_no=%u, frame_no=%u, TIMESTAMP_DIFF is %u us, "
 					"cmdlist_idxs_prev=0x%x, cmdlist_idxs_prev_prev=0x%x, cmdlist_idxs=0x%x, itf0_ints=0x%x\n",
 					hisifd->index, ret, hisifd->vactive0_start_flag, pov_req_dump->frame_no, pov_req->frame_no,
 					hisifb_timestamp_diff(&tv0, &tv1),
 					cmdlist_idxs_prev, cmdlist_idxs_prev_prev, cmdlist_idxs,
-				#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 					inp32(hisifd->dss_base + GLB_GLB_CPU_ITF0_INTS)
-				#elif defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-  					inp32(hisifd->dss_base + DSS_LDI0_OFFSET + LDI_CPU_ITF_INTS)
-				#endif
-					);
+				);
 
-			#if defined (CONFIG_HUAWEI_DSM)
 				s_vactive0_timeout_count++;
 				dmd_index = hisifd->index;
 				dmd_ret = ret;
@@ -8926,25 +8565,18 @@ int hisi_vactive0_start_config(struct hisi_fb_data_type *hisifd,
 				dmd_cmdlist_idxs_prev_prev = cmdlist_idxs_prev_prev;
 				dmd_cmdlist_idxs = cmdlist_idxs;
 				lcd_id = hisifb_get_lcd_id(hisifd);
-			#endif
 
 				if (g_debug_ovl_online_composer_hold) {
-					dumpDssOverlay(hisifd, pov_req_dump, (g_debug_need_save_file == 1));
+					dumpDssOverlay(hisifd, pov_req_dump);
 					hisi_cmdlist_dump_all_node(hisifd, NULL, cmdlist_idxs);
 					mdelay(HISI_DSS_COMPOSER_HOLD_TIME);
 				}
 
 				if (g_debug_ldi_underflow_clear && g_ldi_data_gate_en) {
-				#if 1
 					hisi_cmdlist_config_reset(hisifd, pov_req_dump, cmdlist_idxs);
 
 					ldi_data_gate(hisifd, false);
 					mdelay(10);
-				#else
-					if (hisifd->ldi_underflow_wq) {
-						queue_work(hisifd->ldi_underflow_wq, &hisifd->ldi_underflow_work);
-					}
-				#endif
 
 					mipi_panel_check_reg(hisifd, read_value);
 					ldi_vstate = inp32(hisifd->dss_base + DSS_LDI0_OFFSET + LDI_VSTATE);
@@ -8961,7 +8593,7 @@ int hisi_vactive0_start_config(struct hisi_fb_data_type *hisifd,
 
 					memset(&(hisifd->ov_block_infos_prev), 0,
 						HISI_DSS_OV_BLOCK_NUMS * sizeof(dss_overlay_block_t));
-					memset(&(hisifd->ov_req_prev), 0, sizeof(dss_overlay_t));
+					hisifb_dss_overlay_info_init(&hisifd->ov_req_prev);
 
 					//waitting te0
 					if (LDI_VSTATE_V_WAIT_TE0 == ldi_vstate) {
@@ -8974,7 +8606,6 @@ int hisi_vactive0_start_config(struct hisi_fb_data_type *hisifd,
 					    }
 					}
 
-				#if defined (CONFIG_HUAWEI_DSM)
 					if (s_vactive0_timeout_count > VACTIVE0_TIMEOUT_EXPIRE_COUNT) {
 						if (lcd_dclient && !dsm_client_ocuppy(lcd_dclient) && !g_fake_lcd_flag && !hisifd->lcd_self_testing) {
 							dsm_client_record(lcd_dclient, "fb%d, 1wait_for vactive0_start_flag timeout!ret=%d, "
@@ -8992,11 +8623,9 @@ int hisi_vactive0_start_config(struct hisi_fb_data_type *hisifd,
 						}
 						s_vactive0_timeout_count = 0;
 					}
-				#endif
 
 					return 0;
 				}
-			#if defined (CONFIG_HUAWEI_DSM)
 				else {
 					if (s_vactive0_timeout_count > VACTIVE0_TIMEOUT_EXPIRE_COUNT) {
 						if (lcd_dclient && !dsm_client_ocuppy(lcd_dclient) && !g_fake_lcd_flag && !hisifd->lcd_self_testing) {
@@ -9010,7 +8639,6 @@ int hisi_vactive0_start_config(struct hisi_fb_data_type *hisifd,
 						s_vactive0_timeout_count = 0;
 					}
 				}
-			#endif
 
 				ldi_data_gate(hisifd, false);
 				mipi_panel_check_reg(hisifd, read_value);
@@ -9062,9 +8690,7 @@ int hisi_vactive0_start_config(struct hisi_fb_data_type *hisifd,
 				}
 			} else {
 				ldi_data_gate(hisifd, true);
-			#if defined (CONFIG_HUAWEI_DSM)
 				s_vactive0_timeout_count = 0;
-			#endif
 				ret = 0;
 			}
 		}
@@ -9112,14 +8738,14 @@ int hisi_vactive0_start_config(struct hisi_fb_data_type *hisifd,
 				hisifb_timestamp_diff(&tv0, &tv1), cmdlist_idxs);
 
 			if (g_debug_ovl_online_composer_hold) {
-				dumpDssOverlay(hisifd, pov_req_dump, (g_debug_need_save_file == 1));
+				dumpDssOverlay(hisifd, pov_req_dump);
 				hisi_cmdlist_dump_all_node(hisifd, NULL, cmdlist_idxs);
 				mdelay(HISI_DSS_COMPOSER_HOLD_TIME);
 			}
 			// for blank display of video mode
 			mipi_dsi_reset(hisifd);
 
-			ret = -ETIMEDOUT;
+			ret = 0;
 		} else {
 			ret = 0;
 		}
@@ -9128,160 +8754,44 @@ int hisi_vactive0_start_config(struct hisi_fb_data_type *hisifd,
 	if (ret == -ETIMEDOUT) {
 		if (pov_req_dump && pov_req_dump->ovl_idx == DSS_OVL0) {
 			isr_s1 = inp32(hisifd->dss_base + GLB_CPU_PDP_INTS);
-		#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 			isr_s2_mask = inp32(hisifd->dss_base + GLB_GLB_CPU_ITF0_INT_MSK);
 			isr_s2 = inp32(hisifd->dss_base + GLB_GLB_CPU_ITF0_INTS);
-		#elif defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-			isr_s2_mask = inp32(hisifd->dss_base + DSS_LDI0_OFFSET + LDI_CPU_ITF_INT_MSK);
-			isr_s2 = inp32(hisifd->dss_base + DSS_LDI0_OFFSET + LDI_CPU_ITF_INTS);
-		#endif
 			ldi_base = hisifd->dss_base + DSS_LDI0_OFFSET;
+			HISI_FB_ERR("fb%d, isr_s1=0x%x, isr_s2_mask=0x%x, isr_s2=0x%x, "
+						"LDI_CTRL(0x%x), LDI_FRM_MSK(0x%x).\n",
+						hisifd->index, isr_s1, isr_s2_mask, isr_s2,
+						inp32(ldi_base + LDI_CTRL),
+						inp32(ldi_base + LDI_FRM_MSK));
 		} else if (pov_req_dump && pov_req_dump->ovl_idx == DSS_OVL1) {
 			isr_s1 = inp32(hisifd->dss_base + GLB_CPU_SDP_INTS);
-		#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 			isr_s2_mask = inp32(hisifd->dss_base + GLB_GLB_CPU_ITF1_INT_MSK);
 			isr_s2 = inp32(hisifd->dss_base + GLB_GLB_CPU_ITF1_INTS);
-		#elif defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-			isr_s2_mask = inp32(hisifd->dss_base + DSS_LDI1_OFFSET + LDI_CPU_ITF_INT_MSK);
-			isr_s2 = inp32(hisifd->dss_base + DSS_LDI1_OFFSET + LDI_CPU_ITF_INTS);
-		#endif
 
 			ldi_base = hisifd->dss_base + DSS_LDI1_OFFSET;
+			HISI_FB_ERR("fb%d, isr_s1=0x%x, isr_s2_mask=0x%x, isr_s2=0x%x, "
+						"LDI_CTRL(0x%x), LDI_FRM_MSK(0x%x).\n",
+						hisifd->index, isr_s1, isr_s2_mask, isr_s2,
+						inp32(ldi_base + LDI_CTRL),
+						inp32(ldi_base + LDI_FRM_MSK));
 		} else {
 			; //do nothing;
 		}
-
-		HISI_FB_ERR("fb%d, isr_s1=0x%x, isr_s2_mask=0x%x, isr_s2=0x%x, "
-			"LDI_CTRL(0x%x), LDI_FRM_MSK(0x%x).\n",
-			hisifd->index, isr_s1, isr_s2_mask, isr_s2,
-			inp32(ldi_base + LDI_CTRL),
-			inp32(ldi_base + LDI_FRM_MSK));
 	}
 
 	return ret;
 }
 
-int hisi_crc_enable(struct hisi_fb_data_type *hisifd,
-	dss_overlay_t *pov_req)
-{
-	uint32_t tmp = 0;
-
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
-
-	if (g_enable_crc_debug == 0)
-		return 0;
-
-	if (pov_req->crc_enable_status <= 0)
-		return 0;
-
-	if (hisifd->index == PRIMARY_PANEL_IDX) {
-	#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
-		tmp = inp32(hisifd->dss_base + GLB_INT_MSK);
-	#elif defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		tmp = inp32(hisifd->dss_base + DSS_DPP_OFFSET + DPP_INT_MSK);
-	#endif
-
-		if (pov_req->crc_enable_status == DSS_CRC_OV_EN) {
-			outp32(hisifd->dss_base + DSS_DBG_OFFSET + DBG_CRC_OV0_EN, 0x1);
-
-			tmp &= ~BIT_CRC_OV0_INT;
-		} else if (pov_req->crc_enable_status == DSS_CRC_LDI_EN) {
-			//outp32(hisifd->dss_base + GLB_CRC_LDI0_EN, 0x1);
-
-			tmp &= ~BIT_CRC_ITF0_INT;
-		} else if (pov_req->crc_enable_status == DSS_CRC_SUM_EN) {
-			outp32(hisifd->dss_base + DSS_DBG_OFFSET + DBG_CRC_SUM_EN, 0x1);
-
-			tmp &= ~BIT_CRC_SUM_INT;
-		}
-
-	#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
-		outp32(hisifd->dss_base + GLB_INT_MSK, tmp);
-	#elif defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		outp32(hisifd->dss_base + DSS_DPP_OFFSET + DPP_INT_MSK, tmp);
-	#endif
-	} else if (hisifd->index == EXTERNAL_PANEL_IDX) {
-	#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
-		tmp = inp32(hisifd->dss_base + GLB_INT_MSK);
-	#elif defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		tmp = inp32(hisifd->dss_base + DSS_DPP_OFFSET + DPP_INT_MSK);
-	#endif
-
-		if (pov_req->crc_enable_status == DSS_CRC_OV_EN) {
-			outp32(hisifd->dss_base + DSS_DBG_OFFSET + DBG_CRC_OV1_EN, 0x1);
-
-			tmp &= ~BIT_CRC_OV1_INT;
-		} else if (pov_req->crc_enable_status == DSS_CRC_LDI_EN) {
-			outp32(hisifd->dss_base + GLB_CRC_LDI1_EN, 0x1);
-
-			tmp &= ~BIT_CRC_ITF1_INT;
-		} else if (pov_req->crc_enable_status == DSS_CRC_SUM_EN) {
-			outp32(hisifd->dss_base + DSS_DBG_OFFSET + DBG_CRC_SUM_EN, 0x1);
-
-			tmp &= ~BIT_CRC_SUM_INT;
-		}
-
-	#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
-		outp32(hisifd->dss_base + GLB_INT_MSK, tmp);
-	#elif defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		outp32(hisifd->dss_base + DSS_DPP_OFFSET + DPP_INT_MSK, tmp);
-	#endif
-	} else {
-		HISI_FB_ERR("fb%d, not support!", hisifd->index);
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
-static int hisi_crc_disable(struct hisi_fb_data_type *hisifd)
-{
-	uint32_t tmp = 0;
-
-	BUG_ON(hisifd == NULL);
-
-	if (hisifd->index == PRIMARY_PANEL_IDX) {
-		outp32(hisifd->dss_base + DSS_DBG_OFFSET + DBG_CRC_OV0_EN, 0x0);
-		//outp32(hisifd->dss_base + GLB_CRC_LDI0_EN, 0x0);
-		outp32(hisifd->dss_base + DSS_DBG_OFFSET + DBG_CRC_SUM_EN, 0x0);
-
-	#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
-		tmp = inp32(hisifd->dss_base + GLB_INT_MSK);
-		tmp |= (BIT_CRC_OV0_INT | BIT_CRC_ITF0_INT | BIT_CRC_SUM_INT);
-		outp32(hisifd->dss_base + GLB_INT_MSK, tmp);
-	#elif defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		tmp = inp32(hisifd->dss_base + DSS_DPP_OFFSET + DPP_INT_MSK);
-		tmp |= (BIT_CRC_OV0_INT | BIT_CRC_ITF0_INT | BIT_CRC_SUM_INT);
-		outp32(hisifd->dss_base + DSS_DPP_OFFSET + DPP_INT_MSK, tmp);
-	#endif
-	} else if (hisifd->index == EXTERNAL_PANEL_IDX) {
-		outp32(hisifd->dss_base + DSS_DBG_OFFSET + DBG_CRC_OV1_EN, 0x0);
-		outp32(hisifd->dss_base + GLB_CRC_LDI1_EN, 0x0);
-		outp32(hisifd->dss_base + DSS_DBG_OFFSET + DBG_CRC_SUM_EN, 0x0);
-
-	#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
-		tmp = inp32(hisifd->dss_base + GLB_INT_MSK);
-		tmp |= (BIT_CRC_OV1_INT | BIT_CRC_ITF1_INT | BIT_CRC_SUM_INT);
-		outp32(hisifd->dss_base + GLB_INT_MSK, tmp);
-	#elif defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		tmp = inp32(hisifd->dss_base + DSS_DPP_OFFSET + DPP_INT_MSK);
-		tmp |= (BIT_CRC_OV1_INT | BIT_CRC_ITF1_INT | BIT_CRC_SUM_INT);
-		outp32(hisifd->dss_base + DSS_DPP_OFFSET + DPP_INT_MSK, tmp);
-	#endif
-	} else {
-		HISI_FB_ERR("fb%d, not support!", hisifd->index);
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
 static int hisi_crc_get_result(struct hisi_fb_data_type *hisifd,
 	dss_overlay_t *pov_req)
 {
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == pov_req) {
+		HISI_FB_ERR("pov_req is NULL");
+		return -EINVAL;
+	}
 
 	if (hisifd->index == PRIMARY_PANEL_IDX) {
 		if (pov_req->crc_enable_status == DSS_CRC_OV_EN) {
@@ -9313,69 +8823,17 @@ static int hisi_crc_get_result(struct hisi_fb_data_type *hisifd,
 	return 0;
 }
 
-void hisi_crc_isr_handler(struct hisi_fb_data_type *hisifd)
-{
-	BUG_ON(hisifd == NULL);
-
-	hisi_crc_disable(hisifd);
-
-	hisifd->crc_flag++;
-	wake_up_interruptible_all(&hisifd->crc_wq);
-}
-
-int hisi_crc_config(struct hisi_fb_data_type *hisifd,
-	dss_overlay_t *pov_req)
-{
-	int ret = 0;
-	//uint32_t prev_crc_flag = 0;
-
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
-
-	if (g_enable_crc_debug == 0)
-		return 0;
-
-	if (pov_req->crc_enable_status <= 0)
-		return 0;
-
-#if 1
-	mdelay(100);
-	hisi_crc_get_result(hisifd, pov_req);
-	hisi_crc_disable(hisifd);
-#else
-	prev_crc_flag = hisifd->crc_flag;
-	ret = wait_event_interruptible_timeout(hisifd->crc_wq,
-		(prev_crc_flag != hisifd->crc_flag), 1 * HZ);
-	if (ret == -ERESTARTSYS) {
-		HISI_FB_DEBUG("fb%d, wait_for crc_flag,  Returns -ERESTARTSYS if interrupted by a signal!\n",
-			hisifd->index);
-		ret = wait_event_interruptible_timeout(hisifd->crc_wq,
-			(prev_crc_flag != hisifd->crc_flag), 1 * HZ);
-	}
-
-	if (ret <= 0) {
-		HISI_FB_ERR("fb%d, wait_for crc_flag timeout!ret=%d, "
-			"prev_crc_flag=%d, crc_flag=%d\n",
-			hisifd->index, ret, prev_crc_flag, hisifd->crc_flag);
-		ret = -ETIMEDOUT;
-	} else {
-		ret = 0;
-
-		hisi_crc_get_result(hisifd, pov_req);
-	}
-#endif
-
-	return ret;
-}
-
 void hisi_dss_debug_func(struct work_struct *work)
 {
 	struct hisi_fb_data_type *hisifd = NULL;
 
 	hisifd = container_of(work, struct hisi_fb_data_type, dss_debug_work);
-	BUG_ON(hisifd == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_ERR("hisifd is NULL point!\n");
+		return;
+	}
 
-	dumpDssOverlay(hisifd, &hisifd->ov_req, true);
+	dumpDssOverlay(hisifd, &hisifd->ov_req);
 }
 
 void hisi_ldi_underflow_handle_func(struct work_struct *work)
@@ -9391,7 +8849,10 @@ void hisi_ldi_underflow_handle_func(struct work_struct *work)
 	uint32_t isr_s2 = 0;
 
 	hisifd = container_of(work, struct hisi_fb_data_type, ldi_underflow_work);
-	BUG_ON(hisifd == NULL);
+	if (hisifd == NULL) {
+		HISI_FB_ERR("hisifd is NULL point!\n");
+		return;
+	}
 
 	HISI_FB_INFO("fb%d, +.\n", hisifd->index);
 
@@ -9401,12 +8862,6 @@ void hisi_ldi_underflow_handle_func(struct work_struct *work)
 		up(&hisifd->blank_sem0);
 		return ;
 	}
-
-#if defined(CONFIG_HISI_FB_3660)
-	down(&hisifd->hiace_clear_sem);
-#endif
-
-	hisifb_activate_vsync(hisifd);
 
 	pov_req_prev = &(hisifd->ov_req_prev);
 	pov_req_prev_prev = &(hisifd->ov_req_prev_prev);
@@ -9421,11 +8876,21 @@ void hisi_ldi_underflow_handle_func(struct work_struct *work)
 		HISI_FB_ERR("fb%d, hisi_cmdlist_get_cmdlist_idxs pov_req_prev_prev failed! ret = %d\n", hisifd->index, ret);
 	}
 
+	if (g_dss_version_tag == FB_ACCEL_KIRIN970) {
+		hisifb_activate_vsync(hisifd);
+		hisi_cmdlist_config_reset(hisifd, &(hisifd->ov_req_prev), cmdlist_idxs_prev | cmdlist_idxs_prev_prev);
+		hisifb_deactivate_vsync(hisifd);
+		up(&hisifd->blank_sem0);
+		return;
+	}
+
+
+	hisifb_activate_vsync(hisifd);
+
 	hisi_cmdlist_config_reset(hisifd, pov_req_prev, cmdlist_idxs_prev | cmdlist_idxs_prev_prev);
 
 	enable_ldi(hisifd);
 
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	isr_s1 = inp32(hisifd->dss_base + GLB_CPU_PDP_INTS);
 	isr_s2 = inp32(hisifd->dss_base + GLB_GLB_CPU_ITF0_INTS);
 	outp32(hisifd->dss_base + GLB_GLB_CPU_ITF0_INTS, isr_s2);
@@ -9434,22 +8899,8 @@ void hisi_ldi_underflow_handle_func(struct work_struct *work)
 	tmp = inp32(hisifd->dss_base + GLB_GLB_CPU_ITF0_INT_MSK);
 	tmp &= ~ BIT_LDI_UNFLOW;
 	outp32(hisifd->dss_base + GLB_GLB_CPU_ITF0_INT_MSK, tmp);
-#elif defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-	isr_s1 = inp32(hisifd->dss_base + GLB_CPU_PDP_INTS);
-	isr_s2 = inp32(hisifd->dss_base + DSS_LDI0_OFFSET + LDI_CPU_ITF_INTS);
-	outp32(hisifd->dss_base + DSS_LDI0_OFFSET + LDI_CPU_ITF_INTS, isr_s2);
-	outp32(hisifd->dss_base + GLB_CPU_PDP_INTS, isr_s1);
-
-	tmp = inp32(hisifd->dss_base + DSS_LDI0_OFFSET + LDI_CPU_ITF_INT_MSK);
-	tmp &= ~ BIT_LDI_UNFLOW;
-	outp32(hisifd->dss_base + DSS_LDI0_OFFSET + LDI_CPU_ITF_INT_MSK, tmp);
-#endif
 
 	hisifb_deactivate_vsync(hisifd);
-
-#if defined(CONFIG_HISI_FB_3660)
-	up(&hisifd->hiace_clear_sem);
-#endif
 
 	up(&hisifd->blank_sem0);
 

@@ -52,6 +52,9 @@ mipi_ifbc_division_t g_mipi_ifbc_division[MIPI_DPHY_NUM][IFBC_TYPE_MAX] =
 			PXL0_DIV4_GT_EN_CLOSE, PXL0_DIVCFG_1, PXL0_DSI_GT_EN_3},
 		//vesa3x_2pipe
 		{XRES_DIV_3, YRES_DIV_1, IFBC_COMP_MODE_6, PXL0_DIV2_GT_EN_OPEN,
+			PXL0_DIV4_GT_EN_CLOSE, PXL0_DIVCFG_2, PXL0_DSI_GT_EN_3},
+		//vesa3.75x_2pipe
+		{XRES_DIV_3, YRES_DIV_1, IFBC_COMP_MODE_6, PXL0_DIV2_GT_EN_OPEN,
 			PXL0_DIV4_GT_EN_CLOSE, PXL0_DIVCFG_2, PXL0_DSI_GT_EN_3}
 	},
 
@@ -86,7 +89,11 @@ mipi_ifbc_division_t g_mipi_ifbc_division[MIPI_DPHY_NUM][IFBC_TYPE_MAX] =
 			PXL0_DIV4_GT_EN_CLOSE, PXL0_DIVCFG_3, PXL0_DSI_GT_EN_3},
 		//vesa3x_2pipe
 		{XRES_DIV_6, YRES_DIV_1, IFBC_COMP_MODE_6, PXL0_DIV2_GT_EN_OPEN,
-			PXL0_DIV4_GT_EN_CLOSE, PXL0_DIVCFG_5, 3}}
+			PXL0_DIV4_GT_EN_CLOSE, PXL0_DIVCFG_5, 3},
+		//vesa3.75x_2pipe
+		{XRES_DIV_6, YRES_DIV_1, IFBC_COMP_MODE_6, PXL0_DIV2_GT_EN_OPEN,
+			PXL0_DIV4_GT_EN_CLOSE, PXL0_DIVCFG_5, 3}
+	}
 };
 
 int hisi_lcd_backlight_on(struct platform_device *pdev)
@@ -94,9 +101,15 @@ int hisi_lcd_backlight_on(struct platform_device *pdev)
 	struct hisi_fb_data_type *hisifd = NULL;
 	int ret = 0;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +!\n", hisifd->index);
 
@@ -122,9 +135,15 @@ int hisi_lcd_backlight_off(struct platform_device *pdev)
 	struct hisi_fb_data_type *hisifd = NULL;
 	int ret = 0;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +!\n", hisifd->index);
 
@@ -222,7 +241,10 @@ int resource_cmds_tx(struct platform_device *pdev,
 	struct resource_desc *cm = NULL;
 	int i = 0;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	cm = cmds;
 
 	for (i = 0; i < cnt; i++) {
@@ -250,13 +272,18 @@ error:
 
 int spi_cmds_tx(struct spi_device *spi, struct spi_cmd_desc *cmds, int cnt)
 {
-#if defined(CONFIG_HISI_FB_3650) || defined(CONFIG_HISI_FB_6250)
 	struct spi_cmd_desc *cm = NULL;
 
 	int i = 0;
 
-	BUG_ON(spi == NULL);
-	BUG_ON(cmds == NULL);
+	if (NULL == spi) {
+		HISI_FB_ERR("spi is NULL");
+		return -EINVAL;
+	}
+	if (NULL == cmds) {
+		HISI_FB_ERR("cmds is NULL");
+		return -EINVAL;
+	}
 
 	cm = cmds;
 
@@ -275,7 +302,6 @@ int spi_cmds_tx(struct spi_device *spi, struct spi_cmd_desc *cmds, int cnt)
 
 		cm++;
 	}
-#endif
 	return 0;
 }
 
@@ -299,7 +325,10 @@ int vcc_cmds_tx(struct platform_device *pdev, struct vcc_desc *cmds, int cnt)
 		}
 
 		if (cm->dtype == DTYPE_VCC_GET) {
-			BUG_ON(pdev == NULL);
+			if (NULL == pdev) {
+				HISI_FB_ERR("pdev is NULL");
+				return -EINVAL;
+			}
 
 			*(cm->regulator) = devm_regulator_get(&pdev->dev, cm->id);
 			if (IS_ERR(*(cm->regulator))) {
@@ -379,7 +408,10 @@ int pinctrl_cmds_tx(struct platform_device *pdev, struct pinctrl_cmd_desc *cmds,
 		}
 
 		if (cm->dtype == DTYPE_PINCTRL_GET) {
-			BUG_ON(pdev == NULL);
+			if (NULL == pdev) {
+				HISI_FB_ERR("pdev is NULL");
+				return -EINVAL;
+			}
 			cm->pctrl_data->p = devm_pinctrl_get(&pdev->dev);
 			if (IS_ERR(cm->pctrl_data->p)) {
 				ret = -1;
@@ -455,7 +487,10 @@ int panel_next_set_fastboot(struct platform_device *pdev)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 
 	pdata = (struct hisi_fb_panel_data *)pdev->dev.platform_data;
 	if (pdata) {
@@ -477,9 +512,15 @@ int panel_next_on(struct platform_device *pdev)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -498,9 +539,15 @@ int panel_next_off(struct platform_device *pdev)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -519,9 +566,15 @@ int panel_next_lp_ctrl(struct platform_device *pdev, bool lp_enter)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -540,9 +593,15 @@ int panel_next_remove(struct platform_device *pdev)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -561,9 +620,15 @@ int panel_next_set_backlight(struct platform_device *pdev, uint32_t bl_level)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -582,9 +647,15 @@ int panel_next_sbl_ctrl(struct platform_device *pdev, int enable)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -603,9 +674,15 @@ int panel_next_vsync_ctrl(struct platform_device *pdev, int enable)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -624,9 +701,15 @@ int panel_next_lcd_fps_scence_handle(struct platform_device *pdev, uint32_t scen
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -645,9 +728,15 @@ int panel_next_lcd_fps_updt_handle(struct platform_device *pdev)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -666,9 +755,15 @@ int panel_next_esd_handle(struct platform_device *pdev)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -687,9 +782,15 @@ int panel_next_set_display_region(struct platform_device *pdev, struct dss_rect 
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL || dirty == NULL);
+	if((pdev == NULL) || (dirty == NULL)){
+		HISI_FB_ERR("pedv or dirty is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -708,9 +809,15 @@ int panel_next_get_lcd_id(struct platform_device *pdev)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -728,9 +835,15 @@ ssize_t panel_next_lcd_model_show(struct platform_device *pdev, char *buf)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -749,9 +862,15 @@ ssize_t panel_next_lcd_cabc_mode_show(struct platform_device *pdev, char *buf)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -771,9 +890,15 @@ ssize_t panel_next_lcd_cabc_mode_store(struct platform_device *pdev,
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -792,9 +917,15 @@ ssize_t panel_next_lcd_check_reg(struct platform_device *pdev, char *buf)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -813,9 +944,15 @@ ssize_t panel_next_lcd_mipi_detect(struct platform_device *pdev, char *buf)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -835,9 +972,15 @@ ssize_t panel_next_mipi_dsi_bit_clk_upt_store(struct platform_device *pdev,
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -856,9 +999,15 @@ ssize_t panel_next_lcd_support_checkmode_show(struct platform_device *pdev, char
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -877,9 +1026,15 @@ ssize_t panel_next_mipi_dsi_bit_clk_upt_show(struct platform_device *pdev, char 
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -898,9 +1053,15 @@ ssize_t panel_next_lcd_hkadc_debug_show(struct platform_device *pdev, char *buf)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -920,9 +1081,15 @@ ssize_t panel_next_lcd_hkadc_debug_store(struct platform_device *pdev,
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -941,9 +1108,15 @@ ssize_t panel_next_lcd_gram_check_show(struct platform_device *pdev, char *buf)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -963,9 +1136,15 @@ ssize_t panel_next_lcd_gram_check_store(struct platform_device *pdev,
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -984,9 +1163,15 @@ ssize_t panel_next_lcd_dynamic_sram_checksum_show(struct platform_device *pdev, 
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1006,9 +1191,15 @@ ssize_t panel_next_lcd_dynamic_sram_checksum_store(struct platform_device *pdev,
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1082,9 +1273,15 @@ ssize_t panel_next_lcd_voltage_enable_store(struct platform_device *pdev, const 
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1103,9 +1300,15 @@ ssize_t panel_next_lcd_bist_check(struct platform_device *pdev, char *buf)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1124,9 +1327,15 @@ ssize_t panel_next_lcd_sleep_ctrl_show(struct platform_device *pdev, char *buf)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1146,9 +1355,15 @@ ssize_t panel_next_lcd_sleep_ctrl_store(struct platform_device *pdev,
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1167,9 +1382,15 @@ ssize_t panel_next_lcd_test_config_show(struct platform_device *pdev, char *buf)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1189,15 +1410,76 @@ ssize_t panel_next_lcd_test_config_store(struct platform_device *pdev,
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
 		next_pdata = dev_get_platdata(&next_pdev->dev);
 		if ((next_pdata) && (next_pdata->lcd_test_config_store))
 			ret = next_pdata->lcd_test_config_store(next_pdev, buf, count);
+	}
+
+	return ret;
+}
+
+ssize_t panel_next_lcd_reg_read_show(struct platform_device *pdev, char *buf)
+{
+	ssize_t ret = 0;
+	struct hisi_fb_panel_data *pdata = NULL;
+	struct hisi_fb_panel_data *next_pdata = NULL;
+	struct platform_device *next_pdev = NULL;
+
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
+	pdata = dev_get_platdata(&pdev->dev);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
+
+	next_pdev = pdata->next;
+	if (next_pdev) {
+		next_pdata = dev_get_platdata(&next_pdev->dev);
+		if ((next_pdata) && (next_pdata->lcd_reg_read_show))
+			ret = next_pdata->lcd_reg_read_show(next_pdev, buf);
+	}
+
+	return ret;
+}
+
+ssize_t panel_next_lcd_reg_read_store(struct platform_device *pdev,
+	const char *buf, size_t count)
+{
+	ssize_t ret = 0;
+	struct hisi_fb_panel_data *pdata = NULL;
+	struct hisi_fb_panel_data *next_pdata = NULL;
+	struct platform_device *next_pdev = NULL;
+
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
+	pdata = dev_get_platdata(&pdev->dev);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
+
+	next_pdev = pdata->next;
+	if (next_pdev) {
+		next_pdata = dev_get_platdata(&next_pdev->dev);
+		if ((next_pdata) && (next_pdata->lcd_reg_read_store))
+			ret = next_pdata->lcd_reg_read_store(next_pdev, buf, count);
 	}
 
 	return ret;
@@ -1210,9 +1492,15 @@ ssize_t panel_next_lcd_support_mode_show(struct platform_device *pdev, char *buf
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1232,9 +1520,15 @@ ssize_t panel_next_lcd_support_mode_store(struct platform_device *pdev,
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1253,9 +1547,15 @@ ssize_t panel_next_lcd_lp2hs_mipi_check_show(struct platform_device *pdev, char 
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1275,9 +1575,15 @@ ssize_t panel_next_lcd_lp2hs_mipi_check_store(struct platform_device *pdev,
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1296,9 +1602,15 @@ ssize_t panel_next_amoled_pcd_errflag_check(struct platform_device *pdev, char *
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1317,9 +1629,15 @@ ssize_t panel_next_lcd_hbm_ctrl_store(struct platform_device *pdev,
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1338,9 +1656,15 @@ ssize_t panel_next_lcd_hbm_ctrl_show(struct platform_device *pdev, char *buf)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1529,9 +1853,15 @@ ssize_t panel_next_sharpness2d_table_store(struct platform_device *pdev,
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1550,9 +1880,15 @@ ssize_t panel_next_sharpness2d_table_show(struct platform_device *pdev, char *bu
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1571,9 +1907,15 @@ ssize_t panel_next_panel_info_show(struct platform_device *pdev, char *buf)
 	struct hisi_fb_panel_data *next_pdata = NULL;
 	struct platform_device *next_pdev = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	pdata = dev_get_platdata(&pdev->dev);
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return -EINVAL;
+	}
 
 	next_pdev = pdata->next;
 	if (next_pdev) {
@@ -1587,7 +1929,10 @@ ssize_t panel_next_panel_info_show(struct platform_device *pdev, char *buf)
 
 bool is_ldi_panel(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return false;
+	}
 	if (hisifd->panel_info.type & PANEL_LCDC)
 		return true;
 
@@ -1596,7 +1941,10 @@ bool is_ldi_panel(struct hisi_fb_data_type *hisifd)
 
 bool is_mipi_cmd_panel(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return false;
+	}
 
 	if (hisifd->panel_info.type & (PANEL_MIPI_CMD | PANEL_DUAL_MIPI_CMD))
 		return true;
@@ -1606,7 +1954,10 @@ bool is_mipi_cmd_panel(struct hisi_fb_data_type *hisifd)
 
 bool is_mipi_cmd_panel_ext(struct hisi_panel_info *pinfo)
 {
-	BUG_ON(pinfo == NULL);
+	if (NULL == pinfo) {
+		HISI_FB_ERR("pinfo is NULL");
+		return false;
+	}
 
 	if (pinfo->type & (PANEL_MIPI_CMD | PANEL_DUAL_MIPI_CMD))
 		return true;
@@ -1616,7 +1967,10 @@ bool is_mipi_cmd_panel_ext(struct hisi_panel_info *pinfo)
 
 bool is_mipi_video_panel(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return false;
+	}
 
 	if (hisifd->panel_info.type & (PANEL_MIPI_VIDEO | PANEL_DUAL_MIPI_VIDEO | PANEL_RGB2MIPI))
 		return true;
@@ -1624,9 +1978,26 @@ bool is_mipi_video_panel(struct hisi_fb_data_type *hisifd)
 	return false;
 }
 
+bool is_dp_panel(struct hisi_fb_data_type *hisifd)
+{
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return false;
+	}
+
+	if (hisifd->panel_info.type & PANEL_DP)
+		return true;
+
+	return false;
+}
+
+
 bool is_mipi_panel(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return false;
+	}
 
 	if (hisifd->panel_info.type & (PANEL_MIPI_VIDEO | PANEL_MIPI_CMD |
 		PANEL_DUAL_MIPI_VIDEO | PANEL_DUAL_MIPI_CMD))
@@ -1637,7 +2008,10 @@ bool is_mipi_panel(struct hisi_fb_data_type *hisifd)
 
 bool is_dual_mipi_panel(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return false;
+	}
 
 	if (hisifd->panel_info.type & (PANEL_DUAL_MIPI_VIDEO | PANEL_DUAL_MIPI_CMD))
 		return true;
@@ -1647,7 +2021,10 @@ bool is_dual_mipi_panel(struct hisi_fb_data_type *hisifd)
 
 bool is_dual_mipi_panel_ext(struct hisi_panel_info *pinfo)
 {
-	BUG_ON(pinfo == NULL);
+	if (NULL == pinfo) {
+		HISI_FB_ERR("pinfo is NULL");
+		return false;
+	}
 
 	if (pinfo->type & (PANEL_DUAL_MIPI_VIDEO | PANEL_DUAL_MIPI_CMD))
 		return true;
@@ -1657,7 +2034,10 @@ bool is_dual_mipi_panel_ext(struct hisi_panel_info *pinfo)
 
 bool is_hisi_writeback_panel(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return false;
+	}
 
 	if (hisifd->panel_info.type & PANEL_WRITEBACK)
 		return true;
@@ -1667,7 +2047,10 @@ bool is_hisi_writeback_panel(struct hisi_fb_data_type *hisifd)
 
 bool is_ifbc_panel(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return false;
+	}
 
 	if (hisifd->panel_info.ifbc_type != IFBC_TYPE_NONE)
 		return true;
@@ -1677,12 +2060,16 @@ bool is_ifbc_panel(struct hisi_fb_data_type *hisifd)
 
 bool is_ifbc_vesa_panel(struct hisi_fb_data_type *hisifd)
 {
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return false;
+	}
 
 	if ((hisifd->panel_info.ifbc_type == IFBC_TYPE_VESA2X_SINGLE) ||
 		(hisifd->panel_info.ifbc_type == IFBC_TYPE_VESA3X_SINGLE) ||
 		(hisifd->panel_info.ifbc_type == IFBC_TYPE_VESA2X_DUAL) ||
-		(hisifd->panel_info.ifbc_type == IFBC_TYPE_VESA3X_DUAL))
+		(hisifd->panel_info.ifbc_type == IFBC_TYPE_VESA3X_DUAL) ||
+		(hisifd->panel_info.ifbc_type == IFBC_TYPE_VESA3_75X_DUAL))
 		return true;
 
 	return false;
@@ -1725,11 +2112,20 @@ int mipi_ifbc_get_rect(struct hisi_fb_data_type *hisifd, struct dss_rect *rect)
 	uint32_t xres_div;
 	uint32_t yres_div;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(rect == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == rect) {
+		HISI_FB_ERR("rect is NULL");
+		return -EINVAL;
+	}
 
 	ifbc_type = hisifd->panel_info.ifbc_type;
-	BUG_ON((ifbc_type < IFBC_TYPE_NONE) || (ifbc_type >= IFBC_TYPE_MAX));
+	if ((ifbc_type < IFBC_TYPE_NONE) || (ifbc_type >= IFBC_TYPE_MAX)) {
+		HISI_FB_ERR("ifbc_type is invalid");
+		return -EINVAL;
+	}
 
 	mipi_idx = is_dual_mipi_panel(hisifd) ? 1 : 0;
 
@@ -1745,21 +2141,37 @@ int mipi_ifbc_get_rect(struct hisi_fb_data_type *hisifd, struct dss_rect *rect)
 	}
 
 	//[NOTE] rsp3x && single_mipi CMD mode amended xres_div = 1.5, yres_div = 2 ,VIDEO mode amended xres_div = 3, yres_div = 1
-#if defined (CONFIG_HISI_FB_3660)
-	if ((mipi_idx == 0) && (ifbc_type == IFBC_TYPE_RSP3X) && (hisifd->panel_info.type == PANEL_MIPI_CMD)) {
-		rect->w *= 2;
-		rect->h /= 2;
-	}
-#else
 	if ((mipi_idx == 0) && (ifbc_type == IFBC_TYPE_RSP3X)) {
 		rect->w *= 2;
 		rect->h /= 2;
 	}
-#endif
 	rect->w /= xres_div;
 	rect->h /= yres_div;
 
 	return 0;
+}
+
+void hisifb_snd_cmd_before_frame(struct hisi_fb_data_type *hisifd)
+{
+	struct hisi_fb_panel_data *pdata = NULL;
+
+	if (hisifd == NULL) {
+		HISI_FB_ERR("hisifd is null\n");
+		return ;
+	}
+	if (!hisifd->panel_info.snd_cmd_before_frame_support) {
+		return ;
+	}
+	pdata = dev_get_platdata(&hisifd->pdev->dev);
+	if (pdata == NULL) {
+		HISI_FB_ERR("pdata is null\n");
+		return ;
+	}
+
+	if (pdata->snd_cmd_before_frame) {
+		pdata->snd_cmd_before_frame(hisifd->pdev);
+	}
+	return;
 }
 
 bool hisi_fb_device_probe_defer(uint32_t panel_type, uint32_t bl_type)
@@ -1791,7 +2203,6 @@ bool hisi_fb_device_probe_defer(uint32_t panel_type, uint32_t bl_type)
 	case PANEL_MIPI_CMD:
 	case PANEL_DUAL_MIPI_VIDEO:
 	case PANEL_DUAL_MIPI_CMD:
-	case PANEL_EDP:
 		if (g_dts_resouce_ready & DTS_FB_RESOURCE_INIT_READY) {
 			if (bl_type & (BL_SET_BY_PWM | BL_SET_BY_BLPWM)) {
 				if (g_dts_resouce_ready & DTS_PWM_READY)
@@ -1802,6 +2213,7 @@ bool hisi_fb_device_probe_defer(uint32_t panel_type, uint32_t bl_type)
 		}
 		break;
 	case PANEL_HDMI:
+	case PANEL_DP:
 		if (g_dts_resouce_ready & DTS_PANEL_PRIMARY_READY)
 			flag = false;
 		break;
@@ -1810,6 +2222,10 @@ bool hisi_fb_device_probe_defer(uint32_t panel_type, uint32_t bl_type)
 			flag = false;
 		break;
 	case PANEL_WRITEBACK:
+		if (g_dts_resouce_ready & DTS_PANEL_OFFLINECOMPOSER_READY)
+			flag = false;
+		break;
+	case PANEL_MEDIACOMMON:
 		if (g_dts_resouce_ready & DTS_PANEL_OFFLINECOMPOSER_READY)
 			flag = false;
 		break;
@@ -1834,7 +2250,10 @@ int hisi_fb_device_set_status1(struct hisi_fb_data_type *hisifd)
 {
 	int ret = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	down(&hisi_fb_dts_resource_sem);
 
@@ -1844,7 +2263,7 @@ int hisi_fb_device_set_status1(struct hisi_fb_data_type *hisifd)
 	case PANEL_MIPI_CMD:
 	case PANEL_DUAL_MIPI_VIDEO:
 	case PANEL_DUAL_MIPI_CMD:
-	case PANEL_EDP:
+	case PANEL_DP:
 	case PANEL_MIPI2RGB:
 	case PANEL_RGB2MIPI:
 	case PANEL_HDMI:
@@ -1861,6 +2280,9 @@ int hisi_fb_device_set_status1(struct hisi_fb_data_type *hisifd)
 		break;
 	case PANEL_WRITEBACK:
 		g_dts_resouce_ready |= DTS_PANEL_WRITEBACK_READY;
+		break;
+	case PANEL_MEDIACOMMON:
+		g_dts_resouce_ready |= DTS_PANEL_MEDIACOMMON_READY;
 		break;
 	default:
 		HISI_FB_ERR("not support this panel type(%d).\n", hisifd->panel_info.type);
@@ -1879,7 +2301,10 @@ struct platform_device *hisi_fb_device_alloc(struct hisi_fb_panel_data *pdata,
 	struct platform_device *this_dev = NULL;
 	char dev_name[32] = {0};
 
-	BUG_ON(pdata == NULL);
+	if (NULL == pdata) {
+		HISI_FB_ERR("pdata is NULL");
+		return NULL;
+	}
 
 	switch (type) {
 	case PANEL_MIPI_VIDEO:
@@ -1888,14 +2313,15 @@ struct platform_device *hisi_fb_device_alloc(struct hisi_fb_panel_data *pdata,
 	case PANEL_DUAL_MIPI_CMD:
 		snprintf(dev_name, sizeof(dev_name), DEV_NAME_MIPIDSI);
 		break;
-	case PANEL_EDP:
-		snprintf(dev_name, sizeof(dev_name), DEV_NAME_EDP);
+	case PANEL_DP:
+		snprintf(dev_name, sizeof(dev_name), DEV_NAME_DP);
 		break;
 	case PANEL_NO:
 	case PANEL_LCDC:
 	case PANEL_HDMI:
 	case PANEL_OFFLINECOMPOSER:
 	case PANEL_WRITEBACK:
+	case PANEL_MEDIACOMMON:
 		snprintf(dev_name, sizeof(dev_name), DEV_NAME_DSS_DPE);
 		break;
 	case PANEL_RGB2MIPI:
@@ -1923,7 +2349,6 @@ struct platform_device *hisi_fb_device_alloc(struct hisi_fb_panel_data *pdata,
 	return this_dev;
 }
 
-#if defined (CONFIG_HUAWEI_DSM)
 void panel_check_status_and_report_by_dsm(struct lcd_reg_read_t *lcd_status_reg, int cnt, char __iomem *mipi_dsi0_base)
 {
 	u32 read_value = 0, expected_value = 0, read_mask = 0;
@@ -1938,6 +2363,7 @@ void panel_check_status_and_report_by_dsm(struct lcd_reg_read_t *lcd_status_reg,
 		dsm_client_ready = 1;
 	}
 
+	lcd_status_reg->recovery = 0;
 	mipi_dsi_check_0lane_is_ready(mipi_dsi0_base);
 	mipi_dsi_max_return_packet_size(&packet_size_set_cmd, mipi_dsi0_base);
 
@@ -1960,8 +2386,7 @@ void panel_check_status_and_report_by_dsm(struct lcd_reg_read_t *lcd_status_reg,
 		udelay(20);
 		do {
 			pkg_status = inp32(mipi_dsi0_base + MIPIDSI_CMD_PKT_STATUS_OFFSET);
-			if (!(pkg_status & 0x10))
-				break;
+			if (!(pkg_status & 0x10)) break;
 			udelay(30);
 		} while (--try_times);
 
@@ -2029,6 +2454,8 @@ void panel_check_status_and_report_by_dsm(struct lcd_reg_read_t *lcd_status_reg,
 			}
 		}
 		dsm_client_notify(lcd_dclient, DSM_LCD_STATUS_ERROR_NO);
+
+		lcd_status_reg->recovery = 1;
 	}
 
 	if (dsm_client_ready) {
@@ -2117,5 +2544,4 @@ void panel_status_report_by_dsm(struct lcd_reg_read_t *lcd_status_reg, int cnt, 
 		HISI_FB_INFO("dsm lcd_dclient ocuppy failed!\n");
 	}
 }
-#endif
 

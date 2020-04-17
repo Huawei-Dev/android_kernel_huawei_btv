@@ -1,4 +1,15 @@
-
+/* Copyright (c) 2008-2014, Hisilicon Tech. Co., Ltd. All rights reserved.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License version 2 and
+* only version 2 as published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+* GNU General Public License for more details.
+*
+*/
 
 #include "hisi_fb.h"
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,0)
@@ -1147,6 +1158,7 @@ static ssize_t mipi_lp8556_write_store(struct device *dev, struct device_attribu
 	return size;
 }
 
+/* add for debug begin*/
 static char debug_cmd[20] = {0x0};
 static struct dsi_cmd_desc g_tm_debug_cmd = {
 		.dtype = DTYPE_DCS_LWRITE,
@@ -1188,6 +1200,7 @@ static ssize_t mipi_sharp_NT35523_8p4_reg_store(struct device *dev,
 	return size;
 }
 
+/*xxw add for debug end*/
 static struct device_attribute attributes[] = {
 	__ATTR(ipc_i2c_read_write, 0664, mipi_lp8556_read_show, mipi_lp8556_write_store),
 	__ATTR(ddic_reg_read_write, 0220, NULL, mipi_sharp_NT35523_8p4_reg_store),
@@ -1300,11 +1313,9 @@ static int mipi_sharp_NT35523_8p4_panel_on(struct platform_device *pdev)
 	char __iomem *acm_base = NULL;
 
 
-#if defined (CONFIG_HUAWEI_DSM)
 	static struct lcd_reg_read_t lcd_status_reg[] = {
 		{0x0A, 0x9C, 0xFF, "lcd power state"},
 	};
-#endif
 
 	if (NULL == pdev) {
 		HISI_FB_ERR("NULL Pointer!\n");
@@ -1348,9 +1359,7 @@ static int mipi_sharp_NT35523_8p4_panel_on(struct platform_device *pdev)
 		mipi_dsi_cmds_tx(lcd_init_display_on_cmds_otp, ARRAY_SIZE(lcd_init_display_on_cmds_otp), mipi_dsi1_base);
 		g_cabc_mode = CABC_UI_MODE;
 
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_check_status_and_report_by_dsm(lcd_status_reg, ARRAY_SIZE(lcd_status_reg), mipi_dsi0_base);
-#endif
 		g_debug_enable = 1;
 		pinfo->lcd_init_step = LCD_INIT_MIPI_HS_SEND_SEQUENCE;
 	} else if (pinfo->lcd_init_step == LCD_INIT_MIPI_HS_SEND_SEQUENCE) {
@@ -1760,9 +1769,15 @@ static ssize_t mipi_sharp_panel_lcd_ic_color_enhancement_mode_show(struct platfo
 	struct hisi_fb_data_type *hisifd = NULL;
 	ssize_t ret = 0;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -1786,9 +1801,15 @@ static ssize_t mipi_sharp_panel_lcd_ic_color_enhancement_mode_store(struct platf
 	char __iomem *acm_base = NULL;
 
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	dpp_base = hisifd->dss_base + DSS_DPP_OFFSET;
 	acm_base = hisifd->dss_base + DSS_DPP_ACM_OFFSET;
 
@@ -1928,17 +1949,11 @@ static int mipi_sharp_NT35523_8p4_probe(struct platform_device *pdev)
 		pinfo->blpwm_input_ena = 1;
 
 
-#ifdef CONFIG_BACKLIGHT_10000
 	pinfo->bl_min = 100;
 	pinfo->bl_max = 9960;
 	pinfo->bl_default = 4000;
 	pinfo->blpwm_precision_type = BLPWM_PRECISION_10000_TYPE;
 	pinfo->blpwm_out_div_value = 7;//(18K/(7+1) = 2.25K)
-#else
-	pinfo->bl_min = 4;
-	pinfo->bl_max = 255;
-	pinfo->bl_default = 102;
-#endif
 
 	pinfo->vsync_ctrl_type = 0;// (VSYNC_CTRL_ISR_OFF | VSYNC_CTRL_MIPI_ULPS);
 

@@ -13,6 +13,7 @@ endif
 ifeq ($(CONFIG_HISI_FB_970),y)
 obj-$(CONFIG_HISI_FB_970) := hisifb.o
 endif
+
 hisifb-objs := \
 	hisi_mipi_dsi_host.o \
 	hisi_mipi_dsi.o \
@@ -30,12 +31,14 @@ hisifb-objs := \
 	hisi_fb_utils.o \
 	hisi_fb.o \
 	hisi_fb_debug.o \
+	hisi_mdc_resource.o \
 	hisi_overlay_utils.o \
 	hisi_overlay_online.o \
 	hisi_overlay_offline.o \
 	hisi_block_algorithm.o \
 	hisi_overlay_cmdlist_utils.o \
 	hisi_offlinecomposer_panel.o \
+	panel/mipi_lcd_utils.o \
 	hisi_display_effect.o
 
 ifeq ($(CONFIG_HISI_FB_3650),y)
@@ -79,17 +82,22 @@ hisifb-objs += \
 	panel/mipi_lg_TD4322_6p0.o \
 	panel/mipi_jdi_R63452_6p0.o \
 	panel/mipi_sharp_NT35523_8p4.o \
-	backlight/lm36923.o
+	backlight/lm36274.o \
+	backlight/lm36923.o \
+	backlight/lp8556.o
 endif
 
 ifeq ($(CONFIG_HISI_FB_6250),y)
 hisifb-objs += \
 	hisi_dpe_utils_hi3650.o \
-	hisi_display_effect_hi3650.o \
+	hisi_display_effect_hi6250.o \
 	hisi_overlay_utils_hi6250.o \
 	hisi_rgb2mipi.o \
 	hisi_fb_spi.o \
 	panel/mipi_lcd_external_panel.o \
+	backlight/lm36274.o\
+	backlight/lm36923.o\
+	backlight/lp8556.o\
 	panel/mipi_auo_OTM1901A.o
 endif
 
@@ -99,6 +107,8 @@ hisifb-objs += \
 	hisi_display_effect_hi3660.o \
 	hisi_overlay_utils_hi3660.o \
 	hisi_overlay_copybit.o \
+	backlight/lm36274.o \
+	backlight/lp8556.o\
 	backlight/lm36923.o\
 	panel/mipi_cmi_NT35521.o\
 	panel/3660/mipi_sharp_NT35597_chicago.o\
@@ -121,22 +131,53 @@ hisifb-objs += \
 	panel/mipi_lg_S6E3HF4_5p5.o \
 	panel/mipi_samsung_S6E3HA3X02_5p5.o \
 	panel/mipi_samsung_D53G6EA8064T_5p5.o \
-	panel/mipi_jdi_OTM2503B_5p5.o \
-	panel/mipi_jdi_duke_R63450_5p7.o
+	panel/mipi_jdi_duke_R63450_5p7.o \
+	panel/mipi_tianma_duke_TD4302_5p7.o \
+	panel/mipi_sharp_duke_NT35597_5p7.o \
+	panel/lcd_common.o
 endif
 
 ifeq ($(CONFIG_HISI_FB_970),y)
 hisifb-objs += \
+	hisi_dp.o \
+	hisi_dp_hpd.o \
 	hisi_dpe_utils_kirin970.o \
 	hisi_display_effect_kirin970.o \
 	hisi_overlay_utils_kirin970.o \
 	hisi_overlay_copybit.o \
+	hisi_overlay_mediacommon.o \
+	hisi_mediacommon_panel.o \
+	backlight/lm36274.o \
 	backlight/lm36923.o \
+	backlight/lp8556.o \
 	panel/kirin970/mipi_cmi_NT35521.o\
 	panel/kirin970/mipi_jdi_NT35695_cut3_1.o\
-	panel/kirin970/mipi_lcd_external_panel.o\
+	panel/kirin970/mipi_lg_TD4322.o \
 	panel/kirin970/mipi_lg_ER69006A.o\
-	panel/kirin970/mipi_jdi_ER63450.o
+	panel/kirin970/mipi_jdi_ER63450.o\
+	panel/kirin970/mipi_sharp_NT36860.o\
+	panel/kirin970/mipi_jdi_NT36860.o\
+	panel/mipi_sharp_TD4322_6p0.o \
+	panel/mipi_lg_TD4322_6p0.o \
+	panel/mipi_jdi_R63452_6p0.o \
+	panel/kirin970/mipi_jdi_NT36860C.o \
+	panel/kirin970/mipi_jdi_2lane_NT36860C.o \
+	panel/kirin970/mipi_lgd_NT36870.o \
+	panel/kirin970/mipi_sharp_NT36870.o \
+	panel/kirin970/mipi_lcd_external_panel.o
+
+hisifb-objs += \
+	dp/dp_aux.o \
+	dp/avgen.o \
+	dp/core.o \
+	dp/intr.o \
+	dp/edid.o \
+	dp/link.o \
+	dp/drm_dp_helper.o \
+	panel/dp_fake_panel.o
+
+hisifb-objs += hdcp22/host_lib_driver_linux_kernel.o \
+			hdcp22/hdcp13.o
 endif
 
 hisifb-objs += \
@@ -145,13 +186,15 @@ hisifb-objs += \
 	panel/hdmi_fake_panel.o
 
 hisifb-objs += voltage/tps65132.o
+hisifb-objs += voltage/rt4801h.o
 hisifb-objs += voltage/ina231.o
 
 EXTRA_CFLAGS += -Idrivers/video/hisi/dss \
 		-Idrivers/video/hisi/panel \
 		-Idrivers/video/hisi \
 		-Iinclude \
-		-Idrivers/staging/android
+		-Idrivers/staging/android \
+		-Idrivers/devkit/lcdkit/include
 
 ifeq ($(CONFIG_TEE_TUI),y)
 EXTRA_CFLAGS += -Idrivers/hisi/tzdriver

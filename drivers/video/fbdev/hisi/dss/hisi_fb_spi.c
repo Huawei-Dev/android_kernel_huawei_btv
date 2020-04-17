@@ -45,13 +45,11 @@ static int hisi_spi_probe (struct spi_device *spi_dev)
 	spi_dev->bits_per_word = 8;
 	spi_dev->mode = SPI_MODE_3;
 
-#ifdef CONFIG_SPI_MASTER
 	ret = spi_setup(spi_dev);
 	if (ret < 0) {
 		HISI_FB_ERR(" ret = %d, spi_setup fail.\n", ret);
 		return -ENXIO;
 	}
-#endif
 	hisi_fb_device_set_status0(DTS_SPI_READY);
 
 	HISI_FB_DEBUG("-.\n");
@@ -90,13 +88,11 @@ static int __init hisi_spi_init(void)
 {
 	int ret = 0;
 
-#ifdef CONFIG_SPI_MASTER
 	ret = spi_register_driver(&this_driver);
 	if (ret) {
 		HISI_FB_ERR("spi_register_driver failed, error=%d!\n", ret);
 		return ret;
 	}
-#endif
 	return ret;
 }
 

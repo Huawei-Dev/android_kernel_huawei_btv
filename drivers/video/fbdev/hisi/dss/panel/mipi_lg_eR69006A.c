@@ -45,32 +45,6 @@ extern unsigned int g_led_rg_para2;
 /*******************************************************************************
 ** Power ON Sequence(sleep mode to Normal mode)
 */
-#if 0
-/*DSI control: 2rd para
-*0xD3 740~1000M, normal
-*0x93 180~280M, for FPGA
-*/
-static char DSI_control[] = {
-	0xB6,
-	0x3B, 0xD3, 0x00,
-};
-
-static char manual_cmd_access_protect[] = {
-	0xB0,
-	0x03,
-};
-
-//display address set
-static char address_mode[] = {
-	0x36,
-	0x00,
-};
-
-static char te_line[] = {
-	0x44,
-	0x03, 0x80,
-};
-#endif
 
 static char te_enable[] = {
 	0x35,
@@ -115,10 +89,6 @@ static struct dsi_cmd_desc lg_display_on_cmds[] = {
 		sizeof(bl_enable), bl_enable},
 	{DTYPE_DCS_WRITE1, 0, 10, WAIT_TYPE_US,
 		sizeof(te_enable), te_enable},
-#if 0
-	{DTYPE_GEN_LWRITE, 0, 10, WAIT_TYPE_US,
-		sizeof(te_line), te_line},
-#endif
 	{DTYPE_DCS_WRITE, 0, 30, WAIT_TYPE_MS,
 		sizeof(display_on), display_on},
 	{DTYPE_DCS_WRITE, 0, 120, WAIT_TYPE_MS,
@@ -1004,14 +974,12 @@ static int mipi_lg_panel_on(struct platform_device *pdev)
 	struct hisi_panel_info *pinfo = NULL;
 	char __iomem *mipi_dsi0_base = NULL;
 	int error = 0;
-#if defined (CONFIG_HUAWEI_DSM)
 	static struct lcd_reg_read_t lcd_status_reg[] = {
 		{0x0A, 0x1C, 0xFF, "lcd power state"},
 		{0x0E, 0x80, 0xC1, "lcd signal mode"},
 		{0x05, 0x00, 0xFF, "mipi dsi error number"},
 		{0xDA, 0x00, 0x00, "RDID1"},
 	};
-#endif
 
 	if (NULL == pdev) {
 		HISI_FB_ERR("NULL Pointer\n");
@@ -1064,14 +1032,12 @@ static int mipi_lg_panel_on(struct platform_device *pdev)
 
 		pinfo->lcd_init_step = LCD_INIT_MIPI_LP_SEND_SEQUENCE;
 	} else if (pinfo->lcd_init_step == LCD_INIT_MIPI_LP_SEND_SEQUENCE) {
-#ifdef CONFIG_HUAWEI_TS
 		if ((g_lcd_control_tp_power || pinfo->esd_recover_step == LCD_ESD_RECOVER_POWER_ON) &&
 			!g_debug_enable_lcd_sleep_in) {
 			error = ts_power_control_notify(TS_RESUME_DEVICE, SHORT_SYNC_TIMEOUT);
 			if (error)
 				HISI_FB_ERR("ts resume device err\n");
 		}
-#endif
 
 		if (false == gesture_func && !g_debug_enable_lcd_sleep_in) {
 			// lcd gpio normal
@@ -1105,21 +1071,17 @@ static int mipi_lg_panel_on(struct platform_device *pdev)
 				ARRAY_SIZE(pwm_out_on_cmds), mipi_dsi0_base);
 		}
 		g_cabc_mode = 1;
-#if defined (CONFIG_HUAWEI_DSM)
 		panel_check_status_and_report_by_dsm(lcd_status_reg, \
 			ARRAY_SIZE(lcd_status_reg), mipi_dsi0_base);
-#endif
 
 		pinfo->lcd_init_step = LCD_INIT_MIPI_HS_SEND_SEQUENCE;
 	} else if (pinfo->lcd_init_step == LCD_INIT_MIPI_HS_SEND_SEQUENCE) {
-#ifdef CONFIG_HUAWEI_TS
 		if ((g_lcd_control_tp_power || pinfo->esd_recover_step == LCD_ESD_RECOVER_POWER_ON) &&
 			!g_debug_enable_lcd_sleep_in) {
 			error = ts_power_control_notify(TS_AFTER_RESUME, NO_SYNC_TIMEOUT);
 			if (error)
 				HISI_FB_ERR("ts after resume err\n");
 		}
-#endif
 	} else {
 		HISI_FB_ERR("failed to init lcd!\n");
 	}
@@ -1137,7 +1099,6 @@ static int mipi_lg_panel_off(struct platform_device *pdev)
 	struct hisi_fb_data_type *hisifd = NULL;
 	struct hisi_panel_info *pinfo = NULL;
 	int error = 0;
-#if defined (CONFIG_HUAWEI_DSM)
 	uint32_t read_value[1] = {0};
 	uint32_t expected_value[1] = {0x00};
 	uint32_t read_mask[1] = {0xFF};
@@ -1163,7 +1124,6 @@ static int mipi_lg_panel_off(struct platform_device *pdev)
 		.cmds = lcd_check_reg,
 		.cnt = ARRAY_SIZE(lcd_check_reg),
 	};
-#endif;
 
 	if (NULL == pdev) {
 		HISI_FB_ERR("NULL Pointer\n");
@@ -1187,12 +1147,10 @@ static int mipi_lg_panel_off(struct platform_device *pdev)
 	if (pinfo->lcd_uninit_step == LCD_UNINIT_MIPI_HS_SEND_SEQUENCE) {
 		LOG_JANK_D(JLID_KERNEL_LCD_POWER_OFF, "%s", "JL_KERNEL_LCD_POWER_OFF");
 
-#if defined (CONFIG_HUAWEI_DSM)
 		mipi_dsi_read_compare(&data, hisifd->mipi_dsi0_base);
 
 		//panel_check_status_and_report_by_dsm(lcd_status_reg, \
 		//	ARRAY_SIZE(lcd_status_reg), hisifd->mipi_dsi0_base);
-#endif
 
 		/* backlight off */
 		hisi_lcd_backlight_off(pdev);
@@ -1232,7 +1190,6 @@ static int mipi_lg_panel_off(struct platform_device *pdev)
 				ARRAY_SIZE(lcd_gpio_sleep_free_cmds));
 		}
 
-#ifdef CONFIG_HUAWEI_TS
 		//if g_debug_enable_lcd_sleep_in == 1, it means don't turn off TP/LCD power
 		//but only let lcd get into sleep.
 		if ((g_lcd_control_tp_power || pinfo->esd_recover_step == LCD_ESD_RECOVER_POWER_OFF)
@@ -1249,7 +1206,6 @@ static int mipi_lg_panel_off(struct platform_device *pdev)
 		if (hisifd->fb_shutdown) {
 			ts_thread_stop_notify();
 		}
-#endif
 
 	} else {
 		HISI_FB_ERR("failed to uninit lcd!\n");
@@ -1683,11 +1639,9 @@ static ssize_t mipi_lg_panel_lcd_bist_check_show(struct platform_device *pdev,
 	mipi_dsi0_base = hisifd->dss_base + DSS_MIPI_DSI0_OFFSET;
 	hisifd->lcd_self_testing = true;
 
-#ifdef CONFIG_HUAWEI_TS
 	error = ts_power_control_notify(TS_BEFORE_SUSPEND, SHORT_SYNC_TIMEOUT);
 	error_pw = ts_power_control_notify(TS_SUSPEND_DEVICE, SHORT_SYNC_TIMEOUT);
 	HISI_FB_INFO("Disable touchscreen during test.\n");
-#endif
 
 	// lcd display off sequence
 	mipi_dsi_cmds_tx(lg_display_off_cmds, \
@@ -1773,37 +1727,12 @@ err_gpio_request:
 	hisifd->on_fnc(hisifd);
 
 
-#if 0
-	// lcd display on sequence
-	mipi_dsi_cmds_tx(lg_initial_set, \
-		ARRAY_SIZE(lg_initial_set), mipi_dsi0_base);
-	mipi_dsi_cmds_tx(lg_power_supply_set, \
-		ARRAY_SIZE(lg_power_supply_set), mipi_dsi0_base);
-	mipi_dsi_cmds_tx(lg_display_on_cmds, \
-		ARRAY_SIZE(lg_display_on_cmds), mipi_dsi0_base);
 
-
-	sent_pixels = 0;
-	remain_pixels = PATTERN_PIXELS_X_SIZE * PATTERN_PIXELS_Y_SIZE;
-	memset(lcd_pattern_packet, 0, PACKET_SIZE);
-	while (remain_pixels > 0) {
-		lcd_pattern_packet[0] = (sent_pixels == 0) ? 0x2c : 0x3c;
-
-		mipi_dsi_cmds_tx(lcd_write_pattern, \
-			ARRAY_SIZE(lcd_write_pattern), mipi_dsi0_base);
-
-		remain_pixels -= PACKET_PIXELS_SIZE;
-		sent_pixels += PACKET_PIXELS_SIZE;
-	}
-#endif
-
-#ifdef CONFIG_HUAWEI_TS
 	if (!error_pw)
 		error_pw = ts_power_control_notify(TS_RESUME_DEVICE, SHORT_SYNC_TIMEOUT);
 	if (!error)
 		error = ts_power_control_notify(TS_AFTER_RESUME, SHORT_SYNC_TIMEOUT);
 	HISI_FB_INFO("Enable touchscreen after test.\n");
-#endif
 
 	mipi_lg_panel_set_backlight(pdev, hisifd->bl_level);
 	hisifd->lcd_self_testing = false;
@@ -1876,9 +1805,6 @@ static ssize_t mipi_lg_panel_lcd_sleep_ctrl_store(struct platform_device *pdev, 
 }
 
 /*for esd check*/
-#if 0
-static int error_cnt = 0;	//esd test
-#endif
 static int mipi_lg_panel_check_esd(struct platform_device* pdev)
 {
 	int ret = 0;
@@ -1923,17 +1849,6 @@ static int mipi_lg_panel_check_esd(struct platform_device* pdev)
 	ret = mipi_dsi_read_compare(&data, hisifd->mipi_dsi0_base);
 	HISI_FB_DEBUG("fb%d, -.\n", hisifd->index);
 
-#if 0
-	error_cnt = (error_cnt + 1) % 5;
-	if ( error_cnt == 0) {
-		HISI_FB_INFO("error_cnt = %d!!!!!++++++++++++++++++++++\n", error_cnt);
-		return 1;
-	}
-	else {
-		HISI_FB_INFO("error_cnt = %d!!!!!-----------------------\n", error_cnt);
-		return 0;
-	}
-#endif
 
 	return ret;
 }
@@ -2031,7 +1946,7 @@ static ssize_t mipi_lg_panel_lcd_test_config_store(struct platform_device *pdev,
 		HISI_FB_INFO("current test cmd:%s\n", lcd_cmd_now);
 	} else {
 		memcpy(lcd_cmd_now, "INVALID", strlen("INVALID") + 1);
-		HISI_FB_INFO("invalid test cmd:%s\n");
+		HISI_FB_INFO("invalid test cmd:\n");
 	}
 
 	return count;
@@ -2188,6 +2103,31 @@ static ssize_t mipi_lcd_panel_gram_check_store(struct platform_device *pdev,
 	return count;
 }
 
+static ssize_t mipi_lg_panel_lcd_panel_info_show(struct platform_device *pdev, char *buf)
+{
+	struct hisi_fb_data_type *hisifd = NULL;
+	ssize_t ret = 0;
+
+	if (NULL == pdev) {
+	    HISI_FB_ERR("pdev NULL pointer\n");
+	    return 0;
+	};
+	hisifd = platform_get_drvdata(pdev);
+	if (NULL == hisifd) {
+	    HISI_FB_ERR("hisifd NULL pointer\n");
+	    return 0;
+	}
+
+	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
+	if (buf) {
+	    ret = snprintf(buf, PAGE_SIZE, "blmax:%u,blmin:%u,lcdtype:%s,\n", hisifd->panel_info.bl_max, hisifd->panel_info.bl_min, "LCD");
+	}
+
+	HISI_FB_DEBUG("fb%d, -.\n", hisifd->index);
+
+	return ret;
+}
+
 static struct hisi_panel_info g_panel_info = {0};
 static struct hisi_fb_panel_data g_panel_data = {
 	.panel_info = &g_panel_info,
@@ -2218,6 +2158,7 @@ static struct hisi_fb_panel_data g_panel_data = {
 	.set_display_resolution = NULL,
 	.sharpness2d_table_store = mipi_lg_panel_sharpness2d_table_store,
 	.sharpness2d_table_show = mipi_lg_panel_sharpness2d_table_show,
+	.panel_info_show = mipi_lg_panel_lcd_panel_info_show,
 };
 
 
@@ -2250,7 +2191,7 @@ static int mipi_lg_probe(struct platform_device *pdev)
 
 	ret = of_property_read_string_index(np, "lcd-bl-ic-name", 0, &lcd_bl_ic_name);
 	if (ret != 0) {
-		memcpy(lcd_bl_ic_name_buf, "INVALID", strlen("INVALID"));
+		memcpy(lcd_bl_ic_name_buf, "INVALID", strlen("INVALID") + 1);
 	} else {
 		memcpy(lcd_bl_ic_name_buf, lcd_bl_ic_name, strlen(lcd_bl_ic_name) + 1);
 	}
@@ -2298,16 +2239,10 @@ static int mipi_lg_probe(struct platform_device *pdev)
 		pinfo->blpwm_precision_type = BLPWM_PRECISION_2048_TYPE;
 		pinfo->bl_ic_ctrl_mode = REG_ONLY_MODE;
 	} else {
-		#ifdef CONFIG_BACKLIGHT_10000
 		pinfo->bl_min = 157;
 		pinfo->bl_max = 9960;
 		pinfo->bl_default = 4000;
 		pinfo->blpwm_precision_type = BLPWM_PRECISION_10000_TYPE;
-		#else
-		pinfo->bl_min = 1;
-		pinfo->bl_max = 255;
-		pinfo->bl_default = 102;
-		#endif
 	}
 	pinfo->frc_enable = 0;
 	pinfo->esd_enable = 1;

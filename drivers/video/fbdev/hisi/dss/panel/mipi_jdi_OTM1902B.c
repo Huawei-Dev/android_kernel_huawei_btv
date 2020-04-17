@@ -834,167 +834,6 @@ static struct dsi_cmd_desc lcd_display_off_cmds[] = {
 		sizeof(enter_sleep), enter_sleep},
 };
 
-#if 0
-static char command_2_enable[] = {
-	0x00,
-	0x00,
-};
-
-static char command_2_enable_1_para[] = {
-	0xFF,
-	0x19, 0x02, 0x01,
-};
-
-static char command_2_enable_2[] = {
-	0x00,
-	0x80,
-};
-
-static char command_2_enable_2_para[] = {
-	0xFF,
-	0x19, 0x02,
-};
-
-static char HD720_setting_1_para[] = {
-	0x2A,
-	0x00, 0x00, 0x02, 0xCF,
-};
-
-static char HD1080_setting_1_para[] = {
-	0x2a,
-	0x00, 0x00, 0x04, 0x37,
-};
-
-static char HD720_setting_2_para[] = {
-	0x2B,
-	0x00, 0x00, 0x04, 0xFF,
-};
-
-static char HD1080_setting_2_para[] = {
-	0x2b,
-	0x00, 0x00, 0x07, 0x7f,
-};
-
-static char cleveredge_1_5x_para[] = {
-	0x1C,
-	0x05,
-};
-
-static char cleveredge_disable[] = {
-	0x1C,
-	0x00,
-};
-
-static char cleveredge_P1[] = {
-	0x00,
-	0x91,
-};
-
-static char cleveredge_P1_para[] = {
-	0xD7,
-	0xC8,
-};
-
-static char cleveredge_P2[] = {
-	0x00,
-	0x93,
-};
-
-static char cleveredge_P2_para[] = {
-	0xD7,
-	0x08,
-};
-
-static char cleveredge_use_setting[] = {
-	0x00,
-	0xAC,
-};
-
-static char cleveredge_use_setting_para[] = {
-	0xC0,
-	0x04,
-};
-
-static char command_2_disable_para[] = {
-	0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF,
-};
-
-static char command_clevermode[] = {
-	0x59,
-	0x03,
-};
-
-static struct dsi_cmd_desc cleveredge_inital_720P_cmds[] = {
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable), command_2_enable},
-	{DTYPE_GEN_LWRITE, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable_1_para), command_2_enable_1_para},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable_2), command_2_enable_2},
-	{DTYPE_GEN_LWRITE, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable_2_para), command_2_enable_2_para},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable), command_2_enable},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(command_clevermode), command_clevermode},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable), command_2_enable},
-	{DTYPE_GEN_LWRITE, 0, 100, WAIT_TYPE_US,
-		sizeof(HD720_setting_1_para), HD720_setting_1_para},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable), command_2_enable},
-	{DTYPE_GEN_LWRITE, 0, 100, WAIT_TYPE_US,
-		sizeof(HD720_setting_2_para), HD720_setting_2_para},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable), command_2_enable},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(cleveredge_1_5x_para), cleveredge_1_5x_para},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(cleveredge_P1), cleveredge_P1},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(cleveredge_P1_para), cleveredge_P1_para},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(cleveredge_P2), cleveredge_P2},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(cleveredge_P2_para), cleveredge_P2_para},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(cleveredge_use_setting), cleveredge_use_setting},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(cleveredge_use_setting_para), cleveredge_use_setting_para},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable), command_2_enable},
-	{DTYPE_GEN_LWRITE, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_disable_para), command_2_disable_para}
-};
-
-static struct dsi_cmd_desc cleveredge_inital_1080P_cmds[] = {
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable), command_2_enable},
-	{DTYPE_GEN_LWRITE, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable_1_para), command_2_enable_1_para},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable_2), command_2_enable_2},
-	{DTYPE_GEN_LWRITE, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable_2_para), command_2_enable_2_para},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable), command_2_enable},
-	{DTYPE_GEN_LWRITE, 0, 100, WAIT_TYPE_US,
-		sizeof(HD1080_setting_1_para), HD1080_setting_1_para},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable), command_2_enable},
-	{DTYPE_GEN_LWRITE, 0, 100, WAIT_TYPE_US,
-		sizeof(HD1080_setting_2_para), HD1080_setting_2_para},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(command_2_enable), command_2_enable},
-	{DTYPE_DCS_WRITE1, 0, 100, WAIT_TYPE_US,
-		sizeof(cleveredge_disable), cleveredge_disable},
-	{DTYPE_DCS_LWRITE, 0, 10, WAIT_TYPE_US,
-		sizeof(sp_shift_0x93), sp_shift_0x93},
-	{DTYPE_DCS_LWRITE, 0, 10, WAIT_TYPE_US,
-		sizeof(sp_D7_3), sp_D7_3},
-};
-#endif
 
 /*******************************************************************************
 ** LCD VCC
@@ -1804,15 +1643,6 @@ static int mipi_jdi_panel_on(struct platform_device *pdev)
 				ARRAY_SIZE(fpga_lcd_gpio_normal_cmds));
 		}
 
-	#if 0
-		if (DISPLAY_LOW_POWER_LEVEL_HD == hisifd->switch_res_flag) {
-			mipi_dsi_cmds_tx(cleveredge_inital_720P_cmds,
-				ARRAY_SIZE(cleveredge_inital_720P_cmds), mipi_dsi0_base);
-		} else {
-			mipi_dsi_cmds_tx(cleveredge_inital_1080P_cmds,
-				ARRAY_SIZE(cleveredge_inital_1080P_cmds), mipi_dsi0_base);
-		}
-	#endif
 
 		// lcd color management sequence
 		mipi_dsi_cmds_tx(lcd_display_effect_cmds, \
@@ -2338,16 +2168,10 @@ static int mipi_jdi_probe(struct platform_device *pdev)
 	if (pinfo->bl_set_type == BL_SET_BY_BLPWM)
 		pinfo->blpwm_input_ena = 0;
 
-#ifdef CONFIG_BACKLIGHT_10000
 	pinfo->bl_min = 157;
 	pinfo->bl_max = 9960;
 	pinfo->bl_default = 4000;
 	pinfo->blpwm_precision_type = BLPWM_PRECISION_10000_TYPE;
-#else
-	pinfo->bl_min = 1;
-	pinfo->bl_max = 255;
-	pinfo->bl_default = 102;
-#endif
 
 	pinfo->type = lcd_display_type;
 	pinfo->ifbc_type = lcd_ifbc_type;

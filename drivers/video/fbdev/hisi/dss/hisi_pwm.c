@@ -15,11 +15,7 @@
 
 
 /* default pwm clk */
-#if defined (CONFIG_HISI_FB_3650) || defined (CONFIG_HISI_FB_6250)
 #define DEFAULT_PWM_CLK_RATE	(120 * 1000000L)
-#elif defined (CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-#define DEFAULT_PWM_CLK_RATE	(80 * 1000000L)
-#endif
 
 static char __iomem *hisifd_pwm_base;
 static struct clk *g_pwm_clk;
@@ -65,7 +61,10 @@ int hisi_pwm_set_backlight(struct hisi_fb_data_type *hisifd, uint32_t bl_level)
 	struct hisi_panel_info *pinfo = NULL;
 	char __iomem *pwm_base = NULL;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 	pinfo = &(hisifd->panel_info);
 
 	pwm_base = hisifd_pwm_base;
@@ -110,9 +109,15 @@ int hisi_pwm_on(struct platform_device *pdev)
 	char __iomem *pwm_base = NULL;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -163,9 +168,15 @@ int hisi_pwm_off(struct platform_device *pdev)
 	char __iomem *pwm_base = NULL;
 	struct hisi_fb_data_type *hisifd = NULL;
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 	hisifd = platform_get_drvdata(pdev);
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
 
 	pwm_base = hisifd_pwm_base;
 	if (!pwm_base) {
@@ -200,7 +211,10 @@ static int hisi_pwm_probe(struct platform_device *pdev)
 
 	HISI_FB_DEBUG("+.\n");
 
-	BUG_ON(pdev == NULL);
+	if (NULL == pdev) {
+		HISI_FB_ERR("pdev is NULL");
+		return -EINVAL;
+	}
 
 	g_pwm_pdev = pdev;
 
@@ -242,15 +256,6 @@ static int hisi_pwm_probe(struct platform_device *pdev)
 			goto err_return;
 		}
 
-	#if 0
-		ret = clk_set_rate(g_pwm_clk, DEFAULT_PWM_CLK_RATE);
-		if (ret != 0) {
-			HISI_FB_ERR("dss_pwm_clk clk_set_rate(%lu) failed, error=%d!\n",
-				DEFAULT_PWM_CLK_RATE, ret);
-			ret = -EINVAL;
-			goto err_return;
-		}
-	#endif
 
 		HISI_FB_INFO("dss_pwm_clk:[%lu]->[%lu].\n",
 			DEFAULT_PWM_CLK_RATE, clk_get_rate(g_pwm_clk));

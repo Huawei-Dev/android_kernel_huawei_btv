@@ -19,8 +19,7 @@
 #define TI_LM36923_LED_NUM "lm36923-led-num"
 #define TI_LM36923_DISABLE_OVP "disable-ovp"
 #define TI_LM36923_BOOST_CTRL_1 "lm36923-boost-ctrl-1"
-#define TI_LM36923_HW_EN_GPIO "lm36923_hw_en_gpio"
-#define GPIO_LM36923_EN_NAME "lm36923_hw_en"
+#define TI_LM36923_FAULT_CTRL "lm36923-fault-ctrl"
 
 #define TI_LM36923_LED_TWO 2
 #define TI_LM36923_LED_THREE 3
@@ -77,7 +76,7 @@
 #define TEST_ERROR_CHIP_INIT BIT(10)
 
 #define LOG_LEVEL_INFO 7
-
+#define LM36923_RW_REG_MAX 14
 #define LM36923_EMERG(msg, ...)    \
 	do { if (lm36923_msg_level > 0)  \
 		printk(KERN_EMERG "[lm36923]%s: "msg, __func__, ## __VA_ARGS__); } while (0)
@@ -180,6 +179,7 @@ enum lm36923_ramp_rate{
 #define OVP_OCP_SHUTDOWN_ENABLE 0x04
 #define OVP_OCP_SHUTDOWN_DISABLE 0x07
 #define OCP_SHUTDOWN_OVP_DISABLE 0x05
+#define OVP_OCP_FOR_DBC_TEST 0x74
 
 struct lm36923_chip_data {
 	struct device *dev;
@@ -201,6 +201,7 @@ struct lm36923_platform_data {
 };
 
 ssize_t lm36923_set_backlight_reg(uint32_t bl_level);
+ssize_t lm36923_set_backlight_init(uint32_t bl_level);
 
 #endif /* __LINUX_LM36923_H */
 

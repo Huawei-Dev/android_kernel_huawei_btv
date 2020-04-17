@@ -22,15 +22,21 @@ static bool g_is_ce_service_init = false;
 static spinlock_t g_ce_service_lock;
 static ce_service_t g_ce_services[CE_SERVICE_LIMIT];
 
+int g_enable_effect = 0;
+int g_debug_effect = 0;
+
 extern int g_dss_effect_ce_en;
 
 static void hisifb_ce_service_init(void);
 static void hisifb_ce_service_deinit(void);
-
+/*lint -e607 */
 #define ce_service_wait_event(wq, condition)		/*lint -save -e* */						\
 {																							\
 	long ret = 0;																			\
 	do {																					\
+		if(!g_is_ce_service_init) { 														\
+			HISI_FB_ERR("[effect] ce_service_wait_event has not init wq \n");				\
+		}																					\
 		ret = wait_event_interruptible_timeout(wq, condition, msecs_to_jiffies(100000));	\
 	} while(!ret);																			\
 	if (ret == -ERESTARTSYS) {																\
@@ -62,6 +68,10 @@ static inline void service_transform_to_next_status(ce_service_t *service)
 
 int do_contrast(dss_ce_info_t * info)
 {
+	if (NULL == info) {
+		return -1;
+	}
+
 	if (g_is_ce_service_init) {
 		ce_service_t *service = get_available_service(CE_SERVICE_HIST_REQ);
 
@@ -90,6 +100,7 @@ void hisi_effect_init(struct hisi_fb_data_type *hisifd)
 	mutex_init(&(hisifd->ce_ctrl.ctrl_lock));
 	mutex_init(&(hisifd->bl_ctrl.ctrl_lock));
 	mutex_init(&(hisifd->bl_enable_ctrl.ctrl_lock));
+	mutex_init(&(hisifd->sre_ctrl.ctrl_lock));
 }
 
 void hisi_effect_deinit(struct hisi_fb_data_type *hisifd)
@@ -98,6 +109,7 @@ void hisi_effect_deinit(struct hisi_fb_data_type *hisifd)
 	mutex_destroy(&(hisifd->ce_ctrl.ctrl_lock));
 	mutex_destroy(&(hisifd->bl_ctrl.ctrl_lock));
 	mutex_destroy(&(hisifd->bl_enable_ctrl.ctrl_lock));
+	mutex_destroy(&(hisifd->sre_ctrl.ctrl_lock));
 }
 
 static void hisifb_ce_service_init(void)
@@ -223,8 +235,15 @@ int hisifb_ce_service_get_limit(struct fb_info *info, void __user *argp)
 
 int hisifb_ce_service_get_param(struct fb_info *info, void __user *argp)
 {
-    return 0;
+	(void)info, (void)argp;
+	return 0;
 }
+
+int hisifb_ce_service_get_hiace_param(struct fb_info *info, void __user *argp){
+	(void)info, (void)argp;
+	return 0;
+}
+
 
 int hisifb_ce_service_get_hist(struct fb_info *info, void __user *argp)
 {
@@ -526,9 +545,20 @@ ssize_t hisifb_display_effect_bl_enable_ctrl_store(struct fb_info *info, const c
 	return (ssize_t)count;
 }
 
+void hisifb_display_effect_func_switch(struct hisi_fb_data_type *hisifd, const char *command)
+{
+	(void)hisifd, (void)command;
+}
+
 bool hisifb_display_effect_is_need_ace(struct hisi_fb_data_type *hisifd)
 {
-    return hisifd->ce_ctrl.ctrl_ce_mode != CE_MODE_DISABLE;
+	return hisifd->ce_ctrl.ctrl_ce_mode != CE_MODE_DISABLE;
+}
+
+bool hisifb_display_effect_is_need_blc(struct hisi_fb_data_type *hisifd)
+{
+	(void)hisifd;
+	return false;
 }
 
 bool hisifb_display_effect_fine_tune_backlight(struct hisi_fb_data_type *hisifd, int backlight_in, int *backlight_out)
@@ -560,27 +590,7 @@ ssize_t hisifb_display_effect_sre_ctrl_show(struct fb_info *info, char *buf)
 
 ssize_t hisifb_display_effect_sre_ctrl_store(struct fb_info *info, const char *buf, size_t count)
 {
-	struct hisi_fb_data_type *hisifd = NULL;
-	dss_display_effect_sre_t *sre_ctrl = NULL;
-	uint32_t value = (uint32_t)simple_strtoul(buf, NULL, 0);
-
-	if (NULL == info) {
-		HISI_FB_ERR("NULL Pointer\n");
-		return -1;
-	}
-
-	hisifd = (struct hisi_fb_data_type *)info->par;
-	if (NULL == hisifd) {
-		HISI_FB_ERR("NULL Pointer\n");
-		return -1;
-	}
-
-	sre_ctrl = &(hisifd->sre_ctrl);
-
-	mutex_lock(&(sre_ctrl->ctrl_lock));
-	sre_ctrl->ctrl_sre_enable = (int)((value >> 24) & 0x1);
-	sre_ctrl->ctrl_sre_al = (int)(value & 0xFFFFFF);
-	mutex_unlock(&(sre_ctrl->ctrl_lock));
+	(void)info, (void)buf;
 
 	return (ssize_t)count;
 }
@@ -760,4 +770,21 @@ void hisi_dpp_ace_end_handle_func(struct work_struct *work)
 
 	ce_info->new_hist_rpt = true;
 }
+int hisifb_ce_service_enable_hiace(struct fb_info *info, void __user *argp) {
+	(void)info, (void)argp;
+	return 0;
+}
+int hisifb_ce_service_set_param(struct fb_info *info, void __user *argp) {
+	(void)info, (void)argp;
+	return 0;
+}
+int hisi_effect_hiace_config(struct hisi_fb_data_type *hisifd) {
+	(void)hisifd;
+	return 0;
+}
+int hisifb_get_reg_val(struct fb_info *info, void __user *argp) {
+	(void)info, (void)argp;
+	return 0;
+}
+
 //lint +e747, +e838

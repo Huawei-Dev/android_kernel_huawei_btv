@@ -29,7 +29,6 @@
 #include "hisi_overlay_utils_kirin970.h"
 #endif
 
-
 #define CONFIG_HISI_DSS_CMDLIST_LAST_USED
 
 #define HISI_DSS_CMDLIST_DATA_MAX	  (3)
@@ -166,10 +165,12 @@ typedef struct dss_cmdlist_node {
 	struct ion_handle *header_ion_handle;
 	ion_phys_addr_t header_phys;
 	cmd_header_t *list_header;
+	size_t header_len;
 
 	struct ion_handle *item_ion_handle;
 	ion_phys_addr_t item_phys;
 	cmd_item_t *list_item;
+	size_t item_len;
 
 	uint32_t item_index;
 	int item_flag;
@@ -199,11 +200,17 @@ typedef struct dss_cmdlist_info {
 } dss_cmdlist_info_t;
 
 typedef struct dss_copybit_info {
-	struct semaphore copybit_sem;  //for chicago copybit
+	struct semaphore copybit_sem;
 	wait_queue_head_t copybit_wq;
 	uint32_t copybit_flag;
 	uint32_t copybit_done;
 } dss_copybit_info_t;
+
+typedef struct dss_media_common_info {
+	wait_queue_head_t mdc_wq;
+	uint32_t mdc_flag;
+	uint32_t mdc_done;
+} dss_media_common_info_t;
 
 typedef struct dss_wb_info {
 	uint32_t to_be_continued;
@@ -220,11 +227,10 @@ extern dss_cmdlist_data_t *g_cmdlist_data;
 */
 void hisi_cmdlist_set_reg(struct hisi_fb_data_type *hisifd,
 	char __iomem *addr, uint32_t value, uint8_t bw, uint8_t bs);
-void hisi_cmdlist_flush_cache(struct hisi_fb_data_type *hisifd, struct ion_client *ion_client,
-	uint32_t cmdlist_idxs);
+void hisi_cmdlist_flush_cache(struct hisi_fb_data_type *hisifd, uint32_t cmdlist_idxs);
 
-dss_cmdlist_node_t* hisi_cmdlist_node_alloc(struct ion_client *ion_client);
-void hisi_cmdlist_node_free(struct ion_client *ion_client, dss_cmdlist_node_t *node);
+dss_cmdlist_node_t* hisi_cmdlist_node_alloc(struct hisi_fb_data_type *hisifd);
+void hisi_cmdlist_node_free(struct hisi_fb_data_type *hisifd, dss_cmdlist_node_t *node);
 
 uint32_t hisi_cmdlist_get_cmdlist_need_start(struct hisi_fb_data_type *hisifd, uint32_t cmdlist_idxs);
 
@@ -239,6 +245,8 @@ int hisi_cmdlist_add_new_node(struct hisi_fb_data_type *hisifd, uint32_t cmdlist
 int hisi_cmdlist_del_all_node(struct list_head *cmdlist_heads);
 
 int hisi_cmdlist_config_start(struct hisi_fb_data_type *hisifd, int mctl_idx, uint32_t cmdlist_idxs, uint32_t wb_compose_type);
+void hisi_mediacommon_cmdlist_config_start(struct hisi_fb_data_type *hisifd, uint32_t cmdlist_idxs);
+
 int hisi_cmdlist_config_stop(struct hisi_fb_data_type *hisifd, uint32_t cmdlist_idxs);
 void hisi_cmdlist_config_reset(struct hisi_fb_data_type *hisifd,
 	dss_overlay_t *pov_req, uint32_t cmdlist_idxs);
@@ -253,6 +261,6 @@ int hisi_cmdlist_dump_all_node (struct hisi_fb_data_type *hisifd, dss_overlay_t 
 
 int hisi_cmdlist_init(struct hisi_fb_data_type *hisifd);
 int hisi_cmdlist_deinit(struct hisi_fb_data_type *hisifd);
-
+bool hisi_check_cmdlist_paremeters_validate(uint8_t bw, uint8_t bs);
 
 #endif

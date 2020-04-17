@@ -68,13 +68,6 @@ REDO_ret1:
 			hisifd->cmdlist_info->cmdlist_wb_done[WB_TYPE_WCH0], hisifd->cmdlist_info->cmdlist_wb_done[WB_TYPE_WCH1]);
 		ret = -ETIMEDOUT;
 	} else {
-	#if defined(CONFIG_HISI_FB_3660) || defined(CONFIG_HISI_FB_970)
-		/* remove last mctl ch & ov */
-		hisi_remove_mctl_mutex(hisifd, last_mctl_idx, last_cmdlist_idxs);
-
-		/* remove mctl ch & ov */
-		hisi_remove_mctl_mutex(hisifd, mctl_idx, cmdlist_idxs);
-	#endif
 
 		ret = 0;
 	}
@@ -164,9 +157,15 @@ static void hisi_dss_offline_composer_on(struct hisi_fb_data_type *hisifd)
 	struct hisi_fb_data_type *hisifd_primary = NULL;
 	int prev_refcount = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 	fbi = hisifd->fbi;
-	BUG_ON(fbi == NULL);
+	if (NULL == fbi) {
+		HISI_FB_ERR("fbi is NULL");
+		return;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -194,9 +193,15 @@ static void hisi_dss_offline_composer_off(struct hisi_fb_data_type *hisifd)
 	struct hisi_fb_data_type *hisifd_primary = NULL;
 	int new_refcount = 0;
 
-	BUG_ON(hisifd == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return;
+	}
 	fbi = hisifd->fbi;
-	BUG_ON(fbi == NULL);
+	if (NULL == fbi) {
+		HISI_FB_ERR("fbi is NULL");
+		return;
+	}
 
 	HISI_FB_DEBUG("fb%d, +.\n", hisifd->index);
 
@@ -204,7 +209,9 @@ static void hisi_dss_offline_composer_off(struct hisi_fb_data_type *hisifd)
 
 	down(&hisifd->offline_composer_sr_sem);
 	new_refcount = --(hisifd->offline_composer_sr_refcount);
-	WARN_ON(new_refcount < 0);
+	if (new_refcount < 0) {
+		HISI_FB_ERR("dss new_refcount err");
+	}
 
 	if (!new_refcount) {
 		if (fbi->fbops->fb_blank)
@@ -224,13 +231,22 @@ static int hisi_add_clear_module_reg_node(struct hisi_fb_data_type *hisifd,
 	dss_overlay_t *pov_req,
 	int cmdlist_idxs,
 	bool enable_cmdlist,
-	bool *use_comm_mmbuf)
+	int *use_comm_mmbuf)
 {
 	int ret = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
-	BUG_ON((cmdlist_idxs < 0) || (cmdlist_idxs >= HISI_DSS_CMDLIST_IDXS_MAX));
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == pov_req) {
+		HISI_FB_ERR("pov_req is NULL");
+		return -EINVAL;
+	}
+	if ((cmdlist_idxs < 0) || (cmdlist_idxs >= HISI_DSS_CMDLIST_IDXS_MAX)) {
+		HISI_FB_ERR("cmdlist_idxs is invalid");
+		return -EINVAL;
+	}
 
 
 	ret = hisi_dss_module_init(hisifd);
@@ -251,8 +267,16 @@ static void hisi_offline_clear(struct hisi_fb_data_type *hisifd,
 	dss_overlay_t *pov_req, int enable_cmdlist, uint32_t cmdlist_idxs, bool reset, bool debug)
 {
 	dss_overlay_block_t *pov_h_block_infos = NULL;
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
+
+	if (hisifd == NULL) {
+		HISI_FB_ERR("hisifd is NULL Point!\n");
+		return ;
+	}
+
+	if (pov_req == NULL) {
+		HISI_FB_ERR("pov_req is NULL Point!\n");
+		return ;
+	}
 
 	hisi_drm_layer_offline_clear(hisifd, pov_req);
 
@@ -267,12 +291,12 @@ static void hisi_offline_clear(struct hisi_fb_data_type *hisifd,
 	}
 
 	if (g_debug_ovl_offline_composer == 2) {
-		dumpDssOverlay(hisifd, pov_req, true);
+		dumpDssOverlay(hisifd, pov_req);
 	}
 
 	if (enable_cmdlist) {
 		if (g_debug_ovl_cmdlist || debug) {
-			dumpDssOverlay(hisifd, pov_req, false);
+			dumpDssOverlay(hisifd, pov_req);
 			hisi_cmdlist_dump_all_node(hisifd, pov_req, cmdlist_idxs);
 		}
 
@@ -306,8 +330,14 @@ static int hisi_get_ov_data_from_user(struct hisi_fb_data_type *hisifd,
 	dss_overlay_block_t *pov_h_block_infos = NULL;
 	uint32_t ov_block_size = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == pov_req) {
+		HISI_FB_ERR("pov_req is NULL");
+		return -EINVAL;
+	}
 
 	if (NULL == argp) {
 		HISI_FB_ERR("user data is invalid\n");
@@ -319,6 +349,8 @@ static int hisi_get_ov_data_from_user(struct hisi_fb_data_type *hisifd,
 		HISI_FB_ERR("fb%d, copy_from_user failed!\n", hisifd->index);
 		return -EINVAL;
 	}
+
+	pov_req->release_fence = -1;
 
 	if ((pov_req->ov_block_nums <= 0) ||
 		(pov_req->ov_block_nums > HISI_DSS_OV_BLOCK_NUMS)) {
@@ -352,7 +384,6 @@ static int hisi_get_ov_data_from_user(struct hisi_fb_data_type *hisifd,
 		pov_h_block_infos = NULL;
 		return -EINVAL;
 	}
-
 	pov_req->ov_block_infos_ptr = (uint64_t)pov_h_block_infos;
 
 	return ret;
@@ -363,7 +394,10 @@ static int32_t hisi_get_wb_type(dss_overlay_t *pov_req)
 	int32_t wb_type = -1;
 	dss_wb_layer_t *wb_layer = NULL;
 
-	BUG_ON(pov_req == NULL);
+	if (NULL == pov_req) {
+		HISI_FB_ERR("pov_req is NULL");
+		return -EINVAL;
+	}
 	wb_layer = &(pov_req->wb_layer_infos[0]);
 
 	if (pov_req->wb_layer_nums == MAX_DSS_DST_NUM) {
@@ -387,9 +421,27 @@ static bool hisi_check_csc_config_needed(dss_overlay_t *pov_req_h_v)
 {
 	dss_overlay_block_t *pov_h_v_block = NULL;
 
-	BUG_ON(pov_req_h_v == NULL);
+	if (NULL == pov_req_h_v) {
+		HISI_FB_ERR("pov_req_h_v is NULL");
+		return false;
+	}
 
 	pov_h_v_block = (dss_overlay_block_t *)(pov_req_h_v->ov_block_infos_ptr);
+
+	if (g_dss_version_tag & FB_ACCEL_KIRIN970) {
+		// check whether csc config needed or not
+		if ((pov_h_v_block->layer_nums == 1) &&
+			(isYUV(pov_h_v_block->layer_infos[0].img.format))) {
+			if ((pov_req_h_v->wb_layer_nums == 1) &&
+				isYUV(pov_req_h_v->wb_layer_infos[0].dst.format)) {
+				if ((pov_h_v_block->layer_infos[0].dst_rect.w == pov_req_h_v->wb_layer_infos[0].dst_rect.w)
+					&& (pov_h_v_block->layer_infos[0].dst_rect.h == pov_req_h_v->wb_layer_infos[0].dst_rect.h)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 
 	// check whether csc config needed or not
 	if ((pov_h_v_block->layer_nums == 1) &&
@@ -409,9 +461,9 @@ static bool hisi_check_csc_config_needed(dss_overlay_t *pov_req_h_v)
 	return true;
 }
 
-static int hisi_vactive0_start_wait(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req)
+static int hisi_vactive0_start_wait(struct hisi_fb_data_type *hisifd, dss_overlay_t *pov_req, int use_comm_mmbuf)
 {
-	struct hisi_fb_data_type *hisifd_primary = NULL;
+	struct hisi_fb_data_type *online_hisifd = NULL;
 	struct timeval tv0;
 	struct timeval tv1;
 	int ret = 1;
@@ -419,8 +471,14 @@ static int hisi_vactive0_start_wait(struct hisi_fb_data_type *hisifd, dss_overla
 	int times = 0;
 	uint32_t prev_vactive0_start = 0;
 
-	BUG_ON(hisifd == NULL);
-	BUG_ON(pov_req == NULL);
+	if (NULL == hisifd) {
+		HISI_FB_ERR("hisifd is NULL");
+		return -EINVAL;
+	}
+	if (NULL == pov_req) {
+		HISI_FB_ERR("pov_req is NULL");
+		return -EINVAL;
+	}
 
 	if (g_fpga_flag == 0) {
 		timeout_interval = DSS_COMPOSER_TIMEOUT_THRESHOLD_ASIC;
@@ -428,17 +486,23 @@ static int hisi_vactive0_start_wait(struct hisi_fb_data_type *hisifd, dss_overla
 		timeout_interval = DSS_COMPOSER_TIMEOUT_THRESHOLD_FPGA;
 	}
 
-	hisifd_primary = hisifd_list[PRIMARY_PANEL_IDX];
+	if (use_comm_mmbuf & (1 << DSS_OVL0)) {
+		online_hisifd = hisifd_list[PRIMARY_PANEL_IDX];
+	}
 
-	if (hisifd_primary && hisifd_primary->panel_power_on) {
+	if (use_comm_mmbuf & (1 << DSS_OVL1)) {
+		online_hisifd = hisifd_list[EXTERNAL_PANEL_IDX];
+	}
+
+	if (online_hisifd && online_hisifd->panel_power_on) {
 		hisifb_get_timestamp(&tv0);
-		if (is_mipi_cmd_panel(hisifd_primary) && (hisifd_primary->vactive0_start_flag == 0)) {
+		if (is_mipi_cmd_panel(online_hisifd) && (online_hisifd->vactive0_start_flag == 0)) {
 		REDO_CMD:
-			ret = wait_event_interruptible_timeout(hisifd_primary->vactive0_start_wq, hisifd_primary->vactive0_start_flag, msecs_to_jiffies(timeout_interval));
-		} else if (is_mipi_video_panel(hisifd_primary)) {
-			prev_vactive0_start = hisifd_primary->vactive0_start_flag;
+			ret = wait_event_interruptible_timeout(online_hisifd->vactive0_start_wq, online_hisifd->vactive0_start_flag, msecs_to_jiffies(timeout_interval));
+		} else if (!is_mipi_cmd_panel(online_hisifd)) {
+			prev_vactive0_start = online_hisifd->vactive0_start_flag;
 		REDO_VIDEO:
-			ret = wait_event_interruptible_timeout(hisifd_primary->vactive0_start_wq,(prev_vactive0_start != hisifd_primary->vactive0_start_flag),
+			ret = wait_event_interruptible_timeout(online_hisifd->vactive0_start_wq,(prev_vactive0_start != online_hisifd->vactive0_start_flag),
 												   msecs_to_jiffies(timeout_interval));
 		}
 
@@ -446,8 +510,8 @@ static int hisi_vactive0_start_wait(struct hisi_fb_data_type *hisifd, dss_overla
 			if (times < 50) {
 				times++;
 				mdelay(10);
-				if (is_mipi_cmd_panel(hisifd_primary)) goto REDO_CMD;
-				if (is_mipi_video_panel(hisifd_primary)) goto REDO_VIDEO;
+				if (is_mipi_cmd_panel(online_hisifd)) goto REDO_CMD;
+				if (is_mipi_video_panel(online_hisifd)) goto REDO_VIDEO;
 			}
 		}
 
@@ -456,7 +520,7 @@ static int hisi_vactive0_start_wait(struct hisi_fb_data_type *hisifd, dss_overla
 
 			HISI_FB_ERR("fb%d, wait_for vactive0_start_flag timeout!ret=%d, "
 				"vactive0_start_flag=%d, TIMESTAMP_DIFF is %u us!\n",
-				hisifd_primary->index, ret, hisifd_primary->vactive0_start_flag,
+				online_hisifd->index, ret, online_hisifd->vactive0_start_flag,
 				hisifb_timestamp_diff(&tv0, &tv1));
 
 			ret = -ETIMEDOUT;
@@ -469,6 +533,62 @@ static int hisi_vactive0_start_wait(struct hisi_fb_data_type *hisifd, dss_overla
 
 	return ret;
 }
+
+static void hisi_tuning_offline_clk_rate(struct hisi_fb_data_type *hisifd)
+{
+	uint64_t offline_clk_rate;
+	uint64_t online_clk_rate;
+
+	if (!hisifd) {
+		HISI_FB_ERR("hisifd is null.\n");
+		return;
+	}
+
+	if (IS_ERR(hisifd->dss_pri_clk)) {
+		HISI_FB_ERR("fb%d: dss_pri_clk is null.\n", hisifd->index);
+		return;
+	}
+
+	if (hisifd->need_tuning_clk) {
+		offline_clk_rate = hisifd->dss_clk_rate.dss_pri_clk_rate;
+		online_clk_rate = hisifd_list[PRIMARY_PANEL_IDX]->dss_clk_rate.dss_pri_clk_rate;
+
+		if (offline_clk_rate >= online_clk_rate) {
+			clk_set_rate(hisifd->dss_pri_clk, offline_clk_rate);
+		}
+
+		HISI_FB_DEBUG("fb%d set online(%llu) -> offline(%llu).\n",
+			hisifd->index, online_clk_rate, offline_clk_rate);
+	}
+}
+
+static void hisi_recovery_online_clk_rate(struct hisi_fb_data_type *hisifd)
+{
+	uint64_t online_clk_rate;
+
+	if (!hisifd) {
+		HISI_FB_ERR("hisifd is null.\n");
+		return;
+	}
+
+	if (IS_ERR(hisifd->dss_pri_clk)) {
+		HISI_FB_ERR("fb%d: dss_pri_clk is null.\n", hisifd->index);
+		return;
+	}
+
+	if (hisifd->need_tuning_clk) {
+		online_clk_rate = hisifd_list[PRIMARY_PANEL_IDX]->dss_clk_rate.dss_pri_clk_rate;
+
+		clk_set_rate(hisifd->dss_pri_clk, online_clk_rate);
+
+		hisifd->dss_clk_rate.dss_pri_clk_rate = online_clk_rate;
+
+		hisifd->need_tuning_clk = false;
+
+		HISI_FB_DEBUG("fb%d recovery online(%llu)\n", hisifd->index, online_clk_rate);
+	}
+}
+
 
 int hisi_ov_offline_play(struct hisi_fb_data_type *hisifd, void __user *argp)
 {
@@ -483,7 +603,7 @@ int hisi_ov_offline_play(struct hisi_fb_data_type *hisifd, void __user *argp)
 	dss_rect_ltrb_t clip_rect;
 	dss_rect_t aligned_rect;
 	bool rdma_stretch_enable = false;
-	bool use_comm_mmbuf = false;
+	int use_comm_mmbuf = 0;
 	int i = 0;
 	int k = 0;
 	int n = 0;
@@ -495,9 +615,6 @@ int hisi_ov_offline_play(struct hisi_fb_data_type *hisifd, void __user *argp)
 	bool last_block = false;
 	dss_rect_t wb_ov_block_rect;
 	uint32_t cmdlist_idxs = 0;
-#ifndef CONFIG_HISI_DSS_CMDLIST_LAST_USED
-	uint32_t cmdlist_idxs_need_start = 0;
-#endif
 	int enable_cmdlist = 0;
 	bool has_base = false;
 	int mctl_idx = 0;
@@ -543,6 +660,8 @@ int hisi_ov_offline_play(struct hisi_fb_data_type *hisifd, void __user *argp)
 
 	hisi_dss_offline_composer_on(hisifd);
 
+	hisi_tuning_offline_clk_rate(hisifd);
+
 	down(&(hisifd->cmdlist_info->cmdlist_wb_common_sem));
 
 	////////////////////////////////////////////////////////////////////////////
@@ -553,8 +672,8 @@ int hisi_ov_offline_play(struct hisi_fb_data_type *hisifd, void __user *argp)
 		HISI_FB_ERR("fb%d, dss_overlay_t alloc failed!\n", hisifd->index);
 		goto err_return_sem0;
 	}
-	memset(pov_req, 0, sizeof(dss_overlay_t));
 
+	hisifb_dss_overlay_info_init(pov_req);
 	ret = hisi_get_ov_data_from_user(hisifd, pov_req, argp);
 	if (ret != 0) {
 		HISI_FB_ERR("fb%d, hisi_get_ov_data_from_user failed! ret = %d\n", hisifd->index, ret);
@@ -565,16 +684,8 @@ int hisi_ov_offline_play(struct hisi_fb_data_type *hisifd, void __user *argp)
 
 	if (g_debug_ovl_offline_composer == 1) {
 		HISI_FB_INFO("fb%d, get ov_req from user.\n", hisifd->index);
-		dumpDssOverlay(hisifd, pov_req, false);
+		dumpDssOverlay(hisifd, pov_req);
 	}
-
-#ifdef CONFIG_DSS_MMBUF_FENCE_USED
-	ret = hisifb_layerbuf_lock_offline(hisifd, pov_req, &lock_list);
-	if (ret != 0) {
-		HISI_FB_ERR("fb%d, hisifb_layerbuf_lock_offline failed! ret = %d\n", hisifd->index, ret);
-		goto err_return_sem0;
-	}
-#endif
 
 	////////////////////////////////////////////////////////////////////////////
 	// get vertical block ov
@@ -596,13 +707,6 @@ int hisi_ov_offline_play(struct hisi_fb_data_type *hisifd, void __user *argp)
 			goto err_return_sem0;
 		}
 
-	#ifndef CONFIG_HISI_DSS_CMDLIST_LAST_USED
-		cmdlist_idxs_need_start = hisi_cmdlist_get_cmdlist_need_start(hisifd, cmdlist_idxs);
-		if (cmdlist_idxs_need_start) {
-			hisi_cmdlist_add_nop_node(hisifd, cmdlist_idxs_need_start, 1, 0);
-			hisi_cmdlist_add_nop_node(hisifd, cmdlist_idxs_need_start, 0, 0);
-		}
-	#endif
 	} else {
 		hisifd->set_reg = hisifb_set_reg;
 	}
@@ -638,7 +742,7 @@ int hisi_ov_offline_play(struct hisi_fb_data_type *hisifd, void __user *argp)
 
 	for (m = 0; m < pov_req->ov_block_nums; m++) {
 		pov_h_block = &(pov_h_block_infos[m]);
-		ret = get_ov_block_rect(pov_req, pov_h_block, wb_layer4block, &block_num, hisifd->ov_block_rects);
+		ret = get_ov_block_rect(pov_req, pov_h_block, wb_layer4block, &block_num, hisifd->ov_block_rects,false);//lint !e747
 		if ((ret != 0) || (block_num == 0) || (block_num >= HISI_DSS_CMDLIST_BLOCK_MAX)) {
 			HISI_FB_ERR("get_ov_block_rect failed! ret = %d, block_num[%d]\n", ret, block_num);
 			ret = -1;
@@ -666,7 +770,7 @@ int hisi_ov_offline_play(struct hisi_fb_data_type *hisifd, void __user *argp)
 
 			if (g_debug_ovl_offline_composer == 1) {
 				HISI_FB_INFO("fb%d, get ov_req_h_v from kernel.\n", hisifd->index);
-				dumpDssOverlay(hisifd, pov_req_h_v, false);
+				dumpDssOverlay(hisifd, pov_req_h_v);
 			}
 
 			if (k == 0) {
@@ -755,11 +859,8 @@ int hisi_ov_offline_play(struct hisi_fb_data_type *hisifd, void __user *argp)
 
 	if (enable_cmdlist) {
 		//Next frame
-	#ifndef CONFIG_HISI_DSS_CMDLIST_LAST_USED
-		hisi_cmdlist_add_nop_node(hisifd, cmdlist_idxs, 0, 1);
-	#endif
 		//wmb();
-		hisi_cmdlist_flush_cache(hisifd, hisifd->ion_client, cmdlist_idxs);
+		hisi_cmdlist_flush_cache(hisifd, cmdlist_idxs);
 	}
 
 	hisifb_buf_sync_handle_offline(hisifd, pov_req);
@@ -772,13 +873,12 @@ int hisi_ov_offline_play(struct hisi_fb_data_type *hisifd, void __user *argp)
 	hisifd->cmdlist_info->cmdlist_wb_done[wb_type] = 0;
 
 	if (enable_cmdlist) {
-	#ifndef CONFIG_DSS_MMBUF_FENCE_USED
 		if (g_debug_ovl_offline_composer_timediff & 0x2)
 			hisifb_get_timestamp(&tv2);
 
 		//wait primary vactive_start int
 		if (use_comm_mmbuf) {
-			ret = hisi_vactive0_start_wait(hisifd, pov_req);
+			ret = hisi_vactive0_start_wait(hisifd, pov_req, use_comm_mmbuf);
 			if (ret != 0) {
 				HISI_FB_ERR("fb%d, hisi_vactive0_start_wait failed!\n", hisifd->index);
 				goto err_return_sem1;
@@ -791,9 +891,7 @@ int hisi_ov_offline_play(struct hisi_fb_data_type *hisifd, void __user *argp)
 			if (timediff >= g_debug_ovl_offline_composer_time_threshold)
 				HISI_FB_ERR("wb_compose_type=%d, OFFLINE_VACTIVE_TIMEDIFF is %u us!\n", wb_compose_type, timediff);
 		}
-	#endif
 
-	#ifdef CONFIG_HISI_DSS_CMDLIST_LAST_USED
 		if (parallel_compose_flag) {
 			hisi_cmdlist_exec(hisifd, cmdlist_idxs | hisifd->wb_info.cmdlist_idxs);
 			hisi_cmdlist_config_start(hisifd, hisifd->wb_info.mctl_idx, hisifd->wb_info.cmdlist_idxs, hisifd->wb_info.wb_compose_type);
@@ -804,12 +902,6 @@ int hisi_ov_offline_play(struct hisi_fb_data_type *hisifd, void __user *argp)
 				hisi_cmdlist_config_start(hisifd, mctl_idx, cmdlist_idxs, wb_compose_type);
 			}
 		}
-	#else
-		if (cmdlist_idxs_need_start) {
-			hisi_cmdlist_config_start(hisifd, mctl_idx, cmdlist_idxs_need_start, wb_compose_type);
-		}
-		hisi_cmdlist_exec(hisifd, cmdlist_idxs);
-	#endif
 	}
 
 	if (pov_req->to_be_continued == DSS_LAYER_PARALLEL_COMPOSE) {
@@ -852,18 +944,11 @@ int hisi_ov_offline_play(struct hisi_fb_data_type *hisifd, void __user *argp)
 			if (g_debug_ovl_offline_composer_hold || g_debug_ovl_block_composer)
 				debug = true;
 		} else {
-		#if defined (CONFIG_HISI_FB_3660)
-			/* remove mctl ch & ov for chicago */
-			hisi_remove_mctl_mutex(hisifd, mctl_idx, cmdlist_idxs);
-		#endif
 			ret = 0;
 		}
 	}
 
 err_return_sem1:
-#ifdef CONFIG_DSS_MMBUF_FENCE_USED
-	hisifb_layerbuf_unlock_offline(hisifd, &lock_list);
-#endif
 	if (parallel_compose_flag) {
 		hisi_offline_clear(hisifd, pov_req, enable_cmdlist, hisifd->wb_info.cmdlist_idxs | cmdlist_idxs, reset, debug);
 		memset(&hisifd->wb_info, 0, sizeof(dss_wb_info_t));
@@ -871,6 +956,8 @@ err_return_sem1:
 		hisi_offline_clear(hisifd, pov_req, enable_cmdlist, cmdlist_idxs, reset, debug);
 	}
 	up(&(hisifd->cmdlist_info->cmdlist_wb_sem[wb_type]));
+
+	hisi_recovery_online_clk_rate(hisifd);
 
 	hisi_dss_offline_composer_off(hisifd);
 
@@ -889,9 +976,6 @@ err_return_sem1:
 	return ret;
 
 err_return_sem0:
-#ifdef CONFIG_DSS_MMBUF_FENCE_USED
-	hisifb_layerbuf_unlock_offline(hisifd, &lock_list);
-#endif
 	if (g_debug_ovl_offline_composer_hold || g_debug_ovl_block_composer) {
 		debug = true;
 	}
@@ -901,6 +985,8 @@ err_return_sem0:
 		hisi_offline_clear(hisifd, pov_req, enable_cmdlist, cmdlist_idxs, reset, debug);
 	}
 	up(&(hisifd->cmdlist_info->cmdlist_wb_common_sem));
+
+	hisi_recovery_online_clk_rate(hisifd);
 
 	hisi_dss_offline_composer_off(hisifd);
 
@@ -925,6 +1011,9 @@ return_parallel_compose:
 	hisifd->wb_info.mctl_idx = mctl_idx;
 	hisifd->wb_info.wb_compose_type = wb_compose_type;
 	up(&(hisifd->cmdlist_info->cmdlist_wb_sem[wb_type]));
+
+	hisi_recovery_online_clk_rate(hisifd);
+
 	hisi_dss_offline_composer_off(hisifd);
 
 	if (g_debug_ovl_offline_composer)

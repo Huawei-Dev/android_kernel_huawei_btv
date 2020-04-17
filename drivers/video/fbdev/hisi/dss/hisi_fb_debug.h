@@ -101,27 +101,25 @@ extern int g_debug_ovl_copybit_composer;
 extern int g_debug_ovl_copybit_composer_hold;
 extern int g_debug_ovl_copybit_composer_timediff;
 extern int g_debug_ovl_copybit_composer_time_threshold;
+extern int g_debug_ovl_mediacommon_composer;
 
 extern int g_debug_ovl_cmdlist;
 extern int g_dump_cmdlist_content;
 extern int g_enable_ovl_cmdlist_online;
+extern int g_enable_l3_cache;
+extern int g_smmu_global_bypass;
 extern int g_enable_ovl_cmdlist_offline;
 extern int g_rdma_stretch_threshold;
 extern int g_enable_dirty_region_updt;
 extern int g_debug_dirty_region_updt;
 extern int g_enable_crc_debug;
 extern int g_ldi_data_gate_en;
-extern int g_debug_need_save_file;
 extern int g_debug_ovl_credit_step;
 extern int g_debug_layerbuf_sync;
 extern int g_enable_dss_idle;
 extern int g_dss_effect_sharpness1D_en;
 extern int g_dss_effect_sharpness2D_en;
 extern int g_dss_effect_acm_ce_en;
-extern int g_enable_effect;
-extern int g_enable_effect_hiace;
-extern int g_debug_effect;
-extern int g_enable_effect_bl;
 extern int g_debug_dump_mmbuf;
 extern uint32_t g_mmbuf_addr_test;
 #if defined(CONFIG_HISI_FB_3660) || defined (CONFIG_HISI_FB_970)
@@ -142,6 +140,4 @@ void hisifb_debug_unregister(struct platform_device *pdev);
 #if defined (CONFIG_HUAWEI_DSM)
 void dss_underflow_debug_func(struct work_struct *work);
 #endif
-
-void dss_underflow_stop_perf_state_online(struct hisi_fb_data_type *hisifd);
 #endif /* HISI_FB_DEBUG_H */
