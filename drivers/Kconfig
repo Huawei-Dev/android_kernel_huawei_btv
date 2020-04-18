@@ -205,8 +205,6 @@ source "drivers/connectivity/Kconfig"
 
 source "drivers/contexthub/Kconfig"
 
-source "drivers/hwbfm/Kconfig"
-
 source "drivers/hwusb/Kconfig"
 
 source "drivers/cpuload/Kconfig"

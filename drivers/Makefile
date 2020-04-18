@@ -181,5 +181,4 @@ obj-$(CONFIG_HWTC)	+= hwtc/
 obj-$(CONFIG_CONNECTIVITY_HI110X)     += connectivity/
 obj-$(CONFIG_CONTEXTHUB)	+= contexthub/
 obj-$(CONFIG_HW_GADGET) += hwusb/
-obj-$(CONFIG_HUAWEI_BFM) += hwbfm/
 obj-$(CONFIG_HW_CPULOAD_NOTI) += cpuload/
