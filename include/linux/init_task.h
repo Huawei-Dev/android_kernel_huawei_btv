@@ -158,15 +158,7 @@ extern struct task_group root_task_group;
 
 #define INIT_TASK_COMM "swapper"
 
-#ifdef CONFIG_HUAWEI_MSG_POLICY
-#define INIT_MSG_POLICY(tsk)	\
-	.ms = {						\
-		.main_looper_thread = false,\
-		.sched_time = {0},		\
-	},
-#else
 #define INIT_MSG_POLICY(tsk)
-#endif
 #ifdef CONFIG_RT_MUTEXES
 # define INIT_RT_MUTEXES(tsk)						\
 	.pi_waiters = RB_ROOT,						\

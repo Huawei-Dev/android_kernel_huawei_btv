@@ -1391,12 +1391,6 @@ enum perf_event_task_context {
 	perf_nr_task_contexts,
 };
 
-#ifdef CONFIG_HUAWEI_MSG_POLICY
-struct msg_stat {
-	bool main_looper_thread;
-	struct timespec sched_time;
-};
-#endif
 #ifdef CONFIG_HISI_SWAP_ZDATA
 struct reclaim_result {
 	unsigned nr_reclaimed;
@@ -1845,9 +1839,6 @@ struct task_struct {
 #if defined(CONFIG_BCACHE) || defined(CONFIG_BCACHE_MODULE)
 	unsigned int	sequential_io;
 	unsigned int	sequential_io_avg;
-#endif
-#ifdef CONFIG_HUAWEI_MSG_POLICY
-	struct msg_stat ms;
 #endif
 #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
 	unsigned long	task_state_change;

@@ -35,10 +35,6 @@
 #include <asm/cacheflush.h>
 #include "audit.h"	/* audit_signal_info() */
 
-#ifdef CONFIG_HUAWEI_KSTATE
-#include <huawei_platform/power/hw_kcollect.h>
-#endif
-
 #ifdef CONFIG_BOOST_KILL
 extern void hisi_get_fast_cpus(struct cpumask *cpumask);
 
@@ -1201,12 +1197,6 @@ int do_send_sig_info(int sig, struct siginfo *info, struct task_struct *p,
 {
 	unsigned long flags;
 	int ret = -ESRCH;
-
-#ifdef CONFIG_HUAWEI_KSTATE
-	if (sig == SIGKILL || sig == SIGTERM || sig == SIGABRT) {
-		hwkillinfo(p->tgid, sig);
-	}
-#endif
 
 	if (lock_task_sighand(p, &flags)) {
 		ret = send_signal(sig, info, p, group);

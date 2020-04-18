@@ -1,6 +1,5 @@
 obj-$(CONFIG_HUAWEI_CHARGER)	+= charger/
 obj-$(CONFIG_HUAWEI_COUL)	+= coul/
-obj-$(CONFIG_HUAWEI_KSTATE)	+= hw_kstate/
 obj-$(CONFIG_HW_PTM) += hw_ptm/
 obj-$(CONFIG_HUAWEI_FEATURE_PRINT_PID_NAME) += pid_socket/
 obj-$(CONFIG_INPUT_HW_ATE)	+= ate/
@@ -15,6 +14,4 @@ ifeq ($(HLTHERM_RUNTEST),true)
 CFLAGS_KERNEL += -DCONFIG_HLTHERM_RUNTEST
 endif
 
-obj-$(CONFIG_HUAWEI_MSG_POLICY) += msgnotify/
-obj-$(CONFIG_HUAWEI_WATER_CHECK) += water_check/
 obj-$(CONFIG_HUAWEI_BDAT) += bdat/

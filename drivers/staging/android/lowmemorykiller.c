@@ -46,10 +46,6 @@
 #define CREATE_TRACE_POINTS
 #include "trace/lowmemorykiller.h"
 
-#ifdef CONFIG_HUAWEI_KSTATE
-#include <huawei_platform/power/hw_kcollect.h>
-#endif
-
 static uint32_t lowmem_debug_level = 1;
 static short lowmem_adj[6] = {
 	0,
@@ -233,10 +229,6 @@ kill_selected:
 		lowmem_deathpending_timeout = jiffies + lmk_timeout_inter * HZ;
 #else
 		lowmem_deathpending_timeout = jiffies + HZ;
-#endif
-#ifdef CONFIG_HUAWEI_KSTATE
-		/*0 stand for low memory kill*/
-		hwkillinfo(selected->tgid, 0);
 #endif
 
 #if defined CONFIG_LOG_JANK

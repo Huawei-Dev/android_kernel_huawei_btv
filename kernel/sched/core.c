@@ -47,9 +47,6 @@
 #include <linux/init_task.h>
 #include <linux/binfmts.h>
 #include <linux/context_tracking.h>
-#ifdef CONFIG_HUAWEI_MSG_POLICY
-#include <huawei_platform/power/msgnotify.h>
-#endif
 #include <linux/compiler.h>
 #include <linux/cpufreq_times.h>
 
@@ -2907,9 +2904,6 @@ static void __sched __schedule(void)
 		rq->curr = next;
 		++*switch_count;
 
-#ifdef CONFIG_HUAWEI_MSG_POLICY
-		update_msg_stat(cpu, prev, next);
-#endif
 		rq = context_switch(rq, prev, next); /* unlocks the rq */
 		cpu = cpu_of(rq);
 	} else

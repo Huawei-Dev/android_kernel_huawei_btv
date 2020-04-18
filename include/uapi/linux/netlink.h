@@ -45,10 +45,6 @@
 
 #define NETLINK_INET_DIAG	NETLINK_SOCK_DIAG
 
-#ifdef CONFIG_HUAWEI_KSTATE
-#define NETLINK_HW_KSTATE	30	/* kstate send event to user */
-#endif
-
 /*netd communicate with hwfilter */
 #ifdef CONFIG_HW_NETFILTER_MODULE
 #define NETLINK_HW_NF   32

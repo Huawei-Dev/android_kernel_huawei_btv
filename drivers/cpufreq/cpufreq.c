@@ -32,10 +32,7 @@
 #include <linux/tick.h>
 #include <linux/sched.h>
 #include <trace/events/power.h>
-#ifdef CONFIG_HUAWEI_MSG_POLICY
-#include <linux/kernel.h>
-#include <huawei_platform/power/msgnotify.h>
-#endif
+
 /* Macros to iterate over lists */
 /* Iterate over online CPUs policies */
 static LIST_HEAD(cpufreq_policy_list);
@@ -776,29 +773,6 @@ static ssize_t show_scaling_setspeed(struct cpufreq_policy *policy, char *buf)
 	return policy->governor->show_setspeed(policy, buf);
 }
 
-#ifdef CONFIG_HUAWEI_MSG_POLICY
-static ssize_t store_msg_policy(struct cpufreq_policy *policy,
-					const char *buf, size_t count)
-{
-	unsigned int value = 0;
-	ssize_t ret;
-
-	ret = kstrtouint(buf, 0, &value);
-	if (ret < 0)
-		return -EINVAL;
-
-	set_msg_threshold(value);
-
-	return count;
-}
-
-static ssize_t show_msg_policy(struct cpufreq_policy *policy, char *buf)
-{
-	return snprintf(buf, PAGE_SIZE, "threshold:%u,max_msg_percent:%u\n",
-		get_msg_threshold(), get_max_msg_percent());
-}
-#endif
-
 /**
  * show_bios_limit - show the current cpufreq HW/BIOS limitation
  */
@@ -828,9 +802,6 @@ cpufreq_freq_attr_rw(scaling_min_freq);
 cpufreq_freq_attr_rw(scaling_max_freq);
 cpufreq_freq_attr_rw(scaling_governor);
 cpufreq_freq_attr_rw(scaling_setspeed);
-#ifdef CONFIG_HUAWEI_MSG_POLICY
-cpufreq_freq_attr_rw(msg_policy);
-#endif
 
 static struct attribute *default_attrs[] = {
 	&cpuinfo_min_freq.attr,
@@ -844,9 +815,6 @@ static struct attribute *default_attrs[] = {
 	&scaling_driver.attr,
 	&scaling_available_governors.attr,
 	&scaling_setspeed.attr,
-#ifdef CONFIG_HUAWEI_MSG_POLICY
-	&msg_policy.attr,
-#endif
 	NULL
 };
 
