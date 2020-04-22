@@ -49,10 +49,10 @@
 
 #include <img_types.h>
 
-extern IMG_UINT16 gaui16mpeg4VlcIndexData[17][3];
+extern IMG_UINT16 gaui16mpeg4VlcIndexData[][3];
 extern const IMG_UINT8 gui8mpeg4VlcIndexSize;
 
-IMG_UINT16 gaui16mpeg4VlcIndexData[17][3] = {
+IMG_UINT16 gaui16mpeg4VlcIndexData[][3] = {
 	{2,	5,	0},		/* B6_mcbpc_i_s_vops_piece.out */
 	{2,	5,	11},		/* B7_mcbpc_p_s_vops_update.out */
 	{0,	3,	40},		/* B8_cbpy_intra.out */
@@ -70,6 +70,7 @@ IMG_UINT16 gaui16mpeg4VlcIndexData[17][3] = {
 	{1,	5,	926},		/* B29_MVDs.out */
 	{1,	5,	945},		/* B30_MVDs.out */
 	{1,	1,	963},		/* B31_conv_ratio.out */
+	{0, 0,  0},         /* dummy to avoid OOB warnings */
 };
 
 const IMG_UINT8 gui8mpeg4VlcIndexSize = 17;

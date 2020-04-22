@@ -56,7 +56,10 @@ IMG_VOID DBGEVENT_dispatch(SYSBRG_sPacket *psPacket)
 	DBGEVENT_sRespMsg sResponseMsg;
 
 	if(SYSOSKM_CopyFromUser(&sCommandMsg, psPacket->pvCmdData, sizeof(sCommandMsg)))
+	{
 		IMG_ASSERT(!"failed to copy from user");
+		return;
+	}
 
 	switch (sCommandMsg.eFuncId)
 	{

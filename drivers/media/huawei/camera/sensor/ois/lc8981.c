@@ -25,6 +25,8 @@
 
 #include "hwois.h"
 
+//lint -save -e31
+
 //#define OIS_ID_CODE		0x24
 //#define I2V(i) container_of(i, ois_t, intf)
 
@@ -148,3 +150,5 @@ module_init(hw_lc8981_module_init);
 module_exit(hw_lc8981_module_exit);
 MODULE_DESCRIPTION("LC8981 OIS");
 MODULE_LICENSE("GPL v2");
+
+//lint -restore

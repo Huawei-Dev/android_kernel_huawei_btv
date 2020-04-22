@@ -59,7 +59,6 @@ typedef enum {
 	TOPAZKM_MMUMAllocateHeapDeviceMemory_ID,
 	TOPAZKM_StreamMMUMAllocateHeapDeviceMemory_ID,
 	TOPAZKM_MMUMFreeDeviceMemory_ID,
-	TOPAZKM_MMUFlushMMUTableCache_ID,
 	TOPAZKM_MapExternal_ID,
 	TOPAZKM_UnMapExternal_ID,
 	TOPAZKM_MMCopyTiledBuffer_ID,
@@ -159,11 +158,6 @@ typedef struct
 		{
 			IMG_BOOL		xTOPAZKM_MMUMFreeDeviceMemoryResp;
 		} sTOPAZKM_MMUMFreeDeviceMemoryResp;
-            
-		struct
-		{
-			IMG_BOOL		xTOPAZKM_MMUFlushMMUTableCacheResp;
-		} sTOPAZKM_MMUFlushMMUTableCacheResp;
             
 		struct
 		{

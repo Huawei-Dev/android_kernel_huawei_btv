@@ -14,6 +14,9 @@
 
 #define I2S(i) container_of(i, sensor_t, intf)
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
+
 extern struct hw_csi_pad hw_csi_pad;
 static hwsensor_vtbl_t s_imx219_vtbl;
 
@@ -256,47 +259,6 @@ static int imx219_match_id(
     return 0;
 }
 
-#if 0
-static ssize_t imx219_powerctrl_show(struct device *dev,
-	struct device_attribute *attr,char *buf)
-{
-    cam_info("enter %s", __func__);
-    return 1;
-}
-static ssize_t imx219_powerctrl_store(struct device *dev,
-	struct device_attribute *attr, const char *buf, size_t count)
-{
-	int state = simple_strtol(buf, NULL, 10);
-	cam_info("enter %s, state %d", __func__, state);
-
-	if (state == POWER_ON)
-		imx219_power_up(&s_imx219.intf);
-	else
-		imx219_power_down(&s_imx219.intf);
-
-	return count;
-}
-
-
-static struct device_attribute imx219_powerctrl =
-    __ATTR(power_ctrl, 0664, imx219_powerctrl_show, imx219_powerctrl_store);
-
-int imx219_register_attribute(hwsensor_intf_t* intf, struct device* dev)
-{
-	int ret = 0;
-
-	ret = device_create_file(dev, &imx219_powerctrl);
-	if (ret < 0) {
-		cam_err("%s failed to creat power ctrl attribute.", __func__);
-		goto err_create_power_ctrl;
-	}
-	return 0;
-err_create_power_ctrl:
-	device_remove_file(dev, &imx219_powerctrl);
-	return ret;
-}
-#endif
-
 static hwsensor_vtbl_t s_imx219_vtbl =
 {
     .get_name = imx219_get_name,
@@ -413,4 +375,4 @@ module_init(imx219_init_module);
 module_exit(imx219_exit_module);
 MODULE_DESCRIPTION("imx219");
 MODULE_LICENSE("GPL v2");
-
+#pragma GCC diagnostic pop

@@ -1125,7 +1125,7 @@ translation_GetSeqHdr(
             return ui32Result;
         }
         UPDATE_DEVICE((&psDdBufMapInfo->sDdBufInfo), !bFakeMTX);
-// *puipSeqAddr = GET_HOST_ADDR(&psDdBufMapInfo->sDdBufInfo, !bFakeMTX);
+        //*puipSeqAddr = GET_HOST_ADDR(&psDdBufMapInfo->sDdBufInfo, !bFakeMTX);
         *puipSeqAddr = GET_HOST_ADDR_OFFSET(&psDdBufMapInfo->sDdBufInfo, !bFakeMTX, psStrUnit->psSequHdrInfo->ui32BufOffset);
     }
     else
@@ -1183,7 +1183,7 @@ translation_GetPPSHdr(
             return ui32Result;
         }
         UPDATE_DEVICE((&psDdBufMapInfo->sDdBufInfo), !bFakeMTX);
-// *puipPPSAddr  = GET_HOST_ADDR(&psDdBufMapInfo->sDdBufInfo, !bFakeMTX);
+        //*puipPPSAddr  = GET_HOST_ADDR(&psDdBufMapInfo->sDdBufInfo, !bFakeMTX);
         *puipPPSAddr = GET_HOST_ADDR_OFFSET(&psDdBufMapInfo->sDdBufInfo, !bFakeMTX, psStrUnit->psPictHdrInfo->sPictAuxData.ui32BufOffset);
     }
     else
@@ -1237,7 +1237,7 @@ translation_GetSecondPPSHdr(
             return ui32Result;
         }
         UPDATE_DEVICE((&psDdBufMapInfo->sDdBufInfo), !bFakeMTX);
-// *puipSecondPPSAddr = GET_HOST_ADDR(&psDdBufMapInfo->sDdBufInfo, !bFakeMTX);
+        //*puipSecondPPSAddr = GET_HOST_ADDR(&psDdBufMapInfo->sDdBufInfo, !bFakeMTX);
         *puipSecondPPSAddr = GET_HOST_ADDR_OFFSET(&psDdBufMapInfo->sDdBufInfo, !bFakeMTX, psStrUnit->psPictHdrInfo->sSecondPictAuxData.ui32BufOffset);
     }
     else
@@ -1729,7 +1729,33 @@ IMG_RESULT TRANSLATION_PicturePrepare(
 #define VDEC_INITIAL_DEVA_DMA_CMD_SIZE 3
 #define VDEC_SINLGE_DEVA_DMA_CMD_SIZE 2
 
+/*!
+******************************************************************************
 
+ @Function              translation_PvdecAddDmaTransfers
+
+ @Description
+
+ Creates DEVA bitstream segments command and saves is to control allocation
+ buffer.
+
+ @Input     psDecPictSegList    : List of bitstream segments
+                                  (DECODER_sDecPictSeg)
+
+ @Input     psEndBytesBufInfo   : Buffer with end bytes segment.
+
+ @In/Output ppui32DmaCmdBuf     : Points to control allocation buffer, where
+                                  command will be saved. It is updated in this
+                                  function to point one word past the end of
+                                  added command.
+
+ @Input     i32CmdBufSize       : Size of empty space in control allocation
+                                  buffer in 32bit words.
+
+ @Return    IMG_RESULT          : This function returns either IMG_SUCCESS or
+                                  an error code.
+
+******************************************************************************/
 static IMG_RESULT translation_PvdecAddDmaTransfers(
     LST_T                  * psDecPictSegList,
     VXDIO_sDdBufInfo       * psEndBytesBufInfo,
@@ -1877,6 +1903,7 @@ static IMG_RESULT translation_PvdecAddDmaTransfers(
     *pui32DmaHdr = ui32BitstreamSize;
 
 #if 0
+    /* Add end bytes */
     i32CmdBufSize -= VDEC_SINLGE_DEVA_DMA_CMD_SIZE;
     if (i32CmdBufSize < 0)
     {
@@ -2006,7 +2033,29 @@ translation_PvdecSetupVP6AddParams(
 }
 #endif
 
+/*!
+******************************************************************************
 
+ @Function              translation_PvdecSetupVlcDma
+
+ @Description
+
+ Creates DEVA VLC DMA command and saves is to control allocation buffer.
+
+ @Input     psVlcTablesBufInfo  : Buffer with VLC tables.
+
+ @In/Output ppui32DmaCmdBuf     : Points to control allocation buffer, where
+                                  command will be saved. It is updated in this
+                                  function to point one word past the end of
+                                  added command.
+
+ @Input     ui32CmdBufSize      : Size of empty space in control allocation
+                                  buffer in 32bit words.
+
+ @Return    IMG_RESULT          : This function returns either IMG_SUCCESS or
+                                  an error code.
+
+******************************************************************************/
 static IMG_RESULT translation_PvdecSetupVlcDma(
     VXDIO_sDdBufInfo       * psVlcTablesBufInfo,
     IMG_UINT32            ** ppui32DmaCmdBuf,
@@ -2043,7 +2092,38 @@ static IMG_RESULT translation_PvdecSetupVlcDma(
 }
 
 
+/*!
+******************************************************************************
 
+ @Function              translation_PvdecSetupVlcTables
+
+ @Description
+
+ Creates DEVA commands for configuring VLC tables and saves them into
+ control allocation buffer.
+
+
+ @Input     aui16VlcIndexData  : Array with configuration of VLC tables:
+                                 addresses, widths and initial opcodes.
+
+ @Input     ui32NumTables      : Number of tables to configure (number of
+                                 items in aui16VlcIndexData)
+
+ @In/Output ppui32CtrlAllocBuf : Points to control allocation buffer, where
+                                 command will be saved. It is updated in this
+                                 function to point one word past the end of
+                                 added command.
+
+ @Input     ui32CtrlAllocSize  : Size of empty space in control allocation
+                                 buffer in 32bit words.
+
+ @Input     ui32MsvdxVecOffset : Offset of MSVDX VEC register space within
+                                 registers area.
+
+ @Return    IMG_RESULT         : This function returns either IMG_SUCCESS or
+                                 an error code.
+
+******************************************************************************/
 static IMG_RESULT translation_PvdecSetupVlcTables(
     IMG_UINT16             aui16VlcIndexData[][3],
     IMG_UINT32             ui32NumTables,
@@ -2201,7 +2281,34 @@ static IMG_RESULT translation_PvdecSetupVlcTables(
 }
 
 
+/*!
+******************************************************************************
 
+ @Function              translation_PvdecSetupCommands
+
+ @Description
+
+ Creates DEVA commands for configuring rendec and writes them into control
+ allocation buffer.
+
+ @Input     aui32PictCmds      : Buffer with commands, in order defined in
+                                 VDECFW_ePictureCmds enum.
+
+ @In/Output ppui32CtrlAllocBuf : Points to control allocation buffer, where
+                                 command will be saved. It is updated in this
+                                 function to point one word past the end of
+                                 added command.
+
+ @Input     ui32CtrlAllocSize  : Size of empty space in control allocation
+                                 buffer in 32bit words.
+
+ @Input     ui32VdmcCmdOffset  : Offset of MSVDX CMD register space within
+                                 registers area.
+
+ @Return    IMG_RESULT         : This function returns either IMG_SUCCESS or
+                                 an error code.
+
+******************************************************************************/
 static IMG_RESULT translation_PvdecSetupCommands(
     IMG_UINT32           * aui32PictCmds,
     IMG_UINT32          ** ppui32CtrlAllocBuf,
@@ -2335,7 +2442,38 @@ static IMG_RESULT translation_PvdecSetupCommands(
 }
 
 #ifdef HAS_HEVC
+/*!
+******************************************************************************
 
+ @Function              translation_PvdecSetupHEVCCommands
+
+ @Description
+
+ Creates DEVA commands for configuring rendec and writes them into control
+ allocation buffer.
+
+ @Input     psDecPict             : Picture being decoded.
+
+ @Input     psStrUnit             : Stream unit being submitted.
+
+ @In/Output ppui32CtrlAllocBuf    : Points to control allocation buffer,
+                                    where command will be saved. It is updated
+                                    in this function to point one word past
+                                    the end of added command.
+
+ @Input     ui32CtrlAllocSize     : Size of empty space in control allocation
+                                    buffer in 32bit words.
+
+ @Input     pui32MemToRegHostPart : Number of 32bits words written to MemToReg
+                                    buffer in this function.
+
+ @Input     aui32PictCmds         : Buffer with commands, in order defined in
+                                    VDECFW_ePictureCmds enum.
+
+ @Return    IMG_RESULT            : This function returns either IMG_SUCCESS or
+                                     an error code.
+
+******************************************************************************/
 static IMG_RESULT translation_PvdecSetupHEVCCommands(
     VDECDD_sPicture      * psPicture,
     DECODER_sDecPict     * psDecPict,

@@ -56,7 +56,10 @@ IMG_VOID HOSTUTILS_dispatch(SYSBRG_sPacket *psPacket)
 	HOSTUTILS_sRespMsg sResponseMsg;
 
 	if(SYSOSKM_CopyFromUser(&sCommandMsg, psPacket->pvCmdData, sizeof(sCommandMsg)))
+	{
 		IMG_ASSERT(!"failed to copy from user");
+		return;
+	}
 
 	switch (sCommandMsg.eFuncId)
 	{

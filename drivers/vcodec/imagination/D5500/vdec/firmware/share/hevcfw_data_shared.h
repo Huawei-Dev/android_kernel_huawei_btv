@@ -115,37 +115,34 @@ typedef struct
     IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, log2_diff_max_min_luma_coding_block_size);
     IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, log2_min_luma_coding_block_size_minus3);
 
-    struct
-    {
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, chroma_format_idc : 2);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, separate_colour_plane_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, num_extra_slice_header_bits : 3);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, log2_max_pic_order_cnt_lsb_minus4 : 4);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, long_term_ref_pics_present_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, sample_adaptive_offset_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, sps_temporal_mvp_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, bit_depth_luma_minus8 : 3);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, bit_depth_chroma_minus8 : 3);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, pcm_sample_bit_depth_luma_minus1 : 4);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, pcm_sample_bit_depth_chroma_minus1 : 4);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, log2_min_pcm_luma_coding_block_size_minus3 : 2);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, log2_diff_max_min_pcm_luma_coding_block_size : 2);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, pcm_loop_filter_disabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, amp_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, pcm_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, strong_intra_smoothing_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, scaling_list_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, high_precision_offsets_enabled_flag : 1);
-    };
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, chroma_format_idc);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, separate_colour_plane_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, num_extra_slice_header_bits);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, log2_max_pic_order_cnt_lsb_minus4);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, long_term_ref_pics_present_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, sample_adaptive_offset_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, sps_temporal_mvp_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, bit_depth_luma_minus8);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, bit_depth_chroma_minus8);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, pcm_sample_bit_depth_luma_minus1);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, pcm_sample_bit_depth_chroma_minus1);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, log2_min_pcm_luma_coding_block_size_minus3);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, log2_diff_max_min_pcm_luma_coding_block_size);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, pcm_loop_filter_disabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, amp_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, pcm_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, strong_intra_smoothing_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, scaling_list_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, high_precision_offsets_enabled_flag);
 
     /* derived elements */
-    IMG_UINT32 ui32PicSizeInCtbsY;
-    IMG_UINT16 ui16PicHeightInCtbsY;
-    IMG_UINT16 ui16PicWidthInCtbsY;
-    IMG_UINT8 ui8CtbSizeY;
-    IMG_UINT8 ui8CtbLog2SizeY;
-    IMG_INT32 i32MaxPicOrderCntLsb;
-    IMG_UINT32 ui32SpsMaxLatencyPictures[HEVCFW_MAX_NUM_SUBLAYERS];
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT32, ui32PicSizeInCtbsY);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT16, ui16PicHeightInCtbsY);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT16, ui16PicWidthInCtbsY);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, ui8CtbSizeY);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, ui8CtbLog2SizeY);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_INT32, i32MaxPicOrderCntLsb);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT32, ui32SpsMaxLatencyPictures[HEVCFW_MAX_NUM_SUBLAYERS]);
 
 } HEVCFW_sSequencePS;
 
@@ -184,50 +181,47 @@ typedef struct
     IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_INT8, pps_cr_qp_offset);
     IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, log2_parallel_merge_level_minus2);
 
-    struct
-    {
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, dependent_slice_segments_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, output_flag_present_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, num_extra_slice_header_bits : 3);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, lists_modification_present_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, cabac_init_present_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, weighted_pred_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, weighted_bipred_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, pps_slice_chroma_qp_offsets_present_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, deblocking_filter_override_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, pps_loop_filter_accross_slices_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, tiles_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, entropy_coding_sync_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, slice_segment_header_extension_present_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, transquant_bypass_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, cu_qp_delta_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, transform_skip_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, sign_data_hiding_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, num_ref_idx_l0_default_active_minus1 : 4);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, num_ref_idx_l1_default_active_minus1 : 4);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, constrained_intra_pred_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, pps_deblocking_filter_disabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, pps_loop_filter_across_slices_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, loop_filter_across_tiles_enabled_flag : 1);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, dependent_slice_segments_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, output_flag_present_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, num_extra_slice_header_bits);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, lists_modification_present_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, cabac_init_present_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, weighted_pred_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, weighted_bipred_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, pps_slice_chroma_qp_offsets_present_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, deblocking_filter_override_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, pps_loop_filter_accross_slices_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, tiles_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, entropy_coding_sync_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, slice_segment_header_extension_present_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, transquant_bypass_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, cu_qp_delta_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, transform_skip_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, sign_data_hiding_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, num_ref_idx_l0_default_active_minus1);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, num_ref_idx_l1_default_active_minus1);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, constrained_intra_pred_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, pps_deblocking_filter_disabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, pps_loop_filter_across_slices_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, loop_filter_across_tiles_enabled_flag);
 
-        /* rewritten from SPS, maybe at some point we could get rid of this */
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, scaling_list_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, chroma_qp_offset_list_enabled_flag : 1);
-        IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, unsigned, diff_cu_chroma_qp_offset_depth : 2);
-    };
+    /* rewritten from SPS, maybe at some point we could get rid of this */
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, scaling_list_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, chroma_qp_offset_list_enabled_flag);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, diff_cu_chroma_qp_offset_depth);
 
     /* PVDEC derived elements. HEVCFW_SCALING_LISTS_BUFSIZE is multiplied by 2
      * to ensure that there will be space for address of each element. 
      * These addresses are completed in lower layer. */
-    IMG_UINT32 aui32ScalingLists[HEVCFW_SCALING_LISTS_BUFSIZE * 2];
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT32, aui32ScalingLists[HEVCFW_SCALING_LISTS_BUFSIZE * 2]);
 
     /* derived elements */
-    IMG_UINT16 aui16ColBd[HEVCFW_MAX_TILE_COLS + 1];
-    IMG_UINT16 aui16RowBd[HEVCFW_MAX_TILE_ROWS + 1];
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT16, aui16ColBd[HEVCFW_MAX_TILE_COLS + 1]);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT16, aui16RowBd[HEVCFW_MAX_TILE_ROWS + 1]);
 
-    IMG_UINT8 chroma_qp_offset_list_len_minus1;
-    IMG_INT8 cb_qp_offset_list[HEVCFW_MAX_CHROMA_QP];
-    IMG_INT8 cr_qp_offset_list[HEVCFW_MAX_CHROMA_QP];
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_UINT8, chroma_qp_offset_list_len_minus1);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_INT8, cb_qp_offset_list[HEVCFW_MAX_CHROMA_QP]);
+    IMG_ALIGN_FIELD(VDECFW_SHARE_DEFAULT_ALIGNMENT, IMG_INT8, cr_qp_offset_list[HEVCFW_MAX_CHROMA_QP]);
 
 } HEVCFW_sPicturePS;
 

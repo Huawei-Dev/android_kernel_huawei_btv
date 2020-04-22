@@ -15,6 +15,8 @@
 
 #define I2S(i) container_of(i, sensor_t, intf)
 
+static bool s_imx286dual_power_on = false;
+
 static struct sensor_power_setting imx286dual_power_setting[] = {
     //M0 AVDD0  2.80V  [LDO19]
     {
@@ -196,10 +198,16 @@ imx286dual_config(
     cam_debug("imx286dual cfgtype = %d",data->cfgtype);
     switch(data->cfgtype){
         case SEN_CONFIG_POWER_ON:
-            ret = si->vtbl->power_up(si);
+            if (!s_imx286dual_power_on) {
+                ret = si->vtbl->power_up(si);
+                s_imx286dual_power_on = true;
+            }
             break;
         case SEN_CONFIG_POWER_OFF:
-            ret = si->vtbl->power_down(si);
+            if (s_imx286dual_power_on) {
+                ret = si->vtbl->power_down(si);
+                s_imx286dual_power_on = false;
+            }
             break;
         case SEN_CONFIG_WRITE_REG:
             break;

@@ -23,15 +23,6 @@ static int imx214dual_config(hwsensor_intf_t* si, void  *argp);
 
 static struct sensor_power_setting hw_imx214dual_power_setting[] = {
 
-#if 0
-	//for test , IR must be PowerUp
-	{
-		.seq_type = SENSOR_AVDD,
-		.config_val = LDO_VOLTAGE_1P8V,  //1.8V
-		.sensor_index = SENSOR_INDEX_INVALID,
-		.delay = 1,
-    },
-#endif
 	//VCM0[PMIC] 3V    //PMU_LDO25
     {
 		.seq_type = SENSOR_VCM_AVDD,
@@ -254,48 +245,6 @@ imx214dual_match_id(
     return 0;
 }
 
-#if 0
-static ssize_t imx214dual_powerctrl_show(struct device *dev,
-	struct device_attribute *attr,char *buf)
-{
-    cam_info("enter %s", __func__);
-    return 1;
-}
-static ssize_t imx214dual_powerctrl_store(struct device *dev,
-	struct device_attribute *attr, const char *buf, size_t count)
-{
-	int state = simple_strtol(buf, NULL, 10);
-	cam_info("enter %s, state %d", __func__, state);
-
-	if (state == POWER_ON)
-		imx214dual_power_up(&s_imx214dual.intf);
-	else
-		imx214dual_power_down(&s_imx214dual.intf);
-
-	return count;
-}
-
-
-static struct device_attribute imx214dual_powerctrl =
-    __ATTR(power_ctrl, 0664, imx214dual_powerctrl_show, imx214dual_powerctrl_store);
-
-static int imx214dual_register_attribute(hwsensor_intf_t* intf, struct device* dev)
-{
-	int ret = 0;
-	cam_info("enter %s", __func__);
-
-	ret = device_create_file(dev, &imx214dual_powerctrl);
-	if (ret < 0) {
-		cam_err("%s failed to creat power ctrl attribute.", __func__);
-		goto err_create_power_ctrl;
-	}
-	return 0;
-err_create_power_ctrl:
-	device_remove_file(dev, &imx214dual_powerctrl);
-	return ret;
-}
-#endif
-
 static hwsensor_vtbl_t
 s_imx214dual_vtbl =
 {
@@ -322,14 +271,21 @@ imx214dual_config(
 		return -1;
 	}
 
+	static bool imx214dual_power_on = false;
 	data = (struct sensor_cfg_data *)argp;
 	cam_debug("imx214dual cfgtype = %d",data->cfgtype);
 	switch(data->cfgtype){
 		case SEN_CONFIG_POWER_ON:
-			ret = si->vtbl->power_up(si);
+			if (!imx214dual_power_on) {
+				ret = si->vtbl->power_up(si);
+				imx214dual_power_on = true;
+			}
 			break;
 		case SEN_CONFIG_POWER_OFF:
-			ret = si->vtbl->power_down(si);
+			if (imx214dual_power_on) {
+				ret = si->vtbl->power_down(si);
+				imx214dual_power_on = false;
+				}
 			break;
 		case SEN_CONFIG_WRITE_REG:
 			break;

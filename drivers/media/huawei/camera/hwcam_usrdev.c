@@ -3,6 +3,7 @@
 
 #include <linux/debugfs.h>
 #include <linux/fs.h>
+#include <linux/version.h>
 #include <linux/module.h>
 #include <linux/sched.h>
 #include <linux/slab.h>
@@ -13,9 +14,13 @@
 #include <media/v4l2-fh.h>
 #include <media/v4l2-ioctl.h>
 #include <media/videobuf2-core.h>
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0))
+#include <media/videobuf2-v4l2.h>
+#endif
 
 #include "hwcam_intf.h"
 #include "cam_log.h"
+//lint -save -e593 -e455 -e454 -e31
 
 typedef struct _tag_hwcam_dev
 {
@@ -26,6 +31,7 @@ typedef struct _tag_hwcam_dev
 
     hwcam_dev_intf_t                            intf;
     hwcam_cfgpipeline_intf_t*                   pipeline;
+    struct mutex                                devlock;
 } hwcam_dev_t;
 
 typedef struct _tag_hwcam_user
@@ -42,6 +48,7 @@ typedef struct _tag_hwcam_user
     struct v4l2_format                          format;
     unsigned long                               f_format_valid : 1;
     unsigned long                               f_pipeline_owner : 1;
+    struct mutex                                lock;
 } hwcam_user_t;
 
 #define VO2USER(fpd) container_of(fpd, hwcam_user_t, eq)
@@ -63,7 +70,7 @@ hwcam_user_release(
     HWCAM_CFG_DEBUG("instance(0x%pK)", &user->intf);
 
     vb2_queue_release(&user->vb2q);
-
+    mutex_destroy(&user->lock);
     user->intf.vtbl = NULL;
     kzfree(user);
 }
@@ -97,11 +104,13 @@ hwcam_user_create_instance(
     memset(&user->format, 0, sizeof(user->format));
 
     user->vb2q.type = V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE;
-    user->vb2q.ops = &s_qops_hwcam_vbuf;
-    user->vb2q.mem_ops = &s_mops_hwcam_vbuf;
+    if (!hw_is_binderized()) {
+        user->vb2q.ops = &s_qops_hwcam_vbuf;
+        user->vb2q.mem_ops = &s_mops_hwcam_vbuf;
+    }
     user->vb2q.io_modes = VB2_USERPTR;
     /* user->vb2q.io_flags = 0; */
-    user->vb2q.buf_struct_size = sizeof(hwcam_vbuf_t);
+    user->vb2q.buf_struct_size = 0; //sizeof(hwcam_vbuf_t);
     user->vb2q.drv_priv = user;
     user->vb2q.timestamp_flags = V4L2_BUF_FLAG_TIMESTAMP_COPY;
     if (vb2_queue_init(&user->vb2q)) {
@@ -110,6 +119,7 @@ hwcam_user_create_instance(
         user = NULL;
         goto exit_create_instance;
     }
+    mutex_init(&user->lock);
 
     HWCAM_CFG_DEBUG("instance(0x%pK)", &user->intf);
 
@@ -175,14 +185,14 @@ s_vtbl_hwcam_user =
 static int
 hwcam_user_vb2q_queue_setup(
         struct vb2_queue* q,
-        const struct v4l2_format* fmt,
+        const void* para,
         unsigned int* num_buffers,
         unsigned int* num_planes,
         unsigned int sizes[],
         void* alloc_ctxs[])
 {
     int i = 0;
-	hwcam_user_t* user = NULL;
+    hwcam_user_t* user = NULL;
     if (NULL == q){
         HWCAM_CFG_ERR("input parameter q is null. \n");
         return -1;
@@ -239,19 +249,24 @@ hwcam_user_vb2q_start_streaming(
         : -ENOENT;
 }
 
-static int
+static void
 hwcam_user_vb2q_stop_streaming(
         struct vb2_queue *q)
 {
-	hwcam_user_t* user = NULL;
+    hwcam_user_t* user = NULL;
     if (NULL == q){
         HWCAM_CFG_ERR("input parameter q is null. \n");
-        return -1;
+        return;
     }
     user = q->drv_priv;
-    return user->stream
-        ? hwcam_cfgstream_intf_stop(user->stream)
-        : -ENOENT;
+    if (NULL == user->stream){
+        HWCAM_CFG_ERR("user->stream of input parameter is null. \n");
+    }
+    else{
+        if (0 != hwcam_cfgstream_intf_stop(user->stream)){
+            HWCAM_CFG_ERR("fail to stop user->stream . \n");
+        }
+    }
 }
 
 static int
@@ -281,7 +296,7 @@ hwcam_user_vb2q_buf_queue(
 static struct vb2_ops
 s_qops_hwcam_vbuf =
 {
-    .queue_setup = hwcam_user_vb2q_queue_setup,
+    .queue_setup = hwcam_user_vb2q_queue_setup, /*lint !e64 */
 
 	.wait_prepare = hwcam_user_vb2q_wait_prepare,
 	.wait_finish = hwcam_user_vb2q_wait_finish,
@@ -300,7 +315,7 @@ hwcam_user_vb2q_get_userptr(
         void* alloc_ctx,      //  hwcam_user_t*
         unsigned long vaddr,  //  fdIon
         unsigned long size,
-        int write)
+        enum dma_data_direction dma_dir)
 {
     return alloc_ctx;
 }
@@ -812,14 +827,7 @@ hwcam_dev_vo_s_parm(
     if (user->stream) {
         return 0;
     }
-#if 0  //dead code
-    else {
-        HWCAM_CFG_ERR("failed to install stream! \n");
-        return -ENOMEM;
-    }
-#else
 	return 0;
-#endif
 }
 
 static int
@@ -994,9 +1002,10 @@ hwcam_dev_vo_poll(
 
     if (!cam || !user) {
         HWCAM_CFG_ERR("%s(%d): cam or user is NULL!", __func__, __LINE__);
-        return -EINVAL;
+        return (unsigned int)(-EINVAL);
     }
 
+    mutex_lock(&user->lock);
     if (user->f_format_valid) {
         rc = vb2_poll(&user->vb2q, filep, wait);
         rc &= ~POLLERR;
@@ -1005,6 +1014,7 @@ hwcam_dev_vo_poll(
     if (v4l2_event_pending(&user->eq)) {
         rc |= POLLPRI | POLLOUT | POLLIN;
     }
+    mutex_unlock(&user->lock);
 
 	return rc;
 }
@@ -1017,14 +1027,16 @@ hwcam_dev_vo_close(
     struct v4l2_fh* eq = NULL;
 
     cam = (hwcam_dev_t*)video_drvdata(filep);
-    swap(filep->private_data, eq);
 
-    if (!cam || !eq) {
-        HWCAM_CFG_ERR("%s(%d): cam or eq is NULL!", __func__, __LINE__);
+    if (!cam) {
+        HWCAM_CFG_ERR("%s(%d): cam is NULL!", __func__, __LINE__);
         return -EINVAL;
     }
 
-	if (eq) {
+    mutex_lock(&cam->devlock);
+    swap(filep->private_data, eq);
+
+    if (eq){
         hwcam_cfgstream_intf_t* stm = NULL;
         hwcam_user_t* user = VO2USER(eq);
 
@@ -1051,9 +1063,15 @@ hwcam_dev_vo_close(
 
         HWCAM_CFG_INFO("instance(0x%pK, /dev/video%d)",
                 user, cam->vdev->num);
-	}
+    }else{
+        HWCAM_CFG_ERR("%s(%d): eq is NULL!", __func__, __LINE__);
+        mutex_unlock(&cam->devlock);
+        return -EINVAL;
+    }
 
-	return 0;
+    mutex_unlock(&cam->devlock);
+
+    return 0;
 }
 
 static int
@@ -1069,10 +1087,11 @@ hwcam_dev_vo_open(
     if (!user) {
         HWCAM_CFG_ERR("failed to failed to create instance! \n");
         rc = -ENOMEM;
-        goto open_end;
+        return rc;
     }
 
-    if (!cam->pipeline) {
+    mutex_lock(&cam->devlock);
+    if (!cam->pipeline && !hw_is_binderized()) {
         hwcam_cfgpipeline_intf_t* pl = NULL;
         int ret = hwcam_cfgdev_mount_pipeline(
                 NULL, &cam->intf, cam->vdev->num, &pl);
@@ -1094,7 +1113,7 @@ hwcam_dev_vo_open(
         }
     }
 
-    if (!cam->pipeline) {
+    if (!cam->pipeline && !hw_is_binderized()) {
         HWCAM_CFG_ERR("failed to install pipeline! \n");
         rc = -ENOENT;
         goto fail_to_mount_pipeline;
@@ -1113,6 +1132,7 @@ fail_to_mount_pipeline:
     hwcam_user_intf_put(&user->intf);
 
 open_end:
+    mutex_unlock(&cam->devlock);
     return rc;
 }
 
@@ -1225,7 +1245,9 @@ hwcam_dev_create(
 	vdev->v4l2_dev = v4l2;
 	vdev->release = video_device_release;
 	vdev->fops = &s_fops_hwcam_dev;
-	vdev->ioctl_ops = &s_iops_hwcam_dev;
+	if (!hw_is_binderized()) {
+        vdev->ioctl_ops = &s_iops_hwcam_dev;
+	}
 	vdev->minor = -1;
 	vdev->vfl_type = VFL_TYPE_GRABBER;
 	vdev->vfl_dir = VFL_DIR_TX;
@@ -1235,6 +1257,7 @@ hwcam_dev_create(
     }
 	cam_debug("video dev name %s %s",vdev->dev.kobj.name,vdev->name);
     mutex_init(&cam->lock);
+    mutex_init(&cam->devlock);
     vdev->lock = &cam->lock;
 	vdev->entity.name = video_device_node_name(vdev);
 	video_set_drvdata(vdev, cam);
@@ -1266,4 +1289,6 @@ video_alloc_fail:
 init_end:
 	return rc;
 }
+//lint -restore
+
 

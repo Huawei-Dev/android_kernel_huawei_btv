@@ -43,46 +43,13 @@
 #include <linux/regulator/machine.h>
 #include "cam_log.h"
 #include "hwcam_intf.h"
+#include "laser_common.h"
 
 #define LOW                             0
 #define HIGH                            1
 
-#define LDO_MAX                         2
 
-typedef enum {
-    XSHUT = 0,
-    IOVDD,
-    IO_MAX
-} gpio_t;
-
-/* laser controler struct define */
-struct hw_laser_info {
-    const char* product_name;
-    const char* laser_name;
-    unsigned int i2c_index;
-
-    /* gpio: laser xshut, avdd */
-    struct gpio laser_gpio[IO_MAX];
-    int gpio_num;
-
-    /* ldo: laser avdd */
-    int ldo_num;
-    struct regulator_bulk_data ldo[LDO_MAX];
-
-    /* pin control config */
-    struct pinctrl *pinctrl;
-    struct pinctrl_state *pins_default;
-    struct pinctrl_state *pins_idle;
-};
-
-
-typedef struct _tag_hw_vl53l0
-{
-    struct v4l2_subdev subdev;
-    struct platform_device *pdev;
-    struct hw_laser_info *laser_info;
-    struct mutex lock;
-} hw_vl53l0_t;
+typedef hw_laser_t  hw_vl53l0_t;
 
 #endif
 

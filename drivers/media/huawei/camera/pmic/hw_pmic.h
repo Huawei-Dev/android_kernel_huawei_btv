@@ -75,6 +75,7 @@ struct hisi_pmic_fn_t {
 	int (*pmic_get_dt_data) (struct hisi_pmic_ctrl_t *);
 	int (*pmic_seq_config)(struct hisi_pmic_ctrl_t *, pmic_seq_index_t, u32, int);
 	int (*pmic_register_attribute)(struct hisi_pmic_ctrl_t *, struct device *);
+	int (*pmic_check_exception)(struct hisi_pmic_ctrl_t *);
 };
 
 struct hisi_pmic_i2c_client {

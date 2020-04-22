@@ -56,7 +56,10 @@ IMG_VOID MEMMGR_dispatch(SYSBRG_sPacket *psPacket)
 	MEMMGR_sRespMsg sResponseMsg;
 
 	if(SYSOSKM_CopyFromUser(&sCommandMsg, psPacket->pvCmdData, sizeof(sCommandMsg)))
+	{
 		IMG_ASSERT(!"failed to copy from user");
+		return;
+	}
 
 	switch (sCommandMsg.eFuncId)
 	{
@@ -142,23 +145,6 @@ IMG_VOID MEMMGR_dispatch(SYSBRG_sPacket *psPacket)
       		TOPAZKM_MMUMFreeDeviceMemory(
       
 	  sCommandMsg.sCmd.sTOPAZKM_MMUMFreeDeviceMemoryCmd.pMemInfo
-      );
-      break;
-      
-    
-      case TOPAZKM_MMUFlushMMUTableCache_ID:
-      
-#if 0
-#ifdef CONFIG_COMPAT      
-      printk("bridge %d %s %s\n", is_compat_task(), __FUNCTION__, "TOPAZKM_MMUFlushMMUTableCache");
-#else
-      printk("bridge %s %s\n", __FUNCTION__, "TOPAZKM_MMUFlushMMUTableCache");
-#endif
-#endif
-      
-	sResponseMsg.sResp.sTOPAZKM_MMUFlushMMUTableCacheResp.xTOPAZKM_MMUFlushMMUTableCacheResp =
-      		TOPAZKM_MMUFlushMMUTableCache(
-      
       );
       break;
       

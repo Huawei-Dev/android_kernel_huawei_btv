@@ -52,7 +52,7 @@
 extern IMG_UINT16 gaui16vc1VlcIndexData[][3];
 extern const IMG_UINT8	gui8vc1VlcIndexSize;
 
-IMG_UINT16	gaui16vc1VlcIndexData[83][3] = {
+IMG_UINT16	gaui16vc1VlcIndexData[][3] = {
 	{0,	3,	0},		/* vc1DEC_Code_3x2_2x3_tiles.out */
     {0,	2,	91},		/* vc1DEC_FourMV_Pattern_0.out */
     {0,	3,	110},		/* vc1DEC_FourMV_Pattern_1.out */
@@ -136,6 +136,7 @@ IMG_UINT16	gaui16vc1VlcIndexData[83][3] = {
     {0,	4,	6518},		/* vc1DEC_Two_Field_Ref_Ilace_MV_5.out */
     {0,	3,	6696},		/* vc1DEC_Two_Field_Ref_Ilace_MV_6.out */
     {0,	4,	6869},		/* vc1DEC_Two_Field_Ref_Ilace_MV_7.out */
+    {0, 0,     0}       /* dummy to avoid OOB warnings */
 };
 
 const IMG_UINT8	gui8vc1VlcIndexSize = 83;

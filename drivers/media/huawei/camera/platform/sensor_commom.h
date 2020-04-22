@@ -75,17 +75,25 @@ struct sensor_cfg_data;
 
 /********************** sensor base data struct define **********************/
 #define SENSOR_INDEX_INVALID        0xFFFFFFFF
+#define LDO_VOLTAGE_1P0V            1000000
 #define LDO_VOLTAGE_1P05V           1050000
 #define LDO_VOLTAGE_1P1V            1100000
+#define LDO_VOLTAGE_1P13V           1130000
 #define LDO_VOLTAGE_1P2V            1200000
+#define LDO_VOLTAGE_1P27V           1270000
 #define LDO_VOLTAGE_1P5V            1500000
 #define LDO_VOLTAGE_1P8V            1800000
 #define LDO_VOLTAGE_2P8V            2850000
+#define LDO_VOLTAGE_3PV             3000000
+
 //add by hefei
+#define LDO_VOLTAGE_V3PV            3000000
+#define LDO_VOLTAGE_V2P9V           2900000
 #define LDO_VOLTAGE_V2P8V           2800000
 #define LDO_VOLTAGE_V2P85V          2850000
 #define LDO_VOLTAGE_V2P6V           2600000
 #define LDO_VOLTAGE_V1P1V           1100000
+#define LDO_VOLTAGE_V1P12V          1120000
 #define LDO_VOLTAGE_V1P125V         1125000
 #define LDO_VOLTAGE_V1P15V          1150000
 #define LDO_VOLTAGE_V1P25V          1250000
@@ -95,6 +103,7 @@ struct sensor_cfg_data;
 //add by yinxuerui
 #define LDO_VOLTAGE_V2P5V       2500000
 
+#define PMIC_1P05V              1050000
 #define PMIC_1P1V               1100000
 #define PMIC_1P125V             1125000
 #define PMIC_1P15V              1150000
@@ -289,7 +298,6 @@ typedef enum {
     RESETB3,//used to 2M camera  when reset
     PWDN2,//used to 2M camera when power down
     IO_MAX,
-
 } gpio_t;
 
 typedef enum {
@@ -337,6 +345,7 @@ typedef struct _tag_hwsensor_board_info
     int csi_id[2];
     int i2c_id[2];
     int module_type;
+    int flash_pos_type;//0-alone 1-mix
 } hwsensor_board_info_t;
 
 struct hisi_sensor_awb_otp {
@@ -397,6 +406,10 @@ int hwsensor_writefile(int index, const char *sensor_name);
 int misp_get_module_info(uint8_t index,uint16_t *sensor_id, uint8_t *module_id);
 int misp_get_chipid(void);
 int misp_load_fw(u8 *out_fw_disp);
-void hwcam_mclk_enable(int index, int enable);
+int rpmsg_sensor_ioctl(unsigned int cmd, int index, char* name);
+void rpmsg_sensor_unregister(void *ptr_sensor);
+int rpmsg_sensor_register(struct platform_device *pdev, void *psensor);
+int do_sensor_power_on(int index, const char *name);
+int do_sensor_power_off(int index, const char *name);
 
 #endif

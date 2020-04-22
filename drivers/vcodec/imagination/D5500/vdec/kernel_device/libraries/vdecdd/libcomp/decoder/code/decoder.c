@@ -2473,18 +2473,32 @@ decoder_PictureFinalize(
 {
     VDECDD_sPicture      * psPicture = IMG_NULL;
     IMG_RESULT             ui32Result;
+#ifndef VDEC_USE_PVDEC
     DECODER_sDecPict     * psDecPict = psDecStrCtx->psCurrentPicture;
+#endif /* ndef VDEC_USE_PVDEC */
     DECODER_sCoreContext * psDecCoreCtx = IMG_NULL;
 
-    IMG_ASSERT(psStrUnit->eStrUnitType == VDECDD_STRUNIT_PICTURE_END);
-    IMG_ASSERT(psDecPict);
-    if (IMG_NULL == psDecPict)
+    psDecCoreCtx = decoder_CoreGetContext(psDecStrCtx->psDecCtx, GET_CORE_ID(psDecStrCtx->ui32LastFeTransactionId));
+    IMG_ASSERT(psDecCoreCtx != IMG_NULL);
+    if (psDecCoreCtx == IMG_NULL)
     {
         REPORT(REPORT_MODULE_DECODER, REPORT_ERR,
-               "[USERSID=0x%08X] Unable to get the current picture from Decoder context",
+               "[USERSID=0x%08X] Unable to obtain core context from last front-end transaction ID",
                psDecStrCtx->sConfig.ui32UserStrId);
         return IMG_ERROR_GENERIC_FAILURE;
     }
+
+    IMG_ASSERT(psStrUnit->eStrUnitType == VDECDD_STRUNIT_PICTURE_END);
+#ifndef VDEC_USE_PVDEC
+    if (IMG_NULL == psDecPict)
+    {
+        REPORT(REPORT_MODULE_DECODER, REPORT_WARNING,
+               "[USERSID=0x%08X] Unable to get the current picture from Decoder context",
+               psDecStrCtx->sConfig.ui32UserStrId);
+        psDecCoreCtx->bBusy = IMG_FALSE;
+        return IMG_SUCCESS;
+    }
+#endif /* ndef VDEC_USE_PVDEC */
 
     // Get pointer to appropriate VDECDD_sPicture via picture id
     ui32Result = IDGEN_GetHandle(psDecStrCtx->hPictIdGen,
@@ -2507,16 +2521,7 @@ decoder_PictureFinalize(
     // Update error flags
     psPicture->psDecPictInfo->ui32ErrorFlags |= psStrUnit->ui32ErrorFlags;
 
-    psDecCoreCtx = decoder_CoreGetContext(psDecStrCtx->psDecCtx, GET_CORE_ID(psDecStrCtx->ui32LastFeTransactionId));
-    IMG_ASSERT(psDecCoreCtx != IMG_NULL);
-    if (psDecCoreCtx == IMG_NULL)
-    {
-        REPORT(REPORT_MODULE_DECODER, REPORT_ERR,
-               "[USERSID=0x%08X] Unable to obtain core context from last front-end transaction ID",
-               psDecStrCtx->sConfig.ui32UserStrId);
-        return IMG_ERROR_GENERIC_FAILURE;
-    }
-
+#ifndef VDEC_USE_PVDEC
     // Submit end bytes
     ui32Result = HWCTRL_CoreSendEndBytes(
                     psDecCoreCtx->hHwCtx,
@@ -2526,6 +2531,7 @@ decoder_PictureFinalize(
     {
         return ui32Result;
     }
+#endif /* ndef VDEC_USE_PVDEC */
 
     IMG_ASSERT(psDecCoreCtx->bBusy == IMG_TRUE);
     psDecCoreCtx->bBusy = IMG_FALSE;
@@ -4657,6 +4663,7 @@ decoder_StreamDestroy(
     }
 
     // Remove the device resources used for decoding and the two
+    // added to hold the last on front and back-end for stream.
     for (i = 0; i < psDecStrCtx->ui32NumDecRes + 2; i++)
     {
         ui32Result = RESOURCE_ListEmpty(&psDecStrCtx->sDecResList,
@@ -6601,6 +6608,7 @@ DECODER_PowerOff(
         ui32Result = IMG_ERROR_INVALID_PARAMETERS;
         goto error;
     }
+    REPORT(REPORT_MODULE_DECODER, REPORT_INFO, "vdec %s start to loop list  \n", __FUNCTION__);
 
     psDecCoreCtx = LST_first(&psDecCtx->sCoreList);
     while (psDecCoreCtx)
@@ -6639,6 +6647,7 @@ DECODER_PowerOff(
 
         psDecCoreCtx = LST_next(psDecCoreCtx);
     }
+    REPORT(REPORT_MODULE_DECODER, REPORT_INFO, "vdec %s stop to loop list  \n", __FUNCTION__);
 
     return IMG_SUCCESS;
 
@@ -6663,6 +6672,7 @@ DECODER_PrePowerOff(
 
     /* Check input parameters. */
     IMG_ASSERT(IMG_NULL != hDecCtx);
+    REPORT(REPORT_MODULE_DECODER, REPORT_INFO, "vdec %s enter \n", __FUNCTION__);
 
     ui32Result = DECODER_PowerOff(hDecCtx,IMG_TRUE);
     IMG_ASSERT(ui32Result == IMG_SUCCESS);
@@ -6677,6 +6687,7 @@ DECODER_PrePowerOff(
         IMG_UINT32      ui32VecRamVal = 0;
         DECODER_sCoreContext *  psDecCoreCtx;
         DECODER_sContext *      psDecCtx = (DECODER_sContext *)hDecCtx;
+        REPORT(REPORT_MODULE_DECODER, REPORT_INFO, "vdec %s start to loop list  \n", __FUNCTION__);
 
         //clear VLR for each core
         psDecCoreCtx = LST_first(&psDecCtx->sCoreList);
@@ -6689,6 +6700,7 @@ DECODER_PrePowerOff(
 
             psDecCoreCtx = LST_next(psDecCoreCtx);
         }
+        REPORT(REPORT_MODULE_DECODER, REPORT_INFO, "vdec %s stop to loop list  \n", __FUNCTION__);
     }
 #endif // VDEC_PM_EVENTS_INJECTION && VDEC_MSVDX_HARDWARE
 
@@ -7161,13 +7173,18 @@ DECODER_CoreServiceInterrupt(
 
                         RESOURCE_PictureDetach(&psDecCoreCtx->hResources,psDecPict);
 
-                        // Free the segments from the decode picture
                         if (NULL != psDecPict)
                         {
+                            // Free the segments from the decode picture
                             decoder_CleanBitStrSegments(&psDecPict->sDecPictSegList);
+                            if(psDecPict == psDecStrCtx->psCurrentPicture)
+                            {
+                               psDecStrCtx->psCurrentPicture = IMG_NULL;
+                            }
+                            // Free decoder picture
+                            IMG_FREE(psDecPict);
                         }
-                        // Free decoder picture
-                        IMG_FREE(psDecPict);
+
                         psDecPict = IMG_NULL;
 
                         bPictStart = (!bHeadOfQueue) ? IMG_TRUE : IMG_FALSE;

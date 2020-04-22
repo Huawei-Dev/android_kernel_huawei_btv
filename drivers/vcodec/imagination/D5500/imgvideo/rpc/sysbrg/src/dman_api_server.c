@@ -56,7 +56,10 @@ IMG_VOID DMAN_dispatch(SYSBRG_sPacket *psPacket)
 	DMAN_sRespMsg sResponseMsg;
 
 	if(SYSOSKM_CopyFromUser(&sCommandMsg, psPacket->pvCmdData, sizeof(sCommandMsg)))
+	{
 		IMG_ASSERT(!"failed to copy from user");
+		return;
+	}
 
 	switch (sCommandMsg.eFuncId)
 	{

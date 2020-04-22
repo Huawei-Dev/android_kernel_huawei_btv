@@ -89,7 +89,7 @@ extern TALMMU_sDevMemInfo sMMU_DeviceMemoryInfo;
 
 /* Guarantee thread-safe access to the memmgr_km */
 static IMG_HANDLE g_hMemmgrMutex = NULL;
-
+static IMG_BOOL g_MemmgrInitFlag = IMG_FALSE;
 
 static IMG_BOOL allocateMemoryHelper(
 	IMG_UINT32	ui32Size,
@@ -101,6 +101,11 @@ static IMG_BOOL allocateMemoryHelper(
 {
 	IMG_RESULT		result;
 	IMG_PHYSADDR		paAddr;
+
+	if (g_MemmgrInitFlag != IMG_TRUE)
+	{
+		return IMG_FALSE;
+	}
 
 	/* If tileSensitive then change the alignment and the heapID, otherwise .. don't change the params. */
 	if(tileSensitive && g_bUseTiledMemory)
@@ -183,6 +188,11 @@ static IMG_BOOL allocateMemoryHelper(
 
 static IMG_BOOL freeMemoryHelper(MEMORY_INFO *pMemInfo)
 {
+	if (g_MemmgrInitFlag != IMG_TRUE)
+	{
+		return IMG_FALSE;
+	}
+
 	#ifdef DEBUG_PA
 	printk(KERN_ERR"-- Free of %pK --\n", pMemInfo->sysMemHandle);
 	#endif
@@ -381,6 +391,15 @@ IMG_VOID writeMemRefToMemRef(
 	MEMORY_INFO *memSrc = hRefDeviceMem;
 	IMG_UINT32 devVirtAddress;
 	IMG_RESULT ui32Result;
+
+	IMG_ASSERT(hDeviceMem != IMG_NULL);
+	IMG_ASSERT(hRefDeviceMem != IMG_NULL);
+
+	if ((!hDeviceMem) || (!hRefDeviceMem))
+	{
+		return ;
+	}
+
 	ui32Result = TALMMU_GetDevVirtAddress(memSrc->hShadowMem, &devVirtAddress);
 	IMG_ASSERT(ui32Result == IMG_SUCCESS);
 	*(IMG_UINT32 *)(memDst->pvLinAddress + ui32Offset) = devVirtAddress + ui32RefOffset;
@@ -415,6 +434,11 @@ IMG_BOOL TOPAZKM_MMUMFreeDeviceMemory(SYSBRG_POINTER_ARG(MEMORY_INFO) pMemInfo)
 	IMG_MEMSET(pMemoryInfo, 0, sizeof(*pMemoryInfo));
 	result = SYSOSKM_CopyFromUser(pMemoryInfo, pMemInfo, sizeof(MEMORY_INFO));
 	IMG_ASSERT(result == IMG_SUCCESS);
+	if (result != IMG_SUCCESS)
+	{
+		IMG_FREE(pMemoryInfo);
+		return IMG_FALSE;
+	}
 
 	if(pMemoryInfo->bufferId)
 	{
@@ -441,6 +465,7 @@ IMG_BOOL TOPAZKM_MMUMFreeDeviceMemory(SYSBRG_POINTER_ARG(MEMORY_INFO) pMemInfo)
 
 IMG_BOOL MMUDeviceMemoryInitialise(IMG_UINT32 ui32MmuFlags, IMG_UINT32 ui32MMUTileStride)
 {
+	IMG_BOOL result = IMG_FALSE;
 	g_bUseTiledMemory = (ui32MmuFlags & MMU_TILED_FLAG);
 	g_bUseInterleavedTiling = (ui32MmuFlags & MMU_TILED_INTERLEAVED);
 	g_bUseSecureFwUpload = (ui32MmuFlags & MMU_SECURE_FW_UPLOAD);
@@ -458,7 +483,17 @@ IMG_BOOL MMUDeviceMemoryInitialise(IMG_UINT32 ui32MmuFlags, IMG_UINT32 ui32MMUTi
 	g_ui32MMUTileStride = 512;
 	while (g_ui32MMUTileStride < ui32MMUTileStride) g_ui32MMUTileStride <<= 1;
 
-	return Topaz_Core_MMU_Configure();
+	result = Topaz_Core_MMU_Configure();
+	IMG_ASSERT(result == IMG_TRUE);
+	if (result != IMG_TRUE)
+	{
+		SYSOSKM_DestroyMutex(g_hMemmgrMutex);
+		g_hMemmgrMutex = NULL;
+		return result;
+	}
+
+	g_MemmgrInitFlag = IMG_TRUE;
+	return IMG_TRUE;
 }
 
 IMG_BOOL MMUDeviceMemoryHWSetup(IMG_HANDLE ui32TCoreReg)
@@ -468,12 +503,14 @@ IMG_BOOL MMUDeviceMemoryHWSetup(IMG_HANDLE ui32TCoreReg)
 
 IMG_VOID MMDeviceMemoryDeInitialise(IMG_VOID)
 {
+	g_MemmgrInitFlag = IMG_FALSE;
 	if(hMMUTemplate)	
 		TALMMU_DevMemTemplateDestroy(hMMUTemplate);
 
 	if (g_hMemmgrMutex)
 	{
 		SYSOSKM_DestroyMutex(g_hMemmgrMutex);
+		g_hMemmgrMutex = NULL;
 	}
 }
 
@@ -518,7 +555,14 @@ IMG_BOOL TOPAZKM_MMUMAllocateHeapDeviceMemory(
 		return(IMG_FALSE);
 	IMG_MEMSET(pMemoryInfo, 0, sizeof(*pMemoryInfo));
 
-	SYSOSKM_CopyFromUser(pMemoryInfo, ppMemInfo, sizeof(MEMORY_INFO));
+	result = SYSOSKM_CopyFromUser(pMemoryInfo, ppMemInfo, sizeof(MEMORY_INFO));
+	IMG_ASSERT(result == IMG_SUCCESS);
+	if (result != IMG_SUCCESS)
+	{
+		IMG_FREE(pMemoryInfo);
+		return result;
+	}
+
 	result = allocateMemoryHelper(ui32Size, ui32Alignment, ui32Heap, bSaveRestore, pMemoryInfo, tileSensitive, (SYS_MEMATTRIB_UNCACHED | SYS_MEMATTRIB_WRITECOMBINE));
 	IMG_ASSERT(result == IMG_TRUE);
 	if(result != IMG_TRUE)
@@ -568,7 +612,14 @@ IMG_BOOL TOPAZKM_StreamMMUMAllocateHeapDeviceMemory(
 		return(IMG_FALSE);
 	IMG_MEMSET(pMemoryInfo, 0, sizeof(*pMemoryInfo));
 
-	SYSOSKM_CopyFromUser(pMemoryInfo, ppMemInfo, sizeof(MEMORY_INFO));
+	result = SYSOSKM_CopyFromUser(pMemoryInfo, ppMemInfo, sizeof(MEMORY_INFO));
+	IMG_ASSERT(result == IMG_SUCCESS);
+	if (result != IMG_SUCCESS)
+	{
+		IMG_FREE(pMemoryInfo);
+		return IMG_FALSE;
+	}
+
 	result = allocateMemoryHelper(ui32Size, ui32Alignment, ui32Heap, bSaveRestore, pMemoryInfo, tileSensitive, (SYS_MEMATTRIB_UNCACHED | SYS_MEMATTRIB_WRITECOMBINE));
 	IMG_ASSERT(result == IMG_TRUE);
 	if(result != IMG_TRUE) {
@@ -655,6 +706,11 @@ IMG_BOOL TOPAZKM_MapExternal(
 	IMG_HANDLE pallocHandle;
 	IMG_VOID *pvUM = (void*)0x42424242;
 
+	if (g_MemmgrInitFlag != IMG_TRUE)
+	{
+		return IMG_FALSE;
+	}
+
 	result = PALLOCKM_GetPagesHandle(ui32PallocId, &pallocHandle);
 	IMG_ASSERT(pallocHandle != IMG_NULL);
 	if(pallocHandle == IMG_NULL)
@@ -665,6 +721,14 @@ IMG_BOOL TOPAZKM_MapExternal(
 	if(pMemoryInfo == IMG_NULL)
 		return IMG_FALSE;
 	IMG_MEMSET(pMemoryInfo, 0, sizeof(*pMemoryInfo));
+
+	IMG_ASSERT(ui32Heap < HEAP_ID_NO_OF_HEAPS);
+	if (ui32Heap >= HEAP_ID_NO_OF_HEAPS)
+		goto map_failed;
+
+	IMG_ASSERT(hTopaz_CoreMMUContext.Topaz_Core_mmu_context != NULL);
+	if (hTopaz_CoreMMUContext.Topaz_Core_mmu_context == NULL)
+		goto map_failed;
 
 	result = TALMMU_GetHeapHandle(asMMU_HeapInfo[ui32Heap].ui32HeapId, hTopaz_CoreMMUContext.Topaz_Core_mmu_context, &hDevMemHeap);
 	IMG_ASSERT(result == IMG_SUCCESS);
@@ -698,6 +762,11 @@ IMG_BOOL TOPAZKM_UnMapExternal(SYSBRG_POINTER_ARG(MEMORY_INFO) memInfo)
 {
 	IMG_RESULT result;
 	MEMORY_INFO* pMemoryInfo;
+
+	if (g_MemmgrInitFlag != IMG_TRUE)
+	{
+		return IMG_FALSE;
+	}
 
 	pMemoryInfo = (MEMORY_INFO *)IMG_MALLOC(sizeof(MEMORY_INFO));
 	IMG_ASSERT(pMemoryInfo != IMG_NULL);

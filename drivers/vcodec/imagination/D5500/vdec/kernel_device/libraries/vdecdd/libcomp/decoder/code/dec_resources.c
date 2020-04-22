@@ -87,51 +87,51 @@
 #endif /* HAS_VC1 */
 
 #ifdef HAS_H264
-extern IMG_UINT16        gaui16h264VlcTableData[544];
+extern IMG_UINT16        gaui16h264VlcTableData[];
 extern const IMG_UINT16  gui16h264VlcTableSize;
-extern IMG_UINT16        gaui16h264VlcIndexData[38][3];
+extern IMG_UINT16        gaui16h264VlcIndexData[][3];
 extern const IMG_UINT8   gui8h264VlcIndexSize;
 #endif /* HAS_H264 */
 
 #ifdef HAS_MPEG4
-extern IMG_UINT16        gaui16mpeg4VlcTableData[966];
+extern IMG_UINT16        gaui16mpeg4VlcTableData[];
 extern const IMG_UINT16  gui16mpeg4VlcTableSize;
-extern IMG_UINT16        gaui16mpeg4VlcIndexData[17][3];
+extern IMG_UINT16        gaui16mpeg4VlcIndexData[][3];
 extern const IMG_UINT8   gui8mpeg4VlcIndexSize;
 #endif /* HAS_MPEG4 */
 
 #ifdef HAS_VP6
-extern IMG_UINT16        gaui16vp6VlcTableData[1];
+extern IMG_UINT16        gaui16vp6VlcTableData[];
 extern const IMG_UINT16  gui16vp6VlcTableSize;
-extern IMG_UINT16        gaui16vp6VlcIndexData[38][3];
+extern IMG_UINT16        gaui16vp6VlcIndexData[][3];
 extern const IMG_UINT8   gui8vp6VlcIndexSize;
 #endif /* HAS_VP6 */
 
 #ifdef HAS_VP8
-extern IMG_UINT16        gaui16vp8VlcTableData[1];
+extern IMG_UINT16        gaui16vp8VlcTableData[];
 extern const IMG_UINT16  gui16vp8VlcTableSize;
-extern IMG_UINT16        gaui16vp8VlcIndexData[1][3];
+extern IMG_UINT16        gaui16vp8VlcIndexData[][3];
 extern const IMG_UINT8   gui8vp8VlcIndexSize;
 #endif /* HAS_VP8 */
 
 #ifdef HAS_MPEG2
-extern IMG_UINT16        gaui16mpeg2VlcTableData[382];
+extern IMG_UINT16        gaui16mpeg2VlcTableData[];
 extern const IMG_UINT16  gui16mpeg2VlcTableSize;
-extern IMG_UINT16        gaui16mpeg2VlcIndexData[7][3];
+extern IMG_UINT16        gaui16mpeg2VlcIndexData[][3];
 extern const IMG_UINT8   gui8mpeg2VlcIndexSize;
 #endif /* HAS_MPEG2 */
 
 #ifdef HAS_REAL
-IMG_UINT16        gaui16realVlcTableData[1] = { 0 };
+IMG_UINT16        gaui16realVlcTableData[] = { 0, 0, 0 };
 const IMG_UINT16  gui16realVlcTableSize = 1;
-IMG_UINT16        gaui16realVlcIndexData[1][3] = {{ 0,0,0 }};
+IMG_UINT16        gaui16realVlcIndexData[][3] = {{ 0, 0, 0 }, { 0, 0, 0 }};
 const IMG_UINT8   gui8realVlcIndexSize = 1;
 #endif /* HAS_REAL */
 
 #ifdef HAS_VC1
-extern IMG_UINT16        gaui16vc1VlcTableData[7045];
+extern IMG_UINT16        gaui16vc1VlcTableData[];
 extern const IMG_UINT16  gui16vc1VlcTableSize;
-extern IMG_UINT16        gaui16vc1VlcIndexData[83][3];
+extern IMG_UINT16        gaui16vc1VlcIndexData[][3];
 extern const IMG_UINT8   gui8vc1VlcIndexSize;
 #endif /* HAS_VC1 */
 
@@ -790,9 +790,11 @@ IMG_RESULT RESOURCE_Create(
 
         if (sVlcTable.ui32NumTables > 0)
         {
-            /* Size of VLC IDX table in bytes. Has to be aligned to 4, so transfer to MTX succeeds.
+            /* Size of VLC IDX table in bytes. */
+            IMG_UINT32 ui32VlcIdxTableSize = sizeof(IMG_UINT16) * sVlcTable.ui32NumTables * 3;
+            /* Aligned size of VLC IDX table in bytes. Has to be aligned to 4, so transfer to MTX succeeds.
              * (VLC IDX is copied to local RAM of MTX)*/
-            IMG_UINT32 ui32VlcIdxTableSize =  VDEC_ALIGN_SIZE((sizeof(IMG_UINT16) * sVlcTable.ui32NumTables * 3), 4);
+            IMG_UINT32 ui32VlcIdxTableSizeAligned = VDEC_ALIGN_SIZE(ui32VlcIdxTableSize, 4);
 
             ui32Result = MMU_DeviceMalloc(hMmuDevHandle,
                                           MMU_HEAP_DEVICE_BUFFERS,
@@ -819,7 +821,7 @@ IMG_RESULT RESOURCE_Create(
             ui32Result = MMU_DeviceMalloc(hMmuDevHandle,
                                           MMU_HEAP_DEVICE_BUFFERS,
                                           sInsecurePool, //VLC Index Tables are always in insecure memory
-                                          ui32VlcIdxTableSize,
+                                          ui32VlcIdxTableSizeAligned,
                                           DEV_MMU_PAGE_ALIGNMENT,
                                          &psResCtx->asVlcIdxTableBufInfo[ui32I]);
             IMG_ASSERT(ui32Result == IMG_SUCCESS);
@@ -832,7 +834,7 @@ IMG_RESULT RESOURCE_Create(
             {
                 IMG_MEMCPY(psResCtx->asVlcIdxTableBufInfo[ui32I].pvCpuVirt,
                            sVlcTable.pvIndexTable,
-                           psResCtx->asVlcIdxTableBufInfo[ui32I].ui32BufSize);
+                           ui32VlcIdxTableSize);
                 UPDATE_DEVICE((&psResCtx->asVlcIdxTableBufInfo[ui32I]), IMG_TRUE);
             }
         }

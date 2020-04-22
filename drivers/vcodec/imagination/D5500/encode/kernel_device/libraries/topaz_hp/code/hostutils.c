@@ -213,7 +213,9 @@ static IMG_HANDLE ui32TopazMulticoreRegId = IMG_NULL;
 static IMG_HANDLE aui32HpCoreRegId[TOPAZHP_MAX_NUM_PIPES];
 static IMG_HANDLE aui32VLCRegId[TOPAZHP_MAX_NUM_PIPES];
 #if defined(HW_4_0)
+#if !defined(IMG_KERNEL_MODULE)
 static IMG_HANDLE aui32DeblockRegId[TOPAZHP_MAX_NUM_PIPES];
+#endif
 static IMG_HANDLE ui32MMURegId;
 #endif
 static IMG_HANDLE ui32SysMemId;
@@ -447,11 +449,14 @@ wbfifo_Get(
 		if (result != IMG_SUCCESS) return IMG_FALSE;
 	}
 
+	if (psSocket->ui32IncomingFifo_Consumer >= COMM_INCOMING_FIFO_SIZE)
+		return IMG_FALSE;
+
 	IMG_MEMCPY(pNewMsg, &psSocket->asIncomingFifo[psSocket->ui32IncomingFifo_Consumer], sizeof(IMG_WRITEBACK_MSG));
 
 	psSocket->ui32IncomingFifo_Consumer++;
 
-	if (psSocket->ui32IncomingFifo_Consumer == COMM_INCOMING_FIFO_SIZE)
+	if (psSocket->ui32IncomingFifo_Consumer >= COMM_INCOMING_FIFO_SIZE)
 		psSocket->ui32IncomingFifo_Consumer = 0;
 
 	return IMG_TRUE;
@@ -1074,7 +1079,7 @@ IMG_VOID topazkm_pfnDevPowerPreS5(IMG_HANDLE hDevHandle, IMG_VOID *pvDevInstance
 	IMG_UINT32 ui32WriteBackVal = 0;
 	struct IMG_COMM_SOCKET_tag *psLastSocket = IMG_NULL;
 
-	if(!devContext || !devContext->sFwCtxt.bInitialized)
+	if(!devContext)
 	{
 		return;
 	}
@@ -1120,7 +1125,7 @@ IMG_VOID topazkm_pfnDevPowerPreS5(IMG_HANDLE hDevHandle, IMG_VOID *pvDevInstance
 	}
 	
 		
-	MTX_SaveState(&devContext->sFwCtxt);
+	MTX_SaveState(pvDevInstanceData);
 	
 }
 
@@ -1132,13 +1137,13 @@ IMG_VOID topazkm_pfnDevPowerPostS0(IMG_HANDLE hDevHandle, IMG_VOID *pvDevInstanc
 	IMG_UINT32 ui32WriteBackVal = 0;
 	struct IMG_COMM_SOCKET_tag *psLastSocket = IMG_NULL;
 
-	if(!devContext || !devContext->sFwCtxt.bInitialized)
+	if(!devContext)
 	{
 		return;
 	}
 
 	PRINT("\nResuming MTX\n");
-	MTX_RestoreState(hDevHandle, &devContext->sFwCtxt);
+	MTX_RestoreState(pvDevInstanceData);
 
 #ifdef FW_LOGGING
 	// This does manage to restart FW logging after a powertest, but the first
@@ -1398,6 +1403,7 @@ _comm_CloseSocket(
 		MTX_TOMTX_MSG sMsg;
 		IMG_UINT32 ui32WriteBackVal = 0;
 
+		TOPAZKM_MMUFlushMMUTableCache();
 		/* Clear all pending messages */
 		wbfifo_Clear(psSocket);
 

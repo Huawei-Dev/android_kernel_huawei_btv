@@ -24,6 +24,7 @@
 #include "cam_log.h"
 #include "hwcam_compat32.h"
 #include <dsm/dsm_pub.h>
+//lint -save -e455 -e429 -e454
 
 #define CREATE_TRACE_POINTS
 #include "trace_hwcam.h"
@@ -39,7 +40,7 @@ struct dsm_dev dev_camera_user = {
 	.ic_name = NULL,
 	.module_name = NULL,
 	.fops = &ops2,
-	.buff_size = 30000,
+	.buff_size = 4096,
 };
 
 struct dsm_client *client_camera_user;
@@ -53,6 +54,7 @@ typedef struct _tag_hwcam_cfgdev_vo
     struct dentry*                              debug_root;
 	struct v4l2_fh                              rq;
     __u8                                        sbuf[64];
+    struct mutex                                lock;
 } hwcam_cfgdev_vo_t;
 
 typedef enum _tag_hwcam_cfgsvr_flags
@@ -68,6 +70,7 @@ static DEFINE_MUTEX(s_cfgsvr_lock);
 static DECLARE_WAIT_QUEUE_HEAD(s_wait_cfgsvr);
 static struct pid* s_pid_cfgsvr;
 static struct ion_client* s_ion_client;
+static int is_binderized = 0; //default 0 is Passthrough
 
 void
 hwcam_cfgdev_lock(void)
@@ -315,6 +318,7 @@ hwcam_cfgdev_wait_ack(
                 retry--;
                 continue;
             } else {
+                rc = -ERESTART;
                 break;
             }
         }
@@ -508,6 +512,11 @@ exit_release_graphic_buffer:
     mutex_unlock(&s_cfgsvr_lock);
 }
 
+int hw_is_binderized(void)
+{
+    return is_binderized;
+}
+
 static int
 hwcam_cfgdev_check_device_status(
         hwcam_dev_intf_t* cam)
@@ -531,26 +540,26 @@ static bool
 hwcam_cfgdev_is_cfgsvr_running(void)
 {
     bool rc = false;
-
-    mutex_lock(&s_cfgsvr_lock);
     if (s_pid_cfgsvr) {
         rcu_read_lock();
         rc = pid_task(s_pid_cfgsvr, PIDTYPE_PID) != NULL;
         rcu_read_unlock();
     }
-    mutex_unlock(&s_cfgsvr_lock);
     return rc;
 }
 
 static int
 hwcam_cfgdev_check_cfgsvr_status(void)
 {
-    int rc = wait_event_timeout(s_wait_cfgsvr,
+    int rc = 0;
+    mutex_lock(&s_cfgsvr_lock);
+    rc = wait_event_timeout(s_wait_cfgsvr,
             hwcam_cfgdev_is_cfgsvr_running(),
             msecs_to_jiffies(HWCAM_WAIT4CFGSVR_TIME)); //lint !e666
     if (!rc) {
         HWCAM_CFG_ERR("the server is not running!");
     }
+    mutex_unlock(&s_cfgsvr_lock);
     return rc;
 }
 
@@ -603,7 +612,16 @@ hwcam_cfgdev_mount_pipeline(
 
 fail_mount_pipeline:
     hwcam_cfgreq_intf_put((hwcam_cfgreq_intf_t*)mpr);
-
+    if(-ERESTART == rc){
+        mutex_lock(&s_cfgsvr_lock);
+        if (s_pid_cfgsvr) {
+            HWCAM_CFG_ERR(
+                  "the mount operation was interrupted, "
+                  "try restarting it! ");
+            kill_pid(s_pid_cfgsvr, SIGKILL, 1);
+        }
+        mutex_unlock(&s_cfgsvr_lock);
+    }
 exit_mount_pipeline:
     return rc;
 }
@@ -727,10 +745,12 @@ hwcam_cfgdev_vo_poll(
         struct poll_table_struct* ptbl)
 {
 	unsigned int rc = 0;
+	mutex_lock(&s_cfgdev.lock);
 	poll_wait(filep, &s_cfgdev.rq.wait, ptbl);
 	if (v4l2_event_pending(&s_cfgdev.rq)) {
 		rc = POLLIN | POLLRDNORM;
     }
+	mutex_unlock(&s_cfgdev.lock);
 	return rc;
 }
 
@@ -836,9 +856,9 @@ hwcam_cfgdev_vo_ioctl32(
         unsigned long arg)
 {
     long rc = 0;
-    void __user *up = NULL;
+    void __user *up_p = NULL;
     void __user *kp = NULL;
-    up = compat_ptr(arg);
+    up_p = compat_ptr(arg);
 
 	switch (cmd)
 	{
@@ -854,13 +874,13 @@ hwcam_cfgdev_vo_ioctl32(
 			kp = compat_alloc_user_space(sizeof(struct v4l2_event));
 			if (NULL == kp)
 				return -EFAULT;
-			rc = compat_get_v4l2_event_data(kp, up);
+			rc = compat_get_v4l2_event_data(kp, up_p);
 			if (0 != rc)
 				return rc;
 			rc = hwcam_cfgdev_vo_ioctl(filep, cmd, (unsigned long)(kp));
 			if (0 != rc)
 				return rc;
-			rc = compat_put_v4l2_event_data(kp, up);
+			rc = compat_put_v4l2_event_data(kp, up_p);
 		}
 		break;
     default:
@@ -876,7 +896,9 @@ hwcam_cfgdev_vo_close(
         struct file* filep)
 {
     void* fpd = NULL;
+    mutex_lock(&s_cfgdev.lock);
     swap(filep->private_data, fpd);
+    mutex_unlock(&s_cfgdev.lock);
     if (fpd) {
         struct ion_client* ion = NULL;
         struct pid* pid = NULL;
@@ -884,7 +906,6 @@ hwcam_cfgdev_vo_close(
         mutex_lock(&s_cfgsvr_lock);
         swap(s_pid_cfgsvr, pid);
         swap(s_ion_client, ion);
-        mutex_unlock(&s_cfgsvr_lock);
 
         mutex_lock(&s_cfgdev_lock);
         v4l2_fh_del(&s_cfgdev.rq);
@@ -899,6 +920,7 @@ hwcam_cfgdev_vo_close(
             put_pid(pid);
         }
 
+        mutex_unlock(&s_cfgsvr_lock);
         hwcam_cfgdev_flush_ack_queue();
 
         HWCAM_CFG_INFO("the server(%d) detached. \n", current->pid);
@@ -927,12 +949,13 @@ hwcam_cfgdev_vo_open(
         goto exit_open;
     }
     s_pid_cfgsvr = get_pid(task_pid(current));
-    mutex_unlock(&s_cfgsvr_lock);
 
     mutex_lock(&s_cfgdev_lock);
 	v4l2_fh_init(&s_cfgdev.rq, s_cfgdev.vdev);
     v4l2_fh_add(&s_cfgdev.rq);
     mutex_unlock(&s_cfgdev_lock);
+
+    mutex_unlock(&s_cfgsvr_lock);
 
     spin_lock(&s_ack_queue_lock);
     s_cfgsvr_flags = HWCAM_CFGSVR_FLAG_PLAYING;
@@ -945,6 +968,42 @@ hwcam_cfgdev_vo_open(
 
 exit_open:
 	return rc;
+}
+
+static int hwcam_cfgdev_get_dts(struct platform_device* pDev)
+{
+    struct device *pdev;
+    struct device_node *np;
+    int rc;
+
+    if (NULL == pDev) {
+        HWCAM_CFG_ERR("pDev NULL.");
+        return -ENOMEM;
+    }
+
+    pdev = &(pDev->dev);
+
+    if (NULL == pdev) {
+        HWCAM_CFG_ERR("pdev NULL.");
+        return -ENOMEM;
+    }
+
+    np = pdev->of_node;
+
+    if (NULL == np) {
+        HWCAM_CFG_ERR("of node NULL.");
+        return -ENOMEM;
+    }
+
+    rc = of_property_read_u32(np, "huawei,binderized", (u32*)(&is_binderized));
+    if (rc < 0) {
+        HWCAM_CFG_ERR("get binderized flag failed.");
+        return -ENOMEM;
+    }
+
+    HWCAM_CFG_INFO("binderized=%d", is_binderized);
+
+    return 0;
 }
 
 static struct v4l2_file_operations
@@ -990,6 +1049,11 @@ hwcam_cfgdev_vo_probe(
         goto media_alloc_fail;
     }
 
+    rc = hwcam_cfgdev_get_dts(pdev);
+    if (rc < 0) {
+        HWCAM_CFG_DEBUG("get dts failed.");
+    }
+
 	strlcpy(mdev->model, HWCAM_MODEL_CFG, sizeof(mdev->model));
 	mdev->dev = &(pdev->dev);
 	rc = media_device_register(mdev);
@@ -1030,6 +1094,7 @@ hwcam_cfgdev_vo_probe(
     s_cfgdev.mdev = mdev;
 
     s_cfgdev.debug_root = debugfs_create_dir("hwcam", NULL);
+    mutex_init(&s_cfgdev.lock);
 
     if(client_camera_user == NULL)
     {
@@ -1070,6 +1135,7 @@ hwcam_cfgdev_vo_remove(
     video_device_release(s_cfgdev.vdev);
     s_cfgdev.vdev = NULL;
     s_cfgdev.mdev = NULL;
+    mutex_destroy(&s_cfgdev.lock);
     return 0;
 }
 
@@ -1129,4 +1195,5 @@ module_init(hwcam_cfgdev_vo_init);
 module_exit(hwcam_cfgdev_vo_exit);
 MODULE_DESCRIPTION("Huawei V4L2 Camera");
 MODULE_LICENSE("GPL v2");
+//lint -restore
 

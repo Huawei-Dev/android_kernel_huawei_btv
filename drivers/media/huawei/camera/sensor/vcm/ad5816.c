@@ -25,6 +25,8 @@
 
 #include "hwvcm.h"
 
+//lint -save -e31
+
 #define VCM_ID_CODE		0x5816
 #define I2V(i) container_of(i, vcm_t, intf)
 
@@ -59,7 +61,7 @@ int ad5816_i2c_write(hw_vcm_intf_t *vcm_intf, void *data)
 	rc = hw_isp_write_vcm(vcm->vcm_info->slave_address,
 			(uint16_t)cdata->cfg.reg.address,
 			(uint16_t)cdata->cfg.reg.value,
-			vcm->vcm_info->data_type);
+			(i2c_length)vcm->vcm_info->data_type);
 
 	return rc;
 }
@@ -159,3 +161,5 @@ module_init(hw_ad5816_module_init);
 module_exit(hw_ad5816_module_exit);
 MODULE_DESCRIPTION("AD5816 VCM");
 MODULE_LICENSE("GPL v2");
+
+//lint -restore

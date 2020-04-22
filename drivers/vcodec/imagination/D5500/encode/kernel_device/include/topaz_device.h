@@ -76,6 +76,7 @@ typedef struct
 	IMG_HANDLE				hResBHandle; /*!< Resource bucket handle */
 	IMG_CODEC				firmwareUploaded;
 	IMG_FW_CONTEXT			sFwCtxt;
+	IMG_UINT32				psHibernateRegCopy[54];				//!< Copy of HW Register block during hibernate
 
 	IMG_HANDLE				commTxLock;
 	IMG_HANDLE				commRxLock;

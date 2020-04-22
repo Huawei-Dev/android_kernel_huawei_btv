@@ -64,7 +64,7 @@
 #define RMAN_CRESID_MAX_RES_ID			((1<<RMAN_CRESID_RES_ID_BITS)-1)		//!< Max valid resource Id
 #define RMAN_CRESID_RES_ID_MASK			(RMAN_CRESID_MAX_RES_ID)				//!< Resource Id mask
 #define RMAN_CRESID_BUCKET_SHIFT		(RMAN_CRESID_RES_ID_BITS)				//!< Bits to shift bucket index
-#define RMAN_CRESID_MAX_BUCKET_INDEX	((1<<RMAN_CRESID_BUCKET_INDEX_BITS)-1)	//!< Max valid bucket index
+#define RMAN_CRESID_MAX_BUCKET_INDEX	((1<<(RMAN_CRESID_BUCKET_INDEX_BITS+1))-1)	//!< Max valid bucket index
 
 #define RMAN_MAX_ID 		4096		// max number of ids per bucket
 #define RMAN_ID_BLOCKSIZE	256			// size of hash table for ids
@@ -497,6 +497,7 @@ static IMG_VOID * rman_GetResource(
 	IMG_ASSERT((IMG_VOID*)psResource != &psBucket->sResList);
 	if ( (psResource == IMG_NULL) || ((IMG_VOID*)psResource == &psBucket->sResList) )
 	{
+		IMG_ASSERT(!"psResource is NULL or equal to psBucket->sResList");
 		return IMG_NULL;
 	}
 
@@ -528,14 +529,17 @@ IMG_RESULT RMAN_GetResource(
 	//IMG_ASSERT(ui32BucketIndex < RMAN_CRESID_MAX_BUCKET_INDEX);
 	if (ui32BucketIndex >= RMAN_CRESID_MAX_BUCKET_INDEX) {
 	    /* Happens when ui32BucketIndex == 0 */
+	    IMG_ASSERT(!"BucketIndex greater than max value");
 	    return IMG_ERROR_INVALID_ID;
 	}
 	//IMG_ASSERT(ui32IntResId <= RMAN_CRESID_MAX_RES_ID);
 	if (ui32IntResId > RMAN_CRESID_MAX_RES_ID) {
+	    IMG_ASSERT(!"ResId greater than max value");
 	    return IMG_ERROR_INVALID_ID;
 	}
 	//IMG_ASSERT(gapsBucket[ui32BucketIndex] != IMG_NULL);
 	if (gapsBucket[ui32BucketIndex] == NULL) {
+	    IMG_ASSERT(!"gapsBucket[index] is NULL");
 	    return IMG_ERROR_INVALID_ID;
 	}
 
@@ -544,6 +548,7 @@ IMG_RESULT RMAN_GetResource(
 	/* If we didn't find the resource...*/
 	if (pvParam == IMG_NULL)
 	{
+		IMG_ASSERT(!"pvParam is NULL");
 		return IMG_ERROR_INVALID_ID;
 	}
 

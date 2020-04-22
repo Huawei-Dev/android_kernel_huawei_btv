@@ -1,4 +1,29 @@
-
+/*
+ * camera utile class driver
+ *
+ *  Author: 	Zhoujie (zhou.jie1981@163.com)
+ *  Date:  	2013/01/16
+ *  Version:	1.0
+ *  History:	2013/01/16      Frist add driver for dual temperature Led,this is virtual device to manage dual temperature Led
+ *
+ * ----------------------------------------------------------------------------
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * ----------------------------------------------------------------------------
+ *
+ */
 //lint -save -e846 -e514 -e84 -e866 -e715 -e778 -e713 -e665
 #include <linux/module.h>
 #include <linux/kernel.h>

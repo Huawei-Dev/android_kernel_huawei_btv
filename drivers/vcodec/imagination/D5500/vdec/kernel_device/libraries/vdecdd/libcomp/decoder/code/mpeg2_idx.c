@@ -49,7 +49,7 @@
 
 #include <img_types.h>
 
-const IMG_UINT16 gaui16mpeg2VlcIndexData[7][3] = {
+const IMG_UINT16 gaui16mpeg2VlcIndexData[][3] = {
 {1,    5,    0},          /* b12.out */
 {1,    5,    12},         /* b13.out */
 {0,    3,    23},         /* DCT_coefficients_table_0_b14A.out */
@@ -57,6 +57,7 @@ const IMG_UINT16 gaui16mpeg2VlcIndexData[7][3] = {
 {0,    4,    229},        /* DCT_coefficients_table_1_b15.out */
 {2,    5,    342},        /* macroblock_address_increment_b1.out */
 {2,    5,    366},        /* motion_code_b10.out */
+{0,    0,    0}           /* dummy to avoid OOB warnings */
 };
 
 

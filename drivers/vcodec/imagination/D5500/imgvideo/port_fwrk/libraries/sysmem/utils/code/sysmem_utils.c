@@ -382,6 +382,13 @@ IMG_RESULT SYSMEMU_GetCpuKmAddr(IMG_VOID **ppvCpuKmAddr,IMG_HANDLE hPagesHandle)
 {
 	SYSMEMU_sPages *psPages = hPagesHandle;
 	SYSMEM_Heap *heap = psPages->memHeap;
+
+	IMG_ASSERT(hPagesHandle != IMG_NULL);
+	if(!hPagesHandle)
+	{
+		return IMG_ERROR_GENERIC_FAILURE;
+	}
+
 	IMG_ASSERT(ppvCpuKmAddr != IMG_NULL);
 	if(!ppvCpuKmAddr)
 	{

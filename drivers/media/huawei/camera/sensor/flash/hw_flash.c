@@ -1,4 +1,14 @@
-
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
 
 #include "hw_subdev.h"
 #include "hw_flash.h"
@@ -364,6 +374,7 @@ static struct v4l2_subdev_internal_ops hw_flash_subdev_internal_ops = {
     .close = &hw_flash_subdev_internal_close,
 };
 
+/*Add for CLT Camera, begin*/
 static int hw_simulate_init(struct hw_flash_ctrl_t *flash_ctrl)
 {
     cam_info("%s simulated function for CLT Camera\n", __func__);
@@ -420,6 +431,7 @@ static int hw_simulate_match(struct hw_flash_ctrl_t *flash_ctrl)
     return 0;
 }
 
+/*Add for CLT Camera, end*/
 
 int32_t hw_flash_platform_probe(struct platform_device *pdev,
     void *data)

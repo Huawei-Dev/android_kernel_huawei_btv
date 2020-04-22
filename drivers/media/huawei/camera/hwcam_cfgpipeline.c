@@ -18,6 +18,7 @@
 #include "hwcam_compat32.h"
 
 #include "hwcam_intf.h"
+//lint -save -e429 -e31
 
 typedef struct _tag_hwcam_cfgpipeline_mount_req
 {
@@ -38,6 +39,8 @@ typedef struct _tag_hwcam_cfgpipeline_mount_req
 #define I2MPR(i) container_of(i, hwcam_cfgpipeline_mount_req_t, intf)
 
 #define REF2MPR(r) container_of(r, hwcam_cfgpipeline_mount_req_t, ref)
+
+#define MAX_TRYLOCK_TIMES 100
 
 static void
 hwcam_cfgpipeline_mount_req_release(
@@ -1030,9 +1033,9 @@ hwcam_cfgpipeline_vo_ioctl32(
         unsigned long arg)
 {
     long rc = 0;
-    void __user *up = NULL;
+    void __user *up_p = NULL;
     void __user *kp = NULL;
-    up = compat_ptr(arg);
+    up_p = compat_ptr(arg);
 
 	switch (cmd)
 	{
@@ -1050,13 +1053,13 @@ hwcam_cfgpipeline_vo_ioctl32(
 			kp = compat_alloc_user_space(sizeof(struct v4l2_event));
 			if (NULL == kp)
 				return -EFAULT;
-			rc = compat_get_v4l2_event_data(kp, up);
+			rc = compat_get_v4l2_event_data(kp, up_p);
 			if (0 != rc)
 				return rc;
 			rc = hwcam_cfgpipeline_vo_ioctl(filep, cmd, (unsigned long)(kp));
 			if (0 != rc)
 				return rc;
-			rc = compat_put_v4l2_event_data(kp, up);
+			rc = compat_put_v4l2_event_data(kp, up_p);
 		}
 		break;
     default:
@@ -1191,8 +1194,16 @@ hwcam_cfgpipeline_mount_req_on_cancel(
 {
     hwcam_cfgpipeline_mount_req_t* mpr = I2MPR(pintf);
     int rc = 0;
+    int try_times = 0;
 
-    mutex_lock(&mpr->lock);
+    while (!mutex_trylock(&mpr->lock)){
+        if (try_times++ >= MAX_TRYLOCK_TIMES) {
+            HWCAM_CFG_ERR("hwcam_cfgpipeline_mount_req_on_cancel can't get lock after trying 100 times! \n");
+            return -EBUSY;
+        }
+    }
+
+    HWCAM_CFG_ERR("hwcam_cfgpipeline_mount_req_on_cancel try lock %d times! \n", try_times + 1);
 
     if (mpr->finished || mpr->canceled) {
         goto exit_on_canceled;
@@ -1297,4 +1308,5 @@ hwcam_cfgpipeline_mount_req_release(
 
     kzfree(mpr);
 }
+//lint -restore
 

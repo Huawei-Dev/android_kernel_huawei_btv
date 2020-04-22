@@ -17,6 +17,8 @@
 #include "../platform/sensor_commom.h"
 #include "hw_cci.h"
 #include "../io/hw_isp_io.h"
+//lint -save -e679 -e527 -e574
+
 
 static inline int get_i2c_bus_mutex(int bus_mutex)
 {
@@ -393,3 +395,4 @@ error_out2:
 	free_i2c_bus_mutex(reg_bus_mutex);
 	return -EFAULT;
 }
+//lint -restore

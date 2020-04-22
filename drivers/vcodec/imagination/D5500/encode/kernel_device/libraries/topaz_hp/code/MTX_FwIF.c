@@ -147,6 +147,8 @@ mtx_regIfUpload(
 );
 
 extern IMG_BOOL g_bUseSecureFwUpload;
+
+extern IMG_RESULT topazdd_Initialise(TOPAZKM_DevContext *psContext);
 /*!
  ***********************************************************************************
  *
@@ -1277,11 +1279,6 @@ MTX_Deinitialize(
 		psFwCtxt->psMTXContextDataCopy[i]=NULL;
 	}
 
-	if ( psFwCtxt->psMTXRegCopy )
-	{
-		TRACK_FREE( psFwCtxt->psMTXRegCopy );
-		psFwCtxt->psMTXRegCopy =NULL;
-	}
 /*
 	if ( psFwCtxt->psWriteBackMem )
 	{
@@ -1421,12 +1418,6 @@ IMG_VOID MTX_Initialize(IMG_HANDLE context, IMG_FW_CONTEXT * psFwCtxt)
 	if(psFwCtxt->ui32MTXTOPAZFWDataSize != 0)
 	{
 
-#if defined(HW_3_X)	
-		psFwCtxt->psMTXRegCopy = TRACK_MALLOC(52*4);
-#endif		
-#if defined(HW_4_0)	
-		psFwCtxt->psMTXRegCopy = TRACK_MALLOC(54*4);
-#endif		
 		for(i = 0; i< TOPAZHP_MAX_POSSIBLE_STREAMS ; i++)
 		{
 			allocMemory(
@@ -1638,21 +1629,32 @@ IMG_UINT32 PollHWInactive(	IMG_FW_CONTEXT * psFwCtxt)
 
 IMG_VOID
 MTX_SaveState(
-	IMG_FW_CONTEXT * psFwCtxt
+	IMG_VOID *context
 )
 {
 	IMG_UINT32 * psMtxRegState;
 	IMG_UINT32 ui32RegValue;
 	IMG_UINT32 i;
 	IMG_UINT32 ui32NumPipes;
+	IMG_FW_CONTEXT * psFwCtxt;
+	TOPAZKM_DevContext *devContext = (TOPAZKM_DevContext *)context;
+#if defined(HW_4_0)
+	IMG_HANDLE hMMURegId = TAL_GetMemSpaceHandle("REG_MMU");
+#endif
 
-	TALREG_ReadWord32( psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MULTICORE_HW_CFG, &ui32RegValue);
+	if (!context)
+	{
+		return;
+	}
+	TALREG_ReadWord32( devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MULTICORE_HW_CFG, &ui32RegValue);
 	ui32NumPipes = (ui32RegValue & MASK_TOPAZHP_TOP_CR_NUM_CORES_SUPPORTED);
+	psFwCtxt = &devContext->sFwCtxt;
 
+	/* If MTX is active then stop it */
 	if ( psFwCtxt->bInitialized )
 	{
 		/* target only the current MTX */
-		mtx_setTarget( psFwCtxt );
+		mtx_setTarget(psFwCtxt);
 
 		// Wait for HW complete
 		TALPDUMP_Comment(psFwCtxt->ui32MtxRegMemSpceId, "MTX_SaveState: Wait for HW Completion");
@@ -1664,14 +1666,16 @@ MTX_SaveState(
 
 		MTX_Stop(psFwCtxt);
 		MTX_WaitForCompletion(psFwCtxt); // Is this necessary if we're using MTX_Stop?
+	}
 
-		psMtxRegState = psFwCtxt->psMTXRegCopy;
+	{
+	    psMtxRegState = devContext->psHibernateRegCopy;
 
 		TALPDUMP_Comment(psFwCtxt->ui32MtxRegMemSpceId, "MTX_SaveState: Storing MMU Control Register States");
 
 		// Save the MMU Control Registers
 #if defined(HW_3_X)
-		TALREG_ReadWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_DIR_LIST_BASE(0), psMtxRegState);
+		TALREG_ReadWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_DIR_LIST_BASE(0), psMtxRegState);
 		psMtxRegState++;
 
 #if !defined(IMG_KERNEL_MODULE)
@@ -1679,29 +1683,29 @@ MTX_SaveState(
 		{
 			TALPDUMP_Comment(psFwCtxt->ui32MtxRegMemSpceId, "MTX_SaveState: Save a copy of MMU_DIR_LIST_BASE(0) in a pdump register to restore later");
 			/* if we are pdumping we can't just read and write this register */
-			TALINTVAR_ReadFromReg32(psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_DIR_LIST_BASE(0), psFwCtxt->ui32TopazMulticoreRegId, 1);
+			TALINTVAR_ReadFromReg32(devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_DIR_LIST_BASE(0), devContext->ui32MultiCoreMemSpaceId, 1);
 		}
 #endif
-		TALREG_ReadWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_TILE(0), psMtxRegState);
+		TALREG_ReadWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_TILE(0), psMtxRegState);
 		psMtxRegState++;
 
-		TALREG_ReadWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_TILE(1), psMtxRegState);
+		TALREG_ReadWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_TILE(1), psMtxRegState);
 		psMtxRegState++;
 
-		TALREG_ReadWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_CONTROL2, psMtxRegState);
+		TALREG_ReadWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_CONTROL2, psMtxRegState);
 		psMtxRegState++;		
 
-		TALREG_ReadWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_CONTROL1, psMtxRegState);
+		TALREG_ReadWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_CONTROL1, psMtxRegState);
 		psMtxRegState++;
 
-		TALREG_ReadWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_CONTROL0, psMtxRegState);
+		TALREG_ReadWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_CONTROL0, psMtxRegState);
 		psMtxRegState++;
 #endif
 #if defined(HW_4_0)
-		TALREG_ReadWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_FIRMWARE_REG_7, psMtxRegState);
+		TALREG_ReadWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_FIRMWARE_REG_7, psMtxRegState);
 		psMtxRegState++;
 
-		TALREG_ReadWord32 (psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_DIR_BASE_ADDR(0), psMtxRegState);
+		TALREG_ReadWord32 (hMMURegId, IMG_BUS4_MMU_DIR_BASE_ADDR(0), psMtxRegState);
 		psMtxRegState++;
 
 #if !defined(IMG_KERNEL_MODULE)
@@ -1709,22 +1713,22 @@ MTX_SaveState(
 		{
 			TALPDUMP_Comment(psFwCtxt->ui32MtxRegMemSpceId, "MTX_SaveState: Save a copy of MMU_DIR_LIST_BASE(0) in a pdump register to restore later");
 			/* if we are pdumping we can't just read and write this register */
-			TALINTVAR_ReadFromReg32(psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_DIR_BASE_ADDR(0), psFwCtxt->ui32MMURegId, 1);
+			TALINTVAR_ReadFromReg32(hMMURegId, IMG_BUS4_MMU_DIR_BASE_ADDR(0), hMMURegId, 1);
 		}
 #endif
-		TALREG_ReadWord32 (psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_TILE_CFG(0), psMtxRegState);
+		TALREG_ReadWord32 (hMMURegId, IMG_BUS4_MMU_TILE_CFG(0), psMtxRegState);
 		psMtxRegState++;
 
-		TALREG_ReadWord32 (psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_TILE_CFG(1), psMtxRegState);
+		TALREG_ReadWord32 (hMMURegId, IMG_BUS4_MMU_TILE_CFG(1), psMtxRegState);
 		psMtxRegState++;
 
-		TALREG_ReadWord32 (psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_ADDRESS_CONTROL, psMtxRegState);
+		TALREG_ReadWord32 (hMMURegId, IMG_BUS4_MMU_ADDRESS_CONTROL, psMtxRegState);
 		psMtxRegState++;		
 
-		TALREG_ReadWord32 (psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_CONTROL1, psMtxRegState);
+		TALREG_ReadWord32 (hMMURegId, IMG_BUS4_MMU_CONTROL1, psMtxRegState);
 		psMtxRegState++;
 
-		TALREG_ReadWord32 (psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_CONTROL0, psMtxRegState);
+		TALREG_ReadWord32 (hMMURegId, IMG_BUS4_MMU_CONTROL0, psMtxRegState);
 		psMtxRegState++;
 #endif
 
@@ -1769,8 +1773,7 @@ MTX_SaveState(
 ******************************************************************************/
 IMG_VOID
 MTX_RestoreState(
-	IMG_HANDLE context,
-	IMG_FW_CONTEXT * psFwCtxt
+	IMG_VOID *context
 )
 {
 	IMG_UINT32 *psMtxRegState;
@@ -1778,38 +1781,46 @@ MTX_RestoreState(
 	IMG_UINT32 i;
 	IMG_UINT32 ui32NumPipes;
 	TOPAZKM_DevContext *devContext = (TOPAZKM_DevContext *)context;
+	IMG_FW_CONTEXT * psFwCtxt = &devContext->sFwCtxt;
+#if defined(HW_4_0)
+	IMG_HANDLE hMMURegId = TAL_GetMemSpaceHandle("REG_MMU");
+#endif
 
-	TALREG_ReadWord32( psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MULTICORE_HW_CFG, &ui32RegValue);
+	if (!context)
+	{
+		return;
+	}
+	TALREG_ReadWord32( devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MULTICORE_HW_CFG, &ui32RegValue);
 	ui32NumPipes = (ui32RegValue & MASK_TOPAZHP_TOP_CR_NUM_CORES_SUPPORTED);
 
-	if ( psFwCtxt->bInitialized )
+	if (psFwCtxt->bInitialized)
 	{
 
 		{
 			/* Clear registers used for Host-FW communications */
-			TALPDUMP_Comment(psFwCtxt->ui32TopazMulticoreRegId, "Clear registers used for Host-FW communications");
-			TALREG_WriteWord32(psFwCtxt->ui32TopazMulticoreRegId, MTX_SCRATCHREG_IDLE, 0);
+			TALPDUMP_Comment(devContext->ui32MultiCoreMemSpaceId, "Clear registers used for Host-FW communications");
+			TALREG_WriteWord32(devContext->ui32MultiCoreMemSpaceId, MTX_SCRATCHREG_IDLE, 0);
 
-			TALREG_WriteWord32(psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_FIRMWARE_REG_1 + (MTX_SCRATCHREG_BOOTSTATUS << 2), 0);
+			TALREG_WriteWord32(devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_FIRMWARE_REG_1 + (MTX_SCRATCHREG_BOOTSTATUS << 2), 0);
 
-			TALREG_WriteWord32(psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_FIRMWARE_REG_1 + (MTX_SCRATCHREG_TOHOST << 2), 0);
+			TALREG_WriteWord32(devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_FIRMWARE_REG_1 + (MTX_SCRATCHREG_TOHOST << 2), 0);
 
-			TALREG_WriteWord32(psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_FIRMWARE_REG_1 + (MTX_SCRATCHREG_TOMTX  << 2), 0);
+			TALREG_WriteWord32(devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_FIRMWARE_REG_1 + (MTX_SCRATCHREG_TOMTX << 2), 0);
 		}
 
-		if(g_bUseSecureFwUpload)
+		if (g_bUseSecureFwUpload)
 		{
-			TALPDUMP_Comment(psFwCtxt->ui32TopazMulticoreRegId, "----SecHost START-----------------------------------");
+			TALPDUMP_Comment(devContext->ui32MultiCoreMemSpaceId, "----SecHost START-----------------------------------");
 
 			/* We need to make sure the MMU is bypassed.  That will be automatic after the reset in hardware but the simulator needs it done explicitly */
-			TALPDUMP_Comment(psFwCtxt->ui32TopazMulticoreRegId, "Explicitly set MMU bypass (for simulator)");
+			TALPDUMP_Comment(devContext->ui32MultiCoreMemSpaceId, "Explicitly set MMU bypass (for simulator)");
 #if defined(HW_3_X)
-			TALREG_WriteWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_CONTROL0, F_ENCODE(1,TOPAZHP_TOP_CR_MMU_BYPASS_TOPAZ)); // Required only for simulator
+			TALREG_WriteWord32(devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_CONTROL0, F_ENCODE(1, TOPAZHP_TOP_CR_MMU_BYPASS_TOPAZ)); // Required only for simulator
 #endif
 #if defined(HW_4_0)
 			// This reg holds different information now
 			// Default is currently 0 (UPPER_ADDRESS_FIX, MMU_ENABLE_EXT_ADDRESSING, MMU_BYPASS)
-			TALREG_WriteWord32 (psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_ADDRESS_CONTROL, F_ENCODE(1,IMG_BUS4_MMU_BYPASS));
+			TALREG_WriteWord32(hMMURegId, IMG_BUS4_MMU_ADDRESS_CONTROL, F_ENCODE(1, IMG_BUS4_MMU_BYPASS));
 #endif
 		}
 
@@ -1851,14 +1862,15 @@ MTX_RestoreState(
 			MTX_Load(devContext, psFwCtxt, psFwCtxt->eLoadMethod);
 			TALPDUMP_Comment(psFwCtxt->ui32TopazMulticoreRegId, "----SecHost END-----------------------------------");
 		}
-
-		psMtxRegState = psFwCtxt->psMTXRegCopy;
+	}
+	{
+		psMtxRegState = devContext->psHibernateRegCopy;;
 
 		TALPDUMP_Comment(psFwCtxt->ui32MtxRegMemSpceId, "MTX_RestoreState: Restore MMU Control Register States");
 
 		// Restore the MMU Control Registers
 #if defined(HW_3_X)
-		TALREG_WriteWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_DIR_LIST_BASE(0), *psMtxRegState); // Required
+		TALREG_WriteWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_DIR_LIST_BASE(0), *psMtxRegState); // Required
 		psMtxRegState++;
 
 #if !defined(IMG_KERNEL_MODULE)
@@ -1866,44 +1878,45 @@ MTX_RestoreState(
 		{
 			TALPDUMP_Comment(psFwCtxt->ui32MtxRegMemSpceId, "MTX_RestoreState: The MMU_DIR_LIST_BASE(0) register is an address and can't simply be written with an immediate value");
 			/* if we are pdumping we can't just read and write this register */
-			TALINTVAR_WriteToReg32(psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_DIR_LIST_BASE(0), psFwCtxt->ui32TopazMulticoreRegId, 1);
+			TALINTVAR_WriteToReg32(devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_DIR_LIST_BASE(0), devContext->ui32MultiCoreMemSpaceId, 1);
 		}
 #endif
-		TALREG_WriteWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_TILE(0), *psMtxRegState);
+		TALREG_WriteWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_TILE(0), *psMtxRegState);
 		psMtxRegState++;
 
-		TALREG_WriteWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_TILE(1), *psMtxRegState);
+		TALREG_WriteWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_TILE(1), *psMtxRegState);
 		psMtxRegState++;
 
-		TALREG_WriteWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_CONTROL2, *psMtxRegState); // Required
+		TALREG_WriteWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_CONTROL2, *psMtxRegState); // Required
 		psMtxRegState++;
 
-		TALREG_WriteWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_CONTROL1, *psMtxRegState); // Required
+		TALREG_WriteWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_CONTROL1, *psMtxRegState); // Required
 		psMtxRegState++;
 
-		if(g_bUseSecureFwUpload)
+		if(g_bUseSecureFwUpload && psFwCtxt->bInitialized)
 		{
 			/* in secure mode the firmware has to write the MMU_CONTROL0 register */
-			TALPDUMP_Comment(psFwCtxt->ui32TopazMulticoreRegId, "Write MMU control register value to CMD FIFO");
-			TALREG_WriteWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MULTICORE_CMD_FIFO_WRITE, *psMtxRegState); // Required
+			TALPDUMP_Comment(devContext->ui32MultiCoreMemSpaceId, "Write MMU control register value to CMD FIFO");
+			TALREG_WriteWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MULTICORE_CMD_FIFO_WRITE, *psMtxRegState); // Required
 
 		}
 		else
 		{
+			if (psFwCtxt->bInitialized)
 			{
 				/* we do not want to run in secre FW mode so write a place holder to the FIFO that the firmware will know to ignore */
-				TALPDUMP_Comment(psFwCtxt->ui32TopazMulticoreRegId, "Write dummy value to CMD FIFO (Firmware will know to ignore it)");
-				TALREG_WriteWord32(	psFwCtxt->ui32TopazMulticoreRegId,	TOPAZHP_TOP_CR_MULTICORE_CMD_FIFO_WRITE,TOPAZHP_NON_SECURE_FW_MARKER);
+				TALPDUMP_Comment(devContext->ui32MultiCoreMemSpaceId, "Write dummy value to CMD FIFO (Firmware will know to ignore it)");
+				TALREG_WriteWord32(	devContext->ui32MultiCoreMemSpaceId,	TOPAZHP_TOP_CR_MULTICORE_CMD_FIFO_WRITE,TOPAZHP_NON_SECURE_FW_MARKER);
 			}
 
 			//*psMtxRegState &= ~0xC; //Don't write to bits 2 or 3 as they may cause unwanted cache flushes?
-			TALREG_WriteWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MMU_CONTROL0, *psMtxRegState); // Required
+			TALREG_WriteWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MMU_CONTROL0, *psMtxRegState); // Required
 #endif
 #if defined(HW_4_0)		
-		TALREG_WriteWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_FIRMWARE_REG_7, *psMtxRegState);
+		TALREG_WriteWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_FIRMWARE_REG_7, *psMtxRegState);
 		psMtxRegState++;
 			
-		TALREG_WriteWord32 (psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_DIR_BASE_ADDR(0), *psMtxRegState); // Required
+		TALREG_WriteWord32 (hMMURegId, IMG_BUS4_MMU_DIR_BASE_ADDR(0), *psMtxRegState); // Required
 		psMtxRegState++;
 
 #if !defined(IMG_KERNEL_MODULE)
@@ -1911,42 +1924,46 @@ MTX_RestoreState(
 		{
 			TALPDUMP_Comment(psFwCtxt->ui32MtxRegMemSpceId, "MTX_RestoreState: The IMG_BUS4_MMU_DIR_BASE_ADDR(0) register is an address and can't simply be written with an immediate value");
 			/* if we are pdumping we can't just read and write this register */
-			TALINTVAR_WriteToReg32(psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_DIR_BASE_ADDR(0), psFwCtxt->ui32MMURegId, 1);
+			TALINTVAR_WriteToReg32(hMMURegId, IMG_BUS4_MMU_DIR_BASE_ADDR(0), hMMURegId, 1);
 		}
 #endif
-		TALREG_WriteWord32 (psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_TILE_CFG(0), *psMtxRegState);
+		TALREG_WriteWord32 (hMMURegId, IMG_BUS4_MMU_TILE_CFG(0), *psMtxRegState);
 		psMtxRegState++;
 
-		TALREG_WriteWord32 (psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_TILE_CFG(1), *psMtxRegState);
+		TALREG_WriteWord32 (hMMURegId, IMG_BUS4_MMU_TILE_CFG(1), *psMtxRegState);
 		psMtxRegState++;
 
-		TALREG_WriteWord32 (psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_ADDRESS_CONTROL, *psMtxRegState); // Required
+		TALREG_WriteWord32 (hMMURegId, IMG_BUS4_MMU_ADDRESS_CONTROL, *psMtxRegState); // Required
 		psMtxRegState++;
 
-		TALREG_WriteWord32 (psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_CONTROL1, *psMtxRegState); // Required
+		TALREG_WriteWord32 (hMMURegId, IMG_BUS4_MMU_CONTROL1, *psMtxRegState); // Required
 		psMtxRegState++;
 
-		if(g_bUseSecureFwUpload)
+		if(g_bUseSecureFwUpload && psFwCtxt->bInitialized)
 		{
 			/* in secure mode the firmware has to write the MMU_CONTROL0 register */
-			TALPDUMP_Comment(psFwCtxt->ui32TopazMulticoreRegId, "Write MMU control register value to CMD FIFO");
-			TALREG_WriteWord32 (psFwCtxt->ui32TopazMulticoreRegId, TOPAZHP_TOP_CR_MULTICORE_CMD_FIFO_WRITE, *psMtxRegState); // Required
+			TALPDUMP_Comment(devContext->ui32MultiCoreMemSpaceId, "Write MMU control register value to CMD FIFO");
+			TALREG_WriteWord32 (devContext->ui32MultiCoreMemSpaceId, TOPAZHP_TOP_CR_MULTICORE_CMD_FIFO_WRITE, *psMtxRegState); // Required
 
 		}
 		else
 		{
+			if (psFwCtxt->bInitialized)
 			{
 				/* we do not want to run in secre FW mode so write a place holder to the FIFO that the firmware will know to ignore */
-				TALPDUMP_Comment(psFwCtxt->ui32TopazMulticoreRegId, "Write dummy value to CMD FIFO (Firmware will know to ignore it)");
-				TALREG_WriteWord32(	psFwCtxt->ui32TopazMulticoreRegId,	TOPAZHP_TOP_CR_MULTICORE_CMD_FIFO_WRITE,TOPAZHP_NON_SECURE_FW_MARKER);
+				TALPDUMP_Comment(devContext->ui32MultiCoreMemSpaceId, "Write dummy value to CMD FIFO (Firmware will know to ignore it)");
+				TALREG_WriteWord32(	devContext->ui32MultiCoreMemSpaceId,	TOPAZHP_TOP_CR_MULTICORE_CMD_FIFO_WRITE,TOPAZHP_NON_SECURE_FW_MARKER);
 			}
 
-		//*psMtxRegState &= ~0xC; //Don't write to bits 2 or 3 as they may cause unwanted cache flushes?
-		TALREG_WriteWord32 (psFwCtxt->ui32MMURegId, IMG_BUS4_MMU_CONTROL0, *psMtxRegState); // Required
+			//*psMtxRegState &= ~0xC; //Don't write to bits 2 or 3 as they may cause unwanted cache flushes?
+			TALREG_WriteWord32 (hMMURegId, IMG_BUS4_MMU_CONTROL0, *psMtxRegState); // Required
 #endif
 
-			// Restore MTX code and data
-			MTX_Load(devContext, psFwCtxt, psFwCtxt->eLoadMethod);
+			if (psFwCtxt->bInitialized)
+			{
+				// Restore MTX code and data
+				MTX_Load(devContext, psFwCtxt, psFwCtxt->eLoadMethod);
+			}
 		}
 		psMtxRegState++;
 
@@ -1973,13 +1990,18 @@ MTX_RestoreState(
 		
 		TALPDUMP_Comment(psFwCtxt->ui32MtxRegMemSpceId, "MTX_RestoreState: Start the MTX");
 
-		// Turn On MTX
-		MTX_Start(psFwCtxt);
+		if (psFwCtxt->bInitialized)
+		{
+			// Turn On MTX
+			MTX_Start(psFwCtxt);
 
-		/* Kick the MTX to get things running */
-		MTX_Kick( psFwCtxt, 1 );
-
+			/* Kick the MTX to get things running */
+			MTX_Kick( psFwCtxt, 1 );
+		}
 	}
+	devContext->bInitialised = false;
+	topazdd_Initialise(devContext);
+
 }
 
 /* EOF */

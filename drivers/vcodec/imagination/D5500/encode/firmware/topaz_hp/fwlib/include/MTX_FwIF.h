@@ -129,7 +129,6 @@ typedef struct tag_IMG_FW_CONTEXT
 	IMG_UINT32 ui32NumContexts;				//!< Number of contexts supported by firmware
 
 	struct MEMORY_INFO_TAG* psMTXContextDataCopy[TOPAZHP_MAX_POSSIBLE_STREAMS];  //!< Copy of MTX Context Data during hibernate
-	IMG_UINT32 *psMTXRegCopy;				//!< Copy of MTX Register block during hibernate
 
 	IMG_UINT32 ui32MTXTOPAZFWTextSize;      //!< Size of MTX Firmware Text Section in words
 	IMG_UINT32 *pui32MTXTOPAZFWText;        //!< Pointer to MTX Firmware Text Section
@@ -245,7 +244,7 @@ IMG_VOID MTX_Deinitialize(
  * Description        : Saves MTX State -- Registers and Data Memory
  ************************************************************************************/
 IMG_VOID MTX_SaveState(
-	IMG_FW_CONTEXT *psFwCtxt);
+	IMG_VOID * context);
 
 
 /*!
@@ -257,8 +256,7 @@ IMG_VOID MTX_SaveState(
  * Description        : Restores MTX State -- Registers and Data Memory
  ************************************************************************************/
 IMG_VOID MTX_RestoreState(
-	IMG_HANDLE context,
-	IMG_FW_CONTEXT *psFwCtxt);
+	IMG_VOID * context);
 
 
 /*!

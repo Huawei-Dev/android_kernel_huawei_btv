@@ -54,7 +54,7 @@
 extern IMG_UINT16 gaui16vp8VlcTableData[];
 extern const IMG_UINT16 gui16vp8VlcTableSize;
 
-IMG_UINT16 gaui16vp8VlcTableData[] = { 0 }; 
+IMG_UINT16 gaui16vp8VlcTableData[] = { 0, 0, 0 };
 const IMG_UINT16 gui16vp8VlcTableSize = 1;
 
 /* EOF */

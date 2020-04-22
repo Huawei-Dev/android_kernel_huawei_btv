@@ -88,7 +88,6 @@ typedef struct _jpgenc_config_t
     uint32_t                                    jpegSize;        
 }jpgenc_config_t;
 
-
 /* v4l2 subdev ioctl case id define */
 /* #define VIDIOC_HISI_VCM_CFG	_IOWR('V', BASE_VIDIOC_PRIVATE + 31, struct hw_vcm_cfg_data) */
 #define HJPEG_ENCODE_PROCESS _IOWR('A', BASE_VIDIOC_PRIVATE + 51,  jpgenc_config_t)
@@ -96,5 +95,6 @@ typedef struct _jpgenc_config_t
 #define HJPEG_ENCODE_POWERDOWN _IO('A', BASE_VIDIOC_PRIVATE + 53)
 #define HJPEG_ENCODE_SETREG  _IOW('A', BASE_VIDIOC_PRIVATE + 54,  jpgenc_config_t)
 #define HJPEG_ENCODE_GETREG  _IOWR('A', BASE_VIDIOC_PRIVATE + 55, jpgenc_config_t)
+
 #endif
 

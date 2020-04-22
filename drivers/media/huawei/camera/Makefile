@@ -9,11 +9,6 @@ CFLAGS_hwcam_cfgdev.o = -I$(src)
 
 
 obj-y += sensor/
-
-ifeq ($(CONFIG_HUAWEI_CAMERA_USE_EXTISP),y)
-	obj-y += extisp/
-endif
-
 obj-y += depthisp/
 obj-y += hisp/
 obj-y += cci/
@@ -24,3 +19,4 @@ obj-y += platform/
 obj-y += laser/
 obj-y += hjpeg/
 obj-y += clt/
+obj-y += fd/

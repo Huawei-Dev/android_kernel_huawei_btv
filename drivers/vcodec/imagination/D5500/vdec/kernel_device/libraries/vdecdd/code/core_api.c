@@ -70,6 +70,8 @@
 #define INIT_HM_MSG_LIST_SIZE 64
 #define FRAME_PERIOD 33              /*!< Worst case frame period in milliseconds on a stream [30fps]. */
 
+extern IMG_INT32 gSuspendResult;
+extern IMG_INT32 TimeoutCount;
 /*!
 ******************************************************************************
  This type defines the core message Ids.
@@ -987,7 +989,32 @@ static IMG_RESULT core_SendSyncMsg(
     DMANKM_ActivateKmHisr(psDdDevContext->hDevHandle);
 
     /* Wait for the message to be processed */
-    ui32Result = SYSOSKM_WaitEventObject(psCoreMsg->hEventHandle, IMG_TRUE);
+    if (CORE_MSGID_DEV_POWER_PRE_S5 == eMsgId)
+    {
+        REPORT(REPORT_MODULE_CORE, REPORT_INFO, "waiting for power pre s5 msg \n");
+        if (TimeoutCount < 1)
+        {
+            ui32Result = SYSOSKM_WaitEventObject_Timeout(psCoreMsg->hEventHandle, 1);
+        }
+        else
+        {
+            TimeoutCount = 0;
+            ui32Result = SYSOSKM_WaitEventObject(psCoreMsg->hEventHandle, IMG_TRUE);
+        }
+
+        if (ui32Result != IMG_SUCCESS)
+        {
+            TimeoutCount++;
+        }
+        else
+        {
+            TimeoutCount = 0;
+        }
+    }
+    else
+    {
+        ui32Result = SYSOSKM_WaitEventObject(psCoreMsg->hEventHandle, IMG_TRUE);
+    }
     /* Destroy the event object. */
     SYSOSKM_DestroyEventObject(psCoreMsg->hEventHandle);
 
@@ -3290,6 +3317,7 @@ IMG_VOID CORE_DevPowerPreS5(
     VDEC_BZERO(&sCoreMsg);
 
     /* Send and wait for response. */
+    REPORT(REPORT_MODULE_CORE, REPORT_INFO, "vdec power pres5 msg send \n");
     ui32Result = core_SendSyncMsg(CORE_MSGID_DEV_POWER_PRE_S5,
                                   CORE_NO_STREAM_ID,
                                   psDdDevContext,
@@ -5121,6 +5149,7 @@ IMG_RESULT CORE_ProcessEvent(
                 IMG_ASSERT(ui32Result == IMG_SUCCESS);
                 if (ui32Result != IMG_SUCCESS)
                 {
+                    REPORT(REPORT_MODULE_CORE, REPORT_ERR, "CORE_MSGID_STREAM_UNMAP_BUF return failed \n");
                     return ui32Result;
                 }
 
@@ -5157,6 +5186,7 @@ IMG_RESULT CORE_ProcessEvent(
                 IMG_ASSERT(ui32Result == IMG_SUCCESS);
                 if (ui32Result != IMG_SUCCESS)
                 {
+                    REPORT(REPORT_MODULE_CORE, REPORT_ERR, "CORE_MSGID_STREAM_FILL_PICT_BUF return failed \n");
                     return ui32Result;
                 }
 
@@ -5245,15 +5275,22 @@ IMG_RESULT CORE_ProcessEvent(
             break;
 
         case CORE_MSGID_DEV_POWER_PRE_S5:
+            REPORT(REPORT_MODULE_CORE, REPORT_INFO, "vdec power pres5 msg recived \n");
             SCHEDULER_Pause(psDdDevContext->hSchedulerContext);
             SYSOSKM_MSleep(FRAME_PERIOD * 2);
 
             psCoreMsg->ui32Result = core_DevPowerPreS5(psDdDevContext);
             IMG_ASSERT(psCoreMsg->ui32Result == IMG_SUCCESS);
 
-            
+            /*!<
+                When a PPM suspend event is received, the userspace has already been frozen.
+                However, it necessary to wait for eventual interrupts to trigger, which could add new messages to
+                the queue (hence sleeping FRAME_PERIOD * 2). We then check the queue, and if not empty we post
+                ourselves to the end, effectively making the pipes drain.
+            */
             if (LST_first(&psDdDevContext->sCoreMsgList) != NULL)
             {
+                REPORT(REPORT_MODULE_CORE, REPORT_ERR, "vdec power pres5 msg processing, core msg list is not NULL \n");
                 LST_add(&psDdDevContext->sCoreMsgList, psCoreMsg);
                 return IMG_SUCCESS;
             }
@@ -5264,10 +5301,11 @@ IMG_RESULT CORE_ProcessEvent(
             */
             if (DECODER_GetHWQueueLength(psDdDevContext->hDecoderContext) > 0)
             {
+                REPORT(REPORT_MODULE_CORE, REPORT_ERR, "vdec power pres5 msg processing, queue length greater than 0 \n");
                 LST_add(&psDdDevContext->sCoreMsgList, psCoreMsg);
                 return IMG_SUCCESS;
             }
-
+            REPORT(REPORT_MODULE_CORE, REPORT_INFO, "vdec power pres5 msg process done \n");
             break;
 
         case CORE_MSGID_DEV_POWER_POST_S0:
@@ -5303,6 +5341,10 @@ error:
     if (psCoreMsg->hEventHandle != IMG_NULL)
     {
         /* Signal completion. */
+        if (CORE_MSGID_DEV_POWER_PRE_S5 == psCoreMsg->eMsgId)
+        {
+            REPORT(REPORT_MODULE_CORE, REPORT_INFO, "vdec power pres5 msg ack \n");
+        }
         SYSOSKM_SignalEventObject(psCoreMsg->hEventHandle);
     }
     else

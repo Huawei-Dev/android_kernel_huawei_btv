@@ -404,14 +404,21 @@ static int imx219_config(hwsensor_intf_t* si, void  *argp)
 		return -1;
 	}
 
+    static bool imx219_power_on = false;
     data = (struct sensor_cfg_data *)argp;
     cam_debug("imx219 cfgtype = %d",data->cfgtype);
     switch(data->cfgtype){
         case SEN_CONFIG_POWER_ON:
-            ret = si->vtbl->power_up(si);
+            if (!imx219_power_on) {
+                ret = si->vtbl->power_up(si);
+                imx219_power_on = true;
+            }
             break;
         case SEN_CONFIG_POWER_OFF:
-            ret = si->vtbl->power_down(si);
+            if (imx219_power_on) {
+                ret = si->vtbl->power_down(si);
+                imx219_power_on = false;
+            }
             break;
         case SEN_CONFIG_WRITE_REG:
             break;

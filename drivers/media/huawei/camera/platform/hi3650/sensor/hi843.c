@@ -299,14 +299,21 @@ static int hi843_config(hwsensor_intf_t* si, void  *argp)
 		return -1;
 	}
 
+    static bool hi843_power_on = false;
     data = (struct sensor_cfg_data *)argp;
     cam_debug("hi843 cfgtype = %d",data->cfgtype);
     switch(data->cfgtype){
         case SEN_CONFIG_POWER_ON:
-            ret = si->vtbl->power_up(si);
+            if (!hi843_power_on) {
+                ret = si->vtbl->power_up(si);
+                hi843_power_on = true;
+            }
             break;
         case SEN_CONFIG_POWER_OFF:
-            ret = si->vtbl->power_down(si);
+            if (hi843_power_on) {
+                ret = si->vtbl->power_down(si);
+                hi843_power_on = false;
+            }
             break;
         case SEN_CONFIG_WRITE_REG:
             break;

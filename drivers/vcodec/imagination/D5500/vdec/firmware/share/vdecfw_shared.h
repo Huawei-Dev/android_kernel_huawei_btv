@@ -320,6 +320,7 @@ typedef enum
     VDECFW_CHECKPOINT_MAX,
 
     // Indicate which checkpoints mark the start and end of each group (FW, FE and BE).
+    // The start and end values should be updated if new checkpoints are added
     // before the current start or after the current end of any group.
     VDECFW_CHECKPOINT_FW_START = VDECFW_CHECKPOINT_PICTURE_STARTED,
     VDECFW_CHECKPOINT_FW_END   = VDECFW_CHECKPOINT_FIRMWARE_SAVED,

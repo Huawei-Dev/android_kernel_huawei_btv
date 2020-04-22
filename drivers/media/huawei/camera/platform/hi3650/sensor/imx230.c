@@ -204,97 +204,12 @@ imx230_match_id(
 //    int camif_id = -1;
 
     cam_info("%s TODO.", __func__);
-#if	0
-    if(0 == board_info->gpios[FSIN].gpio) {
-		cam_err("%s gpio type[FSIN] is not actived.", __func__);
-		ret = -1;
-		goto out;
-    }
-
-    ret = gpio_request(board_info->gpios[FSIN].gpio, "camif_id");
-    if(ret < 0) {
-		cam_err("failed to request gpio[%d]", board_info->gpios[FSIN].gpio);
-		goto out;
-	}
-    ret = gpio_direction_input(board_info->gpios[FSIN].gpio);
-    if(ret < 0) {
-		cam_err("failed to control gpio[%d]", board_info->gpios[FSIN].gpio);
-		goto out_gpio;
-	}
-
-    ret = gpio_get_value(board_info->gpios[FSIN].gpio);
-    if(ret < 0) {
-		cam_err("failed to get gpio[%d]", board_info->gpios[FSIN].gpio);
-		goto out_gpio;
-	} else {
-		camif_id = ret;
-		cam_notice("%s camif id = %d.", __func__, camif_id);
-	}
-
-	if (camif_id != board_info->camif_id) {
-		cam_notice("%s camera[%s] module is not match.", __func__, board_info->name);
-		board_info->sensor_index = CAMERA_SENSOR_INVALID;
-		ret = -1;
-	} else {
-		cam_notice("%s camera[%s] match successfully.", __func__, board_info->name);
-		sensor_index = board_info->sensor_index;
-		ret = 0;
-	}
-
-out_gpio:
-	gpio_free(board_info->gpios[FSIN].gpio);
-out:
-    cdata->data = sensor_index;
-    return ret;
-#endif
     strncpy(cdata->cfg.name, sensor->board_info->name, DEVICE_NAME_SIZE-1);
     cdata->data = sensor->board_info->sensor_index;
 
 	return 0;
 
 }
-
-#if 0
-static ssize_t imx230_powerctrl_show(struct device *dev,
-	struct device_attribute *attr,char *buf)
-{
-    cam_info("enter %s", __func__);
-    return 1;
-}
-static ssize_t imx230_powerctrl_store(struct device *dev,
-	struct device_attribute *attr, const char *buf, size_t count)
-{
-	int state = simple_strtol(buf, NULL, 10);
-	cam_info("enter %s, state %d", __func__, state);
-
-	if (state == POWER_ON)
-		imx230_power_up(&s_imx230.intf);
-	else
-		imx230_power_down(&s_imx230.intf);
-
-	return count;
-}
-
-
-static struct device_attribute imx230_powerctrl =
-    __ATTR(power_ctrl, 0664, imx230_powerctrl_show, imx230_powerctrl_store);
-
-int imx230_register_attribute(hwsensor_intf_t* intf, struct device* dev)
-{
-	int ret = 0;
-	cam_info("enter %s", __func__);
-
-	ret = device_create_file(dev, &imx230_powerctrl);
-	if (ret < 0) {
-		cam_err("%s failed to creat power ctrl attribute.", __func__);
-		goto err_create_power_ctrl;
-	}
-	return 0;
-err_create_power_ctrl:
-	device_remove_file(dev, &imx230_powerctrl);
-	return ret;
-}
-#endif
 
 static hwsensor_vtbl_t
 s_imx230_vtbl =
@@ -324,14 +239,21 @@ imx230_config(
 		return -1;
 	}
 
+	static bool imx230_power_on = false;
 	data = (struct sensor_cfg_data *)argp;
 	cam_debug("imx230_austin cfgtype = %d",data->cfgtype);
 	switch(data->cfgtype){
 		case SEN_CONFIG_POWER_ON:
-			ret = si->vtbl->power_up(si);
+			if (!imx230_power_on) {
+				ret = si->vtbl->power_up(si);
+				imx230_power_on = true;
+			}
 			break;
 		case SEN_CONFIG_POWER_OFF:
-			ret = si->vtbl->power_down(si);
+			if (imx230_power_on) {
+				ret = si->vtbl->power_down(si);
+				imx230_power_on = false;
+			}
 			break;
 		case SEN_CONFIG_WRITE_REG:
 			break;

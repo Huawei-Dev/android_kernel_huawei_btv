@@ -14,6 +14,9 @@
 
 #define I2S(i) container_of(i, sensor_t, intf)
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
+
 extern struct hw_csi_pad hw_csi_pad;
 static hwsensor_vtbl_t s_ov8858_vtbl;
 
@@ -216,47 +219,6 @@ static int ov8858_match_id(
     return 0;
 }
 
-#if 0
-static ssize_t ov8858_powerctrl_show(struct device *dev,
-	struct device_attribute *attr,char *buf)
-{
-    cam_info("enter %s", __func__);
-    return 1;
-}
-static ssize_t ov8858_powerctrl_store(struct device *dev,
-	struct device_attribute *attr, const char *buf, size_t count)
-{
-	int state = simple_strtol(buf, NULL, 10);
-	cam_info("enter %s, state %d", __func__, state);
-
-	if (state == POWER_ON)
-		ov8858_power_up(&s_ov8858.intf);
-	else
-		ov8858_power_down(&s_ov8858.intf);
-
-	return count;
-}
-
-
-static struct device_attribute ov8858_powerctrl =
-    __ATTR(power_ctrl, 0664, ov8858_powerctrl_show, ov8858_powerctrl_store);
-
-int ov8858_register_attribute(hwsensor_intf_t* intf, struct device* dev)
-{
-	int ret = 0;
-
-	ret = device_create_file(dev, &ov8858_powerctrl);
-	if (ret < 0) {
-		cam_err("%s failed to creat power ctrl attribute.", __func__);
-		goto err_create_power_ctrl;
-	}
-	return 0;
-err_create_power_ctrl:
-	device_remove_file(dev, &ov8858_powerctrl);
-	return ret;
-}
-#endif
-
 static hwsensor_vtbl_t s_ov8858_vtbl =
 {
 	.get_name = ov8858_get_name,
@@ -376,3 +338,4 @@ module_init(ov8858_init_module);
 module_exit(ov8858_exit_module);
 MODULE_DESCRIPTION("ov8858");
 MODULE_LICENSE("GPL v2");
+#pragma GCC diagnostic pop

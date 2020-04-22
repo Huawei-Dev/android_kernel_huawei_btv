@@ -9,7 +9,7 @@
 #define ARSR_REQ_OUT_NUM     (2)
 #define NAME_LEN             (32)
 #define PARAS_LEN            (400)
-#define EXT_ACK_PARAS_LEN    (64)
+#define EXT_ACK_PARAS_LEN    (68)
 #define EVENT_PARAMS_LEN     (400)
 #define PIPELINE_COUNT       (2)
 
@@ -57,6 +57,7 @@ typedef enum
     STREAM_ISP_YUV_OUT_DMAP_PRE,
     STREAM_ISP_SENSOR_Y_OUT_FD,
     STREAM_RAW_OUT,
+    STREAM_ISP_PD,
     STREAM_ISP_YUV_OUT_CB,
     STREAM_POS_MAX,
 } stream_pos_e;
@@ -118,6 +119,12 @@ typedef enum
     COMMAND_DGEN_FLUSH_REQUEST,
     COMMAND_DOPT_FLUSH_REQUEST,
     COMMAND_DMAP_FORMAT_REQUEST,
+    COMMAND_MOTION_SENSOR_MAP_REQUEST,
+    COMMAND_DRBR_REQUEST,
+    COMMAND_DMAP_REQUEST,
+    COMMAND_DMAP_FLUSH_REQUEST,
+    COMMAND_MEM_POOL_INIT_REQUEST,
+    COMMAND_MEM_POOL_DEINIT_REQUEST,
 
     /* Response items. */
     QUERY_CAPABILITY_RESPONSE = 0x2000,
@@ -157,6 +164,12 @@ typedef enum
     DGEN_FLUSH_RESPONSE,
     DOPT_FLUSH_RESPONSE,
     DMAP_FORMAT_RESPONSE,
+    MOTION_SENSOR_MAP_RESPONSE,
+    DRBR_REQUEST_RESPONSE,
+    DMAP_REQUEST_RESPONSE,
+    DMAP_FLUSH_RESPONSE,
+    MEM_POOL_INIT_RESPONSE,
+    MEM_POOL_DEINIT_RESPONSE,
 
     /* Event items sent to AP. */
     MSG_EVENT_SENT           = 0x3000,
@@ -176,7 +189,11 @@ typedef enum _ucfg_ext_e
     TUNING_PRE_MODE      = 1 << 9,
     H_VIDEO_720P_240     = 1 << 10,
     H_VIDEO_1080P_120    = 1 << 11,
-    RESERVED             = 1 << 12,
+    H_VIDEO_HIGH_RES     = 1 << 12,
+    SEAMLESS_MODE        = 1 << 13,
+    H_VIDEO_1080P_90     = 1 << 14,
+    QUADRAW_MODE         = 1 << 15,
+    RESERVED             = 1 << 16,
 } ucfg_ext_e;
 
 typedef enum _ucfg_scene_e
@@ -191,6 +208,7 @@ typedef enum
     PRIMARY_CAMERA = 0,
     FRONT_CAMERA,
     SECONDARY_CAMERA,
+    IR_CAMERA,
 } camera_id_t;
 typedef struct _isp_crop_region_info_t
 {
@@ -470,14 +488,54 @@ typedef struct _msg_ack_jpeg_encode_t
     int          status;
 } msg_ack_jpeg_encode_t;
 
+typedef enum{
+    MODE_EIS_VIDHANCE = 0,
+    MODE_DMAP = 1,
+} warp_request_mode_e;
+
+typedef struct grid_displacement
+{
+    unsigned int x_offset;
+    unsigned int y_offset;
+} grid_displacement_t;
+
+typedef struct cgrid_info
+{
+    unsigned int cgrid_offset_h;
+    unsigned int cgrid_offset_v;
+    unsigned int cgrid_size_exp_h;
+    unsigned int cgrid_size_exp_v;
+    unsigned int cgrid_sector_h;
+    unsigned int cgrid_sector_v;
+    grid_displacement_t cgrid_xy_location[567];
+} cgrid_info_t;
+
+typedef struct warp_image_info
+{
+    unsigned int inputwidth;
+    unsigned int inputheight;
+    unsigned int outputwidth;
+    unsigned int outputheight;
+    unsigned int i_offset_h;
+    unsigned int i_offset_v;
+} warp_image_info_t;
+
+typedef struct warp_info
+{
+    cgrid_info_t grid_info;
+    warp_image_info_t image_info;
+} warp_info_t;
 typedef struct _msg_req_warp_request_t
 {
     unsigned int  cam_id;
     unsigned int  frame_number;
     stream_info_t input_stream_info;
     stream_info_t output_stream_info;
+    stream_info_t warp_output_stream_info;
     unsigned int  grid_enable;
     unsigned int  grid_order;
+    warp_request_mode_e mode;
+    unsigned int cgrid_info_buffer;
 } msg_req_warp_request_t;
 
 typedef struct _msg_ack_warp_request_t
@@ -672,11 +730,16 @@ typedef struct OISInfo
     char moduleId[64];
 }OISInfo;
 
-typedef struct _warp_cgrid_params_t
+typedef enum {
+    WARP_BASE_PRIMARY = 0,
+    WARP_BASE_SECOND,
+}warp_base_t;
+
+typedef struct _warp_info_params_t
 {
     unsigned int fw_map_addr;
     OISInfo nvinfo;
-} warp_cgrid_params_t;
+} warp_info_params_t;
 
 typedef struct _msg_req_dgen_request_t
 {
@@ -748,11 +811,75 @@ typedef struct _msg_ack_dopt_request_t
     unsigned int  status;
 } msg_ack_dopt_request_t;
 
+typedef struct _msg_req_dmap_request_t
+{
+    unsigned int  base_img;
+    unsigned int  frame_number;
+    unsigned int  req_type;
+    unsigned int  disp_direction;
+    unsigned int  sparse_enable;
+    unsigned int  dense_enable;
+    unsigned int  warp_enable;
+    unsigned int  dmap_crop_x;
+    unsigned int  dmap_crop_y;
+    unsigned int  dmap_crop_width;
+    unsigned int  dmap_crop_height;
+    unsigned int  input_dgen_left;
+    unsigned int  input_dgen_right;
+    unsigned int  output_dgen_left;
+    unsigned int  output_sparse_disp;
+    unsigned int  output_conf_raster;
+    unsigned int  output_sparse_depth;
+    unsigned int  output_disp_fw_addr;
+    unsigned int  output_conf_fw_addr;
+    unsigned int  input_dopt_horz_left;
+    unsigned int  input_dopt_vert_left;
+    unsigned int  input_dopt_disp_buffer;
+    unsigned int  input_last_left_buffer;
+    unsigned int  input_last_disp_buffer;
+    unsigned int  output_dense_horz_disp;
+    unsigned int  output_dense_vert_disp;
+    unsigned int  output_dense_depth;
+    unsigned int  output_dense_xmap;
+    unsigned int  output_dense_ymap;
+    unsigned int  input_warp_sparse_setting_buffer;
+    unsigned int  input_warp_dense_setting_buffer;
+} msg_req_dmap_request_t;
+typedef struct _msg_ack_dmap_request_t
+{
+    unsigned int  output_sparse_disp;
+    unsigned int  output_conf_raster;
+    unsigned int  output_dgen_left;
+    unsigned int  output_sparse_depth;
+    unsigned int  input_dgen_left;
+    unsigned int  input_dgen_right;
+    unsigned int  output_dense_horz_disp;
+    unsigned int  output_dense_vert_disp;
+    unsigned int  output_dense_depth;
+    unsigned int  output_dense_xmap;
+    unsigned int  output_dense_ymap;
+    unsigned int  input_dopt_horz_left;
+    unsigned int  input_dopt_vert_left;
+    unsigned int  input_dopt_disp_buffer;
+    unsigned int  input_last_left_buffer;
+    unsigned int  input_last_disp_buffer;
+    unsigned int  input_warp_sparse_setting_buffer;
+    unsigned int  input_warp_dense_setting_buffer;
+    unsigned int  base_img;
+    unsigned int  frame_number;
+    unsigned int  req_type;
+    unsigned int  out_stride;
+    unsigned int  timestampL;
+    unsigned int  timestampH;
+    unsigned int  warp_flag;
+    unsigned int  status;
+} msg_ack_dmap_request_t;
 typedef struct _msg_req_dmap_map_t
 {
-    unsigned int isp_map_addr;
-    unsigned int fw_map_addr;
-    unsigned int buffer_size;
+    unsigned int fw_cfg_addr;
+    unsigned int isp_buf_addr;
+    unsigned int cfg_mem_size;
+    unsigned int buf_mem_size;
     unsigned int mode;
 }msg_req_dmap_map_t;
 
@@ -763,7 +890,8 @@ typedef struct _msg_ack_dmap_map_t
 
 typedef struct _msg_req_dmap_unmap_t
 {
-    unsigned int unmap_addr;
+    unsigned int unmap_cfg_addr;
+    unsigned int unmap_buf_addr;
 }msg_req_dmap_unmap_t;
 
 typedef struct _msg_ack_dmap_unmap_t
@@ -791,14 +919,26 @@ typedef struct _msg_ack_dopt_flush_t
     unsigned int status;
 }msg_ack_dopt_flush_t;
 
+typedef struct _msg_req_dmap_flush_t
+{
+    int flag;
+}msg_req_dmap_flush_t;
+typedef struct _msg_ack_dmap_flush_t
+{
+    unsigned int status;
+}msg_ack_dmap_flush_t;
 typedef struct _msg_req_map_buffer_t
 {
     unsigned int cam_id;
     unsigned int fw_map_addr;
+    unsigned int fw_map_size;
     unsigned int isp_map_addr;
     unsigned int buffer_size;
     unsigned int t2_enable;
     unsigned int dis_enable;
+    unsigned int sec_fw_map_addr;
+    unsigned int sec_isp_map_addr;
+    unsigned int sec_buffer_size;
 } msg_req_map_buffer_t;
 
 typedef struct _msg_ack_map_buffer_t
@@ -952,6 +1092,8 @@ typedef struct _msg_req_ois_update_t
 {
     unsigned int cam_id;
     char sensor_name[32];
+    unsigned int input_ois_buffer;
+    unsigned int input_ois_buffer_size;
 } msg_req_ois_update_t;
 
 typedef struct _msg_ack_ois_update_t
@@ -959,6 +1101,49 @@ typedef struct _msg_ack_ois_update_t
     unsigned int cam_id;
     int status;
 } msg_ack_ois_update_t;
+
+typedef struct _msg_req_mem_pool_init_t
+{
+    unsigned int mempool_addr;
+    unsigned int mempool_size;
+    unsigned int mempool_prot;
+}msg_req_mem_pool_init_t;
+
+typedef struct _msg_ack_mem_pool_init_t
+{
+    unsigned int status;
+}msg_ack_mem_pool_init_t;
+
+typedef struct _msg_req_mem_pool_deinit_t
+{
+    unsigned int mempool_addr;
+    unsigned int mempool_size;
+    unsigned int mempool_prot;
+}msg_req_mem_pool_deinit_t;
+
+typedef struct _msg_ack_mem_pool_deinit_t
+{
+    unsigned int status;
+}msg_ack_mem_pool_deinit_t;
+
+typedef enum{
+    MOTION_SENSOR_ACCEL = 1,
+    MOTION_SENSOR_GYRO = 4,
+    MOTION_SENSOR_LINEAR_ACCEL = 10,
+}motion_sensor_type_t;
+
+typedef struct _msg_req_motion_sensor_map_t
+{
+    motion_sensor_type_t motion_sensor_type;
+    unsigned int input_motion_sensor_mem_buffer;
+    unsigned int input_motion_sensor_mem_buffer_size;
+} msg_req_motion_sensor_map_t;
+
+typedef struct _msg_ack_motion_sensor_map_t
+{
+    motion_sensor_type_t motion_sensor_type;
+    int status;
+} msg_ack_motion_sensor_map_t;
 
 typedef enum
 {
@@ -1111,9 +1296,27 @@ typedef enum
     SUBCMD_SET_SELF_LEARN_DATA = 145,
     SUBCMD_SET_SFR_TEST_DATA = 146,
     SUBCMD_SET_SCE_HUE_GAIN = 147,
-    SUBCMD_SET_MOTION_INFO,
+    SUBCMD_SET_MOTION_INFO = 148,
     SUBCMD_ENABLE_EIS = 149,
-    SUBCMD_SET_AF_OTPSTART_MODE = 150,
+    SUBCMD_SET_REDUCE_EXPOSURE = 150,
+    SUBCMD_SET_APERTURE_MONO = 151,
+    SUBCMD_SET_LSC_MODE = 152,
+    SUBCMD_SET_SEAMLESS_INFO = 153,
+    SUBCMD_SET_RAW2YUV_INFO = 154,
+    SUBCMD_SET_ISP_ALGO_STATUS = 155,
+    SUBCMD_SET_RAWNF_DS = 156,
+    SUBCMD_SET_YUVNF_DS = 157,
+    SUBCMD_SET_AF_OTPSTART_MODE = 158,
+    SUBCMD_FOV_SCALE_RATIO_STATUS = 159,
+    SUBCMD_SET_HFBC_ALIGMENT = 160,
+    SUBCMD_SET_SOFTLIGHT_MODE  = 166,
+    SUBCMD_SET_PDALGO_ENABLE = 167,
+    SUBCMD_SET_PD_INFO = 168,
+    SUBCMD_SET_SWPD_KEY = 169,
+    SUBCMD_GET_SWPD_KEY = 170,
+    SUBCMD_GET_SENSOR_COORD = 171,
+    SUBCMD_SHARPNESS_ENHANCE_ENABLE = 173,
+
     SUBCMD_MAX,
 } extendset_info_e;
 
@@ -1124,6 +1327,57 @@ typedef enum
     SUBCMD_GET_M_DF_FLAG,
     SUBCMD_GET_DF_TUNING,
 } extendget_info_e;
+typedef enum
+{
+    ALGO_ID_NULL = 0,
+    /* special algo */
+    ALGO_ID_FD,
+    ALGO_ID_AE,
+    ALGO_ID_AF,
+    ALGO_ID_FLASH,
+    /* FE algo */
+    ALGO_ID_BLC,
+    ALGO_ID_DGAMMA,
+    ALGO_ID_PDAF,
+    ALGO_ID_SCLRGB,
+    ALGO_ID_MINILSC,
+    ALGO_ID_STAT3A,
+    ALGO_ID_AWB,
+    ALGO_ID_DIS,
+    ALGO_ID_AUTOCLS,
+    ALGO_ID_LASER,
+    /* BE algo */
+    ALGO_ID_RAWNF,
+    ALGO_ID_LSC,
+    ALGO_ID_DPCC,
+    ALGO_ID_AWBGAIN,
+    ALGO_ID_GCD,
+    ALGO_ID_LBC,
+    ALGO_ID_CC,
+    ALGO_ID_DRC,
+    ALGO_ID_CGT,
+    ALGO_ID_GAMMA,
+    ALGO_ID_MINIPIPE,
+    ALGO_ID_RGB2YUV,
+    ALGO_ID_UVDEC,
+    ALGO_ID_CE,
+    ALGO_ID_YUVNFIIR,
+    ALGO_ID_SHARPEN,
+    ALGO_ID_DE,
+    ALGO_ID_TNR,
+    /*PE algo*/
+    ALGO_ID_YUVNF,
+    ALGO_ID_LUT3D,
+    ALGO_ID_SCALER,
+    ALGO_ID_ARSR,
+    ALGO_ID_WARP,
+    ALGO_ID_DMAP,
+    /* others */
+    ALGO_ID_OIS,
+    ALGO_ID_SD,
+    ALGO_ID_MONITOR,
+    ALGO_ID_MAX,
+} algo_id_e;
 
 typedef enum
 {
@@ -1210,7 +1464,8 @@ typedef struct _msg_event_sent_t
     event_info_e event_id;
     unsigned int frame_number;
     unsigned int stream_id;
-    unsigned int timestamp;
+    unsigned int timestampL;
+    unsigned int timestampH;
     char         event_params[EVENT_PARAMS_LEN];
 } msg_event_sent_t;
 
@@ -1251,6 +1506,7 @@ typedef struct _isp_msg_t
         msg_req_warp_request_t          req_warp_request;
         msg_req_arsr_request_t          req_arsr_request;
         msg_req_dmap_format_t           req_dmap_format;
+        msg_req_dmap_request_t          req_dmap_request;
         msg_req_dgen_request_t          req_dgen_request;
         msg_req_dopt_request_t          req_dopt_request;
         msg_req_map_buffer_t            req_map_buffer;
@@ -1266,6 +1522,7 @@ typedef struct _isp_msg_t
         msg_req_flush_t                 req_flush;
         msg_req_dgen_flush_t            req_dgen_flush;
         msg_req_dopt_flush_t            req_dopt_flush;
+        msg_req_dmap_flush_t            req_dmap_flush;
         msg_req_extend_set_t            req_extend_set;
         msg_req_extend_get_t            req_extend_get;
         msg_req_jpeg_encode_t       req_jpeg_encode;
@@ -1277,7 +1534,9 @@ typedef struct _isp_msg_t
         msg_req_release_laser_t         req_release_laser;
         msg_req_acquire_depthisp_t      req_acquire_depthisp;
         msg_req_release_depthisp_t      req_release_depthisp;
-
+        msg_req_motion_sensor_map_t     req_motion_sensor_map;
+        msg_req_mem_pool_init_t         req_mem_pool_init;
+        msg_req_mem_pool_deinit_t       req_mem_pool_deinit;
         /* Response items. */
         msg_ack_query_capability_t      ack_query_capability;
         msg_ack_acquire_camera_t        ack_require_camera;
@@ -1289,6 +1548,7 @@ typedef struct _isp_msg_t
         msg_ack_warp_request_t          ack_warp_request;
         msg_ack_arsr_request_t          ack_arsr_request;
         msg_ack_dmap_format_t           ack_dmap_format;
+        msg_ack_dmap_request_t          ack_dmap_request;
         msg_ack_dgen_request_t          ack_dgen_request;
         msg_ack_dopt_request_t          ack_dopt_request;
         msg_ack_map_buffer_t            ack_map_buffer;
@@ -1304,6 +1564,7 @@ typedef struct _isp_msg_t
         msg_ack_flush_t                 ack_flush;
         msg_ack_dgen_flush_t            ack_dgen_flush;
         msg_ack_dopt_flush_t            ack_dopt_flush;
+        msg_ack_dmap_flush_t            ack_dmap_flush;
         msg_ack_extend_set_t            ack_extend_set;
         msg_ack_extend_get_t            ack_extend_get;
         msg_ack_jpeg_encode_t       ack_jpeg_encode;
@@ -1316,7 +1577,9 @@ typedef struct _isp_msg_t
         msg_ack_acquire_depthisp_t      ack_require_depthisp;
         msg_ack_release_depthisp_t      ack_release_depthisp;
         msg_ack_get_api_version_t       ack_get_api_version;
-
+        msg_ack_motion_sensor_map_t     ack_motion_sensor_map;
+        msg_ack_mem_pool_init_t         ack_mem_pool_init;
+        msg_ack_mem_pool_deinit_t       ack_mem_pool_deinit;
         /* Event items sent to AP. */
         msg_event_sent_t                event_sent;
     }u;
@@ -1327,5 +1590,6 @@ typedef struct _isp_msg_t
 
 void msg_init_req(hisp_msg_t* req, unsigned int api_name, unsigned int msg_id);
 void msg_init_ack(hisp_msg_t* req, hisp_msg_t* ack);
+
 
 #endif /* HISP150_MSG_H_INCLUDED */

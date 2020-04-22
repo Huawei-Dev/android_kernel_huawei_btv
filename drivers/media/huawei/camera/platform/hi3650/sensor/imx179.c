@@ -13,6 +13,9 @@
 
 #define I2S(i) container_of(i, sensor_t, intf)
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
+
 static hwsensor_vtbl_t s_imx179_vtbl;
 
 static int imx179_config(hwsensor_intf_t* si, void  *argp);
@@ -355,4 +358,4 @@ module_init(imx179_init_module);
 module_exit(imx179_exit_module);
 MODULE_DESCRIPTION("imx179");
 MODULE_LICENSE("GPL v2");
-
+#pragma GCC diagnostic pop

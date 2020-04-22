@@ -12,7 +12,6 @@
 
 #ifndef _HW_CSI_H
 #define _HW_CSI_H
-#include "../platform/hi3635/platform_cfg.h"
 #include <linux/irq.h>
 
 typedef irqreturn_t (*csi_irq_handle)(int irq, void *dev_id);

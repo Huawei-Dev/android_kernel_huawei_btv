@@ -25,6 +25,8 @@
 
 #include "hwvcm.h"
 
+//lint -save -e31
+
 #define VCM_ID_CODE		0x9714
 #define I2V(i) container_of(i, vcm_t, intf)
 
@@ -61,7 +63,7 @@ int dw9714_i2c_write(hw_vcm_intf_t *vcm_intf, void *data)
 	rc = hw_isp_write_vcm(vcm->vcm_info->slave_address,
 			cdata->cfg.reg.address,
 			cdata->cfg.reg.value,
-			vcm->vcm_info->data_type);
+			(i2c_length)vcm->vcm_info->data_type);
 
 	return rc;
 }
@@ -163,3 +165,5 @@ module_init(hw_dw9714_module_init);
 module_exit(hw_dw9714_module_exit);
 MODULE_DESCRIPTION("DW9714 VCM");
 MODULE_LICENSE("GPL v2");
+
+//lint -restore

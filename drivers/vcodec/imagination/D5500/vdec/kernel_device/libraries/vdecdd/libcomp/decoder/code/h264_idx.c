@@ -52,7 +52,7 @@
 extern IMG_UINT16 gaui16h264VlcIndexData[][3];
 extern const IMG_UINT8 gui8h264VlcIndexSize;
 
-IMG_UINT16 gaui16h264VlcIndexData[38][3] = {
+IMG_UINT16 gaui16h264VlcIndexData[][3] = {
 	{2,	5,	0},		/* NumCoeffTrailingOnes_Table9-5_nC_0-1.out */
 	{0,	3,	76},		/* NumCoeffTrailingOnes_Table9-5_nC_2-3.out */
 	{0,	3,	160},		/* NumCoeffTrailingOnes_Table9-5_nC_4-7.out */

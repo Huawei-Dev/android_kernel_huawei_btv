@@ -47,6 +47,15 @@
 
 #include "talmmu_api.h"
 
+// Data structure definitions
+enum heap_ids
+{
+        MMU_TILED_HEAP_ID = 0x00,
+        MMU_GENERAL_HEAP_ID = 0x01,
+        // Do not remove - keeps count of size
+        HEAP_ID_NO_OF_HEAPS
+};
+
 // Function definitions
 
 /*!

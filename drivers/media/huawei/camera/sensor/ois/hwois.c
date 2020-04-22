@@ -1,4 +1,4 @@
-/*
+ /*
  *  Hisilicon K3 SOC camera driver source file
  *
  *  Copyright (C) Huawei Technology Co., Ltd.
@@ -36,11 +36,12 @@
 #include <media/v4l2-subdev.h>
 #include "hwois.h"
 
+//lint -save -e429
 #define SD2Ois(sd) container_of(sd, hw_ois_t, subdev)
 
 int hw_ois_get_dt_data(struct platform_device *pdev, ois_t *ois)
 {
-	struct device_node *of_node = pdev->dev.of_node;
+	struct device_node *dev_node = pdev->dev.of_node;
 	struct hw_ois_info *ois_info = NULL;
 	int rc = 0;
 
@@ -51,21 +52,21 @@ int hw_ois_get_dt_data(struct platform_device *pdev, ois_t *ois)
 	}
 	ois->ois_info = ois_info;
 
-	rc = of_property_read_string(of_node, "hisi,ois-name", &ois_info->ois_name);
+	rc = of_property_read_string(dev_node, "hisi,ois-name", &ois_info->ois_name);
 	cam_info("%s hisi,ois-name %s, rc %d\n", __func__, ois_info->ois_name, rc);
 	if (rc < 0) {
 		cam_err("%s failed %d\n", __func__, __LINE__);
 		goto fail;
 	}
 
-	rc = of_property_read_u32(of_node, "hisi,ois-support", &ois_info->ois_support);
+	rc = of_property_read_u32(dev_node, "hisi,ois-support", (u32 *)&ois_info->ois_support);
 	cam_info("%s hisi,ois-support %d, rc %d\n", __func__, ois_info->ois_support, rc);
 	if (rc < 0) {
 		cam_err("%s failed %d\n", __func__, __LINE__);
 		goto fail;
 	}
 
-	rc = of_property_read_u32(of_node, "hisi,slave-addr", &ois_info->slave_address);
+	rc = of_property_read_u32(dev_node, "hisi,slave-addr", &ois_info->slave_address);
 	cam_info("%s hisi,slave-addr 0x%x, rc %d\n", __func__, ois_info->slave_address, rc);
 	if (rc < 0) {
 		cam_err("%s failed %d\n", __func__, __LINE__);
@@ -227,7 +228,7 @@ register_fail:
 }
 
 #define Intf2Hwois(si) container_of(si, hw_ois_t, intf)
-extern void hw_ois_unregister(hw_ois_intf_t *intf)
+void hw_ois_unregister(hw_ois_intf_t *intf)
 {
 	struct v4l2_subdev* subdev = NULL;
 	hw_ois_t* hw_ois = Intf2Hwois(intf);
@@ -239,3 +240,5 @@ extern void hw_ois_unregister(hw_ois_intf_t *intf)
 	kzfree(hw_ois->ois_info);
 	kzfree(hw_ois);
 }
+
+//lint -restore

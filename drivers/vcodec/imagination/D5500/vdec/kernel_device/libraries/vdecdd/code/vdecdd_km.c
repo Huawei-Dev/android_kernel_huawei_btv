@@ -362,6 +362,7 @@ static IMG_VOID vdeckm_fnDevPowerPreS5(
     VDECDD_sDdDevContext *            psDdDevContext = (VDECDD_sDdDevContext *)pvDevInstanceData;
 
     /* Pass on to core. */
+    REPORT(REPORT_MODULE_VDECDD, REPORT_INFO, "enter %s at line %d \n", __FUNCTION__, __LINE__);
     CORE_DevPowerPreS5(psDdDevContext);
 }
 

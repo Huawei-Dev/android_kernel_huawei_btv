@@ -36,11 +36,12 @@
 #include <media/v4l2-subdev.h>
 #include "hwvcm.h"
 
+//lint -save -e429
 #define SD2Vcm(sd) container_of(sd, hw_vcm_t, subdev)
 
 int hw_vcm_get_dt_data(struct platform_device *pdev, vcm_t *vcm)
 {
-	struct device_node *of_node = pdev->dev.of_node;
+	struct device_node *dev_node = pdev->dev.of_node;
 	struct hw_vcm_info *vcm_info = NULL;
 	int rc = 0;
 
@@ -51,28 +52,28 @@ int hw_vcm_get_dt_data(struct platform_device *pdev, vcm_t *vcm)
 	}
 	vcm->vcm_info = vcm_info;
 
-	rc = of_property_read_string(of_node, "hisi,vcm-name", &vcm_info->vcm_name);
+	rc = of_property_read_string(dev_node, "hisi,vcm-name", &vcm_info->vcm_name);
 	cam_info("%s hisi,vcm-name %s, rc %d\n", __func__, vcm_info->vcm_name, rc);
 	if (rc < 0) {
 		cam_err("%s failed %d\n", __func__, __LINE__);
 		goto fail;
 	}
 
-	rc = of_property_read_u32(of_node, "hisi,vcm-index", &vcm_info->index);
+	rc = of_property_read_u32(dev_node, "hisi,vcm-index", (u32 *)&vcm_info->index);
 	cam_info("%s hisi,vcm-index %d, rc %d\n", __func__, vcm_info->index, rc);
 	if (rc < 0) {
 		cam_err("%s failed %d\n", __func__, __LINE__);
 		goto fail;
 	}
 
-	rc = of_property_read_u32(of_node, "hisi,slave-addr", &vcm_info->slave_address);
+	rc = of_property_read_u32(dev_node, "hisi,slave-addr", &vcm_info->slave_address);
 	cam_info("%s hisi,slave-addr 0x%x, rc %d\n", __func__, vcm_info->slave_address, rc);
 	if (rc < 0) {
 		cam_err("%s failed %d\n", __func__, __LINE__);
 		goto fail;
 	}
 
-	rc = of_property_read_u32(of_node, "hisi,data-type", &vcm_info->data_type);
+	rc = of_property_read_u32(dev_node, "hisi,data-type", (u32 *)&vcm_info->data_type);
 	cam_info("%s hisi,data-type 0x%x, rc %d\n", __func__, vcm_info->data_type, rc);
 	if (rc < 0) {
 		cam_err("%s failed %d\n", __func__, __LINE__);
@@ -231,7 +232,7 @@ register_fail:
 }
 
 #define Intf2Hwvcm(si) container_of(si, hw_vcm_t, intf)
-extern void hw_vcm_unregister(hw_vcm_intf_t *intf)
+void hw_vcm_unregister(hw_vcm_intf_t *intf)
 {
 	struct v4l2_subdev* subdev = NULL;
 	hw_vcm_t* hw_vcm = Intf2Hwvcm(intf);
@@ -243,3 +244,5 @@ extern void hw_vcm_unregister(hw_vcm_intf_t *intf)
 	kzfree(hw_vcm->vcm_info);
 	kzfree(hw_vcm);
 }
+
+//lint -restore

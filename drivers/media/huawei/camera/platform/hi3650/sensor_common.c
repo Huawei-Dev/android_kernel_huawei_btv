@@ -18,6 +18,9 @@
 #include "hw_pmic.h"
 //#include "isp_ops.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
+
 static int is_fpga = 0; //default is no fpga
 static atomic_t volatile s_powered = ATOMIC_INIT(0);
 
@@ -120,22 +123,6 @@ int mclk_config(sensor_t *s_ctrl, unsigned int id, unsigned int clk, int on)
 
     return 0;
 }
-
-void hwcam_mclk_enable(int index, int enable)
-{
-	cam_info("%s index = %d, enable=%d", __func__,index, enable);
-
-	if (POWER_ON == enable) {
-		if (CAMERA_SENSOR_PRIMARY == index) {
-			ISP_SETREG8(REG_ISP_CLK_DIVIDER, 0x44);
-		} else {
-			ISP_SETREG8(REG_ISP_CLK_DIVIDER, 0x44);
-		}
-	} else {
-		ISP_SETREG8(REG_ISP_CLK_DIVIDER, 0);
-	}
-}
-
 
 int hw_mclk_config(sensor_t *s_ctrl,
 	struct sensor_power_setting *power_setting, int state)
@@ -811,7 +798,7 @@ int hw_sensor_i2c_write_seq( sensor_t *s_ctrl, void *data)
 	int data_length = sizeof(struct sensor_i2c_reg)*cdata->cfg.setting.size;
 	long rc = 0;
 
-	cam_info("%s: enter setting=%p size=%d.\n", __func__,
+	cam_info("%s: enter setting=%pK size=%d.\n", __func__,
 			cdata->cfg.setting.setting,
 			(unsigned int)cdata->cfg.setting.size);
 
@@ -838,42 +825,6 @@ out:
 	kfree(setting.setting);
 	return rc;
 }
-#if 0
-int hisi_sensor_apply_expo_gain(struct hisi_sensor_ctrl_t *s_ctrl, void *data)
-{
-	struct sensor_cfg_data *cdata = (struct sensor_cfg_data *)data;
-	struct expo_gain_seq me_seq = cdata->cfg.me_seq;
-	struct hisi_sensor_t *sensor = s_ctrl->sensor;
-	int i;
-
-	cam_debug("seq_size[%d]", me_seq.seq_size);
-	for(i = 0; i < me_seq.seq_size; i++) {
-		cam_debug("expo[0x%04x], gain[0x%02x]", me_seq.expo[i], me_seq.gain[i]);
-	}
-	cam_debug("eof trigger[%d]\n", me_seq.eof_trigger);
-
-	if(sensor->sensor_info->sensor_type == 1) {/*ov sensor*/
-		memmove(me_seq.gain + 1, me_seq.gain, sizeof(u32) * me_seq.seq_size);
-		me_seq.expo[me_seq.seq_size] = me_seq.expo[me_seq.seq_size - 1];
-		me_seq.seq_size++;
-	}
-
-	for(i = 0; i < me_seq.seq_size; i++) {
-		cam_debug("expo[0x%04x], gain[0x%02x], hts[0x%02x], vts[0x%02x]",
-			me_seq.expo[i], me_seq.gain[i], me_seq.hts, me_seq.vts);
-	}
-
-	return hw_setup_eof_tasklet(sensor, &me_seq);
-
-}
-
-int hisi_sensor_suspend_eg_task(struct hisi_sensor_ctrl_t *s_ctrl)
-{
-	cam_debug("enter %s", __func__);
-
-	return hw_destory_eof_tasklet();
-}
-#endif
 
 int hwsensor_writefile(int index, const char *sensor_name)
 {
@@ -1056,7 +1007,7 @@ int hw_sensor_get_dt_data(struct platform_device *pdev,
         sizeof(u32));
     if (count > 0) {
         ret = of_property_read_u32_array(of_node, "huawei,csi_index",
-            &sensor_info->csi_id, count);
+            (unsigned int *)&sensor_info->csi_id, count);
     } else {
         sensor_info->csi_id[0] = sensor_info->sensor_index;
         sensor_info->csi_id[1] = -1;
@@ -1074,7 +1025,7 @@ int hw_sensor_get_dt_data(struct platform_device *pdev,
         sensor_info->i2c_id[1] = -1;
     }
     cam_info("sensor:%s i2c_id[0-1]=%d:%d", sensor_info->name,
-			sensor_info->i2c_id[0], sensor_info->i2c_id[1]);
+			(unsigned int *)sensor_info->i2c_id[0], sensor_info->i2c_id[1]);
 
     rc = of_property_read_u32(of_node, "module_type", &sensor_info->module_type);
     cam_info("%s module_type 0x%x, rc %d\n", __func__, sensor_info->module_type, rc);
@@ -1108,4 +1059,4 @@ int hw_is_fpga_board(void)
 	return is_fpga;
 }
 EXPORT_SYMBOL(hw_is_fpga_board);
-
+#pragma GCC diagnostic pop

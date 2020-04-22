@@ -29,7 +29,7 @@
 #include "cam_log.h"
 #include <dsm/dsm_pub.h>
 
-#define  DSM_DEV_BUFF_SIZE 30000
+#define  DSM_DEV_BUFF_SIZE 1024
 #define  HwtoHisp(isp_intf) container_of(isp_intf, hisp_t, hw)
 #define CREATE_TRACE_POINTS
 #include "trace_hisp.h"

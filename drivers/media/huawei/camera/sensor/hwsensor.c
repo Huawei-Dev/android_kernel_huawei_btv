@@ -18,6 +18,9 @@
 #include "sensor_commom.h"
 #include "cam_log.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+
 typedef struct _tag_hwsensor
 {
     struct v4l2_subdev                          subdev;
@@ -264,7 +267,9 @@ hwsensor_v4l2_enum_fmt(
 static struct v4l2_subdev_video_ops
 s_subdev_video_ops_hwsensor =
 {
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 4, 0))
     .enum_mbus_fmt = hwsensor_v4l2_enum_fmt,
+#endif
 };
 
 static struct v4l2_subdev_ops
@@ -335,4 +340,4 @@ hwsensor_unregister(hwsensor_intf_t* si)
 
     kzfree(sensor);
 }
-
+#pragma GCC diagnostic pop

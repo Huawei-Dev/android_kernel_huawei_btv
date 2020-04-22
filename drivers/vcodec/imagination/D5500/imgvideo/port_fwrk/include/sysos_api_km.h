@@ -463,6 +463,32 @@ extern IMG_RESULT SYSOSKM_WaitEventObject(
     IMG_BOOL            bUninterruptible
 );
 
+/*!
+******************************************************************************
+
+ @Function				SYSOSKM_WaitEventObject_Timeout
+
+ @Description
+
+ This function is used to wait for an event on a event object.
+
+ NOTE: Because Linux may "interrupt" the wait and require a return to user mode
+ (this happens when using gdb/ddd to debug user mode application that are using
+ the Portability Framework) then IMG_ERROR_INTERRUPTED may be returned by
+ SYSOSKM_WaitEventObject(). The calling code should detect this return to user
+ mode before re-initiate the command and waiting for the event to complete normally.
+
+ @Input hEventHandle : The event object handle returned by
+                        SYSOSKM_CreateEventObject().
+
+ @Return IMG_RESULT : This function returns either IMG_SUCCESS or IMG_ERROR_INTERRUPTED
+                      or an error code.
+
+******************************************************************************/
+extern IMG_RESULT SYSOSKM_WaitEventObject_Timeout(
+    IMG_HANDLE hEventHandle,
+    IMG_UINT   uiTimeS
+);
 
 /*!
 ******************************************************************************

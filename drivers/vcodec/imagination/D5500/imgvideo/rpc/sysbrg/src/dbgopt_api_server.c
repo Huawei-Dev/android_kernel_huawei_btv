@@ -55,8 +55,12 @@ IMG_VOID DBGOPTBRG_dispatch(SYSBRG_sPacket *psPacket)
 	DBGOPTBRG_sCmdMsg sCommandMsg;
 	DBGOPTBRG_sRespMsg sResponseMsg;
 
+
 	if(SYSOSKM_CopyFromUser(&sCommandMsg, psPacket->pvCmdData, sizeof(sCommandMsg)))
+	{
 		IMG_ASSERT(!"failed to copy from user");
+		return;
+	}
 
 	switch (sCommandMsg.eFuncId)
 	{
@@ -226,4 +230,5 @@ IMG_VOID DBGOPTBRG_dispatch(SYSBRG_sPacket *psPacket)
 	}
 	if(SYSOSKM_CopyToUser(psPacket->pvRespData, &sResponseMsg, sizeof(sResponseMsg)))
 		IMG_ASSERT(!"failed to copy to user");
+
 }

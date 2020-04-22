@@ -98,13 +98,6 @@ extern SYSDEVU_sInfo topaz_device;
 //extern IMG_UINT32 gui32SysMemId;
 
 /************************************************** Internal data structures */
-enum heap_ids
-{
-		MMU_TILED_HEAP_ID		= 0x00,
-		MMU_GENERAL_HEAP_ID		= 0x01,
-		// Do not remove - keeps count of size
-		HEAP_ID_NO_OF_HEAPS
-};
 
 // These determine the sizes of the MMU heaps we are using.
 // The tiled heap is set arbitrarily large at present.

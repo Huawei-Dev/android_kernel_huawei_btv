@@ -27,6 +27,7 @@
 #include "hisp_intf.h"
 #include "platform/sensor_commom.h"
 #include <linux/wakelock.h>
+#include <linux/platform_data/remoteproc-hisi.h>
 #include "trace_hisp.h"
 
 
@@ -34,6 +35,8 @@
 #include <linux/hisi/hilog.h>
 #define HILOG_CAMERA_MODULE_NAME    "Camera"
 #define HILOG_CAMERA_SUBMODULE_NAME    "FW_Interaction"
+
+#define HiLOGE(module, sub_module, fmt, ...)
 
 DEFINE_MUTEX(hisi_rpmsg_service_mutex);
 DEFINE_MUTEX(hisp_wake_lock_mutex);
@@ -213,10 +216,6 @@ void hisp100_set_timestamp(unsigned int *timestampH, unsigned int *timestampL)
 	fw_micro_second =
 	    (micro_second / MICROSECOND_PER_SECOND + s_timeval.tv_sec) * MICROSECOND_PER_SECOND
 		+ ((micro_second % MICROSECOND_PER_SECOND) + s_timeval.tv_usec);
-#if 0
-	do_gettimeofday(&s_timeval);
-	fw_micro_second= s_timeval.tv_sec * MICROSECOND_PER_SECOND + s_timeval.tv_usec;
-#endif
 
 	*timestampH = (u32)(fw_micro_second >>32 & 0xFFFFFFFF);
 	*timestampL = (u32)(fw_micro_second & 0xFFFFFFFF);
@@ -312,53 +311,6 @@ static void hisp100_save_rpmsg_data(void *data, int len)
 
 	trace_hisp_rpmsg_notify((hisp_msg_t*)data);
 }
-
-/*Function declaration */
-/**********************************************
- *Power up CSI/DPHY/sensor according to isp req
- *Only called by hisp100_rpmsg_ept_cb when api_name
- *is POWER_REQ, and will send a POWER_RSP to isp
- *after power request done.
- *********************************************/
-#if 0
-static void
-hisp100_power_req(hisp_msg_t *msg, int len)
-{
-	struct rpmsg_hisp100_service *hisi_serv = rpmsg_local.hisi_isp_serv;
-
-	cam_info("Enter %s\n", __func__);
-	if (NULL == hisi_serv){
-		cam_err("func %s: hisi_serv is NULL",__func__);
-		return;
-	}
-	if (NULL == msg){
-		cam_err("func %s: msg is NULL",__func__);
-		return;
-	}
-#if 0
-	hisp_assert(POWER_REQ == msg->api_name);
-	hisp_assert(HISP_SERV_FIRST_RECV != hisi_serv->recv_count);
-
-	switch (msg->u.req_power.power_req_nr) {
-		/*TODO: power up csi/DPHY/sensor according to isp req*/
-	default:
-		cam_info("%s invalid req_power!\n", __func__);
-		break;
-	}
-	msg->api_name = POWER_RSP;
-#endif
-#ifdef FAKE_FW
-	fake_rpmsg_send(hisi_serv->rpdev, (void *)msg, len);
-#else
-	if (0 != rpmsg_send_offchannel(hisi_serv->rpdev, hisi_serv->ept->addr,
-		hisi_serv->dst, (void *)msg, len)){
-		cam_err("func %s failed  \n", __func__);
-		return;
-	}
-#endif
-	cam_info("%s Not implement yet ....\n", __func__);
-}
-#endif
 
 static void
 hisp100_rpmsg_ept_cb(struct rpmsg_channel *rpdev,
@@ -670,26 +622,7 @@ static int hisp100_power_off(hisp_intf_t *i)
 	hisi_serv->recv_count = HISP_SERV_FIRST_RECV;
 
 	if (atomic_read((&hi->opened))) {
-
-#if 0
-		rc = rpmsg_reset_device();
-		if (rc != 0) {
-			cam_err("%s() %d failed: rpmsg_reset_device ret is %d!\n", __func__,
-					__LINE__, rc);
-		}
-
-		/*todo: release resources here */
-		/*
-		 *If state == fail, remote processor crashed, so don't send it
-		 *any message.
-		 */
-		hisi_rproc_flush();
-		hisi_isp_rproc_device_disable();
-		//print_rpmsg_vq_msg();
-#else
 		hisi_isp_rproc_disable();
-#endif
-
 		if (!hw_is_fpga_board()) {
 			if (!IS_ERR(hi->dt.pinctrl_idle)) {
 				rc = pinctrl_select_state(hi->dt.pinctrl, hi->dt.pinctrl_idle);
@@ -1055,6 +988,8 @@ static const struct of_device_id s_hisp100_dt_match[] = {
 MODULE_DEVICE_TABLE(of, s_hisp100_dt_match);
 
 static struct rpmsg_driver rpmsg_hisp100_driver = {
+	.drv.name   = KBUILD_MODNAME, //lint !e64 !e485
+	.drv.owner  = THIS_MODULE, //lint !e64 !e485
 	.id_table = rpmsg_hisp100_id_table,
 	.probe = hisp100_rpmsg_probe,
 	.callback = hisp100_rpmsg_driver_cb,

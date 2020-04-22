@@ -295,14 +295,21 @@ static int ov8856_config(hwsensor_intf_t* si, void  *argp)
 		return -1;
 	}
 
+    static bool ov8856_power_on = false;
     data = (struct sensor_cfg_data *)argp;
     cam_debug("ov8856 cfgtype = %d",data->cfgtype);
     switch(data->cfgtype){
         case SEN_CONFIG_POWER_ON:
-            ret = si->vtbl->power_up(si);
+            if (!ov8856_power_on) {
+                ret = si->vtbl->power_up(si);
+                ov8856_power_on = true;
+                }
             break;
         case SEN_CONFIG_POWER_OFF:
-            ret = si->vtbl->power_down(si);
+            if (ov8856_power_on) {
+                ret = si->vtbl->power_down(si);
+                ov8856_power_on = false;
+            }
             break;
         case SEN_CONFIG_WRITE_REG:
             break;

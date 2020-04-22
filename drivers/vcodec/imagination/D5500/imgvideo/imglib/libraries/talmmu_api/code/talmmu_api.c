@@ -2549,6 +2549,11 @@ IMG_RESULT TALMMU_GetHeapHandle(
 
     for (i=0; i<psDevMemContext->ui32NoHeaps; i++)
     {
+        if (NULL == psDevMemContext->pasDevMemHeap[i])
+        {
+            return IMG_ERROR_INVALID_PARAMETERS;
+        }
+
         if (psDevMemContext->pasDevMemHeap[i]->sHeapInfo.ui32HeapId == ui32HeapId)
         {
             *phDevMemHeap = psDevMemContext->pasDevMemHeap[i];
@@ -3375,6 +3380,13 @@ IMG_RESULT TALMMU_DevMemMap(
     IMG_HANDLE                hDevMemContext;
     IMG_UINT32                ui32Result;
 
+    IMG_ASSERT(hMemory != IMG_NULL);
+    if (!hMemory)
+    {
+        ui32Result = IMG_ERROR_INVALID_PARAMETERS;
+        return ui32Result;
+    }
+
     IMG_ASSERT(gInitialised);
     IMG_ASSERT(psMemory->bMapped);
 
@@ -3473,6 +3485,12 @@ IMG_RESULT TALMMU_CopyTileBuffer(
 {
     TALMMU_sMemory *  psMemory = hMemory;
     IMG_UINT32        ui32Result;
+
+    IMG_ASSERT(hMemory != IMG_NULL);
+    if (!hMemory)
+    {
+        return IMG_ERROR_INVALID_PARAMETERS;
+    }
 
     IMG_ASSERT(gInitialised);
     IMG_ASSERT(psMemory->bMapped);

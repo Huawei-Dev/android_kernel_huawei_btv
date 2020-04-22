@@ -391,6 +391,7 @@ IMG_RESULT ADDR_CxDefineMemoryRegion(
                 goto error;
             }
 
+            //Add to end of list
             psTmpRegion->psNextRegion = psRegion;
         }
         else

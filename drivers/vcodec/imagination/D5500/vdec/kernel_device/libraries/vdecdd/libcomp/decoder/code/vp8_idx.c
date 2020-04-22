@@ -52,7 +52,7 @@
 extern IMG_UINT16 gaui16vp8VlcIndexData[][3];
 extern const IMG_UINT8	gui8vp8VlcIndexSize;
 
-IMG_UINT16 gaui16vp8VlcIndexData[1][3] = {{ 0,0,0 }};
+IMG_UINT16 gaui16vp8VlcIndexData[][3] = {{ 0,0,0 }};
 const IMG_UINT8	gui8vp8VlcIndexSize = 1;
 
 /* EOF */
