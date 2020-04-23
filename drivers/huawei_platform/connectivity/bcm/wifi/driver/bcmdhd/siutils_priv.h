@@ -114,6 +114,9 @@ typedef struct si_info {
 	void *cores_info;
 	gci_gpio_item_t	*gci_gpio_head;	/* gci gpio interrupts head */
 	uint	chipnew;		/* new chip number */
+#ifdef BCM_PCIE_UPDATE
+	uint second_bar0win;		/* Backplane region */
+#endif
 } si_info_t;
 
 

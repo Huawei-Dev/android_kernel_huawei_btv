@@ -1,4 +1,19 @@
-
+/* Copyright (c) 2009-2013,	Code Aurora	Forum. All rights reserved.
+ *
+ * This	program	is free	software; you can redistribute it and/or modify
+ * it under	the	terms of the GNU General Public	License	version	2 and
+ * only	version	2 as published by the Free Software	Foundation.
+ *
+ * This	program	is distributed in the hope that	it will	be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A	PARTICULAR PURPOSE.	 See the
+ * GNU General Public License for more details.
+ *
+ * You should have received	a copy of the GNU General Public License
+ * along with this program;	if not,	write to the Free Software
+ * Foundation, Inc., 51	Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+ */
 
 
 /*
@@ -279,23 +294,24 @@ Others:         NA
 					  size_t len, loff_t *off)
 {
        char BtCalDateBuf[BLUETOOTH_HUAWEI_NV_BTNVRAM_LENGTH + 1];
+	int CalDataLen = 0;
 
 	pr_info("bluetooth_power_read_data_calibrate \n");
 
-	len = bluetooth_power_load_calibrate_data(BtCalDateBuf, sizeof(BtCalDateBuf));
-	if (len <= 0) {
+	CalDataLen = bluetooth_power_load_calibrate_data(BtCalDateBuf, sizeof(BtCalDateBuf));
+	if (CalDataLen <= 0) {
 		pr_err("%s: calibrate data is empty, no need to calibrate nvram\n",  __func__);
 		return -EINVAL;
 
 	}
 
-	if( 0 != copy_to_user(buffer, BtCalDateBuf, len))
+	if( 0 != copy_to_user(buffer, BtCalDateBuf, CalDataLen))
 	{
 		pr_err("bluetooth_power_read_data_calibrate copy to user failed \n");
 		return -EFAULT;
 	}
 
-	pr_info("bluetooth_power_read_data_calibrate read success !! len =%d \n", len);
+	pr_info("bluetooth_power_read_data_calibrate read success !! len =%d \n", CalDataLen);
 	return 0;
 }
 
@@ -650,4 +666,4 @@ static void __exit bluetooth_power_exit(void)
 module_init(bluetooth_power_init);
 module_exit(bluetooth_power_exit);
 
-MODULE_LICENSE("GPL	v2");
+MODULE_LICENSE("GPL v2");

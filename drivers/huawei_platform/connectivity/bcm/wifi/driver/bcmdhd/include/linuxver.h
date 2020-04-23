@@ -567,7 +567,33 @@ static inline bool binary_sema_down(tsk_ctl_t *tsk)
 	} else
 		return true;
 }
+#ifdef DHD_DEVWAKE_EARLY
+static inline bool binary_sema_down_ex(tsk_ctl_t *tsk)
+{
+	unsigned long flags = 0;
 
+	spin_lock_irqsave(&tsk->spinlock, flags);
+	if (tsk->up_cnt == 1)
+		tsk->up_cnt--;
+	spin_unlock_irqrestore(&tsk->spinlock, flags);
+
+	if (down_interruptible(&tsk->sema) == 0) {
+		return false;
+	} else
+		return true;
+}
+static inline bool binary_sema_task_is_running(tsk_ctl_t *tsk)
+{
+	unsigned long flags = 0;
+	bool is_running = false;
+
+	spin_lock_irqsave(&tsk->spinlock, flags);
+	if (tsk->up_cnt) is_running = true;
+	spin_unlock_irqrestore(&tsk->spinlock, flags);
+
+	return is_running;
+}
+#endif
 static inline bool binary_sema_up(tsk_ctl_t *tsk)
 {
 	bool sem_up = false;
@@ -604,10 +630,16 @@ static inline bool binary_sema_up(tsk_ctl_t *tsk)
 	(tsk_ctl)->proc_name = name;  \
 	(tsk_ctl)->terminated = FALSE; \
 	(tsk_ctl)->p_task  = kthread_run(thread_func, tsk_ctl, (char*)name); \
-	(tsk_ctl)->thr_pid = (tsk_ctl)->p_task->pid; \
-	spin_lock_init(&((tsk_ctl)->spinlock)); \
-	DBG_THR(("%s(): thread:%s:%lx started\n", __FUNCTION__, \
-		(tsk_ctl)->proc_name, (tsk_ctl)->thr_pid)); \
+	if (IS_ERR((tsk_ctl)->p_task)) { \
+		(tsk_ctl)->thr_pid = DHD_PID_KT_INVALID; \
+                DBG_THR(("%s(): thread:%s:%lx failed\n", __FUNCTION__, \
+                        (tsk_ctl)->proc_name, (tsk_ctl)->thr_pid)); \
+	} else { \
+		(tsk_ctl)->thr_pid = (tsk_ctl)->p_task->pid; \
+		spin_lock_init(&((tsk_ctl)->spinlock)); \
+		DBG_THR(("%s(): thread:%s:%lx started\n", __FUNCTION__, \
+			(tsk_ctl)->proc_name, (tsk_ctl)->thr_pid)); \
+	} \
 }
 
 #define PROC_STOP(tsk_ctl) \

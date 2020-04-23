@@ -1,7 +1,11 @@
 #ifndef __HW_COUNTRY_CODE_H__
 #define __HW_COUNTRY_CODE_H__
 
-#include <wl_iw.h>
+struct cntry_locales_custom {
+	char iso_abbrev[WLC_CNTRY_BUF_SZ];
+	char custom_locale[WLC_CNTRY_BUF_SZ];
+	int32 custom_locale_rev;
+};
 
 /* Customized Locale table : OPTIONAL feature */
 const struct cntry_locales_custom hw_translate_custom_table[] = {
@@ -48,6 +52,7 @@ const struct cntry_locales_custom hw_translate_custom_table[] = {
     {"KY", "KY", 3},
     {"CN", "CN", 38},
     {"CR", "CR", 17},
+    {"CO", "CO", 17},
     {"HR", "HR", 4},
     {"CY", "CY", 4},
     {"CZ", "CZ", 4},
@@ -117,12 +122,12 @@ const struct cntry_locales_custom hw_translate_custom_table[] = {
     {"LK", "LK", 1},
     {"SE", "SE", 4},
     {"CH", "CH", 4},
-    {"TW", "TW", 1},
+    {"TW", "TW", 65},
     {"TH", "TH", 5},
     {"TT", "TT", 3},
     {"TR", "TR", 7},
     {"AE", "AE", 6},
-    {"UG", "UG", 2},
+    {"UG", "TW", 1},
     {"GB", "GB", 6},
     {"UY", "UY", 0},
     {"VI", "VI", 13},
@@ -133,7 +138,7 @@ const struct cntry_locales_custom hw_translate_custom_table[] = {
     {"EC", "EC", 21},
     {"SV", "SV", 25},
     {"KR", "KR", 48},
-    {"RU", "RU", 13},
+    {"RU", "RU", 984},
     {"GT", "GT", 1},
     {"FR", "FR", 5},
     {"MN", "MN", 1},

@@ -42,7 +42,8 @@
 #include <linux/of.h>
 #include <linux/of_platform.h>
 #include <linux/of_device.h>
-
+#include <linux/sysfs.h>
+#include <linux/of_device.h>
 #ifdef CONFIG_HWCONNECTIVITY
 #include <huawei_platform/connectivity/hw_connectivity.h>
 #endif
@@ -59,6 +60,10 @@ extern int get_gps_ic_type(void);
 #define GPS_IC_TYPE_4752 4752
 #define GPS_IC_TYPE_47531 47531
 #define GPS_IC_TYPE_4774 4774
+
+#define GPSINFO(fmt, args...)	pr_info("[DRV_GPS, I %s:%d]" fmt "\n",  __func__,  __LINE__, ## args)
+#define GPSDBG(fmt, args...)	pr_debug("[DRV_GPS, D %s:%d]" fmt "\n",  __func__,  __LINE__, ## args)
+#define GPSERR(fmt, args...)	pr_err("[DRV_GPS, E %s:%d]" fmt "\n",  __func__, __LINE__, ## args)
 
 typedef struct gps_bcm_info {
 	struct gpio gpioid_en;
@@ -94,7 +99,7 @@ static struct clk *gps_ref_clk;
 static GPS_BCM_INFO *g_gps_bcm;
 static struct proc_dir_entry *gps_dir;
 static struct gps_geofence_wake g_geofence_wake;
-
+static int lhdstat = 0;
 char *Gps_DtsNodeName[] = {
 	"huawei,mcu_req",
 	"huawei,mcu_req_rsp",
@@ -107,22 +112,44 @@ char *Gps_DeviceNodeName[] = {
 	"nstandby"
 };
 
+/* read lhdstat value */
+static ssize_t lhd_status_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+    return sprintf(buf, "%d\n", lhdstat);
+}
+
+/*  write lhdstat value  */
+static ssize_t lhd_status_store(struct device *dev, struct device_attribute *attr,
+            const char *buf, size_t count)
+{
+    sscanf(buf, "%du", &lhdstat);
+    return count;
+}
+
+static struct device_attribute lhdstat_attr[]= {
+    __ATTR(lhd_status, 0664, lhd_status_show, lhd_status_store),
+};
+
+int gps_get_lhd_status(void)
+{
+    return lhdstat;
+}
 static int gps_geofence_wake_open(struct inode *inode, struct file *filp)
 {
-	pr_info("%s\n", __func__);
+	GPSINFO("be called.");
 	return 0;
 }
 
 static int gps_geofence_wake_release(struct inode *inode, struct file *filp)
 {
-	pr_info("%s\n", __func__);
+	GPSINFO("be called.");
 	return 0;
 }
 
 static int gps_geofence_wake_ioctl(struct file *filp, unsigned int cmd,
 				   unsigned int arg)
 {
-	pr_info("%s\n", __func__);
+	GPSINFO("be called.");
 	return 0;
 }
 
@@ -169,10 +196,10 @@ static int gps_gpio_irq_init(int gpio)
 	int ret = 0;
 	int irq = 0;
 
-	pr_info("[gps]%s\n", __func__);
+	GPSDBG("be called.");
 	/*1. Set GPIO*/
 	if ((gpio_request(gpio, "gps_host_wake"))) {
-		printk
+		GPSERR
 		    ("[gps]Can't request HOST_REQ GPIO %d.It may be already registered in init.xyz.3rdparty.rc/init.xyz.rc\n",
 		     gpio);
 		return -EIO;
@@ -187,7 +214,7 @@ static int gps_gpio_irq_init(int gpio)
 	/*2. Set IRQ*/
 	irq = gpio_to_irq(gpio);
 	if (irq < 0) {
-		pr_info("[gps]Could not get HOST_WAKE_GPIO = %d!, err = %d\n",
+		GPSERR("Could not get HOST_WAKE_GPIO = %d!, err = %d.",
 		       gpio, irq);
 		gpio_free(gpio);
 		return -EIO;
@@ -199,7 +226,7 @@ static int gps_gpio_irq_init(int gpio)
 			IRQF_TRIGGER_FALLING | IRQF_ONESHOT, "gps_host_wake",
 			NULL);
 	if (ret) {
-		pr_info("[gps]Request_host wake irq failed.\n");
+		GPSERR("[gps]Request_host wake irq failed.");
 		gpio_free(gpio);
 		return -EIO;
 	}
@@ -207,7 +234,7 @@ static int gps_gpio_irq_init(int gpio)
 	ret = irq_set_irq_wake(irq, 1);
 
 	if (ret) {
-		pr_info("[gps]Set_irq_wake failed.\n");
+		GPSERR("Set_irq_wake failed.");
 		gpio_free(gpio);
 		free_irq(irq, NULL);
 		return -EIO;
@@ -219,7 +246,7 @@ static int gps_gpio_irq_init(int gpio)
 /* cleanup GPIO and IRQ*/
 static void gps_gpio_irq_cleanup(int gpio, int irq)
 {
-	pr_debug("[gps]%s\n", __func__);
+	GPSDBG("be called.");
 	gpio_free(gpio);
 	free_irq(irq, NULL);
 }
@@ -229,26 +256,26 @@ static ssize_t gps_write_proc_nstandby(struct file *filp,
 				       loff_t *off)
 {
 	char gps_nstandby = '0';
-	pr_info("[GPS] gps_write_proc_nstandby\n");
+	GPSINFO("gps_write_proc_nstandby.");
 
 	if ((len < 1) || (NULL == g_gps_bcm)) {
-		pr_err("[GPS] gps_write_proc_nstandby g_gps_bcm is NULL or read length = 0.\n");
+		GPSERR("gps_write_proc_nstandby g_gps_bcm is NULL or read length = 0.");
 		return -EINVAL;
 	}
 
 	if (copy_from_user(&gps_nstandby, buffer, sizeof(gps_nstandby))) {
-		pr_err("[GPS] gps_write_proc_nstandby copy_from_user failed!\n");
+		GPSERR("gps_write_proc_nstandby copy_from_user failed!");
 		return -EFAULT;
 	}
 
 	if (gps_nstandby == '0') {
-		pr_info("[GPS] gps nstandby.\n");
+		GPSINFO("gps nstandby.");
 		gpio_set_value(g_gps_bcm->gpioid_en.gpio, GPS_STANDBY);
 	} else if (gps_nstandby == '1') {
-		pr_info("[GPS] gps active.\n");
+		GPSINFO("[GPS] gps active.");
 		gpio_set_value(g_gps_bcm->gpioid_en.gpio, GPS_ACTIVE);
 	} else {
-		pr_err("[GPS] gps nstandby write error code[%d].\n",
+		GPSERR(" gps nstandby write error code[%d].",
 		       gps_nstandby);
 	}
 
@@ -263,23 +290,23 @@ static ssize_t gps_read_proc_nstandby(struct file *filp,
 	char tmp[2];
 
 	memset(tmp, 0, sizeof(tmp));
-	pr_info("[GPS] gps_read_proc_nstandby\n");
+	GPSINFO(" gps_read_proc_nstandby.");
 	if (len < 1 || NULL == g_gps_bcm) {
-		pr_err("[GPS] gps_read_proc_nstandby g_gps_bcm is NULL or read length = 0.\n");
+		GPSERR(" gps_read_proc_nstandby g_gps_bcm is NULL or read length = 0.");
 		return -EINVAL;
 	}
 	len = 1;
-	pr_info("[GPS] gps_read_proc_nstandby off = %d\n",
+	GPSINFO(" gps_read_proc_nstandby off = %d.",
 	       (unsigned int)*off);
 	if ((unsigned int)*off > 0) {
 		return 0;
 	}
 	gps_nstandby = gpio_get_value(g_gps_bcm->gpioid_en.gpio);
 	sprintf(tmp, "%d", gps_nstandby);
-	pr_info("[GPS] gps nstandby status[%s]\n", tmp);
+	GPSINFO(" gps nstandby status[%s]", tmp);
 
 	if (copy_to_user(buffer, tmp, len)) {
-		pr_err("[GPS] gps_read_proc_nstandby copy_to_user failed!\n");
+		GPSERR("[GPS] gps_read_proc_nstandby copy_to_user failed!");
 		return -EFAULT;
 	}
 	*off += len;
@@ -299,26 +326,26 @@ static ssize_t gps_write_proc_mcureq(struct file *filp,
 {
 	char gps_nstandby = '0';
 
-	pr_info("[GPS] gps_write_proc_nstandby\n");
+	GPSINFO(" gps_write_proc_nstandby");
 
 	if ((len < 1) || (NULL == g_gps_bcm)) {
-		pr_err("[GPS] gps_write_proc_mcureq g_gps_bcm is NULL or read length = 0.\n");
+		GPSERR(" gps_write_proc_mcureq g_gps_bcm is NULL or read length = 0.");
 		return -EINVAL;
 	}
 
 	if (copy_from_user(&gps_nstandby, buffer, sizeof(gps_nstandby))) {
-		pr_err("[GPS] gps_write_proc_mcureq copy_from_user failed!\n");
+		GPSERR(" gps_write_proc_mcureq copy_from_user failed!");
 		return -EFAULT;
 	}
 
 	if (gps_nstandby == '0') {
-		pr_info("[GPS] gps nstandby.\n");
+		GPSINFO(" gps nstandby.");
 		gpio_set_value(g_gps_bcm->mcu_req.gpio, GPS_STANDBY);
 	} else if (gps_nstandby == '1') {
-		pr_info("[GPS] gps active.\n");
+		GPSINFO(" gps active.");
 		gpio_set_value(g_gps_bcm->mcu_req.gpio, GPS_ACTIVE);
 	} else {
-		pr_err("[GPS] gps nstandby write error code[%d].\n",
+		GPSERR(" gps nstandby write error code[%d].",
 		       gps_nstandby);
 	}
 
@@ -333,23 +360,23 @@ static ssize_t gps_read_proc_mcureq(struct file *filp,
 	char tmp[2];
 
 	memset(tmp, 0, sizeof(tmp));
-	pr_info("[GPS] gps_read_proc_nstandby\n");
+	GPSINFO("gps_read_proc_nstandby.");
 	if (len < 1 || NULL == g_gps_bcm) {
-		pr_err("[GPS] gps_read_proc_mcureq g_gps_bcm is NULL or read length = 0.\n");
+		GPSERR(" gps_read_proc_mcureq g_gps_bcm is NULL or read length = 0.");
 		return -EINVAL;
 	}
 	len = 1;
-	pr_info("[GPS] gps_read_proc_mcureq off = %d\n",
+	GPSINFO(" gps_read_proc_mcureq off = %d.",
 	       (unsigned int)*off);
 	if ((unsigned int)*off > 0) {
 		return 0;
 	}
 	gps_nstandby = gpio_get_value(g_gps_bcm->mcu_req.gpio);
 	sprintf(tmp, "%d", gps_nstandby);
-	pr_info("[GPS] gps mcu_req status[%s]\n", tmp);
+	GPSINFO(" gps mcu_req status[%s]", tmp);
 
 	if (copy_to_user(buffer, tmp, len)) {
-		pr_err("[GPS] mcu_req copy_to_user failed!\n");
+		GPSERR(" mcu_req copy_to_user failed!");
 		return -EFAULT;
 	}
 	*off += len;
@@ -373,22 +400,22 @@ static ssize_t gps_read_proc_mcureq_rsp(struct file *filp,
 	memset(tmp, 0, sizeof(tmp));
 
 	if (1 > len || NULL == g_gps_bcm) {
-		pr_err("[GPS] gps_read_proc_mcureq  g_gps_bcm is NULL or read length = 0.\n");
+		GPSERR(" gps_read_proc_mcureq  g_gps_bcm is NULL or read length = 0.");
 		return -EINVAL;
 	}
 
 	len = 1;
-	pr_info("[GPS] gps_read_proc_nstandby off = %d\n",
+	GPSINFO(" gps_read_proc_nstandby off = %d",
 	       (unsigned int)*off);
 	if ((unsigned int)*off > 0) {
 		return 0;
 	}
 	gps_reqrsp_data = gpio_get_value(g_gps_bcm->mcu_req_rsp.gpio);
 	sprintf(tmp, "%d", gps_reqrsp_data);
-	pr_info("[GPS] gps gps_reqrsp_data status[%s]\n", tmp);
+	GPSINFO(" gps gps_reqrsp_data status[%s]", tmp);
 
 	if (copy_to_user(buffer, tmp, len)) {
-		pr_err("[GPS] gps_read_proc_nstandby copy_to_user failed!\n");
+		GPSERR(" gps_read_proc_nstandby copy_to_user failed!");
 		return -EFAULT;
 	}
 	*off += len;
@@ -402,26 +429,26 @@ static ssize_t gps_write_proc_mcureq_rsp(struct file *filp,
 {
 	char gps_nstandby = '0';
 
-	pr_info("[GPS] gps_write_proc_nstandby\n");
+	GPSINFO("[GPS] gps_write_proc_nstandby");
 
 	if ((len < 1) || (NULL == g_gps_bcm)) {
-		pr_err("[GPS] gps_write_proc_mcureq g_gps_bcm is NULL or read length = 0.\n");
+		GPSERR(" gps_write_proc_mcureq g_gps_bcm is NULL or read length = 0.");
 		return -EINVAL;
 	}
 
 	if (copy_from_user(&gps_nstandby, buffer, sizeof(gps_nstandby))) {
-		pr_err("[GPS] gps_write_proc_mcureq copy_from_user failed!\n");
+		GPSERR(" gps_write_proc_mcureq copy_from_user failed!");
 		return -EFAULT;
 	}
 
 	if (gps_nstandby == '0') {
-		pr_info("[GPS] gps nstandby.\n");
+		GPSINFO(" gps nstandby.");
 		gpio_set_value(g_gps_bcm->mcu_req_rsp.gpio, GPS_STANDBY);
 	} else if (gps_nstandby == '1') {
-		pr_info("[GPS] gps active.\n");
+		GPSINFO("[GPS] gps active.");
 		gpio_set_value(g_gps_bcm->mcu_req_rsp.gpio, GPS_ACTIVE);
 	} else {
-		pr_err("[GPS] gps nstandby write error code[%d].\n",
+		GPSERR(" gps nstandby write error code[%d].",
 		       gps_nstandby);
 	}
 
@@ -441,7 +468,7 @@ int gps_bcm4774_node_init(struct device_node *np, struct gpio *Pgpio, int node,
 
 	Pgpio->gpio = of_get_named_gpio(np, Gps_DtsNodeName[node], 0);
 	if (!gpio_is_valid(Pgpio->gpio)) {
-		pr_err("[GPS] of_get_named_gpio  %s failed.\n",
+		GPSERR(" of_get_named_gpio  %s failed.",
 		       Gps_DtsNodeName[node]);
 		ret = -1;
 		return ret;
@@ -449,7 +476,7 @@ int gps_bcm4774_node_init(struct device_node *np, struct gpio *Pgpio, int node,
 
 	ret = gpio_request(Pgpio->gpio, Gps_DeviceNodeName[node]);
 	if (ret) {
-		pr_err("[GPS] gpio_requestt [%d]%s  failed, ret:%d\n",
+		GPSERR(" gpio_requestt [%d]%s  failed, ret:%d",
 		       Pgpio->gpio, Gps_DeviceNodeName[node], ret);
 		return ret;
 	}
@@ -460,7 +487,7 @@ int gps_bcm4774_node_init(struct device_node *np, struct gpio *Pgpio, int node,
 	ret = gpio_export(Pgpio->gpio, false);
 #endif
 	if (ret) {
-		pr_err("[GPS] gpio_export %d failed, ret:%d\n",
+		GPSERR(" gpio_export %d failed, ret:%d",
 		       Pgpio->gpio, ret);
 		return ret;
 	}
@@ -468,15 +495,15 @@ int gps_bcm4774_node_init(struct device_node *np, struct gpio *Pgpio, int node,
 	/* For req */
 	ret = gpio_direction_input(Pgpio->gpio);
 	if (ret) {
-		pr_err("[GPS] gpio_direction_input %d failed, ret:0x%X\n",
+		GPSERR(" gpio_direction_input %d failed, ret:0x%X",
 		       Pgpio->gpio, ret);
 		return ret;
 	}
-	pr_info("[GPS] finish gpio_direction_input \n");
+	GPSINFO(" finish gpio_direction_input ");
 
 	ret = gpio_direction_output(Pgpio->gpio, 0);
 	if (ret) {
-		pr_err("[GPS] gpio_direction_output %d failed, ret:0x%X\n",
+		GPSERR(" gpio_direction_output %d failed, ret:0x%X",
 		       Pgpio->gpio, ret);
 		return ret;
 	}
@@ -486,7 +513,7 @@ int gps_bcm4774_node_init(struct device_node *np, struct gpio *Pgpio, int node,
 			S_IRUGO | S_IWUSR | S_IWGRP | S_IFREG, gps_dir,
 			gps_proc_fops);
 	if (!ret) {
-		pr_err("[GPS] gps create proc file [%s] failed. ret = %d\n",
+		GPSERR(" gps create proc file [%s] failed. ret = %d",
 		       Gps_DeviceNodeName[node], ret);
 		ret = -ENOMEM;
 		return ret;
@@ -505,16 +532,19 @@ static int k3_gps_bcm_probe(struct platform_device *pdev)
 	int irq = 0;
 	struct gps_geofence_wake *ac_data = &g_geofence_wake;
 
-	pr_info("[GPS] start find gps_power and ic type is 4774\n");
+	pr_info("[GPS] device_create_file\n");
+	device_create_file(gps_power_dev, lhdstat_attr);
+
+	GPSINFO(" start find gps_power and ic type is 4774");
 	gps_bcm = kzalloc(sizeof(GPS_BCM_INFO), GFP_KERNEL);
 	if (!gps_bcm) {
-		pr_err("[GPS] Alloc memory failed\n");
+		GPSERR("[GPS] Alloc memory failed");
 		return -ENOMEM;
 	}
 
 	gps_dir = proc_mkdir("gps", NULL);
 	if (!gps_dir) {
-		pr_err("[GPS] proc dir create failed\n");
+		GPSERR("[GPS] proc dir create failed");
 		ret = -ENOMEM;
 		goto err_free_gps;
 	}
@@ -523,7 +553,7 @@ static int k3_gps_bcm_probe(struct platform_device *pdev)
 	    gps_bcm4774_node_init(np, &gps_bcm->gpioid_en, GPS_PROC_EN,
 				  &gps_proc_fops_nstandby);
 	if (0 != ret) {
-		pr_err("[GPS] gps_bcm4774_node_init  gps_bcm  failed.\n");
+		GPSERR(" gps_bcm4774_node_init  gps_bcm  failed.");
 		ret = -1;
 		goto err_free_nstandby;
 	}
@@ -532,11 +562,11 @@ static int k3_gps_bcm_probe(struct platform_device *pdev)
 	    of_get_named_gpio(np, "huawei,gps_hostwake", 0);
 	if (!gpio_is_valid(gps_bcm->gpioid_hostwake.gpio)) {
 		ret = -1;
-		pr_err("[GPS] get huawei,gps_hostwake failed.\n");
+		GPSERR(" get huawei,gps_hostwake failed.");
 		goto err_free_gps_en;
 	}
 	/*1. Init GPIO and IRQ for HOST_WAKE*/
-	pr_info("[gps]%s,gps_bcm->gpioid_hostwake.gpio=%d\n", __func__,
+	GPSINFO("gps_bcm->gpioid_hostwake.gpio=%d",
 	       gps_bcm->gpioid_hostwake.gpio);
 
 	/*2. Register Driver*/
@@ -551,45 +581,45 @@ static int k3_gps_bcm_probe(struct platform_device *pdev)
 	ac_data->irq = irq;
 	ac_data->host_req_pin = gps_bcm->gpioid_hostwake.gpio;
 
-	pr_info("[gps]misc register, name %s, irq %d, host req pin num %d\n",
+	GPSINFO("misc register, name %s, irq %d, host req pin num %d",
 	       ac_data->misc.name, irq, ac_data->host_req_pin);
 	/*2.3 Register misc driver*/
 	ret = misc_register(&ac_data->misc);
 	if (0 != ret) {
 		printk
-		    ("[gps]cannot register gps geofence wake miscdev on minor=%d (%d)\n",
+		    (" cannot register gps geofence wake miscdev on minor=%d (%d)",
 		     MISC_DYNAMIC_MINOR, ret);
 		goto err_free_host_wake;
 	}
 	/*3. Init wake_lock*/
 	wake_lock_init(&ac_data->wake_lock, WAKE_LOCK_SUSPEND,
 		       "gps_geofence_wakelock");
-	pr_info("[gps]wake_lock_init done\n");
+	GPSINFO("[gps]wake_lock_init done");
 	irq = gps_gpio_irq_init(gps_bcm->gpioid_hostwake.gpio);
 	if (irq < 0) {
-		pr_info("[gps]hostwake irq error\n");
+		GPSINFO("[gps]hostwake irq error");
 		goto err_free_misc_register;
 	}
 
 	/* Set 32KC clock */
 	gps_bcm->clk = of_clk_get_by_name(np, "gps_32k");
 	if (IS_ERR(gps_bcm->clk)) {
-		pr_err("[GPS] clk_32k get failed!\n");
+		GPSERR("clk_32k get failed!");
 		ret = -1;
 		goto err_free_misc_register;
 	}
 	ret = clk_prepare_enable(gps_bcm->clk);
 	if (ret) {
-		pr_err("[GPS] clk_32k enable is failed\n");
+		GPSERR(" clk_32k enable is failed");
 		goto err_free_clk;
 	}
-	pr_info("[GPS] clk_32k is finished\n");
+	GPSINFO(" clk_32k is finished");
 
 	ret =
 	    gps_bcm4774_node_init(np, &gps_bcm->mcu_req, GPS_PROC_MCUREQ,
 				  &gps_proc_fops_mcureq);
 	if (0 != ret) {
-		pr_err("[GPS]gps_bcm4774_node_init  mcu_req  failed\n");
+		GPSERR(" gps_bcm4774_node_init  mcu_req  failed");
 		goto err_free_mcureq;
 	}
 
@@ -598,54 +628,54 @@ static int k3_gps_bcm_probe(struct platform_device *pdev)
 				  GPS_PROC_MCUREQ_RSP,
 				  &gps_proc_fops_mcureq_rsp);
 	if (0 != ret) {
-		pr_err("[GPS]gps_bcm4774_node_init  mcu_req_rsp  failed\n");
+		GPSERR("gps_bcm4774_node_init  mcu_req_rsp  failed");
 		goto err_free_mcureq_rsp;
 	}
 
 	gps_bcm->pctrl = devm_pinctrl_get(gps_power_dev);
 	if (IS_ERR(gps_bcm->pctrl)) {
-		pr_err("[GPS] pinctrl get error!\n");
+		GPSERR(" pinctrl get error!");
 		ret = -1;
 		goto err_free_clk;
 	}
 
 	gps_bcm->pins_normal = pinctrl_lookup_state(gps_bcm->pctrl, "default");
 	if (IS_ERR(gps_bcm->pins_normal)) {
-		pr_err("[GPS] gps_bcm->pins_normal lookup error!\n");
+		GPSERR(" gps_bcm->pins_normal lookup error!");
 		ret = -1;
 		goto err_free_pinctrl;
 	}
 
 	gps_bcm->pins_idle = pinctrl_lookup_state(gps_bcm->pctrl, "idle");
 	if (IS_ERR(gps_bcm->pins_idle)) {
-		pr_err("[GPS] gps_bcm->pins_idle lookup error!\n");
+		GPSERR(" gps_bcm->pins_idle lookup error!");
 		ret = -1;
 		goto err_free_pinctrl;
 	}
 
 	ret = pinctrl_select_state(gps_bcm->pctrl, gps_bcm->pins_normal);
 	if (ret) {
-		pr_err("[GPS] pinctrl_select_state error!\n");
+		GPSERR("[GPS] pinctrl_select_state error!");
 		goto err_free_pinctrl;
 	}
-	pr_info("[GPS] pinctrl is finish\n");
+	GPSINFO("[GPS] pinctrl is finish");
 
 	gps_bcm->refclk = of_clk_get_by_name(np, "clk_gps");
 	if (IS_ERR(gps_bcm->refclk)) {
-		pr_err("[GPS] @@@ref_clk get failed!\n");
+		GPSERR("@@@ref_clk get failed!");
 		ret = -1;
 		goto err_free_pinctrl;
 	}
 
 	ret = clk_set_rate(gps_bcm->refclk, GPS_REF_CLK_FREQ_19M);
 	if (ret < 0) {
-		pr_err("[GPS] clk_set_rate HI3635_CLK_RATE failed\n");
+		GPSERR(" clk_set_rate HI3635_CLK_RATE failed");
 		goto err_free_refclk;
 	}
 
 	gps_ref_clk = gps_bcm->refclk;
 
-	pr_info("[GPS] ref clk is finished!\n");
+	GPSINFO(" ref clk is finished!");
 	platform_set_drvdata(pdev, gps_bcm);
 	g_gps_bcm = gps_bcm;
 
@@ -663,10 +693,10 @@ err_free_clk:
 err_free_misc_register:
 	misc_deregister(&ac_data->misc);
 	wake_lock_destroy(&ac_data->wake_lock);
-	pr_err("%s: misc_deregister!\n", __func__);
+	GPSERR(" misc_deregister!");
 err_free_host_wake:
 	gpio_free(gps_bcm->gpioid_hostwake.gpio);
-	pr_err("%s: err_free_host_wake!\n", __func__);
+	GPSERR(" err_free_host_wake!");
 
 err_free_gps_en:
 	gpio_free(gps_bcm->gpioid_en.gpio);
@@ -683,10 +713,10 @@ static void K3_gps_bcm_shutdown(struct platform_device *pdev)
 {
 	GPS_BCM_INFO *gps_bcm = platform_get_drvdata(pdev);
 
-	pr_info("[GPS] K3_gps_bcm_shutdown!\n");
+	GPSINFO(" K3_gps_bcm_shutdown!");
 
 	if (!gps_bcm) {
-		pr_err("[GPS] gps_bcm is NULL,just return.\n");
+		GPSERR("gps_bcm is NULL,just return.");
 		return;
 	}
 
@@ -729,21 +759,21 @@ static int __init k3_gps_bcm_init(void)
 	/*For OneTrack, we need check it's the right chip type or not.
 	 If it's not the right chip type, don't init the driver*/
 	if (!isMyConnectivityChip(CHIP_TYPE_BCM)) {
-		pr_err("gps chip type is not match, skip driver init");
+		GPSERR("gps chip type is not match, skip driver init");
 		return -EINVAL;
 	} else {
-		pr_info(
+		GPSINFO(
 		       "gps chip type is matched with Broadcom, continue");
 	}
 #endif
 
 	if (GPS_IC_TYPE_4774 != get_gps_ic_type()) {
-		pr_info(
+		GPSINFO(
 		       "gps chip type is matched with Broadcom, but is not 4774");
 		return -EINVAL;
 	}
-	pr_info(
-	       "gps chip type is matched with Broadcom, and it is 4774\n");
+	GPSINFO(
+	       "gps chip type is matched with Broadcom, and it is 4774");
 	return platform_driver_register(&k3_gps_bcm_driver);
 }
 
@@ -756,22 +786,22 @@ int set_gps_ref_clk_enable_bcm4774(bool enable)
 {
 	int ret = 0;
 
-	pr_info("[GPS] set_gps_ref_clk_enable(%d)\n", enable);
+	GPSINFO("[GPS] set_gps_ref_clk_enable(%d)", enable);
 	if (IS_ERR(gps_ref_clk)) {
-		pr_err("[GPS] ERROR: refclk is invalid!\n");
+		GPSERR(" ERROR: refclk is invalid");
 		return -1;
 	}
 
 	if (enable) {
 		ret = clk_prepare_enable(gps_ref_clk);
 		if (ret < 0) {
-			pr_err("[GPS] ERROR: refclk enable failed!\n");
+			GPSERR("ERROR: refclk enable failed!");
 			return -1;
 		}
 	} else {
 		clk_disable_unprepare(gps_ref_clk);
 	}
-	pr_info("[GPS] set_gps_ref_clk_enable finish\n");
+	GPSINFO(" set_gps_ref_clk_enable finish");
 
 	return 0;
 }

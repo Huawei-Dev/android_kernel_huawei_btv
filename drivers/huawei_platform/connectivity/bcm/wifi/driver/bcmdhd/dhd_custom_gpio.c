@@ -1,4 +1,27 @@
-
+/*
+* Customer code to add GPIO control during WLAN start/stop
+* Copyright (C) 1999-2014, Broadcom Corporation
+* 
+*      Unless you and Broadcom execute a separate written software license
+* agreement governing use of this software, this software is licensed to you
+* under the terms of the GNU General Public License version 2 (the "GPL"),
+* available at http://www.broadcom.com/licenses/GPLv2.php, with the
+* following added to such license:
+* 
+*      As a special exception, the copyright holders of this software give you
+* permission to link this software with independent modules, and to copy and
+* distribute the resulting executable under terms of your choice, provided that
+* you also meet, for each linked independent module, the terms and conditions of
+* the license of that module.  An independent module is a module which is not
+* derived from this software.  The special exception does not apply to any
+* modifications of the software.
+* 
+*      Notwithstanding the above, under no circumstances may you combine this
+* software in any way with any other Broadcom software provided under a license
+* other than the GPL, without Broadcom's express prior written consent.
+*
+* $Id: dhd_custom_gpio.c 447105 2014-01-08 05:27:09Z $
+*/
 
 #include <typedefs.h>
 #include <linuxver.h>
@@ -9,7 +32,6 @@
 #include <dhd_linux.h>
 
 #include <wlioctl.h>
-#include <wl_iw.h>
 
 #define WL_ERROR(x) printf x
 #define WL_TRACE(x)
@@ -116,6 +138,12 @@ dhd_custom_get_mac_address(void *adapter, unsigned char *buf)
 	return ret;
 }
 #endif /* GET_CUSTOM_MAC_ENABLE */
+
+struct cntry_locales_custom {
+	char iso_abbrev[WLC_CNTRY_BUF_SZ];
+	char custom_locale[WLC_CNTRY_BUF_SZ];
+	int32 custom_locale_rev;
+};
 
 /* Customized Locale table : OPTIONAL feature */
 const struct cntry_locales_custom translate_custom_table[] = {
@@ -227,7 +255,6 @@ const struct cntry_locales_custom translate_custom_table[] = {
 #endif
 #endif /* CUSTOMER_HW2 */
 };
-
 
 /* Customized Locale convertor
 *  input : ISO 3166-1 country abbreviation

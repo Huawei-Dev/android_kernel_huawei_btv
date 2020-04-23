@@ -453,8 +453,15 @@
 #define WAPI_AUTH_PSK		0x0800	/* Pre-shared key */
 #endif /* BCMWAPI_WAI || BCMWAPI_WPI */
 #define WPA2_AUTH_MFP           0x1000  /* MFP (11w) in contrast to CCX */
+#ifdef  BRCM_RSDB
+#define WPA2_AUTH_1X_SHA256	0x1000  /* 1X with SHA256 key derivation */
+#endif
 #define WPA2_AUTH_TPK		0x2000 	/* TDLS Peer Key */
 #define WPA2_AUTH_FT		0x4000 	/* Fast Transition. */
+#ifdef  BRCM_RSDB
+#define WPA2_AUTH_PSK_SHA256	0x8000	/* PSK with SHA256 key derivation */
+#define WPA2_AUTH_SHA256	0x8000
+#endif
 #define WPA_AUTH_PFN_ANY	0xffffffff	/* for PFN, match only ssid */
 
 /* pmkid */
@@ -1517,6 +1524,9 @@
 #define VNDR_IE_PRBREQ_FLAG	0x10
 #define VNDR_IE_ASSOCREQ_FLAG	0x20
 #define VNDR_IE_IWAPID_FLAG	0x40 /* vendor IE in IW advertisement protocol ID field */
+#if defined(WLFBT)
+	#define VNDR_IE_AUTHREQ_FLAG 0x80
+#endif
 #define VNDR_IE_CUSTOM_FLAG	0x100 /* allow custom IE id */
 
 #if defined(WLP2P)

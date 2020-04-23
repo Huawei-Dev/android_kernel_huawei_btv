@@ -52,6 +52,10 @@ typedef struct {
 #define BCMPCIE_MAX_TX_FLOWS	40
 #endif /* ! BCMPCIE_MAX_TX_FLOWS */
 
+/**
+ * Feature flags enabled in dongle. Advertised by dongle to DHD via the PCIe Shared structure that
+ * is located in device memory.
+ */
 #define PCIE_SHARED_VERSION		0x00005
 #define PCIE_SHARED_VERSION_MASK	0x000FF
 #define PCIE_SHARED_ASSERT_BUILT	0x00100
@@ -63,7 +67,32 @@ typedef struct {
 #define PCIE_SHARED_TXPUSH_SPRT		0x04000
 #define PCIE_SHARED_EVT_SEQNUM		0x08000
 #define PCIE_SHARED_DMA_INDEX		0x10000
+#ifdef BCM_PCIE_UPDATE
+/**
+ * There are host types where a device interrupt can 'race ahead' of data written by the device into
+ * host memory. The dongle can avoid this condition using a variety of techniques (read barrier,
+ * using PCIe Message Signalled Interrupts, or by using the PCIE_DMA_INDEX feature). Unfortunately
+ * these techniques have drawbacks on router platforms. For these platforms, it was decided to not
+ * avoid the condition, but to detect the condition instead and act on it.
+ * D2H M2M DMA Complete Sync mechanism: Modulo-253-SeqNum or XORCSUM
+ */
+#define PCIE_SHARED_D2H_SYNC_SEQNUM     0x20000
+#define PCIE_SHARED_D2H_SYNC_XORCSUM    0x40000
+#define PCIE_SHARED_D2H_SYNC_MODE_MASK \
+	(PCIE_SHARED_D2H_SYNC_SEQNUM | PCIE_SHARED_D2H_SYNC_XORCSUM)
+#define PCIE_SHARED_IDLE_FLOW_RING		0x80000
+#define PCIE_SHARED_2BYTE_INDICES       0x100000
 
+
+#define PCIE_SHARED_D2H_MAGIC		0xFEDCBA09
+#define PCIE_SHARED_H2D_MAGIC		0x12345678
+#endif
+/**
+ * Message rings convey messages between host and device. They are unidirectional, and are located
+ * in host memory.
+ *
+ * This is the minimal set of message rings, known as 'common message rings':
+ */
 #define BCMPCIE_H2D_MSGRING_CONTROL_SUBMIT		0
 #define BCMPCIE_H2D_MSGRING_RXPOST_SUBMIT		1
 #define BCMPCIE_D2H_MSGRING_CONTROL_COMPLETE		2
@@ -129,6 +158,10 @@ typedef struct ring_info {
 	uint16		rsvd;
 } ring_info_t;
 
+/**
+ * A structure located in TCM that is shared between host and device, primarily used during
+ * initialization.
+ */
 typedef struct {
 	/* shared area version captured at flags 7:0 */
 	uint32	flags;
@@ -169,20 +202,32 @@ typedef struct {
 #endif
 } pciedev_shared_t;
 
+extern pciedev_shared_t pciedev_shared;
+
+/**
+ * Mailboxes notify a remote party that an event took place, using interrupts. They use hardware
+ * support.
+ */
 
 /* H2D mail box Data */
 #define H2D_HOST_D3_INFORM	0x00000001
 #define H2D_HOST_DS_ACK		0x00000002
-#define H2D_HOST_CONS_INT	0x80000000	/* h2d int for console cmds  */
+#define H2D_HOST_DS_NAK		0x00000004
+#define H2D_HOST_CONS_INT	0x80000000	/**< h2d int for console cmds  */
+#define H2D_FW_TRAP			0x20000000	/**< dump HW reg info for Livelock issue */
+#define H2D_HOST_D0_INFORM_IN_USE	0x00000008
+#define H2D_HOST_D0_INFORM	0x00000010
 
 /* D2H mail box Data */
 #define D2H_DEV_D3_ACK		0x00000001
 #define D2H_DEV_DS_ENTER_REQ	0x00000002
 #define D2H_DEV_DS_EXIT_NOTE	0x00000004
 #define D2H_DEV_FWHALT		0x10000000
-
-
-extern pciedev_shared_t pciedev_shared;
+#ifdef BCM_PCIE_UPDATE
+#define D2H_DEV_MB_MASK		(D2H_DEV_D3_ACK | D2H_DEV_DS_ENTER_REQ | \
+				D2H_DEV_DS_EXIT_NOTE | D2H_DEV_FWHALT)
+#define D2H_DEV_MB_INVALIDATED(x)	((!x) || (x & ~D2H_DEV_MB_MASK))
+#endif
 #define NEXTTXP(i, d)           ((((i)+1) >= (d)) ? 0 : ((i)+1))
 #define NTXPACTIVE(r, w, d)     (((r) <= (w)) ? ((w)-(r)) : ((d)-(r)+(w)))
 #define NTXPAVAIL(r, w, d)      (((d) - NTXPACTIVE((r), (w), (d))) > 1)

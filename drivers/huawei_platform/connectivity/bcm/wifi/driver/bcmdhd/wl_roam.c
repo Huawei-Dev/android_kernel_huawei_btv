@@ -58,7 +58,50 @@ static uint band2G, band5G, band_bw;
 #ifdef HW_MUTEX_ROAM_CACHE
 static struct mutex roam_cache_mtx;
 #endif
+#ifdef  BRCM_RSDB
+int init_roam_cache(struct bcm_cfg80211 *cfg, int ioctl_ver)
+{
+	int err;
+	struct net_device *dev = bcmcfg_to_prmry_ndev(cfg);
+	s32 mode;
 
+	/* Check support in firmware */
+	err = wldev_iovar_getint(dev, "roamscan_mode", &mode);
+	if (err && (err == BCME_UNSUPPORTED)) {
+		/* If firmware doesn't support, return error. Else proceed */
+		WL_ERR(("roamscan_mode iovar failed. %d\n", err));
+		return err;
+	}
+
+#ifdef D11AC_IOTYPES
+	if (ioctl_ver == 1) {
+		/* legacy chanspec */
+		band2G = WL_LCHANSPEC_BAND_2G;
+		band5G = WL_LCHANSPEC_BAND_5G;
+		band_bw = WL_LCHANSPEC_BW_20 | WL_LCHANSPEC_CTL_SB_NONE;
+	} else {
+		band2G = WL_CHANSPEC_BAND_2G;
+		band5G = WL_CHANSPEC_BAND_5G;
+		band_bw = WL_CHANSPEC_BW_20;
+	}
+#else
+	band2G = WL_CHANSPEC_BAND_2G;
+	band5G = WL_CHANSPEC_BAND_5G;
+	band_bw = WL_CHANSPEC_BW_20 | WL_CHANSPEC_CTL_SB_NONE;
+#endif /* D11AC_IOTYPES */
+
+	n_roam_cache = 0;
+	roam_band = WLC_BAND_AUTO;
+#ifdef WES_SUPPORT
+	roamscan_mode = ROAMSCAN_MODE_NORMAL;
+#endif /* WES_SUPPORT */
+
+#ifdef HW_MUTEX_ROAM_CACHE
+        mutex_init(&roam_cache_mtx);
+#endif
+	return 0;
+}
+#endif /* BRCM_RSDB */
 void init_roam(int ioctl_ver)
 {
 #ifdef D11AC_IOTYPES

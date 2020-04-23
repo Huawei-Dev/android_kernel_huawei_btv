@@ -92,6 +92,8 @@ extern int dhd_net_bus_power_down(struct net_device *dev);
 #endif
 extern int dhd_net_wifi_platform_set_power(struct net_device *dev, bool on,
 	unsigned long delay_msec);
+extern int dhd_net_wifi_platform_set_reset(struct net_device *dev, bool on,
+	unsigned long delay_msec);
 extern void dhd_get_customized_country_code(struct net_device *dev, char *country_iso_code,
 	wl_country_t *cspec);
 extern void dhd_bus_country_set(struct net_device *dev, wl_country_t *cspec, bool notify);

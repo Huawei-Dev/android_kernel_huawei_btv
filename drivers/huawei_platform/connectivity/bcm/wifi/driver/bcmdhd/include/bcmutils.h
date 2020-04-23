@@ -668,6 +668,16 @@ typedef struct bcm_bit_desc_ex {
 /* buffer length for ethernet address from bcm_ether_ntoa() */
 #define ETHER_ADDR_STR_LEN	18	/* 18-bytes of Ethernet address buffer length */
 
+static INLINE uint32 /* 32bit word aligned xor-32 */
+bcm_compute_xor32(volatile uint32 *u32_val, int num_u32)
+{
+	int idx;
+	uint32 xor32 = 0;
+	for (idx = 0; idx < num_u32; idx++)
+		xor32 ^= *(u32_val + idx);
+	return xor32;
+}
+
 /* crypto utility function */
 /* 128-bit xor: *dst = *src1 xor *src2. dst1, src1 and src2 may have any alignment */
 static INLINE void

@@ -185,7 +185,15 @@ extern void osl_dma_free_consistent(osl_t *osh, void *va, uint size, dmaaddr_t p
 	osl_dma_unmap((osh), (pa), (size), (direction))
 extern dmaaddr_t osl_dma_map(osl_t *osh, void *va, uint size, int direction, void *p,
 	hnddma_seg_map_t *txp_dmah);
+#ifndef BCM_PCIE_UPDATE
 extern void osl_dma_unmap(osl_t *osh, uint pa, uint size, int direction);
+#else
+extern void osl_dma_unmap(osl_t *osh, dmaaddr_t pa, uint size, int direction);
+#define OSL_SMP_WMB()	smp_wmb()
+/* API for CPU relax */
+extern void osl_cpu_relax(void);
+#define OSL_CPU_RELAX() osl_cpu_relax()
+#endif /* BCM_PCIE_UPDATE */
 
 /* API for DMA addressing capability */
 #define OSL_DMADDRWIDTH(osh, addrwidth) ({BCM_REFERENCE(osh); BCM_REFERENCE(addrwidth);})
@@ -291,7 +299,7 @@ extern int osl_error(int bcmerror);
 		}), \
 		OSL_READ_REG(osh, r)) \
 )
-
+#ifndef HW_PCIE_STABILITY
 #define W_REG(osh, r, v) do { \
 	SELECT_BUS_WRITE(osh, \
 		switch (sizeof(*(r))) { \
@@ -301,7 +309,21 @@ extern int osl_error(int bcmerror);
 		}, \
 		(OSL_WRITE_REG(osh, r, v))); \
 	} while (0)
+#else /* HW_PCIE_STABILITY */
+extern bool osl_pcie_linkdown(osl_t *osh);
+#define BUS_LINK_CHECK(osh) if (osl_pcie_linkdown(osh)) break;
+#define W_REG(osh, r, v) do { \
+	BUS_LINK_CHECK(osh) \
+        SELECT_BUS_WRITE(osh, \
+                switch (sizeof(*(r))) { \
+                        case sizeof(uint8):     writeb((uint8)(v), (volatile uint8*)(r)); break; \
+                        case sizeof(uint16):    writew((uint16)(v), (volatile uint16*)(r)); break; \
+                        case sizeof(uint32):    writel((uint32)(v), (volatile uint32*)(r)); break; \
+                }, \
+                (OSL_WRITE_REG(osh, r, v))); \
+        } while (0)
 
+#endif /* HW_PCIE_STABILITY */
 #define	AND_REG(osh, r, v)		W_REG(osh, (r), R_REG(osh, r) & (v))
 #define	OR_REG(osh, r, v)		W_REG(osh, (r), R_REG(osh, r) | (v))
 

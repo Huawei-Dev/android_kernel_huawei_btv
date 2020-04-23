@@ -15,23 +15,19 @@
 #include <linux/uaccess.h>
 
 
-
 #define MAX_CMD_LEN 32
-static int wlanfty_status_value = 0;
+extern int wlanfty_status_value;
 extern int dhd_wlanfty_ver(void);
+extern void wlanfty_register_handle(void);
 //BIT 0 is reserve
 #define WLANFTY_STATUS_HALTED		(1 << 1)
 #define WLANFTY_STATUS_KSO_ERROR	(1 << 2)
 #define WLANFTY_STATUS_RECOVERY		(1 << 3)
 
+MODULE_LICENSE("GPL v2");
 
 HWLOG_REGIST();
 
-//set the node of  wlanfty_status value
-void set_wlanfty_status(int value) {
-	wlanfty_status_value |= value;
-	hwlog_err("set wlanfty_status is %d\n", wlanfty_status_value);
-}
 //clear node wlanfty_status
 void clear_wlanfty_status(void) {
 	wlanfty_status_value = 0;
@@ -62,6 +58,11 @@ static ssize_t wlanfty_status_read(struct file *file, char __user *buf, size_t c
 	size_t copy_size = 0;
    	char g_cmd_buff[MAX_CMD_LEN + 1] = {0};
 
+	if (buf == NULL || count == 0) {
+		hwlog_info("%s buf is not enough count %d \n", __FUNCTION__, count);
+		return 0;
+	}
+
 	if(*ppos > 0) {
 		hwlog_info("%s read is done ,no need to read again\n", __FUNCTION__);
 		return 0;
@@ -73,6 +74,10 @@ static ssize_t wlanfty_status_read(struct file *file, char __user *buf, size_t c
 	if(wlanfty_status_value)
 		hwlog_err("%s value = %x error\n", __FUNCTION__, wlanfty_status_value);
 
+	if (copy_size > count) {
+		hwlog_info("%s count %d is small\n", __FUNCTION__, count);
+		return 0;
+	}
 	if(copy_to_user(buf, g_cmd_buff, copy_size) == 0) {
 		hwlog_info("read %d byte to user\n", copy_size);
 		*ppos += copy_size;
@@ -90,6 +95,11 @@ static ssize_t wlanfty_ver_read(struct file *file, char __user *buf, size_t coun
 	char g_cmd_buff[MAX_CMD_LEN + 1] = {0};
 	int value;
 
+	if (buf == NULL || count == 0) {
+                hwlog_info("%s buf is not enough count %d \n", __FUNCTION__, count);
+                return 0;
+        }
+
  	if(*ppos > 0) {
 		hwlog_info("%s read is done ,no need to read again\n", __FUNCTION__);
 		return 0;
@@ -100,6 +110,11 @@ static ssize_t wlanfty_ver_read(struct file *file, char __user *buf, size_t coun
 
 	if(value)
 	    hwlog_err("%s value = %d error\n", __FUNCTION__, value);
+
+	if (copy_size > count) {
+                hwlog_info("%s count %d is small \n", __FUNCTION__, count);
+                return 0;
+        }
 
 	if(copy_to_user(buf, g_cmd_buff, copy_size) == 0) {
 		hwlog_info("read %d byte to user\n", copy_size);

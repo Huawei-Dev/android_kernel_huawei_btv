@@ -182,6 +182,10 @@ extern uint si_corevendor(si_t *sih);
 extern uint si_corerev(si_t *sih);
 extern void *si_osh(si_t *sih);
 extern void si_setosh(si_t *sih, osl_t *osh);
+#ifdef BCM_PCIE_UPDATE
+extern uint si_backplane_access(si_t *sih, uint addr, uint size,
+	uint *val, bool read);
+#endif
 extern uint si_corereg(si_t *sih, uint coreidx, uint regoff, uint mask, uint val);
 extern uint si_pmu_corereg(si_t *sih, uint32 idx, uint regoff, uint mask, uint val);
 extern uint32 *si_corereg_addr(si_t *sih, uint coreidx, uint regoff);

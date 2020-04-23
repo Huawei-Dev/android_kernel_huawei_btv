@@ -43,6 +43,11 @@ enum dhd_prealloc_index {
     DHD_PREALLOC_DHD_WLFC_INFO = 8,
     DHD_PREALLOC_IF_FLOW_LKUP = 9,
     DHD_PREALLOC_FLOWRING = 10,
+#ifdef CONFIG_BCMDHD_PCIE
+    DHD_PREALLOC_PKTID_MAP = 13,
+    DHD_PREALLOC_PKTID_MAP_IOCTL = 14,
+    DHD_PREALLOC_IF_FLOW_TBL = 15,
+#endif
     DHD_PREALLOC_MAX
 };
 
@@ -57,11 +62,18 @@ enum dhd_prealloc_index {
 #endif
 
 #define DHD_PREALLOC_WIPHY_ESCAN0_SIZE  (64 * 1024)
+#ifndef CONFIG_BCMDHD_PCIE
 #define DHD_PREALLOC_DHD_INFO_SIZE      (24 * 1024)
+#else
+#define DHD_PREALLOC_DHD_INFO_SIZE      (26 * 1024)
+#endif
 #ifdef CONFIG_64BIT
 #define DHD_PREALLOC_IF_FLOW_LKUP_SIZE  (20 * 1024 * 2)
 #else
 #define DHD_PREALLOC_IF_FLOW_LKUP_SIZE  (20 * 1024)
+#endif
+#ifdef BCM_ALLOC_STATIC_10K
+#define DHD_PREALLOC_IF_FLOW_TBL_SIZE	(10 * 1024)
 #endif
 #define DHD_PREALLOC_OSL_BUF_SIZE      (STATIC_BUF_MAX_NUM * STATIC_BUF_SIZE)
 
@@ -88,6 +100,7 @@ enum dhd_prealloc_index {
 #define DHD_SKB_1PAGE_BUF_NUM   0
 #define DHD_SKB_2PAGE_BUF_NUM   64
 #define DHD_SKB_4PAGE_BUF_NUM   0
+#define WLAN_DHD_PREALLOC_PKTID_MAP	(170 * 1024)
 #else
 #define WLAN_SECTION_SIZE_0 (PREALLOC_WLAN_BUF_NUM * 128)
 #define WLAN_SECTION_SIZE_1 (PREALLOC_WLAN_BUF_NUM * 128)
@@ -117,6 +130,9 @@ struct wifi_host_s {
 	bool bEnable;
 	int enable;
 	int wifi_wakeup_irq;
+#ifdef DHD_DEVWAKE_EARLY
+	int dev_wake;
+#endif
 	char nvram_path[NVRAM_PATH_LEN];
 #ifdef HW_WIFI_DRIVER_NORMALIZE
 	char fw_path[FW_PATH_LEN];

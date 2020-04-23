@@ -91,14 +91,6 @@ config BCM4358
 	depends on BCMDHD
 	default n
 
-config BCMDHD_WEXT
-	bool "Enable WEXT support"
-	depends on BCMDHD && CFG80211 = n
-	select WIRELESS_EXT
-	select WEXT_PRIV
-	help
-	  Enables WEXT support
-
 config DHD_USE_STATIC_BUF
 	bool "Enable memory preallocation"
 	depends on BCMDHD
@@ -128,6 +120,7 @@ config DHD_OF_SUPPORT
 config BCM_VIO
 	tristate "BCM VIO support"
 	depends on BCMDHD
+	default n
 
 config HW_WIFI_FREQ_CTRL_FLAG
 	tristate "wifi dynamic frequency adjust support"
@@ -140,3 +133,18 @@ config HW_VOWIFI
 config HW_WLANFTY_STATUS
 	tristate "Record the wifi exception information"
 	depends on BCMDHD
+
+config HW_ABS
+	bool "BCM ABS support"
+	depends on BCMDHD
+	default n
+
+config DHD_STATIC_KO
+	bool "BCM STATIC KO FOR ANDROID_O support"
+	depends on BCMDHD
+	default y
+
+config HW_GET_EXT_SIG
+	bool "BCM GET EXT SIG"
+	depends on BCMDHD
+

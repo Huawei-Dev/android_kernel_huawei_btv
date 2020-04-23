@@ -51,6 +51,10 @@
 #endif
 #include <hw_wifi.h>
 
+#include <wl_dbg.h>
+#define WL_ERROR(x) printk x
+#define WL_TRACE(x)
+
 /*
  * Android private command strings, PLEASE define new private commands here
  * so they can be updated easily in the future (if needed)
@@ -113,6 +117,9 @@
 
 
 #define CMD_ROAM_OFFLOAD			"SETROAMOFFLOAD"
+#ifdef BCM_BLOCK_DATA_FRAME
+#define CMD_SET_BLOCKFRAME			"SETBLOCKFRAME"
+#endif
 
 #ifdef CONFIG_HW_VOWIFI
 #define CMD_GET_MODE	"GET MODE"
@@ -136,6 +143,31 @@
 
 #ifdef HW_SET_PM
 #define CMD_POWER_LOCK		"POWER_LOCK"
+#endif
+
+#ifdef BRCM_RSDB
+#define CMD_CAPAB_RSDB      "GET_CAPAB_RSDB"
+#endif
+
+#ifdef HW_DOZE_PKT_FILTER
+#define CMD_FILTER_SWITCH   "FILTER"
+#endif
+
+#ifndef HUAWEI_ANDROID_EXTENSION
+#define HUAWEI_ANDROID_EXTENSION
+#endif
+
+#ifdef HUAWEI_ANDROID_EXTENSION
+#define AUTO_RECOVERY_AFTER_ROAMING          0       //send disassoc after roaming
+#define AUTO_RECOVERY_BEFORE_ASSOC_COMPLETE  1       //send disassoc before assoc_complete
+#define AUTO_RECOVERY_BY_MANUAL              2       //send disasoc by manual
+
+#define CMD_AP_SET_CFG "AP_SET_CFG"
+#define CMD_AP_GET_STA_LIST "AP_GET_STA_LIST"
+#define CMD_AP_SET_MAC_FLTR "AP_SET_MAC_FLTR"
+#define CMD_AP_STA_DISASSOC "AP_STA_DISASSOC"
+#define CMD_SET_TX_POWER "SET_TX_POWER"
+#define CMD_SET_DISASSOC_ROAMING_BSSID "SET_DISASSOC_ROAMING_BSSID"
 #endif
 
 /* miracast related definition */
@@ -337,6 +369,32 @@ static int wl_android_set_suspendmode(struct net_device *dev, char *command, int
 	return ret;
 }
 
+#ifdef HW_DOZE_PKT_FILTER
+#define IS_NUMBER(c) ((c) >= '0' && (c) <= '9')
+static int wl_android_set_doze_filter(struct net_device *dev, char *command)
+{
+	int ret = -1;
+	int enable;
+	char c;
+	DHD_ERROR(("cmd:%s\n",command));
+	if (NULL == command) {
+		DHD_ERROR(("doze filer cmd is null"));
+		return ret;
+	}
+	/* format:FILTER 1*/
+	c = *(command + strlen(CMD_FILTER_SWITCH) + 1);
+
+	if (!IS_NUMBER(c)) {
+		DHD_ERROR(("doze filer cmd is error"));
+		return ret;
+	}
+	enable = c - '0';
+
+	ret = hw_set_net_filter_enable(enable);
+	return ret;
+}
+#endif
+
 static int wl_android_get_band(struct net_device *dev, char *command, int total_len)
 {
 	uint band;
@@ -354,7 +412,7 @@ static int wl_android_get_band(struct net_device *dev, char *command, int total_
 #ifdef PNO_SUPPORT
 #define PNO_PARAM_SIZE 50
 #define VALUE_SIZE 50
-#define LIMIT_STR_FMT  ("%50s %50s")
+#define LIMIT_STR_FMT  ("%49s %49s")
 static int
 wls_parse_batching_cmd(struct net_device *dev, char *command, int total_len)
 {
@@ -755,6 +813,13 @@ int wl_android_wifi_on(struct net_device *dev)
 			dhd_net_wifi_platform_set_power(dev, FALSE, WIFI_TURNOFF_DELAY);
 #ifdef HW_WIFI_SDIO_LOWPOWER
 			dhd_net_bus_power_down(dev);
+#endif
+#ifdef DHD_VIO_RESET
+			if((1 == retry) && (-ETIMEDOUT == ret))
+			{
+				dhd_net_wifi_platform_set_reset(dev, FALSE, WIFI_TURNOFF_DELAY);
+				dhd_net_wifi_platform_set_reset(dev, TRUE, WIFI_TURNON_DELAY);
+			}
 #endif
 		} while (retry-- > 0);
 		if (ret != 0) {
@@ -1219,7 +1284,7 @@ wl_android_iolist_resume(struct net_device *dev, struct list_head *head)
 static int
 wl_android_set_miracast(struct net_device *dev, char *command, int total_len)
 {
-	int mode, val;
+	int mode, val = 0;
 	int ret = 0;
 	struct io_cfg config;
 
@@ -1307,14 +1372,10 @@ resume:
 
 int wl_keep_alive_set(struct net_device *dev, char* extra, int total_len)
 {
-	char 				buf[256];
-	const char 			*str;
 	wl_mkeep_alive_pkt_t	mkeep_alive_pkt;
-	wl_mkeep_alive_pkt_t	*mkeep_alive_pktp;
-	int					buf_len;
-	int					str_len;
-	int res 				= -1;
+	int ret;
 	uint period_msec = 0;
+	char *buf;
 
 	if (extra == NULL)
 	{
@@ -1327,39 +1388,32 @@ int wl_keep_alive_set(struct net_device *dev, char* extra, int total_len)
 		 return -EINVAL;
 	}
 	DHD_ERROR(("%s: period_msec is %d\n", __FUNCTION__, period_msec));
-
 	memset(&mkeep_alive_pkt, 0, sizeof(wl_mkeep_alive_pkt_t));
 
-	str = "mkeep_alive";
-	str_len = strlen(str);
-	strncpy(buf, str, str_len);
-	buf[ str_len ] = '\0';
-	mkeep_alive_pktp = (wl_mkeep_alive_pkt_t *) (buf + str_len + 1);
 	mkeep_alive_pkt.period_msec = period_msec;
-	buf_len = str_len + 1;
 	mkeep_alive_pkt.version = htod16(WL_MKEEP_ALIVE_VERSION);
 	mkeep_alive_pkt.length = htod16(WL_MKEEP_ALIVE_FIXED_LEN);
 
 	/* Setup keep alive zero for null packet generation */
 	mkeep_alive_pkt.keep_alive_id = 0;
 	mkeep_alive_pkt.len_bytes = 0;
-	buf_len += WL_MKEEP_ALIVE_FIXED_LEN;
-	/* Keep-alive attributes are set in local	variable (mkeep_alive_pkt), and
-	 * then memcpy'ed into buffer (mkeep_alive_pktp) since there is no
-	 * guarantee that the buffer is properly aligned.
-	 */
-	memcpy((char *)mkeep_alive_pktp, &mkeep_alive_pkt, WL_MKEEP_ALIVE_FIXED_LEN);
 
-	if ((res = wldev_ioctl(dev, WLC_SET_VAR, buf, buf_len, TRUE)) < 0)
-	{
-		DHD_ERROR(("%s:keep_alive set failed. res[%d]\n", __FUNCTION__, res));
+	buf = kzalloc(WLC_IOCTL_SMLEN, GFP_KERNEL);
+	if (!buf) {
+		DHD_ERROR(("%s: buffer alloc failed\n", __FUNCTION__));
+		return BCME_NOMEM;
 	}
+
+	ret = wldev_iovar_setbuf(dev, "mkeep_alive", (char *)&mkeep_alive_pkt,
+				 WL_MKEEP_ALIVE_FIXED_LEN, buf, WLC_IOCTL_SMLEN,
+				 NULL);
+	if (ret < 0)
+		DHD_ERROR(("%s:keep_alive set failed:%d\n", __FUNCTION__, ret));
 	else
-	{
-		DHD_ERROR(("%s:keep_alive set ok. res[%d]\n", __FUNCTION__, res));
-	}
+		DHD_TRACE(("%s:keep_alive set ok\n", __FUNCTION__));
 
-	return res;
+	kfree(buf);
+	return ret;
 }
 
 #ifdef HW_WIFI_GET_DRIVER_BUS_STATUS
@@ -1463,6 +1517,779 @@ s32 wl_android_vowifi_issupport(
 }
 #endif
 
+#ifdef HUAWEI_ANDROID_EXTENSION
+#if defined(SOFTAP) && defined(HW_SOFTAP_MANAGEMENT)
+#define PTYPE_STRING 0
+#define PTYPE_INTDEC 1
+#define PTYPE_INTHEX 2
+#define PTYPE_STR_HEX 3
+#define SSID_LEN	33
+#define SEC_LEN		16
+#define KEY_LEN		65
+#define PROFILE_OFFSET	32
+struct ap_profile {
+	uint8	ssid[SSID_LEN];
+	uint8	sec[SEC_LEN];
+	uint8	key[KEY_LEN];
+	uint32	channel;
+	uint32	preamble;
+	uint32	max_scb;
+	uint32  closednet;
+	char country_code[WLC_CNTRY_BUF_SZ];
+};
+
+#define MACLIST_MODE_DISABLED  0
+#define MACLIST_MODE_DENY              1
+#define MACLIST_MODE_ALLOW             2
+struct mflist {
+       uint count;
+       struct ether_addr ea[16];
+};
+
+struct mac_list_set {
+       uint32  mode;
+       struct mflist mac_list;
+};
+
+#define MAX_WX_STRING 80
+#define MAC_FILT_MAX 8
+#define htod32(i) (i)
+#define WL_SOFTAP(x) printk x;
+
+static int
+dev_wlc_ioctl(
+	struct net_device *dev,
+	int cmd,
+	void *arg,
+	int len
+)
+{
+	struct ifreq ifr;
+	wl_ioctl_t ioc;
+	mm_segment_t fs;
+	int ret;
+
+	memset(&ioc, 0, sizeof(ioc));
+#if defined(CONFIG_COMPAT) && defined(HW_SOFTAP_MANAGEMENT_BUG)
+		ioc.cmd = cmd | WLC_SPEC_FLAG;
+#else
+		ioc.cmd = cmd;
+#endif
+	ioc.buf = arg;
+	ioc.len = len;
+
+	strcpy(ifr.ifr_name, dev->name);
+	ifr.ifr_data = (caddr_t) &ioc;
+
+	fs = get_fs();
+	set_fs(get_ds());
+#if defined(WL_USE_NETDEV_OPS)
+	ret = dev->netdev_ops->ndo_do_ioctl(dev, &ifr, SIOCDEVPRIVATE);
+#else
+	ret = dev->do_ioctl(dev, &ifr, SIOCDEVPRIVATE);
+#endif
+	set_fs(fs);
+
+	return ret;
+}
+
+/*
+set named driver variable to int value and return error indication
+calling example: dev_wlc_intvar_set(dev, "arate", rate)
+*/
+static int
+dev_wlc_intvar_set(
+	struct net_device *dev,
+	char *name,
+	int val)
+{
+	char buf[WLC_IOCTL_SMLEN];
+	uint len;
+
+	val = htod32(val);
+	len = bcm_mkiovar(name, (char *)(&val), sizeof(val), buf, sizeof(buf));
+	ASSERT(len);
+
+	return (dev_wlc_ioctl(dev, WLC_SET_VAR, buf, len));
+}
+
+static int
+dev_iw_iovar_setbuf(
+	struct net_device *dev,
+	char *iovar,
+	void *param,
+	int paramlen,
+	void *bufptr,
+	int buflen)
+{
+	int iolen;
+
+	iolen = bcm_mkiovar(iovar, param, paramlen, bufptr, buflen);
+	ASSERT(iolen);
+	BCM_REFERENCE(iolen);
+
+	return (dev_wlc_ioctl(dev, WLC_SET_VAR, bufptr, iolen));
+}
+
+static int
+dev_iw_write_cfg0_bss_var(struct net_device *dev, int val)
+{
+	struct {
+		int cfg;
+		int val;
+	} bss_setbuf;
+	int bss_set_res;
+	char smbuf[WLC_IOCTL_SMLEN];
+	memset(smbuf, 0, sizeof(smbuf));
+	bss_setbuf.cfg = 0;
+	bss_setbuf.val = val;
+	bss_set_res = dev_iw_iovar_setbuf(dev, "bss",
+		&bss_setbuf, sizeof(bss_setbuf), smbuf, sizeof(smbuf));
+	WL_TRACE(("%s: bss_set_result:%d set with %d\n", __FUNCTION__, bss_set_res, val));
+	return bss_set_res;
+}
+
+#ifdef HW_SOFTAP_REASON_CODE
+/* 802.11-2012 Table 8-36--Reason codes */
+/* Previous authentication no longer valid */
+#define REASON_CODE_NO_VALID    2
+/* Disassociated due to inactivity */
+#define REASON_CODE_INACTIVITY  4
+/* Disassociated beause AP is unable to handle all currently associated STAs */
+#define REASON_CODE_UN_HANDLE   5
+/* Disassociated because sending STA is leaving (or has left) BSS */
+#define REASON_CODE_LEAVING     8
+
+/* 802.11-2012 Table 8-37--Status codes */
+/* Association denied because AP is unable to handle additional associated STAs */
+#define STATUS_CODE_LIMIT       17
+/* The request has been declined */
+#define STATUS_CODE_DECLINED    37
+
+/* deny auth request from STAs outside of ACL list */
+#define HW_DENY_REASON_ACL      STATUS_CODE_DECLINED
+#endif
+
+void check_error(int res, const char *msg, const char *func, int line)
+{
+       if (res != 0)
+               WL_ERROR(("%s, %d function:%s, line:%d\n", msg, res, func, line));
+}
+
+static int
+hex2num(char c)
+{
+       if (c >= '0' && c <= '9')
+               return c - '0';
+       if (c >= 'a' && c <= 'f')
+               return c - 'a' + 10;
+       if (c >= 'A' && c <= 'F')
+               return c - 'A' + 10;
+       return -1;
+}
+static int
+hstr_2_buf(const char *txt, u8 *buf, int len)
+{
+       int i;
+       for (i = 0; i < len; i++) {
+               int a, b;
+               a = hex2num(*txt++);
+               if (a < 0)
+                       return -1;
+               b = hex2num(*txt++);
+               if (b < 0)
+                       return -1;
+               *buf++ = (a << 4) | b;
+       }
+       return 0;
+}
+
+static int
+get_parameter_from_string(
+                        char **str_ptr, const char *token,
+                        int param_type, void  *dst, int param_max_len)
+{
+        char int_str[7] = "0";
+        int parm_str_len;
+        char  *param_str_begin;
+        char  *param_str_end;
+        char  *orig_str = *str_ptr;
+        if ((*str_ptr) && !strncmp(*str_ptr, token, strlen(token))) {
+                strsep(str_ptr, "=,");
+                param_str_begin = *str_ptr;
+                strsep(str_ptr, "=,");
+                if (*str_ptr == NULL) {
+                        parm_str_len = strlen(param_str_begin);
+                } else {
+                        param_str_end = *str_ptr-1;
+                        parm_str_len = param_str_end - param_str_begin;
+                }
+                WL_TRACE((" 'token:%s', len:%d, ", token, parm_str_len));
+                if (parm_str_len > param_max_len) {
+                        WL_ERROR((" WARNING: extracted param len:%d is > MAX:%d\n",
+                                parm_str_len, param_max_len));
+                        parm_str_len = param_max_len;
+                }
+                switch (param_type) {
+                        case PTYPE_INTDEC: {
+                                int *pdst_int = dst;
+                                char *eptr;
+                                if (parm_str_len > sizeof(int_str))
+                                         parm_str_len = sizeof(int_str);
+                                memcpy(int_str, param_str_begin, parm_str_len);
+                                *pdst_int = simple_strtoul(int_str, &eptr, 10);
+                                WL_TRACE((" written as integer:%d\n",  *pdst_int));
+                        }
+                        break;
+                        case PTYPE_STR_HEX: {
+                                u8 *buf = dst;
+                                param_max_len = param_max_len >> 1;
+                                hstr_2_buf(param_str_begin, buf, param_max_len);
+                                dhd_print_buf(buf, param_max_len, 0);
+                        }
+                        break;
+                        default:
+                                memcpy(dst, param_str_begin, parm_str_len);
+                                *((char *)dst + parm_str_len) = 0;
+                                WL_ERROR((" written as a string:%s\n", (char *)dst));
+                        break;
+                }
+                return 0;
+        } else {
+                WL_ERROR(("\n %s: ERROR: can't find token:%s in str:%s \n",
+                        __FUNCTION__, token, orig_str));
+         return -1;
+        }
+}
+
+static int
+init_ap_profile_from_string(char *param_str, struct ap_profile *ap_cfg)
+{
+	char *str_ptr = param_str;
+#ifdef HW_MEM_OVERFLOW_BUGFIX
+	char sub_cmd[SSID_LEN + 1];
+#else
+	char sub_cmd[16];
+#endif
+	int ret = 0;
+	memset(sub_cmd, 0, sizeof(sub_cmd));
+	memset(ap_cfg, 0, sizeof(struct ap_profile));
+	if (get_parameter_from_string(&str_ptr, "ASCII_CMD=",
+		PTYPE_STRING, sub_cmd, SSID_LEN) != 0) {
+	 return -1;
+	}
+	if (strncmp(sub_cmd, "AP_CFG", 6)) {
+	   WL_ERROR(("ERROR: sub_cmd:%s != 'AP_CFG'!\n", sub_cmd));
+		return -1;
+	}
+	get_parameter_from_string(&str_ptr, "SSID=", PTYPE_STRING, ap_cfg->ssid, SSID_LEN);
+	get_parameter_from_string(&str_ptr, "SEC=", PTYPE_STRING,  ap_cfg->sec, SEC_LEN);
+	get_parameter_from_string(&str_ptr, "KEY=", PTYPE_STRING,  ap_cfg->key, KEY_LEN);
+	get_parameter_from_string(&str_ptr, "CHANNEL=", PTYPE_INTDEC, &ap_cfg->channel, 5);
+	get_parameter_from_string(&str_ptr, "PREAMBLE=", PTYPE_INTDEC, &ap_cfg->preamble, 5);
+	get_parameter_from_string(&str_ptr, "MAX_SCB=", PTYPE_INTDEC,  &ap_cfg->max_scb, 5);
+	get_parameter_from_string(&str_ptr, "HIDDEN=",
+		PTYPE_INTDEC,  &ap_cfg->closednet, 5);
+	get_parameter_from_string(&str_ptr, "COUNTRY=",
+		PTYPE_STRING,  &ap_cfg->country_code, 3);
+	return ret;
+}
+
+#ifndef AP_ONLY
+static int last_auto_channel = 6;
+#endif
+
+static int
+get_softap_auto_channel(struct net_device *dev, struct ap_profile *ap)
+{
+	int chosen = 0;
+	wl_uint32_list_t request;
+	int retry = 0;
+	int ret = 0;
+	int res = 0;
+	request.count = htod32(0);
+	ret = dev_wlc_ioctl(dev, WLC_START_CHANNEL_SEL, &request, sizeof(request));
+	if (ret < 0) {
+		WL_ERROR(("can't start auto channel scan\n"));
+		goto fail;
+	}
+	get_channel_retry:
+	bcm_mdelay(350);
+	ret = dev_wlc_ioctl(dev, WLC_GET_CHANNEL_SEL, &chosen, sizeof(chosen));
+		if (ret < 0 || dtoh32(chosen) == 0) {
+			if (retry++ < 15) {
+				goto get_channel_retry;
+			} else {
+				if (ret < 0) {
+					WL_ERROR(("can't get auto channel sel, err = %d, "
+					          "chosen = 0x%04X\n", ret, (uint16)chosen));
+					goto fail;
+				} else {
+					ap->channel = (uint16)last_auto_channel;
+					WL_ERROR(("auto channel sel timed out. we get channel %d\n",
+						ap->channel));
+				}
+			}
+		}
+		if (chosen) {
+			ap->channel = (uint16)chosen & 0x00FF;
+			WL_ERROR(("%s: Got auto channel = %d, attempt:%d\n",
+				__FUNCTION__, ap->channel, retry));
+		}
+#ifndef AP_ONLY
+	if (!res || !ret)
+		last_auto_channel = ap->channel;
+#endif
+fail :
+	if (ret < 0) {
+		WL_TRACE(("%s: return value %d\n", __FUNCTION__, ret));
+		return ret;
+	}
+	return res;
+}
+
+static int
+set_ap_cfg_hw(struct net_device *dev, struct ap_profile *ap)
+{
+#ifndef HW_SOFTAP_ENABLE_BW_80
+	int channel = 0;
+#endif
+	int max_assoc = 8;
+	int res = 0;
+	int mpc = 0;
+#ifndef HW_SOFTAP_ENABLE_BW_80
+	int updown = 0;
+#endif
+	if (!dev) {
+		WL_ERROR(("%s: dev is null\n", __FUNCTION__));
+		return -1;
+	}
+
+	WL_ERROR(("wl_iw: set ap profile:\n"));
+	WL_ERROR(("	ssid = '%s'\n", ap->ssid));
+	WL_ERROR(("	security = '%s'\n", ap->sec));
+	if (ap->key[0] != '\0')
+		WL_ERROR(("	key = '%s'\n", ap->key));
+	WL_ERROR(("	channel = %d\n", ap->channel));
+	WL_ERROR(("	max scb = %d\n", ap->max_scb));
+	mpc = 0;
+	if ((res = dev_wlc_intvar_set(dev, "mpc", mpc))) {
+		WL_ERROR(("%s fail to set mpc\n", __FUNCTION__));
+		goto fail;
+	}
+	OSL_DELAY(50*1000);
+#ifndef HW_SOFTAP_ENABLE_BW_80
+	if ((res = dev_iw_write_cfg0_bss_var(dev, 0)) < 0) {
+		WL_ERROR(("%s fail to set bss down\n", __FUNCTION__));
+		goto fail;
+	}
+	OSL_DELAY(50*1000);
+	if ((ap->channel == 0) && (get_softap_auto_channel(dev, ap) < 0)) {
+		ap->channel = 1;
+		WL_ERROR(("%s auto channel failed, use channel=%d\n",
+		          __FUNCTION__, ap->channel));
+	}
+	OSL_DELAY(50*1000);
+	if ((res = dev_iw_write_cfg0_bss_var(dev, 1)) < 0) {
+		WL_ERROR(("%s fail to set bss up\n", __FUNCTION__));
+		goto fail;
+	}
+	OSL_DELAY(50*1000);
+	updown = 1;
+	if ((res = dev_wlc_ioctl(dev, WLC_DOWN, &updown, sizeof(updown))) < 0) {
+		WL_ERROR(("%s fail to set down err =%d\n", __FUNCTION__, res));
+		goto fail;
+	}
+	OSL_DELAY(50*1000);
+	WL_SOFTAP(("%s: use channel=%d\n", __FUNCTION__, ap->channel));
+	channel = ap->channel;
+	if ((res = dev_wlc_ioctl(dev, WLC_SET_CHANNEL, &channel, sizeof(channel)))) {
+		WL_ERROR(("%s fail to set channel\n", __FUNCTION__));
+	}
+	OSL_DELAY(50*1000);
+	updown = 1;
+	if ((res = dev_wlc_ioctl(dev, WLC_UP, &updown, sizeof(updown))) < 0) {
+		WL_ERROR(("%s fail to set up err =%d\n", __FUNCTION__, res));
+		goto fail;
+	}
+	OSL_DELAY(50*1000);
+#endif
+	max_assoc = ap->max_scb;
+	if ((res = dev_wlc_intvar_set(dev, "maxassoc", max_assoc))) {
+		WL_ERROR(("%s fail to set maxassoc\n", __FUNCTION__));
+		goto fail;
+	}
+fail:
+	WL_ERROR(("%s exit with %d\n", __FUNCTION__, res));
+	return res;
+}
+
+static int
+wl_android_set_ap_config(struct net_device *dev, char *command, int total_len)
+{
+	int res = 0;
+	struct ap_profile ap_cfg;
+	memset(&ap_cfg, 0, sizeof(struct ap_profile));
+	if ((res = init_ap_profile_from_string(command, &ap_cfg)) < 0) {
+		WL_ERROR(("%s failed to parse %d\n", __FUNCTION__, res));
+		return -1;
+	}
+
+	if ((res = set_ap_cfg_hw(dev, &ap_cfg)) < 0)
+		WL_ERROR(("%s failed to set_ap_cfg %d\n", __FUNCTION__, res));
+	return res;
+}
+
+static int
+get_assoc_sta_list(struct net_device *dev, char *buf, int len)
+{
+	WL_TRACE(("%s: dev_wlc_ioctl(dev:%p, cmd:%d, buf:%p, len:%d)\n",
+		__FUNCTION__, dev, WLC_GET_ASSOCLIST, buf, len));
+	return dev_wlc_ioctl(dev, WLC_GET_ASSOCLIST, buf, len);
+}
+
+static int wl_android_get_assoc_list(struct net_device *dev, char *command, int total_len)
+{
+	int i, ret = 0;
+	char mac_buf[256];
+	struct maclist *sta_maclist = (struct maclist *)mac_buf;
+	char mac_lst[384];
+	char *p_mac_str;
+	char *p_mac_str_end;
+	int bytes_written = 0;
+	if ((!dev) || (!command)) {
+		return -EINVAL;
+	}
+
+	memset(sta_maclist, 0, sizeof(mac_buf));
+	sta_maclist->count = 8;
+
+	if ((ret = get_assoc_sta_list(dev, mac_buf, sizeof(mac_buf))) < 0) {
+		WL_ERROR(("%s: sta list ioctl error:%d\n", __FUNCTION__, ret));
+		goto func_exit;
+	}
+
+	WL_ERROR(("%s: got %d stations\n", __FUNCTION__, sta_maclist->count));
+	memset(mac_lst, 0, sizeof(mac_lst));
+	p_mac_str = mac_lst;
+	p_mac_str_end = &mac_lst[sizeof(mac_lst)-1];
+	for (i = 0; i < 8; i++) {
+		struct ether_addr * id = &sta_maclist->ea[i];
+		if (!ETHER_ISNULLADDR(id->octet)) {
+			if ((p_mac_str_end - p_mac_str) <= 36) {
+				WL_ERROR(("%s: mac list buf is < 36 for item[%i] item\n",
+					__FUNCTION__, i));
+				break;
+			}
+			p_mac_str += snprintf(p_mac_str, MAX_WX_STRING,
+			"%02X:%02X:%02X:%02X:%02X:%02X\n",
+			id->octet[0], id->octet[1], id->octet[2],
+			id->octet[3], id->octet[4], id->octet[5]);
+		}
+	}
+
+	if ((total_len) < (int)(strlen(mac_lst)+1))
+		return -ENOMEM;
+	bytes_written = snprintf(command, total_len, "%s", mac_lst);
+	return bytes_written;
+func_exit:
+	return ret;
+}
+
+
+static int
+set_ap_mac_list(struct net_device *dev, void *buf)
+{
+	struct mac_list_set *mac_list_set = (struct mac_list_set *)buf;
+	struct maclist *maclist = (struct maclist *)&mac_list_set->mac_list;
+	int length;
+	uint i;
+	int mac_mode = mac_list_set->mode;
+	int ioc_res = 0;
+	if (mac_mode == MACLIST_MODE_DISABLED) {
+		ioc_res = dev_wlc_ioctl(dev, WLC_SET_MACMODE, &mac_mode, sizeof(mac_mode));
+		check_error(ioc_res, "ioctl ERROR:", __FUNCTION__, __LINE__);
+		WL_SOFTAP(("%s: MAC filtering disabled\n", __FUNCTION__));
+	} else {
+		scb_val_t scbval;
+		char mac_buf[256] = {0};
+		struct maclist *assoc_maclist = (struct maclist *) mac_buf;
+#ifdef HW_SOFTAP_REASON_CODE
+		int reasonCode = HW_DENY_REASON_ACL;
+#endif
+		ioc_res = dev_wlc_ioctl(dev, WLC_SET_MACMODE, &mac_mode, sizeof(mac_mode));
+		check_error(ioc_res, "ioctl ERROR:", __FUNCTION__, __LINE__);
+		length = sizeof(maclist->count) + maclist->count*ETHER_ADDR_LEN;
+		dev_wlc_ioctl(dev, WLC_SET_MACLIST, maclist, length);
+		WL_SOFTAP(("%s: applied MAC List, mode:%d, length %d:\n",
+			__FUNCTION__, mac_mode, length));
+		for (i = 0; i < maclist->count; i++)
+			WL_SOFTAP(("mac %d: %02X:%02X:%02X:%02X:%02X:%02X\n",
+				i, maclist->ea[i].octet[0], maclist->ea[i].octet[1],
+				maclist->ea[i].octet[2],
+				maclist->ea[i].octet[3], maclist->ea[i].octet[4],
+				maclist->ea[i].octet[5]));
+#ifdef HW_SOFTAP_REASON_CODE
+		/* set ACL deny reason */
+		WL_SOFTAP(("%s: set deny reason %d\n", __FUNCTION__, reasonCode));
+		ioc_res = dev_wlc_intvar_set(dev, "mac_deny_reason", reasonCode);
+		check_error(ioc_res, "ioctl ERROR:", __FUNCTION__, __LINE__);
+#endif
+		assoc_maclist->count = 8;
+		ioc_res = dev_wlc_ioctl(dev, WLC_GET_ASSOCLIST, assoc_maclist, 256);
+		check_error(ioc_res, "ioctl ERROR:", __FUNCTION__, __LINE__);
+		WL_SOFTAP((" Cur assoc clients:%d\n", assoc_maclist->count));
+		if (assoc_maclist->count)
+			for (i = 0; i < assoc_maclist->count; i++) {
+				uint j;
+				bool assoc_mac_matched = FALSE;
+				WL_SOFTAP(("\n Cheking assoc STA: "));
+				dhd_print_buf(&assoc_maclist->ea[i], 6, 7);
+				WL_SOFTAP(("with the b/w list:"));
+				for (j = 0; j < maclist->count; j++)
+					if (!bcmp(&assoc_maclist->ea[i], &maclist->ea[j],
+						ETHER_ADDR_LEN)) {
+						assoc_mac_matched = TRUE;
+						break;
+					}
+				if (((mac_mode == MACLIST_MODE_ALLOW) && !assoc_mac_matched) ||
+					((mac_mode == MACLIST_MODE_DENY) && assoc_mac_matched)) {
+					WL_SOFTAP(("b-match or w-mismatch,"
+								" do deauth/disassoc \n"));
+							scbval.val = htod32(1);
+							bcopy(&assoc_maclist->ea[i], &scbval.ea,
+							ETHER_ADDR_LEN);
+							ioc_res = dev_wlc_ioctl(dev,
+								WLC_SCB_DEAUTHENTICATE_FOR_REASON,
+								&scbval, sizeof(scb_val_t));
+							check_error(ioc_res,
+								"ioctl ERROR:",
+								__FUNCTION__, __LINE__);
+				} else {
+					WL_SOFTAP((" no b/w list hits, let it be\n"));
+				}
+		} else {
+			WL_SOFTAP(("No ASSOC CLIENTS\n"));
+		}
+	}
+	WL_SOFTAP(("%s iocres:%d\n", __FUNCTION__, ioc_res));
+	return ioc_res;
+}
+
+static int wl_android_set_mac_filters(struct net_device *dev, char *command, int total_len)
+{
+	int i, ret = -1;
+	int mac_cnt = 0;
+	int mac_mode = 0;
+	struct ether_addr *p_ea;
+	struct mac_list_set mflist_set;
+	char *str_ptr;
+
+	memset(&mflist_set, 0, sizeof(mflist_set));
+	str_ptr = command;
+	if (get_parameter_from_string(&str_ptr, "MAC_MODE=",
+		PTYPE_INTDEC, &mac_mode, 4) != 0) {
+		WL_ERROR(("ERROR: 'MAC_MODE=' token is missing\n"));
+		goto exit_proc;
+	}
+	p_ea = &mflist_set.mac_list.ea[0];
+	if (get_parameter_from_string(&str_ptr, "MAC_CNT=",
+		PTYPE_INTDEC, &mac_cnt, 4) != 0) {
+		WL_ERROR(("ERROR: 'MAC_CNT=' token param is missing \n"));
+		goto exit_proc;
+	}
+	if (mac_cnt < 0 || mac_cnt > MAC_FILT_MAX) {
+		WL_ERROR(("ERROR: number of MAC filters > MAX\n"));
+		goto exit_proc;
+	}
+	for (i=0; i< mac_cnt; i++)
+	if (get_parameter_from_string(&str_ptr, "MAC=",
+		PTYPE_STR_HEX, &p_ea[i], 12) != 0) {
+		WL_ERROR(("ERROR: MAC_filter[%d] is missing !\n", i));
+		goto exit_proc;
+	}
+	WL_ERROR(("MAC_MODE=:%d, MAC_CNT=%d, MACs:..\n", mac_mode, mac_cnt));
+	for (i = 0; i < mac_cnt; i++) {
+	   WL_ERROR(("mac_filt[%d]:", i));
+	   dhd_print_buf(&p_ea[i], 6, 0);
+	}
+	mflist_set.mode = mac_mode;
+	mflist_set.mac_list.count = mac_cnt;
+	set_ap_mac_list(dev, &mflist_set);
+	ret = 0;
+
+	exit_proc:
+	return ret;
+}
+
+static int wl_iw_softap_deassoc_stations(struct net_device *dev, u8 *mac)
+{
+	int i;
+	int res = 0;
+	char mac_buf[128] = {0};
+	char z_mac[6] = {0, 0, 0, 0, 0, 0};
+	char *sta_mac;
+	struct maclist *assoc_maclist = (struct maclist *) mac_buf;
+	bool deauth_all = FALSE;
+	if (mac == NULL) {
+		deauth_all = TRUE;
+		sta_mac = z_mac;
+	} else {
+		sta_mac = mac;
+	}
+	memset(assoc_maclist, 0, sizeof(mac_buf));
+	assoc_maclist->count = 8;
+	res = dev_wlc_ioctl(dev, WLC_GET_ASSOCLIST, assoc_maclist, 128);
+	if (res != 0) {
+		WL_ERROR(("%s: Error:%d Couldn't get ASSOC List\n", __FUNCTION__, res));
+		return res;
+	}
+	if (assoc_maclist->count)
+		for (i = 0; i < assoc_maclist->count; i++) {
+		scb_val_t scbval;
+		scbval.val = htod32(1);
+		bcopy(&assoc_maclist->ea[i], &scbval.ea, ETHER_ADDR_LEN);
+		if (deauth_all || (memcmp(&scbval.ea, sta_mac, ETHER_ADDR_LEN) == 0))  {
+			WL_ERROR(("%s, deauth STA:%d \n", __FUNCTION__, i));
+			res |= dev_wlc_ioctl(dev, WLC_SCB_DEAUTHENTICATE_FOR_REASON,
+				&scbval, sizeof(scb_val_t));
+		}
+	} else WL_SOFTAP(("%s: No Stations \n", __FUNCTION__));
+	if (res != 0) {
+		WL_ERROR(("%s: Error:%d\n", __FUNCTION__, res));
+	} else if (assoc_maclist->count) {
+		bcm_mdelay(200);
+	}
+	return res;
+}
+
+static int wl_android_set_ap_sta_disassoc(struct net_device *dev, char *command, int total_len)
+{
+	int res = 0;
+	char sta_mac[6] = {0, 0, 0, 0, 0, 0};
+	char *str_ptr = command;
+
+	if (get_parameter_from_string(&str_ptr,
+		"MAC=", PTYPE_STR_HEX, sta_mac, 12) == 0) {
+		res = wl_iw_softap_deassoc_stations(dev, sta_mac);
+	} else  {
+		WL_ERROR(("ERROR: STA_MAC= token not found\n"));
+      }
+
+	return res;
+}
+#endif
+
+#define SAR_PARAMETER1  1001
+#define SAR_PARAMETER2  1002
+#define SAR_PARAMETER3  1003
+#define SAR_DISABLE 1000
+static int
+wl_iw_set_sar_enable(
+       struct net_device *dev,
+       int sar_enable)
+{
+       int error = -EINVAL;
+
+       if (sar_enable == SAR_DISABLE) {
+		error = dev_wlc_intvar_set(dev, "sar_enable", 0);
+		WL_ERROR(("%s enter sar_disable  \n", __FUNCTION__));
+       } else if(sar_enable == SAR_PARAMETER1) {
+		error = dev_wlc_intvar_set(dev, "sar_enable", 1);
+		WL_ERROR(("%s enter sar_enable parameter1 \n",__FUNCTION__));
+       } else if(sar_enable == SAR_PARAMETER2) {
+                error = dev_wlc_intvar_set(dev, "sar_enable", 2);
+                WL_ERROR(("%s enter sar_enable parameter2 \n",__FUNCTION__));
+       } else if(sar_enable == SAR_PARAMETER3) {
+                error = dev_wlc_intvar_set(dev, "sar_enable", 3);
+                WL_ERROR(("%s enter sar_enable parameter3 \n",__FUNCTION__));
+       } else {
+		WL_ERROR(("Sar parameter is invalid\n"));
+       }
+
+       return error;
+}
+
+static int
+wl_iw_set_txpow_dbm(
+	struct net_device *dev,
+	int txpwrdbm)
+{
+	int error;
+	txpwrdbm *= 4;
+	if (txpwrdbm < 0 || txpwrdbm>127) {
+		txpwrdbm = 127;
+	}
+	error = dev_wlc_intvar_set(dev, "qtxpower", txpwrdbm);
+	return error;
+}
+
+static int
+wl_android_set_txpow(struct net_device *dev, char *command, int total_len)
+{
+	int error, disable;
+	int value = 0;
+	int disabled = 0;
+	WL_TRACE(("%s: SIOCSIWTXPOW\n", dev->name));
+
+	if (sscanf(command, "%d %d", &disabled, &value) != 2)
+	{
+		 DHD_ERROR(("%s: sscanf error. check txpow value\n", __FUNCTION__));
+		 return -EINVAL;
+	}
+	/* Make sure radio is off or on as far as software is concerned */
+	disable = disabled ? WL_RADIO_SW_DISABLE : 0;
+	disable += WL_RADIO_SW_DISABLE << 16;
+
+	disable = htod32(disable);
+	if ((error = dev_wlc_ioctl(dev, WLC_SET_RADIO, &disable, sizeof(disable))))
+		return error;
+
+	/* If Radio is off, nothing more to do */
+	if (disable & WL_RADIO_SW_DISABLE)
+		return 0;
+
+	/* handle dbm */
+	if(value >= SAR_DISABLE)
+		error = wl_iw_set_sar_enable(dev, value);
+	else
+		error = wl_iw_set_txpow_dbm(dev, value);
+
+	return error;
+}
+
+static int
+wl_android_set_disassoc_roaming_bssid(struct net_device *dev, char *command, int total_len)
+{
+	int error;
+	int mode = AUTO_RECOVERY_BY_MANUAL;
+    WL_TRACE(("%s: wl_android_set_disassoc_roaming_bssid\n", dev->name));
+	scb_val_t scbval;
+	memset(&scbval, 0, sizeof(scb_val_t));
+	if(!command)
+	{
+		DHD_ERROR(("%s: invalid mode vale\n", __FUNCTION__));
+		return -EINVAL;
+	}
+	if (sscanf(command, "%d", &mode) != 1)
+	{
+		 DHD_ERROR(("%s: sscanf error. check wl_android_set_disassoc_roaming_bssid value\n", __FUNCTION__));
+		 return -EINVAL;
+	}
+	if((mode < AUTO_RECOVERY_AFTER_ROAMING) || (mode > AUTO_RECOVERY_BY_MANUAL))
+	{
+		 DHD_ERROR(("%s: mode error. mode vale is %d\n", __FUNCTION__, mode));
+		 return -EINVAL;
+	}
+	DHD_ERROR(("%s: mode vale is %d\n", __FUNCTION__, mode));
+	scbval.val = mode;
+	if ((error = wldev_ioctl(dev, WLC_SCB_DEAUTHENTICATE_FOR_REASON, &scbval, sizeof(scb_val_t), true)) != 0){
+	     DHD_ERROR(("%s WLC_SCB_DEAUTHENTICATE error=%d\n", __FUNCTION__, error));
+	}
+	return error;
+}
+
+#endif
 
 int wl_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 {
@@ -1474,6 +2301,9 @@ int wl_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 	char *command = NULL;
 	int bytes_written = 0;
 	android_wifi_priv_cmd priv_cmd;
+#ifdef BRCM_RSDB
+	dhd_pub_t * dhd_pub = NULL;
+#endif
 
 	net_os_wake_lock(net);
 #ifdef BCM_PATCH_CVE_2016_2475
@@ -1482,7 +2312,7 @@ int wl_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 		goto exit;
 	}
 #endif
-	if (!ifr->ifr_data) {
+	if (!ifr || !ifr->ifr_data) {
 		ret = -EINVAL;
 		goto exit;
 	}
@@ -1664,6 +2494,11 @@ int wl_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 	}
 #endif /* WL_CFG80211 */
 
+#ifdef HW_DOZE_PKT_FILTER
+	else if (strnicmp(command, CMD_FILTER_SWITCH, strlen(CMD_FILTER_SWITCH)) == 0) {
+		wl_android_set_doze_filter(net,command);
+	}
+#endif
 
 #ifdef PNO_SUPPORT
 	else if (strnicmp(command, CMD_PNOSSIDCLR_SET, strlen(CMD_PNOSSIDCLR_SET)) == 0) {
@@ -1748,6 +2583,45 @@ int wl_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 		int enable = *(command + strlen(CMD_POWER_LOCK) + 1) - '0';
 		bytes_written = wl_cfg80211_powerlock(net, enable);
 	}
+#endif
+#ifdef BCM_BLOCK_DATA_FRAME
+	else if (strnicmp(command, CMD_SET_BLOCKFRAME, strlen(CMD_SET_BLOCKFRAME)) == 0) {
+		int skip = strlen(CMD_SET_BLOCKFRAME) + 1;
+		bytes_written = wl_cfg80211_set_blockframe(net, command + skip, priv_cmd.total_len - skip);
+	}
+#endif
+#ifdef BRCM_RSDB
+	else if (strnicmp(command, CMD_CAPAB_RSDB, strlen(CMD_CAPAB_RSDB)) == 0) {
+		dhd_pub = hw_get_dhd_pub(net);
+		if (NULL != dhd_pub && priv_cmd.total_len > 0) {
+			bytes_written = snprintf(command, priv_cmd.total_len, "RSDB:%d", dhd_pub->rsdb_mode);
+		}
+	}
+#endif
+#ifdef HUAWEI_ANDROID_EXTENSION
+        else if (strnicmp(command, CMD_AP_SET_CFG, strlen(CMD_AP_SET_CFG)) == 0) {
+            int skip = strlen(CMD_AP_SET_CFG) + 1;
+            bytes_written = wl_android_set_ap_config(net, command+skip, priv_cmd.total_len-skip);
+        }
+        else if (strnicmp(command, CMD_AP_GET_STA_LIST, strlen(CMD_AP_GET_STA_LIST)) == 0) {
+            bytes_written = wl_android_get_assoc_list(net, command, priv_cmd.total_len);
+        }
+       else if (strnicmp(command, CMD_AP_SET_MAC_FLTR, strlen(CMD_AP_SET_MAC_FLTR)) == 0) {
+            int skip = strlen(CMD_AP_SET_MAC_FLTR) + 1;
+            bytes_written = wl_android_set_mac_filters(net, command+skip, priv_cmd.total_len-skip);
+        }
+        else if (strnicmp(command, CMD_AP_STA_DISASSOC, strlen(CMD_AP_STA_DISASSOC)) == 0) {
+            int skip = strlen(CMD_AP_STA_DISASSOC) + 1;
+            bytes_written = wl_android_set_ap_sta_disassoc(net, command+skip, priv_cmd.total_len-skip);
+        }
+        else if (strnicmp(command, CMD_SET_TX_POWER, strlen(CMD_SET_TX_POWER)) == 0) {
+            int skip = strlen(CMD_SET_TX_POWER) + 1;
+            bytes_written = wl_android_set_txpow(net, command+skip, priv_cmd.total_len-skip);
+        }
+        else if (strnicmp(command, CMD_SET_DISASSOC_ROAMING_BSSID, strlen(CMD_SET_DISASSOC_ROAMING_BSSID)) == 0) {
+            int skip = strlen(CMD_SET_DISASSOC_ROAMING_BSSID) + 1;
+            bytes_written = wl_android_set_disassoc_roaming_bssid(net, command+skip, priv_cmd.total_len-skip);
+        }
 #endif
 	else {
 		DHD_ERROR(("Unknown PRIVATE command %s - ignored\n", command));

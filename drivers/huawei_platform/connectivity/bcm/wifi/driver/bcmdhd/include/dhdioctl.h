@@ -93,7 +93,14 @@ enum {
 #define DHD_NOCHECKDIED_VAL		0x20000 /* UTF WAR */
 #define DHD_WL_VAL2		0x40000
 #define DHD_PNO_VAL		0x80000
+#ifndef BCM_PCIE_UPDATE
 #define DHD_RTT_VAL		0x100000
+#else
+#define DHD_MSGTRACE_VAL	0x100000
+#define DHD_FWLOG_VAL		0x400000
+#define DHD_RTT_VAL		0x200000
+#define DHD_IOV_INFO_VAL	0x800000
+#endif
 
 #ifdef SDTEST
 /* For pktgen iovar */

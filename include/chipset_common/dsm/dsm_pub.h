@@ -372,6 +372,10 @@
 #define DSM_WIFI_SET_SHAREDKEY_ERROR        (909030018)
 #define DSM_WIFI_OPEN_ERROR                 (909030019)
 
+/*wifi tem ctrl*/
+#define DSM_WIFI_CHIPSET_DAMAGE_WARNING     (909030020)
+#define DSM_WIFI_TEM_CTRL_EVENT             (909030021)
+
 #define DSM_WIFI_RESERVED                   (20701)
 
 

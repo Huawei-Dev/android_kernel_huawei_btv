@@ -36,6 +36,7 @@
 #include <dhd_bus.h>
 #include <dhd_linux.h>
 #include <wl_android.h>
+#include <hw_wifi.h>
 
 #ifdef HW_WIFI_SHUTDOWN
 extern void wifi_plat_dev_drv_shutdown(struct platform_device *pdev);
@@ -158,6 +159,14 @@ int wifi_platform_set_power(wifi_adapter_info_t *adapter, bool on, unsigned long
 #endif /* ENABLE_4335BT_WAR */
 
 		err = plat_data->set_power(on);
+#ifdef HW_WIFI_DMD_LOG
+		if (on) {
+			hw_dmd_set_dhd_state(DMD_DHD_STATE_OPEN);
+			hw_dmd_trace_log("wifi_platform_set_power = 1");
+		} else {
+			hw_dmd_set_dhd_state(DMD_DHD_STATE_STOP);
+		}
+#endif
 	}
 
 	if (msec && !err)
@@ -167,6 +176,25 @@ int wifi_platform_set_power(wifi_adapter_info_t *adapter, bool on, unsigned long
 		is_power_on = TRUE;
 	else
 		is_power_on = FALSE;
+
+	return err;
+}
+
+int wifi_platform_set_reset(wifi_adapter_info_t *adapter, bool on, unsigned long msec)
+{
+	int err = 0;
+	struct wifi_platform_data *plat_data;
+
+	if (!adapter || !adapter->wifi_plat_data)
+		return -EINVAL;
+	plat_data = adapter->wifi_plat_data;
+	DHD_ERROR(("%s = %d\n", __FUNCTION__, on));
+	if (plat_data->set_reset)
+	{
+		err = plat_data->set_reset(on);
+	}
+	if (msec && !err)
+		OSL_SLEEP(msec);
 
 	return err;
 }
@@ -181,6 +209,9 @@ int wifi_platform_bus_enumerate(wifi_adapter_info_t *adapter, bool device_presen
 	plat_data = adapter->wifi_plat_data;
 
 	DHD_ERROR(("%s device present %d\n", __FUNCTION__, device_present));
+#ifdef HW_WIFI_DMD_LOG
+	if (device_present) hw_dmd_trace_log("%s device present 1", __FUNCTION__);
+#endif
 	if (plat_data->set_carddetect) {
 		err = plat_data->set_carddetect(device_present);
 	} else {

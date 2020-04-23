@@ -617,7 +617,7 @@ static ssize_t store_ice40bin_dir(struct device *dev,
 			hwlog_err("%s wrong file path len!\n", __func__);
 			return count;
 		}
-		ret = sscanf(buf, "%s", ice40_bin_dir);
+		ret = sscanf(buf, "%95s", ice40_bin_dir);
 	} else {
 		snprintf(ice40_bin_dir, ICE40_IMAGE_FILEPAHT_LENTH - 1, "%s%s",
 			 ICE40_IMAGE_FILE_DIR,
@@ -1300,12 +1300,16 @@ static ssize_t set_testmode(struct device *dev, struct device_attribute *attr,
 	unsigned char input_address[TEST_MODE_INPUT_LEN] = { 0 };
 	fpga_data *drv_data = get_fpga_data();
 	fpga_plat_data *plat_data = NULL;
+	if (count > TEST_MODE_INPUT_LEN){
+		hwlog_err("%s buf length too long!\n", __func__);
+		return count;
+	}
 	if (!drv_data) {
 		hwlog_err("%s drv data is null.\n", __func__);
 		return count;
 	}
 	plat_data = &drv_data->plat_data;
-	ret = sscanf(buf, "%s", input_address);
+	ret = sscanf(buf, "%10s", input_address);
 	(void)kstrtoint(input_address, BASE_BINARY, &ret);//rec
 	hwlog_info("%s ret = %d\n", __func__, ret);
 	memset(indata, 0, SPI_DATA_LEN);

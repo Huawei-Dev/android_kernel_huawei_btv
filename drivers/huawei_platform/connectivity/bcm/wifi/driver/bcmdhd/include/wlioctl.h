@@ -1,4 +1,31 @@
-
+/*
+ * Custom OID/ioctl definitions for
+ * Broadcom 802.11abg Networking Device Driver
+ *
+ * Definitions subject to change without notice.
+ *
+ * Copyright (C) 1999-2014, Broadcom Corporation
+ *
+ *      Unless you and Broadcom execute a separate written software license
+ * agreement governing use of this software, this software is licensed to you
+ * under the terms of the GNU General Public License version 2 (the "GPL"),
+ * available at http://www.broadcom.com/licenses/GPLv2.php, with the
+ * following added to such license:
+ *
+ *      As a special exception, the copyright holders of this software give you
+ * permission to link this software with independent modules, and to copy and
+ * distribute the resulting executable under terms of your choice, provided that
+ * you also meet, for each linked independent module, the terms and conditions of
+ * the license of that module.  An independent module is a module which is not
+ * derived from this software.  The special exception does not apply to any
+ * modifications of the software.
+ *
+ *      Notwithstanding the above, under no circumstances may you combine this
+ * software in any way with any other Broadcom software provided under a license
+ * other than the GPL, without Broadcom's express prior written consent.
+ *
+ * $Id: wlioctl.h 490639 2014-07-11 08:31:53Z $
+ */
 
 #ifndef _wlioctl_h_
 #define	_wlioctl_h_
@@ -1092,6 +1119,15 @@ typedef struct {
 	struct ether_addr ea;
 } scb_val_t;
 
+#ifdef CONFIG_HW_GET_EXT_SIG
+typedef struct rrmrep {
+	unsigned char reg;
+	unsigned char chan;
+	unsigned short random_int;
+	unsigned short dur;
+} rrmrep_t;
+#endif
+
 /* Used by iovar versions of some ioctls, i.e. WLC_SCB_AUTHORIZE et al */
 typedef struct {
 	uint32 code;
@@ -1748,7 +1784,11 @@ typedef struct wl_bsstrans_roamthrottle {
 #define NREINITREASONCOUNT	8
 #define REINITREASONIDX(_x)	(((_x) < NREINITREASONCOUNT) ? (_x) : 0)
 
+#ifdef CONFIG_BCMDHD_PCIE
+#define	WL_CNT_T_VERSION	11	/* current version of wl_cnt_t struct */
+#else
 #define	WL_CNT_T_VERSION	10	/* current version of wl_cnt_t struct */
+#endif
 
 typedef struct {
 	uint16	version;	/* see definition of WL_CNT_T_VERSION */
@@ -1771,7 +1811,7 @@ typedef struct {
 	/* transmit chip error counters */
 	uint32	txuflo;		/* tx fifo underflows */
 	uint32	txphyerr;	/* tx phy errors (indicated in tx status) */
-	uint32	txphycrs;
+	uint32	txphycrs;   /* PR8861/8963 counter */
 
 	/* receive stat counters */
 	uint32	rxframe;	/* rx data frames */
@@ -1805,7 +1845,7 @@ typedef struct {
 	uint32	dmape;		/* tx/rx dma descriptor protocol errors */
 	uint32	reset;		/* reset count */
 	uint32	tbtt;		/* cnts the TBTT int's */
-	uint32	txdmawar;
+	uint32	txdmawar;   /* # occurrences of PR15420 workaround */
 	uint32	pkt_callback_reg_fail;	/* callbacks register failure */
 
 	/* MAC counters: 32-bit version of d11.h's macstat_t */
@@ -2002,6 +2042,20 @@ typedef struct {
 	uint32	pciereset;	/* Secondary Bus Reset issued by driver */
 	uint32	cfgrestore;	/* configspace restore by driver */
 	uint32	reinitreason[NREINITREASONCOUNT]; /* reinitreason counters; 0: Unknown reason */
+#ifdef CONFIG_BCMDHD_PCIE
+	uint32  rxrtry;		/* num of received packets with retry bit on */
+	uint32	txmpdu;		/* macstat cnt only valid in ver 11. number of MPDUs txed.  */
+	uint32	rxnodelim;	/* macstat cnt only valid in ver 11.
+				 * number of occasions that no valid delimiter is detected
+				 * by ampdu parser.
+				 */
+	uint32  rxmpdu_mu;  /* Number of MU MPDUs received */
+	/* This structure is deprecated in trunk and used only for ver <= 11.
+	 * Please refer to the following twiki before editing.
+	 * http://hwnbu-twiki.sj.broadcom.com/bin/view/
+	 * Mwgroup/WlCounters#wlc_layer_counters_non_xTLV
+	 */
+#endif
 } wl_cnt_t;
 
 typedef struct {
@@ -2586,7 +2640,7 @@ enum {
 #define PFN_HOTLIST_MAX_NUM_APS   64
 
 #define MAX_EPNO_HIDDEN_SSID         8
-#define MAX_WHITELIST_SSID           2
+#define MAX_WHITELIST_SSID           0   /* close the roam whitelist because the firmware not support */
 
 /* PFN network info structure */
 typedef struct wl_pfn_subnet_info {
@@ -2620,10 +2674,10 @@ typedef struct wl_pfn_lscanresults {
 	uint32 version;
         uint32 pading1;
         uint32 pading2;	
-	wl_pfn_lnet_info_t netinfo[1];
         uint16 status;
         uint16 count;
         uint32 scan_ch_buckets[MAX_CHBKT_PER_RESULT];
+        wl_pfn_lnet_info_t netinfo[1];
 } wl_pfn_lscanresults_t;
 #else
 typedef struct wl_pfn_lscanresults {
@@ -2639,10 +2693,10 @@ typedef struct wl_pfn_scanresults {
 	uint32 version;
 	uint32 status;
 	uint32 count;
-	wl_pfn_net_info_t netinfo[1];
 #ifdef BCM_PATCH_GSCAN
 	uint32 scan_ch_bucket;
 #endif
+	wl_pfn_net_info_t netinfo[1];
 } wl_pfn_scanresults_t;
 
 typedef struct wl_pfn_significant_net {
@@ -3161,6 +3215,9 @@ typedef enum wl_pkt_filter_type {
 	WL_PKT_FILTER_TYPE_MAGIC_PATTERN_MATCH=1, /* Magic packet match */
 	WL_PKT_FILTER_TYPE_PATTERN_LIST_MATCH=2, /* A pattern list (match all to match filter) */
 	WL_PKT_FILTER_TYPE_ENCRYPTED_PATTERN_MATCH=3, /* SECURE WOWL magic / net pattern match */
+#if defined(PKT_FILTER_SUPPORT) && defined(BCM_APF)
+	WL_PKT_FILTER_TYPE_APF_MATCH=4, /* Android packet filter match */
+#endif /* PKT_FILTER_SUPPORT && BCM_APF */
 } wl_pkt_filter_type_t;
 
 #define WL_PKT_FILTER_TYPE wl_pkt_filter_type_t
@@ -3209,6 +3266,15 @@ typedef struct wl_pkt_filter_pattern_list {
 	wl_pkt_filter_pattern_listel_t patterns[1]; /* Variable number of list elements */
 } wl_pkt_filter_pattern_list_t;
 
+#if defined(PKT_FILTER_SUPPORT) && defined(BCM_APF)
+typedef struct wl_apf_program {
+	uint16 version;
+	uint16 instr_len;	/* number of instruction blocks */
+	uint32 inst_ts;		/* program installation timestamp */
+	uint8 instrs[1];	/* variable length instructions */
+} wl_apf_program_t;
+#endif /* PKT_FILTER_SUPPORT && BCM_APF */
+
 /* IOVAR "pkt_filter_add" parameter. Used to install packet filters. */
 typedef struct wl_pkt_filter {
 	uint32	id;		/* Unique filter id, specified by app. */
@@ -3217,6 +3283,9 @@ typedef struct wl_pkt_filter {
 	union {			/* Filter definitions */
 		wl_pkt_filter_pattern_t pattern;	/* Pattern matching filter */
 		wl_pkt_filter_pattern_list_t patlist; /* List of patterns to match */
+#if defined(PKT_FILTER_SUPPORT) && defined(BCM_APF)
+		wl_apf_program_t apf_program; /* apf program */
+#endif /* PKT_FILTER_SUPPORT && BCM_APF */
 	} u;
 } wl_pkt_filter_t;
 
@@ -3231,6 +3300,18 @@ typedef struct wl_tcp_keep_set {
 #define WL_PKT_FILTER_PATTERN_LIST_FIXED_LEN OFFSETOF(wl_pkt_filter_pattern_list_t, patterns)
 #define WL_PKT_FILTER_PATTERN_LISTEL_FIXED_LEN	\
 			OFFSETOF(wl_pkt_filter_pattern_listel_t, mask_and_data)
+
+#if defined(PKT_FILTER_SUPPORT) && defined(BCM_APF)
+#define WL_APF_INTERNAL_VERSION 1
+#ifdef BCM_PATCH_CVE_2016_8455
+#define WL_APF_PROGRAM_MAX_SIZE (2 * 1024)
+#endif
+#define WL_APF_PROGRAM_FIXED_LEN OFFSETOF(wl_apf_program_t, instrs)
+#define WL_APF_PROGRAM_LEN(apf_program) \
+	(apf_program->instr_len * sizeof(apf_program->instrs[0]))
+#define WL_APF_PROGRAM_TOTAL_LEN(apf_program) \
+	(WL_APF_PROGRAM_FIXED_LEN + WL_APF_PROGRAM_LEN(apf_program))
+#endif /* PKT_FILTER_SUPPORT && BCM_APF */
 
 /* IOVAR "pkt_filter_enable" parameter. */
 typedef struct wl_pkt_filter_enable {
@@ -3595,7 +3676,10 @@ typedef struct log_idstr {
 
 #define FMTSTRF_USER		1
 
-
+/* flat ID definitions
+ * New definitions HAVE TO BE ADDED at the end of the table. Otherwise, it will
+ * affect backward compatibility with pre-existing apps
+ */
 typedef enum {
 	FMTSTR_DRIVER_UP_ID = 0,
 	FMTSTR_DRIVER_DOWN_ID = 1,
@@ -6620,7 +6704,62 @@ typedef struct wl_roam_prof_band {
 	wl_roam_prof_t roam_prof[WL_MAX_ROAM_PROF_BRACKETS];
 } wl_roam_prof_band_t;
 
+#ifdef CONFIG_HW_ABS
+/* ant event notification configuration. */
+typedef struct wl_ant_qual_event {
+	int8 thresh_low_core1;
+	int8 delta_low;
+	uint32 hyst_time_low;
+	int8 thresh_high_core1;
+	int8 delta_high;
+	uint32 hyst_time_high;
+} wl_ant_qual_event_t;
+#endif
+
 /* no default structure packing */
 #include <packed_section_end.h>
+#ifdef  BRCM_RSDB
+/* Data structures for Interface Create/Remove  */
+
+#define WL_INTERFACE_CREATE_VER	(0)
+
+/*
+ * The flags filed of the wl_interface_create is designed to be
+ * a Bit Mask. As of now only Bit 0 and Bit 1 are used as mentioned below.
+ * The rest of the bits can be used, incase we have to provide
+ * more information to the dongle
+ */
+
+/*
+ * Bit 0 of flags field is used to inform whether the interface requested to
+ * be created is STA or AP.
+ * 0 - Create a STA interface
+ * 1 - Create an AP interface
+ */
+#define WL_INTERFACE_CREATE_STA	(0 << 0)
+#define WL_INTERFACE_CREATE_AP	(1 << 0)
+
+/*
+ * Bit 1 of flags field is used to inform whether MAC is present in the
+ * data structure or not.
+ * 0 - Ignore mac_addr field
+ * 1 - Use the mac_addr field
+ */
+#define WL_INTERFACE_MAC_DONT_USE	(0 << 1)
+#define WL_INTERFACE_MAC_USE		(1 << 1)
+
+typedef struct wl_interface_create {
+	uint16	ver;			/* version of this struct */
+	uint32  flags;			/* flags that defines the operation */
+	struct	ether_addr   mac_addr;	/* Optional Mac address */
+} wl_interface_create_t;
+
+typedef struct wl_interface_info {
+	uint16	ver;			/* version of this struct */
+	struct ether_addr    mac_addr;	/* MAC address of the interface */
+	char	ifname[BCM_MSG_IFNAME_MAX]; /* name of interface */
+	uint8	bsscfgidx;		/* source bsscfg index */
+} wl_interface_info_t;
 
 #endif /* _wlioctl_h_ */
+#endif

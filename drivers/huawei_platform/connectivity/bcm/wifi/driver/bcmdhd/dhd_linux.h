@@ -41,9 +41,7 @@
 #include <dhd_wmf_linux.h>
 #endif
 /* Linux wireless extension support */
-#if defined(WL_WIRELESS_EXT)
-#include <wl_iw.h>
-#endif /* defined(WL_WIRELESS_EXT) */
+
 #if defined(CONFIG_HAS_EARLYSUSPEND) && defined(DHD_USE_EARLYSUSPEND)
 #include <linux/earlysuspend.h>
 #endif /* defined(CONFIG_HAS_EARLYSUSPEND) && defined(DHD_USE_EARLYSUSPEND) */
@@ -109,6 +107,7 @@ void dhd_wifi_platform_unregister_drv(void);
 wifi_adapter_info_t* dhd_wifi_platform_get_adapter(uint32 bus_type, uint32 bus_num,
 	uint32 slot_num);
 int wifi_platform_set_power(wifi_adapter_info_t *adapter, bool on, unsigned long msec);
+int wifi_platform_set_reset(wifi_adapter_info_t *adapter, bool on, unsigned long msec);
 int wifi_platform_bus_enumerate(wifi_adapter_info_t *adapter, bool device_present);
 int wifi_platform_get_irq_number(wifi_adapter_info_t *adapter, unsigned long *irq_flags_ptr);
 int wifi_platform_get_mac_addr(wifi_adapter_info_t *adapter, unsigned char *buf);

@@ -40,20 +40,30 @@
 #ifdef CONFIG_HWCONNECTIVITY
 #include <huawei_platform/connectivity/hw_connectivity.h>
 #endif
-
+#define DTS_COMP_GPS_POWER_NAME "huawei,gps_power"
+#define BUFFER_SIZE 16
 #define PORT_NAME "/dev/ttyAMA3"
-
+#define SIZE_MAX      (18446744073709551615UL)
 #define USE_TIMER 1
 //#define BCM_TTY_DEBUG_INFO 0
 //#define BCM_TTY_DEBUG 0
-#define BCM_TTY_DELTA_MS_TO_TOGGLE_LOW 400
+/*
+From EMUI4.1 to  EMUI 5.0 , the GpioDelayMs is changed from 50ms to 250ms,
+so bcm suggest change the delay time from 400ms to 600 ms.
+*/
+//#define BCM_TTY_DELTA_MS_TO_TOGGLE_LOW 400
+#define BCM_TTY_DELTA_MS_TO_TOGGLE_LOW 600
 #define BCM_TTY_TIMER_IDLE_INTERVAL_MS 200
 //#define BCM_TTY_MCU_REQ_RESP 1
+
+#define GPSINFO(fmt, args...)	pr_info("[DRV_GPS, I %s:%d]" fmt "\n",  __func__,  __LINE__, ## args)
+#define GPSDBG(fmt, args...)	pr_debug("[DRV_GPS, D %s:%d]" fmt "\n",  __func__,  __LINE__, ## args)
+#define GPSERR(fmt, args...)	pr_err("[DRV_GPS, E %s:%d]" fmt "\n",  __func__, __LINE__, ## args)
 
 #ifdef CONFIG_SENSORS_SSP_BBD
 extern void bbd_parse_asic_data(unsigned char *pucData, unsigned short usLen, void (*to_gpsd)(unsigned char *packet, unsigned short len, void* priv), void* priv);
 #endif
-
+char gps_tty[16];
 //--------------------------------------------------------------
 //
 //               Structs
@@ -105,7 +115,7 @@ struct bcm_tty_priv *priv;
 static bool bcm477x_hello(struct bcm_tty_priv *priv, unsigned total_bytes_in_queue, unsigned total_write_request)
 {
 #ifdef BCM_TTY_DEBUG
-	pr_info("[SSPBBD]gpstty driver bcm477x_hello is coming %d total_bytes_in_queue=%d total_write_request=%d\n", priv->mcu_req, total_bytes_in_queue, total_write_request);
+	GPSINFO("[SSPBBD]gpstty driver bcm477x_hello is coming %d total_bytes_in_queue=%d total_write_request=%d", priv->mcu_req, total_bytes_in_queue, total_write_request);
 #endif
 
 	gpio_set_value(priv->mcu_req, 1);
@@ -118,7 +128,7 @@ static bool bcm477x_hello(struct bcm_tty_priv *priv, unsigned total_bytes_in_que
 	{
 		if (count++ > 100) {
 			gpio_set_value(priv->mcu_req, 0);
-			pr_info("MCU_REQ_RESP timeout. MCU_RESP(gpio%d) not responding to MCU_REQ(gpio%d)\n",
+			GPSINFO("MCU_REQ_RESP timeout. MCU_RESP(gpio%d) not responding to MCU_REQ(gpio%d)",
 					priv->mcu_resp, priv->mcu_req);
 			return false;
 		}
@@ -147,7 +157,7 @@ static bool bcm477x_hello(struct bcm_tty_priv *priv, unsigned total_bytes_in_que
 static void bcm477x_bye(struct bcm_tty_priv *priv)
 {
 #ifdef BCM_TTY_DEBUG
-	pr_info("[SSPBBD]gpstty driver bcm477x_bye is coming\n");
+	GPSINFO("[SSPBBD]gpstty driver bcm477x_bye is coming");
 #endif
 
 	gpio_set_value(priv->mcu_req, 0);
@@ -160,7 +170,7 @@ static void raz_timer(void)
 #ifdef USE_TIMER
 
 #ifdef BCM_TTY_DEBUG
-	pr_info( "[SSPBBD]gpstty driver raz_timer\n");
+	GPSINFO( "[SSPBBD]gpstty driver raz_timer");
 #endif
 
 	txalarm_bases[TXALARM_KERNEL_TIMER].total_write_request = 0;
@@ -195,7 +205,7 @@ void timer_idle_callback( unsigned long data )
 
 	// if delta_since_last_write_jiffies >= BCM_TTY_DELTA_MS_TO_TOGGLE_LOW then we toggle MCU_REQ low
 	if (delta_ms >= BCM_TTY_DELTA_MS_TO_TOGGLE_LOW && base->toggled_low==0)
-    {
+	{
 		bcm477x_bye(priv);
 		base->toggled_low = 1;
 		raz_timer();
@@ -210,8 +220,8 @@ void timer_idle_callback( unsigned long data )
 
 #ifdef USE_TIMER
 #ifdef BCM_TTY_DEBUG
-	pr_info( "[SSPBBD]gpstty driver timer_idle_callback %d jiffies delta %d jiffies => %d ms\n", (unsigned long)j, base->delta_since_last_write_jiffies, delta_ms);
-	pr_info( KERN_INFO "[SSPBBD]gpstty driver timer_idle_callback exit\n");
+	GPSINFO( "[SSPBBD]gpstty driver timer_idle_callback %d jiffies delta %d jiffies => %d ms", (unsigned long)j, base->delta_since_last_write_jiffies, delta_ms);
+	GPSINFO( "[SSPBBD]gpstty driver timer_idle_callback exit");
 #endif
 #endif
 
@@ -228,7 +238,7 @@ static void alarm_idle_init(enum ttyalarmtimer_type type,
 	unsigned long flags;
 
 #ifdef BCM_TTY_DEBUG
-	pr_info( "[SSPBBD] alarm_idle_init enter\n");
+	GPSINFO( "[SSPBBD] alarm_idle_init enter");
 #endif
 
 	spin_lock_irqsave(&base->lock, flags);
@@ -243,7 +253,7 @@ static void alarm_idle_init(enum ttyalarmtimer_type type,
 	spin_unlock_irqrestore(&base->lock, flags);
 
 #ifdef BCM_TTY_DEBUG
-	pr_info( "[SSPBBD]gpstty driver alarm_idle_init exit\n");
+	GPSINFO( "[SSPBBD]gpstty driver alarm_idle_init exit");
 #endif
 
 #endif
@@ -271,7 +281,7 @@ static void config_timer(struct bcm_tty_priv *priv)
 #ifdef USE_TIMER
 
 #ifdef BCM_TTY_DEBUG
-	pr_info( "[SSPBBD]gpstty driver config_timer\n");
+	GPSINFO( "[SSPBBD]gpstty driver config_timer");
 #endif
 
 	raz_timer();
@@ -293,7 +303,7 @@ static int timer_idle_try_to_cancel(void)
 	unsigned long flags;
 
 #ifdef BCM_TTY_DEBUG
-	pr_info( "[SSPBBD]gpstty driver txalarm_try_to_cancel\n");
+	GPSINFO( "[SSPBBD]gpstty driver txalarm_try_to_cancel");
 #endif
 
         /*to void timer null point*/
@@ -301,9 +311,9 @@ static int timer_idle_try_to_cancel(void)
 
 #ifdef BCM_TTY_DEBUG
 	if (ret)
-		pr_info("[SSPBBD]gpstty driver timer_idle still in use...\n");
+		GPSINFO("[SSPBBD]gpstty driver timer_idle still in use...");
 	else
-		pr_info("[SSPBBD]gpstty driver timer_idle deleted\n");
+		GPSINFO("[SSPBBD]gpstty driver timer_idle deleted");
 #endif
 
 #endif
@@ -315,7 +325,7 @@ static int timer_idle_cancel(void)
 {
 #ifdef USE_TIMER
 #ifdef BCM_TTY_DEBUG
-	pr_info( "[SSPBBD]gpstty driver timer_idle_cancel\n");
+	GPSINFO( "[SSPBBD]gpstty driver timer_idle_cancel");
 #endif
 
 	for (;;)
@@ -348,7 +358,7 @@ static int bcm_tty_config(struct file *f)
 	/* Get termios */
 	ret = f->f_op->unlocked_ioctl(f, TCGETS, (unsigned long)&termios);
 	if (ret) {
-		pr_err("%s TCGETS failed, err=%ld\n",__func__,ret);
+		GPSERR(" TCGETS failed, err=%ld", ret);
 		set_fs(fs);
 		return -1;
 	}
@@ -364,7 +374,7 @@ static int bcm_tty_config(struct file *f)
 	/* Set termios */
 	ret = f->f_op->unlocked_ioctl(f, TCSETS, (unsigned long)&termios);
 	if (ret) {
-		pr_err("%s TCSETS failed, err=%ld\n",__func__,ret);
+		GPSERR(" TCSETS failed, err=%ld", ret);
 		set_fs(fs);
 		return -1;
 	}
@@ -389,7 +399,7 @@ static int bcm_tty_config_close(struct file *f)
 	/* Get termios */
 	ret = f->f_op->unlocked_ioctl(f, TCGETS, (unsigned long)&termios);
 	if (ret) {
-		pr_err("%s TCGETS failed, err=%ld\n",__func__,ret);
+		GPSERR(" TCGETS failed, err=%ld", ret);
 		set_fs(fs);
 		return -1;
 	}
@@ -404,7 +414,7 @@ static int bcm_tty_config_close(struct file *f)
 	/* Set termios */
 	ret = f->f_op->unlocked_ioctl(f, TCSETS, (unsigned long)&termios);
 	if (ret) {
-		pr_err("%s TCSETS failed, err=%ld\n",__func__,ret);
+		GPSERR(" TCSETS failed, err=%ld", ret);
 		set_fs(fs);
 		return -1;
 	}
@@ -414,6 +424,31 @@ static int bcm_tty_config_close(struct file *f)
 	return 0;
 }
 
+static int get_GPS_TTY_Port(void)
+{
+	struct device_node *np = NULL;
+	int ret = 0;
+	char *gps_tty_port_str = NULL;
+    
+	memset(gps_tty,0,sizeof(gps_tty));
+	np = of_find_compatible_node(NULL, NULL, DTS_COMP_GPS_POWER_NAME);
+	if (!np) 
+	{
+		GPSERR("%s, can't find node %s\n", __func__,DTS_COMP_GPS_POWER_NAME);
+		return -1;
+	}
+	ret = of_property_read_string(np, "broadcom_config,tty_port",(const char **)&gps_tty_port_str);
+	if (ret) 
+	{
+		GPSINFO("get broadcom_config,tty_port fail ret=%d\n",ret);
+		snprintf(gps_tty, sizeof(gps_tty),"/dev/%s", "ttyAMA3");
+		return 0;
+	}
+	snprintf(gps_tty, sizeof(gps_tty),"/dev/%s", gps_tty_port_str);
+	GPSINFO("get gps_tty=%s\n",gps_tty);
+	return 0;
+	
+}
 //--------------------------------------------------------------
 //
 //               File Operations
@@ -427,25 +462,29 @@ static int bcm_tty_open(struct inode *inode, struct file *filp)
 #endif
 	struct bcm_tty_priv *priv = container_of(filp->private_data, struct bcm_tty_priv, misc);
 
-	pr_info("%s++\n", __func__);
-
+	GPSINFO("++");
+    if(get_GPS_TTY_Port()<0)
+	{
+		GPSERR("get_GPS_TTY_Port failed !");
+		return -1;
+	}
 	if(priv->tty)
 	{
-		pr_err("%s-- has opened, open failed !\n", __func__);
+		GPSERR("-- has opened, open failed !");
 		return -1;
 	}
 
 	/* Open tty */
-	priv->tty = filp_open(PORT_NAME, O_RDWR, 0);
+	priv->tty = filp_open(gps_tty, O_RDWR, 0);
 	if (IS_ERR(priv->tty)) {
 		int ret = (int)PTR_ERR(priv->tty);
-		pr_err("%s can not open %s, error=%d\n", __func__, PORT_NAME, ret);
+		GPSERR(" can not open %s, error=%d", gps_tty, ret);
 		return ret;
 	}
 
 	/* Config tty */
 	if (bcm_tty_config(priv->tty)) {
-		pr_err("%s can not change %s setting.\n", __func__, PORT_NAME);
+		GPSERR(" can not change %s setting.", gps_tty);
 		return -EIO;
 	}
 
@@ -459,7 +498,7 @@ static int bcm_tty_open(struct inode *inode, struct file *filp)
 #endif
 
 #ifdef BCM_TTY_DEBUG_INFO
-	pr_info("%s--\n", __func__);
+	GPSINFO("be called --");
 #endif
 
 	return 0;
@@ -471,13 +510,13 @@ static int bcm_tty_release(struct inode *inode, struct file *filp)
 	struct file *tty = priv->tty;
 	int ret = 0;
 
-	pr_info("%s++\n", __func__);
+	GPSINFO("++");
 	priv->tty = NULL;
 	ret = filp_close(tty, 0);
 #ifdef USE_TIMER
 	timer_idle_cancel();
 #endif
-	pr_info("%s--\n", __func__);
+	GPSINFO("--");
 
 	return ret;
 }
@@ -509,6 +548,9 @@ static ssize_t bcm_tty_write(struct file *filp, const char __user *buf, size_t s
 	priv = (struct bcm_tty_priv *)base->priv_data;
 
 	spin_lock_irqsave(&base->lock, flags);
+	if(size > SIZE_MAX){
+		size = SIZE_MAX;
+	}
 	base->total_bytes_to_write+=size;
 	base->total_write_request++;
 
@@ -543,7 +585,7 @@ int bcm4774_suspend(struct platform_device *p, pm_message_t state)
 
 	if((NULL == priv) || (NULL == priv->tty) || (NULL == priv->tty->private_data))
 	{
-		pr_err("%s priv is NOT init \n", __func__);
+		GPSERR(" priv is NOT init ");
 		return 0;
 	}
 
@@ -551,17 +593,17 @@ int bcm4774_suspend(struct platform_device *p, pm_message_t state)
 	ttypoint = ((struct tty_file_private *)ttyfile->private_data)->tty;
 	if((NULL == ttypoint) || (NULL == ttypoint->port))
 	{
-		pr_err("%s ttypoint is NULL \n", __func__);
+		GPSERR(" ttypoint is NULL ");
 		return 0;
 	}
 	/* Disable auto uart flow control by hardware, enable manual uart flow control by register */
 	if (bcm_tty_config_close(ttyfile)) {
-		pr_err("%s can not change %s setting.\n", __func__, PORT_NAME);
+		GPSERR("can not change %s setting.", gps_tty);
 		return 0;
 	}
 	/* Disable  uart RTS via register: pull high (register =0 means pull high) */
 	tty_port_lower_dtr_rts(ttypoint->port);
-	pr_info("%s entry ++ :%s\n", __func__, ttypoint->name);
+	GPSINFO(" entry ++ :%s",  ttypoint->name);
 	return 0;
 }
 
@@ -572,7 +614,7 @@ int bcm4774_resume(struct platform_device *p)
 
 	if((NULL == priv) || (NULL == priv->tty) || (NULL == priv->tty->private_data))
 	{
-		pr_err("%s priv is NOT init \n", __func__);
+		GPSERR(" priv is NOT init ");
 		return 0;
 	}
 
@@ -580,17 +622,17 @@ int bcm4774_resume(struct platform_device *p)
 	ttypoint = ((struct tty_file_private *)ttyfile->private_data)->tty;
 	if((NULL == ttypoint) || (NULL == ttypoint->port))
 	{
-		pr_err("%s ttypoint is NULL \n", __func__);
+		GPSERR(" ttypoint is NULL ");
 		return 0;
 	}
 
 	/* Enable auto uart flow control by hardware, manual uart flow control by register is disabled */
 	if (bcm_tty_config(ttyfile)) {
-		pr_err("%s can not change %s setting.\n", __func__, PORT_NAME);
+		GPSERR(" can not change %s setting.", gps_tty);
 		return 0;
 	}
 
-	pr_info("%s -- :%s\n", __func__, ttypoint->name);
+	GPSINFO(" -- :%s", ttypoint->name);
 	return 0;
 }
 
@@ -598,7 +640,7 @@ static long bcm_tty_ioctl( struct file *filp,
         unsigned int cmd, unsigned long arg)
 {
 #ifdef BCM_TTY_DEBUG
-    pr_info("[SSPBBD]gpstty driver bcm_tty_ioctl is coming\n" );
+    GPSINFO("[SSPBBD]gpstty driver bcm_tty_ioctl is coming");
 #endif
     return 0;
 }
@@ -632,10 +674,10 @@ static int __init bcm_tty_init(void)
     //For OneTrack, we need check it's the right chip type or not.
     //If it's not the right chip type, don't init the driver
     if (!isMyConnectivityChip(CHIP_TYPE_BCM)) {
-        pr_err("bcm tty chip type is not match, skip driver init\n");
+        GPSERR("bcm tty chip type is not match, skip driver init");
         return -EINVAL;
     } else {
-        pr_err("bcm tty chip type is matched with Broadcom, continue\n");
+        GPSINFO("bcm tty chip type is matched with Broadcom, continue");
     }
 #endif
 
@@ -650,17 +692,17 @@ static int __init bcm_tty_init(void)
 	  ===================================================== */
 	struct device_node *np = of_find_node_by_name(NULL, "gps_power");
 	if (!np) {
-		pr_err("[SSPBBD]gpstty driver fail to find OF node huawei,gps_power\n");
+		GPSERR("[SSPBBD]gpstty driver fail to find OF node huawei,gps_power");
 		goto err_exit;
 	}
 	mcu_req = of_get_named_gpio(np,"huawei,mcu_req",0);
 	mcu_resp = of_get_named_gpio(np,"huawei,mcu_req_rsp",0);
 	//host_req = of_get_named_gpio(np,"huawei,gps_hostwake",0);
 #ifdef BCM_TTY_DEBUG_INFO
-	pr_info("[SSPBBD]gpstty driver huawei,mcu_req=%d, huawei,mcu_req_rsp=%d\n",  mcu_req, mcu_resp);
+	GPSINFO("[SSPBBD]gpstty driver huawei,mcu_req=%d, huawei,mcu_req_rsp=%d",  mcu_req, mcu_resp);
 #endif
 	if (mcu_req<0 || mcu_resp<0) {
-		pr_err("[SSPBBD]: GPIO value not correct\n");
+		GPSERR("[SSPBBD]: GPIO value not correct");
 		goto err_exit;
 	}
 
@@ -673,7 +715,7 @@ static int __init bcm_tty_init(void)
 	/* Alloc */
 	priv = (struct bcm_tty_priv*) kmalloc(sizeof(*priv), GFP_KERNEL);
 	if (!priv) {
-		pr_err("%s Failed to allocate \"gpstty\"\n", __func__);
+		GPSERR("Failed to allocate \"gpstty\"");
 		goto err_exit;
 	}
 
@@ -696,7 +738,7 @@ static int __init bcm_tty_init(void)
 
 	ret = misc_register(&priv->misc);
 	if (ret) {
-		pr_err("%s Failed to register gpstty. err=%d\n", __func__,ret);
+		GPSERR(" Failed to register gpstty. err=%d", ret);
 		goto free_mem;
 	}
 

@@ -21,6 +21,8 @@
 #define SET_VIO    1
 #define HWLOG_TAG       vio
 
+MODULE_LICENSE("GPL v2");
+
 int gpio_vio;
 
 HWLOG_REGIST();

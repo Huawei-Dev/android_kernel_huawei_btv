@@ -1,14 +1,14 @@
 /*
  * Linux OS Independent Layer
  *
- * Copyright (C) 1999-2014, Broadcom Corporation
- *
+ * Copyright (C) 1999-2016, Broadcom Corporation
+ * 
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
  * under the terms of the GNU General Public License version 2 (the "GPL"),
  * available at http://www.broadcom.com/licenses/GPLv2.php, with the
  * following added to such license:
- *
+ * 
  *      As a special exception, the copyright holders of this software give you
  * permission to link this software with independent modules, and to copy and
  * distribute the resulting executable under terms of your choice, provided that
@@ -16,12 +16,15 @@
  * the license of that module.  An independent module is a module which is not
  * derived from this software.  The special exception does not apply to any
  * modifications of the software.
- *
+ * 
  *      Notwithstanding the above, under no circumstances may you combine this
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
- * $Id: linux_osl.c 474402 2014-05-01 03:50:41Z $
+ *
+ * <<Broadcom-WL-IPTag/Open:>>
+ *
+ * $Id: linux_osl.c 633414 2016-04-22 11:22:49Z $
  */
 
 #define LINUX_PORT
@@ -53,6 +56,9 @@
 #ifdef BCMPCIE
 #include <bcmpcie.h>
 #endif /* BCMPCIE */
+#ifdef BCM_OBJECT_TRACE
+#include <bcmutils.h>
+#endif /* BCM_OBJECT_TRACE */
 
 #define PCI_CFG_RETRY		10
 
@@ -60,10 +66,25 @@
 #define BCM_MEM_FILENAME_LEN	24		/* Mem. filename length */
 #define DUMPBUFSZ 1024
 
+/* dependancy check */
+#if !defined(BCMPCIE) && defined(DHD_USE_STATIC_CTRLBUF)
+#error "DHD_USE_STATIC_CTRLBUF suppored PCIE target only"
+#endif /* !BCMPCIE && DHD_USE_STATIC_CTRLBUF */
+
 #ifdef CONFIG_DHD_USE_STATIC_BUF
+#ifdef DHD_USE_STATIC_CTRLBUF
 #define DHD_SKB_1PAGE_BUFSIZE	(PAGE_SIZE*1)
 #define DHD_SKB_2PAGE_BUFSIZE	(PAGE_SIZE*2)
 #define DHD_SKB_4PAGE_BUFSIZE	(PAGE_SIZE*4)
+
+#define PREALLOC_FREE_MAGIC	0xFEDC
+#define PREALLOC_USED_MAGIC	0xFCDE
+#else
+#define DHD_SKB_HDRSIZE		336
+#define DHD_SKB_1PAGE_BUFSIZE	((PAGE_SIZE*1)-DHD_SKB_HDRSIZE)
+#define DHD_SKB_2PAGE_BUFSIZE	((PAGE_SIZE*2)-DHD_SKB_HDRSIZE)
+#define DHD_SKB_4PAGE_BUFSIZE	((PAGE_SIZE*4)-DHD_SKB_HDRSIZE)
+#endif /* DHD_USE_STATIC_CTRLBUF */
 
 #define STATIC_BUF_MAX_NUM	16
 #ifdef HW_SOFTAP_THROUGHPUT_OPTIMIZE
@@ -74,14 +95,18 @@
 #define STATIC_BUF_TOTAL_LEN	(STATIC_BUF_MAX_NUM * STATIC_BUF_SIZE)
 
 typedef struct bcm_static_buf {
+#ifndef BCM_PCIE_UPDATE
 	spinlock_t static_lock;
+#else
+	struct semaphore static_sem;
+#endif
 	unsigned char *buf_ptr;
 	unsigned char buf_use[STATIC_BUF_MAX_NUM];
 } bcm_static_buf_t;
 
 static bcm_static_buf_t *bcm_static_buf = 0;
 
-#if defined(BCMPCIE)
+#ifdef DHD_USE_STATIC_CTRLBUF
 #define STATIC_PKT_4PAGE_NUM	0
 #define DHD_SKB_MAX_BUFSIZE	DHD_SKB_2PAGE_BUFSIZE
 #elif defined(ENHANCED_STATIC_BUF)
@@ -89,16 +114,16 @@ static bcm_static_buf_t *bcm_static_buf = 0;
 #define DHD_SKB_MAX_BUFSIZE	DHD_SKB_4PAGE_BUFSIZE
 #else
 #define STATIC_PKT_4PAGE_NUM	0
-#define DHD_SKB_MAX_BUFSIZE DHD_SKB_2PAGE_BUFSIZE
-#endif /* BCMPCIE */
+#define DHD_SKB_MAX_BUFSIZE	DHD_SKB_2PAGE_BUFSIZE
+#endif /* DHD_USE_STATIC_CTRLBUF */
 
-#ifdef BCMPCIE
+#ifdef DHD_USE_STATIC_CTRLBUF
 #define STATIC_PKT_1PAGE_NUM	0
 #define STATIC_PKT_2PAGE_NUM	64
 #else
 #define STATIC_PKT_1PAGE_NUM	8
 #define STATIC_PKT_2PAGE_NUM	8
-#endif /* BCMPCIE */
+#endif /* DHD_USE_STATIC_CTRLBUF */
 
 #define STATIC_PKT_1_2PAGE_NUM	\
 	((STATIC_PKT_1PAGE_NUM) + (STATIC_PKT_2PAGE_NUM))
@@ -106,9 +131,11 @@ static bcm_static_buf_t *bcm_static_buf = 0;
 	((STATIC_PKT_1_2PAGE_NUM) + (STATIC_PKT_4PAGE_NUM))
 
 typedef struct bcm_static_pkt {
-#if defined(BCMPCIE)
+#ifdef DHD_USE_STATIC_CTRLBUF
 	struct sk_buff *skb_8k[STATIC_PKT_2PAGE_NUM];
+	unsigned char pkt_invalid[STATIC_PKT_2PAGE_NUM];
 	spinlock_t osl_pkt_lock;
+	uint32 last_allocated_index;
 #else
 	struct sk_buff *skb_4k[STATIC_PKT_1PAGE_NUM];
 	struct sk_buff *skb_8k[STATIC_PKT_2PAGE_NUM];
@@ -116,7 +143,7 @@ typedef struct bcm_static_pkt {
 	struct sk_buff *skb_16k;
 #endif /* ENHANCED_STATIC_BUF */
 	struct semaphore osl_pkt_sem;
-#endif /* !BCMPCIE */
+#endif /* DHD_USE_STATIC_CTRLBUF */
 	unsigned char pkt_use[STATIC_PKT_MAX_NUM];
 } bcm_static_pkt_t;
 
@@ -148,6 +175,7 @@ typedef struct osl_cmn_info osl_cmn_t;
 
 struct osl_info {
 	osl_pubinfo_t pub;
+	uint32  flags;		/* If specific cases to be handled in the OSL */
 #ifdef CTFPOOL
 	ctfpool_t *ctfpool;
 #endif /* CTFPOOL */
@@ -158,7 +186,6 @@ struct osl_info {
 	osl_cmn_t *cmn; /* Common OSL related data shred between two OSH's */
 
 	void *bus_handle;
-	uint32  flags;		/* If specific cases to be handled in the OSL */
 };
 
 #define OSL_PKTTAG_CLEAR(p) \
@@ -254,6 +281,74 @@ osl_error(int bcmerror)
 	/* Array bounds covered by ASSERT in osl_attach */
 	return linuxbcmerrormap[-bcmerror];
 }
+#ifdef BCM_ALLOC_STATIC_24K
+#define MAX_STATIC_FLOWRING 40
+#define FLOWRING_BUF_SIZE (24*1024)
+typedef struct {
+	void * va[MAX_STATIC_FLOWRING];
+	dmaaddr_t pap[MAX_STATIC_FLOWRING];
+	unsigned char used[MAX_STATIC_FLOWRING];
+} bcm_static_flowring_t;
+
+static bcm_static_flowring_t *static_flowring = NULL;
+static unsigned int atomic_allocated_size = 0;
+
+static void*
+osl_dma_alloc_static_flowring(dmaaddr_t *pap, int *idx)
+{
+	int i = 0;
+
+	if (!static_flowring)
+		return NULL;
+
+	for (i=0;i<MAX_STATIC_FLOWRING;i++) {
+		if (!static_flowring->used[i]) {
+			printf("[WLAN] %s: get static flow buf idx=%d\n", __FUNCTION__, i);
+			*idx = i;
+			*pap = static_flowring->pap[i];
+			static_flowring->used[i] = 1;
+			return static_flowring->va[i];
+		}
+	}
+
+        printf("[WLAN] %s: out of static flowring\n", __FUNCTION__);
+	return NULL;
+}
+
+static bool
+osl_dma_clear_static_flowring(void *va)
+{
+	int i = 0;
+	if (!static_flowring)
+		return false;
+
+	for (i=0;i<MAX_STATIC_FLOWRING;i++) {
+		if (static_flowring->va[i] == va) {
+			printf("[WLAN] %s: return static flow buf idx=%d\n", __FUNCTION__, i);
+			static_flowring->used[i] = 0;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+static void
+osl_dma_free_static_flowring(osl_t *osh)
+{
+	int i = 0;
+
+	if (!static_flowring) 
+		return;
+
+	for (i=0;i<MAX_STATIC_FLOWRING;i++) {
+		pci_free_consistent(osh->pdev, FLOWRING_BUF_SIZE,
+			static_flowring->va[i], static_flowring->pap[i]);
+	}
+
+	kfree(static_flowring);
+}
+#endif
 #ifdef SHARED_OSL_CMN
 osl_t *
 osl_attach(void *pdev, uint bustype, bool pkttag, void **osl_cmn)
@@ -305,6 +400,20 @@ osl_attach(void *pdev, uint bustype, bool pkttag)
 
 	switch (bustype) {
 		case PCI_BUS:
+#ifdef BCM_ALLOC_STATIC_24K
+			if ((static_flowring = kmalloc(sizeof(bcm_static_flowring_t), flags))){
+				int i;
+				for (i=0; i<MAX_STATIC_FLOWRING; i++) {
+					static_flowring->va[i] =
+						dma_alloc_coherent(pdev, FLOWRING_BUF_SIZE, &(static_flowring->pap[i]), flags);
+					static_flowring->used[i] = 0;
+					if (!static_flowring->va[i])
+						printf("[WLAN] %s: cannot malloc va of static_flowring\n", __FUNCTION__);
+				}
+			} else {
+				printf("[WLAN] %s: cannot malloc static_flowring\n", __FUNCTION__);
+			}
+#endif
 		case SI_BUS:
 		case PCMCIA_BUS:
 			osh->pub.mmbus = TRUE;
@@ -339,11 +448,15 @@ int osl_static_mem_init(osl_t *osh, void *adapter)
 		} else {
 			printf("alloc static buf at %p!\n", bcm_static_buf);
 		}
-
+#ifndef BCM_PCIE_UPDATE
 		spin_lock_init(&bcm_static_buf->static_lock);
+#else
+		sema_init(&bcm_static_buf->static_sem, 1);
+#endif
 		bcm_static_buf->buf_ptr = (unsigned char *)bcm_static_buf + STATIC_BUF_SIZE;
 	}
 
+#if defined(BCMSDIO) || defined(DHD_USE_STATIC_CTRLBUF)
 	if (!bcm_static_skb && adapter) {
 		int i;
 		void *skb_buff_ptr = 0;
@@ -359,16 +472,20 @@ int osl_static_mem_init(osl_t *osh, void *adapter)
 
 		bcopy(skb_buff_ptr, bcm_static_skb, sizeof(struct sk_buff *) *
 			(STATIC_PKT_MAX_NUM));
-		for (i = 0; i < STATIC_PKT_MAX_NUM; i++)
+		for (i = 0; i < STATIC_PKT_MAX_NUM; i++) {
 			bcm_static_skb->pkt_use[i] = 0;
+		}
 
-#if defined(BCMPCIE)
-		spin_lock_init(&bcm_static_skb->osl_pkt_lock);
+#ifdef DHD_USE_STATIC_CTRLBUF
+			spin_lock_init(&bcm_static_skb->osl_pkt_lock);
+#ifdef BCM_PCIE_UPDATE
+			bcm_static_skb->last_allocated_index = 0;
+#endif
 #else
 		sema_init(&bcm_static_skb->osl_pkt_sem, 1);
-#endif /* BCMPCIE */
+#endif /* DHD_USE_STATIC_CTRLBUF */
 	}
-
+#endif /* BCMSDIO || DHD_USE_STATIC_CTRLBUF */
 #endif /* CONFIG_DHD_USE_STATIC_BUF */
 
 	return 0;
@@ -395,6 +512,9 @@ osl_detach(osl_t *osh)
 	if (atomic_read(&osh->cmn->refcount) == 0) {
 			kfree(osh->cmn);
 	}
+#ifdef BCM_ALLOC_STATIC_24K
+	osl_dma_free_static_flowring(osh);
+#endif
 	kfree(osh);
 }
 
@@ -404,9 +524,11 @@ int osl_static_mem_deinit(osl_t *osh, void *adapter)
 	if (bcm_static_buf) {
 		bcm_static_buf = 0;
 	}
+#ifdef BCMSDIO
 	if (bcm_static_skb) {
 		bcm_static_skb = 0;
 	}
+#endif /* BCMSDIO */
 #endif /* CONFIG_DHD_USE_STATIC_BUF */
 	return 0;
 }
@@ -573,9 +695,11 @@ osl_ctfpool_stats(osl_t *osh, void *b)
 	if (bcm_static_buf) {
 		bcm_static_buf = 0;
 	}
+#ifdef BCMSDIO
 	if (bcm_static_skb) {
 		bcm_static_skb = 0;
 	}
+#endif /* BCMSDIO */
 #endif /* CONFIG_DHD_USE_STATIC_BUF */
 
 	bb = b;
@@ -799,6 +923,22 @@ osl_pktfree(osl_t *osh, void *p, bool send)
 
 	PKTDBG_TRACE(osh, (void *) skb, PKTLIST_PKTFREE);
 
+#if defined(CONFIG_DHD_USE_STATIC_BUF) && defined(DHD_USE_STATIC_CTRLBUF)
+	if (skb && (skb->mac_len == PREALLOC_USED_MAGIC)) {
+		printk("%s: pkt %p is from static pool\n",
+			__FUNCTION__, p);
+		dump_stack();
+		return;
+	}
+
+	if (skb && (skb->mac_len == PREALLOC_FREE_MAGIC)) {
+		printk("%s: pkt %p is from static pool and not in used\n",
+			__FUNCTION__, p);
+		dump_stack();
+		return;
+	}
+#endif /* CONFIG_DHD_USE_STATIC_BUF && DHD_USE_STATIC_CTRLBUF */
+
 	/* perversion: we use skb->next to chain multi-skb packets */
 	while (skb) {
 		nskb = skb->next;
@@ -827,6 +967,256 @@ next_skb:
 }
 
 #ifdef CONFIG_DHD_USE_STATIC_BUF
+#ifdef BCM_PCIE_UPDATE
+void*
+osl_pktget_static(osl_t *osh, uint len)
+{
+	int i = 0;
+	struct sk_buff *skb;
+#ifdef DHD_USE_STATIC_CTRLBUF
+	unsigned long flags;
+#endif /* DHD_USE_STATIC_CTRLBUF */
+
+	if (!bcm_static_skb)
+		return osl_pktget(osh, len);
+
+	if (len > DHD_SKB_MAX_BUFSIZE) {
+		printf("%s: attempt to allocate huge packet (0x%x)\n", __FUNCTION__, len);
+		return osl_pktget(osh, len);
+	}
+
+#ifdef DHD_USE_STATIC_CTRLBUF
+	spin_lock_irqsave(&bcm_static_skb->osl_pkt_lock, flags);
+
+	if (len <= DHD_SKB_2PAGE_BUFSIZE) {
+		uint32 index;
+		for (i = 0; i < STATIC_PKT_2PAGE_NUM; i++) {
+			index = bcm_static_skb->last_allocated_index % STATIC_PKT_2PAGE_NUM;
+			bcm_static_skb->last_allocated_index++;
+			if (bcm_static_skb->skb_8k[index] &&
+				bcm_static_skb->pkt_use[index] == 0) {
+				break;
+			}
+		}
+
+		if ((i != STATIC_PKT_2PAGE_NUM) &&
+			(index >= 0) && (index < STATIC_PKT_2PAGE_NUM)) {
+			bcm_static_skb->pkt_use[index] = 1;
+			skb = bcm_static_skb->skb_8k[index];
+			skb->data = skb->head;
+#ifdef NET_SKBUFF_DATA_USES_OFFSET
+			skb_set_tail_pointer(skb, NET_SKB_PAD);
+#else
+			skb->tail = skb->data + NET_SKB_PAD;
+#endif /* NET_SKBUFF_DATA_USES_OFFSET */
+			skb->data += NET_SKB_PAD;
+			skb->cloned = 0;
+			skb->priority = 0;
+#ifdef NET_SKBUFF_DATA_USES_OFFSET
+			skb_set_tail_pointer(skb, len);
+#else
+			skb->tail = skb->data + len;
+#endif /* NET_SKBUFF_DATA_USES_OFFSET */
+			skb->len = len;
+			skb->mac_len = PREALLOC_USED_MAGIC;
+			spin_unlock_irqrestore(&bcm_static_skb->osl_pkt_lock, flags);
+			return skb;
+		}
+	}
+
+	spin_unlock_irqrestore(&bcm_static_skb->osl_pkt_lock, flags);
+	printk("%s: all static pkt in use!\n", __FUNCTION__);
+	return NULL;
+#else
+	down(&bcm_static_skb->osl_pkt_sem);
+
+	if (len <= DHD_SKB_1PAGE_BUFSIZE) {
+		for (i = 0; i < STATIC_PKT_1PAGE_NUM; i++) {
+			if (bcm_static_skb->skb_4k[i] &&
+				bcm_static_skb->pkt_use[i] == 0) {
+				break;
+			}
+		}
+
+		if (i != STATIC_PKT_1PAGE_NUM) {
+			bcm_static_skb->pkt_use[i] = 1;
+
+			skb = bcm_static_skb->skb_4k[i];
+#ifdef NET_SKBUFF_DATA_USES_OFFSET
+			skb_set_tail_pointer(skb, len);
+#else
+			skb->tail = skb->data + len;
+#endif /* NET_SKBUFF_DATA_USES_OFFSET */
+			skb->len = len;
+
+			up(&bcm_static_skb->osl_pkt_sem);
+#ifdef HW_WIFI_SECURITY_PATCH
+			memset(skb->data, 0, skb->len);
+#endif
+			return skb;
+		}
+	}
+
+	if (len <= DHD_SKB_2PAGE_BUFSIZE) {
+		for (i = STATIC_PKT_1PAGE_NUM; i < STATIC_PKT_1_2PAGE_NUM; i++) {
+			if (bcm_static_skb->skb_8k[i - STATIC_PKT_1PAGE_NUM] &&
+				bcm_static_skb->pkt_use[i] == 0) {
+				break;
+			}
+		}
+
+		if ((i >= STATIC_PKT_1PAGE_NUM) && (i < STATIC_PKT_1_2PAGE_NUM)) {
+			bcm_static_skb->pkt_use[i] = 1;
+			skb = bcm_static_skb->skb_8k[i - STATIC_PKT_1PAGE_NUM];
+#ifdef NET_SKBUFF_DATA_USES_OFFSET
+			skb_set_tail_pointer(skb, len);
+#else
+			skb->tail = skb->data + len;
+#endif /* NET_SKBUFF_DATA_USES_OFFSET */
+			skb->len = len;
+
+			up(&bcm_static_skb->osl_pkt_sem);
+#ifdef HW_WIFI_SECURITY_PATCH
+			memset(skb->data, 0, skb->len);
+#endif
+			return skb;
+		}
+	}
+
+#if defined(ENHANCED_STATIC_BUF)
+	if (bcm_static_skb->skb_16k &&
+		bcm_static_skb->pkt_use[STATIC_PKT_MAX_NUM - 1] == 0) {
+		bcm_static_skb->pkt_use[STATIC_PKT_MAX_NUM - 1] = 1;
+
+		skb = bcm_static_skb->skb_16k;
+#ifdef NET_SKBUFF_DATA_USES_OFFSET
+		skb_set_tail_pointer(skb, len);
+#else
+		skb->tail = skb->data + len;
+#endif /* NET_SKBUFF_DATA_USES_OFFSET */
+		skb->len = len;
+
+		up(&bcm_static_skb->osl_pkt_sem);
+#ifdef HW_WIFI_SECURITY_PATCH
+		memset(skb->data, 0, skb->len);
+#endif
+
+		return skb;
+	}
+#endif /* ENHANCED_STATIC_BUF */
+
+	up(&bcm_static_skb->osl_pkt_sem);
+	printf("%s: all static pkt in use!\n", __FUNCTION__);
+	return osl_pktget(osh, len);
+#endif /* DHD_USE_STATIC_CTRLBUF */
+}
+
+void
+osl_pktfree_static(osl_t *osh, void *p, bool send)
+{
+	int i;
+#ifdef DHD_USE_STATIC_CTRLBUF
+	struct sk_buff *skb = (struct sk_buff *)p;
+	unsigned long flags;
+#endif /* DHD_USE_STATIC_CTRLBUF */
+
+	if (!p) {
+		return;
+	}
+
+	if (!bcm_static_skb) {
+		osl_pktfree(osh, p, send);
+		return;
+	}
+
+#ifdef DHD_USE_STATIC_CTRLBUF
+	spin_lock_irqsave(&bcm_static_skb->osl_pkt_lock, flags);
+
+	for (i = 0; i < STATIC_PKT_2PAGE_NUM; i++) {
+		if (p == bcm_static_skb->skb_8k[i]) {
+			if (bcm_static_skb->pkt_use[i] == 0) {
+				printk("%s: static pkt idx %d(%p) is double free\n",
+					__FUNCTION__, i, p);
+			} else {
+				bcm_static_skb->pkt_use[i] = 0;
+			}
+
+			if (skb->mac_len != PREALLOC_USED_MAGIC) {
+				printk("%s: static pkt idx %d(%p) is not in used\n",
+					__FUNCTION__, i, p);
+			}
+
+			skb->mac_len = PREALLOC_FREE_MAGIC;
+			spin_unlock_irqrestore(&bcm_static_skb->osl_pkt_lock, flags);
+			return;
+		}
+	}
+
+	spin_unlock_irqrestore(&bcm_static_skb->osl_pkt_lock, flags);
+	printf("%s: packet %p does not exist in the pool\n", __FUNCTION__, p);
+#else
+	down(&bcm_static_skb->osl_pkt_sem);
+	for (i = 0; i < STATIC_PKT_1PAGE_NUM; i++) {
+		if (p == bcm_static_skb->skb_4k[i]) {
+			bcm_static_skb->pkt_use[i] = 0;
+			up(&bcm_static_skb->osl_pkt_sem);
+			return;
+		}
+	}
+
+	for (i = STATIC_PKT_1PAGE_NUM; i < STATIC_PKT_1_2PAGE_NUM; i++) {
+		if (p == bcm_static_skb->skb_8k[i - STATIC_PKT_1PAGE_NUM]) {
+			if (bcm_static_skb->pkt_use[i] == 0)
+				printf("%s: double free! pkt idx %d(%p)\n", __FUNCTION__, i, p);
+
+			bcm_static_skb->pkt_use[i] = 0;
+			up(&bcm_static_skb->osl_pkt_sem);
+			return;
+		}
+	}
+#ifdef ENHANCED_STATIC_BUF
+	if (p == bcm_static_skb->skb_16k) {
+		bcm_static_skb->pkt_use[STATIC_PKT_MAX_NUM - 1] = 0;
+		up(&bcm_static_skb->osl_pkt_sem);
+		return;
+	}
+#endif
+	up(&bcm_static_skb->osl_pkt_sem);
+	osl_pktfree(osh, p, send);
+#endif /* DHD_USE_STATIC_CTRLBUF */
+}
+
+void
+osl_pktclear_static(osl_t *osh)
+{
+	int i;
+#ifdef DHD_USE_STATIC_CTRLBUF
+	unsigned long flags;
+#endif /* DHD_USE_STATIC_CTRLBUF */
+
+	if (!bcm_static_skb) {
+		printf("%s: bcm_static_skb is NULL\n", __FUNCTION__);
+		return;
+	}
+
+#ifdef DHD_USE_STATIC_CTRLBUF
+	spin_lock_irqsave(&bcm_static_skb->osl_pkt_lock, flags);
+#else
+	down(&bcm_static_skb->osl_pkt_sem);
+#endif /* DHD_USE_STATIC_CTRLBUF */
+	for (i = 0; i < STATIC_PKT_MAX_NUM; i++) {
+		if (bcm_static_skb->pkt_use[i]) {
+			bcm_static_skb->pkt_use[i] = 0;
+		}
+	}
+
+#ifdef DHD_USE_STATIC_CTRLBUF
+	spin_unlock_irqrestore(&bcm_static_skb->osl_pkt_lock, flags);
+#else
+	up(&bcm_static_skb->osl_pkt_sem);
+#endif /* DHD_USE_STATIC_CTRLBUF */
+}
+#else  /* BCM_PCIE_UPDATE */
 void*
 osl_pktget_static(osl_t *osh, uint len)
 {
@@ -1046,6 +1436,7 @@ osl_pktclear_static(osl_t *osh)
 #endif /* BCMPCIE */
 }
 #endif /* CONFIG_DHD_USE_STATIC_BUF */
+#endif /* BCM_PCIE_UPDATE */
 
 uint32
 osl_pci_read_config(osl_t *osh, uint offset, uint size)
@@ -1168,6 +1559,30 @@ osl_malloc(osl_t *osh, uint size)
 	if (osh)
 		ASSERT(osh->magic == OS_HANDLE_MAGIC);
 #ifdef CONFIG_DHD_USE_STATIC_BUF
+#ifdef BCM_PCIE_UPDATE
+	if (bcm_static_buf)
+	{
+		int i = 0;
+		if ((size >= PAGE_SIZE)&&(size <= STATIC_BUF_SIZE))
+		{
+			down(&bcm_static_buf->static_sem);
+
+			for (i = 0; i < STATIC_BUF_MAX_NUM; i++)
+			{
+				if (bcm_static_buf->buf_use[i] == 0)
+					break;
+			}
+
+			if (i == STATIC_BUF_MAX_NUM)
+			{
+				up(&bcm_static_buf->static_sem);
+				printf("all static buff in use!\n");
+				goto original;
+			}
+
+			bcm_static_buf->buf_use[i] = 1;
+			up(&bcm_static_buf->static_sem);
+#else
 	if (bcm_static_buf)
 	{
 		unsigned long irq_flags;
@@ -1192,6 +1607,7 @@ osl_malloc(osl_t *osh, uint size)
 			bcm_static_buf->buf_use[i] = 1;
 			spin_unlock_irqrestore(&bcm_static_buf->static_lock, irq_flags);
 
+#endif
 			bzero(bcm_static_buf->buf_ptr+STATIC_BUF_SIZE*i, size);
 			if (osh)
 				atomic_add(size, &osh->cmn->malloced);
@@ -1232,8 +1648,9 @@ void
 osl_mfree(osl_t *osh, void *addr, uint size)
 {
 #ifdef CONFIG_DHD_USE_STATIC_BUF
+#ifndef BCM_PCIE_UPDATE
 	unsigned long flags;
-
+#endif
 	if (bcm_static_buf)
 	{
 		if ((addr > (void *)bcm_static_buf) && ((unsigned char *)addr
@@ -1242,10 +1659,15 @@ osl_mfree(osl_t *osh, void *addr, uint size)
 			int buf_idx = 0;
 
 			buf_idx = ((unsigned char *)addr - bcm_static_buf->buf_ptr)/STATIC_BUF_SIZE;
-
+#ifdef BCM_PCIE_UPDATE
+			down(&bcm_static_buf->static_sem);
+			bcm_static_buf->buf_use[buf_idx] = 0;
+			up(&bcm_static_buf->static_sem);
+#else
 			spin_lock_irqsave(&bcm_static_buf->static_lock, flags);
 			bcm_static_buf->buf_use[buf_idx] = 0;
 			spin_unlock_irqrestore(&bcm_static_buf->static_lock, flags);
+#endif
 
 			if (osh && osh->cmn) {
 				ASSERT(osh->magic == OS_HANDLE_MAGIC);
@@ -1314,8 +1736,44 @@ osl_dma_alloc_consistent(osl_t *osh, uint size, uint16 align_bits, uint *alloced
 #else
 	{
 		dma_addr_t pap_lin;
+#ifdef BCM_ALLOC_STATIC_24K
+		struct pci_dev *hwdev = osh->pdev;
+		gfp_t flags = 0;
+		int i = 0;
+		flags = CAN_SLEEP() ? GFP_KERNEL: GFP_ATOMIC;
+		/* use static buf when alloc GFP_ATOMIC 24K */
+		if (flags == GFP_ATOMIC && size == FLOWRING_BUF_SIZE ) {
+				va = osl_dma_alloc_static_flowring(pap, &i);
+				if (va) {
+					printf("[WLAN] %s: use static flowring. size=%d, idx=%d\n",
+						__FUNCTION__, size, i);
+					return va;
+				}
+			atomic_allocated_size += size;
+			printf("[WLAN] %s: use atomic mem. size=%d, used_size=%d\n", __FUNCTION__, size,
+				atomic_allocated_size);
+		}
+
+		va = dma_alloc_coherent(&hwdev->dev, size, &pap_lin, flags);
+#endif
+#ifdef BCM_PCIE_UPDATE
+		struct pci_dev *hwdev = osh->pdev;
+		gfp_t flags;
+#ifdef DHD_ALLOC_COHERENT_MEM_FROM_ATOMIC_POOL
+		flags = GFP_ATOMIC;
+#else
+		flags = GFP_KERNEL;
+#endif /* DHD_ALLOC_COHERENT_MEM_FROM_ATOMIC_POOL */
+		va = dma_alloc_coherent(&hwdev->dev, size, &pap_lin, flags);
+#else /* BCM_PCIE_UPDATE */
 		va = pci_alloc_consistent(osh->pdev, size, &pap_lin);
+#endif /* BCM_PCIE_UPDATE */
+#ifdef BCMDMA64OSL
+		memcpy(pap, &pap_lin, sizeof(dmaaddr_t));
+#else
 		*pap = (dmaaddr_t)pap_lin;
+#endif /* BCMDMA64OSL */
+
 	}
 #endif
 	return va;
@@ -1324,12 +1782,27 @@ osl_dma_alloc_consistent(osl_t *osh, uint size, uint16 align_bits, uint *alloced
 void
 osl_dma_free_consistent(osl_t *osh, void *va, uint size, dmaaddr_t pa)
 {
+#ifdef BCMDMA64OSL
+	dma_addr_t *da = (dma_addr_t *)(&pa);
+#endif
 	ASSERT((osh && (osh->magic == OS_HANDLE_MAGIC)));
 
 #if defined(USE_KMALLOC_FOR_FLOW_RING) && defined(__ARM_ARCH_7A__)
 	kfree(va);
 #else
+#ifdef BCM_ALLOC_STATIC_24K
+	if (size == FLOWRING_BUF_SIZE) {
+		if (osl_dma_clear_static_flowring(va)) {
+			/* found static flow ring buffer */
+			return;
+		}
+	}
+#endif
+#ifdef BCMDMA64OSL
+	pci_free_consistent(osh->pdev, size, va, *da);
+#else
 	pci_free_consistent(osh->pdev, size, va, (dma_addr_t)pa);
+#endif /* BCMDMA64OSL */
 #endif
 }
 
@@ -1338,10 +1811,14 @@ dmaaddr_t BCMFASTPATH
 osl_dma_map(osl_t *osh, void *va, uint size, int direction, void *p, hnddma_seg_map_t *dmah)
 {
 	int dir;
-
+#ifdef BCM_PCIE_UPDATE
+	dmaaddr_t ret_addr;
+	dma_addr_t  map_addr;
+	int ret;
+#endif
 	ASSERT((osh && (osh->magic == OS_HANDLE_MAGIC)));
 	dir = (direction == DMA_TX)? PCI_DMA_TODEVICE: PCI_DMA_FROMDEVICE;
-
+#ifndef BCM_PCIE_UPDATE
 #if defined(__ARM_ARCH_7A__) && defined(BCMDMASGLISTOSL)
 	if (dmah != NULL) {
 		int32 nsegs, i, totsegs = 0, totlen = 0;
@@ -1374,18 +1851,60 @@ osl_dma_map(osl_t *osh, void *va, uint size, int direction, void *p, hnddma_seg_
 #endif /* __ARM_ARCH_7A__ && BCMDMASGLISTOSL */
 
 	return (pci_map_single(osh->pdev, va, size, dir));
-}
+#else
+	map_addr = pci_map_single(osh->pdev, va, size, dir);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27))
+	ret = pci_dma_mapping_error(osh->pdev, map_addr);
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 5))
+	ret = pci_dma_mapping_error(map_addr);
+#else
+	ret = 0;
+#endif
+	if (ret) {
+		printk("%s: Failed to map memory\n", __FUNCTION__);
+		PHYSADDRLOSET(ret_addr, 0);
+		PHYSADDRHISET(ret_addr, 0);
+	} else {
+		PHYSADDRLOSET(ret_addr, map_addr & 0xffffffff);
+		PHYSADDRHISET(ret_addr, (map_addr >> 32) & 0xffffffff);
+	}
 
+	return ret_addr;
+#endif
+}
+#ifndef BCM_PCIE_UPDATE
 void BCMFASTPATH
 osl_dma_unmap(osl_t *osh, uint pa, uint size, int direction)
+#else
+void BCMFASTPATH
+osl_dma_unmap(osl_t *osh, dmaaddr_t pa, uint size, int direction)
+#endif
 {
 	int dir;
+#ifdef BCMDMA64OSL
+	dma_addr_t *da = (dma_addr_t *)(&pa);
+#endif
 
 	ASSERT((osh && (osh->magic == OS_HANDLE_MAGIC)));
 	dir = (direction == DMA_TX)? PCI_DMA_TODEVICE: PCI_DMA_FROMDEVICE;
+#ifdef BCMDMA64OSL
+	pci_unmap_single(osh->pdev, *da, size, dir);
+#else
 	pci_unmap_single(osh->pdev, (uint32)pa, size, dir);
+#endif
 }
-
+#ifdef BCM_PCIE_UPDATE
+/* OSL function for CPU relax */
+inline void BCMFASTPATH
+osl_cpu_relax(void)
+{
+	cpu_relax();
+}
+inline bool osl_pcie_linkdown(osl_t *osh)
+{
+	return (!osh->bus_handle);
+}
+#endif
 #if defined(USE_KMALLOC_FOR_FLOW_RING) && defined(__ARM_ARCH_7A__)
 
 inline void BCMFASTPATH

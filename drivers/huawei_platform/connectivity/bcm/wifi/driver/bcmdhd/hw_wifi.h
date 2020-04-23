@@ -18,7 +18,6 @@ HUAWEI-2014.007:       0728             set bcn_timeout for beacon loss and roam
 #include <dngl_stats.h>
 #include <dhd.h>
 #include <wlioctl.h>
-#include <wl_iw.h>
 #ifdef HW_WIFI_DMD_LOG
 #include <dsm/dsm_pub.h>
 #endif
@@ -26,7 +25,14 @@ HUAWEI-2014.007:       0728             set bcn_timeout for beacon loss and roam
 #include <linux/perf_event.h>
 #include <linux/hw_breakpoint.h>
 #endif
+#ifdef HW_DOZE_PKT_FILTER
+#include <huawei_platform/power/wifi_filter/wifi_filter.h>
+#endif
 
+#ifdef HW_AP_POWERSAVE
+#include <linux/fb.h>
+#endif
+#include "hw_driver_register.h"
 #define        HUAWEI_VERSION_STR ", HUAWEI-2014.007"
 
 #ifdef HW_WIFI_WAKEUP_SRC_PARSE
@@ -44,8 +50,8 @@ extern volatile bool g_wifi_firstwake;
 #define DHCP_CLIENT_PORT    (68)
 #define DNS_SERVER_PORT     (53)
 
-#define HWMACSTR "%02x:%02x:%02x:%02x:%02x:%02x"
-#define HWMAC2STR(a) (a)[0], (a)[1], (a)[2], (a)[3], (a)[4], (a)[5]
+#define HWMACSTR "%02x:%02x:%02x:**:**:%02x"
+#define HWMAC2STR(a) (a)[0], (a)[1], (a)[2], (a)[5]
 
 #define DHCP_CHADDR_LEN         16
 #define SERVERNAME_LEN          64
@@ -455,7 +461,11 @@ extern const char *sdio_command_to_string(enum __sdio_cmd_type cmd);
 extern void hw_wlanfty_attach(dhd_pub_t *dhd);
 extern void hw_dhd_wlanfty_detach(void);
 extern void set_wlanfty_status(int value);
+extern int wlanfty_status_value;
 #endif
+
+extern void dhd_unregister_handle(void);
+extern void dhd_register_handle(void);
 
 #ifdef HW_WL_COUNTERS_STATISTIC
 extern const char *counters_command_to_string(enum __counters_cmd_type cmd);
@@ -474,6 +484,66 @@ extern uint is_beta_user(void);
 extern void hw_record_reg_recovery(void);
 extern int hw_need_reg_recovery(unsigned long request_stamp);
 extern int hw_need_reg_panic(void);
+#endif
+
+#if (defined(CONFIG_BCMDHD_PCIE) && defined(HW_WIFI_DMD_LOG) && defined(CONFIG_ARCH_HISI))
+#define DHD_PCIE_BUF_SIZE (384)
+extern void dsm_pcie_dump_reginfo(char* buf, u32 buflen);
+#endif
+
+#if defined(HW_WIFI_DMD_LOG)
+#define DMD_SDIO_CMD52_MAX_CNT (3)
+#define DMD_DHD_STATE_STOP (0)
+#define DMD_DHD_STATE_OPEN (1)
+
+extern int   hw_dmd_trigger_sdio_cmd(int dsm_id);
+extern void  hw_dmd_increase_count(int dsm_id);
+extern void  hw_dmd_set_dhd_state(int state);
+extern void  hw_dmd_trace_log(const char *fmt, ...);
+extern char* hw_dmd_get_trace_log(void);
+
+#endif
+
+#ifdef HW_DOZE_PKT_FILTER
+#define HW_FILTER_PATTERN "%d 0 0 12 0xFFFFFF0000000000000000FF000000000000000000000000FFFF 0x0800450000000000000000%02x000000000000000000000000%02x%02x"
+#define HW_FILTER_PATTERN_LEN   (26)
+#define HW_PKT_FILTER_LEN       (128)
+#define HW_PKT_FILTER_MAX_NUM   (32)
+#define HW_PKT_FILTER_MIN_IDX   (32)
+#define HW_PKT_FILTER_MAX_IDX   (HW_PKT_FILTER_MIN_IDX + HW_PKT_FILTER_MAX_NUM)
+#define HW_PKT_FILTER_ID_BASE   (300)
+#define HW_PKT_FILTER_ID_MAX    (HW_PKT_FILTER_ID_BASE + HW_PKT_FILTER_MAX_NUM)
+
+extern void hw_attach_dhd_pub_t(dhd_pub_t* dhd);
+extern void hw_detach_dhd_pub_t(void);
+
+extern int hw_set_filter_enable(int on);
+extern int hw_add_filter_items(hw_wifi_filter_item *items, int count);
+extern int hw_clear_filters(void);
+extern int hw_get_filter_pkg_stat(hw_wifi_filter_item *list, int max_count, int* count);
+
+extern int net_hw_clear_filters(dhd_pub_t *pub);
+extern int net_hw_add_filter_items(dhd_pub_t *pub, hw_wifi_filter_item *items, int count);
+extern int net_hw_set_filter_enable(dhd_pub_t *pub, int on);
+
+extern void dhd_pktfilter_offload_list(dhd_pub_t *dhd, hw_wifi_filter_item *list, int max_count, int* count);
+#endif
+
+#ifdef HW_AP_POWERSAVE
+extern void hw_suspend_work_handler(struct work_struct *work);
+extern int hw_dhd_fb_notify(int blank, unsigned long action, dhd_pub_t *pub);
+#endif
+
+#ifdef HW_LP_OVERSEA
+extern void hw_set_region_oversea(int oversea);
+extern void hw_set_pmlock(dhd_pub_t *dhd);
+#endif
+
+#ifdef HW_LOG_PATCH1
+extern void hw_dhd_log(const char *fmt, ...);
+extern void hw_dhd_looplog_start(void);
+extern void hw_dhd_looplog(const char *fmt, ...);
+extern void hw_dhd_looplog_end(void);
 #endif
 
 #endif /* end of __HW_WIFI_H__ */

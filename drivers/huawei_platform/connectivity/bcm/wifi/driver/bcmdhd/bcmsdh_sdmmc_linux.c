@@ -43,6 +43,10 @@
 #include <bcmsdh.h>
 #include "hw_wifi.h"
 
+#ifdef CONFIG_HWCONNECTIVITY
+#include <huawei_platform/connectivity/hw_connectivity.h>
+#endif
+
 #if !defined(SDIO_VENDOR_ID_BROADCOM)
 #define SDIO_VENDOR_ID_BROADCOM		0x02d0
 #endif /* !defined(SDIO_VENDOR_ID_BROADCOM) */
@@ -362,6 +366,17 @@ static int __init
 bcmsdh_module_init(void)
 {
 	int error = 0;
+#ifdef CONFIG_HWCONNECTIVITY
+	//For OneTrack, we need check it's the right chip type or not.
+	//If it's not the right chip type, don't init the driver
+	if (!isMyConnectivityChip(CHIP_TYPE_BCM)) {
+		sd_err(("wifi-sdh chip type is not match, skip driver init"));
+		return -EINVAL;
+	} else {
+		sd_info(("wifi-sdh chip type is matched with Broadcom, continue"));
+	}
+#endif
+
 	error = sdio_function_init();
 	return error;
 }

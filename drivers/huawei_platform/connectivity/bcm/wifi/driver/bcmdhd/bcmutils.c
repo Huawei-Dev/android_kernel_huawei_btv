@@ -57,6 +57,7 @@
 #include <proto/ethernet.h>
 #include <proto/vlan.h>
 #include <proto/bcmip.h>
+#include <proto/bcmudp.h>
 #include <proto/802.1d.h>
 #include <proto/802.11.h>
 
@@ -833,10 +834,49 @@ pktsetprio(void *pkt, bool update_vtag)
 		}
 
 		rc |= PKTPRIO_DSCP;
+		/*for high priority data ,use VI priority*/
+		#ifdef CONFIG_HUAWEI_XENGINE
+		if(DSCP_EF == PKTPRIO(pkt))
+			priority = PRIO_8021D_VI;
+		#endif
 	}
+
+#ifdef HUAWEI_DNS_PRIO
+	{
+		uint8 *new_ether_hdr;   /* Ethernet header of the new packet */
+		uint8  new_ether_type;   /* Ether type of the new packet */
+		uint8 *new_ip_hdr;                         /* IP header of the new packet */
+		uint32 new_ip_hdr_len;  /* IP header length of the new packet */
+		uint8 *new_udp_hdr;      /* UDP header of the new packet */
+
+		new_ether_hdr = PKTDATA(OSH_NULL, pkt);
+
+		if (eh->ether_type == hton16(ETHER_TYPE_IP)) {
+			new_ip_hdr = new_ether_hdr + ETHER_HDR_LEN;
+
+			new_ip_hdr_len = IPV4_HLEN(new_ip_hdr);
+			if (IP_VER(new_ip_hdr) == IP_VER_4 && IPV4_PROT(new_ip_hdr) == IP_PROT_UDP) {
+				struct bcmudp_hdr *udp_hdr = NULL;
+
+				new_udp_hdr = new_ip_hdr + new_ip_hdr_len;
+
+				udp_hdr = (struct bcmudp_hdr *)new_udp_hdr;
+				if (udp_hdr->dst_port == hton16(UDP_PORT_DNS)) {
+					priority = PRIO_8021D_VO;
+					rc = PKTPRIO_DSCP;
+				}
+			}
+		}
+	}
+#endif
 
 	ASSERT(priority >= 0 && priority <= MAXPRIO);
 	PKTSETPRIO(pkt, priority);
+
+	if (PKTMARK(pkt) == 0x5a){
+		PKTSETPRIO(pkt, PRIO_8021D_VI);
+	}
+
 	return (rc | priority);
 }
 
@@ -1709,8 +1749,10 @@ bcm_mkiovar(char *name, char *data, uint datalen, char *buf, uint buflen)
 	strncpy(buf, name, buflen);
 
 	/* append data onto the end of the name string */
-	memcpy(&buf[len], data, datalen);
-	len += datalen;
+	if (data && datalen != 0) {
+		memcpy(&buf[len], data, datalen);
+		len += datalen;
+	}
 
 	return len;
 }

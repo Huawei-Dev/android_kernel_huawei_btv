@@ -102,7 +102,7 @@ static ssize_t antenna_show(struct device *dev,
 
 static struct class *hw_antenna_class = NULL;
 static struct class *antenna_board_match_class = NULL;
-struct device * antenna_dev = NULL;
+struct device * antenna_adc_dev = NULL;
 
 /*get new class*/
 struct class *hw_antenna_get_class(void)
@@ -172,15 +172,15 @@ static int antenna_board_match_probe(struct platform_device *pdev)
     antenna_board_match_class = hw_antenna_get_class();
     if(antenna_board_match_class)
     {
-        if(antenna_dev == NULL)
-        antenna_dev = device_create(antenna_board_match_class, NULL, 0, NULL,"antenna_board");
-        if(IS_ERR(antenna_dev))
+        if(antenna_adc_dev == NULL)
+        antenna_adc_dev = device_create(antenna_board_match_class, NULL, 0, NULL,"antenna_board");
+        if(IS_ERR(antenna_adc_dev))
         {
-            antenna_dev = NULL;
+            antenna_adc_dev = NULL;
             hwlog_err("create rf_dev failed!\n");
             goto Antenna_board_failed_1;
         }
-        ret = sysfs_create_link(&antenna_dev->kobj, &di->dev->kobj, "antenna_board_data");
+        ret = sysfs_create_link(&antenna_adc_dev->kobj, &di->dev->kobj, "antenna_board_data");
         if(ret)
         {
             hwlog_err("create link to board_match fail.\n");

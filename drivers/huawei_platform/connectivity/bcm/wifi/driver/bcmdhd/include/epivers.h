@@ -43,6 +43,9 @@
 #define EPI_VERSION_DEV		1.201.31
 
 /* Driver Version String, ASCII, 32 chars max */
+#ifdef  BRCM_RSDB
+#define	EPI_VERSION_STR		"1.201.31.rsdb (r)"
+#else
 #define	EPI_VERSION_STR		"1.201.31 (r)"
-
+#endif
 #endif /* _epivers_h_ */

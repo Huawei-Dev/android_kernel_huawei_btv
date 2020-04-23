@@ -1,4 +1,29 @@
-
+/*
+ * Misc utility routines for accessing chip-specific features
+ * of the SiliconBackplane-based Broadcom chips.
+ *
+ * Copyright (C) 1999-2014, Broadcom Corporation
+ * 
+ *      Unless you and Broadcom execute a separate written software license
+ * agreement governing use of this software, this software is licensed to you
+ * under the terms of the GNU General Public License version 2 (the "GPL"),
+ * available at http://www.broadcom.com/licenses/GPLv2.php, with the
+ * following added to such license:
+ * 
+ *      As a special exception, the copyright holders of this software give you
+ * permission to link this software with independent modules, and to copy and
+ * distribute the resulting executable under terms of your choice, provided that
+ * you also meet, for each linked independent module, the terms and conditions of
+ * the license of that module.  An independent module is a module which is not
+ * derived from this software.  The special exception does not apply to any
+ * modifications of the software.
+ * 
+ *      Notwithstanding the above, under no circumstances may you combine this
+ * software in any way with any other Broadcom software provided under a license
+ * other than the GPL, without Broadcom's express prior written consent.
+ *
+ * $Id: sbutils.c 467150 2014-04-02 17:30:43Z $
+ */
 
 #include <bcm_cfg.h>
 #include <typedefs.h>
@@ -575,6 +600,7 @@ _sb_scan(si_info_t *sii, uint32 sba, void *regs, uint bus, uint32 sbba, uint num
 			SI_VMSG(("_sb_scan: there are %u cores in the chip %s\n", numcores,
 				sii->pub.issim ? "QT" : ""));
 		}
+		/* scan bridged SB(s) and add results to the end of the list */
 		else if (cores_info->coreid[next] == OCP_CORE_ID) {
 			sbconfig_t *sb = REGS2SB(sii->curmap);
 			uint32 nsbba = R_SBREG(sii, &sb->sbadmatch1);

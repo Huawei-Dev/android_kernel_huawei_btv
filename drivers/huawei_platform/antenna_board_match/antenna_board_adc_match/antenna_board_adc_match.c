@@ -41,9 +41,9 @@ int check_match_by_adc(void)
     return ret;
 }
 
+/*lint -save -e* */
 static void parse_dts(struct antenna_adc_match_info *di)
 {
-    int ret;
     struct device_node* np;
 
     np = di->dev->of_node;
@@ -107,7 +107,9 @@ adc_match_fail0:
     di = NULL;
     return -1;
 }
+/*lint -restore*/
 
+/*lint -save -esym(528,* ) -e19 */
 /*
  *probe match table
 */
@@ -155,3 +157,4 @@ module_exit(antenna_board_adc_exit);
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("huawei antenna board adc driver");
 MODULE_AUTHOR("HUAWEI Inc");
+/*lint -restore*/

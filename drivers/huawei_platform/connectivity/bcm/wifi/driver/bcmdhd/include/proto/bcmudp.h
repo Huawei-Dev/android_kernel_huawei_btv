@@ -27,7 +27,7 @@
 #define UDP_DEST_PORT_OFFSET	2	/* UDP dest port offset */
 #define UDP_LEN_OFFSET		4	/* UDP length offset */
 #define UDP_CHKSUM_OFFSET	6	/* UDP body checksum offset */
-
+#define UDP_PORT_DNS    53      /* DNS */
 #define UDP_HDR_LEN	8	/* UDP header length */
 #define UDP_PORT_LEN	2	/* UDP port length */
 

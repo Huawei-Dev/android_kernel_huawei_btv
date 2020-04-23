@@ -549,7 +549,7 @@ dhd_dbg_custom_evnt_handler(dhd_pub_t *dhdp, event_log_hdr_t *hdr, uint32 *data)
 	}
 	return ret;
 }
-
+#ifdef SHOW_LOGTRACE
 #define MAX_NO_OF_ARG	16
 #define FMTSTR_SIZE	100
 #define SIZE_LOC_STR	50
@@ -780,7 +780,7 @@ dhd_dbg_trace_evnt_handler(dhd_pub_t *dhdp, void *event_data,
 	else if (hdr->trace_type == MSGTRACE_HDR_TYPE_LOG)
 		dhd_dbg_msgtrace_log_parser(dhdp, event_data, raw_event_ptr, datalen);
 }
-
+#endif /*SHOW_LOGTRACE*/
 static int
 dhd_dbg_ring_init(dhd_pub_t *dhdp, dhd_dbg_ring_t *ring, uint16 id, uint8 *name,
 		uint32 ring_sz)
@@ -843,8 +843,6 @@ void
 dhd_dbg_set_event_log_tag(dhd_pub_t *dhdp, uint16 tag, uint8 set)
 {
 	wl_el_tag_params_t pars;
-	char *cmd = "event_log_tag_control";
-	char iovbuf[WLC_IOCTL_SMLEN] = { 0 };
 	int ret;
 
 	memset(&pars, 0, sizeof(pars));
@@ -852,12 +850,8 @@ dhd_dbg_set_event_log_tag(dhd_pub_t *dhdp, uint16 tag, uint8 set)
 	pars.set = set;
 	pars.flags = EVENT_LOG_TAG_FLAG_LOG;
 
-	if (!bcm_mkiovar(cmd, (char *)&pars, sizeof(pars), iovbuf, sizeof(iovbuf))) {
-		DHD_ERROR(("%s mkiovar failed\n", __FUNCTION__));
-		return;
-	}
-
-	ret = dhd_wl_ioctl_cmd(dhdp, WLC_SET_VAR, iovbuf, sizeof(iovbuf), TRUE, 0);
+	ret = dhd_iovar(dhdp, 0, "event_log_tag_control", (char *)&pars,
+			sizeof(pars), NULL, 0, TRUE);
 	if (ret) {
 		DHD_INFO(("%s set log tag iovar failed %d\n", __FUNCTION__, ret));
 	}

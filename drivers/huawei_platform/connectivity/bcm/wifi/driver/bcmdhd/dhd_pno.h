@@ -354,12 +354,12 @@ typedef struct dhd_epno_results {
 	uint16 flags;
 	struct ether_addr bssid;
 } dhd_epno_results_t;
-
+#ifndef BCM_PATCH_SECURITY_2017_07
 struct dhd_pno_swc_evt_param {
 	uint16 results_rxed_so_far;
 	wl_pfn_significant_net_t *change_array;
 };
-
+#endif
 typedef struct wifi_gscan_result {
     uint64 ts;                           /* Time of discovery           */
     char ssid[DOT11_MAX_SSID_LEN+1];     /* null terminated             */
@@ -418,10 +418,19 @@ typedef struct dhd_pno_gscan_capabilities {
     int max_rssi_sample_size;
     int max_scan_reporting_threshold;
     int max_hotlist_aps;
+#ifdef BCM_BSSID_BLACKLIST
+    int max_hotlist_ssids;  /* add this member to match wifi_gscan_capabilities defined in gscan.h for HAL */
+#endif
     int max_significant_wifi_change_aps;
+#ifdef BCM_BSSID_BLACKLIST
+    int max_bssid_history_entries;  /* add this member to match wifi_gscan_capabilities defined in gscan.h for HAL */
+#endif
     int max_epno_ssid_crc32;
     int max_epno_hidden_ssid;
     int max_white_list_ssid;
+#ifdef BCM_BSSID_BLACKLIST
+    int max_blacklist_bssid;
+#endif
 } dhd_pno_gscan_capabilities_t;
 
 #ifdef BCM_PATCH_GSCAN
@@ -436,8 +445,10 @@ struct dhd_pno_gscan_params {
 	uint8 bestn;
 	uint8 mscan;
 	uint8 buffer_threshold;
+#ifndef BCM_PATCH_SECURITY_2017_07
 	uint8 swc_nbssid_threshold;
 	uint8 swc_rssi_window_size;
+#endif
 	uint8 lost_ap_window;
 	uint8 nchannel_buckets;
 	uint8 reason;
@@ -447,7 +458,9 @@ struct dhd_pno_gscan_params {
 	gscan_results_cache_t *gscan_batch_cache;
 	gscan_results_cache_t *gscan_hotlist_found;
 	gscan_results_cache_t *gscan_hotlist_lost;
+#ifndef BCM_PATCH_SECURITY_2017_07
 	uint16 nbssid_significant_change;
+#endif
 	uint16 nbssid_hotlist;
 #ifdef BCM_PATCH_GSCAN
 #else
@@ -459,10 +472,14 @@ struct dhd_pno_gscan_params {
 	 */
 	uint8 ssid_ext_last_used_index;
 #endif
+#ifndef BCM_PATCH_SECURITY_2017_07
 	struct dhd_pno_swc_evt_param param_significant;
+#endif
 	struct dhd_pno_gscan_channel_bucket channel_bucket[GSCAN_MAX_CH_BUCKETS];
 	struct list_head hotlist_bssid_list;
+#ifndef BCM_PATCH_SECURITY_2017_07
 	struct list_head significant_bssid_list;
+#endif
 #ifdef BCM_PATCH_GSCAN
 	dhd_epno_ssid_cfg_t epno_cfg;
 #else
@@ -493,7 +510,7 @@ typedef struct gscan_hotlist_scan_params {
 	uint16 nbssid;   /* number of bssids  */
 	struct bssid_t bssid[1];  /* n bssids to follow */
 } gscan_hotlist_scan_params_t;
-
+#ifndef BCM_PATCH_SECURITY_2017_07
 /* SWC (Significant WiFi Change) params */
 typedef struct gscan_swc_params {
 	/* Rssi averaging window size */
@@ -507,7 +524,7 @@ typedef struct gscan_swc_params {
 	uint8 nbssid;
 	wl_pfn_significant_bssid_t bssid_elem_list[1];
 } gscan_swc_params_t;
-
+#endif
 typedef struct dhd_pno_significant_bssid {
 	struct ether_addr BSSID;
 	int8 rssi_low_threshold;
@@ -578,13 +595,20 @@ int dhd_dev_pno_lock_access_batch_results(struct net_device *dev);
 void dhd_dev_pno_unlock_access_batch_results(struct net_device *dev);
 extern int dhd_dev_pno_run_gscan(struct net_device *dev, bool run, bool flush);
 extern int dhd_dev_pno_enable_full_scan_result(struct net_device *dev, bool real_time);
+#ifndef BCM_PATCH_SECURITY_2017_07
 extern void * dhd_dev_swc_scan_event(struct net_device *dev, const void  *data,
               int *send_evt_bytes);
+#endif
 int dhd_retreive_batch_scan_results(dhd_pub_t *dhd);
 extern void * dhd_dev_hotlist_scan_event(struct net_device *dev,
                          const void  *data, int *send_evt_bytes, hotlist_type_t type);
+#ifndef BCM_PATCH_SECURITY_2017_07
 void * dhd_dev_process_full_gscan_result(struct net_device *dev,
                                         const void  *data, int *send_evt_bytes);
+#else
+void * dhd_dev_process_full_gscan_result(struct net_device *dev,
+                         const void  *data, uint32 len, int *send_evt_bytes);
+#endif
 extern int dhd_dev_gscan_batch_cache_cleanup(struct net_device *dev);
 extern void dhd_dev_gscan_hotlist_cache_cleanup(struct net_device *dev, hotlist_type_t type);
 extern int dhd_dev_wait_batch_results_complete(struct net_device *dev);
@@ -636,11 +660,18 @@ extern int dhd_pno_initiate_gscan_request(dhd_pub_t *dhd, bool run, bool flush);
 extern int dhd_pno_enable_full_scan_result(dhd_pub_t *dhd, bool real_time_flag);
 extern int dhd_pno_cfg_gscan(dhd_pub_t *dhd, dhd_pno_gscan_cmd_cfg_t type, void *buf);
 extern int dhd_dev_retrieve_batch_scan(struct net_device *dev);
+#ifndef BCM_PATCH_SECURITY_2017_07
 extern void *dhd_handle_swc_evt(dhd_pub_t *dhd, const void *event_data, int *send_evt_bytes);
+#endif
 extern void *dhd_handle_hotlist_scan_evt(dhd_pub_t *dhd, const void *event_data,
                        int *send_evt_bytes, hotlist_type_t type);
+#ifndef BCM_PATCH_SECURITY_2017_07
 extern void *dhd_process_full_gscan_result(dhd_pub_t *dhd, const void *event_data,
                        int *send_evt_bytes);
+#else
+extern void *dhd_process_full_gscan_result(dhd_pub_t *dhd, const void *event_data,
+                       uint32 len, int *send_evt_bytes);
+#endif
 extern int dhd_gscan_batch_cache_cleanup(dhd_pub_t *dhd);
 extern void dhd_gscan_hotlist_cache_cleanup(dhd_pub_t *dhd, hotlist_type_t type);
 extern int dhd_wait_batch_results_complete(dhd_pub_t *dhd);

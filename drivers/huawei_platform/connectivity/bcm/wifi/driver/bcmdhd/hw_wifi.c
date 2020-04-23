@@ -23,8 +23,14 @@
 #include "LLT_wifi.h"
 #include <log/log_usertype/log-usertype.h>
 
+#ifdef CONFIG_HUAWEI_DUBAI
+#include <huawei_platform/log/hwlog_kernel.h>
+#endif
+
 #ifdef CONFIG_HW_WLANFTY_STATUS
 #include <dhd.h>
+int wlanfty_status_value = 0;
+EXPORT_SYMBOL(wlanfty_status_value);
 #endif
 
 #define HW_BCN_TIMEOUT 10
@@ -32,6 +38,10 @@
 #ifdef HW_WIFI_DRIVER_NORMALIZE
 #include <hw_country_code.h>
 #endif /* HW_WIFI_DRIVER_NORMALIZE */
+
+#ifdef CONFIG_HW_ABS
+extern bool g_abs_enabled;
+#endif /* CONFIG_HW_ABS */
 
 #ifdef HW_WIFI_WAKEUP_SRC_PARSE
 #define MAX_MSG_LENGTH 30
@@ -41,6 +51,11 @@ volatile bool g_wifi_firstwake = FALSE;
         ((unsigned char*)&addr)[1], \
         ((unsigned char*)&addr)[2], \
         ((unsigned char*)&addr)[3]
+#define IPADDR_IP_ANONYMOUS(addr) \
+        ((unsigned char*)&addr)[0], \
+        ((unsigned char*)&addr)[3]
+#define FILTER_ADDR(data) \
+		(((data) >= 1) && ((data) <= 223) && ((data) != 127))
 
 #define IPV6_ADDRESS_SIZEINBYTES 0x10
 #define IPV6_DESTOPTS_HDR_OPTIONSIZE 0x8
@@ -96,6 +111,21 @@ typedef struct IPV6AuthenticationHeaderFormatTag
 }IPV6AuthenticationHeader;
 #endif
 
+extern int wl_get_wrong_action_flag(void);
+extern int wl_trigger_disable_nmode(void);
+
+void dhd_register_handle(void)
+{
+	struct dev_wifi_handle dev_handle;
+	dev_handle.wl_get_wrong_action_flag_handle = &wl_get_wrong_action_flag;
+	dev_handle.wl_trigger_disable_nmode_handle = &wl_trigger_disable_nmode;
+	register_dev_wifi_handle(dev_handle);
+}
+
+void dhd_unregister_handle(void)
+{
+	unregister_dev_wifi_handle();
+}
 
 
 /* Customized Locale convertor
@@ -290,6 +320,10 @@ void hw_dhd_check_and_disable_timestamps(void)
 ***************************************************************************/
 static void wlan_send_nl_event(struct net_device *net_dev,  u16 port)
 {
+/* Because selinux permission problem ,this function is not used
+** And send uevent can cause panic problem in VV product 
+**/
+#ifdef HW_WIFI_WAKEUP_SRC_SEND_UEVENT
 	struct device* dev = NULL;
 	char *uevent[2];
 	char msg[MAX_MSG_LENGTH];
@@ -301,7 +335,7 @@ static void wlan_send_nl_event(struct net_device *net_dev,  u16 port)
 	uevent[0] = msg;
 	uevent[1] = NULL;
 	kobject_uevent_env(&(dev->kobj), KOBJ_CHANGE, (char**)&uevent);
-
+#endif
 	return;
 }
 
@@ -324,7 +358,14 @@ static void parse_ipv4_packet(struct sk_buff *skb)
 	iph = (struct iphdr *)skb->data;
 	iphdr_len = iph->ihl*4;
 
-	HW_PRINT_HI("src ip:%d.%d.%d.%d, dst ip:%d.%d.%d.%d\n", IPADDR(iph->saddr), IPADDR(iph->daddr));
+	HW_PRINT_HI("src ip:%d.**.**.%d, dst ip:%d.**.**.%d\n", IPADDR_IP_ANONYMOUS(iph->saddr), IPADDR_IP_ANONYMOUS(iph->daddr));
+#ifdef CONFIG_HUAWEI_DUBAI
+	if (FILTER_ADDR(((unsigned char*)&iph->saddr)[0]) &&
+		FILTER_ADDR(((unsigned char*)&iph->daddr)[0])) {
+		HWDUBAI_LOGE("DUBAI_TAG_WIFI_WAKE_IPV4", "");
+	}
+#endif
+
 	if (iph->protocol == IPPROTO_UDP){
 		uh = (struct udphdr *)(skb->data + iphdr_len);
 		HW_PRINT_HI("receive UDP packet, src port:%d, dst port:%d.\n", ntohs(uh->source), ntohs(uh->dest));
@@ -348,12 +389,8 @@ static void parse_ipv4_packet(struct sk_buff *skb)
 
 void dump_ipv6_addr(unsigned short *addr)
 {
-	int i =0;
-
-	for (i = 0; i < (IPV6_ADDRESS_SIZEINBYTES/2); i++) {
-		HW_PRINT_HI(":%lx", ntohs(addr[i]));
-	}
-	HW_PRINT_HI("\n");
+	HW_PRINT_HI(":%lx:%lx:%lx:%lx\n", ntohs(addr[0]),ntohs(addr[1]),ntohs(addr[2]),ntohs(addr[3]));
+	HW_PRINT_HI(":%lx:%lx:%lx:%lx\n", ntohs(addr[4]),ntohs(addr[5]),ntohs(addr[6]),ntohs(addr[7]));
 }
 
 static uint8_t *get_next_ipv6_chain_header(uint8_t **headerscan, uint8_t *headtype, int8_t *done, uint16_t *payload_len)
@@ -475,20 +512,21 @@ static void parse_ipv6_packet(struct sk_buff *skb)
 	uint16_t des_port;
 	uint8_t *payload;
 
-	/*
-	*This code may cause crash, so it should be closed  temporarily
-	*payload = nh + sizeof(struct ipv6hdr);
-	*pointer payload may illegal
-	*/
-	return;
-
 	nh = (struct ipv6hdr *)skb->data;
 	HW_PRINT_HI("version: %d, payload length: %d, nh->nexthdr: %d. \n", nh->version, ntohs(nh->payload_len), nh->nexthdr);
 	HW_PRINT_HI("ipv6 src addr: ");
 	dump_ipv6_addr((unsigned short *)&(nh->saddr));
 	HW_PRINT_HI("ipv6 dst addr: ");
 	dump_ipv6_addr((unsigned short *)&(nh->daddr));
-	payload = nh + sizeof(struct ipv6hdr);
+
+    /*
+	*This code may cause crash, so it should be closed  temporarily
+	*payload = nh + sizeof(struct ipv6hdr);
+	*pointer payload may illegal
+	*just print src and dst addr
+	*/
+	return;
+	payload = (char *)nh + sizeof(struct ipv6hdr);
 
 	get_ipv6_protocal_ports(payload, nh->payload_len, nh->nexthdr, &src_port, &des_port);
 
@@ -773,15 +811,15 @@ static void hw_parse_special_dhcp_packet(uint8_t *buff, uint32_t buflen, uint8_t
     if (type == DHCP_DISCOVER) {
         HW_PRINT_HI("%s: type: DHCP_DISCOVER\n", __func__);
     } else if (type == DHCP_OFFER) {
-        HW_PRINT_HI("%s: type: DHCP_OFFER, ip:%d.%d.%d.%d srvip:%d.%d.%d.%d MAC:" HWMACSTR "\n",
-                __func__, IPADDR(msg->yiaddr), IPADDR(msg->siaddr), HWMAC2STR(dst));
+        HW_PRINT_HI("%s: type: DHCP_OFFER, ip:%d.**.**.%d srvip:%d.**.**.%d MAC:" HWMACSTR "\n",
+                __func__, IPADDR_IP_ANONYMOUS(msg->yiaddr), IPADDR_IP_ANONYMOUS(msg->siaddr), HWMAC2STR(dst));
     } else if (type == DHCP_REQUEST) {
         hw_dhcp_get_option_uint32(&req_ip, msg->options, len, DHO_IPADDRESS);
         hw_dhcp_get_option_uint32(&req_srv, msg->options, len, DHO_SERVERID);
         req_ip = ntoh32(req_ip);
         req_srv = ntoh32(req_srv);
-        HW_PRINT_HI("%s: type: DHCP_REQUEST, ip:%d.%d.%d.%d srvip:%d.%d.%d.%d\n",
-                __func__, IPADDR(req_ip), IPADDR(req_srv));
+        HW_PRINT_HI("%s: type: DHCP_REQUEST, ip:%d.**.**.%d srvip:%d.**.**.%d\n",
+                __func__, IPADDR_IP_ANONYMOUS(req_ip), IPADDR_IP_ANONYMOUS(req_srv));
     } else if (type == DHCP_ACK) {
         HW_PRINT_HI("%s: type: DHCP_ACK MAC:" HWMACSTR "\n", __func__, HWMAC2STR(dst));
     } else if (type == DHCP_NAK) {
@@ -853,9 +891,12 @@ int dhd_wlanfty_ver(void)
 	char buf[WLC_IOCTL_SMLEN] = {0};
 
 	if( NULL != dhd_wlanfty) {
-
+#ifndef	HW_PCIE_STABILITY
 		if (dhd_wlanfty->busstate == DHD_BUS_DOWN)	{
-			DHD_ERROR(("%s: bus is down\n", __FUNCTION__));
+#else
+		if (dhd_wlanfty->busstate == DHD_BUS_DOWN || dhd_wlanfty->up == 0) {
+#endif
+			DHD_ERROR(("%s: bus is down or wifi is closed\n", __FUNCTION__));
 			return -1;
 		}
 
@@ -873,6 +914,14 @@ int dhd_wlanfty_ver(void)
 		return -3;
 	}
 }
+EXPORT_SYMBOL(dhd_wlanfty_ver);
+
+void set_wlanfty_status(int value) {
+	wlanfty_status_value |= value;
+	DHD_ERROR(("set wlanfty_status is %d\n", wlanfty_status_value));
+}
+EXPORT_SYMBOL(set_wlanfty_status);
+
 #endif
 
 
@@ -916,7 +965,7 @@ void hw_counters_hex_dump(wl_cnt_t *counters) {
 uint is_beta_user(void) {
 #if defined(HW_WIFI_USER_TYPE) && defined(CONFIG_PROC_LOGUSERTYPE)
     unsigned int type = get_logusertype_flag();
-    if (type == BETA_USER) {
+    if (type == BETA_USER || type == OVERSEA_USER) {
         return 1;
     }
 #endif
@@ -1405,6 +1454,349 @@ static int __init wlan_parse_reboot_reason_cmdline(char *reboot_reason_cmdline) 
 
 early_param("reboot_reason", wlan_parse_reboot_reason_cmdline);
 
+#endif
+
+#if defined(HW_WIFI_DMD_LOG)
+#define DMD_TRACE_BUF_SIZE (384)
+static int dmd_cmd52_count = 0;
+static int dmd_cmd53_count = 0;
+static char dmd_trace_buf[DMD_TRACE_BUF_SIZE];
+
+void hw_dmd_set_dhd_state(int state) {
+    if (DMD_DHD_STATE_OPEN == state) {
+        dmd_cmd52_count = 0;
+        dmd_cmd53_count = 0;
+        HW_PRINT_HI("dmd_set_dhd_state: DMD_DHD_STATE_OPEN\n");
+    } else if (DMD_DHD_STATE_STOP == state) {
+        dmd_cmd52_count = DMD_SDIO_CMD52_MAX_CNT;
+        dmd_cmd53_count = DMD_SDIO_CMD52_MAX_CNT;
+        HW_PRINT_HI("dmd_set_dhd_state: DMD_DHD_STATE_STOP\n");
+    } else {
+        HW_PRINT_HI("dmd_set_dhd_state unknown state: %d\n", state);
+    }
+}
+
+/* limit count of DMD log(sdio52 and cmd53),
+ * allow count(DMD_SDIO_CMD52_MAX_CNT) of log in one session, dont report log when DHD stopped
+ * return value: 1 allow report, 0 not report
+ */
+int hw_dmd_trigger_sdio_cmd(int dsm_id) {
+    int current_count = DMD_SDIO_CMD52_MAX_CNT;
+
+    if (DSM_WIFI_CMD52_ERROR == dsm_id) {
+        current_count = dmd_cmd52_count;
+    } else if (DSM_WIFI_CMD53_ERROR == dsm_id) {
+        current_count = dmd_cmd53_count;
+    } else {
+        current_count = DMD_SDIO_CMD52_MAX_CNT;
+    }
+
+    return ((current_count < DMD_SDIO_CMD52_MAX_CNT) ? 1: 0);
+}
+
+void hw_dmd_increase_count(int dsm_id) {
+    if (DSM_WIFI_CMD52_ERROR == dsm_id) {
+        dmd_cmd52_count += 1;
+    } else if (DSM_WIFI_CMD53_ERROR == dsm_id) {
+        dmd_cmd53_count += 1;
+    } else {
+        HW_PRINT_HI("hw_dmd_increase_count unknown id: %d\n", dsm_id);
+    }
+}
+
+char* hw_dmd_get_trace_log(void) {
+    return dmd_trace_buf;
+}
+
+void hw_dmd_trace_log(const char *fmt, ...) {
+    va_list ap;
+    memset(dmd_trace_buf, 0, DMD_TRACE_BUF_SIZE);
+
+    va_start(ap, fmt);
+    if(fmt) {
+        vsnprintf(dmd_trace_buf, DMD_TRACE_BUF_SIZE, fmt, ap);
+    }
+    va_end(ap);
+    HW_PRINT_HI("dhd trace log: %s \n", dmd_trace_buf);
+}
+
+#endif
+
+#ifdef HW_AP_POWERSAVE
+static int ap_early_suspend;
+void hw_suspend_work_handler(struct work_struct *work) {
+    int enable = 0;
+    dhd_pub_t *dhdp;
+
+    if (NULL == work) {
+        return;
+    }
+
+    dhdp = container_of(work, dhd_pub_t, ap_suspend_work);
+    if(dhdp) {
+        if (ap_early_suspend) {
+            enable = 1;
+            dhd_iovar(dhdp, 0, "radio_pwrsave_enable", (char*)&enable, sizeof(enable), NULL, 0, TRUE);
+            HW_PRINT_HI("early suspend enter\n");
+        } else {
+            enable = 0;
+            dhd_iovar(dhdp, 0, "radio_pwrsave_enable", (char*)&enable, sizeof(enable), NULL, 0, TRUE);
+            HW_PRINT_HI("later resume enter\n");
+        }
+    }
+}
+
+int hw_dhd_fb_notify(int blank, unsigned long action, dhd_pub_t *pub) {
+    if (NULL == pub) {
+        return NOTIFY_BAD;
+    }
+
+    switch(blank){
+    case FB_BLANK_UNBLANK:
+        /*resume device*/
+        switch(action) {
+        case FB_EVENT_BLANK:
+            ap_early_suspend = 0;
+            if (pub->up && pub->op_mode & DHD_FLAG_HOSTAP_MODE) {
+                schedule_work(&pub->ap_suspend_work);
+            }
+            break;
+        default:
+            break;
+        }
+        break;
+    case FB_BLANK_VSYNC_SUSPEND:
+    case FB_BLANK_HSYNC_SUSPEND:
+    case FB_BLANK_NORMAL:
+    case FB_BLANK_POWERDOWN:
+    default:
+        /*suspend device*/
+        switch(action) {
+        case FB_EVENT_BLANK:
+            ap_early_suspend = 1;
+            if (pub->up && pub->op_mode & DHD_FLAG_HOSTAP_MODE) {
+                schedule_work(&pub->ap_suspend_work);
+            }
+            break;
+        default:
+            break;
+        }
+        break;
+    }
+
+    return NOTIFY_OK;
+}
+#endif
+
+#ifdef HW_DOZE_PKT_FILTER
+static dhd_pub_t *hw_dhd_pub_t = NULL;
+static struct hw_wlan_filter_ops wlan_filter_ops = {
+    .set_filter_enable = hw_set_filter_enable,
+    .add_filter_items = hw_add_filter_items,
+    .clear_filters = hw_clear_filters,
+    .get_filter_pkg_stat = hw_get_filter_pkg_stat,
+};
+
+void hw_attach_dhd_pub_t(dhd_pub_t* dhd) {
+    HW_PRINT_HI("%s enter \n", __func__);
+    hw_dhd_pub_t = dhd;
+    hw_register_wlan_filter(&wlan_filter_ops);
+}
+
+void hw_detach_dhd_pub_t(void) {
+    HW_PRINT_HI("%s enter \n", __func__);
+    hw_unregister_wlan_filter();
+    hw_dhd_pub_t = NULL;
+}
+
+int hw_set_filter_enable(int on) {
+    if (NULL != hw_dhd_pub_t) {
+        if (on && hw_dhd_pub_t->up && (hw_dhd_pub_t->op_mode & DHD_FLAG_STA_MODE)) {
+            return net_hw_set_filter_enable(hw_dhd_pub_t, on);
+        } else if (!on) {
+            return net_hw_set_filter_enable(hw_dhd_pub_t, on);
+        } else {
+            return 0;
+        }
+    }
+    return -1;
+}
+
+int hw_add_filter_items(hw_wifi_filter_item *items, int count) {
+    if (NULL != hw_dhd_pub_t) {
+        if (hw_dhd_pub_t->up && (hw_dhd_pub_t->op_mode & DHD_FLAG_STA_MODE)) {
+            return net_hw_add_filter_items(hw_dhd_pub_t, items, count);
+        }
+        return 0;
+    }
+    return -1;
+}
+
+int hw_clear_filters(void) {
+    if (NULL != hw_dhd_pub_t && hw_dhd_pub_t->up) {
+        return net_hw_clear_filters(hw_dhd_pub_t);
+    }
+    return -1;
+}
+
+int hw_get_filter_pkg_stat(hw_wifi_filter_item *list, int max_count, int* count) {
+    char *iovbuf, smbuf[WLC_IOCTL_SMLEN];
+    int ret;
+    uint8 *mask_and_pattern;
+    uint32 i, mask_len, id, filter_len, enable = 1;
+
+    wl_pkt_filter_t         *filterp;
+    wl_pkt_filter_stats_t   *stats;
+    wl_pkt_filter_list_t    *filter_list;
+
+    if (NULL == hw_dhd_pub_t) {
+        HW_PRINT_HI("%s: hw_dhd_pub_t is NULL\n", __FUNCTION__);
+        return -1;
+    }
+
+    if (!hw_dhd_pub_t->up) {
+        HW_PRINT_HI("%s: hw_dhd_pub_t is not up\n", __FUNCTION__);
+        return -1;
+    }
+
+    if (!(iovbuf = MALLOC(hw_dhd_pub_t->osh, WLC_IOCTL_MAXLEN))) {
+        HW_PRINT_HI("%s: malloc failed\n", __FUNCTION__);
+        return -1;
+    }
+
+    memset(iovbuf, 0, WLC_IOCTL_MAXLEN);
+    bcm_mkiovar("pkt_filter_list", (char *)&enable, 4, iovbuf, WLC_IOCTL_MAXLEN);
+    ret = dhd_wl_ioctl_cmd(hw_dhd_pub_t, WLC_GET_VAR, iovbuf, WLC_IOCTL_MAXLEN, FALSE, 0);
+    if (ret < 0) {
+        HW_PRINT_HI("%s: failed to get filter ret=%d\n", __FUNCTION__, ret);
+        goto exit;
+    }
+
+    filter_list = (wl_pkt_filter_list_t *) iovbuf;
+
+    filterp = filter_list->filter;
+    for (i = 0; i < filter_list->num; i++) {
+        if(filterp->id >= HW_PKT_FILTER_ID_BASE && filterp->id < HW_PKT_FILTER_ID_MAX) {
+            if(*count < max_count) {
+                mask_len = filterp->u.pattern.size_bytes;
+                if (mask_len < HW_FILTER_PATTERN_LEN) {
+                    HW_PRINT_HI("error pattern len: %d\n", mask_len);
+                    goto exit;
+                }
+                mask_and_pattern = filterp->u.pattern.mask_and_pattern;
+                list->protocol = mask_and_pattern[mask_len+11];
+                list->port = mask_and_pattern[mask_len+24] | (mask_and_pattern[mask_len+25] << 8);
+
+                // get filter count
+                memset(smbuf, 0, WLC_IOCTL_SMLEN);
+                id = filterp->id;
+                bcm_mkiovar("pkt_filter_stats", (char *)&id, 4, smbuf, WLC_IOCTL_SMLEN);
+                ret = dhd_wl_ioctl_cmd(hw_dhd_pub_t, WLC_GET_VAR, smbuf, WLC_IOCTL_SMLEN, FALSE, 0);
+                if (ret < 0) {
+                    HW_PRINT_HI("%s: Failed to get filter stats ret=%d\n", __FUNCTION__, ret);
+                    goto exit;
+                }
+                stats = (wl_pkt_filter_stats_t *) smbuf;
+                list->filter_cnt = stats->num_pkts_matched;
+                HW_PRINT_HI("%u 0x%4x %u\n", list->protocol, list->port, list->filter_cnt);
+                list++;
+                (*count)++;
+            }
+        }
+
+        filter_len = WL_PKT_FILTER_FIXED_LEN;
+#ifdef BCM_APF
+		if (filterp->type == WL_PKT_FILTER_TYPE_APF_MATCH) {
+			wl_apf_program_t* apf_program = &filterp->u.apf_program;
+			filter_len += WL_APF_PROGRAM_TOTAL_LEN(apf_program);
+			HW_PRINT_HI("%s: type=%d, program len=%d\n", __FUNCTION__, filterp->type, WL_APF_PROGRAM_LEN(apf_program));
+		} else {
+			filter_len += (WL_PKT_FILTER_PATTERN_FIXED_LEN + 2 * filterp->u.pattern.size_bytes);
+        }
+#else
+		filter_len += WL_PKT_FILTER_PATTERN_FIXED_LEN + 2 * filterp->u.pattern.size_bytes;
+#endif //BCM_APF
+        filterp = (wl_pkt_filter_t *) ((uint8 *)filterp + filter_len);
+        filterp = ALIGN_ADDR(filterp, sizeof(uint32));
+    }
+
+exit:
+    MFREE(hw_dhd_pub_t->osh, iovbuf, WLC_IOCTL_MAXLEN);
+    return;
+}
+#endif
+#ifdef HW_LP_OVERSEA
+int g_region_oversea = 1;
+void hw_set_region_oversea(int oversea) {
+    g_region_oversea = oversea;
+}
+
+void hw_set_pmlock(dhd_pub_t *dhd) {
+    int ret = 0;
+    uint32 pmlock = 0;
+    if (NULL != dhd && g_region_oversea) {
+        ret = dhd_iovar(dhd, 0, "pm_lock", (char *)&pmlock, sizeof(pmlock), NULL, 0, TRUE);
+        if (ret < 0) {
+            ret = dhd_iovar(dhd, 0, "pm_lock", (char *)&pmlock, sizeof(pmlock), NULL, 0, TRUE);
+            if (ret < 0) {
+                HW_PRINT_HI("%s Set pm_lock ret: %d\n", __FUNCTION__, ret);
+            }
+        }
+    }
+}
+#endif
+
+#ifdef HW_LOG_PATCH1
+#define DHD_LOG_BUF_SIZE (256)
+#define DHD_LOOPLOG_BUF_SIZE (256)
+static int dhd_looplog_idx = 0;
+static char dhd_log_buf[DHD_LOG_BUF_SIZE];
+static char dhd_loop_buf[DHD_LOOPLOG_BUF_SIZE];
+
+void hw_dhd_looplog_start(void) {
+    dhd_looplog_idx = 0;
+    memset(dhd_loop_buf, 0, DHD_LOOPLOG_BUF_SIZE);
+}
+
+void hw_dhd_looplog_end(void) {
+    if (is_beta_user()) {
+        HW_PRINT_HI("BCMDHD: %s \n", dhd_loop_buf);
+    }
+}
+
+void hw_dhd_looplog(const char *fmt, ...) {
+    int len = 0;
+    va_list ap;
+
+    if (!is_beta_user()) {
+        return;
+    }
+
+    va_start(ap, fmt);
+    if(fmt && dhd_looplog_idx < DHD_LOOPLOG_BUF_SIZE) {
+        len = vsnprintf(dhd_loop_buf + dhd_looplog_idx, DHD_LOOPLOG_BUF_SIZE - dhd_looplog_idx, fmt, ap);
+        if (len > 0) {
+            dhd_looplog_idx += len;
+        }
+    }
+    va_end(ap);
+}
+
+void hw_dhd_log(const char *fmt, ...) {
+    va_list ap;
+
+    if (!is_beta_user()) {
+        return;
+    }
+
+    memset(dhd_log_buf, 0, DHD_LOG_BUF_SIZE);
+    va_start(ap, fmt);
+    if(fmt) {
+        vsnprintf(dhd_log_buf, DHD_LOG_BUF_SIZE, fmt, ap);
+    }
+    va_end(ap);
+    HW_PRINT_HI("BCMDHD: %s \n", dhd_log_buf);
+}
 #endif
 ////end of file
 

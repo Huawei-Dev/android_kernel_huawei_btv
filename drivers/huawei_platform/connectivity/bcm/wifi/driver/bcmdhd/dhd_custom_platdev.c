@@ -80,8 +80,12 @@ enum dhd_prealloc_index {
 
 #define STATIC_BUF_MAX_NUM	20
 #define STATIC_BUF_SIZE	(PAGE_SIZE*2)
-
+#ifndef BCM_PCIE_UPDATE
 #define DHD_PREALLOC_PROT_SIZE   	(512)
+#else
+#define DHD_PREALLOC_PROT_SIZE   	(2048)
+#define DHD_PREALLOC_WIPHY_ESCAN1_SIZE	0
+#endif
 #define DHD_PREALLOC_WIPHY_ESCAN0_SIZE	(64 * 1024)
 #define DHD_PREALLOC_DHD_INFO_SIZE		(24 * 1024)
 #ifdef CONFIG_64BIT
@@ -152,21 +156,62 @@ void *wlan_static_if_flow_lkup = NULL;
 void *wlan_static_osl_buf = NULL;
 
 static struct sk_buff *wlan_static_skb[WLAN_SKB_BUF_NUM];
-
+static unsigned int wlan_static_skb_allocated_size = 0;
 
 static void *dhd_wlan_mem_prealloc(int section, unsigned long size)
 {
+#ifndef BCM_PCIE_UPDATE
 	if (section == DHD_PREALLOC_PROT)
 		return wlan_static_prot;
-
+#else
+	if (section == DHD_PREALLOC_PROT) {
+		if (size > DHD_PREALLOC_PROT_SIZE) {
+			pr_err("request PROT_BUF(%lu) is bigger than static size(%d).\n",
+				size, DHD_PREALLOC_PROT_SIZE);
+			return NULL;
+		}
+		return wlan_static_prot;
+	}
+#endif
+#ifndef BCM_PCIE_UPDATE
 	if (section == DHD_PREALLOC_SKB_BUF)
 		return wlan_static_skb;
-
+#else
+	if (section == DHD_PREALLOC_SKB_BUF) {
+		if (size > wlan_static_skb_allocated_size) {
+			pr_err("request SKB_BUF(%lu) is bigger than static size(%u).\n",
+				size, wlan_static_skb_allocated_size);
+			return NULL;
+		}
+		return wlan_static_skb;
+	}
+#endif
+#ifndef BCM_PCIE_UPDATE
 	if (section == DHD_PREALLOC_WIPHY_ESCAN0)
 		return wlan_static_scan_buf0;
-
+#else
+	if (section == DHD_PREALLOC_WIPHY_ESCAN0) {
+		if (size > DHD_PREALLOC_WIPHY_ESCAN0_SIZE) {
+			pr_err("request WIPHY_ESCAN0_BUF(%lu) is bigger than static size(%d).\n",
+				size, DHD_PREALLOC_WIPHY_ESCAN0_SIZE);
+			return NULL;
+		}
+		return wlan_static_scan_buf0;
+	}
+#endif
+#ifndef BCM_PCIE_UPDATE
 	if (section == DHD_PREALLOC_WIPHY_ESCAN1)
 		return wlan_static_scan_buf1;
+#else
+	if (section == DHD_PREALLOC_WIPHY_ESCAN1) {
+		if (size > DHD_PREALLOC_WIPHY_ESCAN1_SIZE) {
+			pr_err("request WIPHY_ESCAN1_BUF(%lu) is bigger than static size(%d).\n",
+				size, DHD_PREALLOC_WIPHY_ESCAN1_SIZE);
+			return NULL;
+		}
+		return wlan_static_scan_buf1;
+	}
+#endif
 
 	if (section == DHD_PREALLOC_OSL_BUF) {
 		if (size > DHD_PREALLOC_OSL_BUF_SIZE) {
@@ -206,12 +251,17 @@ static int dhd_init_wlan_mem(void)
 
 	int i;
 	int j;
-
+#ifdef BCM_PCIE_UPDATE
+	wlan_static_skb_allocated_size = 0;
+#endif
 	for (i = 0; i < DHD_SKB_1PAGE_BUF_NUM; i++) {
 		wlan_static_skb[i] = dev_alloc_skb(DHD_SKB_1PAGE_BUFSIZE);
 		if (!wlan_static_skb[i]) {
 			goto err_skb_alloc;
 		}
+#ifdef BCM_PCIE_UPDATE
+		wlan_static_skb_allocated_size += DHD_SKB_1PAGE_BUFSIZE;
+#endif
 	}
 
 	for (i = DHD_SKB_1PAGE_BUF_NUM; i < WLAN_SKB_1_2PAGE_BUF_NUM; i++) {
@@ -219,6 +269,9 @@ static int dhd_init_wlan_mem(void)
 		if (!wlan_static_skb[i]) {
 			goto err_skb_alloc;
 		}
+#ifdef BCM_PCIE_UPDATE
+		wlan_static_skb_allocated_size += DHD_SKB_2PAGE_BUFSIZE;
+#endif
 	}
 
 #if !defined(CONFIG_BCMDHD_PCIE)
@@ -226,6 +279,9 @@ static int dhd_init_wlan_mem(void)
 	if (!wlan_static_skb[i]) {
 		goto err_skb_alloc;
 	}
+#ifdef BCM_PCIE_UPDATE
+	wlan_static_skb_allocated_size += DHD_SKB_4PAGE_BUFSIZE;
+#endif
 #endif /* !CONFIG_BCMDHD_PCIE */
 
 	wlan_static_prot = kmalloc(DHD_PREALLOC_PROT_SIZE, GFP_KERNEL);
@@ -617,6 +673,7 @@ int __init dhd_wlan_init(void)
 	dhd_wlan_resources[0].start = dhd_wlan_resources[0].end =
 		brcm_wake_irq;
 
+	printf(KERN_INFO "%s: LEAVE\n", __FUNCTION__);
 	return ret;
 }
 

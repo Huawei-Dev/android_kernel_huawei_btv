@@ -1,4 +1,28 @@
-
+/*
+ * DHD Bus Module for SDIO
+ *
+ * Copyright (C) 1999-2014, Broadcom Corporation
+ *
+ *      Unless you and Broadcom execute a separate written software license
+ * agreement governing use of this software, this software is licensed to you
+ * under the terms of the GNU General Public License version 2 (the "GPL"),
+ * available at http://www.broadcom.com/licenses/GPLv2.php, with the
+ * following added to such license:
+ *
+ *      As a special exception, the copyright holders of this software give you
+ * permission to link this software with independent modules, and to copy and
+ * distribute the resulting executable under terms of your choice, provided that
+ * you also meet, for each linked independent module, the terms and conditions of
+ * the license of that module.  An independent module is a module which is not
+ * derived from this software.  The special exception does not apply to any
+ * modifications of the software.
+ *
+ *      Notwithstanding the above, under no circumstances may you combine this
+ * software in any way with any other Broadcom software provided under a license
+ * other than the GPL, without Broadcom's express prior written consent.
+ *
+ * $Id: dhd_sdio.c 476991 2014-05-12 06:21:02Z $
+ */
 
 #include <typedefs.h>
 #include <osl.h>
@@ -1607,16 +1631,6 @@ dhd_bus_txdata(struct dhd_bus *bus, void *pkt)
 	uint16_t hwdump_protocal;
 	uint hwdump_len;
 #endif
-
-#ifdef CONFIG_NET_STREAM
-	MAC_AND_WIFI_STAT_STRU *pstMacMesgTrackStat = NULL;
-	unsigned int uiNetStreamFlag = 0;
-	unsigned int uiNetStreamIndex = 0;
-
-	uiNetStreamFlag = ((struct sk_buff *)(pkt))->uiNetStreamFlag;
-	uiNetStreamIndex = ((struct sk_buff *)(pkt))->uiNetStreamIndex;
-#endif
-
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	osh = bus->dhd->osh;
@@ -1689,15 +1703,6 @@ dhd_bus_txdata(struct dhd_bus *bus, void *pkt)
 		dhd_os_sdunlock_txq(bus->dhd);
 
 		if (!deq_ret) {
-
-#ifdef CONFIG_NET_STREAM
-			/* 异常统计 */
-			MAC_STREAM_COUNT_PAR2(ulTxErr, ulTxNoResourceErr);
-
-			/* 流跟踪 */
-			MAC_STREAM_TRACK_PAR2(uiNetStreamFlag, uiNetStreamIndex, pstMacMesgTrackStat, ulTxErr, ulTxNoResourceErr);
-#endif
-
 #ifdef PROP_TXSTATUS
 			if (DHD_PKTTAG_WLFCPKT(PKTTAG(pkt)) == 0)
 #endif /* PROP_TXSTATUS */
@@ -1713,18 +1718,8 @@ dhd_bus_txdata(struct dhd_bus *bus, void *pkt)
 				PKTFREE(osh, pkt, TRUE);
 			}
 			ret = BCME_NORESOURCE;
-		} else {
-
-#ifdef CONFIG_NET_STREAM
-				/* 正常统计 */
-				MAC_STREAM_COUNT_PAR2(ulTxDeqretOk, ulTxOk);
-
-				/* 流跟踪 */
-				MAC_STREAM_TRACK_PAR2(uiNetStreamFlag, uiNetStreamIndex, pstMacMesgTrackStat, ulTxDeqretOk, ulTxOk);
-#endif
-
-				ret = BCME_OK;
-			}
+		} else
+			ret = BCME_OK;
 
 		dhd_os_sdlock_txq(bus->dhd);
 		pkq_len = pktq_len(&bus->txq);
@@ -1768,31 +1763,10 @@ dhd_bus_txdata(struct dhd_bus *bus, void *pkt)
 
 		ret = dhdsdio_txpkt(bus, chan, &pkt, 1, TRUE);
 
-		if (ret != BCME_OK) {
+		if (ret != BCME_OK)
 			bus->dhd->tx_errors++;
-
-
-#ifdef CONFIG_NET_STREAM
-			/* 正常统计 */
-			MAC_STREAM_COUNT_PAR2(ulTxStdioPktFailErr, ulTxErr);
-
-			/* 流跟踪 */
-			MAC_STREAM_TRACK_PAR2(uiNetStreamFlag, uiNetStreamIndex, pstMacMesgTrackStat, ulTxStdioPktFailErr, ulTxErr);
-#endif
-
-		} else {
+		else
 			bus->dhd->dstats.tx_bytes += datalen;
-
-
-#ifdef CONFIG_NET_STREAM
-			/* 正常统计 */
-			MAC_STREAM_COUNT_PAR2(ulTxStdioPktOk, ulTxOk);
-
-			/* 流跟踪 */
-			MAC_STREAM_TRACK_PAR2(uiNetStreamFlag, uiNetStreamIndex, pstMacMesgTrackStat, ulTxStdioPktOk, ulTxOk);
-#endif
-
-		}
 
 		if ((bus->idletime == DHD_IDLE_IMMEDIATE) && !bus->dpc_sched) {
 			bus->activity = FALSE;
@@ -2093,18 +2067,8 @@ static int dhdsdio_txpkt(dhd_bus_t *bus, uint chan, void** pkts, int num_pkt, bo
 	void *new_pkts[MAX_TX_PKTCHAIN_CNT];
 	bool wlfc_enabled = FALSE;
 
-	if (bus->dhd->dongle_reset) {
-
-#ifdef CONFIG_NET_STREAM
-
-		/* 异常统计 */
-		MAC_STREAM_COUNT_PAR2(ulTxErr, ulTxBcmeNotReadyErr);
-
-#endif
-
-
+	if (bus->dhd->dongle_reset)
 		return BCME_NOTREADY;
-	}
 
 	sdh = bus->sdh;
 	osh = bus->dhd->osh;
@@ -2121,17 +2085,8 @@ static int dhdsdio_txpkt(dhd_bus_t *bus, uint chan, void** pkts, int num_pkt, bo
 		last_pkt = (i == num_pkt - 1);
 		pkt_len = dhdsdio_txpkt_preprocess(bus, pkt, chan, bus->tx_seq + i,
 			total_len, last_pkt, &pad_pkt_len, &new_pkt);
-		if (pkt_len <= 0) {
-
-#ifdef CONFIG_NET_STREAM
-
-			/* 异常统计 */
-			MAC_STREAM_COUNT_PAR2(ulTxErr, ulTxStdioPktLenErr);
-#endif
-
-
+		if (pkt_len <= 0)
 			goto done;
-		}
 		if (new_pkt) {
 			pkt = new_pkt;
 			new_pkts[new_pkt_num++] = new_pkt;
@@ -2171,24 +2126,9 @@ static int dhdsdio_txpkt(dhd_bus_t *bus, uint chan, void** pkts, int num_pkt, bo
 	pkt_chain = PKTNEXT(osh, head_pkt) ? head_pkt : NULL;
 	ret = dhd_bcmsdh_send_buf(bus, bcmsdh_cur_sbwad(sdh), SDIO_FUNC_2, F2SYNC,
 		PKTDATA(osh, head_pkt), total_len, pkt_chain, NULL, NULL, TXRETRIES);
-	if (ret == BCME_OK) {
+	if (ret == BCME_OK)
 		bus->tx_seq = (bus->tx_seq + num_pkt) % SDPCM_SEQUENCE_WRAP;
 
-
-#ifdef CONFIG_NET_STREAM
-		/* 正常统计 此处不能使用宏替换,因生产的宏永远提示错误do not use assignment in if condition*/
-		if (NULL != g_pstMacMesgStat) {
-			g_pstMacMesgStat->ulTxStdioSendBufOk += num_pkt;
-		}
-		} else {
-		/* 异常统计 */
-		if (NULL != g_pstMacMesgStat) {
-			g_pstMacMesgStat->ulTxErr += num_pkt;
-			g_pstMacMesgStat->ulTxStdioSendBufFailErr += num_pkt;
-		}
-#endif
-
-	}
 	/* if a padding packet was needed, remove it from the link list as it not a data pkt */
 	if (pad_pkt_len && pkt)
 		PKTSETNEXT(osh, pkt, NULL);
@@ -2217,13 +2157,6 @@ done:
 		if (!wlfc_enabled) {
 			PKTSETNEXT(osh, pkt, NULL);
 			dhd_txcomplete(bus->dhd, pkt, ret != 0);
-
-#ifdef CONFIG_NET_STREAM0
-			/* 正常统计 */
-			MAC_STREAM_COUNT_PAR1(ulTxStdioPktCompleteOk);
-
-#endif
-
 			if (free_pkt)
 				PKTFREE(osh, pkt, TRUE);
 		}
@@ -4080,8 +4013,10 @@ dhdsdio_write_vars(dhd_bus_t *bus)
 		/* Verify NVRAM bytes */
 		DHD_INFO(("Compare NVRAM dl & ul; varsize=%d\n", varsize));
 		nvram_ularray = (uint8*)MALLOC(bus->dhd->osh, varsize);
-		if (!nvram_ularray)
+		if (!nvram_ularray) {
+			MFREE(bus->dhd->osh, vbuffer, varsize);
 			return BCME_NOMEM;
+		}
 
 		/* Upload image to verify downloaded contents. */
 		memset(nvram_ularray, 0xaa, varsize);
@@ -4527,7 +4462,6 @@ dhd_txglom_enable(dhd_pub_t *dhdp, bool enable)
 	 */
 	dhd_bus_t *bus = dhdp->bus;
 #ifdef BCMSDIOH_TXGLOM
-	char buf[256];
 	uint32 rxglom;
 	int32 ret;
 
@@ -4540,9 +4474,8 @@ dhd_txglom_enable(dhd_pub_t *dhdp, bool enable)
 
 	if (enable) {
 		rxglom = 1;
-		memset(buf, 0, sizeof(buf));
-		bcm_mkiovar("bus:rxglom", (void *)&rxglom, 4, buf, sizeof(buf));
-		ret = dhd_wl_ioctl_cmd(dhdp, WLC_SET_VAR, buf, sizeof(buf), TRUE, 0);
+		ret = dhd_iovar(dhdp, 0, "bus:rxglom", (char *)&rxglom,
+				sizeof(rxglom), NULL, 0, TRUE);
 		if (ret >= 0)
 			bus->txglom_enable = TRUE;
 		else {
@@ -6168,7 +6101,6 @@ dhdsdio_dpc(dhd_bus_t *bus)
 		bus->ipend = FALSE;
 #ifdef HW_REG_RECOVERY
 		read_reg_stamp = jiffies;
-#endif
 		hwintstatus = 0;
 		hwintstatus |= bcmsdh_cfg_read(bus->sdh, SDIO_FUNC_1, ((unsigned int)&regs->intstatus & 0xffff) + 0, &hwerr1);
 		hwintstatus |= bcmsdh_cfg_read(bus->sdh, SDIO_FUNC_1, ((unsigned int)&regs->intstatus & 0xffff) + 1, &hwerr2) << 8;
@@ -6179,6 +6111,9 @@ dhdsdio_dpc(dhd_bus_t *bus)
 		if (hwerr1 || 0xffffffff == newstatus || 0x0 == newstatus) {
 			R_SDREG(newstatus, &regs->intstatus, retries);
 		}
+#else
+		R_SDREG(newstatus, &regs->intstatus, retries);
+#endif
 		bus->f1regdata++;
 #ifdef HW_REG_RECOVERY
 		if (bcmsdh_regfail(bus->sdh)) {
@@ -7177,7 +7112,9 @@ dhdsdio_probe(uint16 venid, uint16 devid, uint16 bus_no, uint16 slot,
 	dhd_txminmax = DHD_TXMINMAX;
 
 	forcealign = TRUE;
-
+#ifdef HW_WIFI_DMD_LOG
+	hw_dmd_trace_log("dhdsdio_probe: Enter");
+#endif
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 	DHD_INFO(("%s: venid 0x%04x devid 0x%04x\n", __FUNCTION__, venid, devid));
 
@@ -7255,23 +7192,35 @@ dhdsdio_probe(uint16 venid, uint16 devid, uint16 bus_no, uint16 slot,
 	/* attempt to attach to the dongle */
 	if (!(dhdsdio_probe_attach(bus, osh, sdh, regsva, devid))) {
 		DHD_ERROR(("%s: dhdsdio_probe_attach failed\n", __FUNCTION__));
+#ifdef HW_WIFI_DMD_LOG
+		hw_dmd_trace_log("%s: dhdsdio_probe_attach failed", __FUNCTION__);
+#endif
 		goto fail;
 	}
 
 	/* Attach to the dhd/OS/network interface */
 	if (!(bus->dhd = dhd_attach(osh, bus, SDPCM_RESERVE))) {
 		DHD_ERROR(("%s: dhd_attach failed\n", __FUNCTION__));
+#ifdef HW_WIFI_DMD_LOG
+		hw_dmd_trace_log("%s: dhd_attach failed", __FUNCTION__);
+#endif
 		goto fail;
 	}
 
 	/* Allocate buffers */
 	if (!(dhdsdio_probe_malloc(bus, osh, sdh))) {
 		DHD_ERROR(("%s: dhdsdio_probe_malloc failed\n", __FUNCTION__));
+#ifdef HW_WIFI_DMD_LOG
+		hw_dmd_trace_log("%s: dhdsdio_probe_malloc failed", __FUNCTION__);
+#endif
 		goto fail;
 	}
 
 	if (!(dhdsdio_probe_init(bus, osh, sdh))) {
 		DHD_ERROR(("%s: dhdsdio_probe_init failed\n", __FUNCTION__));
+#ifdef HW_WIFI_DMD_LOG
+		hw_dmd_trace_log("%s: dhdsdio_probe_init failed", __FUNCTION__);
+#endif
 		goto fail;
 	}
 
@@ -7291,6 +7240,9 @@ dhdsdio_probe(uint16 venid, uint16 devid, uint16 bus_no, uint16 slot,
 	}
 
 	DHD_INFO(("%s: completed!!\n", __FUNCTION__));
+#ifdef HW_WIFI_DMD_LOG
+	hw_dmd_trace_log("dhdsdio_probe: completed");
+#endif
 
 	/* if firmware path present try to download and bring up bus */
 	bus->dhd->hang_report  = TRUE;
@@ -7405,14 +7357,20 @@ dhdsdio_probe_attach(struct dhd_bus *bus, osl_t *osh, void *sdh, void *regsva,
 	if (!(bus->sih = si_attach((uint)devid, osh, regsva, DHD_BUS, sdh,
 	                           &bus->vars, &bus->varsz))) {
 		DHD_ERROR(("%s: si_attach failed!\n", __FUNCTION__));
+#ifdef HW_WIFI_DMD_LOG
+		hw_dmd_trace_log("%s: si_attach failed!", __FUNCTION__);
+#endif
 		goto fail;
 	}
 
 #ifdef DHD_DEBUG
 	DHD_ERROR(("F1 signature OK, socitype:0x%x chip:0x%4x rev:0x%x pkg:0x%x\n",
 		bus->sih->socitype, bus->sih->chip, bus->sih->chiprev, bus->sih->chippkg));
+#ifdef HW_WIFI_DMD_LOG
+	hw_dmd_trace_log("F1 signature OK, socitype:0x%x chip:0x%4x rev:0x%x pkg:0x%x",
+		bus->sih->socitype, bus->sih->chip, bus->sih->chiprev, bus->sih->chippkg);
+#endif
 #endif /* DHD_DEBUG */
-
 
 	bcmsdh_chipinfo(sdh, bus->sih->chip, bus->sih->chiprev);
 
@@ -7477,7 +7435,7 @@ dhdsdio_probe_attach(struct dhd_bus *bus, osl_t *osh, void *sdh, void *regsva,
 			#else
 				bus->dongle_ram_base = (bus->sih->chiprev < 6)  /* from 4345C0 */
 					? CR4_4345_LT_C0_RAM_BASE : CR4_4345_GE_C0_RAM_BASE;
-#endif
+			#endif
 				break;
 			case BCM4349_CHIP_GRPID:
 				bus->dongle_ram_base = CR4_4349_RAM_BASE;
@@ -7586,6 +7544,9 @@ dhdsdio_probe_init(dhd_bus_t *bus, osl_t *osh, void *sdh)
 	int32 fnum;
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
+#ifdef HW_WIFI_DMD_LOG
+	hw_dmd_trace_log("dhdsdio_probe_init enter");
+#endif
 
 	bus->_srenab = FALSE;
 
@@ -7895,6 +7856,9 @@ int
 dhd_bus_register(void)
 {
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
+#ifdef HW_WIFI_DMD_LOG
+	hw_dmd_trace_log("dhd_bus_register: Enter");
+#endif
 
 	return bcmsdh_register(&dhd_sdio);
 }
@@ -7938,6 +7902,7 @@ dhdsdio_download_code_array(struct dhd_bus *bus)
 
 			if (offset == 0) {
 				bus->resetinstr = *(((uint32*)dlarray));
+				/* Add start of RAM address to the address given by user */
 				offset += bus->dongle_ram_base;
 			}
 		}
@@ -8045,6 +8010,7 @@ dhdsdio_download_code_file(struct dhd_bus *bus, char *pfw_path)
 
 			if (offset == 0) {
 				bus->resetinstr = *(((uint32*)memptr));
+				/* Add start of RAM address to the address given by user */
 				offset += bus->dongle_ram_base;
 			}
 		}
@@ -8703,13 +8669,6 @@ dhd_bcmsdh_send_buf(dhd_bus_t *bus, uint32 addr, uint fn, uint flags, uint8 *buf
 
 	if (!KSO_ENAB(bus)) {
 		DHD_ERROR(("%s: Device asleep\n", __FUNCTION__));
-
-#ifdef CONFIG_NET_STREAM
-
-		/* 异常统计 */
-		MAC_STREAM_COUNT_PAR2(ulTxErr, ulTxSendBufNoDevErr);
-#endif
-
 		return BCME_NODEVICE;
 	}
 
@@ -8839,7 +8798,9 @@ dhd_bus_devreset(dhd_pub_t *dhdp, uint8 flag)
 		/* App must have restored power to device before calling */
 
 		DHD_TRACE(("\n\n%s: == WLAN ON ==\n", __FUNCTION__));
-
+#ifdef HW_WIFI_DMD_LOG
+		hw_dmd_trace_log("dhd_bus_devreset enter flag: 0");
+#endif
 		if (bus->dhd->dongle_reset) {
 			/* Turn on WLAN */
 			dhd_os_sdlock(dhdp);

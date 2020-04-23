@@ -2034,7 +2034,6 @@ static int dw_mci_hs_runtime_resume(struct device *dev)
 }
 #endif
 
-extern void hw_wifi_dsm_client_notify(int dsm_id, const char *fmt, ...);
 char print_dmd_buffer[1024] = {0};
 /*lint -e124*/
 void dw_mci_hisi_dmd_print(struct dw_mci *host)
@@ -2098,9 +2097,6 @@ void dw_mci_hisi_dmd_print(struct dw_mci *host)
                 snprintf(p,sizeof(print_dmd_buffer),"%08x ",sdio_host_reg[j]);
                 p += 9;
         }
-
-        hw_wifi_dsm_client_notify(909030004,"dw_mci_hisi_dmd_print:%s \n",print_dmd_buffer);
-
 }
 /*lint +e124*/
 

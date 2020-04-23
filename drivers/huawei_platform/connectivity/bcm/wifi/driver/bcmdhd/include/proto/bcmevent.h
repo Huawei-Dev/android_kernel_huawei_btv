@@ -163,6 +163,11 @@ typedef union bcm_event_msg_u {
 #define WLC_E_UNICAST_DECODE_ERROR	50	/* Unsupported unicast encrypted frame */
 #define WLC_E_MULTICAST_DECODE_ERROR	51	/* Unsupported multicast encrypted frame */
 #define WLC_E_TRACE		52
+#ifdef  BRCM_RSDB
+#ifdef WLBTAMP
+#define WLC_E_BTA_HCI_EVENT	53	/* BT-AMP HCI event */
+#endif
+#endif
 #define WLC_E_IF		54	/* I/F change (for dongle host notification) */
 #define WLC_E_P2P_DISC_LISTEN_COMPLETE	55	/* listen state expires */
 #define WLC_E_RSSI		56	/* indicate RSSI change based on configured levels */
@@ -227,6 +232,12 @@ typedef union bcm_event_msg_u {
 #define WLC_E_IBSS_COALESCE		110	/* IBSS Coalescing */
 #define WLC_E_AIBSS_TXFAIL		110	/* TXFAIL event for AIBSS, re using event 110 */
 #define WLC_E_BSS_LOAD			114	/* Inform host of beacon bss load */
+#ifdef  BRCM_RSDB
+#define WLC_E_MIMO_PWR_SAVE		115	/* Inform host MIMO PWR SAVE learning events */
+#define WLC_E_LEAKY_AP_STATS	116 /* Inform host leaky Ap stats events */
+#define WLC_E_ALLOW_CREDIT_BORROW 117	/* Allow or disallow wlfc credit borrowing in DHD */
+#define WLC_E_MSCH			120	/* Multiple channel scheduler event */
+#endif
 #define WLC_E_CSA_START_IND		121
 #define WLC_E_CSA_DONE_IND		122
 #define WLC_E_CSA_FAILURE_IND		123
@@ -234,17 +245,52 @@ typedef union bcm_event_msg_u {
 #define WLC_E_BSSID		125	/* to report change in BSSID while roaming */
 #define WLC_E_TX_STAT_ERROR		126	/* tx error indication */
 #define WLC_E_BCMC_CREDIT_SUPPORT	127	/* credit check for BCMC supported */
+#ifdef  BRCM_RSDB
+#define WLC_E_PEER_TIMEOUT	128 /* silently drop a STA because of inactivity */
+#endif
 #define WLC_E_BT_WIFI_HANDOVER_REQ	130	/* Handover Request Initiated */
 #define WLC_E_SPW_TXINHIBIT		131     /* Southpaw TxInhibit notification */
 #define WLC_E_FBT_AUTH_REQ_IND		132	/* FBT Authentication Request Indication */
 #define WLC_E_RSSI_LQM			133	/* Enhancement addition for WLC_E_RSSI */
 #define WLC_E_PFN_GSCAN_FULL_RESULT		134 /* Full probe/beacon (IEs etc) results */
 #define WLC_E_PFN_SWC		135 /* Significant change in rssi of bssids being tracked */
+#ifdef  BRCM_RSDB
+#define WLC_E_AUTHORIZED	136	/* a STA been authroized for traffic */
+#define WLC_E_PROBREQ_MSG_RX	137 /* probe req with wl_event_rx_frame_data_t header */
+#endif
 #define WLC_E_PFN_SCAN_COMPLETE		138	/* PFN completed scan of network list */
 #define WLC_E_RMC_EVENT			139	/* RMC event */
+#ifdef  BRCM_RSDB
+#define WLC_E_DPSTA_INTF_IND	140	/* DPSTA interface indication */
+#endif
+#define WLC_E_RRM               141     /* RRM Event */
 #define WLC_E_PFN_SSID_EXT      142  /* SSID EXT event */
 #define WLC_E_ROAM_EXP_EVENT    143  /* Expanded roam event */
-#define WLC_E_LAST			144	/* highest val + 1 for range checking */
+#define WLC_E_ULP			146	/* ULP entered indication */
+#define WLC_E_MACDBG			147	/* Ucode debugging event */
+#define WLC_E_RESERVED			148	/* reserved */
+#define WLC_E_PRE_ASSOC_RSEP_IND	149	/* assoc resp received */
+#define WLC_E_ID_AUTH			150	/* ID AUTH WPA2-PSK 4 WAY Handshake failure */
+#define WLC_E_TKO			151     /* TCP keepalive offload */
+#ifdef  BRCM_RSDB
+#define WLC_E_SDB_TRANSITION            152     /* SDB mode-switch event */
+#define WLC_E_NATOE_NFCT		153     /* natoe event */
+#endif
+#ifdef CONFIG_HW_ABS
+#define WLC_E_ANT_EVENT		166
+#endif
+
+#define WLC_E_RRM_RESP_STATUS    168
+#ifdef WL_TIM_EVENT
+#define WLC_E_TIM_EVENT     169
+#endif
+#ifdef WL_TEM_CTRL
+#define WLC_E_TEM_CTRL_EVENT          172
+#endif
+#define WLC_E_LAST                     173     /* highest val + 1 for range checking */
+#if (WLC_E_LAST > 173)
+#error "WLC_E_LAST: Invalid value for last event; must be <= 172."
+#endif /* WLC_E_LAST */
 
 /* define an API for getting the string name of an event */
 extern const char *bcmevent_get_name(uint event_type);
@@ -274,6 +320,36 @@ extern int is_wlc_event_frame(void *pktdata, uint pktlen, uint16 exp_usr_subtype
 #define WLC_E_STATUS_ERROR		16	/* request failed due to error */
 #define WLC_E_STATUS_INVALID 0xff  /* Invalid status code to init variables. */
 
+#ifdef  BRCM_RSDB
+/* SDB transition status code */
+#define WLC_E_STATUS_SDB_START          1
+#define WLC_E_STATUS_SDB_COMPLETE       2
+
+/* SDB transition reason code */
+#define WLC_E_REASON_HOST_DIRECT	0
+#define WLC_E_REASON_INFRA_ASSOC	1
+#define WLC_E_REASON_INFRA_ROAM		2
+#define WLC_E_REASON_INFRA_DISASSOC	3
+#define WLC_E_REASON_NO_MODE_CHANGE_NEEDED	4
+
+/* WLC_E_SDB_TRANSITION event data */
+#define WL_MAX_BSSCFG     4
+#define WL_EVENT_SDB_TRANSITION_VER     1
+typedef struct wl_event_sdb_data {
+	uint8 wlunit;           /* Core index */
+	uint8 is_iftype;        /* Interface Type(Station, SoftAP, P2P_GO, P2P_GC */
+	uint16 chanspec;        /* Interface Channel/Chanspec */
+	char ssidbuf[(4 * 32) + 1];	/* SSID_FMT_BUF_LEN: ((4 * DOT11_MAX_SSID_LEN) + 1) */
+} wl_event_sdb_data_t;
+
+typedef struct wl_event_sdb_trans {
+	uint8 version;          /* Event Data Version */
+	uint8 rsdb_mode;
+	uint8 enable_bsscfg;
+	uint8 reserved;
+	struct wl_event_sdb_data values[WL_MAX_BSSCFG];
+} wl_event_sdb_trans_t;
+#endif
 
 /* roam reason codes */
 #define WLC_E_REASON_INITIAL_ASSOC	0	/* initial assoc */
@@ -293,7 +369,10 @@ extern int is_wlc_event_frame(void *pktdata, uint pktlen, uint16 exp_usr_subtype
 #define WLC_E_REASON_REQUESTED_ROAM	11
 #define WLC_E_REASON_BSSTRANS_REQ	11	/* roamed due to BSS Transition request by AP */
 #define WLC_E_REASON_BCNS_RECOVERY	12	/* recovery from lost beacons */
-
+#ifdef  BRCM_RSDB
+#define WLC_E_REASON_LOW_RSSI_CU		12 /* roamed due to low RSSI and Channel Usage */
+#define WLC_E_REASON_RADAR_DETECTED	13	/* roamed due to radar detection by STA */
+#endif
 /* prune reason codes */
 #define WLC_E_PRUNE_ENCR_MISMATCH	1	/* encryption mismatch */
 #define WLC_E_PRUNE_BCAST_BSSID		2	/* AP uses a broadcast BSSID */
@@ -312,6 +391,9 @@ extern int is_wlc_event_frame(void *pktdata, uint pktlen, uint16 exp_usr_subtype
 #define WLC_E_PRUNE_HOME_AP		17	/* prune home AP */
 #ifdef WRONG_ACTION_PATCH
 #define WLC_E_PRUNE_WRONG_ACTION	20
+#endif
+#ifdef BCM_PATCH_FOR_AMPDU_TEAR_DOWN
+#define WLC_E_PRUNE_AMPDU_TEARDOWN	21
 #endif
 
 /* WPA failure reason codes carried in the WLC_E_PSK_SUP event */
@@ -397,6 +479,25 @@ typedef struct wl_event_data_rssi {
 #define WLC_E_REASON_RMC_NONE		0
 #define WLC_E_REASON_RMC_AR_LOST		1
 #define WLC_E_REASON_RMC_AR_NO_ACK		2
+
+#ifdef  BRCM_RSDB
+#ifdef WLTDLS
+/* TDLS Action Category code */
+#define TDLS_AF_CATEGORY		12
+/* Wi-Fi Display (WFD) Vendor Specific Category */
+/* used for WFD Tunneled Probe Request and Response */
+#define TDLS_VENDOR_SPECIFIC		127
+/* TDLS Action Field Values */
+#define TDLS_ACTION_SETUP_REQ		0
+#define TDLS_ACTION_SETUP_RESP		1
+#define TDLS_ACTION_SETUP_CONFIRM	2
+#define TDLS_ACTION_TEARDOWN		3
+#define WLAN_TDLS_SET_PROBE_WFD_IE	11
+#define WLAN_TDLS_SET_SETUP_WFD_IE	12
+#define WLAN_TDLS_SET_WFD_ENABLED	13
+#define WLAN_TDLS_SET_WFD_DISABLED	14
+#endif
+#endif
 
 #ifdef HW_DFX_TXFAIL_EVENT
 /* status code to indicate ARP and DHCPC tx frame failure  */
@@ -517,6 +618,23 @@ enum nan_app_events {
 };
 #define IS_NAN_EVT_ON(var, evt) ((var & (1 << (evt-1))) != 0)
 /*  ******************* end of NAN section *************** */
+
+#ifdef CONFIG_HW_ABS
+/* WLC_E_ANT_EVENT event data */
+typedef struct wl_event_data_ant {
+	int32 state;
+} wl_event_data_ant_t;
+#endif
+#ifdef CONFIG_HW_GET_EXT_SIG
+#define RRM_EVENT_VERSION  0
+typedef struct wl_rrm_event {
+int16 version;
+	int16 len;
+	int16 cat;                             /* Category */
+	int16 subevent;
+	char payload[1]; /* Measurement payload */
+} wl_rrm_event_t;
+#endif
 
 /* This marks the end of a packed structure section. */
 #include <packed_section_end.h>

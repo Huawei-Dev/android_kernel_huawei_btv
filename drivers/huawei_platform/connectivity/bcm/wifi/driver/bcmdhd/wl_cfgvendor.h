@@ -65,6 +65,24 @@
 #define VENDOR_REPLY_OVERHEAD       (VENDOR_ID_OVERHEAD + \
 									VENDOR_SUBCMD_OVERHEAD + \
 									VENDOR_DATA_OVERHEAD)
+
+#ifdef BCM_BSSID_BLACKLIST
+#define GSCAN_ATTR_SET1				10
+#define GSCAN_ATTR_SET2				20
+#define GSCAN_ATTR_SET3				30
+#define GSCAN_ATTR_SET4				40
+#define GSCAN_ATTR_SET5				50
+#define GSCAN_ATTR_SET6				60
+#define GSCAN_ATTR_SET7				70
+#define GSCAN_ATTR_SET8				80
+#define GSCAN_ATTR_SET9				90
+#define GSCAN_ATTR_SET10			100
+#define GSCAN_ATTR_SET11			110
+#define GSCAN_ATTR_SET12			120
+#define GSCAN_ATTR_SET13			130
+#define GSCAN_ATTR_SET14			140
+#endif
+
 typedef enum {
 	/* don't use 0 as a valid subcommand */
 	VENDOR_NL80211_SUBCMD_UNSPECIFIED,
@@ -99,6 +117,12 @@ typedef enum {
 	ANDROID_NL80211_SUBCMD_WIFI_OFFLOAD_RANGE_START = 0x1600,
 	ANDROID_NL80211_SUBCMD_WIFI_OFFLOAD_RANGE_END   = 0x16FF,
 
+#if defined(PKT_FILTER_SUPPORT) && defined(BCM_APF)
+	/* define all packet filter related commands between 0x1800 and 0x18FF */
+	ANDROID_NL80211_SUBCMD_PKT_FILTER_RANGE_START = 0x1800,
+	ANDROID_NL80211_SUBCMD_PKT_FILTER_RANGE_END   = 0x18FF,
+#endif /* PKT_FILTER_SUPPORT && BCM_APF */
+
 	/* This is reserved for future usage */
 
 } ANDROID_VENDOR_SUB_COMMAND;
@@ -129,6 +153,11 @@ enum wl_vendor_subcmd {
 	WIFI_SUBCMD_SET_BSSID_BLACKLIST,
 	GSCAN_SUBCMD_ANQPO_CONFIG,
 	WIFI_SUBCMD_SET_RSSI_MONITOR,
+#ifdef BCM_BSSID_BLACKLIST
+	WIFI_SUBCMD_CONFIG_ND_OFFLOAD,
+	WIFI_SUBCMD_CONFIG_TCPACK_SUP,
+	WIFI_SUBCMD_FW_ROAM_POLICY,
+#endif
 	RTT_SUBCMD_SET_CONFIG = ANDROID_NL80211_SUBCMD_RTT_RANGE_START,
 	RTT_SUBCMD_CANCEL_CONFIG,
 	RTT_SUBCMD_GETCAPABILITY,
@@ -143,6 +172,10 @@ enum wl_vendor_subcmd {
 	DEBUG_RESET_LOGGING,
 	WIFI_OFFLOAD_SUBCMD_START_MKEEP_ALIVE = ANDROID_NL80211_SUBCMD_WIFI_OFFLOAD_RANGE_START,
 	WIFI_OFFLOAD_SUBCMD_STOP_MKEEP_ALIVE,
+#if defined(PKT_FILTER_SUPPORT) && defined(BCM_APF)
+	APF_SUBCMD_GET_CAPABILITIES = ANDROID_NL80211_SUBCMD_PKT_FILTER_RANGE_START,
+	APF_SUBCMD_SET_FILTER,
+#endif /* PKT_FILTER_SUPPORT && BCM_APF */
 	/* Add more sub commands here */
     VENDOR_SUBCMD_MAX
 };
@@ -267,6 +300,11 @@ enum gscan_attributes {
     GSCAN_ATTRIBUTE_EPNO_5G_BONUS,
 #endif
 
+#ifdef BCM_BSSID_BLACKLIST
+    /* Android O Roaming features */
+    GSCAN_ATTRIBUTE_ROAM_STATE_SET = GSCAN_ATTR_SET14,
+#endif
+
     GSCAN_ATTRIBUTE_MAX
 };
 
@@ -338,6 +376,14 @@ enum mkeep_alive_attributes {
 	MKEEP_ALIVE_ATTRIBUTE_PERIOD_MSEC
 };
 
+#if defined(PKT_FILTER_SUPPORT) && defined(BCM_APF)
+enum apf_attributes {
+	APF_ATTRIBUTE_VERSION,
+	APF_ATTRIBUTE_MAX_LEN,
+	APF_ATTRIBUTE_PROGRAM,
+	APF_ATTRIBUTE_PROGRAM_LEN
+};
+#endif /* PKT_FILTER_SUPPORT && BCM_APF */
 enum wifi_rssi_monitor_attr {
 	RSSI_MONITOR_ATTRIBUTE_MAX_RSSI,
 	RSSI_MONITOR_ATTRIBUTE_MIN_RSSI,
@@ -359,7 +405,36 @@ typedef enum wl_vendor_event {
 	GOOGLE_FW_DUMP_EVENT,
 	GOOGLE_PNO_HOTSPOT_FOUND_EVENT,
 	GOOGLE_RSSI_MONITOR_EVENT,
-	GOOGLE_MKEEP_ALIVE_EVENT
+	GOOGLE_MKEEP_ALIVE_EVENT,
+#ifdef BCM_BSSID_BLACKLIST
+	BRCM_VENDOR_EVENT_IDSUP_STATUS,
+	/*
+	 * BRCM specific events should be placed after
+	 * the Generic events so that enums don't mismatch
+	 * between the DHD and HAL
+	 */
+	GOOGLE_NAN_EVENT_ENABLED,
+	GOOGLE_NAN_EVENT_DISABLED,
+	GOOGLE_NAN_EVENT_PUBLISH_TERMINATED,
+	GOOGLE_NAN_EVENT_SUBSCRIBE_MATCH,
+	GOOGLE_NAN_EVENT_SUBSCRIBE_UNMATCH,
+	GOOGLE_NAN_EVENT_SUBSCRIBE_TERMINATED,
+	GOOGLE_NAN_EVENT_DE_EVENT,
+	GOOGLE_NAN_EVENT_FOLLOWUP,
+	GOOGLE_NAN_EVENT_TCA,
+	GOOGLE_NAN_EVENT_DATA_REQUEST,
+	GOOGLE_NAN_EVENT_DATA_CONFIRMATION,
+	GOOGLE_NAN_EVENT_DATA_END,
+	GOOGLE_NAN_EVENT_BEACON,
+	GOOGLE_NAN_EVENT_SDF,
+	GOOGLE_NAN_EVENT_TRANSMIT_FOLLOWUP_IND,
+	GOOGLE_NAN_EVENT_REPLIED,
+	GOOGLE_NAN_EVENT_UNKNOWN,
+
+	GOOGLE_ROAM_EVENT_START
+#else
+	BRCM_VENDOR_EVENT_IDSUP_STATUS
+#endif
 } wl_vendor_event_t;
 
 enum andr_wifi_attr {
@@ -410,7 +485,11 @@ typedef enum gscan_complete_event {
 #define BRCM_VENDOR_SCMD_CAPA	"cap"
 
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(3, 13, 0)) || defined(WL_VENDOR_EXT_SUPPORT)
+#ifndef  BRCM_RSDB
 extern int wl_cfgvendor_attach(struct wiphy *wiphy, dhd_pub_t *dhd);
+#else
+extern int wl_cfgvendor_attach(struct wiphy *wiphy);
+#endif
 extern int wl_cfgvendor_detach(struct wiphy *wiphy);
 extern int wl_cfgvendor_send_async_event(struct wiphy *wiphy,
                   struct net_device *dev, int event_id, const void  *data, int len);

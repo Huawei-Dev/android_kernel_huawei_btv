@@ -137,17 +137,17 @@ int set_gps_ref_clk_enable_bcm(bool enable, gps_modem_id_enum modem_id,
 	switch (ic_type) {
 	case GPS_IC_TYPE_4752:
 		{
-			ret = set_gps_ref_clk_enable_bcm4752(enable);
+			//ret = set_gps_ref_clk_enable_bcm4752(enable);
 			break;
 		}
 	case GPS_IC_TYPE_47531:
 		{
-			ret = set_gps_ref_clk_enable_bcm47531(enable);
+			//ret = set_gps_ref_clk_enable_bcm47531(enable);
 			break;
 		}
 	case GPS_IC_TYPE_4774:
 		{
-			ret = set_gps_ref_clk_enable_bcm4774(enable);
+			//ret = set_gps_ref_clk_enable_bcm4774(enable);
 			break;
 		}
 	default:

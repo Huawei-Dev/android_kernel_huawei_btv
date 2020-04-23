@@ -34,22 +34,34 @@
 
 #define MSGBUF_MAX_MSG_SIZE   ETHER_MAX_LEN
 
-#define D2H_EPOCH_MODULO			253 /* sequence number wrap */
-#define D2H_EPOCH_INIT_VAL			(D2H_EPOCH_MODULO + 1)
-
+#define D2H_EPOCH_MODULO		253 /* sequence number wrap */
+#define D2H_EPOCH_INIT_VAL		(D2H_EPOCH_MODULO + 1)
+#ifdef BCM_PCIE_UPDATE
+#define H2D_EPOCH_MODULO		253 /* sequence number wrap */
+#define H2D_EPOCH_INIT_VAL		(H2D_EPOCH_MODULO + 1)
+#endif
 #define H2DRING_TXPOST_ITEMSIZE		48
 #define H2DRING_RXPOST_ITEMSIZE		32
 #define H2DRING_CTRL_SUB_ITEMSIZE	40
 #define D2HRING_TXCMPLT_ITEMSIZE	16
 #define D2HRING_RXCMPLT_ITEMSIZE	32
 #define D2HRING_CTRL_CMPLT_ITEMSIZE	24
-
+#ifndef BCM_PCIE_UPDATE
 #define H2DRING_TXPOST_MAX_ITEM			512
 #define H2DRING_RXPOST_MAX_ITEM			256
 #define H2DRING_CTRL_SUB_MAX_ITEM		20
 #define D2HRING_TXCMPLT_MAX_ITEM		1024
 #define D2HRING_RXCMPLT_MAX_ITEM		256
 #define D2HRING_CTRL_CMPLT_MAX_ITEM		20
+#else
+#define H2DRING_TXPOST_MAX_ITEM			512
+#define H2DRING_RXPOST_MAX_ITEM			512
+#define H2DRING_CTRL_SUB_MAX_ITEM		64
+#define D2HRING_TXCMPLT_MAX_ITEM		1024
+#define D2HRING_RXCMPLT_MAX_ITEM		512
+
+#define D2HRING_CTRL_CMPLT_MAX_ITEM		64
+#endif
 enum {
 	DNGL_TO_HOST_MSGBUF,
 	HOST_TO_DNGL_MSGBUF
@@ -145,6 +157,24 @@ typedef enum bcmpcie_msgtype {
 	MSG_TYPE_RX_CMPLT		= 0x12,
 	MSG_TYPE_LPBK_DMAXFER 		= 0x13,
 	MSG_TYPE_LPBK_DMAXFER_CMPLT	= 0x14,
+#ifdef BCM_PCIE_UPDATE
+	MSG_TYPE_FLOW_RING_RESUME	 = 0x15,
+	MSG_TYPE_FLOW_RING_RESUME_CMPLT	= 0x16,
+	MSG_TYPE_FLOW_RING_SUSPEND	= 0x17,
+	MSG_TYPE_FLOW_RING_SUSPEND_CMPLT	= 0x18,
+	MSG_TYPE_INFO_BUF_POST		= 0x19,
+	MSG_TYPE_INFO_BUF_CMPLT		= 0x1A,
+	MSG_TYPE_H2D_RING_CREATE	= 0x1B,
+	MSG_TYPE_D2H_RING_CREATE	= 0x1C,
+	MSG_TYPE_H2D_RING_CREATE_CMPLT	= 0x1D,
+	MSG_TYPE_D2H_RING_CREATE_CMPLT	= 0x1E,
+	MSG_TYPE_H2D_RING_CONFIG	= 0x1F,
+	MSG_TYPE_D2H_RING_CONFIG	= 0x20,
+	MSG_TYPE_H2D_RING_CONFIG_CMPLT	= 0x21,
+	MSG_TYPE_D2H_RING_CONFIG_CMPLT	= 0x22,
+	MSG_TYPE_H2D_MAILBOX_DATA	= 0x23,
+	MSG_TYPE_D2H_MAILBOX_DATA	= 0x24,
+#endif
 	MSG_TYPE_API_MAX_RSVD		= 0x3F
 } bcmpcie_msg_type_t;
 
@@ -415,7 +445,17 @@ typedef struct ctrl_compl_msg {
 	/* XOR checksum or a magic number to audit DMA done */
 	dma_done_t		marker;
 } ctrl_compl_msg_t;
-
+#ifdef BCM_PCIE_UPDATE
+typedef struct ring_config_resp {
+	/** common message header */
+	cmn_msg_hdr_t       cmn_hdr;
+	/** completion message header */
+	compl_msg_hdr_t     compl_hdr;
+	uint32          rsvd[2];
+	/** XOR checksum or a magic number to audit DMA done */
+	dma_done_t      marker;
+} ring_config_resp_t;
+#endif
 typedef union ctrl_completion_item {
 	ioctl_comp_resp_msg_t		ioctl_resp;
 	wlevent_req_msg_t		event;
@@ -427,6 +467,9 @@ typedef union ctrl_completion_item {
 	tx_flowring_delete_response_t	txfl_delete_resp;
 	tx_flowring_flush_response_t	txfl_flush_resp;
 	ctrl_compl_msg_t		ctrl_compl;
+#ifdef BCM_PCIE_UPDATE
+	ring_config_resp_t		ring_config_resp;
+#endif
 	unsigned char		check[D2HRING_CTRL_CMPLT_ITEMSIZE];
 } ctrl_completion_item_t;
 

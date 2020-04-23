@@ -125,13 +125,19 @@ s32 dhd_cfg80211_clean_p2p_info(struct bcm_cfg80211 *cfg)
 
 	return 0;
 }
-
+#ifndef  BRCM_RSDB
 struct net_device* wl_cfg80211_allocate_if(struct bcm_cfg80211 *cfg, int ifidx, char *name,
 	uint8 *mac, uint8 bssidx)
 {
 	return dhd_allocate_if(cfg->pub, ifidx, name, mac, bssidx, FALSE);
 }
-
+#else
+struct net_device* wl_cfg80211_allocate_if(struct bcm_cfg80211 *cfg, int ifidx, char *name,
+	uint8 *mac, uint8 bssidx, char *dngl_name)
+{
+	return dhd_allocate_if(cfg->pub, ifidx, name, mac, bssidx, FALSE, dngl_name);
+}
+#endif
 int wl_cfg80211_register_if(struct bcm_cfg80211 *cfg, int ifidx, struct net_device* ndev)
 {
 	return dhd_register_if(cfg->pub, ifidx, FALSE);

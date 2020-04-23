@@ -128,6 +128,7 @@ extern int dhd_bus_get_ids(struct dhd_bus *bus, uint32 *bus_type, uint32 *bus_nu
 	uint32 *slot_num);
 
 #ifdef BCMPCIE
+#ifndef BCM_PCIE_UPDATE
 enum {
 	DNGL_TO_HOST_BUF_IOCT,
 	DNGL_TO_HOST_DMA_SCRATCH_BUFFER,
@@ -150,6 +151,55 @@ enum {
 	RING_MAX_ITEM,
 	MAX_HOST_RXBUFS
 };
+#else
+enum {
+	/* Scratch buffer confiuguration update */
+	D2H_DMA_SCRATCH_BUF,
+	D2H_DMA_SCRATCH_BUF_LEN,
+
+	/* DMA Indices array buffers for: H2D WR and RD, and D2H WR and RD */
+	H2D_DMA_INDX_WR_BUF, /* update H2D WR dma indices buf base addr to dongle */
+	H2D_DMA_INDX_RD_BUF, /* update H2D RD dma indices buf base addr to dongle */
+	D2H_DMA_INDX_WR_BUF, /* update D2H WR dma indices buf base addr to dongle */
+	D2H_DMA_INDX_RD_BUF, /* update D2H RD dma indices buf base addr to dongle */
+
+	/* DHD sets/gets WR or RD index, in host's H2D and D2H DMA indices buffer */
+	H2D_DMA_INDX_WR_UPD, /* update H2D WR index in H2D WR dma indices buf */
+	H2D_DMA_INDX_RD_UPD, /* update H2D RD index in H2D RD dma indices buf */
+	D2H_DMA_INDX_WR_UPD, /* update D2H WR index in D2H WR dma indices buf */
+	D2H_DMA_INDX_RD_UPD, /* update D2H RD index in D2H RD dma indices buf */
+
+	/* H2D and D2H Mailbox data update */
+	H2D_MB_DATA,
+	D2H_MB_DATA,
+
+	/* (Common) MsgBuf Ring configuration update */
+	RING_BUF_ADDR,       /* update ring base address to dongle */
+	RING_ITEM_LEN,       /* update ring item size to dongle */
+	RING_MAX_ITEMS,      /* update ring max items to dongle */
+
+	/* Update of WR or RD index, for a MsgBuf Ring */
+	RING_RD_UPD,         /* update ring read index from/to dongle */
+	RING_WR_UPD,         /* update ring write index from/to dongle */
+
+	TOTAL_LFRAG_PACKET_CNT,
+	MAX_HOST_RXBUFS
+};
+#endif
+#ifdef PCIE_CLEANFLOW
+#define INIT_FLOW_RINGS_TIMER(timer, func, duration)	\
+	do {				   \
+		init_timer(timer); \
+		timer->function = func; \
+		timer->expires = jiffies + msecs_to_jiffies(duration);  \
+		timer->data = (unsigned long) flow_ring_node; \
+		add_timer(timer); \
+	} while (0);
+
+#define FLOW_RINGS_RESPONSE_TIME	100
+void dhd_bus_flow_ring_response_expired(unsigned long data);
+#endif /* PCIE_CLEANFLOW */
+
 typedef void (*dhd_mb_ring_t) (struct dhd_bus *, uint32);
 extern void dhd_bus_cmn_writeshared(struct dhd_bus *bus, void * data, uint32 len, uint8 type,
 	uint16 ringid);
@@ -173,8 +223,12 @@ extern int dhd_bus_flow_ring_delete_request(struct dhd_bus *bus, void *flow_ring
 extern void dhd_bus_flow_ring_delete_response(struct dhd_bus *bus, uint16 flowid, uint32 status);
 extern int dhd_bus_flow_ring_flush_request(struct dhd_bus *bus, void *flow_ring_node);
 extern void dhd_bus_flow_ring_flush_response(struct dhd_bus *bus, uint16 flowid, uint32 status);
+#ifndef BCM_PCIE_UPDATE
 extern uint8 dhd_bus_is_txmode_push(struct dhd_bus *bus);
 extern uint32 dhd_bus_max_h2d_queues(struct dhd_bus *bus, uint8 *txpush);
+#else
+extern uint32 dhd_bus_max_h2d_queues(struct dhd_bus *bus);
+#endif
 extern int dhd_bus_schedule_queue(struct dhd_bus *bus, uint16 flow_id, bool txs);
 extern int dhdpcie_bus_clock_start(struct dhd_bus *bus);
 extern int dhdpcie_bus_clock_stop(struct dhd_bus *bus);

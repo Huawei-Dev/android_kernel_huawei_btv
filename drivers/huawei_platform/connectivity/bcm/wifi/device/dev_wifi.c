@@ -45,9 +45,12 @@
 #include <huawei_platform/log/hw_log.h>
 
 #include "dev_wifi.h"
+#include "hw_driver_register.h"
 
 #define HW_FAC_GPIO_VAL_LOW     20700
 #define HW_FAC_GPIO_VAL_HIG     20701
+
+#define DHD_ERROR_VAL   0x0001
 
 #define DTS_COMP_WIFI_POWER_NAME "hisilicon,bcm_wifi"
 
@@ -63,7 +66,10 @@ static struct WIFI_VCC_CMD_S vcc_setvol_cmd = {WIFI_REGU_SET_VOLTAGE, &wifi_vcci
 #define HWLOG_TAG       dev_wifi
 
 struct wifi_host_s *wifi_host;
+struct dev_wifi_handle dev_handle;
 
+int vio_enable = 0;
+bool ext_gpio_type = 0;
 #ifdef CONFIG_DHD_USE_STATIC_BUF
 void *wlan_static_prot = NULL;
 void *wlan_static_scan_buf0 = NULL;
@@ -71,7 +77,10 @@ void *wlan_static_scan_buf1 = NULL;
 void *wlan_static_dhd_info_buf = NULL;
 void *wlan_static_if_flow_lkup = NULL;
 void *wlan_static_osl_buf = NULL;
-
+void *wlan_static_dhd_prealloc_pktid_map = NULL;
+#ifdef BCM_ALLOC_STATIC_10K
+void *wlan_static_if_flow_tbl = NULL;
+#endif
 static struct sk_buff *wlan_static_skb[WLAN_SKB_BUF_NUM];
 unsigned char g_wifimac[WLAN_MAC_LEN] = {0x00,0x00,0x00,0x00,0x00,0x00};
 static wifi_mem_prealloc_t wifi_mem_array[PREALLOC_WLAN_SEC_NUM] = {
@@ -83,6 +92,17 @@ static wifi_mem_prealloc_t wifi_mem_array[PREALLOC_WLAN_SEC_NUM] = {
 HWLOG_REGIST();
 
 #ifdef CONFIG_DHD_USE_STATIC_BUF
+
+MODULE_LICENSE("GPL v2");
+
+void register_dev_wifi_handle (struct dev_wifi_handle org) {
+    memcpy(&dev_handle, &org, sizeof(struct dev_wifi_handle));
+}
+void unregister_dev_wifi_handle(void) {
+    memset(&dev_handle, 0, sizeof(struct dev_wifi_handle));
+}
+EXPORT_SYMBOL(register_dev_wifi_handle);
+EXPORT_SYMBOL(unregister_dev_wifi_handle);
 void *wifi_mem_prealloc(int section, unsigned long size) {
     int mem_idx = 0;
     if (section == DHD_PREALLOC_PROT) {
@@ -129,6 +149,31 @@ void *wifi_mem_prealloc(int section, unsigned long size) {
 
         return wlan_static_if_flow_lkup;
     }
+#ifdef CONFIG_BCMDHD_PCIE
+	if (section == DHD_PREALLOC_PKTID_MAP) {
+		if (size > WLAN_DHD_PREALLOC_PKTID_MAP) {
+			hwlog_err("request DHD_PREALLOC_PKTID_MAP size(%lu) is bigger"
+				" than static size(%d).\n",
+				size, WLAN_DHD_PREALLOC_PKTID_MAP);
+			return NULL;
+		}
+		hwlog_err("request DHD_PREALLOC_PKTID_MAP size(%lu) ok, static size(%d).\n",
+			size, WLAN_DHD_PREALLOC_PKTID_MAP);
+		return wlan_static_dhd_prealloc_pktid_map;
+	}
+#ifdef BCM_ALLOC_STATIC_10K
+	if (section == DHD_PREALLOC_IF_FLOW_TBL)  {
+		if (size > DHD_PREALLOC_IF_FLOW_TBL_SIZE) {
+			hwlog_err("request DHD_IF_FLOW_TBL size(%lu) > static size(%d).\n",
+				size, DHD_PREALLOC_IF_FLOW_TBL_SIZE);
+			return NULL;
+		}
+		hwlog_err("request DHD_IF_FLOW_TBL size(%lu) ok, static size(%d).\n",
+			size, DHD_PREALLOC_IF_FLOW_TBL_SIZE);
+		return wlan_static_if_flow_tbl;
+	}
+#endif
+#endif
     if (section > DHD_PREALLOC_PROT && section <= (DHD_PREALLOC_PROT + PREALLOC_WLAN_SEC_NUM)) {
         mem_idx = section - DHD_PREALLOC_PROT - 1;
         if (wifi_mem_array[mem_idx].size < size) {
@@ -201,6 +246,19 @@ static int init_wifi_mem(void) {
         hwlog_err("Failed to alloc wlan_static_if_flow_lkup\n");
         goto err_mem_alloc;
     }
+
+    wlan_static_dhd_prealloc_pktid_map = kmalloc(WLAN_DHD_PREALLOC_PKTID_MAP, GFP_KERNEL);
+    if (!wlan_static_dhd_prealloc_pktid_map) {
+        hwlog_err("[WLAN] Failed to alloc wlan_static_dhd_prealloc_pktid_map\n");
+            goto err_mem_alloc;
+    }
+#ifdef BCM_ALLOC_STATIC_10K
+    wlan_static_if_flow_tbl = kmalloc(DHD_PREALLOC_IF_FLOW_TBL_SIZE, GFP_KERNEL);
+    if (!wlan_static_if_flow_tbl) {
+	hwlog_err("Failed to alloc wlan_static_if_flow_tbl\n");
+	goto err_mem_alloc;
+    }
+#endif
 #endif /* CONFIG_BCMDHD_PCIE */
 
 #if !defined(CONFIG_BCMDHD_PCIE)
@@ -245,6 +303,12 @@ err_mem_alloc:
 #ifdef CONFIG_BCMDHD_PCIE
     if (wlan_static_if_flow_lkup)
         kfree(wlan_static_if_flow_lkup);
+    if (wlan_static_dhd_prealloc_pktid_map)
+        kfree(wlan_static_dhd_prealloc_pktid_map);
+#ifdef BCM_ALLOC_STATIC_10K
+	if (wlan_static_if_flow_tbl)
+		kfree(wlan_static_if_flow_tbl);
+#endif
 #endif
     hwlog_err("Failed to mem_alloc for WLAN\n");
 
@@ -298,6 +362,12 @@ int deinit_wifi_mem(void) {
 #ifdef CONFIG_BCMDHD_PCIE
     if (wlan_static_if_flow_lkup)
         kfree(wlan_static_if_flow_lkup);
+    if (wlan_static_dhd_prealloc_pktid_map)
+        kfree(wlan_static_dhd_prealloc_pktid_map);
+#ifdef BCM_ALLOC_STATIC_10K
+    if (wlan_static_if_flow_tbl)
+		kfree(wlan_static_if_flow_tbl);
+#endif
 #endif
 
     for (i = 0; i < PREALLOC_WLAN_SEC_NUM; i++) {
@@ -512,13 +582,33 @@ int bcm_wifi_power(int on)
 
 static int bcm_wifi_reset(int on)
 {
+	int ret = 0;
 	hwlog_info("%s: on:%d.\n", __func__, on);
+	if (vio_enable <= 0) {
+		hwlog_err("%s: get vio_enable (%d) failed.\n", __func__, vio_enable);
+		return -1;
+	}
+	ret = gpio_request(vio_enable, NULL);
+	if (ret < 0) {
+        hwlog_err("%s: gpio_request failed, ret=%d\n",__func__, ret);
+        return ret;
+	}
+	gpio_direction_output(vio_enable, 0);
 	if (on) {
-		gpio_set_value(wifi_host->enable, 1);
+		if(!ext_gpio_type) {
+			gpio_set_value(vio_enable, 1);
+		} else {
+			gpio_set_value_cansleep(vio_enable, 1);
+		}
 	}
 	else {
-		gpio_set_value(wifi_host->enable, 0);
+		if(!ext_gpio_type) {
+			gpio_set_value(vio_enable, 0);
+		} else {
+			gpio_set_value_cansleep(vio_enable, 0);
+		}
 	}
+	gpio_free(vio_enable);
 	return 0;
 }
 
@@ -573,12 +663,14 @@ int hi_sdio_detectcard_to_core(int val)
 
     return 0;
 }
-extern int dhd_msg_level;
+int dhd_msg_level = DHD_ERROR_VAL;
+EXPORT_SYMBOL(dhd_msg_level);
 
 static ssize_t show_wifi_debug_level(struct device *dev,
         struct device_attribute *attr, char *buf) {
     return sprintf(buf, "%d\n", dhd_msg_level);
 }
+
 static ssize_t restore_wifi_debug_level(struct device *dev, struct device_attribute *attr,
         const char *buf, size_t size) {
     int value;
@@ -598,12 +690,13 @@ static ssize_t restore_wifi_debug_level(struct device *dev, struct device_attrib
     return -1;
 }
 
-extern int wl_get_wrong_action_flag(void);
-extern int wl_trigger_disable_nmode(void);
-
 static ssize_t show_wifi_wrong_action_flag(struct device *dev,
         struct device_attribute *attr, char *buf) {
-    int has_wrong_action = wl_get_wrong_action_flag();
+    if(dev_handle.wl_get_wrong_action_flag_handle == NULL) {
+        hwlog_err("%s: handle has not been registered\n", __func__);
+        return -1;
+    }
+    int has_wrong_action = dev_handle.wl_get_wrong_action_flag_handle();
     hwlog_info("%s has wrong action %d\n", __func__, has_wrong_action);
     return sprintf(buf, "%d\n", has_wrong_action);
 }
@@ -614,7 +707,11 @@ static ssize_t restore_wifi_arp_timeout(struct device *dev, struct device_attrib
     if (sscanf(buf, "%d\n", &value) == 1) {
         if(value == 1) {
             hwlog_info("%s enter should invoke wrong action handler\n", __func__);
-            wl_trigger_disable_nmode();
+            if(dev_handle.wl_trigger_disable_nmode_handle == NULL) {
+                hwlog_err("%s: handle has not been registered\n", __func__);
+                return -1;
+            }
+                dev_handle.wl_trigger_disable_nmode_handle();
         }
         return size;
     }
@@ -627,7 +724,11 @@ static ssize_t restore_wifi_wrong_action_debug(struct device *dev, struct device
     if (sscanf(buf, "%d\n", &value) == 1) {
         if(value == 1) {
             hwlog_info("%s enter should invoke wrong action handler\n", __func__);
-            wl_trigger_disable_nmode();
+            if(dev_handle.wl_trigger_disable_nmode_handle == NULL) {
+                hwlog_err("%s: handle has not been registered\n");
+                return -1;
+            }
+            dev_handle.wl_trigger_disable_nmode_handle();
         }
         return size;
     }
@@ -708,7 +809,7 @@ void set_wifi_open_err_code(int err_num)
 {
     wifi_open_err_code = err_num;
 }
-
+EXPORT_SYMBOL(set_wifi_open_err_code);
 static DEVICE_ATTR(wifi_open_state, S_IRUGO | S_IWUSR,
 				   show_wifi_open_state, restore_wifi_open_state);
 
@@ -742,8 +843,13 @@ struct wifi_platform_data bcm_wifi_control = {
 static struct resource bcm_wifi_resources[] = {
 	[0] = {
 	.name  = "bcmdhd_wlan_irq",
-	.flags = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL
+#if defined(CONFIG_BCMDHD_PCIE)
+	.flags = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHEDGE
 			| IRQF_NO_SUSPEND,
+#else
+	.flags = IORESOURCE_IRQ | IORESOURCE_IRQ_HIGHLEVEL
+                        | IRQF_NO_SUSPEND,
+#endif
 	},
 };
 
@@ -812,9 +918,8 @@ error:
 
 
 int do_wifi_vio(struct platform_device *pdev) {
-	int vio_enable = 0;
+
 	int ret = 0;
-	bool ext_gpio_type = 0;
 	hwlog_err("%s: not udp board, set vio.\n", __func__);
 	vio_enable = of_get_named_gpio(pdev->dev.of_node, "wlan_enable,gpio_vio", 0);
 	if (vio_enable < 0) {
@@ -883,17 +988,77 @@ int enable_wifi_supply (struct platform_device *pdev) {
 		hwlog_err("%s: udp board doesn't have vio, do nothing.\n", __func__);
 		return 0;
 	}
-
 	ret = of_property_read_u32(pdev->dev.of_node, "wifi_supply_type", &supplytype);
 	if (ret < 0) {
 		return do_wifi_vio(pdev);
+	} else if (supplytype == 0) {
+		hwlog_err("%s: IO power no need to set\n", __func__);
+		return 0;
 	} else if (supplytype == 1) {
 		return do_wifi_vcc_enable(pdev);
 	} else {
 		return do_wifi_vio(pdev);
 	}
 }
+#ifdef DHD_DEVWAKE_EARLY
+static int gpio_wl_dev_wake = -1;
+int dhd_wlan_dev_wake(int on)
+{
+	if(gpio_wl_dev_wake < 0) {
+		hwlog_info("%s Enter: dev_wake is not support\n", __func__);
+		return -EIO;
+	}
+	//pr_info("%s Enter: dev_wake %s\n", __func__, on ? "on" : "off");
 
+	if (on) {
+		if (gpio_direction_output(gpio_wl_dev_wake, 1)) {
+			hwlog_err("%s: WL_DEV_WAKE didn't output high\n", __func__);
+			return -EIO;
+		}
+		if (gpio_get_value(gpio_wl_dev_wake) == 0)
+			hwlog_err("[%s] gpio didn't set high.\n", __func__);
+	} else {
+		if (gpio_direction_output(gpio_wl_dev_wake, 0)) {
+			hwlog_err("%s: WL_DEV_WAKE didn't output low\n", __func__);
+			return -EIO;
+		}
+		if (gpio_get_value(gpio_wl_dev_wake) != 0)
+			hwlog_err("[%s] gpio didn't set low.\n", __func__);
+	}
+
+	return 0;
+
+}
+int devwake_gpio_is_support(void)
+{
+	return gpio_wl_dev_wake;
+}
+int dhd_wlan_dev_wake_value(void)
+{
+	if(gpio_wl_dev_wake < 0)
+		return -EIO;
+	else
+		return gpio_get_value(gpio_wl_dev_wake);
+}
+EXPORT_SYMBOL(dhd_wlan_dev_wake_value);
+EXPORT_SYMBOL(devwake_gpio_is_support);
+EXPORT_SYMBOL(dhd_wlan_dev_wake);
+#endif
+#ifdef HW_PCIE_NOCLOG
+int get_enable_gpio(void)
+{
+	if (NULL == wifi_host) {
+		hwlog_err("%s: wifi_host is null\n", __func__);
+		return -1;
+	}
+	return gpio_get_value(wifi_host->enable);
+}
+EXPORT_SYMBOL(get_enable_gpio);
+#endif
+#ifdef CONFIG_HW_ABS
+bool g_abs_enabled;
+EXPORT_SYMBOL(g_abs_enabled);
+#endif
 int  wifi_power_probe(struct platform_device *pdev)
 {
 	int ret = 0;
@@ -906,6 +1071,8 @@ int  wifi_power_probe(struct platform_device *pdev)
 	const char *ictype = NULL;
 	const char *fw = NULL;
 #endif /* HW_WIFI_DRIVER_NORMALIZE */
+
+	memset(&dev_handle, 0, sizeof(struct dev_wifi_handle));
 
 	np = of_find_compatible_node(NULL, NULL, DTS_COMP_WIFI_POWER_NAME);	// should be the same as dts node compatible property
 	if (np == NULL) {
@@ -994,11 +1161,9 @@ int  wifi_power_probe(struct platform_device *pdev)
 		ret = -1;
 		goto err_gpio_get;
 	}
-#if defined(CONFIG_BCMDHD_PCIE)
-    wifi_host->wifi_wakeup_irq = platform_get_irq(pdev, 0);
-#else
-    wifi_host->wifi_wakeup_irq= of_get_named_gpio(pdev->dev.of_node, "wlan-irq,gpio-irq", 0);
-#endif
+        //Register wlan IRQ
+	wifi_host->wifi_wakeup_irq= of_get_named_gpio(pdev->dev.of_node, "wlan-irq,gpio-irq", 0);
+
 	hwlog_err("%s: wifi_host->wifi_wakeup_irq %d\n", __func__, wifi_host->wifi_wakeup_irq);
 	if (wifi_host->wifi_wakeup_irq<0) {
 		ret = -1;
@@ -1010,6 +1175,21 @@ int  wifi_power_probe(struct platform_device *pdev)
 		hwlog_err("%s: enable_wifi_supply failed, ret:%d.\n", __func__, ret);
 		goto err_gpio_get;
 	}
+#ifdef DHD_DEVWAKE_EARLY
+	wifi_host->dev_wake = of_get_named_gpio(pdev->dev.of_node, "wlan_wake,gpio_wake", 0);
+	if (wifi_host->dev_wake >= 0) {
+	   hwlog_err("%s: wl_dev_wake:%d.\n", __FUNCTION__, wifi_host->dev_wake);
+	   gpio_wl_dev_wake = wifi_host->dev_wake;
+	   ret = gpio_request_one(wifi_host->dev_wake,
+	         GPIOF_OUT_INIT_HIGH, "wlan_wake,gpio_wake");
+	   if (ret < 0) {
+	      hwlog_err("%s: failed to configure output direction for GPIO %d err %d\n",
+	                           __FUNCTION__, wifi_host->dev_wake, ret);
+	   }
+	} else {
+	      hwlog_err("%s: wlan_wake,gpio_wake %d is not configured\n", __FUNCTION__, wifi_host->dev_wake);
+	}
+#endif
 #endif
 
     /* set power gpio */
@@ -1085,7 +1265,10 @@ int  wifi_power_probe(struct platform_device *pdev)
 	if (ret) {
 		hwlog_err("wifi_power_probe sysfs_create_group error ret =%d", ret);
 	}
-
+#ifdef CONFIG_HW_ABS
+	g_abs_enabled = of_property_read_bool(pdev->dev.of_node,"abs_enabled");
+	hwlog_err("%s: abs_enabled: %d\n", __func__, g_abs_enabled);
+#endif
 	return 0;
 err_platform_device_register:
 	gpio_free(wifi_host->wifi_wakeup_irq);
