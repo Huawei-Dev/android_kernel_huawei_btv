@@ -1143,44 +1143,6 @@ static int sdhci_arasan_get_resource(void)
 	return 0;
 }
 
-#ifdef CONFIG_MMC_CQ_HCI
-void sdhci_cmdq_dsm_set_host_status(struct sdhci_host *host, u32 error_bits)
-{
-	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
-	struct sdhci_arasan_data *sdhci_arasan = pltfm_host->priv;
-	if (error_bits != -1U)
-		sdhci_arasan->para = ((error_bits << 16) | 0x8000000000000000ULL);
-	else
-		sdhci_arasan->para = 0;	// timeout
-}
-
-void sdhci_cmdq_dsm_work(struct cmdq_host *cq_host, bool dsm)
-{
-	struct mmc_card *card;
-	struct sdhci_host *host = mmc_priv(cq_host->mmc);
-	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
-	struct sdhci_arasan_data *sdhci_arasan = pltfm_host->priv;
-
-	u32 error_bits, opcode;
-	u64 para;
-	unsigned long flags;
-	spin_lock_irqsave(&cq_host->cmdq_lock, flags);
-	para = sdhci_arasan->para;
-	sdhci_arasan->para = 0;
-	spin_unlock_irqrestore(&cq_host->cmdq_lock, flags);
-	if (!dsm)
-		return;
-	card = host->mmc->card;
-	opcode = para & 0x3f;
-	error_bits = ((para >> 16) & 0xffffffff);
-	if (para & 0x8000000000000000ULL) {
-		DSM_EMMC_LOG(card, DSM_EMMC_HOST_ERR, "opcode:%d failed, status:%x\n", opcode, error_bits);
-	} else {
-		DSM_EMMC_LOG(card, DSM_EMMC_RW_TIMEOUT_ERR, "opcode:%d failed, status:%x\n", opcode, error_bits);
-	}
-}
-#endif
-
 #ifdef CONFIG_HISI_MMC
 void sdhci_retry_req(struct sdhci_host *host,struct mmc_request *mrq)
 {
