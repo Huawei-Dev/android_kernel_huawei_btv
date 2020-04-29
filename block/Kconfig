@@ -183,11 +183,6 @@ config HISI_PARTITION_KIRIN970
         help
            config partition for kirin970 platform
 
-config HW_SYSTEM_WR_PROTECT
-	bool "write protection function of system partitions."
-	depends on BLOCK
-	default n
-
 config HISI_BLK_INLINE_CRYPTO
 	bool "Hisi HW inline crytpo support"
 	depends on BLOCK

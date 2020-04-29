@@ -70,9 +70,6 @@ struct kmem_cache *blk_requestq_cachep;
  * Controlling structure to kblockd
  */
 static struct workqueue_struct *kblockd_workqueue;
-#ifdef CONFIG_HW_SYSTEM_WR_PROTECT
-#include <linux/mmc/hw_write_protect.h>
-#endif
 
 void blk_queue_congestion_threshold(struct request_queue *q)
 {
@@ -2179,11 +2176,6 @@ void submit_bio(int rw, struct bio *bio)
 			task_io_account_read(bio->bi_iter.bi_size);
 			count_vm_events(PGPGIN, count);
 		}
-
-#ifdef CONFIG_HW_SYSTEM_WR_PROTECT
-		if (should_trap_this_bio(rw, bio, count))
-			return;
-#endif
 
 		if (unlikely(block_dump)) {
 			char b[BDEVNAME_SIZE];
