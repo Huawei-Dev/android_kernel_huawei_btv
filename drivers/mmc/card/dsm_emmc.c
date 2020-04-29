@@ -60,7 +60,6 @@ static int dsm_emmc_process_log(int code, char *err_msg)
 	int ret = 0;
 	/*the MAX times of erevy err code*/
 	static char vdet_err_max_count = ERR_MAX_COUNT;
-#ifndef CONFIG_HUAWEI_EMMC_DSM_ONLY_VDET
 	static char system_w_err_max_count = ERR_MAX_COUNT;
 	static char erase_err_max_count = ERR_MAX_COUNT;
 	static char send_cxd_err_max_count = ERR_MAX_COUNT;
@@ -77,7 +76,7 @@ static int dsm_emmc_process_log(int code, char *err_msg)
 	static char emmc_dyncap_needed_max_count = ERR_MAX_COUNT;
 	static char emmc_syspool_exhausted_max_count = ERR_MAX_COUNT;
 	static char emmc_packed_failure_max_count = ERR_MAX_COUNT;
-#endif
+
 	/*filter: if it has the same msg code with last, record err code&count*/
     if (g_last_msg_code == code) {
 		ret = 0;
@@ -98,7 +97,6 @@ static int dsm_emmc_process_log(int code, char *err_msg)
 				ret = 0;
 			}
 			break;
-#ifndef CONFIG_HUAWEI_EMMC_DSM_ONLY_VDET
 		case DSM_SYSTEM_W_ERR:
 			if (0 < system_w_err_max_count) {
 				system_w_err_max_count--;
@@ -227,7 +225,6 @@ static int dsm_emmc_process_log(int code, char *err_msg)
 				ret = 0;
 			}
 			break;
-#endif
 		default:
 			ret = 0;
 			break;
