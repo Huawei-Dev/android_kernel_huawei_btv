@@ -90,22 +90,6 @@ config HISI_SMART_RECLAIM
 	  of background processes(file tpyes .dex, .jar and/or .apk).
 	  This triggered by writting soft to /proc/<pid>/reclaim from user space.
 
-config HUAWEI_RCC
-	tristate "RAM Compress and Clean"
-	depends on SYSFS && SWAP
-	default n
-	help
-	  Creates background thread for compress and clean used RAM
-	  dynamiclly,enabled by write 1 to /sys/kernel/rcc/enable.
-
-config HUAWEI_RCC_DEBUG
-	bool "RAM Compress and Clean debug support"
-	depends on HISI_RCC
-	default n
-	help
-	  This option adds additional debugging code to the
-	  RAM Compress and Clean module.
-
 source "drivers/staging/android/ion/Kconfig"
 
 source "drivers/staging/android/fiq_debugger/Kconfig"

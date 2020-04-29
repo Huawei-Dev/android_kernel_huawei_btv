@@ -12,4 +12,3 @@ obj-$(CONFIG_SYNC)			+= sync.o sync_debug.o
 obj-$(CONFIG_SW_SYNC)			+= sw_sync.o
 obj-$(CONFIG_HW_LOGGER)				+= hwlogger/
 obj-$(CONFIG_HISI_SMART_RECLAIM)	+= smart_reclaim.o
-obj-$(CONFIG_HUAWEI_RCC)	+=	rcc.o
