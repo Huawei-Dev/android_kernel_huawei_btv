@@ -17,10 +17,6 @@
 #include <linux/types.h>
 #include <trace/events/power.h>
 
-#ifdef CONFIG_HUAWEI_BDAT
-#include <huawei_platform/power/bdat/bdat.h>
-#endif
-
 #ifdef CONFIG_HUAWEI_SLEEPLOG
 #include <linux/proc_fs.h>
 #endif
@@ -420,9 +416,6 @@ static void wakeup_source_activate(struct wakeup_source *ws)
 	cec = atomic_inc_return(&combined_event_count);
 
 	trace_wakeup_source_activate(ws->name, cec);
-#ifdef CONFIG_HUAWEI_BDAT
-	bdat_update_wakelock(ws->name, ws->active);
-#endif
 }
 
 /**
@@ -552,9 +545,6 @@ static void wakeup_source_deactivate(struct wakeup_source *ws)
 	split_counters(&cnt, &inpr);
 	if (!inpr && waitqueue_active(&wakeup_count_wait_queue))
 		wake_up(&wakeup_count_wait_queue);
-#ifdef CONFIG_HUAWEI_BDAT
-	bdat_update_wakelock(ws->name, ws->active);
-#endif
 }
 
 /**

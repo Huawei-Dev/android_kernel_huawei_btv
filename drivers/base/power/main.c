@@ -38,10 +38,6 @@
 #include <huawei_platform/log/log_jank.h>
 #endif
 
-#ifdef CONFIG_HUAWEI_BDAT
-#include <huawei_platform/log/hwlog_kernel.h>
-#endif
-
 #include "../base.h"
 #include "power.h"
 
@@ -368,10 +364,6 @@ static void pm_dev_err(struct device *dev, pm_message_t state, char *info,
 {
 	printk(KERN_ERR "PM: Device %s failed to %s%s: error %d\n",
 		dev_name(dev), pm_verb(state.event), info, error);
-#ifdef CONFIG_HUAWEI_BDAT
-	HWBDAT_LOGE("BDAT_TAG_SUSPEND_FAILED", "name=%s event=%d",
-		dev_name(dev), state.event);
-#endif
 }
 
 static void dpm_show_time(ktime_t starttime, pm_message_t state, char *info)

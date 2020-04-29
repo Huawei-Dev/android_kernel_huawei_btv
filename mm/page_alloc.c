@@ -73,10 +73,6 @@
 #include "hisi/slowpath_count.h"
 #endif
 
-#ifdef CONFIG_HUAWEI_BDAT
-#include <huawei_platform/log/hwlog_kernel.h>
-#endif
-
 /* prevent >1 _updater_ of zone percpu pageset ->high and ->batch fields */
 static DEFINE_MUTEX(pcp_batch_high_lock);
 #define MIN_PERCPU_PAGELIST_FRACTION	(8)
@@ -3369,10 +3365,6 @@ void show_free_areas(unsigned int filter)
 			free_pcp += per_cpu_ptr(zone->pageset, cpu)->pcp.count;
 
 		show_node(zone);
-#ifdef CONFIG_HUAWEI_BDAT
-		if (K(zone_page_state(zone, NR_FREE_PAGES)) < K(low_wmark_pages(zone)))
-			HWBDAT_LOGE("BDAT_TAG_LOW_MEM", "name=%s", zone->name);
-#endif
 		printk("%s"
 			" free:%lukB"
 			" min:%lukB"

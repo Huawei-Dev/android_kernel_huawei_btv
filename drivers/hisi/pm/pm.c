@@ -23,8 +23,6 @@
 #include <linux/mfd/hisi_pmic.h>
 #include "hisi_lpregs.h"
 
-#include <huawei_platform/power/bdat/bdat.h>
-
 #include <huawei_platform/power/hw_power_monitor.h>
 
 #define POWER_STATE_TYPE_SYS_SUSPEND	3
@@ -119,10 +117,7 @@ void pm_gic_pending_dump(void)
 					printk("(gpio-%d)", gpio);
 					power_monitor_report(WAKEUP_GPIO, "%d",
 							gpio);
-                }
-				/* notify bdat module to update wakeup information */
-				bdat_update_wakeup_info(g_ap_irq_name[irq], gpio);
-				printk("\n");
+                		}
 			}
 		}
 	}

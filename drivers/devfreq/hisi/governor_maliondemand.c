@@ -25,10 +25,6 @@
 
 #include <linux/hisi/hisi_devfreq.h>
 
-#ifdef CONFIG_HUAWEI_BDAT
-#include <huawei_platform/power/bdat/bdat.h>
-#endif
-
 /* Default constants for DevFreq-Mali-Ondemand (DFMO) */
 #define DFMO_VSYNC_UPTHRESHOLD		(85)
 #define DFMO_VSYNC_DOWNDIFFERENCTIAL	(15)
@@ -102,11 +98,6 @@ static int devfreq_mali_ondemand_func(struct devfreq *df,
 	struct devfreq_mali_ondemand_data *data = df->data;
 	struct hisi_devfreq_data *priv_data = stat.private_data;
 	unsigned long max = (df->max_freq) ? df->max_freq : UINT_MAX;
-
-#ifdef CONFIG_HUAWEI_BDAT
-	bdat_update_gpu_info(stat.current_frequency, stat.busy_time,
-		stat.total_time, df->profile->polling_ms);
-#endif
 
 	if (err)
 		return err;
