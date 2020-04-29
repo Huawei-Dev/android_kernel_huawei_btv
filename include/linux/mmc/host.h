@@ -21,10 +21,6 @@
 #include <linux/mmc/card.h>
 #include <linux/mmc/pm.h>
 
-#ifdef CONFIG_HW_MMC_TEST
-#define CARD_ADDR_MAGIC 0xA5A55A5AA5A55A5ALL
-#endif
-
 struct mmc_ios {
 	unsigned int	clock;			/* clock rate */
 	unsigned int	old_rate;
@@ -480,10 +476,6 @@ struct mmc_host {
 		struct sdio_embedded_func	*funcs;
 		int				num_funcs;
 	} embedded_sdio_data;
-#endif
-
-#ifdef CONFIG_HW_MMC_TEST
-    int test_status;            /* save mmc_test status */
 #endif
 
 	unsigned int    cmdq_slots;
