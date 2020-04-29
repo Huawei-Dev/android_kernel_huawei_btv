@@ -18,7 +18,6 @@ obj-$(CONFIG_PCI)		+= pci/
 obj-$(CONFIG_PARISC)		+= parisc/
 obj-$(CONFIG_RAPIDIO)		+= rapidio/
 obj-y				+= video/
-obj-$(CONFIG_HUAWEI_LCD_PANEL)  += huawei_platform/lcd/
 obj-y				+= idle/
 obj-$(CONFIG_HISI_BOOTDEVICE)   += bootdevice/
 
