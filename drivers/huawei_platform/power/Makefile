@@ -1,6 +1,5 @@
 obj-$(CONFIG_HUAWEI_CHARGER)	+= charger/
 obj-$(CONFIG_HW_PTM) += hw_ptm/
-obj-$(CONFIG_HUAWEI_FEATURE_PRINT_PID_NAME) += pid_socket/
 obj-$(CONFIG_INPUT_HW_ATE)	+= ate/
 obj-$(CONFIG_HUAWEI_BASTET)	+= bastet/
 obj-$(CONFIG_HUAWEI_SMPL)	+= smpl/
