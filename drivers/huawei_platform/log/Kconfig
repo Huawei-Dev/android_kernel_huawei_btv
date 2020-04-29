@@ -1,7 +1,6 @@
 #
 # Logger extend configuration
 #
-source "drivers/huawei_platform/log/goldeneye/Kconfig"
 source "drivers/huawei_platform/log/boot_log/Kconfig"
 
 menu "Logger extend configuration"
