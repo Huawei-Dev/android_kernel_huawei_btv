@@ -1,6 +1,3 @@
-#=============================================================================
-#=============================================================================
-
 obj-$(CONFIG_HW_ANTENNA_BOARD_MATCH)  += antenna_board_match/
 obj-$(CONFIG_ANTENNA_FPGA) += antenna_fpga/
 obj-$(CONFIG_HUAWEI_AUDIO) += audio/
@@ -28,7 +25,6 @@ obj-y   += usb/
 obj-$(CONFIG_HW_VOLTAGE_DETECTION) += voltage_detection/
 obj-$(CONFIG_ANTENNA_BOARDID_GPIO_DETECT) += antenna_board_gpio_match/
 obj-$(CONFIG_HUAWEI_VIBRATOR) += vibrator/
-obj-$(CONFIG_HUAWEI_OCP) += ocp/
 obj-$(CONFIG_MADAPT) += madapt/
 obj-$(CONFIG_DOME_KEY) += dome_key/
 obj-$(CONFIG_HUAWEI_IO_TRACING) += iotrace/

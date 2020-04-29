@@ -736,9 +736,4 @@ struct platform_device *hisi_fb_device_alloc(struct hisi_fb_panel_data *pdata,
 	uint32_t type, uint32_t id);
 struct platform_device *hisi_fb_add_device(struct platform_device *pdev);
 
-#ifdef CONFIG_HUAWEI_OCP
-int hisi_lcd_ocp_recover(struct notifier_block *nb,
-		unsigned long event, void *data);
-#endif
-
 #endif /* HISI_FB_H */
