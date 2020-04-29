@@ -94,11 +94,6 @@ config MMC_FFU_SAMSUNG45
 	  This is an option to run firmware update on Samsung eMMC 4.5.
 	  Field firmware updates (FFU) enables features enhancment
 	  in the field.
-config HW_SD_HEALTH_DETECT
-	bool "SD HEALTH DIAG SUPPORT"
-	default y
-	help
-	  This is an option to diag sd health status.
 config HW_MMC_TEST
 	bool "MMC host test driver by Huawei"
 	default n
