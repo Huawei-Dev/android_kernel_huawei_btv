@@ -20,10 +20,6 @@
 #include "lock.h"
 #endif
 
-#ifdef CONFIG_HUAWEI_SDCARD_DSM
-#include <linux/mmc/dsm_sdcard.h>
-#endif
-
 static const unsigned int tran_exp[] = {
 	10000,		100000,		1000000,	10000000,
 	0,		0,		0,		0
@@ -863,25 +859,8 @@ int mmc_sd_get_csd(struct mmc_host *host, struct mmc_card *card)
 	 */
 	err = mmc_send_csd(card, card->raw_csd);
 
-#ifdef CONFIG_HUAWEI_SDCARD_DSM
-	if (!strcmp(mmc_hostname(host), "mmc1")) {
-		dsm_sdcard_cmd_logs[DSM_SDCARD_CMD9_R0].value = card->raw_csd[0];
-		dsm_sdcard_cmd_logs[DSM_SDCARD_CMD9_R1].value = card->raw_csd[1];
-		dsm_sdcard_cmd_logs[DSM_SDCARD_CMD9_R2].value = card->raw_csd[2];
-		dsm_sdcard_cmd_logs[DSM_SDCARD_CMD9_R3].value = card->raw_csd[3];
-	}
-
-	if (err) {
-		if (-ENOMEDIUM != err && -ETIMEDOUT != err
-				&& !strcmp(mmc_hostname(host), "mmc1"))
-			dsm_sdcard_report(DSM_SDCARD_CMD9_R3, DSM_SDCARD_CMD9_RESP_ERR);
-
-		return err;
-	}
-#else
 	if (err)
 		return err;
-#endif
 
 	err = mmc_decode_csd(card);
 	if (err)

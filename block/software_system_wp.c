@@ -31,9 +31,6 @@
 #ifdef CONFIG_HW_FEATURE_STORAGE_DIAGNOSE_LOG
 #include <linux/store_log.h>
 #endif
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-#include <linux/mmc/dsm_emmc.h>
-#endif
 
 #include <linux/proc_fs.h>
 
@@ -140,11 +137,7 @@ int should_trap_this_bio(int rw, struct bio *bio, unsigned int count)
 	if ((NULL == ro_secure_debuggable) || (0 == *ro_secure_debuggable))
 		return 0;
 
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-	DSM_EMMC_LOG(NULL, DSM_SYSTEM_W_ERR,
-#else
 			printk(KERN_DEBUG
-#endif
 				"[HW]:EXT4_ERR_CAPS:%s(%d)[Parent: %s(%d)]: %s block %llu on %s (%u sectors) %d %s.\n",
 				current->comm, task_pid_nr(current),
 				current->parent->comm,

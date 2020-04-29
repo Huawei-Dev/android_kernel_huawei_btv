@@ -35,13 +35,6 @@
 #include <linux/mmc/card.h>
 #include <soc_pmctrl_interface.h>
 #include <linux/regulator/consumer.h>
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-#include <linux/mmc/mmc.h>
-#include <linux/mmc/sdio.h>
-#include <linux/mmc/sd.h>
-#include <linux/mmc/dsm_emmc.h>
-#include <linux/workqueue.h>
-#endif
 
 #define CLK_CTRL_TIMEOUT_SHIFT		16
 #define CLK_CTRL_TIMEOUT_MASK		(0xf << CLK_CTRL_TIMEOUT_SHIFT)
@@ -100,12 +93,6 @@ struct sdhci_arasan_data {
 	int tuning_strobe_init_sample;
 	int tuning_strobe_move_sample;
 	int tuning_strobe_move_count;
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-	u64 para;
-	u32 cmd_data_status;
-	void *data;
-	struct work_struct dsm_work;
-#endif
 };
 void __iomem *iosoc_acpu_pmc_base_addr = NULL;
 static int sdhci_get_pmctrl_resocure(void)
@@ -364,7 +351,7 @@ static void sdhci_of_arasan_update_phy_control(struct sdhci_host *host, unsigned
 
 	pr_debug("%s: timing=%d, host->clock=%d\n", __func__, timing, host->clock);
 /*
-DLL支持50MHz 到 200MHz时钟配置。0: 200-170MHz, 1: 170-140MHz, 2: 140-110MHz, 3: 110-80MHz, 4: 80-50MHz, 7: 200-225MHz
+DLL支\B3\D650MHz \B5\BD 200MHz时\D6\D3\C5\E4\D6谩\A30: 200-170MHz, 1: 170-140MHz, 2: 140-110MHz, 3: 110-80MHz, 4: 80-50MHz, 7: 200-225MHz
 */
 	if ((host->clock <= 200000000) && (host->clock >= 190000000)) {
 		if (freq_sel_efuse_enable)
@@ -392,16 +379,16 @@ DLL支持50MHz 到 200MHz时钟配置。0: 200-170MHz, 1: 170-140MHz, 2: 140-110MHz, 3: 
 		old_bus_mode = host->mmc->ios.bus_mode;
 	}
 /*
-SDHCI_PHY_CTRL3_OTAPDLYENA:使能手动调整TX时钟相位
-SDHCI_PHY_CTRL3_OTAPDLYSEL:TX时钟相位:0-0xF，默认值0
-SDHCI_PHY_CTRL3_ITAPDLYENA:使能手动调整RX时钟相位,不使能使使用自动tuning的相位值
-初始化时软件配置为不使能
-SDHCI_PHY_CTRL3_ITAPDLYSEL:RX时钟相位:0-0x1F，默认值0
-SDHCI_PHY_CTRL1_DR_TY:阻抗值，驱动力调整，支持如下四种，默认值0x0
+SDHCI_PHY_CTRL3_OTAPDLYENA:使\C4\DC\CA侄\AF\B5\F7\D5\FBTX时\D6\D3\CF\E0位
+SDHCI_PHY_CTRL3_OTAPDLYSEL:TX时\D6\D3\CF\E0位:0-0xF\A3\AC默\C8\CF值0
+SDHCI_PHY_CTRL3_ITAPDLYENA:使\C4\DC\CA侄\AF\B5\F7\D5\FBRX时\D6\D3\CF\E0位,\B2\BB使\C4\DC使使\D3\C3\D7远\AFtuning\B5\C4\CF\E0位值
+\B3\F5始\BB\AF时\C8\ED\BC\FE\C5\E4\D6\C3为\B2\BB使\C4\DC
+SDHCI_PHY_CTRL3_ITAPDLYSEL:RX时\D6\D3\CF\E0位:0-0x1F\A3\AC默\C8\CF值0
+SDHCI_PHY_CTRL1_DR_TY:\D7杩怪礬A3\AC\C7\FD\B6\AF\C1\A6\B5\F7\D5\FB\A3\AC支\B3\D6\C8\E7\CF\C2\CB\C4\D6郑\AC默\C8\CF值0x0
 0x0-50欧
-0x1-33欧驱动力最强
+0x1-33欧\C7\FD\B6\AF\C1\A6\D7\EE强
 0x2-66欧
-0x3-100欧驱动力最弱
+0x3-100欧\C7\FD\B6\AF\C1\A6\D7\EE\C8\F5
 0x4-40欧
 */
 	if (timing == MMC_TIMING_MMC_HS400) {
@@ -1156,14 +1143,6 @@ static int sdhci_arasan_get_resource(void)
 	return 0;
 }
 
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-void sdhci_dsm_set_host_status(struct sdhci_host *host, u32 error_bits)
-{
-	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
-	struct sdhci_arasan_data *sdhci_arasan = pltfm_host->priv;
-	sdhci_arasan->cmd_data_status |= error_bits;
-}
-
 #ifdef CONFIG_MMC_CQ_HCI
 void sdhci_cmdq_dsm_set_host_status(struct sdhci_host *host, u32 error_bits)
 {
@@ -1198,59 +1177,6 @@ void sdhci_cmdq_dsm_work(struct cmdq_host *cq_host, bool dsm)
 		DSM_EMMC_LOG(card, DSM_EMMC_HOST_ERR, "opcode:%d failed, status:%x\n", opcode, error_bits);
 	} else {
 		DSM_EMMC_LOG(card, DSM_EMMC_RW_TIMEOUT_ERR, "opcode:%d failed, status:%x\n", opcode, error_bits);
-	}
-}
-#endif
-
-static void sdhci_dsm_work(struct work_struct *work)
-{
-	struct mmc_card *card;
-	struct sdhci_arasan_data *sdhci_arasan = container_of(work, struct sdhci_arasan_data, dsm_work);
-	struct sdhci_host *host = (struct sdhci_host *)sdhci_arasan->data;
-	u32 error_bits, opcode;
-	u64 para;
-	unsigned long flags;
-	spin_lock_irqsave(&host->lock, flags);
-	para = sdhci_arasan->para;
-	sdhci_arasan->para = 0;
-	spin_unlock_irqrestore(&host->lock, flags);
-	card = host->mmc->card;
-	opcode = para & 0x3f;
-	error_bits = ((para >> 16) & 0xffffffff);
-	if (para & 0x8000000000000000ULL) {
-		DSM_EMMC_LOG(card, DSM_EMMC_HOST_ERR, "opcode:%d failed, status:%x\n", opcode, error_bits);
-	} else {
-		DSM_EMMC_LOG(card, DSM_EMMC_RW_TIMEOUT_ERR, "opcode:%d failed, status:%x\n", opcode, error_bits);
-	}
-}
-
-static inline void sdhci_dsm_host_error_filter(struct sdhci_host *host, struct mmc_request *mrq, u32 * error_bits)
-{
-	if (mrq->cmd) {
-		if (mrq->cmd->opcode == MMC_SEND_TUNING_BLOCK_HS200)
-			*error_bits = 0;
-		else if (host->mmc->ios.clock <= 400000UL) {
-			if (((mrq->cmd->opcode == SD_IO_RW_DIRECT) || (mrq->cmd->opcode == SD_SEND_IF_COND) || (mrq->cmd->opcode == SD_IO_SEND_OP_COND) || (mrq->cmd->opcode == MMC_APP_CMD)))
-				*error_bits = 0;
-			else if (mrq->cmd->opcode == MMC_SEND_STATUS)
-				*error_bits &= ~SDHCI_INT_CRC;
-		}
-	}
-}
-
-void sdhci_dsm_handle(struct sdhci_host *host, struct mmc_request *mrq)
-{
-	u32 error_bits;
-	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
-	struct sdhci_arasan_data *sdhci_arasan = pltfm_host->priv;
-	error_bits = sdhci_arasan->cmd_data_status;
-	if (error_bits) {
-		sdhci_arasan->cmd_data_status = 0;
-		sdhci_dsm_host_error_filter(host, mrq, &error_bits);
-		if (error_bits) {
-			sdhci_arasan->para = ((error_bits << 16) | ((mrq->cmd ? mrq->cmd->opcode : 0) & 0x3f) | 0x8000000000000000ULL);
-			queue_work(system_freezable_wq, &sdhci_arasan->dsm_work);
-		}
 	}
 }
 #endif
@@ -1502,11 +1428,6 @@ static int sdhci_arasan_probe(struct platform_device *pdev)
 #ifdef CONFIG_HISI_BOOTDEVICE
 	if (get_bootdevice_type() == BOOT_DEVICE_EMMC)
 		set_bootdevice_name(&pdev->dev);
-#endif
-
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-	sdhci_arasan->data = (void *)host;
-	INIT_WORK(&sdhci_arasan->dsm_work, sdhci_dsm_work);
 #endif
 
 	ret = sdhci_add_host(host);

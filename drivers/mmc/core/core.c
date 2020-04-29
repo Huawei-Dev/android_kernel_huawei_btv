@@ -41,14 +41,6 @@
 
 #include <linux/debugfs.h>
 
-#ifdef CONFIG_HUAWEI_SDCARD_DSM
-#include <linux/mmc/dsm_sdcard.h>
-#endif
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-#include <linux/mmc/dsm_emmc.h>
-#include "../card/queue.h"
-#endif
-
 /* If the device is not responding */
 #define MMC_CORE_TIMEOUT_MS	(10 * 60 * 1000) /* 10 minute timeout */
 
@@ -384,11 +376,6 @@ void mmc_start_bkops(struct mmc_card *card, bool from_exception)
 	    from_exception)
 		return;
 
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-	DSM_EMMC_LOG(card, DSM_EMMC_URGENT_BKOPS,
-		"the device needs to perform background operations urgently\n");
-#endif
-
 	mmc_claim_host(card->host);
 	if (card->ext_csd.raw_bkops_status >= EXT_CSD_BKOPS_LEVEL_2) {
 		timeout = MMC_BKOPS_MAX_TIMEOUT;
@@ -538,98 +525,6 @@ static int mmc_wait_for_data_req_done(struct mmc_host *host,
 	return err;
 }
 
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-#define MMC_RSP_R1_ERROR_MASK (R1_OUT_OF_RANGE | R1_ADDRESS_ERROR | R1_BLOCK_LEN_ERROR | R1_ERASE_SEQ_ERROR | \
-								  R1_ERASE_PARAM | R1_WP_VIOLATION | R1_LOCK_UNLOCK_FAILED | \
-								  R1_COM_CRC_ERROR | R1_ILLEGAL_COMMAND | R1_CARD_ECC_FAILED | R1_CC_ERROR | \
-								  R1_ERROR | R1_CID_CSD_OVERWRITE | \
-								  R1_WP_ERASE_SKIP | R1_ERASE_RESET | \
-								  R1_SWITCH_ERROR)
-
-#define MMC_RSP_R1_ERROR_NON_CRC_MASK (MMC_RSP_R1_ERROR_MASK & (~(R1_COM_CRC_ERROR | R1_ILLEGAL_COMMAND)))
-
-static inline int mmc_dsm_request_response_error_filter(struct mmc_request *mrq) {
-	return (((mrq)->cmd->opcode == MMC_SEND_TUNING_BLOCK_HS200) ||
-			(((mrq)->cmd->opcode == MMC_SWITCH) && ((mrq)->cmd->resp[0] & (R1_COM_CRC_ERROR | R1_ILLEGAL_COMMAND)) && (((mrq)->cmd->resp[0] & MMC_RSP_R1_ERROR_NON_CRC_MASK) == 0)));
-}
-
-static void mmc_dsm_request_response_error_check(struct mmc_host *host, struct mmc_request *mrq) {
-	int do_event = 0;
-	if (mrq->sbc) {
-		if (mrq->sbc->resp[0] & (MMC_RSP_R1_ERROR_MASK | R1_EXCEPTION_EVENT)) {
-			if (host->index == 0) {
-				if (mrq->sbc->resp[0] & MMC_RSP_R1_ERROR_MASK) {
-					struct mmc_card *card;
-					card = host->card;
-					DSM_EMMC_LOG(card, DSM_EMMC_RSP_ERR,
-						"cmd: %d, requesting status %#x\n",
-						mrq->sbc->opcode, mrq->sbc->resp[0]);
-				}
-				do_event = mrq->sbc->resp[0] & R1_EXCEPTION_EVENT;
-			}
-		}
-	}
-	if (mrq->cmd && ((mmc_resp_type(mrq->cmd) == MMC_RSP_R1) || (mmc_resp_type(mrq->cmd) == MMC_RSP_R1B))) {
-		if (mrq->cmd->resp[0] & (MMC_RSP_R1_ERROR_MASK | R1_EXCEPTION_EVENT)) {
-			if (host->index == 0) {
-				if ((mrq->cmd->resp[0] & MMC_RSP_R1_ERROR_MASK) && !mmc_dsm_request_response_error_filter(mrq)) {
-					struct mmc_card *card;
-					card = host->card;
-					DSM_EMMC_LOG(card, DSM_EMMC_RSP_ERR,
-						"cmd: %d, requesting status %#x\n",
-						mrq->cmd->opcode, mrq->cmd->resp[0]);
-				}
-				do_event = mrq->cmd->resp[0] & R1_EXCEPTION_EVENT;
-			}
-		}
-	}
-	if (mrq->stop) {
-		if (mrq->stop->resp[0] & (MMC_RSP_R1_ERROR_MASK | R1_EXCEPTION_EVENT)) {
-			if (host->index == 0) {
-				if (mrq->stop->resp[0] & MMC_RSP_R1_ERROR_MASK) {
-					struct mmc_card *card;
-					card = host->card;
-					DSM_EMMC_LOG(card, DSM_EMMC_RSP_ERR,
-						"cmd: %d, requesting status %#x\n",
-						mrq->stop->opcode, mrq->stop->resp[0]);
-				}
-				do_event = mrq->stop->resp[0] & R1_EXCEPTION_EVENT;
-			}
-		}
-	}
-	if (unlikely(do_event)) {
-		if(mrq->done == mmc_wait_data_done) {
-			struct mmc_queue_req *mq_mrq = container_of(mrq, struct mmc_queue_req,
-								    brq.mrq);
-			do_event = !mmc_packed_cmd(mq_mrq->cmd_type);
-		} else {
-			do_event = 0;
-		}
-		if (do_event) {
-			int err;
-			u8 *ext_csd;
-			ext_csd = NULL;
-
-			err = mmc_get_ext_csd(host->card, &ext_csd);
-			if (err)
-				return;
-			if(ext_csd[EXT_CSD_EXP_EVENTS_STATUS] &
-			     EXT_CSD_DYNCAP_NEEDED) {
-				DSM_EMMC_LOG(host->card, DSM_EMMC_DYNCAP_NEEDED,
-					"DYNCAP_NEEDED [58]: %d, the device may degrade in performance and eventually become non-functional\n",
-			       ext_csd[58]);
-			}
-			if(ext_csd[EXT_CSD_EXP_EVENTS_STATUS] &
-			     EXT_CSD_SYSPOOL_EXHAUSTED) {
-				DSM_EMMC_LOG(host->card, DSM_EMMC_SYSPOOL_EXHAUSTED,
-					"SYSPOOL_EXHAUSTED, System resources pool exhausted\n");
-			}
-			kfree(ext_csd);
-		}
-	}
-}
-#endif
-
 static void mmc_wait_for_req_done(struct mmc_host *host,
 				  struct mmc_request *mrq)
 {
@@ -639,9 +534,6 @@ static void mmc_wait_for_req_done(struct mmc_host *host,
 		wait_for_completion(&mrq->completion);
 
 		cmd = mrq->cmd;
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-		mmc_dsm_request_response_error_check(host, mrq);
-#endif
 		/*
 		 * If host has timed out waiting for the sanitize
 		 * to complete, card might be still in programming state
@@ -770,9 +662,6 @@ struct mmc_async_req *mmc_start_req(struct mmc_host *host,
 			if (areq)
 				mmc_pre_req(host, areq->mrq, !host->areq);
 		}
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-		mmc_dsm_request_response_error_check(host, host->areq->mrq);
-#endif
 	}
 
 	if (!err && areq) {
@@ -1222,11 +1111,6 @@ void mmc_set_ios(struct mmc_host *host)
 	if (ios->clock > 0)
 		mmc_set_ungated(host);
 	host->ops->set_ios(host, ios);
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-	if (ios->old_rate != ios->clock) {
-		ios->old_rate = ios->clock;
-	}
-#endif
 }
 
 /*
@@ -2398,14 +2282,6 @@ static int mmc_do_erase(struct mmc_card *card, unsigned int from,
 		/* Do not retry else we can't see errors */
 		err = mmc_wait_for_cmd(card->host, &cmd, 0);
 		if (err || (cmd.resp[0] & 0xFDF92000)) {
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-			if (!mmc_card_sd(card)){
-				DSM_EMMC_LOG(card, DSM_EMMC_ERASE_ERR,
-					"%s:error %d requesting status %#x\n", __FUNCTION__,
-					err, cmd.resp[0]);
-
-			}
-#endif
 			pr_err("error %d requesting status %#x\n",
 				err, cmd.resp[0]);
 			err = -EIO;
@@ -2732,16 +2608,6 @@ static int mmc_rescan_try_freq(struct mmc_host *host, unsigned freq)
 int _mmc_detect_card_removed(struct mmc_host *host)
 {
 	int ret;
-
-#ifdef CONFIG_HUAWEI_SDCARD_DSM
-	int i;
-
-	if (!strcmp(mmc_hostname(host), "mmc1")) {
-		for (i = 0; i < DSM_SDCARD_CMD_MAX; i++) {
-			dsm_sdcard_cmd_logs[i].value = 0;
-		}
-	}
-#endif
 
 	if (host->caps & MMC_CAP_NONREMOVABLE)
 		return 0;

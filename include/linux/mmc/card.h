@@ -13,11 +13,6 @@
 #include <linux/device.h>
 #include <linux/mmc/core.h>
 #include <linux/mod_devicetable.h>
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-#define EXT_CSD_PRE_EOL_INFO_NORMAL     0x01
-#define EXT_CSD_PRE_EOL_INFO_WARNING     0x02
-#define EXT_CSD_PRE_EOL_INFO_URGENT     0x03
-#endif
 
 #define MMC_CARD_CMDQ_BLK_SIZE 512
 
@@ -352,10 +347,6 @@ struct mmc_card {
 	unsigned int    nr_parts;
 	bool                    cmdq_init; /* cmdq init done */
         struct dentry           *debugfs_sdxc;
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-	u8 *cached_ext_csd;
-#endif
-
 };
 
 /*

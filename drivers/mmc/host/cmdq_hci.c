@@ -40,11 +40,6 @@
 /*fix the soc bug that the qbr task can't be cleared*/
 #define CMDQ_FIX_CLEAR_QBRTASK
 
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-extern void sdhci_cmdq_dsm_set_host_status(struct sdhci_host *host, u32 error_bits);
-extern void sdhci_cmdq_dsm_work(struct cmdq_host *cq_host, bool dsm);
-#endif
-
 static void cmdq_dumpregs(struct cmdq_host *cq_host)
 {
 	struct mmc_host *mmc = cq_host->mmc;
@@ -789,9 +784,6 @@ irqreturn_t cmdq_irq(struct mmc_host *mmc, u32 intmask)
 			/* clean error interupt */
 			cq_host->ops->clean_irqs(mmc, SDHCI_INT_ERROR_MASK);
 			cmdq_writel(cq_host, CQIS_RED, CQIS);
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-			sdhci_cmdq_dsm_set_host_status(mmc_priv(mmc), (intmask & SDHCI_INT_ERROR_MASK));
-#endif
 			queue_work(cq_host->wq_resend, &cq_host->work_resend);
 		}
 		spin_unlock(&cq_host->cmdq_lock);
@@ -936,9 +928,6 @@ static void cmdq_work_resend(struct work_struct *work)
 	u32 req_count = 0;
 	bool timeout_fail = false;
 
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-	bool dsm = true;
-#endif
 	pr_err("%s:%s++\n", mmc_hostname(cq_host->mmc), __func__);
 	/* count error retry */
 	val = cmdq_readl(cq_host, CQTERRI);
@@ -1093,9 +1082,6 @@ dishalt:
 
 	pr_err("%s:%s--\n", mmc_hostname(cq_host->mmc), __func__);
 
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-	sdhci_cmdq_dsm_work(cq_host, dsm);
-#endif
 }
 
 static void cmdq_timeout_timer(unsigned long param)
@@ -1111,9 +1097,6 @@ static void cmdq_timeout_timer(unsigned long param)
 		/* mask & disable error interupt */
 		cq_host->ops->clear_set_irqs(cq_host->mmc, 0xFFFFFFFF, SDHCI_INT_CMDQ_EN);
 		cmdq_clear_set_irqs(cq_host, CQIS_RED, 0x0);
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-		sdhci_cmdq_dsm_set_host_status(mmc_priv(cq_host->mmc), -1U);	/* timeout*/
-#endif
 		queue_work(cq_host->wq_resend, &cq_host->work_resend);
 	}
 	spin_unlock_irqrestore(&cq_host->cmdq_lock, flags);

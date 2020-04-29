@@ -32,10 +32,6 @@
 #include "slot-gpio.h"
 #include "pwrseq.h"
 
-#ifdef CONFIG_HUAWEI_SDCARD_DSM
-#include <linux/mmc/dsm_sdcard.h>
-#endif
-
 #define cls_dev_to_mmc_host(d)	container_of(d, struct mmc_host, class_dev)
 
 static DEFINE_IDR(mmc_host_idr);
@@ -553,10 +549,6 @@ struct mmc_host *mmc_alloc_host(int extra, struct device *dev)
 	init_waitqueue_head(&host->wq);
 	wake_lock_init(&host->detect_wake_lock, WAKE_LOCK_SUSPEND,
 		kasprintf(GFP_KERNEL, "%s_detect", mmc_hostname(host)));
-
-#ifdef CONFIG_HUAWEI_SDCARD_DSM
-	dsm_sdcard_init();
-#endif
 
 	INIT_DELAYED_WORK(&host->detect, mmc_rescan);
 #ifdef CONFIG_PM

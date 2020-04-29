@@ -37,9 +37,6 @@
 #include "dw_mmc.h"
 #include "dw_mmc-pltfm.h"
 
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-#include <linux/mmc/dsm_emmc.h>
-#endif
 #ifdef CONFIG_HUAWEI_DSM
 #include <dsm/dsm_pub.h>
 
@@ -1573,11 +1570,6 @@ static int dw_mci_hs_tuning_find_condition(struct dw_mci *host, int timing)
 		if (-1 == host->tuning_init_sample) {
 			host->tuning_init_sample = (sample_min + sample_max) / 2;
 			dev_info(host->dev, "tuning err: no good sam_del, " "timing is %d, tuning_flag = 0x%x", timing, host->tuning_sample_flag);
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-			if (host->hw_mmc_id == DWMMC_EMMC_ID) {
-				DSM_EMMC_LOG(host->cur_slot->mmc, DSM_EMMC_TUNING_ERROR, "%s:eMMC tuning error: timing is %d, tuning_flag = 0x%x\n", __FUNCTION__, timing, host->tuning_sample_flag);
-			}
-#endif
 			ret = -1;
 		}
 
@@ -2622,11 +2614,6 @@ void dw_mci_work_routine_card(struct work_struct *work)
 					if (mrq->stop)
 						mrq->stop->error = -ENOMEDIUM;
 
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-					if(DWMMC_EMMC_ID == host->hw_mmc_id)
-						if(del_timer(&host->rw_to_timer) == 0)
-							dev_info(host->dev,"inactive timer\n");
-#endif
 					if (del_timer(&host->timer) !=0)
 						dev_info(host->dev,"del_timer failed\n");
 					spin_unlock(&host->lock);

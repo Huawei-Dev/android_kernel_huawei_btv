@@ -71,11 +71,6 @@ static void sdhci_runtime_pm_bus_off(struct sdhci_host *host)
 }
 #endif
 
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-extern void sdhci_dsm_handle(struct sdhci_host *host, struct mmc_request *mrq);
-extern void sdhci_dsm_set_host_status(struct sdhci_host *host, u32 error_bits);
-#endif
-
 #ifdef CONFIG_MMC_CQ_HCI
 extern irqreturn_t sdhci_cmdq_irq(struct mmc_host *mmc, u32 intmask);
 extern void sdhci_cmdq_init(struct sdhci_host *host, struct mmc_host *mmc);
@@ -1301,8 +1296,8 @@ clock_set:
 
 	clk |= SDHCI_CLOCK_CARD_EN;
 	sdhci_writew(host, clk, SDHCI_CLOCK_CONTROL);
-/*µ±¹Ø±ÕÊ¹ÄÜsd_clkÊ±ÖÓ£¬ÔÙ´Î´ò¿ªÊ¹ÄÜÊ±£¬ÐèÒªÔÙµÈ´ýÖÁÉÙ8¸ösd_clkÊ±ÖÓÖÜÆÚ£¬²ÅÄÜ·¢ÆðÐÂµÄÃüÁî¡£
-400kÊ±8¸öÊ±ÖÓÖÜÆÚÊÇ20Î¢Ãë
+/*\B5\B1\B9Ø±\D5Ê¹\C4\DCsd_clkÊ±\D6Ó£\AC\D4Ù´Î´\F2\BF\AAÊ¹\C4\DCÊ±\A3\AC\D0\E8Òª\D4ÙµÈ´\FD\D6\C1\C9\D98\B8\F6sd_clkÊ±\D6\D3\D6\DC\C6Ú£\AC\B2\C5\C4Ü·\A2\C6\F0\D0Âµ\C4\C3\FC\C1î¡£
+400kÊ±8\B8\F6Ê±\D6\D3\D6\DC\C6\DA\CA\C720Î¢\C3\EB
 */
 	mdelay(1);
 }
@@ -2409,10 +2404,6 @@ static void sdhci_tasklet_finish(unsigned long param)
 	sdhci_deactivate_led(host);
 #endif
 
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-	sdhci_dsm_handle(host, mrq);
-#endif
-
 	mmiowb();
 	spin_unlock_irqrestore(&host->lock, flags);
 
@@ -2495,9 +2486,6 @@ static void sdhci_cmd_irq(struct sdhci_host *host, u32 intmask, u32 *mask)
 			&& (!(host->flags & SDHCI_EXE_SOFT_TUNING))
 			) {
 			sdhci_dumpregs(host);
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-			sdhci_dsm_set_host_status(host, (intmask & ~SDHCI_INT_RESPONSE));
-#endif
 		}
 		tasklet_schedule(&host->finish_tasklet);
 		return;
@@ -2648,9 +2636,6 @@ static void sdhci_data_irq(struct sdhci_host *host, u32 intmask)
 			&& (!(host->flags & SDHCI_EXE_SOFT_TUNING))
 			) {
 			sdhci_dumpregs(host);
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-			sdhci_dsm_set_host_status(host, intmask & (SDHCI_INT_DATA_TIMEOUT | SDHCI_INT_DATA_END_BIT | SDHCI_INT_DATA_CRC | SDHCI_INT_ADMA_ERROR));
-#endif
 		}
 		sdhci_finish_data(host);
 	} else {

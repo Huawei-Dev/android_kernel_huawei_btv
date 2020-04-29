@@ -17,15 +17,6 @@
 #include <linux/scatterlist.h>
 #include <linux/mmc/core.h>
 
-/* austin k3v5 platform dw emmc controller use as wifi usage with id = 0 */
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-#undef CONFIG_HUAWEI_EMMC_DSM
-#endif
-
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-#include <linux/mmc/dsm_emmc.h>
-#endif
-
 #define MAX_MCI_SLOTS	2
 #define TUNING_INIT_CONFIG_NUM 7
 #define TUNING_INIT_TIMING_MODE 10
@@ -223,12 +214,6 @@ struct dw_mci {
 	bool			vqmmc_enabled;
 	/* S/W reset timer */
 	struct timer_list       timer;
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-	struct timer_list       rw_to_timer;
-	struct work_struct   dmd_work;
-	u32 para;
-	u32			dmd_cmd_status;
-#endif
 
 	/* pinctrl handles */
 	struct pinctrl		*pinctrl;
@@ -258,12 +243,10 @@ struct dw_mci {
 	int						sd_reinit;
 	int						sd_hw_timeout;
 
-    /*那那??DT??D??? begin*/
 	u32           		    clock;		      /* Current clock (MHz) */
 	u32          		    clock_to_restore; /* Saved clock for dynamic clock gating (MHz) */
 	bool                    tuning_done;
 	bool					tuning_needed;	  /* tuning move start flag */
-    /*那那??DT??D??? end  */
 	int			sdio_id0;
 
 	struct timer_list       cmd11_timer;

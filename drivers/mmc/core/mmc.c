@@ -28,9 +28,6 @@
 #include "bus.h"
 #include "mmc_ops.h"
 #include "sd_ops.h"
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-#include <linux/mmc/dsm_emmc.h>
-#endif
 #ifdef CONFIG_HISI_BOOTDEVICE
 #include <linux/bootdevice.h>
 #endif
@@ -1732,10 +1729,6 @@ static int mmc_init_card(struct mmc_host *host, u32 ocr,
 		host->card = card;
 
 	pr_info("%s: eMMC init card done, support bus_width=%d bit.\n", mmc_hostname(card->host), (0x1 << card->host->ios.bus_width));
-
-#ifdef CONFIG_HUAWEI_EMMC_DSM
-	(void)dsm_emmc_get_life_time(card);
-#endif
 
 	return 0;
 
