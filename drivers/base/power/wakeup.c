@@ -17,10 +17,6 @@
 #include <linux/types.h>
 #include <trace/events/power.h>
 
-#ifdef CONFIG_HW_PTM
-#include <huawei_platform/power/hw_power_monitor.h>
-#endif
-
 #include "power.h"
 
 /*
@@ -726,11 +722,7 @@ void pm_print_active_wakeup_sources(void)
 	if (!active && last_activity_ws){
 		pr_info("last active wakeup source: %s\n",
 			last_activity_ws->name);
-#ifdef CONFIG_HW_PTM
-        power_monitor_report(FREEZING_FAILED,"%s",
-            last_activity_ws->name);
-#endif
-    }
+        }
 	rcu_read_unlock();
 }
 EXPORT_SYMBOL_GPL(pm_print_active_wakeup_sources);
@@ -803,10 +795,6 @@ bool pm_get_wakeup_count(unsigned int *count, bool block)
 			split_counters(&cnt, &inpr);
 			if (inpr == 0 || signal_pending(current))
 				break;
-#ifdef CONFIG_HW_PTM
-			pm_print_active_wakeup_sources();
-#endif
-
 			schedule();
 		}
 		finish_wait(&wakeup_count_wait_queue, &wait);

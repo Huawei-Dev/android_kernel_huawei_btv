@@ -23,8 +23,6 @@
 #include <linux/mfd/hisi_pmic.h>
 #include "hisi_lpregs.h"
 
-#include <huawei_platform/power/hw_power_monitor.h>
-
 #define POWER_STATE_TYPE_SYS_SUSPEND	3
 
 /*lint -e750 -esym(750,*) */
@@ -110,13 +108,9 @@ void pm_gic_pending_dump(void)
 				} else {
 					printk("wake up irq num: %d, irq name: no name!", irq);
 				}
-				power_monitor_report(WAKEUP_IRQ, "%s",
-						g_ap_irq_name[irq]);
 				gpio = pm_ao_gpio_irq_dump(irq);
 				if (gpio >= 0) {
 					printk("(gpio-%d)", gpio);
-					power_monitor_report(WAKEUP_GPIO, "%d",
-							gpio);
                 		}
 			}
 		}

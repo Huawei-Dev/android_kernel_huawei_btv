@@ -34,8 +34,6 @@
 #include <linux/hisi/hisi_gpio_auto_gen.h>
 #include "m3_rdr_ddr_map.h"
 
-#include <huawei_platform/power/hw_power_monitor.h>
-
 #define PM_WAKE_STATUS_OFFSET			(0x034)
 #define PM_SYS_SLEEP_CNT_OFFSET			(0x060)
 #define PM_SYS_WAKE_CNT_OFFSET			(0x064)
@@ -659,8 +657,6 @@ void pm_status_show(struct seq_file *s)
 		(wake_status & WAKE_STATUS_GPS_MASK) ? 1 : 0,
 		(wake_status & WAKE_STATUS_HOTPLUG_MASK(0)) ? 1 : 0,
 		(wake_status & WAKE_STATUS_HOTPLUG_MASK(1)) ? 1 : 0);
-    power_monitor_report(MODEM_SLEEP,"%d",(wake_status & WAKE_STATUS_MODEM_MASK) ? 1 : 0);
-    power_monitor_report(IOM3_SLEEP,"%d",(wake_status & WAKE_STATUS_IOMCU_MASK) ? 1 : 0);
 
 	LOWPM_MSG(s, "SR:system sleeped %u times.\n",
 		readl(sysreg_base.reserved_base + PM_SYS_SLEEP_CNT_OFFSET));
