@@ -58,9 +58,6 @@
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/vmscan.h>
-#ifdef CONFIG_SHRINK_MEMORY
-#include <linux/suspend.h>
-#endif
 
 #ifdef CONFIG_HISI_SWAP_ZDATA
 #include <linux/signal.h>
@@ -167,22 +164,6 @@ unsigned long vm_total_pages;
 
 static LIST_HEAD(shrinker_list);
 static DECLARE_RWSEM(shrinker_rwsem);
-#ifdef CONFIG_SHRINK_MEMORY_CANCEL
-static atomic_t shrink_all_cancel = ATOMIC_INIT(0);
-
-static inline int current_is_shrink(void)
-{
-	return current->flags & PF_SHRINK_ALL;
-}
-
-static int is_shrink_cancel(void)
-{
-	/*pr_err("current is %s, current->flags is 0x%x, shrink_all_cancel is %d\n",
-		current->comm, current->flags, atomic_read(&shrink_all_cancel));*/
-	return current_is_shrink() &&
-		atomic_read(&shrink_all_cancel) > 0;
-}
-#endif
 
 #ifdef CONFIG_MEMCG
 static bool global_reclaim(struct scan_control *sc)
@@ -512,10 +493,6 @@ static unsigned long shrink_slab(gfp_t gfp_mask, int nid,
 			.memcg = memcg,
 		};
 
-#ifdef CONFIG_SHRINK_MEMORY_CANCEL
-		if (is_shrink_cancel())
-			break;
-#endif
 		if (memcg && !(shrinker->flags & SHRINKER_MEMCG_AWARE))
 			continue;
 
@@ -1001,10 +978,6 @@ static unsigned long shrink_page_list(struct list_head *page_list,
 		enum page_references references = PAGEREF_RECLAIM;
 		bool dirty, writeback;
 
-#ifdef CONFIG_SHRINK_MEMORY_CANCEL
-		if (is_shrink_cancel())
-			break;
-#endif
 #ifdef CONFIG_HISI_SWAP_ZDATA
 		if (rec_flag && reclaim_sigusr_pending(current))
 			break;
@@ -1960,9 +1933,6 @@ static void shrink_active_list(unsigned long nr_to_scan,
 	unsigned long nr_rotated = 0;
 	isolate_mode_t isolate_mode = 0;
 	int file = is_file_lru(lru);
-#ifdef CONFIG_SHRINK_MEMORY_CANCEL
-	int is_cancelled = 0;
-#endif
 	struct zone *zone = lruvec_zone(lruvec);
 
 	lru_add_drain();
@@ -1986,18 +1956,7 @@ static void shrink_active_list(unsigned long nr_to_scan,
 	__mod_zone_page_state(zone, NR_ISOLATED_ANON + file, nr_taken);
 	spin_unlock_irq(&zone->lru_lock);
 
-#ifdef CONFIG_SHRINK_MEMORY_CANCEL
-	is_cancelled = is_shrink_cancel();
-#endif
 	while (!list_empty(&l_hold)) {
-#ifdef CONFIG_SHRINK_MEMORY_CANCEL
-		if (is_cancelled) {
-			page = lru_to_page(&l_hold);
-			list_del(&page->lru);
-			putback_lru_page(page);
-			continue;
-		}
-#endif
 		cond_resched();
 		page = lru_to_page(&l_hold);
 		list_del(&page->lru);
@@ -2402,15 +2361,7 @@ static void shrink_lruvec(struct lruvec *lruvec, int swappiness,
 		unsigned long nr_anon, nr_file, percentage;
 		unsigned long nr_scanned;
 
-#ifdef CONFIG_SHRINK_MEMORY_CANCEL
-		if (is_shrink_cancel())
-			break;
-#endif
 		for_each_evictable_lru(lru) {
-#ifdef CONFIG_SHRINK_MEMORY_CANCEL
-			if (is_shrink_cancel())
-				break;
-#endif
 			if (nr[lru]) {
 				nr_to_scan = min(nr[lru], SWAP_CLUSTER_MAX);
 				nr[lru] -= nr_to_scan;
@@ -2589,10 +2540,6 @@ static bool shrink_zone(struct zone *zone, struct scan_control *sc,
 			struct lruvec *lruvec;
 			int swappiness;
 
-#ifdef CONFIG_SHRINK_MEMORY_CANCEL
-			if (is_shrink_cancel())
-				break;
-#endif
 			if (mem_cgroup_low(root, memcg)) {
 				if (!sc->may_thrash)
 					continue;
@@ -2734,10 +2681,6 @@ static bool shrink_zones(struct zonelist *zonelist, struct scan_control *sc)
 					gfp_zone(sc->gfp_mask), sc->nodemask) {
 		enum zone_type classzone_idx;
 
-#ifdef CONFIG_SHRINK_MEMORY_CANCEL
-		if (is_shrink_cancel())
-			break;
-#endif
 		if (!populated_zone(zone))
 			continue;
 
@@ -3688,7 +3631,7 @@ void wakeup_kswapd(struct zone *zone, int order, enum zone_type classzone_idx)
 	wake_up_interruptible(&pgdat->kswapd_wait);
 }
 
-#if defined CONFIG_HIBERNATION || CONFIG_SHRINK_MEMORY
+#if defined CONFIG_HIBERNATION
 /*
  * Try to free `nr_to_reclaim' of memory, system-wide, and return the number of
  * freed pages.
@@ -3728,45 +3671,9 @@ unsigned long shrink_all_memory(unsigned long nr_to_reclaim)
 	lockdep_clear_current_reclaim_state();
 	p->flags &= ~PF_MEMALLOC;
 
-#ifdef CONFIG_SHRINK_MEMORY_CANCEL
-	if (is_shrink_cancel())
-		atomic_set(&shrink_all_cancel, 0);
-#endif
 	return nr_reclaimed;
 }
 #endif /* CONFIG_HIBERNATION */
-
-#ifdef CONFIG_SHRINK_MEMORY
-int sysctl_shrink_memory = 1;
-#define DEFAULT_FREE_RATIO 30
-int sysctl_shrinkmem_handler(struct ctl_table *table, int write,
-			void __user *buffer, size_t *length, loff_t *ppos)
-{
-	int ret;
-	struct task_struct *tsk = current;
-
-	ret = proc_dointvec_minmax(table, write, buffer, length, ppos);
-	if (ret)
-		return ret;
-
-#ifdef CONFIG_SHRINK_MEMORY_CANCEL
-	pr_err("sysctl_shrink_memory is %d\n", sysctl_shrink_memory);
-	if (!sysctl_shrink_memory) {
-		atomic_inc(&shrink_all_cancel);
-		return 0;
-	}
-#endif
-	if (write) {
-		int free_ratio = sysctl_shrink_memory;
-		if (sysctl_shrink_memory == 1)
-			free_ratio = DEFAULT_FREE_RATIO;
-		tsk->flags |= PF_SHRINK_ALL;
-		shrink_all_memory(totalram_pages * free_ratio / 100);
-		tsk->flags &= ~PF_SHRINK_ALL;
-	}
-	return 0;
-}
-#endif
 
 /* It's optimal to keep kswapds on the same CPUs as their memory, but
    not required for correctness.  So if the last cpu in a node goes

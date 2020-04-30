@@ -61,22 +61,6 @@ config SPARSEMEM_MANUAL
 
 endchoice
 
-config SHRINK_MEMORY
-	bool "Allow for system-wide shrinking of memory"
-	default n
-	depends on MMU
-	help
-	It ebable support for system-wide memory reclaim in one shot using
-	echo 1 > /proc/sys/vm/shrink_memory
-
-config SHRINK_MEMORY_CANCEL
-	bool "Allow cancel shrink_memory triggered by sysctl"
-	depends on SHRINK_MEMORY
-	default n
-	help
-	  echo 0 > /proc/sys/vm/shrink_memory.
-	  You can cancel by this.
-
 config DISCONTIGMEM
 	def_bool y
 	depends on (!SELECT_MEMORY_MODEL && ARCH_DISCONTIGMEM_ENABLE) || DISCONTIGMEM_MANUAL
