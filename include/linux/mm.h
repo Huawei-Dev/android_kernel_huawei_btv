@@ -1157,11 +1157,6 @@ struct mm_walk {
 	struct mm_struct *mm;
 	struct vm_area_struct *vma;
 	void *private;
-#ifdef CONFIG_HISI_SWAP_ZDATA
-	bool hiber;
-	unsigned nr_reclaimed;
-	unsigned nr_writedblock;
-#endif
 };
 
 int walk_page_range(unsigned long addr, unsigned long end,

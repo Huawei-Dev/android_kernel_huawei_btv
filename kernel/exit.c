@@ -824,9 +824,6 @@ void do_exit(long code)
 	 */
 	smp_mb();
 	raw_spin_unlock_wait(&tsk->pi_lock);
-#ifdef CONFIG_HISI_SWAP_ZDATA
-	exit_proc_reclaim(tsk);
-#endif
 	/* causes final put_task_struct in finish_task_switch(). */
 	tsk->state = TASK_DEAD;
 	tsk->flags |= PF_NOFREEZE;	/* tell freezer to ignore us */

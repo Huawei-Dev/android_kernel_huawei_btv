@@ -1391,14 +1391,6 @@ enum perf_event_task_context {
 	perf_nr_task_contexts,
 };
 
-#ifdef CONFIG_HISI_SWAP_ZDATA
-struct reclaim_result {
-	unsigned nr_reclaimed;
-	unsigned nr_writedblock;
-	s64 elapsed_centisecs64;
-};
-#endif
-
 struct task_struct {
 	volatile long state;	/* -1 unrunnable, 0 runnable, >0 stopped */
 	void *stack;
@@ -1842,9 +1834,6 @@ struct task_struct {
 #endif
 #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
 	unsigned long	task_state_change;
-#endif
-#ifdef CONFIG_HISI_SWAP_ZDATA
-	struct reclaim_result *proc_reclaimed_result;
 #endif
 };
 

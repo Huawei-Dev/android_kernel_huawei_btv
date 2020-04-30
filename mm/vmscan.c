@@ -59,10 +59,6 @@
 #define CREATE_TRACE_POINTS
 #include <trace/events/vmscan.h>
 
-#ifdef CONFIG_HISI_SWAP_ZDATA
-#include <linux/signal.h>
-#endif
-
 struct scan_control {
 	/* How many pages shrink_list() should reclaim */
 	unsigned long nr_to_reclaim;
@@ -116,10 +112,6 @@ struct scan_control {
 	 * on memory until last task zap it.
 	 */
 	struct vm_area_struct *target_vma;
-#ifdef CONFIG_HISI_SWAP_ZDATA
-	bool ishibernation_rec;
-	unsigned nr_writedblock;  /*the number of blocks that was writebacked*/
-#endif
 };
 
 #define lru_to_page(_head) (list_entry((_head)->prev, struct page, lru))
@@ -638,11 +630,6 @@ static pageout_t pageout(struct page *page, struct address_space *mapping,
 			.range_start = 0,
 			.range_end = LLONG_MAX,
 			.for_reclaim = 1,
-#ifdef CONFIG_HISI_SWAP_ZDATA
-			.ishibernation_rec = sc->ishibernation_rec,
-			/*the number of blocks that was writebacked*/
-			.nr_writedblock = (PAGE_SIZE>>9),
-#endif
 		};
 
 		SetPageReclaim(page);
@@ -660,10 +647,6 @@ static pageout_t pageout(struct page *page, struct address_space *mapping,
 		}
 		trace_mm_vmscan_writepage(page, trace_reclaim_flags(page));
 		inc_zone_page_state(page, NR_VMSCAN_WRITE);
-#ifdef CONFIG_HISI_SWAP_ZDATA
-		if (sc->ishibernation_rec && !res)
-			sc->nr_writedblock += wbc.nr_writedblock;
-#endif
 		return PAGE_SUCCESS;
 	}
 
@@ -966,9 +949,6 @@ static unsigned long shrink_page_list(struct list_head *page_list,
 	unsigned long nr_writeback = 0;
 	unsigned long nr_immediate = 0;
 
-#ifdef CONFIG_HISI_SWAP_ZDATA
-	bool rec_flag = sc->ishibernation_rec;
-#endif
 	cond_resched();
 
 	while (!list_empty(page_list)) {
@@ -978,10 +958,6 @@ static unsigned long shrink_page_list(struct list_head *page_list,
 		enum page_references references = PAGEREF_RECLAIM;
 		bool dirty, writeback;
 
-#ifdef CONFIG_HISI_SWAP_ZDATA
-		if (rec_flag && reclaim_sigusr_pending(current))
-			break;
-#endif
 		cond_resched();
 
 		page = lru_to_page(page_list);
@@ -1330,14 +1306,8 @@ unsigned long reclaim_clean_pages_from_list(struct zone *zone,
 	return ret;
 }
 #ifdef CONFIG_PROCESS_RECLAIM
-#ifdef CONFIG_HISI_SWAP_ZDATA
-unsigned long reclaim_pages_from_list(struct list_head *page_list,
-					struct vm_area_struct *vma,
-					bool hiber, unsigned *nr_writedblock)
-#else
 unsigned long reclaim_pages_from_list(struct list_head *page_list,
 					struct vm_area_struct *vma)
-#endif
 {
 	struct scan_control sc = {
 		.gfp_mask = GFP_KERNEL,
@@ -1346,21 +1316,11 @@ unsigned long reclaim_pages_from_list(struct list_head *page_list,
 		.may_unmap = 1,
 		.may_swap = 1,
 		.target_vma = vma,
-#ifdef CONFIG_HISI_SWAP_ZDATA
-		.nr_writedblock = 0,
-#endif
 	};
 
 	unsigned long nr_reclaimed;
 	struct page *page;
 	unsigned long dummy1, dummy2, dummy3, dummy4, dummy5;
-
-#ifdef CONFIG_HISI_SWAP_ZDATA
-	if (true == hiber)
-		sc.ishibernation_rec = true;
-	else
-		sc.ishibernation_rec = false;
-#endif
 
 	list_for_each_entry(page, page_list, lru)
 		ClearPageActive(page);
@@ -1376,10 +1336,6 @@ unsigned long reclaim_pages_from_list(struct list_head *page_list,
 				page_is_file_cache(page));
 		putback_lru_page(page);
 	}
-#ifdef CONFIG_HISI_SWAP_ZDATA
-	if (true == hiber)
-		*nr_writedblock += sc.nr_writedblock;
-#endif
 	return nr_reclaimed;
 }
 #endif
@@ -1763,9 +1719,6 @@ shrink_inactive_list(unsigned long nr_to_scan, struct lruvec *lruvec,
 	if (nr_taken == 0)
 		return 0;
 
-#ifdef CONFIG_HISI_SWAP_ZDATA
-	sc->ishibernation_rec = false;
-#endif
 	nr_reclaimed = shrink_page_list(&page_list, zone, sc, TTU_UNMAP,
 				&nr_dirty, &nr_unqueued_dirty, &nr_congested,
 				&nr_writeback, &nr_immediate,
