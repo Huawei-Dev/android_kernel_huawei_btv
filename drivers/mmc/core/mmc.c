@@ -2093,10 +2093,6 @@ static const struct mmc_bus_ops mmc_ops = {
 #endif
 	.remove = mmc_remove,
 	.detect = mmc_detect,
-#ifdef CONFIG_MMC_PASSWORDS
-	.sysfs_add = NULL,
-	.sysfs_remove = NULL,
-#endif
 	.suspend = mmc_suspend,
 	.resume = mmc_resume,
 	.runtime_suspend = mmc_runtime_suspend,

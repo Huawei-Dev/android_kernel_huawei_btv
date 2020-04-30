@@ -551,12 +551,9 @@ static void dw_mci_translate_sglist(struct dw_mci *host, struct mmc_data *data,
 
 			/* Set the OWN bit and disable interrupts for this descriptor */
 			desc->des0 = IDMAC_DES0_OWN | IDMAC_DES0_DIC | IDMAC_DES0_CH;
-			/*优化修改，防止内存不初始化*/
 			if(desc->des0 & IDMAC_DES0_CH) {
 				desc->des1 = 0;
 			}
-
-			/*优化修改，防止内存不初始化*/
 			if(desc->des0 & IDMAC_DES0_CH) {
 				desc->des1 = 0;
 			}
@@ -600,12 +597,10 @@ static void dw_mci_translate_sglist(struct dw_mci *host, struct mmc_data *data,
 				/* Set the OWN bit and disable interrupts for this descriptor */
 				desc->des0 = IDMAC_DES0_OWN | IDMAC_DES0_DIC | IDMAC_DES0_CH;
 
-				/*优化修改，防止内存不初始化*/
 				if(desc->des0 & IDMAC_DES0_CH) {
 				        desc->des2 = 0;
 				}
 
-				/*优化修改，防止内存不初始化*/
 				if(desc->des0 & IDMAC_DES0_CH) {
 					desc->des2 = 0;
 				}
@@ -1260,7 +1255,7 @@ static void dw_mci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 		drv_data->set_ios(slot->host, ios);
 
 	mmc->f_min = DIV_ROUND_UP(slot->host->bus_hz, 510);
-	mmc->f_max = slot->host->bus_hz;/*上面设置的bus_hz*/
+	mmc->f_max = slot->host->bus_hz;
 
 	/* Slot specific timing and width adjustment */
 	dw_mci_setup_bus(slot, false);
@@ -1415,27 +1410,6 @@ static int dw_mci_execute_tuning(struct mmc_host *mmc,u32 opcode)
     return err;
 }
 
-#ifdef CONFIG_MMC_PASSWORDS
-static int dw_mci_sd_lock_reset(struct mmc_host *mmc)
-{
-	struct dw_mci_slot *slot = mmc_priv(mmc);
-	struct dw_mci *host = slot->host;
-	const struct dw_mci_drv_data *drv_data = slot->host->drv_data;
-	u32 present = 0;
-
-	pm_runtime_get_sync(mmc_dev(mmc));
-	present = dw_mci_get_cd(mmc);
-	if (present == 1) {
-		 if (drv_data && drv_data->work_fail_reset)
-			drv_data->work_fail_reset(host);
-	}
-	pm_runtime_mark_last_busy(mmc_dev(mmc));
-	pm_runtime_put_autosuspend(mmc_dev(mmc));
-
-	return 0;
-}
-#endif
-
 static int dw_mci_card_busy(struct mmc_host *mmc)
 {
 	struct dw_mci_slot *slot = mmc_priv(mmc);
@@ -1463,9 +1437,6 @@ static const struct mmc_host_ops dw_mci_ops = {
 	.enable_sdio_irq	= dw_mci_enable_sdio_irq,
 	.start_signal_voltage_switch = dw_mci_start_signal_voltage_switch,
 	.execute_tuning		 = dw_mci_execute_tuning,
-#ifdef CONFIG_MMC_PASSWORDS
-	.sd_lock_reset		= dw_mci_sd_lock_reset,
-#endif
 };
 
 void dw_mci_request_end(struct dw_mci *host, struct mmc_request *mrq)
@@ -2618,15 +2589,6 @@ static int dw_mci_init_slot(struct dw_mci *host, unsigned int id)
 		host->pins_idle = NULL;
 	}
 
-    	/*
-	 * comment only for balong
-    	 * sd:vmmc :ldo10 卡侧电压；
-       	 * vqmmc:ldo7  I/O 上拉；
-       	 * buck2/ldo5 硬件确认不需要控制，包括低功耗模式下；
-
-    	 * mmc:vmmc:ldo19 vcc 常供3V；
-         * vqmmc:ldo5 vccq 单板长供，软件不设置
-	*/
 	host->vmmc = devm_regulator_get(mmc_dev(mmc), "vmmc");
 	if (IS_ERR(host->vmmc)) {
 		pr_info("%s: no vmmc regulator found\n", mmc_hostname(mmc));
@@ -3100,7 +3062,6 @@ int dw_mci_probe(struct dw_mci *host)
 		 "%u deep fifo\n",
 		 host->irq, width, fifo_size);
 
-	/*每个IP可以支持多张卡*/
 	/* We need at least one slot to succeed */
 	for (i = 0; i < host->num_slots; i++) {
 		ret = dw_mci_init_slot(host, i);

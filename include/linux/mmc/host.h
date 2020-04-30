@@ -166,9 +166,6 @@ struct mmc_host_ops {
 	int	(*multi_io_quirk)(struct mmc_card *card,
 				  unsigned int direction, int blk_size);
 	int	(*enable_enhanced_strobe)(struct mmc_host *host);
-#ifdef CONFIG_MMC_PASSWORDS
-	int	(*sd_lock_reset)(struct mmc_host *host);
-#endif
 };
 
 struct mmc_card;

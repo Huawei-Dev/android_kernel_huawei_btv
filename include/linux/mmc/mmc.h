@@ -495,13 +495,6 @@ struct _mmc_csd {
 /*
  * MMC_LOCK_UNLOCK modes
  */
-#ifdef CONFIG_MMC_PASSWORDS
-#define MMC_LOCK_MODE_ERASE		(1<<3)
-#define MMC_LOCK_MODE_LOCK		(1<<2)
-#define MMC_LOCK_MODE_CLR_PWD	(1<<1)
-#define MMC_LOCK_MODE_SET_PWD	(1<<0)
-#define MMC_LOCK_MODE_UNLOCK    (1<<4)
-#endif /* CONFIG_MMC_PASSWORDS */
 
 extern u64 cmdlog_enable_flag;   /* 0 : Disable , X: Enable */
 #define EMMC_EN   		(1<<0)
