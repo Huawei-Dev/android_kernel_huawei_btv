@@ -1571,9 +1571,6 @@ enum reclaim_type {
 	RECLAIM_ANON,
 	RECLAIM_ALL,
 	RECLAIM_RANGE,
-	RECLAIM_SOFT,
-	RECLAIM_INACTIVE,
-	RECLAIM_SWAPIN,
 };
 
 static ssize_t reclaim_write(struct file *file, const char __user *buf,
@@ -1598,18 +1595,12 @@ static ssize_t reclaim_write(struct file *file, const char __user *buf,
 		return -EFAULT;
 
 	type_buf = strstrip(buffer);
-	if (!strcmp(type_buf, "soft"))
-		type = RECLAIM_SOFT;
-	else if (!strcmp(type_buf, "inactive"))
-		type = RECLAIM_INACTIVE;
-	else if (!strcmp(type_buf, "file"))
+	if (!strcmp(type_buf, "file"))
 		type = RECLAIM_FILE;
 	else if (!strcmp(type_buf, "anon"))
 		type = RECLAIM_ANON;
 	else if (!strcmp(type_buf, "all"))
 		type = RECLAIM_ALL;
-	else if (!strcmp(type_buf, "swapin"))
-		type = RECLAIM_SWAPIN;
 	else if (isdigit(*type_buf))
 		type = RECLAIM_RANGE;
 	else
@@ -1653,16 +1644,6 @@ static ssize_t reclaim_write(struct file *file, const char __user *buf,
 	if (!mm)
 		goto out;
 
-	//here we add a soft shrinker for reclaim
-	if (type == RECLAIM_SOFT) {
-		smart_soft_shrink(mm);
-		mmput(mm);
-		goto out;
-	}
-
-	if (type == RECLAIM_INACTIVE)
-		walk_data.inactive_lru = true;
-
 	reclaim_walk.mm = mm;
 	reclaim_walk.pmd_entry = reclaim_pte_range;
 
@@ -1681,14 +1662,6 @@ static ssize_t reclaim_write(struct file *file, const char __user *buf,
 					min(vma->vm_end, end),
 					&reclaim_walk);
 			vma = vma->vm_next;
-		}
-	} else if (type == RECLAIM_SWAPIN) {
-		for (vma = mm->mmap; vma; vma = vma->vm_next) {
-			reclaim_walk.pmd_entry = swapin_pte_range;
-			walk_data.vma = vma;
-			reclaim_walk.private = &walk_data;
-			walk_page_range(vma->vm_start, vma->vm_end,
-					&reclaim_walk);
 		}
 	} else {
 		for (vma = mm->mmap; vma; vma = vma->vm_next) {
