@@ -64,7 +64,6 @@
 #include <linux/binfmts.h>
 #include <linux/sched/sysctl.h>
 #include <linux/kexec.h>
-#include <linux/boost_sigkill_free.h>
 
 #include <asm/uaccess.h>
 #include <asm/processor.h>
@@ -303,24 +302,6 @@ static struct ctl_table kern_table[] = {
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec,
 	},
-#ifdef CONFIG_BOOST_KILL
-	{
-		.procname	= "boost_killing",
-		.data		= &sysctl_boost_killing,
-		.maxlen		= sizeof(int),
-		.mode		= 0644,
-		.proc_handler	= proc_dointvec,
-	},
-#endif
-#ifdef CONFIG_HW_BOOST_SIGKILL_FREE
-	{
-		.procname	= "boost_sigkill_free",
-		.data		= &sysctl_boost_sigkill_free,
-		.maxlen		= sizeof(int),
-		.mode		= 0644,
-		.proc_handler	= proc_dointvec,
-	},
-#endif
 #ifdef CONFIG_SCHED_DEBUG
 	{
 		.procname	= "sched_min_granularity_ns",

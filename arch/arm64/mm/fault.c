@@ -29,7 +29,6 @@
 #include <linux/sched.h>
 #include <linux/highmem.h>
 #include <linux/perf_event.h>
-#include <linux/boost_sigkill_free.h>
 
 #include <asm/cpufeature.h>
 #include <asm/exception.h>
@@ -184,15 +183,6 @@ static int __do_page_fault(struct mm_struct *mm, unsigned long addr,
 {
 	struct vm_area_struct *vma;
 	int fault;
-
-#ifdef CONFIG_HW_BOOST_SIGKILL_FREE
-	if (unlikely(test_bit(MMF_FAST_FREEING, &mm->flags))) {
-		task_clear_jobctl_pending(tsk, JOBCTL_PENDING_MASK);
-		sigaddset(&tsk->pending.signal, SIGKILL);
-		set_tsk_thread_flag(tsk, TIF_SIGPENDING);
-		return VM_FAULT_BADMAP;
-	}
-#endif
 
 	vma = find_vma(mm, addr);
 	fault = VM_FAULT_BADMAP;

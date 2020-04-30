@@ -935,20 +935,6 @@ config NUMA_BALANCING_DEFAULT_ENABLED
 	  If set, automatic NUMA balancing will be enabled if running on a NUMA
 	  machine.
 
-config BOOST_KILL
-	bool "boost kill"
-	default n
-	help
-	  if set, the process to be killed will be move to fast cpu and its nice
-	  value will also set to -20.
-
-config HW_BOOST_SIGKILL_FREE
-	bool "boost memory release for sigkilled procs"
-	default n
-	help
-	  if set, the process to be killed will release its memory before all
-	  threads are dead.
-
 menuconfig CGROUPS
 	bool "Control Group support"
 	select KERNFS
@@ -982,14 +968,6 @@ config CGROUP_FREEZER
 	  cgroup.
 
 source "kernel/cgroup_huawei/Kconfig"
-
-config HW_CGROUP_IONICE
-	bool "ionice cgroup controller"
-	depends on BLOCK
-	help
-	  Provides a way to set ionice for tasks in a cgroup.
-	  It's useful in mobile devices where certain background apps
-	  are doing heavy io work.
 
 config CGROUP_DEVICE
 	bool "Device controller for cgroups"

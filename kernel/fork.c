@@ -90,9 +90,6 @@
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/task.h>
-#ifdef CONFIG_HW_CGROUP_PIDS
-#include "cgroup_huawei/cgroup_pids.h"
-#endif
 
 /*
  * Minimum number of threads to boot the kernel
@@ -1362,19 +1359,9 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 	}
 	current->flags &= ~PF_NPROC_EXCEEDED;
 
-#ifdef CONFIG_HW_CGROUP_PIDS
-	retval = cgroup_pids_can_fork();
-	if (retval < 0)
-		goto bad_fork_free;
-
-	retval = copy_creds(p, clone_flags);
-	if (retval < 0)
-		goto bad_fork_cleanup_cgroup_pids;
-#else
 	retval = copy_creds(p, clone_flags);
 	if (retval < 0)
 		goto bad_fork_free;
-#endif
 	/*
 	 * If multiple threads are within copy_process(), then this check
 	 * triggers too late. This doesn't hurt, the check is only there
@@ -1694,10 +1681,6 @@ bad_fork_cleanup_threadgroup_lock:
 bad_fork_cleanup_count:
 	atomic_dec(&p->cred->user->processes);
 	exit_creds(p);
-#ifdef CONFIG_HW_CGROUP_PIDS
-bad_fork_cleanup_cgroup_pids:
-	cgroup_pids_cancel_fork();
-#endif
 bad_fork_free:
 	free_task(p);
 fork_out:
