@@ -1786,10 +1786,6 @@ long do_fork(unsigned long clone_flags,
 			get_task_struct(p);
 		}
 
-#ifdef CONFIG_HUAWEI_UID_IO_STATS
-		profile_task_end_fork(p);
-#endif
-
 		wake_up_new_task(p);
 
 		/* forking complete and child started to run, tell ptracer */
