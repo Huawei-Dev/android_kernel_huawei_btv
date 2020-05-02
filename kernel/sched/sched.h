@@ -244,10 +244,6 @@ struct task_group {
 	 * will also be accessed at each tick.
 	 */
 	atomic_long_t load_avg ____cacheline_aligned;
-#ifdef CONFIG_SCHED_HMP
-	atomic_t runnable_avg;
-	atomic_t usage_avg;
-#endif
 #endif
 #endif
 
@@ -335,18 +331,8 @@ extern void sched_move_task(struct task_struct *tsk);
 #ifdef CONFIG_FAIR_GROUP_SCHED
 extern int sched_group_set_shares(struct task_group *tg, unsigned long shares);
 
-#ifdef CONFIG_SMP
-#ifndef CONFIG_SCHED_HMP
 extern void set_task_rq_fair(struct sched_entity *se,
 			     struct cfs_rq *prev, struct cfs_rq *next);
-#else
-static inline void set_task_rq_fair(struct sched_entity *se,
-			     struct cfs_rq *prev, struct cfs_rq *next) { }
-#endif
-#else /* !CONFIG_SMP */
-static inline void set_task_rq_fair(struct sched_entity *se,
-			     struct cfs_rq *prev, struct cfs_rq *next) { }
-#endif /* CONFIG_SMP */
 #endif /* CONFIG_FAIR_GROUP_SCHED */
 
 #else /* CONFIG_CGROUP_SCHED */
@@ -383,31 +369,6 @@ struct cfs_rq {
 	/*
 	 * CFS load tracking
 	 */
-#ifdef CONFIG_SCHED_HMP
-	unsigned long runnable_load_avg, blocked_load_avg, utilization_load_avg;
-	atomic64_t decay_counter;
-	u64 last_decay;
-	atomic_long_t removed_load;
-
-#ifdef CONFIG_FAIR_GROUP_SCHED
-	/* Required to track per-cpu representation of a task_group */
-	u32 tg_runnable_contrib;
-#ifdef CONFIG_SCHED_HMP
-	u32 tg_usage_contrib;
-#endif
-	unsigned long tg_load_contrib;
-
-	/*
-	 *   h_load = weight * f(tg)
-	 *
-	 * Where f(tg) is the recursive weight fraction assigned to
-	 * this group.
-	 */
-	unsigned long h_load;
-	u64 last_h_load_update;
-	struct sched_entity *h_load_next;
-#endif /* CONFIG_FAIR_GROUP_SCHED */
-#else
 	struct sched_avg avg;
 	u64 runnable_load_sum;
 	unsigned long runnable_load_avg;
@@ -430,7 +391,6 @@ struct cfs_rq {
 	u64 last_h_load_update;
 	struct sched_entity *h_load_next;
 #endif /* CONFIG_FAIR_GROUP_SCHED */
-#endif
 #endif /* CONFIG_SMP */
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
@@ -643,9 +603,6 @@ struct rq {
 #ifdef CONFIG_FAIR_GROUP_SCHED
 	/* list of leaf cfs_rq on this cpu: */
 	struct list_head leaf_cfs_rq_list;
-#ifdef CONFIG_SCHED_HMP
-	struct sched_avg avg;
-#endif
 #endif /* CONFIG_FAIR_GROUP_SCHED */
 
 	/*
@@ -679,10 +636,6 @@ struct rq {
 	int active_balance;
 	int push_cpu;
 	struct cpu_stop_work active_balance_work;
-#ifdef CONFIG_SCHED_HMP
-	struct task_struct *migrate_task;
-	int wake_for_idle_pull;
-#endif
 	/* cpu of this runqueue: */
 	int cpu;
 	int online;
@@ -943,12 +896,6 @@ static inline unsigned int group_first_cpu(struct sched_group *group)
 
 extern int group_balance_cpu(struct sched_group *sg);
 
-#ifdef CONFIG_SCHED_HMP
-static LIST_HEAD(hmp_domains);
-DECLARE_PER_CPU(struct hmp_domain *, hmp_cpu_domain);
-#define hmp_cpu_domain(cpu)	(per_cpu(hmp_cpu_domain, (cpu)))
-#endif /* CONFIG_SCHED_HMP */
-
 #else
 
 static inline void sched_ttwu_pending(void) { }
@@ -1180,51 +1127,8 @@ static inline void finish_lock_switch(struct rq *rq, struct task_struct *prev)
 #define WEIGHT_IDLEPRIO                3
 #define WMULT_IDLEPRIO         1431655765
 
-#ifdef CONFIG_SCHED_HMP
-/*
- * Nice levels are multiplicative, with a gentle 10% change for every
- * nice level changed. I.e. when a CPU-bound task goes from nice 0 to
- * nice 1, it will get ~10% less CPU time than another CPU-bound task
- * that remained on nice 0.
- *
- * The "10% effect" is relative and cumulative: from _any_ nice level,
- * if you go up 1 level, it's -10% CPU usage, if you go down 1 level
- * it's +10% CPU usage. (to achieve that we use a multiplier of 1.25.
- * If a task goes up by ~10% and another task goes down by ~10% then
- * the relative distance between them is ~25%.)
- */
-static const int prio_to_weight[40] = {
- /* -20 */     88761,     71755,     56483,     46273,     36291,
- /* -15 */     29154,     23254,     18705,     14949,     11916,
- /* -10 */      9548,      7620,      6100,      4904,      3906,
- /*  -5 */      3121,      2501,      1991,      1586,      1277,
- /*   0 */      1024,       820,       655,       526,       423,
- /*   5 */       335,       272,       215,       172,       137,
- /*  10 */       110,        87,        70,        56,        45,
- /*  15 */        36,        29,        23,        18,        15,
-};
-
-/*
- * Inverse (2^32/x) values of the prio_to_weight[] array, precalculated.
- *
- * In cases where the weight does not change often, we can use the
- * precalculated inverse to speed up arithmetics by turning divisions
- * into multiplications:
- */
-static const u32 prio_to_wmult[40] = {
- /* -20 */     48388,     59856,     76040,     92818,    118348,
- /* -15 */    147320,    184698,    229616,    287308,    360437,
- /* -10 */    449829,    563644,    704093,    875809,   1099582,
- /*  -5 */   1376151,   1717300,   2157191,   2708050,   3363326,
- /*   0 */   4194304,   5237765,   6557202,   8165337,  10153587,
- /*   5 */  12820798,  15790321,  19976592,  24970740,  31350126,
- /*  10 */  39045157,  49367440,  61356676,  76695844,  95443717,
- /*  15 */ 119304647, 148102320, 186737708, 238609294, 286331153,
-};
-#else
 extern const int sched_prio_to_weight[40];
 extern const u32 sched_prio_to_wmult[40];
-#endif
 
 #define ENQUEUE_WAKEUP		1
 #define ENQUEUE_HEAD		2
@@ -1298,11 +1202,7 @@ struct sched_class {
 	void (*update_curr) (struct rq *rq);
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
-#ifdef CONFIG_SCHED_HMP
-	void (*task_move_group) (struct task_struct *p, int on_rq);
-#else
 	void (*task_move_group) (struct task_struct *p);
-#endif
 #endif
 };
 
@@ -1395,15 +1295,9 @@ extern void init_dl_task_timer(struct sched_dl_entity *dl_se);
 
 unsigned long to_ratio(u64 period, u64 runtime);
 
-#ifdef CONFIG_SCHED_HMP
-extern void update_idle_cpu_load(struct rq *this_rq);
-
-extern void init_task_runnable_average(struct task_struct *p);
-#else
 extern void init_entity_runnable_average(struct sched_entity *se);
 
 extern void init_max_cpu_capacity(struct max_cpu_capacity *mcc);
-#endif
 
 static inline void add_nr_running(struct rq *rq, unsigned count)
 {
@@ -1511,7 +1405,6 @@ unsigned long arch_scale_cpu_capacity(struct sched_domain *sd, int cpu)
 #endif
 
 #ifdef CONFIG_SMP
-#ifndef CONFIG_SCHED_HMP
 static inline unsigned long capacity_of(int cpu)
 {
 	return cpu_rq(cpu)->cpu_capacity;
@@ -1564,8 +1457,6 @@ static inline unsigned long cpu_util(int cpu)
 {
 	return __cpu_util(cpu, 0);
 }
-#endif
-
 #endif
 
 #ifdef CONFIG_CPU_FREQ_GOV_SCHED
@@ -1623,9 +1514,6 @@ static inline void set_dl_cpu_capacity(int cpu, bool request,
 static inline void sched_rt_avg_update(struct rq *rq, u64 rt_delta)
 {
 	rq->rt_avg += rt_delta * arch_scale_freq_capacity(NULL, cpu_of(rq));
-#ifdef CONFIG_SCHED_HMP
-	sched_avg_update(rq);
-#endif
 }
 #else
 static inline void sched_rt_avg_update(struct rq *rq, u64 rt_delta) { }

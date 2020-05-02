@@ -97,11 +97,6 @@ bool cpufreq_hotplugged(int cpu)
 }
 EXPORT_SYMBOL_GPL(cpufreq_hotplugged);
 
-#ifdef CONFIG_SCHED_HMP_BOOST
-extern int set_hmp_boostpulse(int duration);
-extern int get_hmp_boost(void);
-#endif
-
 /*********************************************************************
  *                          SYSFS INTERFACE                          *
  *********************************************************************/
@@ -393,9 +388,6 @@ retry:
 				}
 			} else {
 				hifreq_hotplug_cpu(false); /*lint !e747*/
-#ifdef CONFIG_SCHED_HMP_BOOST
-				set_hmp_boostpulse(20000);
-#endif
 			}
 		}
 
@@ -446,9 +438,6 @@ int bL_hifreq_hotplug_set_target(struct cpufreq_policy *policy,
 	}
 	spin_unlock_irqrestore(&(bL_cpufreq_data.hotplug_lock), flags);
 
-#ifdef CONFIG_SCHED_HMP_BOOST
-	boost = get_hmp_boost();
-#endif
 	now = ktime_to_us(ktime_get());
 	nr_runnings = cpu_nr_runnings(policy->cpus);
 
@@ -508,15 +497,6 @@ int bL_hifreq_hotplug_set_target(struct cpufreq_policy *policy,
 			spin_unlock_irqrestore(&(bL_cpufreq_data.hotplug_lock), flags);
 			goto verify_freq;
 		}
-
-#ifdef CONFIG_SCHED_HMP_BOOST
-		boost = get_hmp_boost();
-		if (boost) {
-			bL_hifreq_hotplug_clear_req();
-			spin_unlock_irqrestore(&(bL_cpufreq_data.hotplug_lock), flags);
-			goto verify_freq;
-		}
-#endif
 
 		bL_hifreq_hotplug_clear_req();
 		bL_cpufreq_data.cpu = cpu;

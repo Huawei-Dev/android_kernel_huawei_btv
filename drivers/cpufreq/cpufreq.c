@@ -438,10 +438,8 @@ wait:
 	spin_unlock(&policy->transition_lock);
 
 	scale_freq_capacity(policy, freqs);
-#ifndef CONFIG_SCHED_HMP
 	for_each_cpu(cpu, policy->cpus)
 		trace_cpu_capacity(capacity_curr_of(cpu), cpu);
-#endif
 
 	cpufreq_notify_transition(policy, freqs, CPUFREQ_PRECHANGE);
 }

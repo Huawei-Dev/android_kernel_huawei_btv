@@ -62,11 +62,7 @@ arm64-obj-$(CONFIG_PCI)			+= pci.o
 arm64-obj-$(CONFIG_ARMV8_DEPRECATED)	+= armv8_deprecated.o
 arm64-obj-$(CONFIG_ACPI)		+= acpi.o
 
-ifeq ($(CONFIG_SCHED_HMP),y)
-arm64-obj-$(CONFIG_SCHED_HMP)		+= hmp_topology.o
-else
 arm64-obj-y				+= topology.o
-endif
 
 arm64-obj-$(CONFIG_HIBERNATION)		+= hibernate.o hibernate-asm.o
 

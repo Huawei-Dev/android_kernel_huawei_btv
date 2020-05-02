@@ -183,18 +183,10 @@ extern void get_iowait_load(unsigned long *nr_waiters, unsigned long *load);
 
 extern void calc_global_load(unsigned long ticks);
 
-#ifndef CONFIG_SCHED_HMP
-#if defined(CONFIG_SMP) && defined(CONFIG_NO_HZ_COMMON)
-extern void update_cpu_load_nohz(int active);
-#else
-static inline void update_cpu_load_nohz(int active) { }
-#endif
-#else
 #if defined(CONFIG_SMP) && defined(CONFIG_NO_HZ_COMMON)
 extern void update_cpu_load_nohz(void);
 #else
 static inline void update_cpu_load_nohz(void) { }
-#endif
 #endif
 
 extern unsigned long get_parent_ip(unsigned long addr);
@@ -1096,14 +1088,6 @@ void free_sched_domains(cpumask_var_t doms[], unsigned int ndoms);
 
 bool cpus_share_cache(int this_cpu, int that_cpu);
 
-#ifdef CONFIG_SCHED_HMP
-struct hmp_domain {
-	struct cpumask cpus;
-	struct cpumask possible_cpus;
-	struct list_head hmp_domains;
-};
-#endif /* CONFIG_SCHED_HMP */
-
 typedef const struct cpumask *(*sched_domain_mask_f)(int cpu);
 typedef int (*sched_domain_flags_f)(void);
 typedef
@@ -1177,39 +1161,6 @@ struct load_weight {
 	u32 inv_weight;
 };
 
-#ifdef CONFIG_SCHED_HMP
-struct sched_avg {
-	u64 last_runnable_update;
-	s64 decay_count;
-	/*
-	 * utilization_avg_contrib describes the amount of time that a
-	 * sched_entity is running on a CPU. It is based on running_avg_sum
-	 * and is scaled in the range [0..SCHED_LOAD_SCALE].
-	 * load_avg_contrib described the amount of time that a sched_entity
-	 * is runnable on a rq. It is based on both runnable_avg_sum and the
-	 * weight of the task.
-	 */
-	unsigned long load_avg_contrib, utilization_avg_contrib;
-#ifdef CONFIG_SCHED_HMP
-	unsigned long load_avg_ratio;
-#endif
-	/*
-	 * These sums represent an infinite geometric series and so are bound
-	 * above by 1024/(1-y).  Thus we only need a u32 to store them for all
-	 * choices of y < 1-2^(-32)*1024.
-	 * running_avg_sum reflects the time that the sched_entity is
-	 * effectively running on the CPU.
-	 * runnable_avg_sum represents the amount of time a sched_entity is on
-	 * a runqueue which includes the running time that is monitored by
-	 * running_avg_sum.
-	 */
-	u32 runnable_avg_sum, avg_period, running_avg_sum;
-#ifdef CONFIG_SCHED_HMP
-	u64 hmp_last_up_migration;
-	u64 hmp_last_down_migration;
-#endif
-};
-#else
 /*
  * The load_avg/util_avg accumulates an infinite geometric series.
  * 1) load_avg factors frequency scaling into the amount of time that a
@@ -1229,15 +1180,6 @@ struct sched_avg {
 	u32 util_sum, period_contrib;
 	unsigned long load_avg, util_avg;
 };
-#endif
-
-#ifdef CONFIG_SCHED_HMP
-/*
- * We want to avoid boosting any processes forked from init (PID 1)
- * and kthreadd (assumed to be PID 2).
- */
-#define hmp_task_should_forkboost(task) ((task->parent && task->parent->pid > 2))
-#endif
 
 #ifdef CONFIG_SCHEDSTATS
 struct sched_statistics {
