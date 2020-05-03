@@ -915,7 +915,7 @@ EXPORT_SYMBOL_GPL(__clk_mux_determine_rate_closest);
 
 /***        clk api        ***/
 
-static void clk_core_unprepare(struct clk_core *core)
+void clk_core_unprepare(struct clk_core *core)
 {
 	if (!core)
 		return;
@@ -959,7 +959,7 @@ void clk_unprepare(struct clk *clk)
 }
 EXPORT_SYMBOL_GPL(clk_unprepare);
 
-static int clk_core_prepare(struct clk_core *core)
+int clk_core_prepare(struct clk_core *core)
 {
 	int ret = 0;
 
