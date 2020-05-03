@@ -267,7 +267,7 @@ hwsensor_v4l2_enum_fmt(
 static struct v4l2_subdev_video_ops
 s_subdev_video_ops_hwsensor =
 {
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 4, 0))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 1, 0))
     .enum_mbus_fmt = hwsensor_v4l2_enum_fmt,
 #endif
 };
