@@ -61,15 +61,6 @@ struct loop_device {
 	int			lo_state;
 	struct mutex		lo_ctl_mutex;
 
-#ifdef CONFIG_BLK_DEV_LOOP_NO_MQ
-	struct bio_list		lo_bio_list;
-	unsigned int		lo_bio_count;
-	struct task_struct	*lo_thread;
-	wait_queue_head_t	lo_event;
-	/* wait queue for incoming requests */
-	wait_queue_head_t	lo_req_wait;
-#endif
-
 	struct request_queue	*lo_queue;
 	struct blk_mq_tag_set	tag_set;
 	struct gendisk		*lo_disk;
