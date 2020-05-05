@@ -3087,7 +3087,7 @@ refill:
 		atomic_add(size - 1, &page->_count);
 
 		/* reset page count bias and offset to start of new frag */
-		nc->pfmemalloc = page->pfmemalloc;
+		nc->pfmemalloc = page_is_pfmemalloc(page);
 		nc->pagecnt_bias = size;
 		nc->offset = size;
 	}
