@@ -1362,7 +1362,7 @@ const struct inode_operations exfat_dir_inode_operations = {
 /*======================================================================*/
 /*  File Operations                                                     */
 /*======================================================================*/
-#if LINUX_VERSION_CODE > KERNEL_VERSION(4,2,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(4,1,0)
 static const char *exfat_follow_link(struct dentry *dentry, void **cookie)
 {
 	struct exfat_inode_info *ei = EXFAT_I(dentry->d_inode);

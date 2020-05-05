@@ -1142,16 +1142,14 @@ static int f2fs_rename2(struct inode *old_dir, struct dentry *old_dentry,
 	return f2fs_rename(old_dir, old_dentry, new_dir, new_dentry, flags);
 }
 
-static void *f2fs_encrypted_follow_link(struct dentry *dentry,
-						struct nameidata *nd)
+static const char *f2fs_encrypted_follow_link(struct dentry *dentry, void **cookie)
 {
 	struct page *cpage = NULL;
 	char *caddr, *paddr = NULL;
 	struct fscrypt_str cstr = FSTR_INIT(NULL, 0);
 	struct fscrypt_str pstr = FSTR_INIT(NULL, 0);
 	struct fscrypt_symlink_data *sd;
-	struct inode *inode = dentry->d_inode;
-	loff_t size = min_t(loff_t, i_size_read(inode), PAGE_SIZE - 1);
+	struct inode *inode = d_inode(dentry);
 	u32 max_size = inode->i_sb->s_blocksize;
 	int res;
 
@@ -1162,8 +1160,7 @@ static void *f2fs_encrypted_follow_link(struct dentry *dentry,
 	cpage = read_mapping_page(inode->i_mapping, 0, NULL);
 	if (IS_ERR(cpage))
 		return ERR_CAST(cpage);
-	caddr = kmap(cpage);
-	caddr[size] = 0;
+	caddr = page_address(cpage);
 
 	/* Symlink is encrypted */
 	sd = (struct fscrypt_symlink_data *)caddr;
@@ -1198,16 +1195,13 @@ static void *f2fs_encrypted_follow_link(struct dentry *dentry,
 	paddr = pstr.name;
 
 	/* Null-terminate the name */
-	paddr[res] = '\0';
-	nd_set_link(nd, paddr);
+	paddr[pstr.len] = '\0';
 
-	kunmap(cpage);
-	page_cache_release(cpage);
-	return NULL;
+	put_page(cpage);
+	return *cookie = paddr;
 errout:
 	fscrypt_fname_free_buffer(&pstr);
-	kunmap(cpage);
-	page_cache_release(cpage);
+	put_page(cpage);
 	return ERR_PTR(res);
 }
 

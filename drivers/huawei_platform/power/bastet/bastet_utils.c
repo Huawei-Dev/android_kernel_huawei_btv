@@ -623,14 +623,14 @@ next_nolock:
 	}
 	extb->fastreuse = 0;
 
-	sk = sk_alloc(net, PF_INET, GFP_KERNEL, &tcp_prot);
+	sk = sk_alloc(net, PF_INET, GFP_KERNEL, &tcp_prot, 1);
 	if (sk == NULL) {
 		inet_bind_bucket_destroy(hashinfo->bind_bucket_cachep, tb);
 		inet_bind_bucket_destroy(hashinfo->bind_bucket_cachep, extb);
 		goto fail_unlock;
 	}
 
-	exsk = sk_alloc(net, PF_INET, GFP_KERNEL, &tcp_prot);
+	exsk = sk_alloc(net, PF_INET, GFP_KERNEL, &tcp_prot, 1);
 	if (exsk == NULL) {
 		inet_bind_bucket_destroy(hashinfo->bind_bucket_cachep, tb);
 		inet_bind_bucket_destroy(hashinfo->bind_bucket_cachep, extb);

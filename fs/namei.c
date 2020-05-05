@@ -3145,7 +3145,7 @@ retry_lookup:
 		path_to_nameidata(&path, nd);
 		return -ENOENT;
 	}
-	inode = path->dentry->d_inode;
+	inode = d_backing_inode(path.dentry);
 finish_lookup:
 	if (nd->depth)
 		put_link(nd);
