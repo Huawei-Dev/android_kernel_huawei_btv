@@ -1324,8 +1324,7 @@ int dw_mci_get_cd(struct mmc_host *mmc)
 	pm_runtime_get_sync(mmc_dev(mmc));
 
 	/* Use platform get_cd function, else try onboard card detect */
-	if ((brd->quirks & DW_MCI_QUIRK_BROKEN_CARD_DETECTION) ||
-	    (mmc->caps & MMC_CAP_NONREMOVABLE))
+	if (brd->quirks & DW_MCI_QUIRK_BROKEN_CARD_DETECTION)
 		present = 1;
 	else if (brd->get_cd)
 		present = !brd->get_cd(slot->host, slot->id);
