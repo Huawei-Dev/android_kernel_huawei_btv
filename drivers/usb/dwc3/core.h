@@ -1047,7 +1047,6 @@ static inline void dwc3_host_exit(struct dwc3 *dwc)
 #if IS_ENABLED(CONFIG_USB_DWC3_GADGET) || IS_ENABLED(CONFIG_USB_DWC3_DUAL_ROLE)
 int dwc3_gadget_init(struct dwc3 *dwc);
 void dwc3_gadget_exit(struct dwc3 *dwc);
-void dwc3_phy_setup(struct dwc3 *dwc);
 void dwc3_resume_usb2_phy(struct dwc3 *dwc);
 void dwc3_resume_usb3_phy(struct dwc3 *dwc);
 int dwc3_gadget_set_test_mode(struct dwc3 *dwc, int mode);

@@ -143,7 +143,7 @@ static int dwc3_soft_reset(struct dwc3 *dwc)
 
 		if (time_after(jiffies, timeout)) {
 			dev_err(dwc->dev, "Reset Timed Out\n");
-			ret = -ETIMEDOUT;
+			return -ETIMEDOUT;
 		}
 
 		cpu_relax();
