@@ -57,7 +57,7 @@
 #include <linux/kmemleak.h>
 #include <linux/compaction.h>
 #include <trace/events/kmem.h>
-#include <linux/ftrace_event.h>
+#include <linux/trace_events.h>
 #include <linux/memcontrol.h>
 #include <linux/prefetch.h>
 #include <linux/migrate.h>
