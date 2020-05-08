@@ -136,7 +136,9 @@ static unsigned int hook_local_out_cb(unsigned int hooknum,
 
 static struct nf_hook_ops ipv4_local_out_ops = {
 	.hook		=	hook_local_out_cb,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 1, 0))
 	.owner		=	THIS_MODULE,
+#endif
 	.pf			=	NFPROTO_IPV4,
 	.hooknum	=	NF_INET_LOCAL_OUT,
 	.priority	=	NF_IP_PRI_FIRST,
@@ -144,7 +146,9 @@ static struct nf_hook_ops ipv4_local_out_ops = {
 
 static struct nf_hook_ops ipv6_local_out_ops = {
 	.hook		=	hook_local_out_cb,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 1, 0))
 	.owner		=	THIS_MODULE,
+#endif
 	.pf			=	NFPROTO_IPV6,
 	.hooknum	=	NF_INET_LOCAL_OUT,
 	.priority	=	NF_IP6_PRI_FIRST,

@@ -86,7 +86,9 @@ struct nf_hook_ops {
 
 	/* User fills in from here down. */
 	nf_hookfn		*hook;
+#ifdef CONFIG_NETFILTER_INGRESS
 	struct net_device	*dev;
+#endif
 	struct module		*owner;
 	void			*priv;
 	u_int8_t		pf;
