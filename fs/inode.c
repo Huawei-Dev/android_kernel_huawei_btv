@@ -21,12 +21,6 @@
 #include <trace/events/writeback.h>
 #include "internal.h"
 
-/* Configure use atime update while big file access */
-#if defined CONFIG_HISI_ATIME
-#define FS_INODE_SIZE_MAX (10*1024*1024)
-#else
-#endif
-
 /*
  * Inode locking rules:
  *
