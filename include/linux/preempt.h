@@ -91,6 +91,11 @@
 #endif
 
 /*
+ * The preempt_count offset after spin_lock()
+ */
+#define PREEMPT_LOCK_OFFSET	PREEMPT_DISABLE_OFFSET
+
+/*
  * The preempt_count offset needed for things like:
  *
  *  spin_lock_bh()
