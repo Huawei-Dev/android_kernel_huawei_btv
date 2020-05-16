@@ -28,7 +28,7 @@
 #include <linux/delay.h>
 #include <linux/kfifo.h>
 #include <linux/regulator/consumer.h>
-#include <asm-generic/scatterlist.h>
+#include <linux/scatterlist.h>
 #include <linux/scatterlist.h>
 #include <linux/clk.h>
 #include <linux/rproc_share.h>
