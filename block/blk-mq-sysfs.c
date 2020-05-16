@@ -476,11 +476,7 @@ static void blk_mq_sysfs_init(struct request_queue *q)
 /* see blk_register_queue() */
 void blk_mq_finish_init(struct request_queue *q)
 {
-#ifndef BLK_MQ_NO_PERCPU_REFCOUNT
 	percpu_ref_switch_to_percpu(&q->mq_usage_counter);
-#else
-	blk_mq_ref_finish_init(&q->mq_usage_counter);
-#endif
 }
 
 int blk_mq_register_disk(struct gendisk *disk)

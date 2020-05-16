@@ -593,18 +593,6 @@ struct ufs_unique_number {
  */
 struct ufs_hba {
 	void __iomem *mmio_base;
-#ifdef CONFIG_SCSI_HISI_MQ
-	int processing_read;
-	int processing_write;
-	int continue_read;
-	int continue_sync_io;
-	int continue_sync_write;
-	int continue_async_write;
-	int continue_idle;
-	wait_queue_head_t write_wait_queue;
-
-	struct timer_list continue_idle_check;
-#endif
 	/* Virtual memory reference */
 	struct utp_transfer_cmd_desc *ucdl_base_addr;
 	struct utp_transfer_req_desc *utrdl_base_addr;

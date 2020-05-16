@@ -74,10 +74,6 @@
 #include "blk.h"
 #include "blk-mq.h"
 
-#include "hisi-blk-mq.h"
-#include "hisi-blk-mq-dispatch-strategy.h"
-#include "hisi-blk-mq-debug.h"
-
 /* FLUSH/FUA sequences */
 enum {
 	REQ_FSEQ_PREFLUSH	= (1 << 0), /* pre-flushing in progress */
@@ -326,10 +322,6 @@ static bool blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq)
 	flush_rq->rq_disk = first_rq->rq_disk;
 	flush_rq->end_io = flush_end_io;
 
-	hisi_blk_mq_init_req_timestamp(flush_rq);
-
-	blk_mq_debug_rq_processing_state_update(flush_rq, MQ_PROCESS_FLUSH_INIT);
-
 	return blk_flush_queue_rq(flush_rq, false);
 }
 
@@ -537,120 +529,3 @@ void blk_free_flush_queue(struct blk_flush_queue *fq)
 	kfree(fq->flush_rq);
 	kfree(fq);
 }
-
-#ifdef CONFIG_HISI_BLK_MQ
-#include <linux/hisi/rdr_hisi_platform.h>
-#define HISI_MQ_APD_TEST
-static unsigned char blk_power_off_flush_executing = 0;
-void blk_power_off_flush(int emergency)
-{
-	if(blk_power_off_flush_executing)
-		return;
-	blk_power_off_flush_executing = 1;
-	blk_mq_flush_device_cache(emergency);
-	blk_power_off_flush_executing = 0;
-}
-
-#ifdef HISI_MQ_APD_TEST
-extern void hisi_mntn_test_enable(int enable);
-extern int hisi_wdt_tst_lock(int type);
-extern void rdr_syserr_process_for_ap(u32 modid, u64 arg1, u64 arg2);
-extern void rdr_system_error(u32 modid, u32 arg1, u32 arg2);
-
-int blk_mq_apd_test(int case_id,int mode,int type)
-{
-	unsigned long irqflags = 0;
-	unsigned char disable_intr_ctx = 0;
-	unsigned char disable_preempt_ctx = 0;
-	unsigned int modid;
-	switch(mode){
-		case 1:{
-			printk(KERN_EMERG "MQ-APD:Disable interrupt \r\n");
-			disable_intr_ctx = 1;
-			break;
-		}
-		case 2:{
-			printk(KERN_EMERG "MQ-APD:Disable preempt \r\n");
-			disable_preempt_ctx = 1;
-			break;
-		}
-		default:
-			break;
-	}
-	if(disable_intr_ctx)
-		local_irq_save(irqflags);/*lint !e730 !e550*/
-	if(disable_preempt_ctx)
-		preempt_disable();
-	switch(case_id){
-		case 0:{
-			blk_power_off_flush(0);
-			goto out;
-		}
-		case 1:{
-			printk(KERN_EMERG "MQ-APD:MODID_AP_S_PANIC \r\n");
-			BUG_ON(1);/*lint !e730 */
-			goto out;
-		}
-		case 2:{
-			printk(KERN_EMERG "MQ-APD:MODID_AP_S_NOC \r\n");
-			modid = MODID_AP_S_NOC;
-			break;
-		}
-		case 3:{
-			printk(KERN_EMERG "MQ-APD:MODID_AP_S_PMU \r\n");
-			modid = MODID_AP_S_PMU;
-			break;
-		}
-		case 4:{
-			printk(KERN_EMERG "MQ-APD:MODID_AP_S_DDRC_SEC \r\n");
-			modid = MODID_AP_S_DDRC_SEC;
-			break;
-		}
-		case 5:{
-			printk(KERN_EMERG "MQ-APD:MODID_AP_S_COMBINATIONKEY \r\n");
-			modid = MODID_AP_S_COMBINATIONKEY;
-			break;
-		}
-		case 6:{
-			printk(KERN_EMERG "MQ-APD:MODID_AP_S_F2FS \r\n");
-			modid = MODID_AP_S_F2FS;
-			break;
-		}
-		case 9:{
-			printk(KERN_EMERG "MQ-APD:RDR_MODEM_NOC_MOD_ID \r\n");
-			modid = RDR_MODEM_NOC_MOD_ID;
-			break;
-		}
-		case 10:{
-			printk(KERN_EMERG "MQ-APD:RDR_MODEM_DMSS_MOD_ID \r\n");
-			modid = RDR_MODEM_DMSS_MOD_ID;
-			break;
-		}
-		case 11:{
-			printk(KERN_EMERG "MQ-APD:RDR_AUDIO_NOC_MODID \r\n");
-			modid = RDR_AUDIO_NOC_MODID;
-			break;
-		}
-		case 13:{
-			printk(KERN_EMERG "MQ-APD:WDT timeout simulate \r\n");
-			hisi_mntn_test_enable(1);
-			hisi_wdt_tst_lock(0);
-			goto out;
-		}
-		default:
-			return 1;
-	}
-	if(type == 0)
-		rdr_syserr_process_for_ap(modid, 0UL, 0UL);
-	else if(type == 1)
-		rdr_system_error(modid, 0U, 0U);
-out:
-	if(disable_intr_ctx)
-		local_irq_restore(irqflags);/*lint !e730 !e550*/
-	if(disable_preempt_ctx)
-		preempt_enable();/*lint !e730 */
-	return 0;
-}
-#endif
-EXPORT_SYMBOL(blk_power_off_flush);
-#endif

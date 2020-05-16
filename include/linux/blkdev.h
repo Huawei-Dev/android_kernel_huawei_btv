@@ -146,17 +146,6 @@ struct request {
 
 	unsigned char req_iosche_bypass;
 
-#ifdef CONFIG_HISI_BLK_MQ
-#ifdef CONFIG_HISI_MQ_DEBUG
-	int mq_count_type;
-	int mq_count_num;
-	enum mq_process_enum mq_process_record[MQ_PROCESS_NUM];
-	unsigned char mq_process_record_count;
-	unsigned char mq_process_runqueue_index;
-#endif
-	unsigned char rq_order_flag;
-	unsigned long rq_start_jiffies;
-#endif /* CONFIG_HISI_BLK_MQ */
 #ifdef CONFIG_HISI_IO_LATENCY_TRACE
 	unsigned long req_stage_jiffies[REQ_PROC_STAGE_MAX];
 	unsigned char from_submit_bio_flag;
@@ -351,10 +340,6 @@ struct queue_limits {
 	unsigned char		raid_partial_stripes_expensive;
 };
 
-#ifdef BLK_MQ_NO_PERCPU_REFCOUNT
-#include <linux/blk-mq-ref.h>
-#endif
-
 struct request_queue {
 	/*
 	 * Together with queue_head for cacheline sharing
@@ -412,37 +397,6 @@ struct request_queue {
 	struct delayed_work	delay_work;
 
 	struct backing_dev_info	backing_dev_info;
-
-#ifdef CONFIG_HISI_BLK_MQ
-	/*
-	 * Record if there is any write IO after flush
-	 */
-	atomic_t wio_after_flush_fua;
-
-	/*
-	 * hisi blk-mq quirks
-	 */
-	unsigned long hisi_blk_mq_quirk_flags;
-	struct gendisk *request_queue_disk;
-	struct delayed_work flush_work;
-	atomic_t flush_work_trigger;
-
-#ifdef CONFIG_HISI_MQ_DISPATCH_DECISION
-	int sync_write_io_limit;
-	int async_write_io_limit;
-	int nr_sync_write_dispatch;
-	int nr_async_write_dispatch;
-	
-	spinlock_t statistics_update_lock;
-	
-#ifdef CONFIG_HISI_MQ_DEBUG
-	struct request *mq_sync_dispatch_rq[32];
-	unsigned long mq_sync_dispatch_rq_map;
-	struct request *mq_async_dispatch_rq[32];
-	unsigned long mq_async_dispatch_rq_map;
-#endif
-#endif
-#endif /* CONFIG_HISI_BLK_MQ */
 
 	/*
 	 * The queue owner gets to use this for whatever they like.
@@ -575,11 +529,7 @@ struct request_queue {
 	unsigned int crypto_flag;
 #endif
 
-#ifndef BLK_MQ_NO_PERCPU_REFCOUNT
 	struct percpu_ref	mq_usage_counter;
-#else
-	struct blk_mq_refcount	mq_usage_counter;
-#endif
 	struct list_head	all_q_node;
 
 	struct blk_mq_tag_set	*tag_set;
@@ -1194,23 +1144,9 @@ struct request_queue *blk_alloc_queue_node(gfp_t, int);
 extern void blk_put_queue(struct request_queue *);
 #define BLK_FLUSH_NORMAL		0
 #define BLK_FLUSH_EMERGENCY	1
-#ifdef CONFIG_HISI_BLK_MQ
-#include <linux/hisi-blk-mq.h>
-extern void blk_power_off_flush(int emergency);
-static inline void blk_flush_set_async( struct bio *bio)
-{
-	bio->bi_async_flush = 1;
-}
-static inline int blk_flush_async_support(struct block_device	*bi_bdev)
-{
-	struct request_queue *q = bdev_get_queue(bi_bdev);
-	return hisi_blk_mq_test_queue_quirk(q, HISI_MQ_FLUSH_REDUCING) ? 1 : 0;
-}
-#else
 static inline void blk_flush_set_async( struct bio *bio){}
 static inline void blk_power_off_flush(int emergency){}
 static inline int blk_flush_async_support(struct block_device	*bi_bdev){return 0;}
-#endif
 /*
  * block layer runtime pm functions
  */

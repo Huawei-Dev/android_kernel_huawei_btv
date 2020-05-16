@@ -46,7 +46,6 @@
 #include <linux/nls.h>
 #include <linux/kthread.h>
 #include <linux/wakelock.h>
-#include <linux/hisi-blk-mq.h>
 
 #include <linux/delay.h>
 
@@ -252,21 +251,6 @@ static inline bool ufshcd_valid_tag(struct ufs_hba *hba, int tag)
 	return tag >= 0 && tag < hba->nutrs;
 }
 
-#if defined(CONFIG_SCSI_HISI_MQ) && defined(CONFIG_HISI_MQ_DEBUG)
-unsigned char ufshcd_rq_timeout_enable = 0;
-unsigned char ufshcd_rq_error_enable = 0;
-void ufshcd_rq_timeout_simulate(void)
-{
-	if(ufshcd_rq_timeout_enable == 0)
-		ufshcd_rq_timeout_enable = 1;
-}
-
-void ufshcd_rq_error_simulate(void)
-{
-	if(ufshcd_rq_error_enable == 0)
-		ufshcd_rq_error_enable = 1;
-}
-#endif
 /* replace non-printable or non-ASCII characters with spaces */
 static inline void ufshcd_remove_non_printable(char *val)
 {
@@ -667,22 +651,6 @@ static int ufshcd_hba_uie_init(struct ufs_hba *hba)
 	}
 
 	return err;
-}
-#endif
-
-#ifdef CONFIG_SCSI_HISI_MQ
-static void ufshcd_continue_idle_confirm(unsigned long data)
-{
-	struct ufs_hba *hba = (struct ufs_hba *)data;
-	unsigned long flags = 0;
-	spin_lock_irqsave(hba->host->host_lock, flags);/*lint !e550*/
-	if(hba->processing_read !=0 ||hba->processing_write!=0){
-		spin_unlock_irqrestore(hba->host->host_lock, flags);/*lint !e550*/
-		return;
-	}
-	hba->continue_idle = 1;
-	spin_unlock_irqrestore(hba->host->host_lock, flags);/*lint !e550*/
-	wake_up(&hba->write_wait_queue);
 }
 #endif
 
@@ -1841,46 +1809,6 @@ static int ufshcd_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmd)
 		spin_lock_irqsave(hba->host->host_lock, flags);
 	}
 
-	/*lint -restore*/
-#ifdef CONFIG_SCSI_HISI_MQ
-	if(host->use_blk_mq){
-		if(cmd->request->cmd_type == REQ_TYPE_FS ){
-			if(cmd->request->cmd_flags & REQ_WRITE){
-				hba->continue_read = 0;
-				hba->processing_write++;
-				if(cmd->request->cmd_flags & REQ_SYNC) {
-					hba->continue_sync_write++;
-					hba->continue_sync_io++;
-					hba->continue_async_write = 0;
-				}
-				else {
-					hba->continue_async_write++;
-					hba->continue_sync_io = 0;
-					hba->continue_sync_write = 0;
-				}
-			}else{
-				hba->processing_read++;
-				hba->continue_read++;
-				hba->continue_sync_io++;
-				hba->continue_sync_write = 0;
-				hba->continue_async_write = 0;
-			}
-		}
-		if(hba->outstanding_reqs == 0){
-			del_timer(&hba->continue_idle_check);
-		}
-		hba->continue_idle = 0;
-	}
-#ifdef CONFIG_HISI_MQ_DEBUG
-#if 0
-	{
-		char log[500];
-		sprintf(log,"request %s, data_len=%d",(cmd->request->cmd_flags & REQ_WRITE) ? (cmd->request->cmd_flags & REQ_SYNC ? "SW" : "ASW"):"R", cmd->request->__data_len);
-		trace_scsi_mq_debug(__func__,log);
-	}
-#endif
-#endif
-#endif
 	ufshcd_send_command(hba, tag);
 out_unlock:
 	spin_unlock_irqrestore(hba->host->host_lock, flags);
@@ -4011,11 +3939,7 @@ static void ufshcd_set_queue_depth(struct scsi_device *sdev)
 
 	dev_dbg(hba->dev, "%s: activate tcq with queue depth %d\n",
 			__func__, lun_qdepth);
-#ifdef CONFIG_SCSI_HISI_MQ
-	scsi_change_queue_depth(sdev, (hba->host->use_blk_mq && (lun_qdepth == hba->nutrs)) ? hba->host->can_queue : lun_qdepth);
-#else
 	scsi_change_queue_depth(sdev, lun_qdepth);
-#endif
 }
 
 /*
@@ -4180,11 +4104,7 @@ static int ufshcd_change_queue_depth(struct scsi_device *sdev, int depth)
 
 	if (depth > hba->nutrs)
 		depth = hba->nutrs;
-#ifdef CONFIG_SCSI_HISI_MQ
-	return scsi_change_queue_depth(sdev, (hba->host->use_blk_mq && (depth == hba->nutrs)) ? hba->host->can_queue : depth);
-#else
 	return scsi_change_queue_depth(sdev, depth);
-#endif
 }
 
 /**
@@ -4317,14 +4237,6 @@ ufshcd_transfer_rsp_status(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
 
 	/* overall command status of utrd */
 	ocs = ufshcd_get_tr_ocs(lrbp);
-
-#if defined(CONFIG_SCSI_HISI_MQ) && defined(CONFIG_HISI_MQ_DEBUG)
-	if(ufshcd_rq_error_enable == 1){
-		ufshcd_rq_error_enable = 2;
-		ocs = OCS_FATAL_ERROR;
-		dev_err(hba->dev,"UFS MQ: <%s>  request err simulate \r\n",__func__);
-	}
-#endif
 
 	switch (ocs) {
 	case OCS_SUCCESS:
@@ -4460,40 +4372,7 @@ check:
 		if (cmd && lrbp->command_type != UTP_CMD_TYPE_DEV_MANAGE) {
 			UFSHCD_UPDATE_TAG_STATS_COMPLETION(hba, cmd);
 			result = ufshcd_transfer_rsp_status(hba, lrbp);
-			#ifdef CONFIG_SCSI_HISI_MQ
-			if(hba->host->use_blk_mq){
-				if(cmd->request && cmd->request->cmd_type == REQ_TYPE_FS){
-					if(cmd->request->cmd_flags & REQ_WRITE){
-						if(hba->processing_write){
-							hba->processing_write--;
-						}
-						else{
-							dev_err(hba->dev, "UFS MQ: <%s>  hba->processing_write has been zero! \r\n",__func__);
-						#ifdef CONFIG_HISI_MQ_DEBUG
-							BUG();
-						#endif
-						}
-					}
-					else{
-						if(hba->processing_read){
-							hba->processing_read--;
-						}
-						else{
-							dev_err(hba->dev, "UFS MQ: <%s>  &hba->processing_read has been zero! \r\n",__func__);
-						#ifdef CONFIG_HISI_MQ_DEBUG
-							BUG();
-						#endif
-						}
-					}
-					wake_up(&hba->write_wait_queue);
-				}
-			}
-			else{
-			#endif
-				scsi_dma_unmap(cmd);
-			#ifdef CONFIG_SCSI_HISI_MQ
-			}
-			#endif
+			scsi_dma_unmap(cmd);
 			cmd->result = result;
 			if(DID_OK != host_byte(result)) {
 				ufs_log_utr_limit_rate( hba, lrbp, ((u32)result << 8) | UFSHCD_ERR_REQ_FAIL );
@@ -4503,24 +4382,7 @@ check:
 			lrbp->cmd = NULL;
 			clear_bit_unlock(index, &hba->lrb_in_use);
 			/* Do not touch lrbp after scsi done */
-		#if defined(CONFIG_SCSI_HISI_MQ) && defined(CONFIG_HISI_MQ_DEBUG)
-		#if 0
-			{
-				char log[500];
-				sprintf(log,"request %s, data_len=%d",(cmd->request->cmd_flags & REQ_WRITE) ? (cmd->request->cmd_flags & REQ_SYNC ? "SW" : "ASW"):"R", cmd->request->__data_len);
-				trace_scsi_mq_debug(__func__,log);
-			}
-		#endif
-			if(hba->host->use_blk_mq && cmd->request->cmd_type == REQ_TYPE_FS && ufshcd_rq_timeout_enable == 1){
-				dev_err(hba->dev, "UFS MQ: <%s>  request timeout simulate \r\n",__func__);
-				ufshcd_rq_timeout_enable = 2;
-			}
-			else{
-				cmd->scsi_done(cmd);
-			}
-		#else
 			cmd->scsi_done(cmd);
-		#endif
 			pm_runtime_mark_last_busy(hba->dev);
 			pm_runtime_put_autosuspend(hba->dev);
 			__ufshcd_release(hba);
@@ -4532,25 +4394,6 @@ check:
 
 	/* clear corresponding bits of completed commands */
 	hba->outstanding_reqs ^= completed_reqs;
-#ifdef CONFIG_SCSI_HISI_MQ
-	if(hba->host->use_blk_mq){
-		if(hba->outstanding_reqs == 0){
-		#ifdef CONFIG_HISI_MQ_DEBUG
-			if((hba->processing_read!=0)||(hba->processing_write!=0))
-				BUG();
-		#endif
-			hba->continue_idle_check.data = (unsigned long)hba;
-			hba->continue_idle_check.function= ufshcd_continue_idle_confirm;
-			mod_timer(&hba->continue_idle_check,jiffies + msecs_to_jiffies(20));
-		}
-		else{
-			tr_doorbell = ufshcd_readl(hba, REG_UTP_TRANSFER_REQ_DOOR_BELL);
-			completed_reqs = tr_doorbell ^ hba->outstanding_reqs;
-			if(completed_reqs)
-				goto check;
-		}
-	}
-#endif
 
 	ufshcd_clk_scaling_update_busy(hba);
 
@@ -5989,15 +5832,6 @@ static int ufshcd_probe_hba(struct ufs_hba *hba)
 	set_rpmb_blk_count(rpmb_blk_count);
 #endif
 
-#ifdef CONFIG_SCSI_HISI_MQ
-	hba->host->mq_quirk_flag = 0;
-	hba->host->mq_quirk_flag |= SHOST_MQ_QUIRK(SHOST_MQ_QUIRK_FORCE_SAME_CPU);
-	hba->host->mq_quirk_flag |= SHOST_MQ_QUIRK(SHOST_MQ_QUIRK_FORCE_DISPATCH_CTX);
-	hba->host->mq_quirk_flag |= SHOST_MQ_QUIRK(SHOST_MQ_QUIRK_FORCE_SOFT_IRQ);
-	hba->host->mq_quirk_flag |= SHOST_MQ_QUIRK(SHOST_MQ_QUIRK_DISPATCH_DICISION);
-	hba->host->mq_quirk_flag |= SHOST_MQ_QUIRK(SHOST_MQ_QUIRK_FLUSH_REDUCING);
-#endif
-
 	hba->wlun_dev_clr_ua = true;
 
 	if (ufshcd_get_max_pwr_mode(hba)) {
@@ -6344,12 +6178,6 @@ static enum blk_eh_timer_return ufshcd_eh_timed_out(struct scsi_cmnd *scmd)
 			break;
 		}
 	}
-#if defined(CONFIG_SCSI_HISI_MQ) && defined(CONFIG_HISI_MQ_DEBUG)
-	if(ufshcd_rq_timeout_enable == 2){
-		spin_unlock_irqrestore(host->host_lock, flags);
-		return BLK_EH_NOT_HANDLED;
-	}
-#endif
 	spin_unlock_irqrestore(host->host_lock, flags);
 
 	if( true == found ) {
@@ -6581,52 +6409,6 @@ static int ufshcd_ioctl(struct scsi_device *dev, int cmd, void __user *buffer)
 
 	return err;
 }
-/*lint +e835*/
-
-#ifdef CONFIG_SCSI_HISI_MQ
-static int ufshcd_direct_flush(struct scsi_device *sdev, int normal);
-
-static void ufshcd_statistics_report(struct Scsi_Host *host,struct blkdev_statistics_info* info)
-{
-	struct ufs_hba *hba = shost_priv(host);
-	unsigned long flags;
-	spin_lock_irqsave(hba->host->host_lock, flags);
-	info->blkdev_processing_read = hba->processing_read;
-	info->blkdev_processing_write = hba->processing_write;
-	info->blkdev_continue_read = hba->continue_read;
-	info->blkdev_continue_sync_write = hba->continue_sync_write;
-	info->blkdev_continue_async_write = hba->continue_async_write;
-	info->blkdev_continue_idle = hba->continue_idle;
-	info->blkdev_continue_sync_io = hba->continue_sync_io;
-	spin_unlock_irqrestore(hba->host->host_lock, flags);
-}
-
-static int ufshcd_io_schedule(struct Scsi_Host *host,struct blk_dispatch_decision_para *p,int (* condition)(struct blk_dispatch_decision_para *))
-{
-	struct ufs_hba *hba = shost_priv(host);
-	DEFINE_WAIT(write_wait);/*lint !e446*/
-	do{
-		struct blkdev_statistics_info info;
-		prepare_to_wait(&hba->write_wait_queue, &write_wait, TASK_UNINTERRUPTIBLE);
-		ufshcd_statistics_report(host,&info);
-		if(condition(p))
-			break;
-		if(!io_schedule_timeout((long)HZ)){
-		#ifdef CONFIG_HISI_MQ_DEBUG
-			dev_err(hba->dev, "UFS MQ: <%s> io_schedule time out!start: continue_idle = %d processing_read = %d processing_write = %d continue_read = %d blkdev_continue_sync_write = %d blkdev_continue_async_write = %d \r\n",__func__,info.blkdev_continue_idle,info.blkdev_processing_read,info.blkdev_processing_write,info.blkdev_continue_read,info.blkdev_continue_sync_write,info.blkdev_continue_async_write);
-			dev_err(hba->dev, "UFS MQ: <%s> when timeout: continue_idle = %d processing_read = %d processing_write = %d continue_read = %d blkdev_continue_sync_write = %d blkdev_continue_async_write = %d \r\n",__func__,hba->continue_idle,hba->processing_read,hba->processing_write,hba->continue_read,hba->continue_sync_write,hba->continue_async_write);
-			trace_scsi_mq_debug(__func__,"io_schedule time out !!!");
-			if(info.blkdev_processing_read == 0 && info.blkdev_processing_write == 0){
-				BUG();
-			}
-		#endif
-		}
-	}while(1);
-	finish_wait(&hba->write_wait_queue, &write_wait);
-
-	return 0;
-}
-#endif
 
 static struct scsi_host_template ufshcd_driver_template = {
 	.module			= THIS_MODULE,
@@ -6644,12 +6426,6 @@ static struct scsi_host_template ufshcd_driver_template = {
 	.ioctl                  = ufshcd_ioctl,
 #ifdef CONFIG_COMPAT
 	.compat_ioctl           = ufshcd_ioctl,
-#endif
-#ifdef CONFIG_SCSI_HISI_MQ
-	.direct_flush 			= ufshcd_direct_flush,
-	.statistics_report		= ufshcd_statistics_report,
-	.wait_io_schedule		= ufshcd_io_schedule,
-	.disable_blk_mq = 0,
 #endif
 	.this_id		= -1,
 	.sg_tablesize		= SG_ALL,
@@ -7407,168 +7183,6 @@ out:
 		kfree(buffer);
 	return ret;
 }
-
-#ifdef CONFIG_SCSI_HISI_MQ
-static unsigned char *sync_cache_buffer;
-static int ufshcd_send_scsi_sync_cache_init(void)
-{
-	sync_cache_buffer = kzalloc((size_t)SCSI_SENSE_BUFFERSIZE, GFP_KERNEL);
-	if (!sync_cache_buffer)
-		return -ENOMEM;
-	return 0;
-}
-
-static void ufshcd_send_scsi_sync_cache_deinit(void)
-{
-	if(sync_cache_buffer)
-		kfree(sync_cache_buffer);
-}
-
-static int ufshcd_sync_cache_irq_safe(struct ufs_hba *hba,
-					struct scsi_cmnd *cmd,	unsigned int query_intr_timeout)
-{
-	int err;
-	int tag;
-	unsigned long flags;
-	struct ufshcd_lrb *lrbp;
-	volatile u32 ie_value = 0;
-	volatile u32 tr_doorbell = 0;
-
-	err = pm_runtime_get_sync(hba->dev);
-	if (err < 0) {
-		dev_err(hba->dev, "%s, failed to exit from hibernate, %d\n",__func__, err);
-		goto exit_h8;
-	}
-
-	spin_lock_irqsave(hba->host->host_lock, flags);/*lint !e730 !e550*/
-	scsi_block_requests(hba->host);
-	err = __ufshcd_wait_for_doorbell_clr(hba);
-	if (err) {
-		dev_err(hba->dev, "wait doorbell clear timeout\n");
-		goto unlock_unblock_and_enable_intr;
-	}
-
-	ie_value = ufshcd_readl(hba, REG_INTERRUPT_ENABLE);
-	if(ie_value){
-		ufshcd_writel(hba, 0, REG_INTERRUPT_ENABLE);
-	}
-
-	tag =(int)ffz(hba->lrb_in_use);
-	if(tag >= hba->nutrs)
-		goto unlock_unblock_and_enable_intr;
-
-	__set_bit(tag, &hba->lrb_in_use);
-	lrbp = &hba->lrb[tag];
-	lrbp->cmd = cmd;
-	lrbp->sense_bufflen = SCSI_SENSE_BUFFERSIZE;
-	lrbp->sense_buffer = cmd->sense_buffer;
-	lrbp->saved_sense_len = 0;
-	lrbp->task_tag = tag;
-	lrbp->lun = ufshcd_scsi_to_upiu_lun((unsigned int)cmd->device->lun);
-	lrbp->intr_cmd = false;
-	lrbp->command_type = UTP_CMD_TYPE_SCSI;
-
-	ufshcd_compose_upiu(hba, lrbp);
-	/* Make sure descriptors are ready before ringing the doorbell */
-	wmb();
-	/* issue command to the controller */
-	__set_bit(tag, &hba->outstanding_reqs);
-	ufshcd_writel(hba, 1 << tag, REG_UTP_TRANSFER_REQ_DOOR_BELL);
-	/* Make sure that doorbell is committed immediately */
-	wmb();
-	while (query_intr_timeout-- > 0) {
-		tr_doorbell = ufshcd_readl(hba, REG_UTP_TRANSFER_REQ_DOOR_BELL);
-		if (!(tr_doorbell & (1U << tag))){
-			hba->outstanding_reqs ^= (1UL << tag);
-			goto scsi_cmd_deinit;
-		}
-		udelay(50);/*lint !e778 !e774 !e747*/
-	}
-scsi_cmd_deinit:
-	lrbp->cmd = NULL;
-	__clear_bit(tag, &hba->lrb_in_use);
-unlock_unblock_and_enable_intr:
-	if(ie_value){
-		ufshcd_writel(hba, ie_value, REG_INTERRUPT_ENABLE);
-	}
-	spin_unlock_irqrestore(hba->host->host_lock, flags);/*lint !e730 !e550*/
-	scsi_unblock_requests(hba->host);
-exit_h8:
-	pm_runtime_put_autosuspend(hba->dev);
-	return err;
-}
-
-static int ufshcd_send_scsi_sync_cache_on_specified_disk(struct ufs_hba *hba,
-				       struct scsi_device *sdp,int normal)
-{
-	int ret;
-	struct scsi_cmnd cmnd = {0};
-	unsigned char cmd[10] = {0};
-	cmd[0] = SYNCHRONIZE_CACHE;
-	ufshcd_compose_scsi_cmd(&cmnd, sdp, cmd, sync_cache_buffer, DMA_NONE, NULL, 0, 0);
-	if(normal)
-		ret = ufshcd_queuecommand_directly(hba, &cmnd, (unsigned int)20000);
-	else{
-		ret = ufshcd_sync_cache_irq_safe(hba, &cmnd, (unsigned int)100000);
-		printk(KERN_EMERG "UFS:<%s> Emergency sync cache lun=%llu ret = %d \r\n", __func__,sdp->lun,ret);
-	}
-	return ret;
-}
-
-static int ufshcd_trylock_hostlock(struct ufs_hba *hba,unsigned long* flags)
-{
-	int locked = 0;
-	unsigned int trycount = 100000;
-	do{
-		locked = spin_trylock_irqsave(hba->host->host_lock, *flags);/*lint !e730 !e550 !e1072 !e666*/
-		if(locked)
-			break;
-		udelay(10);/*lint !e778 !e774 !e747*/
-	}while(--trycount>0);
-	return locked;
-}
-
-static int ufshcd_direct_flush(struct scsi_device *sdev, int normal)
-{
-	int ret;
-	unsigned long flags;
-	struct Scsi_Host *host = sdev->host;
-	struct ufs_hba *hba = shost_priv(host);
-	if (!sdev){
-		dev_err(hba->dev, "%s, sdev is null!\n",__func__);
-		return -ENODEV;
-	}
-	if(hba->is_sys_suspended){/*If ufs is suspended, it's uncessary to flush the cache*/
-		dev_err(hba->dev, "%s, sys has suspended!\n",__func__);
-		return 0;
-	}
-	if(normal)
-		spin_lock_irqsave(hba->host->host_lock, flags);/*lint !e730 !e550*/
-	else{
-		if(!ufshcd_trylock_hostlock(hba,&flags)){/*Get hostlock timeout, the abnormal context may have the locker*/
-			dev_err(hba->dev, "%s, can't get the hostlock!\n",__func__);
-			return -EIO;
-		}
-	}
-	ret = scsi_device_get(sdev);
-	if (!ret && !scsi_device_online(sdev)){
-		dev_err(hba->dev, "%s, scsi_device_get error or device not online, %d\n",__func__, ret);
-		ret = -ENODEV;
-	}
-	if (hba->ufshcd_state != UFSHCD_STATE_OPERATIONAL){
-		dev_err(hba->dev, "%s, ufshcd_state isn't operational, ufshcd_state = %d\n",__func__, hba->ufshcd_state);
-		ret = SCSI_MLQUEUE_HOST_BUSY;
-	}
-	spin_unlock_irqrestore(hba->host->host_lock, flags);/*lint !e730 !e550*/
-	if (ret){
-		scsi_device_put(sdev);
-		return ret;
-	}
-	ret = ufshcd_send_scsi_sync_cache_on_specified_disk(hba,sdev,normal);
-	scsi_device_put(sdev);
-	return ret;
-}
-#endif
 
 /**
  * ufshcd_set_dev_pwr_mode - sends START STOP UNIT command to set device
@@ -8454,23 +8068,6 @@ int ufshcd_init(struct ufs_hba *hba, void __iomem *mmio_base, unsigned int irq)
 	/* init stats before all */
 	ufshcd_init_stats( &(hba->ufs_stats) );
 
-#ifdef CONFIG_SCSI_HISI_MQ
-	hba->processing_read = 0;
-	hba->processing_write = 0;
-	hba->continue_read = 0;
-	hba->continue_sync_write = 0;
-	hba->continue_async_write = 0;
-	hba->continue_sync_io = 0;
-	hba->continue_idle = 1;
-
-	init_timer(&hba->continue_idle_check);
-
-	init_waitqueue_head(&hba->write_wait_queue);
-	err = ufshcd_send_scsi_sync_cache_init();
-	if(err)
-		goto out_error;
-#endif
-
 	err = ufshcd_hba_init(hba);
 	if (err) {
 		ufs_log_hci_all_regs(hba, UFSHCD_ERR_INIT_SOC);
@@ -8511,14 +8108,6 @@ int ufshcd_init(struct ufs_hba *hba, void __iomem *mmio_base, unsigned int irq)
 	host->unique_id = host->host_no;
 	host->max_cmd_len = MAX_CDB_SIZE;
 	host->set_dbd_for_caching = 1;
-
-#ifdef CONFIG_SCSI_HISI_MQ
-	if(host->use_blk_mq){
-		host->nr_hw_queues = (unsigned) nr_cpu_ids;
-		host->mq_queue_depth =  UFS_MQ_MAX_HARDWARE_SLOTS_PER_CPU;
-		host->can_queue = host->mq_queue_depth * (int)host->nr_hw_queues;
-	}
-#endif
 
 	hba->max_pwr_info.is_valid = false;
 	hba->init_retry = 6;
@@ -8610,9 +8199,6 @@ out_disable:
 	scsi_host_put(host);
 	ufshcd_hba_exit(hba);
 out_error:
-#ifdef CONFIG_SCSI_HISI_MQ
-	ufshcd_send_scsi_sync_cache_deinit();
-#endif
 	return err;
 }
 EXPORT_SYMBOL_GPL(ufshcd_init);

@@ -13,7 +13,6 @@
 
 #include "blk.h"
 #include "blk-mq.h"
-#include "hisi-blk-mq.h"
 
 struct queue_sysfs_entry {
 	struct attribute attr;
@@ -794,8 +793,6 @@ int blk_register_queue(struct gendisk *disk)
 
 	if (WARN_ON(!q))
 		return -ENXIO;
-
-	blk_request_queue_disk_register(disk,q);
 
 	/*
 	 * SCSI probing may synchronously create and destroy a lot of

@@ -41,9 +41,6 @@
 #include "blk.h"
 #include "blk-mq.h"
 
-#include "hisi-blk-mq-dispatch-strategy.h"
-#include "hisi-blk-mq-debug.h"
-
 #ifdef CONFIG_HISI_BLOCK_FREQUENCE_CONTROL
 #include "hisi_freq_ctl.h"
 #endif
@@ -1663,8 +1660,6 @@ void init_request_from_bio(struct request *req, struct bio *bio)
 #endif
 	req_latency_check(req,REQ_PROC_STAGE_INIT_FROM_BIO);
 
-	hisi_blk_mq_init_req_timestamp(req);
-
 	req->cmd_flags |= bio->bi_rw & REQ_COMMON_MASK;
 	if (bio->bi_rw & REQ_RAHEAD)
 		req->cmd_flags |= REQ_FAILFAST_MASK;
@@ -2648,8 +2643,6 @@ bool blk_update_request(struct request *req, int error, unsigned int nr_bytes)
 
 	trace_block_rq_complete(req->q, req, nr_bytes);
 
-	blk_mq_debug_rq_processing_state_update(req, MQ_PROCESS_UPDATE_RQ);
-
 #ifdef CONFIG_WBT
 	/*lint -save -e514*/
 	blk_stat_add(&req->q->rq_stats[rq_data_dir(req)], req);
@@ -2704,8 +2697,6 @@ bool blk_update_request(struct request *req, int error, unsigned int nr_bytes)
 				   __func__, error_type, req->rq_disk ?
 				   req->rq_disk->disk_name : "?",
 				   (unsigned long long)blk_rq_pos(req));
-
-		blk_mq_debug_update_request_error();
 	}
 
 	blk_account_io_completion(req, nr_bytes);

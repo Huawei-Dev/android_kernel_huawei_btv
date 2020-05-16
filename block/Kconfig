@@ -128,24 +128,6 @@ config MMC_BLOCK_IOMMU_64BIT
         help
         Blk-setting will use address >4G for IOMMU.
 
-config HISI_BLK_MQ
-	bool "hisi blk-mq"
-	depends on BLOCK
-	help
-	    hisi block multi queue
-
-config HISI_MQ_DEBUG
-	bool "HISI Multi Queue Debug"
-	depends on BLOCK
-	depends on HISI_BLK_MQ
-	default n
-
-config HISI_MQ_DISPATCH_DECISION
-	bool "HISI Multi Queue dispatch strategy"
-	depends on BLOCK
-	depends on HISI_BLK_MQ
-	default n
-	
 config HISI_IO_LATENCY_TRACE
 	bool "HISI IO LATENCY trace"
 	depends on BLOCK
