@@ -25,6 +25,8 @@
 #include <linux/amba/bus.h>
 #include <linux/amba/serial.h>
 #include <linux/delay.h>
+#include <linux/version.h>
+#include <linux/kthread.h>
 
 #define UART_NR			14
 
@@ -35,8 +37,10 @@ struct vendor_data {
 	bool			oversampling;
 	bool			dma_threshold;
 	bool			cts_event_workaround;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
 	bool			always_enabled;
 	bool			fixed_options;
+#endif
 
 	unsigned int (*get_fifosize)(struct amba_device *dev);
 };
@@ -79,11 +83,6 @@ extern int get_console_name(char *name, int name_buf_len);
 #define UART_TX_CPUON_DEF		3		/* default cpu id */
 #define UART_TX_CPUON_NOTSET	(-1)
 struct uart_tx_unit {
-#ifdef PL011_UART_TX_WORK
-	struct work_struct		tx_work;
-#else
-	struct tasklet_struct	tx_work;
-#endif
 	unsigned int			tx_valid; /* enable or not */
 	int						tx_cpuid;   /* -1:not set */
 	int						max_cpus;
@@ -100,6 +99,9 @@ struct uart_tx_unit {
 	unsigned long			tx_uart_fifo_full;
 	unsigned long			tx_uart_fifo_full_lost;
 	unsigned long			tx_uart_tasklet_run;
+	wait_queue_head_t		waitqueue;
+	atomic_t			 	tx_sig;
+	struct task_struct		*thread;
 };
 #endif
 
@@ -118,9 +120,14 @@ struct uart_tx_unit {
 	unsigned int		lcrh_tx;	/* vendor-specific */
 	unsigned int		lcrh_rx;	/* vendor-specific */
 	unsigned int		old_cr;		/* state during shutdown */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
+#else
 	struct delayed_work	tx_softirq_work;
-	unsigned int		fixed_baud;	/* vendor-set fixed baud rate */
+#endif
 	bool			autorts;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
+	unsigned int		fixed_baud;	/* vendor-set fixed baud rate */
+#endif
 	unsigned int		tx_irq_seen;	/* 0=none, 1=1, 2=2 or more */
 	char			type[12];
 #ifdef CONFIG_DMA_ENGINE

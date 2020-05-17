@@ -47,13 +47,9 @@ const struct file_operations pl011_tx_stat_ops = {
 };
 
 #ifdef CONFIG_SERIAL_AMBA_PL011_CONSOLE
-#ifdef PL011_UART_TX_WORK
-void pl011_uart_tx_work(struct work_struct *work)
-#else
-void pl011_uart_tx_work(unsigned long work)
-#endif
+static int pl011_uart_tx_work(void *arg)
 {
-	struct uart_tx_unit *unit = (struct uart_tx_unit *)work;
+	struct uart_tx_unit *unit = (struct uart_tx_unit *)arg;
 	struct uart_amba_port *uap = container_of(unit, struct uart_amba_port, tx_unit);
 	static char local_static_buf[PL011_TX_LOCAL_BUF_SIZE] = "";
 	unsigned int out_len = 0;
@@ -63,115 +59,123 @@ void pl011_uart_tx_work(unsigned long work)
 	int ret, timeout = TX_WORK_TIMEOUT;
 	unsigned long flags = 0;
 	unsigned int fbrd = 0, ibrd = 0, lcrh_rx = 0, lcrh_tx = 0;
+	__set_current_state(TASK_RUNNING);
+	while (!kthread_should_stop()) {
+		/* Wait for data to actually write */
+		(void)wait_event_interruptible(unit->waitqueue,
+					 atomic_read(&unit->tx_sig) ||
+					 kthread_should_stop());
+		if (kthread_should_stop())
+			break;
+print_retry:
+		timeout = TX_WORK_TIMEOUT;
+		unit->tx_uart_tasklet_run++;
 
-	unit->tx_uart_tasklet_run++;
+		local_irq_save(flags);
 
-	local_irq_save(flags);
-
-	/* lock uart port */
-	if (uap->port.sysrq) {
-		locked = 0;
-	}
-	else if (oops_in_progress) {
-		locked = spin_trylock(&uap->port.lock);
-	}
-	else
-		spin_lock(&uap->port.lock);
-
-	ret = clk_enable(uap->clk);
-	if (ret) {
-		printk(KERN_ERR	"could not enable clock\n");
-	}
-
-	fbrd = readw(uap->port.membase + UART011_FBRD);
-	ibrd = readw(uap->port.membase + UART011_IBRD);
-	lcrh_rx = readw(uap->port.membase + uap->lcrh_rx);
-	if (uap->lcrh_tx != uap->lcrh_rx)
-		lcrh_tx = readw(uap->port.membase + uap->lcrh_tx);
-	writew(uap->console_fbrd, uap->port.membase + UART011_FBRD);
-	writew(uap->console_ibrd, uap->port.membase + UART011_IBRD);
-	writew(uap->console_lcrh_rx, uap->port.membase + uap->lcrh_rx);
-	if (uap->lcrh_tx != uap->lcrh_rx) {
-		int i;
-		/*
-		* Wait 10 PCLKs before writing LCRH_TX register,
-		* to get this delay write read only register 10 times
-		*/
-		for (i = 0; i < 10; ++i)
-			writew(0xff, uap->port.membase + UART011_MIS);
-		writew(uap->console_lcrh_tx, uap->port.membase + uap->lcrh_tx);
-	}
-
-	/*
-	 *	First save the CR then disable the interrupts
-	 */
-	old_cr = readw(uap->port.membase + UART011_CR);
-	new_cr = old_cr & ~UART011_CR_CTSEN;
-	new_cr |= UART01x_CR_UARTEN | UART011_CR_TXE;
-	writew(new_cr, uap->port.membase + UART011_CR);
-
-	/* fifo out and send */
-	spin_lock(&unit->tx_lock_in);
-	out_len = kfifo_out(&unit->tx_fifo, local_static_buf, PL011_TX_LOCAL_BUF_SIZE);
-	spin_unlock(&unit->tx_lock_in);
-	unit->tx_out += out_len;
-	for (pos = 0; pos < out_len; pos++) {
-		if (('\n' == local_static_buf[pos]) && (0 != pos) && ('\r' != local_static_buf[pos-1])) {
-			pl011_console_putchar(&uap->port, '\r');
+		/* lock uart port */
+		if (uap->port.sysrq) {
+			locked = 0;
 		}
-		pl011_console_putchar(&uap->port, local_static_buf[pos]);
-		unit->tx_sent++;
-	}
-
-	/* still something to print, call another work */
-	if (kfifo_len(&unit->tx_fifo) > 0) {
-		if ((-1 == unit->tx_cpuid) || (unit->max_cpus <= unit->tx_cpuid)) {
-			schedule_work(&unit->tx_work);
-		} else {
-			schedule_work_on(unit->tx_cpuid, &unit->tx_work);
+		else if (oops_in_progress) {
+			locked = spin_trylock(&uap->port.lock);
 		}
-	}
+		else {
+			spin_lock(&uap->port.lock);
+			locked = 1;
+		}
 
-	/*
-	 *	Finally, wait for transmitter to become empty
-	 *	and restore the TCR
-	 */
-	do {
-		status = readw(uap->port.membase + UART01x_FR);
-	} while ((status & UART01x_FR_BUSY) && timeout--);
-	writew(old_cr, uap->port.membase + UART011_CR);
+		ret = clk_enable(uap->clk);
+		if (ret) {
+			printk(KERN_ERR	"could not enable clock\n");
+		}
 
-	if (timeout == -1) {
-		printk(KERN_ERR "%s: PL011 tx work timeout\n", __func__);
-	}
+		fbrd = readw(uap->port.membase + UART011_FBRD);
+		ibrd = readw(uap->port.membase + UART011_IBRD);
+		lcrh_rx = readw(uap->port.membase + uap->lcrh_rx);
+		if (uap->lcrh_tx != uap->lcrh_rx)
+			lcrh_tx = readw(uap->port.membase + uap->lcrh_tx);
+		writew(uap->console_fbrd, uap->port.membase + UART011_FBRD);
+		writew(uap->console_ibrd, uap->port.membase + UART011_IBRD);
+		writew(uap->console_lcrh_rx, uap->port.membase + uap->lcrh_rx);
+		if (uap->lcrh_tx != uap->lcrh_rx) {
+			int i;
+			/*
+			* Wait 10 PCLKs before writing LCRH_TX register,
+			* to get this delay write read only register 10 times
+			*/
+			for (i = 0; i < 10; ++i)
+				writew(0xff, uap->port.membase + UART011_MIS);
+			writew(uap->console_lcrh_tx, uap->port.membase + uap->lcrh_tx);
+		}
 
-	writew(fbrd, uap->port.membase + UART011_FBRD);
-	writew(ibrd, uap->port.membase + UART011_IBRD);
-	writew(lcrh_rx, uap->port.membase + uap->lcrh_rx);
-	if (uap->lcrh_tx != uap->lcrh_rx) {
-		int i;
 		/*
-		* Wait 10 PCLKs before writing LCRH_TX register,
-		* to get this delay write read only register 10 times
-		*/
-		for (i = 0; i < 10; ++i)
-			writew(0xff, uap->port.membase + UART011_MIS);
-		writew(lcrh_tx, uap->port.membase + uap->lcrh_tx);
-	}
+		 *	First save the CR then disable the interrupts
+		 */
+		old_cr = readw(uap->port.membase + UART011_CR);
+		new_cr = old_cr & ~UART011_CR_CTSEN;
+		new_cr |= UART01x_CR_UARTEN | UART011_CR_TXE;
+		writew(new_cr, uap->port.membase + UART011_CR);
+
+		/* fifo out and send */
+		spin_lock(&unit->tx_lock_in);
+		out_len = kfifo_out(&unit->tx_fifo, local_static_buf, PL011_TX_LOCAL_BUF_SIZE);
+		spin_unlock(&unit->tx_lock_in);
+		unit->tx_out += out_len;
+		for (pos = 0; pos < out_len; pos++) {
+			if (('\n' == local_static_buf[pos]) && (0 != pos) && ('\r' != local_static_buf[pos-1])) {
+				pl011_console_putchar(&uap->port, '\r');
+			}
+			pl011_console_putchar(&uap->port, local_static_buf[pos]);
+			unit->tx_sent++;
+		}
+
+		/*
+		 *	Finally, wait for transmitter to become empty
+		 *	and restore the TCR
+		 */
+		do {
+			status = readw(uap->port.membase + UART01x_FR);
+		} while ((status & UART01x_FR_BUSY) && timeout--);
+		writew(old_cr, uap->port.membase + UART011_CR);
+
+		if (timeout == -1) {
+			printk(KERN_ERR "%s: PL011 tx work timeout\n", __func__);
+		}
+
+		writew(fbrd, uap->port.membase + UART011_FBRD);
+		writew(ibrd, uap->port.membase + UART011_IBRD);
+		writew(lcrh_rx, uap->port.membase + uap->lcrh_rx);
+		if (uap->lcrh_tx != uap->lcrh_rx) {
+			int i;
+			/*
+			* Wait 10 PCLKs before writing LCRH_TX register,
+			* to get this delay write read only register 10 times
+			*/
+			for (i = 0; i < 10; ++i)
+				writew(0xff, uap->port.membase + UART011_MIS);
+			writew(lcrh_tx, uap->port.membase + uap->lcrh_tx);
+		}
 
 #ifdef CONFIG_ARCH_HI6XXX
-	if (false == Chip_Verification_Check_Debug(CHIP_VERIFICATION_UART_DEBUG)) {
-		clk_disable(uap->clk);
-	}
+		if (false == Chip_Verification_Check_Debug(CHIP_VERIFICATION_UART_DEBUG)) {
+			clk_disable(uap->clk);
+		}
 #else
-		clk_disable(uap->clk);
+			clk_disable(uap->clk);
 #endif
 
-	/* unlock uart port */
-	if (locked)
-		spin_unlock(&uap->port.lock);
+		/* unlock uart port */
+		if (locked)
+			spin_unlock(&uap->port.lock);
 
-	local_irq_restore(flags);
+		local_irq_restore(flags);
+		if (kfifo_len(&unit->tx_fifo) > 0) {
+			goto print_retry;
+		}
+		atomic_set(&unit->tx_sig, 0);
+	}
+	return 0;
 }
 int pl011_tx_work_init(struct uart_amba_port *uap, unsigned int aurt_tx_buf_size, int cpuid)
 {
@@ -182,16 +186,21 @@ int pl011_tx_work_init(struct uart_amba_port *uap, unsigned int aurt_tx_buf_size
 	ret = kfifo_alloc(&unit->tx_fifo, aurt_tx_buf_size, GFP_KERNEL | __GFP_ZERO);
 	if (ret) {
 		printk(KERN_ERR "%s: port[%d] malloc fail\n", __func__, uap->port.line);
+		unit->tx_valid = 0;
 		return ret;
 	}
 
 	spin_lock_init(&unit->tx_lock_in);
 
-#ifdef PL011_UART_TX_WORK
-	INIT_WORK(&unit->tx_work, pl011_uart_tx_work);
-#else
-	tasklet_init(&unit->tx_work, pl011_uart_tx_work, (unsigned long)unit);
-#endif
+	atomic_set(&unit->tx_sig, 0);
+	init_waitqueue_head(&unit->waitqueue);
+	unit->thread = kthread_create(pl011_uart_tx_work, unit, "uart console thread");
+	if (IS_ERR(unit->thread)) {
+		ret = PTR_ERR(unit->thread);
+		printk(KERN_ERR "%s: Couldn't create kthread (%d)\n", __func__, ret);
+		unit->tx_valid = 0;
+		return ret;
+	}
 
 	unit->tx_got  = 0;
 	unit->tx_uart_fifo_full = 0;
@@ -208,6 +217,11 @@ int pl011_tx_work_init(struct uart_amba_port *uap, unsigned int aurt_tx_buf_size
 	unit->tx_buf_over_size = 0;
 	unit->tx_uart_tasklet_run = 0;
 
+	if ((-1 != unit->tx_cpuid) || (unit->max_cpus >= unit->tx_cpuid) ) {
+		kthread_bind(unit->thread, unit->tx_cpuid);
+	}
+	wake_up_process(unit->thread);
+
 	snprintf(dbgfs_name, 16, "uart%d_stat", uap->port.line);
 #ifdef CONFIG_HISI_DEBUG_FS
 	debugfs_create_file(dbgfs_name, S_IRUGO, NULL, unit, &pl011_tx_stat_ops);
@@ -222,6 +236,7 @@ int pl011_tx_work_uninit(struct uart_amba_port *uap)
 	if (!unit->tx_valid) {
 		return -ENODEV;
 	}
+	kthread_stop(unit->thread);
 	unit->tx_valid   = 0;
 	unit->tx_cpuid = UART_TX_CPUON_NOTSET;
 	kfifo_free(&unit->tx_fifo);
@@ -285,15 +300,8 @@ pl011_console_write_tx(struct console *co, const char *s, unsigned int count)
 	} else {
 		unit->tx_buf_max = max(unit->tx_buf_max, (unsigned long)fifo_len);
 	}
-#ifdef PL011_UART_TX_WORK
-	if ((-1 == unit->tx_cpuid) || (unit->max_cpus <= unit->tx_cpuid) || !cpu_online(unit->tx_cpuid)) {
-		schedule_work(&unit->tx_work);
-	} else {
-		schedule_work_on(unit->tx_cpuid, &unit->tx_work);
-	}
-#else
-	tasklet_schedule(&unit->tx_work);
-#endif
+	atomic_inc(&unit->tx_sig);
+	wake_up_interruptible(&unit->waitqueue);
 	spin_unlock_irqrestore(&unit->tx_lock_in, flag);
 
 }
@@ -375,7 +383,7 @@ void hisi_pl011_probe_console_enable(struct amba_device *dev, struct uart_amba_p
 	char console_uart_name[8] = "";
 
 	if (0 == get_console_name(console_uart_name, sizeof(console_uart_name))) {
-		if (0 == strcmp(console_uart_name, amba_console_name))
+		if (0 == strncmp(console_uart_name, amba_console_name,8))
 			console_uart_name_is_ttyAMA = 1;
 	}
 	if (console_uart_name_is_ttyAMA && (get_console_index() == (int)uap->port.line)) {
@@ -448,9 +456,11 @@ int hisi_pl011_suspend(struct device *dev)
 
 	if (!uap)
 		return -EINVAL;
+	uap->pm_op_in_progress = 1;
 	dev_info(uap->port.dev, "%s: +\n", __func__);
 	ret = uart_suspend_port(&amba_reg, &uap->port);
 	dev_info(uap->port.dev, "%s: -\n", __func__);
+	uap->pm_op_in_progress = 0;
 	return ret;
 }
 
@@ -461,9 +471,11 @@ int hisi_pl011_resume(struct device *dev)
 
 	if (!uap)
 		return -EINVAL;
+	uap->pm_op_in_progress = 1;
 	dev_info(uap->port.dev, "%s: +\n", __func__);
 	ret =  uart_resume_port(&amba_reg, &uap->port);
 	dev_info(uap->port.dev, "%s: -\n", __func__);
+	uap->pm_op_in_progress = 0;
 	return ret;
 }
 #endif
