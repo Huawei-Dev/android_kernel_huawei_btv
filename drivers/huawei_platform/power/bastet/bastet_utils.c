@@ -707,7 +707,9 @@ int unbind_local_ports(u16 local_port)
 	}
 
 	if (find_port && ex_find_port) {
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 1, 0))
 		atomic_dec(&hashinfo->bsockets);
+#endif
 		tb->num_owners--;
 		sk = hlist_entry(tb->owners.first, struct sock, sk_bind_node);
 		__sk_del_bind_node(sk);
@@ -715,8 +717,9 @@ int unbind_local_ports(u16 local_port)
 			sk_free(sk);
 
 		inet_bind_bucket_destroy(hashinfo->bind_bucket_cachep, tb);
-
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 1, 0))
 		atomic_dec(&hashinfo->bsockets);
+#endif
 		extb->num_owners--;
 		exsk = hlist_entry(extb->owners.first,
 			struct sock, sk_bind_node);

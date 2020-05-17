@@ -1084,6 +1084,9 @@ static void pl011_dma_startup(struct uart_amba_port *uap)
 		goto skip_rx;
 
 	/* Allocate and map DMA RX buffers */
+#ifdef CONFIG_HISI_AMBA_PL011
+	if (!uap->pm_op_in_progress) {
+#endif
 	ret = pl011_sgbuf_init(uap->dmarx.chan, &uap->dmarx.sgbuf_a,
 			       DMA_FROM_DEVICE);
 	if (ret) {
@@ -1101,7 +1104,9 @@ static void pl011_dma_startup(struct uart_amba_port *uap)
 				 DMA_FROM_DEVICE);
 		goto skip_rx;
 	}
-
+#ifdef CONFIG_HISI_AMBA_PL011
+	}
+#endif
 	uap->using_rx_dma = true;
 
 skip_rx:
@@ -1173,8 +1178,14 @@ static void pl011_dma_shutdown(struct uart_amba_port *uap)
 	if (uap->using_rx_dma) {
 		dmaengine_terminate_all(uap->dmarx.chan);
 		/* Clean up the RX DMA */
+#ifdef CONFIG_HISI_AMBA_PL011
+		if (!uap->pm_op_in_progress) {
+#endif
 		pl011_sgbuf_free(uap->dmarx.chan, &uap->dmarx.sgbuf_a, DMA_FROM_DEVICE);
 		pl011_sgbuf_free(uap->dmarx.chan, &uap->dmarx.sgbuf_b, DMA_FROM_DEVICE);
+#ifdef CONFIG_HISI_AMBA_PL011
+		}
+#endif
 		if (uap->dmarx.poll_rate)
 			del_timer_sync(&uap->dmarx.timer);
 		uap->using_rx_dma = false;
@@ -1616,6 +1627,11 @@ static int pl011_hwinit(struct uart_port *port)
 	    container_of(port, struct uart_amba_port, port);
 	int retval;
 
+#ifndef CONFIG_HISI_AMBA_PL011
+	/* Optionaly enable pins to be muxed in and configured */
+	pinctrl_pm_select_default_state(port->dev);
+#endif
+
 	/*
 	 * Try to enable the clock producer.
 	 */
@@ -1653,8 +1669,6 @@ static int pl011_hwinit(struct uart_port *port)
 			return retval;
 		}
 	}
-#else
-	pinctrl_pm_select_default_state(port->dev);
 #endif
 	return 0;
 }
@@ -1795,12 +1809,6 @@ static void pl011_shutdown_channel(struct uart_amba_port *uap,
 static void pl011_disable_uart(struct uart_amba_port *uap)
 {
 	unsigned int cr;
-#ifdef CONFIG_HISI_AMBA_PL011
-	int retval;
-
-	if (port)
-	    dev_info(port->dev, "%s: ttyAMA%d\n", __func__, port->line);
-#endif
 
 	uap->autorts = false;
 	spin_lock_irq(&uap->port.lock);
@@ -1835,7 +1843,12 @@ static void pl011_shutdown(struct uart_port *port)
 {
 	struct uart_amba_port *uap =
 		container_of(port, struct uart_amba_port, port);
+#ifdef CONFIG_HISI_AMBA_PL011
+	int retval;
 
+	if (port)
+	    dev_info(port->dev, "%s: ttyAMA%d\n", __func__, port->line);
+#endif
 	pl011_disable_interrupts(uap);
 
 	pl011_dma_shutdown(uap);
@@ -2157,8 +2170,6 @@ static struct uart_ops amba_pl011_pops = {
 #endif
 };
 
-#ifdef CONFIG_HISI_AMBA_PL011
-#else
 static void sbsa_uart_set_mctrl(struct uart_port *port, unsigned int mctrl)
 {
 }
@@ -2190,6 +2201,8 @@ static const struct uart_ops sbsa_uart_pops = {
 #endif
 };
 
+#ifdef CONFIG_HISI_AMBA_PL011
+#else
 static struct uart_amba_port *amba_ports[UART_NR];
 #endif
 
@@ -2505,12 +2518,25 @@ static int pl011_setup_port(struct device *dev, struct uart_amba_port *uap,
 			    struct resource *mmiobase, int index)
 {
 	void __iomem *base;
+	int ret;
+
+#ifdef CONFIG_HISI_AMBA_PL011
+struct amba_device *pdev = container_of(dev,struct amba_device,dev);
+#endif
 
 	base = devm_ioremap_resource(dev, mmiobase);
 	if (!base)
 		return -ENOMEM;
 
 	index = pl011_probe_dt_alias(index, dev);
+	
+#ifdef CONFIG_HISI_AMBA_PL011
+	ret = hisi_pl011_pinctrl(pdev, uap);
+	if (ret) {
+		dev_err(&pdev->dev, "%s get pinctrl failed!!\n", __func__);
+		return ret;
+	}
+#endif
 
 	uap->old_cr = 0;
 	uap->port.dev = dev;
@@ -2522,6 +2548,23 @@ static int pl011_setup_port(struct device *dev, struct uart_amba_port *uap,
 	uap->port.line = index;
 
 	amba_ports[index] = uap;
+	
+#ifdef CONFIG_HISI_AMBA_PL011
+	ret = hisi_pl011_probe_reset_func_enable(pdev, uap);
+	if (ret) {
+		dev_err(&pdev->dev, "%s can not enable reset function!\n", __func__);
+	}
+
+	ret = clk_prepare_enable(uap->clk);
+	if (ret) {
+		dev_err(&pdev->dev, "%s clk_prepare_enable failed!!\n", __func__);
+		return ret;
+	}
+
+	clk_disable_unprepare(uap->clk);
+
+	hisi_pl011_probe_console_enable(pdev, uap, amba_console.name);
+#endif
 
 	return 0;
 }
@@ -2574,7 +2617,13 @@ static int pl011_probe(struct amba_device *dev, const struct amba_id *id)
 	uap->clk = devm_clk_get(&dev->dev, NULL);
 	if (IS_ERR(uap->clk))
 		return PTR_ERR(uap->clk);
-
+#ifdef CONFIG_HISI_AMBA_PL011
+	ret = hisi_pl011_probe_get_clk_freq(dev, uap, portnr);
+	if (ret) {
+		dev_err(&dev->dev, "%s can not get clk freq!\n", __func__);
+	}
+	uap->pm_op_in_progress = 0;
+#endif
 	uap->vendor = vendor;
 	uap->lcrh_rx = vendor->lcrh_rx;
 	uap->lcrh_tx = vendor->lcrh_tx;

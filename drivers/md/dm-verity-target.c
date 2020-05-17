@@ -770,7 +770,7 @@ static void verity_finish_io(struct dm_verity_io *io, int error)
 
 	verity_fec_finish_io(io);
 
-	bio_endio_nodec(bio, error);
+	bio_endio(bio, error);
 }
 
 static void verity_work(struct work_struct *w)
