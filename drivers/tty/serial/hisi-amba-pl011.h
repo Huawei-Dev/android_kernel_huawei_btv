@@ -35,6 +35,8 @@ struct vendor_data {
 	bool			oversampling;
 	bool			dma_threshold;
 	bool			cts_event_workaround;
+	bool			always_enabled;
+	bool			fixed_options;
 
 	unsigned int (*get_fifosize)(struct amba_device *dev);
 };
@@ -117,6 +119,7 @@ struct uart_tx_unit {
 	unsigned int		lcrh_rx;	/* vendor-specific */
 	unsigned int		old_cr;		/* state during shutdown */
 	struct delayed_work	tx_softirq_work;
+	unsigned int		fixed_baud;	/* vendor-set fixed baud rate */
 	bool			autorts;
 	unsigned int		tx_irq_seen;	/* 0=none, 1=1, 2=2 or more */
 	char			type[12];
@@ -128,6 +131,7 @@ struct uart_tx_unit {
 	struct pl011_dmatx_data	dmatx;
 	bool			dma_probed;
 #endif
+	int			pm_op_in_progress;
 #ifdef CONFIG_SERIAL_AMBA_PL011_CONSOLE
 	bool reset;
 	void __iomem *reset_reg_base;
