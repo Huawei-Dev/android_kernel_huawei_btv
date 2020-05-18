@@ -1396,7 +1396,9 @@ static int nf_tables_newchain(struct sock *nlsk, struct sk_buff *skb,
 			ops->priority	= priority;
 			ops->priv	= chain;
 			ops->hook	= afi->hooks[ops->hooknum];
+#ifdef CONFIG_NETFILTER_INGRESS
 			ops->dev	= table->dev;
+#endif
 			if (hookfn)
 				ops->hook = hookfn;
 			if (afi->hook_ops_init)

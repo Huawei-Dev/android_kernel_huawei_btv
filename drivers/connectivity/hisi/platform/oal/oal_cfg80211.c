@@ -957,7 +957,10 @@ oal_uint32  oal_cfg80211_disconnected(
                     oal_uint32                  ul_ie_len,
                     oal_gfp_enum_uint8          en_gfp)
 {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,34))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,0))
+    cfg80211_disconnected(pst_net_device,us_reason, puc_ie, ul_ie_len, 0,en_gfp);
+    return OAL_SUCC;
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,34))
     cfg80211_disconnected(pst_net_device,us_reason, puc_ie, ul_ie_len, en_gfp);
 
     return OAL_SUCC;
