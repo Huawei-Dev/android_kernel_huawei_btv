@@ -754,97 +754,17 @@ static u32 pmu_read_counter(struct perf_event *event)
 	return value;
 }
 
-static void pmu_write_counter(struct cci_pmu *cci_pmu, u32 value, int idx)
+static void pmu_write_counter(struct perf_event *event, u32 value)
 {
-	pmu_write_register(cci_pmu, value, idx, CCI_PMU_CNTR);
-}
+	struct cci_pmu *cci_pmu = to_cci_pmu(event->pmu);
+	struct hw_perf_event *hw_counter = &event->hw;
+	int idx = hw_counter->idx;
 
-static void __pmu_write_counters(struct cci_pmu *cci_pmu, unsigned long *mask)
-{
-	int i;
-	struct cci_pmu_hw_events *cci_hw = &cci_pmu->hw_events;
-
-	for_each_set_bit(i, mask, cci_pmu->num_cntrs) {
-		struct perf_event *event = cci_hw->events[i];
-
-		if (WARN_ON(!event))
-			continue;
-		pmu_write_counter(cci_pmu, local64_read(&event->hw.prev_count), i);
-	}
-}
-
-static void pmu_write_counters(struct cci_pmu *cci_pmu, unsigned long *mask)
-{
-	if (cci_pmu->model->write_counters)
-		cci_pmu->model->write_counters(cci_pmu, mask);
+	if (unlikely(!pmu_is_valid_counter(cci_pmu, idx)))
+		dev_err(&cci_pmu->plat_device->dev, "Invalid CCI PMU counter %d\n", idx);
 	else
 		pmu_write_register(cci_pmu, value, idx, CCI_PMU_CNTR);
 }
-
-#ifdef CONFIG_ARM_CCI5xx_PMU
-
-/*
- * CCI-500/CCI-550 has advanced power saving policies, which could gate the
- * clocks to the PMU counters, which makes the writes to them ineffective.
- * The only way to write to those counters is when the global counters
- * are enabled and the particular counter is enabled.
- *
- * So we do the following :
- *
- * 1) Disable all the PMU counters, saving their current state
- * 2) Enable the global PMU profiling, now that all counters are
- *    disabled.
- *
- * For each counter to be programmed, repeat steps 3-7:
- *
- * 3) Write an invalid event code to the event control register for the
-      counter, so that the counters are not modified.
- * 4) Enable the counter control for the counter.
- * 5) Set the counter value
- * 6) Disable the counter
- * 7) Restore the event in the target counter
- *
- * 8) Disable the global PMU.
- * 9) Restore the status of the rest of the counters.
- *
- * We choose an event which for CCI-5xx is guaranteed not to count.
- * We use the highest possible event code (0x1f) for the master interface 0.
- */
-#define CCI5xx_INVALID_EVENT	((CCI5xx_PORT_M0 << CCI5xx_PMU_EVENT_SOURCE_SHIFT) | \
-				 (CCI5xx_PMU_EVENT_CODE_MASK << CCI5xx_PMU_EVENT_CODE_SHIFT))
-static void cci5xx_pmu_write_counters(struct cci_pmu *cci_pmu, unsigned long *mask)
-{
-	int i;
-	DECLARE_BITMAP(saved_mask, cci_pmu->num_cntrs);
-
-	bitmap_zero(saved_mask, cci_pmu->num_cntrs);
-	pmu_save_counters(cci_pmu, saved_mask);
-
-	/*
-	 * Now that all the counters are disabled, we can safely turn the PMU on,
-	 * without syncing the status of the counters
-	 */
-	__cci_pmu_enable_nosync(cci_pmu);
-
-	for_each_set_bit(i, mask, cci_pmu->num_cntrs) {
-		struct perf_event *event = cci_pmu->hw_events.events[i];
-
-		if (WARN_ON(!event))
-			continue;
-
-		pmu_set_event(cci_pmu, i, CCI5xx_INVALID_EVENT);
-		pmu_enable_counter(cci_pmu, i);
-		pmu_write_counter(cci_pmu, local64_read(&event->hw.prev_count), i);
-		pmu_disable_counter(cci_pmu, i);
-		pmu_set_event(cci_pmu, i, event->hw.config_base);
-	}
-
-	__cci_pmu_disable();
-
-	pmu_restore_counters(cci_pmu, saved_mask);
-}
-
-#endif	/* CONFIG_ARM_CCI5xx_PMU */
 
 static u64 pmu_event_update(struct perf_event *event)
 {
@@ -869,7 +789,7 @@ static void pmu_read(struct perf_event *event)
 	pmu_event_update(event);
 }
 
-static void pmu_event_set_period(struct perf_event *event)
+void pmu_event_set_period(struct perf_event *event)
 {
 	struct hw_perf_event *hwc = &event->hw;
 	/*
@@ -880,14 +800,7 @@ static void pmu_event_set_period(struct perf_event *event)
 	 */
 	u64 val = 1ULL << 31;
 	local64_set(&hwc->prev_count, val);
-
-	/*
-	 * CCI PMU uses PERF_HES_ARCH to keep track of the counters, whose
-	 * values needs to be sync-ed with the s/w state before the PMU is
-	 * enabled.
-	 * Mark this counter for sync.
-	 */
-	hwc->state |= PERF_HES_ARCH;
+	pmu_write_counter(event, val);
 }
 
 static irqreturn_t pmu_handle_irq(int irq_num, void *dev)
@@ -898,9 +811,6 @@ static irqreturn_t pmu_handle_irq(int irq_num, void *dev)
 	int idx, handled = IRQ_NONE;
 
 	raw_spin_lock_irqsave(&events->pmu_lock, flags);
-
-	/* Disable the PMU while we walk through the counters */
-	__cci_pmu_disable();
 	/*
 	 * Iterate over counters and update the corresponding perf events.
 	 * This should work regardless of whether we have per-counter overflow
@@ -908,9 +818,12 @@ static irqreturn_t pmu_handle_irq(int irq_num, void *dev)
 	 */
 	for (idx = 0; idx <= CCI_PMU_CNTR_LAST(cci_pmu); idx++) {
 		struct perf_event *event = events->events[idx];
+		struct hw_perf_event *hw_counter;
 
 		if (!event)
 			continue;
+
+		hw_counter = &event->hw;
 
 		/* Did this counter overflow? */
 		if (!(pmu_read_register(cci_pmu, idx, CCI_PMU_OVRFLW) &
@@ -924,9 +837,6 @@ static irqreturn_t pmu_handle_irq(int irq_num, void *dev)
 		pmu_event_set_period(event);
 		handled = IRQ_HANDLED;
 	}
-
-	/* Enable the PMU and sync possibly overflowed counters */
-	__cci_pmu_enable_sync(cci_pmu);
 	raw_spin_unlock_irqrestore(&events->pmu_lock, flags);
 
 	return IRQ_RETVAL(handled);
@@ -965,12 +875,16 @@ static void cci_pmu_enable(struct pmu *pmu)
 	struct cci_pmu_hw_events *hw_events = &cci_pmu->hw_events;
 	int enabled = bitmap_weight(hw_events->used_mask, cci_pmu->num_cntrs);
 	unsigned long flags;
+	u32 val;
 
 	if (!enabled)
 		return;
 
 	raw_spin_lock_irqsave(&hw_events->pmu_lock, flags);
-	__cci_pmu_enable_sync(cci_pmu);
+
+	/* Enable all the PMU counters. */
+	val = readl_relaxed(cci_ctrl_base + CCI_PMCR) | CCI_PMCR_CEN;
+	writel(val, cci_ctrl_base + CCI_PMCR);
 	raw_spin_unlock_irqrestore(&hw_events->pmu_lock, flags);
 
 }
@@ -980,9 +894,13 @@ static void cci_pmu_disable(struct pmu *pmu)
 	struct cci_pmu *cci_pmu = to_cci_pmu(pmu);
 	struct cci_pmu_hw_events *hw_events = &cci_pmu->hw_events;
 	unsigned long flags;
+	u32 val;
 
 	raw_spin_lock_irqsave(&hw_events->pmu_lock, flags);
-	__cci_pmu_disable();
+
+	/* Disable all the PMU counters. */
+	val = readl_relaxed(cci_ctrl_base + CCI_PMCR) & ~CCI_PMCR_CEN;
+	writel(val, cci_ctrl_base + CCI_PMCR);
 	raw_spin_unlock_irqrestore(&hw_events->pmu_lock, flags);
 }
 
@@ -1396,7 +1314,7 @@ static int cci_pmu_cpu_notifier(struct notifier_block *self,
 		if (!cpumask_test_and_clear_cpu(cpu, &cci_pmu->cpus))
 			break;
 		target = cpumask_any_but(cpu_online_mask, cpu);
-		if (target >= nr_cpu_ids) // UP, last CPU
+		if (target < 0) // UP, last CPU
 			break;
 		/*
 		 * TODO: migrate context once core races on event->ctx have
