@@ -2156,7 +2156,20 @@ int32 ps_tx_nfcbuf(struct ps_core_s *ps_core_d, const int8 __user *buf, size_t c
     return 0;
 }
 
-
+/**
+ * Prototype    : ps_tx_gnssbuf
+ * Description  : add packet head to recv gnss data buff from hal,and tx to tty uart
+ * input        : ps_core_d
+ * output       : not
+ * Calls        :
+ * Called By    :
+ *
+ *   History        :
+ *   1.Date         : 2012/11/05
+ *     Author       : wx144390
+ *     Modification : Created function
+ *
+ */
 int32 ps_tx_gnssbuf(struct ps_core_s *ps_core_d, const int8 __user *buf, size_t count)
 {
     struct sk_buff *skb;
@@ -2264,6 +2277,7 @@ int32 ps_core_init(struct ps_core_s **core_data)
     if (!ptr)
     {
         kfree(ps_core_d);
+        ps_core_d = NULL;
         PS_PRINT_ERR("no mem to allocate to public buf!\n");
         return -ENOMEM;
     }
@@ -2277,6 +2291,7 @@ int32 ps_core_init(struct ps_core_s **core_data)
         PS_PRINT_ERR("ps_pm_d memory allocation failed\n");
         kfree(ps_core_d->rx_public_buf_org_ptr);
         kfree(ps_core_d);
+        ps_core_d = NULL;
         return -ENOMEM;
     }
     ps_pm_d->ps_core_data = ps_core_d;
@@ -2286,6 +2301,7 @@ int32 ps_core_init(struct ps_core_s **core_data)
         kfree(ps_core_d->rx_public_buf_org_ptr);
         kfree(ps_core_d->ps_pm);
         kfree(ps_core_d);
+        ps_core_d = NULL;
         PS_PRINT_ERR("error registering ps_pm err = %d\n", err);
         return -EFAULT;
     }
@@ -2300,6 +2316,7 @@ int32 ps_core_init(struct ps_core_s **core_data)
         kfree(ps_core_d->rx_public_buf_org_ptr);
         kfree(ps_core_d->ps_pm);
         kfree(ps_core_d);
+        ps_core_d = NULL;
         PS_PRINT_ERR("error registering %d line discipline %d\n", N_HW_BFG, err);
         return -EFAULT;
     }
@@ -2317,6 +2334,17 @@ int32 ps_core_init(struct ps_core_s **core_data)
     init_completion(&ps_core_d->wait_wifi_closed);
     /* create a singlethread work queue */
     ps_core_d->ps_tx_workqueue = create_singlethread_workqueue("ps_tx_queue");
+    if(NULL == ps_core_d->ps_tx_workqueue)
+    {
+        plat_uart_exit();
+        ps_pm_unregister(ps_pm_d);
+        kfree(ps_core_d->rx_public_buf_org_ptr);
+        kfree(ps_core_d->ps_pm);
+        kfree(ps_core_d);
+        ps_core_d = NULL;
+        PS_PRINT_ERR("create_singlethread_workqueue ps_tx_queue failed\n");
+        return -EFAULT;
+    }
     /* init tx work */
     INIT_WORK(&ps_core_d->tx_skb_work, ps_core_tx_work);
 

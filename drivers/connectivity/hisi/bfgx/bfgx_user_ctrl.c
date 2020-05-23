@@ -110,13 +110,13 @@ STATIC ssize_t store_wifi_pmdbg(struct device *dev, struct kobj_attribute *attr,
        case 6:
         wlan_pm_disable();
        break;
+#endif
        case 7:
        frw_timer_sys_start();
        break;
        case 8:
        frw_timer_sys_stop();
        break;
-#endif       
        default:
        break;
     }
@@ -873,18 +873,6 @@ __ATTR(loglevel, 0664, (void *)show_loglevel, (void *)store_loglevel);
 STATIC struct kobj_attribute bfgx_ir_ctrl =
 __ATTR(ir_ctrl, 0664, (void *)show_ir_mode, (void *)store_ir_mode);
 
-
-#ifdef CONFIG_HI1102_PLAT_HW_CHR
-extern ssize_t show_chr_log_switch(struct device *dev, struct kobj_attribute *attr, int8 *buf);
-extern ssize_t store_chr_log_switch(struct device *dev, struct kobj_attribute *attr, const char *buf, size_t count);
-static struct kobj_attribute chr_log_switch =
-    __ATTR(chr_log_switch, 0644, (void *)show_chr_log_switch, (void *)store_chr_log_switch);
-
-extern ssize_t show_chr_log_stat_info(struct device *dev, struct kobj_attribute *attr, int8 *buf);
-static struct kobj_attribute chr_log_stat =
-    __ATTR(chr_log_stat, 0444, (void *)show_chr_log_stat_info, (void *)0);
-#endif
-
 STATIC struct kobj_attribute bfgx_sleep_attr =
 __ATTR(bfgx_sleep_state, 0444, (void *)bfgx_sleep_state_show, NULL);
 
@@ -907,10 +895,6 @@ STATIC struct attribute *bfgx_attrs[] = {
         &gnss_lowpower_cntrl.attr,
         &bfgx_loglevel.attr,
         &bfgx_ir_ctrl.attr,
-#ifdef CONFIG_HI1102_PLAT_HW_CHR
-        &chr_log_switch.attr,
-        &chr_log_stat.attr,
-#endif
         &bfgx_sleep_attr.attr,
         &bfgx_wkup_host_count_attr.attr,
         NULL,
@@ -1249,18 +1233,18 @@ STATIC ssize_t store_wifi_mem_dump(struct device *dev, struct kobj_attribute *at
 }
 
 /*****************************************************************************
- 函 数 名  : show_bfgx_dump
- 功能描述  : 显示SDIO上报BFGX的reg
- 输入参数  :
- 输出参数  :
- 返 回 值  : void
- 调用函数  :
- 被调函数  :
+ \BA\AF \CA\FD \C3\FB  : show_bfgx_dump
+ \B9\A6\C4\DC\C3\E8\CA\F6  : \CF\D4示SDIO\C9媳\A8BFGX\B5\C4reg
+ \CA\E4\C8\EB\B2\CE\CA\FD  :
+ \CA\E4\B3\F6\B2\CE\CA\FD  :
+ \B7\B5 \BB\D8 值  : void
+ \B5\F7\D3煤\AF\CA\FD  :
+ \B1\BB\B5\F7\BA\AF\CA\FD  :
 
- 修改历史      :
-  1.日    期   : 2015年12月2日
-    作    者   : c00351912
-    修改内容   : 新生成函数
+ \D0薷\C4\C0\FA史      :
+  1.\C8\D5    \C6\DA   : 2015\C4\EA12\D4\C22\C8\D5
+    \D7\F7    \D5\DF   : c00351912
+    \D0薷\C4\C4\DA\C8\DD   : \D0\C2\C9\FA\B3珊\AF\CA\FD
 
 *****************************************************************************/
 STATIC ssize_t show_bfgx_dump(struct device *dev, struct kobj_attribute *attr, int8 *buf)
@@ -1280,19 +1264,19 @@ STATIC ssize_t show_bfgx_dump(struct device *dev, struct kobj_attribute *attr, i
                         " 4    equal cmd 1+2+3         \n");
 }
 /*****************************************************************************
- 函 数 名  : store_bfgx_reg_and_reg_dump
- 功能描述  : SDIO上报BFGX的reg
- 输入参数  :
+ \BA\AF \CA\FD \C3\FB  : store_bfgx_reg_and_reg_dump
+ \B9\A6\C4\DC\C3\E8\CA\F6  : SDIO\C9媳\A8BFGX\B5\C4reg
+ \CA\E4\C8\EB\B2\CE\CA\FD  :
 
- 输出参数  :
- 返 回 值  : void
- 调用函数  :
- 被调函数  :
+ \CA\E4\B3\F6\B2\CE\CA\FD  :
+ \B7\B5 \BB\D8 值  : void
+ \B5\F7\D3煤\AF\CA\FD  :
+ \B1\BB\B5\F7\BA\AF\CA\FD  :
 
- 修改历史      :
-  1.日    期   : 2015年12月2日
-    作    者   : c00351912
-    修改内容   : 新生成函数
+ \D0薷\C4\C0\FA史      :
+  1.\C8\D5    \C6\DA   : 2015\C4\EA12\D4\C22\C8\D5
+    \D7\F7    \D5\DF   : c00351912
+    \D0薷\C4\C4\DA\C8\DD   : \D0\C2\C9\FA\B3珊\AF\CA\FD
 
 *****************************************************************************/
 STATIC ssize_t store_bfgx_reg_and_reg_dump(struct device *dev, struct kobj_attribute *attr, const char *buf, size_t count)

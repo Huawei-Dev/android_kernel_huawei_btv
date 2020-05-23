@@ -39,7 +39,9 @@
 
 #define UART_LOOP_MAX_PKT_LEN       (2048)      /*device buf len is 2400*/
 
-
+/* FIXME: it depends on device's rule, it's 46+5 now,
+ *        and should be modified if it's changed in device end.
+*/
 #define NOBT_FRAME_EXTRA_SPACE      (6)         /* 预留6字节余量 */
 #define MAX_NOBT_FRAME_LEN          (52 + NOBT_FRAME_EXTRA_SPACE)/* FGNI max frame len */
 #define MAX_LAST_WORD_FRAME_LEN     (114 + NOBT_FRAME_EXTRA_SPACE)/* FGNI max frame len */
@@ -181,6 +183,8 @@
 #define UART_LOOP_SET_DEVICE_DATA_HANDLER    (1)
 
 #define SYS_INF_HEARTBEAT_CMD_BASE       (128)
+#define BT_TYPE_DATA_LEN                 (1)
+
 enum TTY_COMPLETE_TYPE_ENUM
 {
     TTY_LDISC_UNINSTALL    = 0,   /* 通知octty关闭uart */
@@ -493,6 +497,13 @@ struct hw_ps_plat_data {
     uint8  flow_cntrl; /* flow control flag */
     uint16 fill_byte1;
     uint8  fill_byte2;
+};
+
+struct bt_data_combination
+{
+    uint8  len;
+    uint8  type;
+    uint16 resverd;
 };
 
 typedef struct uart_loop_user_cfg {

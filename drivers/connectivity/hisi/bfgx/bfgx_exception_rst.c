@@ -918,15 +918,15 @@ int32 wifi_subsystem_reset(void)
         return -EXCEPTION_FAIL;
     }
 
+    hcc_disable(hcc_get_default_handler(), OAL_TRUE);
+    wlan_pm_init_device_ready(pm_data->pst_wlan_pm_info);
+    oal_wlan_gpio_intr_enable(oal_get_sdio_default_handler(), OAL_FALSE);
+
     if (EXCEPTION_SUCCESS != uart_reset_wcpu())
     {
         PS_PRINT_ERR("uart reset wcpu failed\n");
         return -EXCEPTION_FAIL;
     }
-
-    hcc_disable(hcc_get_default_handler(), OAL_TRUE);
-    wlan_pm_init_device_ready(pm_data->pst_wlan_pm_info);
-    oal_wlan_gpio_intr_enable(oal_get_sdio_default_handler(), OAL_FALSE);
 
     if (EXCEPTION_SUCCESS != firmware_download_function(WIFI_CFG))
     {
@@ -3210,6 +3210,14 @@ int32 plat_exception_reset_init(void)
 
     /*初始化异常处理workqueue和work*/
     p_exception_data->plat_exception_rst_workqueue = create_singlethread_workqueue("plat_exception_reset_queue");
+    if(NULL == p_exception_data->plat_exception_rst_workqueue)
+    {
+        PS_PRINT_ERR("create_singlethread_workqueue plat_exception_reset_queue failed\n");
+        kfree(pst_wifi_callback);
+        kfree(p_exception_data);
+        return -EXCEPTION_FAIL;
+    }
+    
     INIT_WORK(&p_exception_data->plat_exception_rst_work, plat_exception_reset_work);
     INIT_WORK(&p_exception_data->uart_store_wifi_mem_to_file_work, store_wifi_mem_to_file_work);
 
