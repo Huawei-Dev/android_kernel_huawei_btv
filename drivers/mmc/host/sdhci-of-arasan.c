@@ -876,10 +876,6 @@ static void sdhci_of_arasan_restore_transfer_para(struct sdhci_host *host)
 		sdhci_writel(host, ctrl_u32, SDHCI_CORE_CFG1);
 	}
 
-	/* Set the re-tuning expiration flag */
-	if (host->flags & SDHCI_USING_RETUNING_TIMER)
-		host->flags |= SDHCI_NEEDS_RETUNING;
-
 	if (host->flags & (SDHCI_USE_SDMA | SDHCI_USE_ADMA))
 		host->flags |= SDHCI_REQ_USE_DMA;
 	/*

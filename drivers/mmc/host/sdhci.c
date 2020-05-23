@@ -3343,7 +3343,7 @@ int sdhci_add_host(struct sdhci_host *host)
 	if (host->tuning_count)
 		host->tuning_count = 1 << (host->tuning_count - 1);
 #ifdef CONFIG_HISI_MMC
-	host->tuning_mode = SDHCI_TUNING_MODE_RESERVED;
+	host->tuning_mode = 3;
 #else
 	/* Re-tuning mode supported by the Host Controller */
 	host->tuning_mode = (caps[1] & SDHCI_RETUNING_MODE_MASK) >>
