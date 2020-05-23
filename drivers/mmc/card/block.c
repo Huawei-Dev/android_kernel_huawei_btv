@@ -1037,8 +1037,8 @@ static int mmc_blk_cmd_recovery(struct mmc_card *card, struct request *req,
 		if (!err)
 			break;
 
-		/* Re-tune if needed */
-		mmc_retune_recheck(card->host);
+		/* Re-tune if needed 
+		mmc_retune_recheck(card->host);*/
 
 		prev_cmd_status_valid = false;
 		pr_info("%s: error %d sending status command, %sing\n",
