@@ -310,6 +310,7 @@ static int wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi,
 	spin_lock_init(&wb->work_lock);
 	INIT_LIST_HEAD(&wb->work_list);
 	INIT_DELAYED_WORK(&wb->dwork, wb_workfn);
+	atomic_set(&wb->dirty_sleeping, 0);
 
 	err = fprop_local_init_percpu(&wb->completions, gfp);
 	if (err)
@@ -816,20 +817,14 @@ static void bdi_remove_from_list(struct backing_dev_info *bdi)
  */
 void bdi_unregister(struct backing_dev_info *bdi)
 {
-	bdi_wb_shutdown(bdi);
+	if (WARN_ON_ONCE(!bdi->dev))
+		return;
+
 	bdi_set_min_ratio(bdi, 0);
-
-	WARN_ON(!list_empty(&bdi->work_list));
-
-	if (bdi->dev) {
-		bdi_debug_unregister(bdi);
-		device_unregister(bdi->dev);
-		bdi->dev = NULL;
-	}
 }
 EXPORT_SYMBOL(bdi_unregister);
 
-void bdi_exit(struct backing_dev_info *bdi)
+void bdi_destroy(struct backing_dev_info *bdi)
 {
 	/* make sure nobody finds us on the bdi_list anymore */
 	bdi_remove_from_list(bdi);
@@ -843,13 +838,6 @@ void bdi_exit(struct backing_dev_info *bdi)
 	}
 
 	wb_exit(&bdi->wb);
-}
-EXPORT_SYMBOL(bdi_exit);
-
-void bdi_destroy(struct backing_dev_info *bdi)
-{
-	bdi_unregister(bdi);
-	bdi_exit(bdi);
 }
 EXPORT_SYMBOL(bdi_destroy);
 
