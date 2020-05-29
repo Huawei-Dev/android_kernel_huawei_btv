@@ -17,6 +17,8 @@
 #include "sd.h"
 #include "sd_ops.h"
 
+static int mmc_sd_reset(struct mmc_host *host);
+
 static const unsigned int tran_exp[] = {
 	10000,		100000,		1000000,	10000000,
 	0,		0,		0,		0

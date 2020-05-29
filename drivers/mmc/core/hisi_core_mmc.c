@@ -15,13 +15,9 @@
 #include "sd_ops.h"
 #include "sdio_ops.h"
 
-
-
-
 extern void mmc_set_ios(struct mmc_host *host);
 extern void mmc_bus_get(struct mmc_host *host);
 extern void mmc_bus_put(struct mmc_host *host);
-
 
 void mmc_power_up_vcc(struct mmc_host *host,u32 ocr)
 {
@@ -442,46 +438,6 @@ int hisi_mmc_reset(struct mmc_host *host)
 }
 #pragma GCC diagnostic pop
 
-/*********************sd ops begin**********************/
-static int mmc_do_sd_reset(struct mmc_host *host)
-{
-	struct mmc_card *card = host->card;
-
-	if (!host->bus_ops->power_restore)
-		return -EOPNOTSUPP;
-
-	if (!card)
-		return -EINVAL;
-
-	mmc_host_clk_hold(host);
-
-	/* TODO! Here add hw_reset for ip reset */
-	if (host->ops->hw_reset)
-		host->ops->hw_reset(host);
-
-	/* Only for K930/920 SD slow down clk*/
-	if (host->ops->slowdown_clk)
-		host->ops->slowdown_clk(host, host->ios.timing);
-
-	mmc_power_off(host);
-	mmc_set_clock(host, host->f_init);
-	/* Wait at least 200 ms */
-	mmc_delay(200);
-	mmc_power_up(host,host->card->ocr);
-	(void)mmc_select_voltage(host, host->card->ocr);
-
-	mmc_host_clk_release(host);
-
-	return host->bus_ops->power_restore(host);
-}
-
-int mmc_sd_reset(struct mmc_host *host)
-{
-	return mmc_do_sd_reset(host);
-}
-EXPORT_SYMBOL(mmc_sd_reset);
-
-/*低速卡，设定频率25M  设置卡位宽*/
 void mmc_select_new_sd(struct mmc_card *card)
 {
 	unsigned int max_dtr;
@@ -493,8 +449,6 @@ void mmc_select_new_sd(struct mmc_card *card)
 	}
 	mmc_set_clock(card->host, max_dtr);
 }
-
-
 
 /*********************wifi ops begin**********************/
 int mmc_power_save_host_for_wifi(struct mmc_host *host)
@@ -544,7 +498,3 @@ int mmc_power_restore_host_for_wifi(struct mmc_host *host)
 	return ret;
 }
 EXPORT_SYMBOL(mmc_power_restore_host_for_wifi);
-
-
-
-
