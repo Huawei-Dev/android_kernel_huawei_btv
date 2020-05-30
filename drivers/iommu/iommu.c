@@ -880,17 +880,6 @@ static int remove_iommu_group(struct device *dev, void *data)
 	return 0;
 }
 
-static int remove_iommu_group(struct device *dev, void *data)
-{
-	struct iommu_callback_data *cb = data;
-	const struct iommu_ops *ops = cb->ops;
-
-	if (ops->remove_device && dev->iommu_group)
-		ops->remove_device(dev);
-
-	return 0;
-}
-
 static int iommu_bus_notifier(struct notifier_block *nb,
 			      unsigned long action, void *data)
 {
