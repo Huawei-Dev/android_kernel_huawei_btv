@@ -378,13 +378,13 @@ int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 		}
 
 		if (dbs_data->cdata->governor == GOV_CONSERVATIVE) {
-			cs_dbs_info->down_skip = 0; /* [false alarm]:fortify */
+			cs_dbs_info->down_skip = 0;
 			cs_dbs_info->enable = 1;
 			cs_dbs_info->requested_freq = policy->cur;
 		} else {
-			od_dbs_info->rate_mult = 1; /* [false alarm]:fortify */
+			od_dbs_info->rate_mult = 1;
 			od_dbs_info->sample_type = OD_NORMAL_SAMPLE;
-			od_ops->powersave_bias_init_cpu(cpu); /* [false alarm]:fortify */
+			od_ops->powersave_bias_init_cpu(cpu);
 		}
 
 		mutex_unlock(&dbs_data->mutex);
@@ -398,7 +398,7 @@ int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 
 	case CPUFREQ_GOV_STOP:
 		if (dbs_data->cdata->governor == GOV_CONSERVATIVE)
-			cs_dbs_info->enable = 0; /* [false alarm]:fortify */
+			cs_dbs_info->enable = 0;
 
 		gov_cancel_work(dbs_data, policy);
 
