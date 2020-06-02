@@ -439,7 +439,11 @@ static irqreturn_t ak8789_event_handler(int irq, void *hall_dev)
 
 	h_dev = (struct hall_device *)hall_dev;
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0))
 	trig_val = h_desc->irq_data.state_use_accessors & IRQD_TRIGGER_MASK;
+#else
+	trig_val = h_desc->irq_data.common->state_use_accessors & IRQD_TRIGGER_MASK;
+#endif
 	hall_gpio_type = h_dev->hall_gpio_type;
 	if (hall_gpio_type & 0x01) {
 		if (trig_val & IRQF_TRIGGER_FALLING) {
