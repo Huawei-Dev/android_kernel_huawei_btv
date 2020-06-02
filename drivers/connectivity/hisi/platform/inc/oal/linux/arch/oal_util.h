@@ -680,9 +680,9 @@ OAL_STATIC OAL_INLINE oal_int8 *oal_strtok(oal_int8 *pc_token, OAL_CONST oal_int
 /* Works only for digits and letters, but small and fast */
 #define TOLOWER(x) ((x) | 0x20)
 
-#define isdigit(c)	('0' <= (c) && (c) <= '9')
+#define isdigitt(c)	('0' <= (c) && (c) <= '9')
 
-#define isxdigit(c)	(('0' <= (c) && (c) <= '9') \
+#define isxdigitt(c)	(('0' <= (c) && (c) <= '9') \
                  || ('a' <= (c) && (c) <= 'f') \
                  || ('A' <= (c) && (c) <= 'F'))
 
@@ -692,7 +692,7 @@ OAL_STATIC OAL_INLINE oal_int8 *oal_strtok(oal_int8 *pc_token, OAL_CONST oal_int
 OAL_STATIC OAL_INLINE unsigned int simple_guess_base(const char *cp)
 {
     if (cp[0] == '0') {
-        if (TOLOWER(cp[1]) == 'x' && isxdigit(cp[2]))
+        if (TOLOWER(cp[1]) == 'x' && isxdigitt(cp[2]))
             return 16;
         else
             return 8;
@@ -711,10 +711,10 @@ OAL_STATIC OAL_INLINE unsigned long long oal_simple_strtoull(const oal_int8 *cp,
     if (base == 16 && cp[0] == '0' && TOLOWER(cp[1]) == 'x')
         cp += 2;
 
-    while (isxdigit(*cp)) {
+    while (isxdigitt(*cp)) {
         unsigned int value;
 
-        value = isdigit(*cp) ? *cp - '0' : TOLOWER(*cp) - 'a' + 10;
+        value = isdigitt(*cp) ? *cp - '0' : TOLOWER(*cp) - 'a' + 10;
         if (value >= base)
             break;
         result = result * base + value;
