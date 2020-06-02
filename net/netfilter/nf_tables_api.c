@@ -1209,8 +1209,10 @@ static void nf_tables_chain_destroy(struct nft_chain *chain)
 
 		module_put(basechain->type->owner);
 		free_percpu(basechain->stats);
+#ifdef CONFIG_NETFILTER_INGRESS
 		if (basechain->ops[0].dev != NULL)
 			dev_put(basechain->ops[0].dev);
+#endif
 		kfree(basechain);
 	} else {
 		kfree(chain);
