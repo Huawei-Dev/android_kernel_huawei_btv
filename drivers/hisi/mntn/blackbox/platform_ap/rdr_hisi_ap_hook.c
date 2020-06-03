@@ -34,6 +34,7 @@
 #include <linux/kobject.h>
 #include <linux/device.h>
 #include <linux/cpu_pm.h>
+#include <linux/version.h>
 #include <linux/hisi/rdr_hisi_ap_hook.h>
 
 #include <linux/hisi/rdr_hisi_ap_ringbuffer.h>
@@ -618,8 +619,13 @@ Input:          NA
 Output:         NA
 Return:         NA
 ********************************************************************************/
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,0))
+static int hot_cpu_callback(struct notifier_block *nfb,
+                                            unsigned long action, void *hcpu)
+#else
 static int __cpuinit hot_cpu_callback(struct notifier_block *nfb,
                                            unsigned long action, void *hcpu)
+#endif
 {
 	unsigned int cpu = (unsigned long)hcpu;
 
