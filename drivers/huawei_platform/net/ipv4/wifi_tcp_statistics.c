@@ -11,6 +11,7 @@
 #include <linux/netlink.h>
 #include <uapi/linux/netlink.h>
 #include <linux/kthread.h>
+#include <linux/proc_fs.h>
 #include <linux/string.h>
 #include <net/tcp.h>
 
