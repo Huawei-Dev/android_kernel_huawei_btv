@@ -73,10 +73,3 @@ config PROC_PAGE_MONITOR
           interfaces will reduce the size of the kernel by approximately 4kb.
 
 source "fs/proc/hisi/Kconfig"
-
-config PROC_UID
-	bool "Include /proc/uid/ files"
-	default y
-	depends on PROC_FS && RT_MUTEXES
-	help
-	Provides aggregated per-uid information under /proc/uid.
