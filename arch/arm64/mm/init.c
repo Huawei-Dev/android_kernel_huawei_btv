@@ -32,7 +32,6 @@
 #include <linux/of_fdt.h>
 #include <linux/dma-mapping.h>
 #include <linux/dma-contiguous.h>
-#include <linux/hisi/hisi_cma.h>
 #include <linux/efi.h>
 #include <linux/swiotlb.h>
 
@@ -181,10 +180,6 @@ void __init arm64_memblock_init(void)
 	else
 		arm64_dma_phys_limit = PHYS_MASK + 1;
 	dma_contiguous_reserve(arm64_dma_phys_limit);
-
-#ifdef CONFIG_HISI_CMA
-	of_hisi_cma_contiguous_reserve_area(arm64_dma_phys_limit);
-#endif
 
 	memblock_allow_resize();
 	memblock_dump_all();

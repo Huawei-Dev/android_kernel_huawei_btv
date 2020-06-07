@@ -25,7 +25,6 @@ obj-$(CONFIG_HISI_IVP) += ivp/
 obj-$(CONFIG_HISI_HISTAR_ISP) += isp/
 obj-$(CONFIG_DRMDRIVER)                         += drmdriver/
 obj-$(CONFIG_HI3XXX_EFUSE)                      += efuse/
-obj-$(CONFIG_HISI_CMA)                          += hisi_cma/
 obj-$(CONFIG_TZDRIVER)                          += tzdriver/
 obj-$(CONFIG_LOAD_IMAGE) += load_image/
 obj-$(CONFIG_HISI_SR)                      += pm/
