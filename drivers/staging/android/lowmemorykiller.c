@@ -210,7 +210,7 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 		task_lock(selected);
 		send_sig(SIGKILL, selected, 0);
 		if (selected->mm)
-			mark_tsk_oom_victim(selected);
+			mark_oom_victim(selected);
 		task_unlock(selected);
 		rem += selected_tasksize;
 	}
