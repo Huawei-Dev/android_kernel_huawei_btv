@@ -16,6 +16,7 @@
 #include <linux/aio.h>
 #include <linux/types.h>
 #include <linux/mutex.h>
+#include <linux/module.h>
 #include <uapi/linux/uio.h>
 #include <huawei_platform/log/hw_log.h>
 #include <linux/hrtimer.h>

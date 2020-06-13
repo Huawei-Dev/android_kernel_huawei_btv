@@ -5,7 +5,7 @@
  *
  */
 #include <linux/version.h>
-#include <linux/init.h>
+#include <linux/module.h>
 #include <linux/cpu_pm.h>
 #include <linux/suspend.h>
 #include <linux/syscore_ops.h>

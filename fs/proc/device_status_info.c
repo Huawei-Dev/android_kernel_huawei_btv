@@ -8,6 +8,7 @@
 #include <linux/string.h>
 #include <chipset_common/hwstatuscheck/device_status_info.h>
 #include <linux/uaccess.h>
+#include <linux/module.h>
 
 static uint32_t check_device_status_flag_long = 0;
 

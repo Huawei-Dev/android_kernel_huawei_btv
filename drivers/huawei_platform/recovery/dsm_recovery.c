@@ -1,4 +1,5 @@
 #include <linux/kthread.h>
+#include <linux/module.h>
 #include <linux/sched/rt.h>
 #include <linux/random.h>
 #include <huawei_platform/log/hw_log.h>

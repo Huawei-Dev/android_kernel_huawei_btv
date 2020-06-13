@@ -47,6 +47,7 @@
  */
 
 #include <linux/device.h>
+#include <linux/module.h>
 #include <linux/stat.h>
 #include "bsp_version.h"
 

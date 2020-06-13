@@ -17,6 +17,7 @@
 #include <linux/cpu.h>
 #include <linux/err.h>
 #include <linux/mm.h>
+#include <linux/module.h>
 #include <linux/platform_device.h>
 #ifdef CONFIG_HISI_AXI_TEST
 #include <linux/slab.h>

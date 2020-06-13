@@ -3,6 +3,7 @@
 #include <linux/sched.h>
 #include <linux/bug.h>
 #include <linux/mm.h>
+#include <linux/module.h>
 #include <linux/bitmap.h>
 #include <linux/device.h>
 #include <dsm/dsm_pub.h>

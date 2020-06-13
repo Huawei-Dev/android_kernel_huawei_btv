@@ -4,6 +4,7 @@
 #include <linux/printk.h>
 #include <linux/stat.h>
 #include <linux/string.h>
+#include <linux/module.h>
 
 extern unsigned int get_pd_charge_flag(void);
 extern unsigned int resetmode_is_normal(void);
