@@ -28,6 +28,7 @@
 #include <linux/of_gpio.h>
 #include <linux/regulator/consumer.h>
 #include <linux/clk.h>
+#include <linux/version.h>
 
 #include "ak4376.h"
 
@@ -737,19 +738,33 @@ static int ak4376_set_fmt(struct snd_soc_codec *codec, unsigned int fmt)
 
 static int ak4376_set_mute(struct snd_soc_codec *codec)
 {
-	if(NULL == codec){
-		loge("%s(%d): codec is NULL\n",__FUNCTION__,__LINE__);
+	struct ak4376_priv *ak4376 = snd_soc_codec_get_drvdata(codec);
+	
+	if (NULL == codec) {
+		loge("%s(%d): codec is NULL\n", __FUNCTION__, __LINE__);
+		return -ENXIO;
+	}
+	
+	if (NULL == ak4376) {
+		loge("%s(%d): ak4376 is NULL\n", __FUNCTION__, __LINE__);
 		return -ENXIO;
 	}
 
-	logi("%s(%d) codec->dapm.bias_level=%d\n",__FUNCTION__,__LINE__,codec->dapm.bias_level);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,2,0)
+        logi("%s(%d) codec->dapm.bias_level=%d\n", __FUNCTION__, __LINE__, snd_soc_codec_get_bias_level(codec));
 
-	if (codec->dapm.bias_level <= SND_SOC_BIAS_STANDBY) {
-		logd("%s(%d) codec->dapm.bias_level <= SND_SOC_BIAS_STANDBY\n",__FUNCTION__,__LINE__);
-
+	if (snd_soc_codec_get_bias_level(codec) <= SND_SOC_BIAS_STANDBY) {
+		logd("%s(%d) codec->dapm.bias_level <= SND_SOC_BIAS_STANDBY\n", __FUNCTION__, __LINE__);
 		ak4376_pdn_control(codec, OFF);
 	}
+#else
+	logi("%s(%d) codec->dapm.bias_level=%d\n", __FUNCTION__, __LINE__, codec->dapm.bias_level);
 
+	if (codec->dapm.bias_level <= SND_SOC_BIAS_STANDBY) {
+		logd("%s(%d) codec->dapm.bias_level <= SND_SOC_BIAS_STANDBY\n", __FUNCTION__, __LINE__);
+		ak4376_pdn_control(codec, OFF);
+	}
+#endif
 	return 0;
 }
 
@@ -1928,6 +1943,96 @@ static int ak4376_set_dai_mute(struct snd_soc_dai *dai, int mute)
 	return 0;
 }
 
+static int ak4376_show_reg_debug(struct snd_soc_codec *codec)
+{
+	struct ak4376_priv *ak4376 = snd_soc_codec_get_drvdata(codec);
+	int i = 0, ret = 0, reg[AK4376_MAX_REG_NUM + 1] = {0};
+
+	if (NULL == codec) {
+		loge("%s(%d): codec is NULL\n", __FUNCTION__, __LINE__);
+		return -ENXIO;
+	}
+
+	if (NULL == ak4376) {
+		loge("%s(%d): ak4376 is NULL\n", __FUNCTION__, __LINE__);
+		return -ENXIO;
+	}
+
+	for (i = 0; i < AK4376_16_DUMMY; i++) {
+		ret = ak4376_reg_read(ak4376_codec, i);
+
+		if (ret < 0) {
+			loge("%s(%d): read register[0x%x] error.\n", __FUNCTION__, __LINE__, i);
+			break;
+		} else {
+			reg[i] = ret;
+		}
+	}
+	reg[AK4376_MAX_REG_NUM-2] = ak4376_reg_read(ak4376_codec, AK4376_24_MODE_CONTROL);
+	reg[AK4376_MAX_REG_NUM-1] = ak4376_reg_read(ak4376_codec, AK4376_26_DAC_ADJ1);
+	reg[AK4376_MAX_REG_NUM] = ak4376_reg_read(ak4376_codec, AK4376_2A_DAC_ADJ2);
+
+	for (i = 0; i < AK4376_16_DUMMY; i++) {
+		logi("%s : read register[0x%02x, %02x]\n", __FUNCTION__, i , reg[i]);
+	}
+	logi("%s : read register[0x24, %02x]\n", __FUNCTION__, reg[AK4376_MAX_REG_NUM -2]);
+	logi("%s : read register[0x26, %02x]\n", __FUNCTION__, reg[AK4376_MAX_REG_NUM -1]);
+	logi("%s : read register[0x2a, %02x]\n", __FUNCTION__, reg[AK4376_MAX_REG_NUM]);
+
+	return 0;
+}
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,2,0)
+static int ak4376_set_bias_level(struct snd_soc_codec *codec,
+		enum snd_soc_bias_level level)
+{
+	struct ak4376_priv *ak4376 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_dapm_context *dapm = snd_soc_codec_get_dapm(codec);
+
+	if (NULL == codec) {
+		loge("%s(%d): codec is NULL\n", __FUNCTION__, __LINE__);
+		return -ENXIO;
+	}
+
+	if (NULL == ak4376 || NULL == dapm) {
+		loge("%s(%d): ak4376 is NULL\n", __FUNCTION__, __LINE__);
+		return -ENXIO;
+	}
+	logi("%s(%d) level=%d, codec->dapm.bias_level=%d\n", __FUNCTION__, __LINE__, level, snd_soc_dapm_get_bias_level(dapm));
+
+	switch (level) {
+	case SND_SOC_BIAS_ON:
+		break;
+	case SND_SOC_BIAS_PREPARE:
+		if (snd_soc_dapm_get_bias_level(dapm) == SND_SOC_BIAS_STANDBY)
+			logi("%s(%d) bias_level = SND_SOC_BIAS_STANDBY\n", __FUNCTION__, __LINE__);
+		if (snd_soc_dapm_get_bias_level(dapm) == SND_SOC_BIAS_ON)
+			logi("%s(%d) bias_level = SND_SOC_BIAS_ON\n", __FUNCTION__, __LINE__);
+		break;
+	case SND_SOC_BIAS_STANDBY:
+		if (snd_soc_dapm_get_bias_level(dapm) == SND_SOC_BIAS_PREPARE) {
+			logi("%s(%d) bias_level = SND_SOC_BIAS_PREPARE\n", __FUNCTION__, __LINE__);
+			ak4376_pdn_control(codec, OFF);
+		} else if (snd_soc_dapm_get_bias_level(dapm) == SND_SOC_BIAS_OFF)
+			logi("%s(%d) bias_level = SND_SOC_BIAS_OFF\n", __FUNCTION__, __LINE__);
+		break;
+	case SND_SOC_BIAS_OFF:
+		if (snd_soc_dapm_get_bias_level(dapm) == SND_SOC_BIAS_STANDBY) {
+			logi("%s(%d) bias_level = SND_SOC_BIAS_STANDBY\n", __FUNCTION__, __LINE__);
+			ak4376_pdn_control(codec, OFF);
+		}
+		break;
+	}
+	snd_soc_dapm_init_bias_level(dapm, level);
+
+	/* show chip regs for debug, after enable ak4376 */
+	if (level == SND_SOC_BIAS_ON) {
+		ak4376_show_reg_debug(codec);
+	}
+
+	return 0;
+}
+#else
 static int ak4376_set_bias_level(struct snd_soc_codec *codec,
 		enum snd_soc_bias_level level)
 {
@@ -1961,6 +2066,7 @@ static int ak4376_set_bias_level(struct snd_soc_codec *codec,
 
 	return 0;
 }
+#endif
 
 #define AK4376_RATES		(SNDRV_PCM_RATE_8000 | SNDRV_PCM_RATE_11025 |\
 				SNDRV_PCM_RATE_16000 | SNDRV_PCM_RATE_22050 |\
