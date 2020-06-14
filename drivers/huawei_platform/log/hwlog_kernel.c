@@ -250,7 +250,7 @@ int hwlog_to_jank(int tag, int prio, const char* fmt, ...)
 	u64                     uptime;
 	u64                     realtime;
 
-	do_posix_clock_monotonic_gettime(&upts);
+	//do_posix_clock_monotonic_gettime(&upts);
 	realts = upts;
 	get_monotonic_boottime(&realts);
 	uptime = (u64)upts.tv_sec*1000 + upts.tv_nsec/1000000;

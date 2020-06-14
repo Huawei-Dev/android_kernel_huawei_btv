@@ -1000,16 +1000,7 @@ static int cdc_ncm_bind(struct usbnet *dev, struct usb_interface *intf)
 	 * Additionally, generic NCM devices are assumed to accept arbitrarily
 	 * placed NDP.
 	 */
-	ret = cdc_ncm_bind_common(dev, intf, CDC_NCM_DATA_ALTSETTING_NCM, 0);
-
-	/*
-	 * We should get an event when network connection is "connected" or
-	 * "disconnected". Set network connection in "disconnected" state
-	 * (carrier is OFF) during attach, so the IP network stack does not
-	 * start IPv6 negotiation and more.
-	 */
-	usbnet_link_change(dev, 0, 0);
-	return ret;
+	return cdc_ncm_bind_common(dev, intf, CDC_NCM_DATA_ALTSETTING_NCM, 0);
 }
 
 static void cdc_ncm_align_tail(struct sk_buff *skb, size_t modulus, size_t remainder, size_t max)

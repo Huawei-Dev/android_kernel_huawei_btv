@@ -135,7 +135,7 @@ u64 rdr_get_tick(void)
 {
 	/* use only one int value to save time: */
 	struct timespec uptime;
-	do_posix_clock_monotonic_gettime(&uptime);
+	//do_posix_clock_monotonic_gettime(&uptime);
 	get_monotonic_boottime(&uptime);
 	return (u64)uptime.tv_sec;
 }
