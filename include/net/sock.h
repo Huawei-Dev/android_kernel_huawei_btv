@@ -218,23 +218,6 @@ struct sock_common {
 	/* public: */
 };
 
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-/* cdn: Cross-layer Dropped Notification */
-#define MAX_CDN_QSIZE 256
-
-struct cdn_queue {
-	struct cdn_queue	*next;
-	u32			seq;
-	u32			padding;
-};
-
-struct cdn_entry {
-	struct cdn_queue	pool[MAX_CDN_QSIZE];
-	struct cdn_queue	*hint;
-	struct cdn_queue	*head;
-	int			index;
-};
-#endif
 struct cg_proto;
 /**
   *	struct sock - network layer representation of sockets
@@ -471,20 +454,6 @@ struct sock {
 	int			(*sk_backlog_rcv)(struct sock *sk,
 						  struct sk_buff *skb);
 	void                    (*sk_destruct)(struct sock *sk);
-#ifdef CONFIG_HW_CROSSLAYER_OPT_DBG_MODULE
-	u32			start_seq;
-	u32			snd_id;
-	u32			nowrtt;
-	u32			fast_rexmit_cnts;
-	u32			timeout_rexmit_cnts;
-	u32			modem_drop_rexmit_cnts;
-	u32			undo_modem_drop_cnts;
-#endif
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-	struct cdn_entry	*sk_dropped;
-	u32			undo_modem_drop_marker;
-	u32			cdn_hash_marker;
-#endif
 };
 
 #define __sk_user_data(sk) ((*((void __rcu **)&(sk)->sk_user_data)))

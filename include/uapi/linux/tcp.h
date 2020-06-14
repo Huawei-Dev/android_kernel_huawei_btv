@@ -149,15 +149,8 @@ enum tcp_ca_state {
 #define TCPF_CA_CWR	(1<<TCP_CA_CWR)
 	TCP_CA_Recovery = 3,
 #define TCPF_CA_Recovery (1<<TCP_CA_Recovery)
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-	TCP_CA_Loss = 4,
-#define TCPF_CA_Loss	(1<<TCP_CA_Loss)
-	TCP_CA_Modem_Drop = 5
-#define TCPF_CA_Modem_Drop (1<<TCP_CA_Modem_Drop)
-#else
 	TCP_CA_Loss = 4
 #define TCPF_CA_Loss	(1<<TCP_CA_Loss)
-#endif
 };
 
 struct tcp_info {

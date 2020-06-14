@@ -352,9 +352,6 @@ enum tsq_flags {
 	TCP_MTU_REDUCED_DEFERRED,  /* tcp_v{4|6}_err() could not call
 				    * tcp_v{4|6}_mtu_reduced()
 				    */
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-	TCP_CROSSLAYER_RECOVERY_DEFERRED, /* aspen_crosslayer_recovery() found socket was owned */
-#endif
 };
 
 static inline struct tcp_sock *tcp_sk(const struct sock *sk)

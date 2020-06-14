@@ -39,10 +39,6 @@
 #define NETLINK_WIFI_EVENT_NL 25
 #endif
 
-#ifdef CONFIG_HW_CROSSLAYER_OPT_DBG_MODULE
-#define NETLINK_ASPEN		26
-#endif
-
 #define NETLINK_INET_DIAG	NETLINK_SOCK_DIAG
 
 /*netd communicate with hwfilter */

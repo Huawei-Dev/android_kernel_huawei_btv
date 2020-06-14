@@ -283,10 +283,6 @@
 #include <asm/unaligned.h>
 #include <net/busy_poll.h>
 
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-#include <net/tcp_crosslayer.h>
-#endif
-
 #ifdef CONFIG_HW_WIFIPRO
 #include <huawei_platform/net/ipv4/wifipro_tcp_monitor.h>
 #endif
@@ -3298,9 +3294,7 @@ void __init tcp_init(void)
 	sysctl_max_syn_backlog = max(128, cnt / 256);
 
 	tcp_init_mem();
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-	aspen_init_hashtable();
-#endif
+
 	/* Set per-socket limits to no more than 1/128 the pressure threshold */
 	limit = nr_free_buffer_pages() << (PAGE_SHIFT - 7);
 	max_wshare = min(4UL*1024*1024, limit);

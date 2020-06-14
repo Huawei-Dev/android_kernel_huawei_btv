@@ -85,10 +85,6 @@
 #include <linux/crypto.h>
 #include <linux/scatterlist.h>
 
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-#include <net/tcp_crosslayer.h>
-#endif
-
 #ifdef CONFIG_HW_WIFIPRO
 #include <huawei_platform/net/ipv4/wifipro_tcp_monitor.h>
 #endif
@@ -259,9 +255,6 @@ int tcp_v4_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 	if (err)
 		goto failure;
 
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-	aspen_mark_hashtable(sk, ntohs(inet->inet_sport));
-#endif
 	return 0;
 
 failure:

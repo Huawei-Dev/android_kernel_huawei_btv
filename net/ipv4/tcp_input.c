@@ -76,10 +76,6 @@
 #include <asm/unaligned.h>
 #include <linux/errqueue.h>
 
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-#include <net/tcp_crosslayer.h>
-#endif
-
 #ifdef CONFIG_HW_WIFIPRO
 #include <huawei_platform/net/ipv4/wifipro_tcp_monitor.h>
 #endif
@@ -1981,9 +1977,6 @@ void tcp_enter_loss(struct sock *sk)
 		tp->fackets_out = 0;
 	}
 	tcp_clear_all_retrans_hints(tp);
-#ifdef CONFIG_HW_CROSSLAYER_OPT_DBG_MODULE
-	ASPEN_INC_TO_REXMIT_CNTS(sk);
-#endif
 	tcp_for_write_queue(skb, sk) {
 		if (skb == tcp_send_head(sk))
 			break;
@@ -2471,9 +2464,6 @@ static bool tcp_try_undo_recovery(struct sock *sk)
 			tp->retrans_stamp = 0;
 		return true;
 	}
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-	aspen_tcp_try_undo_modem_drop(sk, FROM_RECOVERY);
-#endif
 	tcp_set_ca_state(sk, TCP_CA_Open);
 	return false;
 }
@@ -2497,9 +2487,6 @@ static bool tcp_try_undo_loss(struct sock *sk, bool frto_undo)
 {
 	struct tcp_sock *tp = tcp_sk(sk);
 
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-	aspen_tcp_try_undo_modem_drop(sk, FROM_LOSS);
-#endif
 	if (frto_undo || tcp_may_undo(tp)) {
 		tcp_undo_cwnd_reduction(sk, true);
 
@@ -2727,9 +2714,6 @@ static void tcp_enter_recovery(struct sock *sk, bool ece_ack)
 		tcp_init_cwnd_reduction(sk);
 	}
 
-#ifdef CONFIG_HW_CROSSLAYER_OPT_DBG_MODULE
-	ASPEN_INC_FAST_REXMIT_CNTS(sk);
-#endif
 	tcp_set_ca_state(sk, TCP_CA_Recovery);
 }
 
@@ -2879,11 +2863,6 @@ static void tcp_fastretrans_alert(struct sock *sk, const int acked,
 			tcp_end_cwnd_reduction(sk);
 			break;
 
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-		case TCP_CA_Modem_Drop:
-			tcp_set_ca_state(sk, TCP_CA_Open);
-			break;
-#endif
 		}
 	}
 
@@ -2905,13 +2884,6 @@ static void tcp_fastretrans_alert(struct sock *sk, const int acked,
 			return;
 		}
 		break;
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-	case TCP_CA_Modem_Drop:
-		if (flag & FLAG_SND_UNA_ADVANCED)
-			do_lost = tcp_is_reno(tp) ||
-				  tcp_fackets_out(tp) > tp->reordering;
-		break;
-#endif
 	case TCP_CA_Loss:
 		tcp_process_loss(sk, flag, is_dupack);
 		if (icsk->icsk_ca_state != TCP_CA_Open &&
@@ -2952,12 +2924,7 @@ static void tcp_fastretrans_alert(struct sock *sk, const int acked,
 
 	if (do_lost)
 		tcp_update_scoreboard(sk, fast_rexmit);
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-	if (icsk->icsk_ca_state != TCP_CA_Modem_Drop)
-		tcp_cwnd_reduction(sk, prior_unsacked, fast_rexmit, flag);
-#else
 	tcp_cwnd_reduction(sk, prior_unsacked, fast_rexmit, flag);
-#endif
 	tcp_xmit_retransmit_queue(sk);
 }
 
@@ -2990,9 +2957,6 @@ static inline bool tcp_ack_update_rtt(struct sock *sk, const int flag,
 	if (seq_rtt_us < 0)
 		return false;
 
-#ifdef CONFIG_HW_CROSSLAYER_OPT_DBG_MODULE
-	ASPEN_SET_RTT_US(sk);
-#endif
 	tcp_rtt_estimator(sk, seq_rtt_us);
 	tcp_set_rto(sk);
 
@@ -3074,12 +3038,7 @@ void tcp_resume_early_retransmit(struct sock *sk)
 	if (!tp->do_early_retrans)
 		return;
 
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-	if (inet_csk(sk)->icsk_ca_state != TCP_CA_Modem_Drop)
-		tcp_enter_recovery(sk, false);
-#else
 	tcp_enter_recovery(sk, false);
-#endif
 	tcp_update_scoreboard(sk, 1);
 	tcp_xmit_retransmit_queue(sk);
 }

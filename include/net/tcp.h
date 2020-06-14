@@ -923,10 +923,6 @@ static inline void tcp_set_ca_state(struct sock *sk, const u8 ca_state)
 	if (icsk->icsk_ca_ops->set_state)
 		icsk->icsk_ca_ops->set_state(sk, ca_state);
 	icsk->icsk_ca_state = ca_state;
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-	if (ca_state == TCP_CA_Open)
-		sk->undo_modem_drop_marker = 0;
-#endif
 }
 
 static inline void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event)

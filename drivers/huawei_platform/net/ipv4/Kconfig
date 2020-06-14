@@ -1,12 +1,3 @@
-config HW_CROSSLAYER_OPT
-	bool "Huawei network crosslayer optimization"
-	default n
-
-config HW_CROSSLAYER_OPT_DBG
-	tristate "Huawei network crosslayer information collection"
-	depends on HW_CROSSLAYER_OPT && m
-	default n
-
 config HW_WIFIPRO
 	bool "Huawei wifipro tcp monitor support"
 	default n

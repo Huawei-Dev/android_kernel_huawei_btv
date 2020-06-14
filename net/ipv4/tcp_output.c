@@ -42,10 +42,6 @@
 #include <linux/gfp.h>
 #include <linux/module.h>
 
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-#include <net/tcp_crosslayer.h>
-#endif
-
 #ifdef CONFIG_HW_WIFIPRO
 #include <huawei_platform/net/ipv4/wifipro_tcp_monitor.h>
 #endif
@@ -78,27 +74,6 @@ EXPORT_SYMBOL(sysctl_tcp_notsent_lowat);
 
 static bool tcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,
 			   int push_one, gfp_t gfp);
-
-#ifdef CONFIG_HW_CROSSLAYER_OPT_DBG_MODULE
-static inline unsigned int tcp_cwnd_test(const struct tcp_sock *tp,
-					 const struct sk_buff *skb);
-
-static inline unsigned int tcp_snd_wnd_remain(const struct sock *sk,
-					      const struct tcp_sock *tp,
-					      const struct sk_buff *skb)
-{
-	u32 end_seq = TCP_SKB_CB(skb)->end_seq;
-	u32 cur_mss = tcp_current_mss((struct sock *)sk);
-
-	if (skb->len > cur_mss)
-		end_seq = TCP_SKB_CB(skb)->seq + cur_mss;
-
-	if (!after(end_seq, tcp_wnd_end(tp)))
-		return tcp_wnd_end(tp) - end_seq;
-	else
-		return 0;
-}
-#endif
 
 /* Account for new data that has been sent to the network. */
 static void tcp_event_new_data_sent(struct sock *sk, const struct sk_buff *skb)
@@ -819,18 +794,11 @@ static void tcp_tasklet_func(unsigned long data)
 	}
 }
 
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-#define TCP_DEFERRED_ALL ((1UL << TCP_TSQ_DEFERRED) |           \
-				(1UL << TCP_WRITE_TIMER_DEFERRED) |   \
-				(1UL << TCP_DELACK_TIMER_DEFERRED) |  \
-				(1UL << TCP_MTU_REDUCED_DEFERRED) |   \
-				(1UL << TCP_CROSSLAYER_RECOVERY_DEFERRED))
-#else
 #define TCP_DEFERRED_ALL ((1UL << TCP_TSQ_DEFERRED) |           \
 				(1UL << TCP_WRITE_TIMER_DEFERRED) |   \
 				(1UL << TCP_DELACK_TIMER_DEFERRED) |  \
 				(1UL << TCP_MTU_REDUCED_DEFERRED))
-#endif
+
 /**
  * tcp_release_cb - tcp release_sock() callback
  * @sk: socket
@@ -877,12 +845,6 @@ void tcp_release_cb(struct sock *sk)
 		inet_csk(sk)->icsk_af_ops->mtu_reduced(sk);
 		__sock_put(sk);
 	}
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-	if (aspen_tcp_cdn &&
-	    flags & (1UL << TCP_CROSSLAYER_RECOVERY_DEFERRED)) {
-		aspen_tcp_crosslayer_retransmit(sk);
-	}
-#endif
 }
 EXPORT_SYMBOL(tcp_release_cb);
 
@@ -1049,15 +1011,6 @@ static int tcp_transmit_skb(struct sock *sk, struct sk_buff *skb, int clone_it,
 	skb_shinfo(skb)->gso_type = sk->sk_gso_type;
 	if (likely((tcb->tcp_flags & TCPHDR_SYN) == 0))
 		tcp_ecn_send(sk, skb, tcp_header_size);
-
-#ifdef CONFIG_HW_CROSSLAYER_OPT_DBG_MODULE
-	if (skb)
-		aspen_collect_tcp_sender_monitor(sk, skb,
-			(opts.options & OPTION_TS) ? opts.tsval : 0,
-			(opts.options & OPTION_TS) ? opts.tsecr : 0,
-			tcp_cwnd_test(tp, skb),
-			tcp_snd_wnd_remain(sk, tp, skb));
-#endif
 
 #ifdef CONFIG_TCP_MD5SIG
 	/* Calculate the MD5 hash, as we have all we need now */
@@ -2720,9 +2673,6 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb)
 	}
 	return err;
 }
-#ifdef CONFIG_HW_CROSSLAYER_OPT
-EXPORT_SYMBOL(__tcp_retransmit_skb);
-#endif
 
 int tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb)
 {
