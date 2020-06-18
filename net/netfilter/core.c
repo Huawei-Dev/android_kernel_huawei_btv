@@ -88,7 +88,9 @@ int nf_register_net_hook(struct net *net, const struct nf_hook_ops *reg)
 		return -ENOMEM;
 
 	new->hook     = reg->hook;
+#ifdef CONFIG_NETFILTER_INGRESS
 	new->dev      = reg->dev;
+#endif
 	new->owner    = reg->owner;
 	new->priv     = reg->priv;
 	new->pf       = reg->pf;
@@ -129,7 +131,9 @@ void nf_unregister_net_hook(struct net *net, const struct nf_hook_ops *reg)
 	mutex_lock(&nf_hook_mutex);
 	list_for_each_entry(elem, nf_hook_list, list) {
 		if ((reg->hook     == elem->hook) &&
+#ifdef CONFIG_NETFILTER_INGRESS
 		    (reg->dev      == elem->dev) &&
+#endif
 		    (reg->owner    == elem->owner) &&
 		    (reg->priv     == elem->priv) &&
 		    (reg->pf       == elem->pf) &&
