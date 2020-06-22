@@ -431,6 +431,11 @@ CONFIG_CP15_BARRIER_EMULATION=y
 CONFIG_SETEND_EMULATION=y
 
 #
+# ARMv8.1 architectural features
+#
+# CONFIG_ARM64_HW_AFDBM is not set
+
+#
 # Boot options
 #
 CONFIG_CMDLINE="console=ttyAMA0"
