@@ -662,8 +662,6 @@ config DEBUG_VMALLOC
 
 	  Disabling these can result in savings in code size.
 
-source "mm/hisi/Kconfig"
-
 # For architectures that support deferred memory initialisation
 config ARCH_SUPPORTS_DEFERRED_STRUCT_PAGE_INIT
 	bool
