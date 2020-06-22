@@ -181,8 +181,6 @@ static void hisi_ion_flush_cache_all(void *dummy)
 
 	if (MIDR_PARTNUM(midr) == ARM_CPU_PART_CORTEX_ARTEMIS)
 		artemis_flush_cache_all();
-	else
-		flush_cache_all();
 }
 
 void ion_flush_all_cpus_caches(void)

@@ -701,7 +701,6 @@ static void ipi_cpu_stop(unsigned int cpu)
 		memset(&regs, 0x0, sizeof(regs));
 		get_pt_regs(&regs);
 		show_regs(&regs);
-		flush_cache_all();
 		put_cpu();
 #endif
 		dump_stack();

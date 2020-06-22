@@ -209,7 +209,6 @@ void hisi_axi_test(void)
 		return;
 	}
 	writel(1, ioremap_base);
-	flush_cache_all();
 	unmap_address(ioremap_base);
 }
 #endif

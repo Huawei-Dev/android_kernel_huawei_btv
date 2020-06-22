@@ -125,7 +125,6 @@ static void __spin_lock_debug(raw_spinlock_t *lock)
 	if (g_logbuf_lock_ex == lock) {
 		g_logbuf_lock_flag = 0xAA;
 		memcpy(&g_logbuf_lock_panic, lock, sizeof(raw_spinlock_t));
-		flush_cache_all();
 		local_irq_disable();
 		while(1);
 	}

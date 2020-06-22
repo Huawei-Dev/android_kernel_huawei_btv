@@ -77,9 +77,6 @@ ENTRY(cpu_soft_restart)
 	/* Turn D-cache off */
 	bl	cpu_cache_off
 
-	/* Push out all dirty data, and ensure cache is empty */
-	bl	flush_cache_all
-
 	mov	x0, x20
 	ret	x19
 ENDPROC(cpu_soft_restart)

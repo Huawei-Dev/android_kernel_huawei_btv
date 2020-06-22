@@ -504,7 +504,6 @@ int sh_savebuf2fs(char* logpath, char* filename,
 out1:
     filp_close(fp, NULL);
 
-    /*根据权限要求，hisi_logs目录及子目录群组调整为root-system */
     ret = (int)bbox_chown((const char __user*)path, ROOT_UID,
                           SYSTEM_GID, false);
 
@@ -697,7 +696,6 @@ static int write_sh_dump_file(void)
     snprintf(path, PATH_MAXLEN, "sensorhub-%02d.dmp", g_dump_index);
     hwlog_info("%s: write sensorhub dump  file %s\n", __func__, path);
     hwlog_err("sensorhub recovery source is %s\n", sh_reset_reasons[pConfigOnDDr->dump_config.reason]);
-    flush_cache_all();
 
     //write share part
     if (g_sensorhub_dump_buff)

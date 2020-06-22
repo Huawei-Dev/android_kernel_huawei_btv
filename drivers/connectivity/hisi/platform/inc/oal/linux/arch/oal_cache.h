@@ -222,7 +222,6 @@ OAL_STATIC OAL_INLINE oal_void  oal_l2cache_icache_lock(oal_bool_enum_uint8 en_f
 *****************************************************************************/
 OAL_STATIC OAL_INLINE oal_void  oal_cache_flush_all(oal_void)
 {
-    flush_cache_all();
 }
 
 /*****************************************************************************
