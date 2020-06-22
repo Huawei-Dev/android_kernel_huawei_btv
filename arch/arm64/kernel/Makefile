@@ -17,16 +17,10 @@ CFLAGS_REMOVE_return_address.o = -pg
 arm64-obj-y		:= debug-monitors.o entry.o irq.o fpsimd.o		\
 			   entry-fpsimd.o process.o ptrace.o setup.o signal.o	\
 			   sys.o stacktrace.o time.o traps.o io.o vdso.o	\
-			   psci.o psci-call.o cpu_ops.o insn.o			\
+			   hyp-stub.o psci.o psci-call.o cpu_ops.o insn.o		\
 			   return_address.o cpuinfo.o cpu_errata.o		\
 			   cpufeature.o alternative.o cacheinfo.o		\
 			   smp.o smp_spin_table.o topology.o
-
-ifeq ($(CONFIG_HIBERNATION),y)
-arm64-obj-y            +=hibernation_hyp-stub.o
-else
-arm64-obj-y            +=hyp-stub.o
-endif
 
 stub-obj				:= efi-stub.o efi-entry.o
 extra-y					:= $(stub-obj)
@@ -45,11 +39,7 @@ arm64-obj-$(CONFIG_PERF_EVENTS)		+= perf_regs.o perf_callchain.o
 arm64-obj-$(CONFIG_HW_PERF_EVENTS)	+= perf_event.o
 arm64-obj-$(CONFIG_HAVE_HW_BREAKPOINT)	+= hw_breakpoint.o
 arm64-obj-$(CONFIG_HAVE_HW_BREAKPOINT_ADDR_MASK)	+= hisi_arch_watchpoint.o
-ifeq ($(CONFIG_HIBERNATION),y)
-arm64-obj-$(CONFIG_CPU_PM)             += hibernation_sleep.o hibernation_suspend.o
-else
 arm64-obj-$(CONFIG_CPU_PM)		+= sleep.o suspend.o
-endif
 arm64-obj-$(CONFIG_CPU_IDLE)		+= cpuidle.o
 arm64-obj-$(CONFIG_JUMP_LABEL)		+= jump_label.o
 arm64-obj-$(CONFIG_KGDB)		+= kgdb.o
