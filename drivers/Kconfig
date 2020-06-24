@@ -193,6 +193,8 @@ source "drivers/thunderbolt/Kconfig"
 
 source "drivers/android/Kconfig"
 
+source "drivers/nvdimm/Kconfig"
+
 source "drivers/hisi/Kconfig"
 
 source "drivers/huawei_platform/Kconfig"
