@@ -1297,7 +1297,7 @@ static struct request *blk_mq_map_request(struct request_queue *q,
 	if (!rq) {
 		pr_err("%s: alloc request failed\n", __func__);
 		blk_mq_put_ctx(ctx);
-		bio_endio(bio, -EIO);
+		bio_endio(bio);
 		return NULL;
 	}
 
