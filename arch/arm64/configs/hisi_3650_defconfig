@@ -2789,11 +2789,6 @@ CONFIG_USB_DWC3_HISI=y
 #
 # Debugging features
 #
-# CONFIG_USB_DWC3_DEBUG is not set
-
-#
-# Other features
-#
 CONFIG_USB_DWC3_OTG=y
 # CONFIG_USB_DWC2 is not set
 # CONFIG_USB_CHIPIDEA is not set
