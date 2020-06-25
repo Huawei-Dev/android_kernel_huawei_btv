@@ -766,11 +766,11 @@ static void verity_finish_io(struct dm_verity_io *io, int error)
 	struct bio *bio = dm_bio_from_per_bio_data(io, v->ti->per_bio_data_size);
 
 	bio->bi_end_io = io->orig_bi_end_io;
-	bio->bi_private = io->orig_bi_private;
+	bio->bi_error = error;
 
 	verity_fec_finish_io(io);
 
-	bio_endio(bio, error);
+	bio_endio(bio);
 }
 
 static void verity_work(struct work_struct *w)
@@ -780,12 +780,12 @@ static void verity_work(struct work_struct *w)
 	verity_finish_io(io, verity_verify_io(io));
 }
 
-static void verity_end_io(struct bio *bio, int error)
+static void verity_end_io(struct bio *bio)
 {
 	struct dm_verity_io *io = bio->bi_private;
 
-	if (error && !verity_fec_is_enabled(io->v)) {
-		verity_finish_io(io, error);
+	if (bio->bi_error && !verity_fec_is_enabled(io->v)) {
+		verity_finish_io(io, bio->bi_error);
 		return;
 	}
 
