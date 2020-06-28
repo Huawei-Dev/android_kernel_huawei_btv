@@ -2606,7 +2606,7 @@ static int alps_set_protocol(struct psmouse *psmouse,
 		priv->x_max = 1023;
 		priv->y_max = 767;
 		if (dmi_check_system(alps_dmi_has_separate_stick_buttons))
-			priv->flags |= ALPS_STICK_BITS;
+			priv->flags |= ALPS_DELL;
 		break;
 
 	case ALPS_PROTO_V3:
