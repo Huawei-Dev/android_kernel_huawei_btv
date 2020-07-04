@@ -32,8 +32,13 @@
 
 struct vendor_data {
 	unsigned int		ifls;
+	unsigned int		fr_busy;
+	unsigned int		fr_dsr;
+	unsigned int		fr_cts;
+	unsigned int		fr_ri;
 	unsigned int		lcrh_tx;
 	unsigned int		lcrh_rx;
+	u16			*reg_lut;
 	bool			oversampling;
 	bool			dma_threshold;
 	bool			cts_event_workaround;
@@ -119,7 +124,12 @@ struct uart_tx_unit {
 	unsigned int		fifosize;	/* vendor-specific */
 	unsigned int		lcrh_tx;	/* vendor-specific */
 	unsigned int		lcrh_rx;	/* vendor-specific */
+	unsigned int		fr_busy;
+	unsigned int		fr_dsr;
+	unsigned int		fr_cts;
+	unsigned int		fr_ri;
 	unsigned int		old_cr;		/* state during shutdown */
+	u16			*reg_lut;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
 #else
 	struct delayed_work	tx_softirq_work;
