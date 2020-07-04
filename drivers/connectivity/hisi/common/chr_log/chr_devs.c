@@ -1624,11 +1624,7 @@ static int32 chr_miscdevs_register(void)
                     kfree(g_log_devs[num].user.buffer);
                     g_log_devs[num].user.buffer = NULL;
                 }
-                ret = misc_deregister(g_log_devs[num].miscdev);
-                if (0 != ret)
-                {
-                    CHR_ERR("chr dev %s deregist fail\n", g_subsystem_str[g_log_devs[num].dev_index]);
-                }
+                misc_deregister(g_log_devs[num].miscdev);
             }
             g_log_enable = CHR_LOG_DISABLE;
             return -CHR_EFAIL;
@@ -1664,7 +1660,6 @@ static int32 chr_miscdevs_register(void)
 static int32 chr_miscdevs_unregister(void)
 {
     int32 num     = 0;
-    int32 ret     = 0;
     int32 result  = CHR_SUCC;
     int32 dev_num = sizeof(g_log_devs) / sizeof(CHR_DEV);
 
@@ -1681,12 +1676,7 @@ static int32 chr_miscdevs_unregister(void)
             kfree(g_log_devs[num].user.buffer);
             g_log_devs[num].user.buffer = NULL;
         }
-        ret = misc_deregister(g_log_devs[num].miscdev);
-        if (CHR_SUCC != ret)
-        {
-            result = -CHR_EFAIL;
-            CHR_ERR("chr dev %s deregister fail\n",g_subsystem_str[g_log_devs[num].dev_index]);
-        }
+        misc_deregister(g_log_devs[num].miscdev);
     }
 
     g_log_enable = CHR_LOG_DISABLE;

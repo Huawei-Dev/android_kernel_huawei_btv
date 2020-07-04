@@ -188,12 +188,9 @@ Return:        void
 *******************************************************************************************/
 static void __exit motionhub_exit(void)
 {
-	int ret;
-
 	inputhub_route_close(ROUTE_MOTION_PORT);
-	ret = misc_deregister(&motionhub_miscdev);
-
-	hwlog_info("%s ret=%d\n", __func__, ret);
+	misc_deregister(&motionhub_miscdev);
+	hwlog_info("exit %s\n", __func__);
 }
 
 module_init(motionhub_init);

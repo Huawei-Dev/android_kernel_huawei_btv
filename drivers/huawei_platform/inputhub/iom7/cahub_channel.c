@@ -197,13 +197,10 @@ Return:         void
 *******************************************************************************************/
 static void __exit cahub_exit(void)
 {
-	hwlog_info("enter %s \n", __func__);
-    int ret;
-
+    hwlog_info("enter %s \n", __func__);
     inputhub_route_close(ROUTE_CA_PORT);
-    ret = misc_deregister(&cahub_miscdev);
-
-    hwlog_info("%s ret=%d\n", __func__, ret);
+    misc_deregister(&cahub_miscdev);
+    hwlog_info("exit %s \n", __func__);
 }
 
 module_init(cahub_init);

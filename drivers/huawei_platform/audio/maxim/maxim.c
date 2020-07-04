@@ -578,7 +578,7 @@ static int maxim_ioctl_remove(struct platform_device *pdev)
 		maxim_priv_data = NULL;
 	}
 
-	ret = misc_deregister(&maxim_ctrl_miscdev);
+	misc_deregister(&maxim_ctrl_miscdev);
 
 	return ret;
 }

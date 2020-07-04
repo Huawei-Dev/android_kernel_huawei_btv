@@ -429,7 +429,7 @@ static int tfa98xx_ioctl_remove(struct platform_device *pdev)
 		tfa98xx_priv_data = NULL;
 	}
 
-	ret = misc_deregister(&tfa98xx_ctrl_miscdev);
+	misc_deregister(&tfa98xx_ctrl_miscdev);
 
 	return ret;
 }

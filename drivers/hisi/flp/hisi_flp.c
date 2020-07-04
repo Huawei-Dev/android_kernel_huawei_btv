@@ -1897,17 +1897,15 @@ Return:        void
 *******************************************************************************************/
  int hisi_flp_unregister(void)
 {
-    int ret;
-
     unregister_mcu_event_notifier(TAG_PDR, CMD_FLP_PDR_DATA_REQ, get_pdr_data_from_mcu);
     unregister_mcu_event_notifier(TAG_PDR, CMD_FLP_PDR_UNRELIABLE_REQ, get_pdr_notify_from_mcu);
     unregister_mcu_event_notifier(TAG_AR, CMD_FLP_AR_DATA_REQ, get_ar_data_from_mcu);
     genl_unregister_family(&flp_genl_family);
 
-    ret = misc_deregister(&hisi_flp_miscdev);
+    misc_deregister(&hisi_flp_miscdev);
 
-    printk(HISI_FLP_DEBUG "hisi_flp_unregister ret=%d\n", ret);
-    return ret;
+    printk(HISI_FLP_DEBUG "hisi_flp_unregister\n");
+    return 0;
 }
 EXPORT_SYMBOL_GPL(hisi_flp_unregister);
 

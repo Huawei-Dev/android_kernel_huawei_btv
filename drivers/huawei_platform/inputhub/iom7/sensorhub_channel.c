@@ -345,12 +345,9 @@ Return:         成功或者失败信息
 *******************************************************************************************/
 void __exit sensorhub_exit(void)
 {
-    int ret;
-
     inputhub_route_close(ROUTE_SHB_PORT);
-    ret = misc_deregister(&senorhub_miscdev);
-
-    hwlog_info("%s ret=%d\n", __func__, ret);
+    misc_deregister(&senorhub_miscdev);
+    hwlog_info("exit %s\n", __func__);
 }
 
 module_init(sensorhub_init);
