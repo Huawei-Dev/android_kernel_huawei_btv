@@ -1395,7 +1395,7 @@ static int hi3xxx_clkdiv_bestdiv(struct clk_hw *hw, unsigned long rate,
 				 unsigned long *best_parent_rate)
 {
 	struct hi3xxx_divclk *dclk = container_of(hw, struct hi3xxx_divclk, hw);
-	struct clk *clk_parent = __clk_get_parent(hw->clk);
+	struct clk *clk_parent = clk_hw_get_parent(hw);
 	int i, bestdiv = 0;
 	unsigned long parent_rate, best = 0, now, maxdiv;
 
@@ -1418,7 +1418,7 @@ static int hi3xxx_clkdiv_bestdiv(struct clk_hw *hw, unsigned long rate,
 	for (i = 1; i <= maxdiv; i++) {
 		if (!hi3xxx_is_valid_table_div(dclk->table, i))
 			continue;
-		parent_rate = __clk_round_rate(clk_parent,
+		parent_rate = clk_hw_round_rate(clk_parent,
 					       MULT_ROUND_UP(rate, i));
 		now = parent_rate / i;
 		if (now <= rate && now > best) {
@@ -1430,7 +1430,7 @@ static int hi3xxx_clkdiv_bestdiv(struct clk_hw *hw, unsigned long rate,
 
 	if (!bestdiv) {
 		bestdiv = hi3xxx_get_table_maxdiv(dclk->table);
-		*best_parent_rate = __clk_round_rate(clk_parent, 1);
+		*best_parent_rate = clk_hw_round_rate(clk_parent, 1);
 	}
 
 	return bestdiv;
