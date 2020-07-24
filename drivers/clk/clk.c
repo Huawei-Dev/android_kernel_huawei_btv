@@ -238,6 +238,16 @@ late_initcall_sync(clk_disable_unused);
 
 /***    helper functions   ***/
 
+struct clk *__clk_get_parent(struct clk *clk)
+{
+	if (!clk)
+		return NULL;
+
+	/* TODO: Create a per-user clk and change callers to call clk_put */
+	return !clk->core->parent ? NULL : clk->core->parent->hw->clk;
+}
+EXPORT_SYMBOL_GPL(__clk_get_parent);
+
 const char *__clk_get_name(struct clk *clk)
 {
 	return !clk ? NULL : clk->core->name;
@@ -861,6 +871,32 @@ unsigned long clk_hw_round_rate(struct clk_hw *hw, unsigned long rate)
 	return req.rate;
 }
 EXPORT_SYMBOL_GPL(clk_hw_round_rate);
+
+/**
+ * __clk_round_rate - round the given rate for a clk
+ * @clk: round the rate of this clock
+ * @rate: the rate which is to be rounded
+ *
+ * Useful for clk_ops such as .set_rate
+ */
+unsigned long __clk_round_rate(struct clk *clk, unsigned long rate)
+{
+	struct clk_rate_request req;
+	int ret;
+
+	if (!clk)
+		return 0;
+
+	clk_core_get_boundaries(clk->core, &req.min_rate, &req.max_rate);
+	req.rate = rate;
+
+	ret = clk_core_round_rate_nolock(clk->core, &req);
+	if (ret)
+		return 0;
+
+	return req.rate;
+}
+EXPORT_SYMBOL_GPL(__clk_round_rate);
 
 /**
  * clk_round_rate - round the given rate for a clk

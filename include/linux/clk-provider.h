@@ -662,6 +662,9 @@ void clk_unregister(struct clk *clk);
 void devm_clk_unregister(struct device *dev, struct clk *clk);
 
 /* helper functions */
+struct clk *__clk_get_parent(struct clk *clk);
+unsigned long __clk_round_rate(struct clk *clk, unsigned long rate);
+
 const char *__clk_get_name(struct clk *clk);
 const char *clk_hw_get_name(const struct clk_hw *hw);
 struct clk_hw *__clk_get_hw(struct clk *clk);

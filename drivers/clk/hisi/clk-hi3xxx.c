@@ -21,9 +21,13 @@
  *
  */
 
+#include <linux/version.h>
 #include <linux/kernel.h>
 #include <linux/clk.h>
 #include <linux/clkdev.h>
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 13, 0))
+#include <linux/clk-private.h>
+#endif
 #include <linux/clk-provider.h>
 #include <linux/delay.h>
 #include <linux/io.h>
@@ -209,8 +213,13 @@ EXPORT_SYMBOL_GPL(IS_FPGA);
 extern int __clk_enable(struct clk *clk);
 extern void __clk_disable(struct clk *clk);
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 13, 0))
+extern int __clk_prepare(struct clk *clk);
+extern void __clk_unprepare(struct clk *clk);
+#else
 extern int clk_core_prepare(struct clk_core *clk_core);
 extern void clk_core_unprepare(struct clk_core *clk_core);
+#endif
 
 static int hi3xxx_clkgate_enable(struct clk_hw *hw)
 {
@@ -233,14 +242,22 @@ static int hi3xxx_clkgate_enable(struct clk_hw *hw)
 			pr_err("%s get failed!\n", pclk->friend);
 			return -1;
 		}
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 13, 0))
+		ret = __clk_prepare(friend_clk);
+#else
 		ret = clk_core_prepare(friend_clk->core);
+#endif
 		if (ret) {
 			pr_err("[%s], friend clock prepare faild!", __func__);
 			return ret;
 		}
 		ret = __clk_enable(friend_clk);
 		if (ret) {
-			clk_core_unprepare(friend_clk->core);
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 13, 0))
+		__clk_unprepare(friend_clk);
+#else
+		clk_core_unprepare(friend_clk->core);
+#endif
 			pr_err("[%s], friend clock enable faild!", __func__);
 			return ret;
 		}
@@ -275,7 +292,11 @@ static void hi3xxx_clkgate_disable(struct clk_hw *hw)
             return;
 		}
 		__clk_disable(friend_clk);
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 13, 0))
+		__clk_unprepare(friend_clk);
+#else
 		clk_core_unprepare(friend_clk->core);
+#endif
 	}
 #endif
 }
@@ -321,7 +342,7 @@ static void __iomem *hi3xxx_clkgate_get_reg(struct clk_hw *hw)
 		ret = pclk->enable + hi3xxx_CLK_GATE_STATUS_OFFSET;
 		val = readl(ret);
 		val &= pclk->ebits;
-		pr_info("\n[%s]: reg = 0x%pk, bits = 0x%x, regval = 0x%x\n",
+		pr_info("\n[%s]: reg = 0x%pK, bits = 0x%x, regval = 0x%x\n",
 			__clk_get_name(hw->clk), ret, pclk->ebits, val);
 	}
 
@@ -1395,7 +1416,7 @@ static int hi3xxx_clkdiv_bestdiv(struct clk_hw *hw, unsigned long rate,
 				 unsigned long *best_parent_rate)
 {
 	struct hi3xxx_divclk *dclk = container_of(hw, struct hi3xxx_divclk, hw);
-	struct clk *clk_parent = clk_hw_get_parent(hw);
+	struct clk *clk_parent = __clk_get_parent(hw->clk);
 	int i, bestdiv = 0;
 	unsigned long parent_rate, best = 0, now, maxdiv;
 
@@ -1418,7 +1439,7 @@ static int hi3xxx_clkdiv_bestdiv(struct clk_hw *hw, unsigned long rate,
 	for (i = 1; i <= maxdiv; i++) {
 		if (!hi3xxx_is_valid_table_div(dclk->table, i))
 			continue;
-		parent_rate = clk_hw_round_rate(clk_parent,
+		parent_rate = __clk_round_rate(clk_parent,
 					       MULT_ROUND_UP(rate, i));
 		now = parent_rate / i;
 		if (now <= rate && now > best) {
@@ -1430,7 +1451,7 @@ static int hi3xxx_clkdiv_bestdiv(struct clk_hw *hw, unsigned long rate,
 
 	if (!bestdiv) {
 		bestdiv = hi3xxx_get_table_maxdiv(dclk->table);
-		*best_parent_rate = clk_hw_round_rate(clk_parent, 1);
+		*best_parent_rate = __clk_round_rate(clk_parent, 1);
 	}
 
 	return bestdiv;
@@ -1503,7 +1524,7 @@ static void __iomem *hi3xxx_clkdiv_get_reg(struct clk_hw *hw)
 		ret = dclk->reg;
 		val = readl(ret);
 		val &= dclk->mbits;
-		pr_info("\n[%s]: reg = 0x%pk, bits = 0x%x, regval = 0x%x\n",
+		pr_info("\n[%s]: reg = 0x%pK, bits = 0x%x, regval = 0x%x\n",
 			__clk_get_name(hw->clk), ret, dclk->mbits, val);
 	}
 	return ret;
@@ -1792,11 +1813,27 @@ static long hi3xxx_xfreq_clk_round_rate(struct clk_hw *hw, unsigned long rate,
 	return rate;
 }
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 13, 0))
+static long hi3xxx_xfreq_clk_determine_rate(struct clk_hw *hw, unsigned long rate,
+					unsigned long *best_parent_rate,
+					struct clk **best_parent_clk)
+{
+	return rate;
+}
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0))
 static int hi3xxx_xfreq_clk_determine_rate(struct clk_hw *hw,
 			     struct clk_rate_request *req)
 {
-	return (int)req->rate;
+	return 0;
 }
+#else
+static long hi3xxx_xfreq_clk_determine_rate(struct clk_hw *hw, unsigned long rate,
+					  unsigned long min_rate, unsigned long max_rate,
+					  unsigned long *best_parent_rate, struct clk_hw **best_parent_hw)
+{
+	return rate;
+}
+#endif
 
 static int hi3xxx_xfreq_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 				  unsigned long parent_rate)
