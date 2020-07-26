@@ -1097,8 +1097,8 @@ CONFIG_MTD_OF_PARTS=y
 # User Modules And Translation Layers
 #
 CONFIG_HISI_NVE=y
-CONFIG_MTD_BLKDEVS=y
-CONFIG_MTD_BLOCK=y
+CONFIG_HISI_NVE_WHITELIST=y
+# CONFIG_MTD_BLOCK is not set
 # CONFIG_FTL is not set
 # CONFIG_NFTL is not set
 # CONFIG_INFTL is not set
