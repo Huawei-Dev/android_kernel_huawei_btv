@@ -11,6 +11,7 @@
 #include <linux/blktrace_api.h>
 #include <linux/blk-cgroup.h>
 #include "blk.h"
+#include <trace/iotrace.h>
 
 #define SHARE_SHIFT (14)
 #define MAX_SHARE (1 << SHARE_SHIFT)
@@ -30,6 +31,24 @@
 #define IOPS_SLICE_MAX	(4096)
 #define IOPS_SLICE_DEF	(256)
 
+#define MAX_THROTL_DELAY_TM_MS	(3000)	/* 3s */
+
+#ifdef CONFIG_HUAWEI_IO_TRACING
+DEFINE_TRACE(block_throttle_weight)
+DEFINE_TRACE(block_throttle_dispatch)
+DEFINE_TRACE(block_throttle_iocost)
+DEFINE_TRACE(block_throttle_limit_start)
+DEFINE_TRACE(block_throttle_limit_end)
+DEFINE_TRACE(block_throttle_bio_in)
+DEFINE_TRACE(block_throttle_bio_out)
+#endif
+
+enum blk_throtl_weight_onoff_mode {
+	BLK_THROTL_WEIGHT_OFF,
+	BLK_THROTL_WEIGHT_ON_FS,
+	BLK_THROTL_WEIGHT_ON_BLK,
+};
+
 /* Max dispatch from a group in 1 round */
 static int throtl_grp_quantum = 8;
 
@@ -44,11 +63,9 @@ static struct blkcg_policy blkcg_policy_throtl;
 /* A workqueue to queue throttle related work */
 static struct workqueue_struct *kthrotld_workqueue;
 
-/*lint -save -e64 -e570 -e651 -e708 -e785*/
 static DEFINE_MUTEX(throtl_mode_lock);
-/*lint -restore*/
 
-int blk_throtl_weight_offon = 0;
+int blk_throtl_weight_offon = BLK_THROTL_WEIGHT_OFF;
 
 /*
  * To implement hierarchical throttling, throtl_grps form a tree and bios
@@ -157,7 +174,7 @@ struct throtl_grp {
 
 	unsigned int flags;
 
-	unsigned int fg_flag;
+	unsigned int type;
 
 	/* are there any throtl rules between this group and td? */
 	bool has_rules[2];
@@ -167,13 +184,18 @@ struct throtl_grp {
 	/* When did we start a new slice */
 	unsigned long slice_start[2];
 	unsigned long slice_end[2];
-	unsigned long		intime;
-	
-	atomic_t		inflights[2];
-	struct bio_list		bios;
-	struct list_head	node;
+	unsigned long       intime;
 
-	int			quantum;
+	atomic_t        inflights[2];
+	struct bio_list     bios;
+	struct list_head    node;
+	wait_queue_head_t	wait;
+	bool			expired;
+
+	int         quantum;
+
+	atomic_t	delay_cnt;
+	atomic_t	max_delay;
 };
 
 enum run_mode {
@@ -211,23 +233,22 @@ struct throtl_data
 
 	/* Work for dispatching throttled bios */
 	struct work_struct dispatch_work;
+	uint64_t        bw_slice;
+	unsigned int        iops_slice;
+	int         quantum;
 
-	uint64_t		bw_slice;
-	unsigned int		iops_slice;
-	int			quantum;
+	enum run_mode       mode;
 
-	enum run_mode		mode;
+	int         max_inflights;
+	atomic_t        inflights;
 
-	int			max_inflights;
-	atomic_t		inflights;
+	struct list_head    active;
+	struct list_head    expired;
 
-	struct list_head	active;
-	struct list_head	expired;
+	wait_queue_head_t   waitq;
+	struct timer_list   rescue_timer;
 
-	wait_queue_head_t	waitq;
-	struct timer_list	rescue_timer;
-
-	struct timer_list	idle_timer;
+	struct timer_list   idle_timer;
 };
 
 static bool td_weight_based(struct throtl_data *td)
@@ -281,9 +302,7 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
 	if (tg)
 		return tg->td;
 	else
-		/*lint -save -e826*/
 		return container_of(sq, struct throtl_data, service_queue);
-		/*lint -restore*/
 }
 
 static inline int tg_data_index(struct throtl_grp *tg, bool rw)
@@ -350,6 +369,10 @@ static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg)
 static void throtl_qnode_add_bio(struct bio *bio, struct throtl_qnode *qn,
 				 struct list_head *queued)
 {
+#ifdef CONFIG_HISI_BLK_CORE
+	if (bio->io_in_count & HISI_IO_IN_COUNT_SET)
+		bio->io_in_count |= HISI_IO_IN_COUNT_WILL_BE_SEND_AGAIN;
+#endif
 	bio_list_add(&qn->bios, bio);
 	if (list_empty(&qn->node)) {
 		list_add_tail(&qn->node, queued);
@@ -363,7 +386,6 @@ static void throtl_qnode_add_bio(struct bio *bio, struct throtl_qnode *qn,
  */
 static struct bio *throtl_peek_queued(struct list_head *queued)
 {
-	/*lint -save -e727 -e730 -e826*/
 	struct throtl_qnode *qn = list_first_entry(queued, struct throtl_qnode, node);
 	struct bio *bio;
 
@@ -372,7 +394,6 @@ static struct bio *throtl_peek_queued(struct list_head *queued)
 
 	bio = bio_list_peek(&qn->bios);
 	WARN_ON_ONCE(!bio);
-	/*lint -restore*/
 	return bio;
 }
 
@@ -393,18 +414,14 @@ static struct bio *throtl_peek_queued(struct list_head *queued)
 static struct bio *throtl_pop_queued(struct list_head *queued,
 				     struct throtl_grp **tg_to_put)
 {
-	/*lint -save -e826*/
 	struct throtl_qnode *qn = list_first_entry(queued, struct throtl_qnode, node);
-	/*lint -restore*/
 	struct bio *bio;
 
 	if (list_empty(queued))
 		return NULL;
 
 	bio = bio_list_pop(&qn->bios);
-	/*lint -save -e727 -e730*/
 	WARN_ON_ONCE(!bio);
-	/*lint -restore*/
 
 	if (bio_list_empty(&qn->bios)) {
 		list_del_init(&qn->node);
@@ -431,10 +448,10 @@ static void throtl_service_queue_init(struct throtl_service_queue *sq)
 
 static inline void io_cost_init(struct throtl_grp *tg)
 {
-	tg->io_cost.bps[READ] = (u64)(s64)-1;
-	tg->io_cost.bps[WRITE] = (u64)(s64)-1;
-	tg->io_cost.iops[READ] = (u32)-1;
-	tg->io_cost.iops[WRITE] = (u32)-1;
+        tg->io_cost.bps[READ] = (u64)(s64)-1;
+        tg->io_cost.bps[WRITE] = (u64)(s64)-1;
+        tg->io_cost.iops[READ] = (u32)-1;
+        tg->io_cost.iops[WRITE] = (u32)-1;
 }
 
 static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
@@ -452,12 +469,14 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
 		throtl_qnode_init(&tg->qnode_on_self[rw], tg);
 		throtl_qnode_init(&tg->qnode_on_parent[rw], tg);
 	}
-	
+
 	tg->intime = 0;
 	atomic_set(&tg->inflights[0], 0);
 	atomic_set(&tg->inflights[1], 0);
 	bio_list_init(&tg->bios);
 	INIT_LIST_HEAD(&tg->node);
+	init_waitqueue_head(&tg->wait);
+	tg->expired = false;
 
 	RB_CLEAR_NODE(&tg->rb_node);
 	io_cost_init(tg);
@@ -507,11 +526,9 @@ static void tg_update_has_rules(struct throtl_grp *tg)
 	struct throtl_grp *parent_tg = sq_to_tg(tg->service_queue.parent_sq);
 	int i;
 
-	/*lint -save -e574 -e737*/
 	for (i = READ; i <= WRITE; i++)
-	/*lint -restore*/
 		tg->has_rules[i] = (parent_tg && parent_tg->has_rules[i]) ||
-				    io_cost_has_limit(tg, i) ||
+				    (io_cost_has_limit(tg, i)) ||
 				    (td_weight_based(tg->td));
 }
 
@@ -524,26 +541,24 @@ static void tg_update_perf(struct throtl_grp *tg)
 	sq = &tg->service_queue;
 
 	if (!sq->parent_sq)
-		return;
+	    return;
 
 	if (tg->td->mode == MODE_WEIGHT_BANDWIDTH) {
-		new_bps = max_t(uint64_t,
-			(queue_bandwidth_slice(tg->td) * sq->share) >> SHARE_SHIFT,
-			1024);
-		tg->io_cost.bps[0] = new_bps;
-		tg->io_cost.iops[0] = (u32)-1;
+	    new_bps = max_t(uint64_t,
+		(queue_bandwidth_slice(tg->td) * sq->share) >> SHARE_SHIFT,
+		1024);
+	    tg->io_cost.bps[0] = new_bps;
+	    tg->io_cost.iops[0] = (u32)-1;
 	} else if (tg->td->mode == MODE_WEIGHT_IOPS) {
-		new_iops = max_t(unsigned int,
-			(queue_iops_slice(tg->td) * sq->share) >> SHARE_SHIFT,
-			1);
-		tg->io_cost.iops[0] = new_iops;
-		tg->io_cost.bps[0] = (u64)(s64)-1;
-	}
-	/*lint -save -e737*/
-	tg->quantum = max_t(int,
-		(throtl_quantum * sq->share) >> SHARE_SHIFT,
+	    new_iops = max_t(unsigned int,
+		(queue_iops_slice(tg->td) * sq->share) >> SHARE_SHIFT,
 		1);
-	/*lint -restore*/
+	    tg->io_cost.iops[0] = new_iops;
+	    tg->io_cost.bps[0] = (u64)(s64)-1;
+	}
+	tg->quantum = max_t(int,
+	    (throtl_quantum * sq->share) >> SHARE_SHIFT,
+	    1);
 }
 
 /* update share of tg's siblings */
@@ -552,30 +567,27 @@ static void tg_update_share(struct throtl_data *td, struct throtl_grp *tg)
 	struct cgroup_subsys_state *pos_css;
 	struct blkcg_gq *blkg, *parent_blkg;
 	struct throtl_grp *child;
-
 	if (!tg || !tg->service_queue.parent_sq ||
 	    !tg->service_queue.parent_sq->parent_sq)
-		parent_blkg = td->queue->root_blkg;
+	    parent_blkg = td->queue->root_blkg;
 	else
-		parent_blkg = tg_to_blkg(sq_to_tg(tg->service_queue.parent_sq));
+	    parent_blkg = tg_to_blkg(sq_to_tg(tg->service_queue.parent_sq));
 
-	/*lint -save -e747 -e820*/
 	blkg_for_each_descendant_pre(blkg, pos_css, parent_blkg) {
-	/*lint -restore*/
-		struct throtl_service_queue *sq;
+	    struct throtl_service_queue *sq;
 
-		child = blkg_to_tg(blkg);
-		sq = &child->service_queue;
+	    child = blkg_to_tg(blkg);
+	    sq = &child->service_queue;
 
-		if (!sq->parent_sq || !(child->flags & THROTL_TG_ONLINE))
-			continue;
+	    if (!sq->parent_sq || !(child->flags & THROTL_TG_ONLINE))
+		continue;
 
-		sq->share = max_t(unsigned int,
-			sq->parent_sq->share * blkg->weight /
-				sq->parent_sq->children_weight,
-			1);
+	    sq->share = max_t(unsigned int,
+		sq->parent_sq->share * blkg->weight /
+		    sq->parent_sq->children_weight,
+		1);
 
-		tg_update_perf(child);
+	    tg_update_perf(child);
 	}
 }
 
@@ -586,18 +598,19 @@ static void throtl_pd_online(struct blkg_policy_data *pd)
 	struct blkcg_gq *blkg = tg_to_blkg(tg);
 
 	/*
-	 * We don't want new groups to escape the limits of its ancestors.
-	 * Update has_rules[] after a new group is brought online.
-	 */
+	* We don't want new groups to escape the limits of its ancestors.
+	* Update has_rules[] after a new group is brought online.
+	*/
 	tg_update_has_rules(tg);
 
 	tg->flags |= THROTL_TG_ONLINE;
 
 	parent_sq = tg->service_queue.parent_sq;
 	if (parent_sq)
-		parent_sq->children_weight += blkg->weight;
+	    parent_sq->children_weight += blkg->weight;
 
 	tg_update_share(tg->td, tg);
+
 }
 
 static void throtl_pd_offline(struct blkg_policy_data *pd)
@@ -607,17 +620,17 @@ static void throtl_pd_offline(struct blkg_policy_data *pd)
 	struct blkcg_gq *blkg = tg_to_blkg(tg);
 
 	if (!(tg->flags & THROTL_TG_ONLINE))
-		return;
+	    return;
 
 	if (bio_list_empty(&tg->bios) && !list_empty(&tg->node)) {
-		list_del_init(&tg->node);
-		blkg_put(blkg);
+	    list_del_init(&tg->node);
+	    blkg_put(blkg);
 	}
 
 	tg->flags &= ~THROTL_TG_ONLINE;
 
 	if (sq->parent_sq)
-		sq->parent_sq->children_weight -= blkg->weight;
+	    sq->parent_sq->children_weight -= blkg->weight;
 
 	rcu_read_lock();
 	tg_update_share(tg->td, tg);
@@ -643,9 +656,7 @@ throtl_rb_first(struct throtl_service_queue *parent_sq)
 		parent_sq->first_pending = rb_first(&parent_sq->pending_tree);
 
 	if (parent_sq->first_pending)
-		/*lint -save -e826*/
 		return rb_entry_tg(parent_sq->first_pending);
-		/*lint -restore*/
 
 	return NULL;
 }
@@ -687,7 +698,6 @@ static void tg_service_queue_add(struct throtl_grp *tg)
 
 	while (*node != NULL) {
 		parent = *node;
-		/*lint -save -e550 -e774 -e826*/
 		__tg = rb_entry_tg(parent);
 
 		if (time_before(key, __tg->disptime))
@@ -696,7 +706,6 @@ static void tg_service_queue_add(struct throtl_grp *tg)
 			node = &parent->rb_right;
 			left = 0;
 		}
-		/*lint -restore*/
 	}
 
 	if (left)
@@ -736,10 +745,8 @@ static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
 					  unsigned long expires)
 {
 	mod_timer(&sq->pending_timer, expires);
-	/*lint -save -e747*/
 	throtl_log(sq, "schedule timer. delay=%lu jiffies=%lu",
 		   expires - jiffies, jiffies);
-	/*lint -restore*/
 }
 
 /**
@@ -770,12 +777,10 @@ static bool throtl_schedule_next_dispatch(struct throtl_service_queue *sq,
 	update_min_dispatch_time(sq);
 
 	/* is the next dispatch time in the future? */
-	/*lint -save -e550 -e774*/
 	if (force || time_after(sq->first_pending_disptime, jiffies)) {
 		throtl_schedule_pending_timer(sq, sq->first_pending_disptime);
 		return true;
 	}
-	/*lint -restore*/
 
 	/* tell the caller to continue dispatching */
 	return false;
@@ -801,7 +806,6 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
 	 * that bandwidth. Do try to make use of that bandwidth while giving
 	 * credit.
 	 */
-	/*lint -save -e550 -e747 -e774 -e1072*/
 	if (time_after_eq(start, tg->slice_start[index]))
 		tg->slice_start[index] = start;
 
@@ -810,7 +814,6 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
 		   "[%c] new slice with credit start=%lu end=%lu jiffies=%lu",
 		   rw == READ ? 'R' : 'W', tg->slice_start[index],
 		   tg->slice_end[index], jiffies);
-	/*lint -restore*/
 }
 
 static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw)
@@ -820,12 +823,10 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw)
 	io_cost_start_new_slice(tg, rw);
 	tg->slice_start[index] = jiffies;
 	tg->slice_end[index] = jiffies + throtl_slice;
-	/*lint -save -e747*/
 	throtl_log(&tg->service_queue,
 		   "[%c] new slice start=%lu end=%lu jiffies=%lu",
 		   rw == READ ? 'R' : 'W', tg->slice_start[index],
 		   tg->slice_end[index], jiffies);
-	/*lint -restore*/
 }
 
 static inline void throtl_set_slice_end(struct throtl_grp *tg, bool rw,
@@ -840,21 +841,17 @@ static inline void throtl_extend_slice(struct throtl_grp *tg, bool rw,
 {
 	int index = tg_data_index(tg, rw);
 	tg->slice_end[index] = roundup(jiffy_end, throtl_slice);
-	/*lint -save -e747*/
 	throtl_log(&tg->service_queue,
 		   "[%c] extend slice start=%lu end=%lu jiffies=%lu",
 		   rw == READ ? 'R' : 'W', tg->slice_start[index],
 		   tg->slice_end[index], jiffies);
-	/*lint -restore*/
 }
 
 /* Determine if previously allocated or extended slice is complete or not */
 static bool throtl_slice_used(struct throtl_grp *tg, bool rw)
 {
 	int index = tg_data_index(tg, rw);
-	/*lint -save -e550 -e774 -e1072*/
 	if (time_in_range(jiffies, tg->slice_start[index], tg->slice_end[index]))
-	/*lint -restore*/
 		return false;
 
 	return 1;
@@ -895,9 +892,7 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
 	unsigned long nr_slices, time_elapsed;
 	int index = tg_data_index(tg, rw);
 
-	/*lint -save -e550 -e730 -e1072*/
 	BUG_ON(time_before(tg->slice_end[index], tg->slice_start[index]));
-	/*lint -restore*/
 
 	/*
 	 * If bps are unlimited (-1), then time slice don't get
@@ -928,12 +923,10 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
 		return;
 	tg->slice_start[index] += nr_slices * throtl_slice;
 
-	/*lint -save -e747*/
 	throtl_log(&tg->service_queue,
 		   "[%c] trim slice nr=%lu start=%lu end=%lu jiffies=%lu",
 		   rw == READ ? 'R' : 'W', nr_slices,
 		   tg->slice_start[index], tg->slice_end[index], jiffies);
-	/*lint -restore*/
 }
 
 static bool io_cost_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
@@ -966,9 +959,7 @@ static bool io_cost_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
 	if (tmp > UINT_MAX)
 		io_allowed = UINT_MAX;
 	else
-		/*lint -save -e712*/
 		io_allowed = tmp;
-		/*lint -restore*/
 
 	if (tg->io_cost.io_disp[index] + 1 <= io_allowed) {
 		if (wait)
@@ -977,10 +968,8 @@ static bool io_cost_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
 	}
 
 	/* Calc approx time to dispatch */
-	/*lint -save -e647*/
 	jiffy_wait = ((tg->io_cost.io_disp[index] + 1) * HZ) /
 		tg->io_cost.iops[index] + 1;
-	/*lint -restore*/
 
 	if (jiffy_wait > jiffy_elapsed)
 		jiffy_wait = jiffy_wait - jiffy_elapsed;
@@ -1068,10 +1057,8 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
 	 * this function with a different bio if there are other bios
 	 * queued.
 	 */
-	/*lint -save -e730*/
 	BUG_ON(tg->service_queue.nr_queued[index] &&
 	       bio != throtl_peek_queued(&tg->service_queue.queued[index]));
-	/*lint -restore*/
 
 	/* If tg->bps = -1, then BW is unlimited */
 	if (!io_cost_has_limit(tg, index)) {
@@ -1088,10 +1075,8 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
 	if (throtl_slice_used(tg, rw))
 		throtl_start_new_slice(tg, rw);
 	else {
-		/*lint -save -e550 -e774 -e1072*/
 		if (time_before(tg->slice_end[index], jiffies + throtl_slice))
 			throtl_extend_slice(tg, rw, jiffies + throtl_slice);
-		/*lint -restore*/
 	}
 
 	if (io_cost_with_in_limit(tg, bio, &max_wait)) {
@@ -1103,10 +1088,8 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
 	if (wait)
 		*wait = max_wait;
 
-	/*lint -save -e550 -e774 -e1072*/
 	if (time_before(tg->slice_end[index], jiffies + max_wait))
 		throtl_extend_slice(tg, rw, jiffies + max_wait);
-	/*lint -restore*/
 
 	return false;
 }
@@ -1116,11 +1099,9 @@ static inline void io_cost_charge_bio(struct throtl_grp *tg, struct bio *bio)
 	bool rw = bio_data_dir(bio);
 	int index = tg_data_index(tg, rw);
 
-	/* Charge the bio to the group */
 	tg->io_cost.bytes_disp[index] += bio->bi_iter.bi_size;
 	tg->io_cost.io_disp[index]++;
 }
-
 static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
 {
 	io_cost_charge_bio(tg, bio);
@@ -1170,7 +1151,6 @@ static void throtl_add_bio_tg(struct bio *bio, struct throtl_qnode *qn,
 
 static void tg_update_disptime(struct throtl_grp *tg)
 {
-	/*lint -save -e570 -e820 -e838*/
 	struct throtl_service_queue *sq = &tg->service_queue;
 	unsigned long read_wait = -1, write_wait = -1, min_wait = -1, disptime;
 	struct bio *bio;
@@ -1183,7 +1163,6 @@ static void tg_update_disptime(struct throtl_grp *tg)
 
 	min_wait = min(read_wait, write_wait);
 	disptime = jiffies + min_wait;
-	/*lint -restore*/
 
 	/* Update dispatch time */
 	throtl_dequeue_tg(tg);
@@ -1238,9 +1217,7 @@ static void tg_dispatch_one_bio(struct throtl_grp *tg, bool rw)
 	} else {
 		throtl_qnode_add_bio(bio, &tg->qnode_on_parent[index],
 				     &parent_sq->queued[index]);
-		/*lint -save -e730 -e775*/
 		BUG_ON(tg->td->nr_queued[index] <= 0);
-		/*lint -restore*/
 		tg->td->nr_queued[index]--;
 	}
 
@@ -1252,7 +1229,6 @@ static void tg_dispatch_one_bio(struct throtl_grp *tg, bool rw)
 
 static int throtl_dispatch_tg(struct throtl_grp *tg)
 {
-	/*lint -save -e713 -e730 -e732 -e737 -e747 -e820*/
 	struct throtl_service_queue *sq = &tg->service_queue;
 	unsigned int nr_reads = 0, nr_writes = 0;
 	unsigned int max_nr_reads = throtl_grp_quantum*3/4;
@@ -1282,14 +1258,12 @@ static int throtl_dispatch_tg(struct throtl_grp *tg)
 	}
 
 	return nr_reads + nr_writes;
-	/*lint -restore*/
 }
 
 static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
 {
 	unsigned int nr_disp = 0;
 
-	/*lint -save -e550 -e574 -e713 -e737 -e774*/
 	while (1) {
 		struct throtl_grp *tg = throtl_rb_first(parent_sq);
 		struct throtl_service_queue *sq = &tg->service_queue;
@@ -1312,7 +1286,6 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
 	}
 
 	return nr_disp;
-	/*lint -restore*/
 }
 
 /**
@@ -1345,7 +1318,6 @@ again:
 	parent_sq = sq->parent_sq;
 	dispatched = false;
 
-	/*lint -save -e747*/
 	while (true) {
 		throtl_log(sq, "dispatch nr_queued=%u read=%u write=%u",
 			   sq->nr_queued[READ] + sq->nr_queued[WRITE],
@@ -1384,7 +1356,6 @@ again:
 		/* reached the top-level, queue issueing */
 		queue_work(kthrotld_workqueue, &td->dispatch_work);
 	}
-	/*lint -restore*/
 out_unlock:
 	spin_unlock_irq(q->queue_lock);
 }
@@ -1399,10 +1370,8 @@ out_unlock:
  */
 static void blk_throtl_dispatch_work_fn(struct work_struct *work)
 {
-	/*lint -save -e826*/
 	struct throtl_data *td = container_of(work, struct throtl_data,
 					      dispatch_work);
-	/*lint -restore*/
 	struct throtl_service_queue *td_sq = &td->service_queue;
 	struct request_queue *q = td->queue;
 	struct bio_list bio_list_on_stack;
@@ -1413,7 +1382,6 @@ static void blk_throtl_dispatch_work_fn(struct work_struct *work)
 	bio_list_init(&bio_list_on_stack);
 
 	spin_lock_irq(q->queue_lock);
-	/*lint -save -e574 -e737 -e820*/
 	for (i = READ; i <= WRITE; i++)
 		while ((bio = throtl_pop_queued(&td_sq->queued[i], NULL)))
 			bio_list_add(&bio_list_on_stack, bio);
@@ -1425,486 +1393,547 @@ static void blk_throtl_dispatch_work_fn(struct work_struct *work)
 			generic_make_request(bio);
 		blk_finish_plug(&plug);
 	}
-	/*lint -restore*/
 }
 
 static bool tg_may_dispatch_weight(struct throtl_grp *tg)
 {
-	if (!io_cost_has_limit(tg, 0))
-		return true;
+        if (!io_cost_has_limit(tg, 0))
+                return true;
 
-	if (!(tg->flags & THROTL_TG_ONLINE))
-		return true;
+        if (!(tg->flags & THROTL_TG_ONLINE))
+                return true;
 
-	if (tg->td->mode == MODE_WEIGHT_BANDWIDTH)
-		return (tg->io_cost.bytes_disp[0] < tg->io_cost.bps[0]);
-	else if (tg->td->mode == MODE_WEIGHT_IOPS)
-		return (tg->io_cost.io_disp[0] < tg->io_cost.iops[0]);
-	else
-		return true;
+        if (tg->td->mode == MODE_WEIGHT_BANDWIDTH)
+                return (tg->io_cost.bytes_disp[0] < tg->io_cost.bps[0]);
+        else if (tg->td->mode == MODE_WEIGHT_IOPS)
+                return (tg->io_cost.io_disp[0] < tg->io_cost.iops[0]);
+        else
+                return true;
+}
+
+static void throtl_add_bio_weight_trace(struct bio *bio)
+{
+	bio->bi_throtl_in_queue = jiffies;
+#ifdef CONFIG_HUAWEI_IO_TRACING
+	trace_block_throttle_bio_in(bio);
+#endif
+}
+
+static void throtl_pop_bio_weight_trace(struct bio *bio, struct throtl_grp *tg)
+{
+        unsigned int delay;
+        char b[BDEVNAME_SIZE];
+
+        delay = jiffies_to_msecs(jiffies - bio->bi_throtl_in_queue);
+        if (delay > MAX_THROTL_DELAY_TM_MS) {
+                if ((unsigned int)atomic_read(&tg->max_delay) < delay)
+                atomic_set(&tg->max_delay, (int)delay);
+                atomic_inc(&tg->delay_cnt);
+		printk("io-latency: [throtl] [%s] sector=%lu size=%u flag=0x%lx delay=%d weight=%d type=%d\n",
+			bdevname(bio->bi_bdev, b), bio->bi_iter.bi_sector,
+                        bio->bi_iter.bi_size, bio->bi_rw, delay,
+			tg_to_blkg(tg)->weight, tg_to_blkg(tg)->blkcg->type);
+        }
+#ifdef CONFIG_HUAWEI_IO_TRACING
+        trace_block_throttle_bio_out(bio, (long)delay);
+#endif
 }
 
 static void throtl_add_bio_weight(struct bio *bio, struct throtl_grp *tg)
 {
-	struct throtl_data *td = tg->td;
+        struct throtl_data *td = tg->td;
 
-	bio_list_add(&tg->bios, bio);
-	tg->service_queue.nr_queued[0]++;
-	tg->td->nr_queued[0]++;
-	tg->intime = jiffies;
+	throtl_add_bio_weight_trace(bio);
+#ifdef CONFIG_HISI_BLK_CORE
+        bio->io_in_count |= HISI_IO_IN_COUNT_WILL_BE_SEND_AGAIN;
+#endif
+        bio_list_add(&tg->bios, bio);
+        tg->service_queue.nr_queued[0]++;
+        tg->td->nr_queued[0]++;
+        tg->intime = jiffies;
 
-	if (tg->td->nr_queued[0] == 1 && !timer_pending(&tg->td->rescue_timer))
-		mod_timer(&tg->td->rescue_timer,
-			  jiffies + msecs_to_jiffies(THROTL_IDLE_INTERVAL));
+#ifdef CONFIG_HUAWEI_IO_TRACING
+	trace_block_throttle_weight(bio, tg_to_blkg(tg)->weight,
+			tg->td->nr_queued[0]);
+#endif
 
-	if (!list_empty(&tg->node))
-		return;
+        if (tg->td->nr_queued[0] == 1 && !timer_pending(&tg->td->rescue_timer))
+                mod_timer(&tg->td->rescue_timer,
+                          jiffies + msecs_to_jiffies(THROTL_IDLE_INTERVAL));
 
-	blkg_get(tg_to_blkg(tg));
+        if (!list_empty(&tg->node))
+                return;
 
-	if (tg_may_dispatch_weight(tg))
-		list_add_tail(&tg->node, &td->active);
-	else
-		list_add_tail(&tg->node, &td->expired);
+        blkg_get(tg_to_blkg(tg));
+
+        if (tg_may_dispatch_weight(tg))
+                list_add_tail(&tg->node, &td->active);
+        else
+                list_add_tail(&tg->node, &td->expired);
+
 }
 
 static struct bio *throtl_pop_queued_weight(struct throtl_grp *tg)
 {
-	struct bio *bio;
+        struct bio *bio;
 
-	bio = bio_list_pop(&tg->bios);
-	/*lint -save -e727 -e730*/
-	WARN_ON_ONCE(!bio);
-	/*lint -restore*/
+        bio = bio_list_pop(&tg->bios);
+        WARN_ON_ONCE(!bio);
 
-	return bio;
+        throtl_pop_bio_weight_trace(bio, tg);
+        return bio;
 }
 
 static void blk_throtl_weight_io_done(struct bio *bio)
 {
-	struct throtl_grp *tg;
-	struct throtl_data *td;
-	int index = (int)bio_data_dir(bio);
-	int inflights;
+        struct throtl_grp *tg;
+        struct throtl_data *td;
+        int index = (int)bio_data_dir(bio);
+        int inflights;
 
-	tg = (struct throtl_grp *)bio->bi_throtl_private2;
-	td = tg->td;
+        tg = (struct throtl_grp *)bio->bi_throtl_private2;
+        td = tg->td;
 
-	atomic_dec(&tg->inflights[index]);
-	inflights = atomic_dec_return(&td->inflights);
-	smp_mb__after_atomic();
-	if (inflights >= td->quantum)
-		goto out;
-	else if (inflights == 0 && waitqueue_active(&td->waitq))
-		wake_up(&td->waitq);
+        atomic_dec(&tg->inflights[index]);
+        inflights = atomic_dec_return(&td->inflights);
+        smp_mb__after_atomic();
+        if (inflights >= td->quantum)
+                goto out;
+        else if (inflights == 0 && waitqueue_active(&td->waitq))
+                wake_up(&td->waitq);
 
-	if (td->nr_queued[0])
-		queue_work(kthrotld_workqueue, &td->dispatch_work);
+        if (td->nr_queued[0])
+                queue_work(kthrotld_workqueue, &td->dispatch_work);
 out:
-	bio->bi_throtl_private2 = NULL;
-	bio->bi_throtl_end_io2 = NULL;
-	blkg_put(tg_to_blkg(tg));
+        bio->bi_throtl_private2 = NULL;
+        bio->bi_throtl_end_io2 = NULL;
+        blkg_put(tg_to_blkg(tg));
 }
 
 static void tg_dispatch_one_bio_weight(struct throtl_grp *tg,
-				       struct bio_list *bios, bool charge)
+                                       struct bio_list *bios, bool charge)
 {
-	struct bio *bio;
+        struct bio *bio;
 
-	/*
-	 * @bio is being transferred from @tg to @parent_sq.  Popping a bio
-	 * from @tg may put its reference and @parent_sq might end up
-	 * getting released prematurely.  Remember the tg to put and put it
-	 * after @bio is transferred to @parent_sq.
-	 */
-	bio = throtl_pop_queued_weight(tg);
-	tg->service_queue.nr_queued[0]--;
+        /*
+         * @bio is being transferred from @tg to @parent_sq.  Popping a bio
+         * from @tg may put its reference and @parent_sq might end up
+         * getting released prematurely.  Remember the tg to put and put it
+         * after @bio is transferred to @parent_sq.
+         */
+        bio = throtl_pop_queued_weight(tg);
+        tg->service_queue.nr_queued[0]--;
 
-	if (unlikely(!charge))
-		goto skip_charge;
+        if (unlikely(!charge))
+                goto skip_charge;
 
-	throtl_charge_bio(tg, bio);
+        throtl_charge_bio(tg, bio);
 
-	if (!bio->bi_throtl_private2) {
-		int index = (int)bio_data_dir(bio);
+        if (!bio->bi_throtl_private2) {
+                int index = (int)bio_data_dir(bio);
 
-		atomic_inc(&tg->inflights[index]);
-		/* Don't reorder td->nr_queued and inflights */
-		smp_mb__before_atomic();
-		atomic_inc(&tg->td->inflights);
-		smp_mb__after_atomic();
+                atomic_inc(&tg->inflights[index]);
+                /* Don't reorder td->nr_queued and inflights */
+                smp_mb__before_atomic();
+                atomic_inc(&tg->td->inflights);
+                smp_mb__after_atomic();
 
-		bio->bi_throtl_private2 = tg;
+                bio->bi_throtl_private2 = tg;
 
-		/* We might access tg when end io, so grab it */
-		blkg_get(tg_to_blkg(tg));
-		bio->bi_throtl_end_io2 = blk_throtl_weight_io_done;
-	}
+                /* We might access tg when end io, so grab it */
+                blkg_get(tg_to_blkg(tg));
+                bio->bi_throtl_end_io2 = blk_throtl_weight_io_done;
+        }
 
 skip_charge:
-	BUG_ON(tg->td->nr_queued[0] <= 0);
-	tg->td->nr_queued[0]--;
+        BUG_ON(tg->td->nr_queued[0] <= 0);
+        tg->td->nr_queued[0]--;
 
-	bio_list_add(bios, bio);
+        bio_list_add(bios, bio);
+
+#ifdef CONFIG_HUAWEI_IO_TRACING
+        trace_block_throttle_dispatch(bio, tg_to_blkg(tg)->weight);
+        trace_block_throttle_iocost(tg->io_cost.bps[0],
+                tg->io_cost.iops[0], tg->io_cost.bytes_disp[0],
+                tg->io_cost.io_disp[0]);
+#endif
 }
 
 static int throtl_dispatch_tg_weight(struct throtl_grp *tg,
-				     struct bio_list *bios)
+                                     struct bio_list *bios)
 {
-	int nr = 0;
+        int nr = 0;
 
-	BUG_ON(!td_weight_based(tg->td));
+        BUG_ON(!td_weight_based(tg->td));
 
-	while (!bio_list_empty(&tg->bios) &&
-	       tg_may_dispatch_weight(tg)) {
+        while (!bio_list_empty(&tg->bios) &&
+               tg_may_dispatch_weight(tg)) {
 
-		tg_dispatch_one_bio_weight(tg, bios, (bool)true);
-		nr++;
+                tg_dispatch_one_bio_weight(tg, bios, (bool)true);
+                nr++;
 
-		if (nr >= tg->quantum)
-			break;
-	}
+                if (nr >= tg->quantum)
+                        break;
+        }
 
-	if (bio_list_empty(&tg->bios) && !(tg->flags & THROTL_TG_ONLINE)) {
-		list_del_init(&tg->node);
-		blkg_put(tg_to_blkg(tg));
-	} else if (!tg_may_dispatch_weight(tg)) {
-		list_move_tail(&tg->node, &tg->td->expired);
-	}
+        if (bio_list_empty(&tg->bios) && !(tg->flags & THROTL_TG_ONLINE)) {
+                list_del_init(&tg->node);
+                blkg_put(tg_to_blkg(tg));
+        } else if (!tg_may_dispatch_weight(tg)) {
+                list_move_tail(&tg->node, &tg->td->expired);
+        }
 
-	return nr;
+        return nr;
 }
 
 static void throtl_start_new_slice_weight(struct throtl_data *td)
 {
-	struct throtl_grp *tg;
+        struct throtl_grp *tg;
 
-	list_for_each_entry(tg, &td->expired, node) {
-		if (tg->td->mode == MODE_WEIGHT_BANDWIDTH)
+        list_for_each_entry(tg, &td->expired, node) {
+		tg->expired = false;
+		if (tg->td->mode == MODE_WEIGHT_BANDWIDTH) {
 			tg->io_cost.bytes_disp[0] = 0;
-		else if (tg->td->mode == MODE_WEIGHT_IOPS)
+			wake_up_all(&tg->wait);
+		} else {
+			wake_up_nr(&tg->wait, tg->io_cost.iops[0]);
 			tg->io_cost.io_disp[0] = 0;
-	}
+		}
+        }
 
-	list_splice_tail_init(&td->expired, &td->active);
+        list_splice_tail_init(&td->expired, &td->active);
 }
 
 static bool should_start_new_slice(struct throtl_data *td)
 {
-	struct throtl_grp *tg;
-	unsigned long interval;
+        struct throtl_grp *tg;
+        unsigned long interval;
 
-	interval = msecs_to_jiffies(THROTL_IDLE_INTERVAL / 2);
+        interval = msecs_to_jiffies(THROTL_IDLE_INTERVAL / 2);
 
-	list_for_each_entry(tg, &td->expired, node) {
-		if (tg->fg_flag)
-			return true;
-	}
+        list_for_each_entry(tg, &td->expired, node) {
+		if (tg_to_blkg(tg)->blkcg->type <= BLK_THROTL_FG)
+                        return true;
+        }
 
-	list_for_each_entry(tg, &td->active, node) {
-		if (time_before(jiffies, tg->intime + interval))
-			return false;
-	}
+        list_for_each_entry(tg, &td->active, node) {
+                if (time_before(jiffies, tg->intime + interval))
+                        return false;
+        }
 
-	return true;
+        return true;
 }
 
 static void blk_run_throtl_bios_weight(struct throtl_data *td,
-				       struct throtl_grp *tg,
-				       struct bio_list *bios)
+                                       struct throtl_grp *tg,
+                                       struct bio_list *bios)
 {
-	struct throtl_grp *curr, *next;
+        struct throtl_grp *curr, *next;
 
-	if (tg)
-		throtl_dispatch_tg_weight(tg, bios);
+        if (tg)
+                throtl_dispatch_tg_weight(tg, bios);
 
-	if (list_empty(&td->active) && bio_list_empty(bios))
-		goto start_new_slice;
+        if (list_empty(&td->active) && bio_list_empty(bios))
+                goto start_new_slice;
 
-	list_for_each_entry_safe(curr, next, &td->active, node) {
-		if (curr == tg)
-			continue;
-		throtl_dispatch_tg_weight(curr, bios);
-	}
+        list_for_each_entry_safe(curr, next, &td->active, node) {
+                if (curr == tg)
+                        continue;
+                throtl_dispatch_tg_weight(curr, bios);
+        }
 
-	if (!bio_list_empty(bios))
-		return;
+        if (!bio_list_empty(bios))
+                return;
 
-	/*
-	 * If no bios in active queues and many bios are pending in
-	 * the device queue, just idle.
-	 */
+        /*
+         * If no bios in active queues and many bios are pending in
+         * the device queue, just idle.
+         */
 start_new_slice:
-	if (!should_start_new_slice(td)) {
-		unsigned int interval = THROTL_IDLE_INTERVAL / 2;
+        if (!should_start_new_slice(td)) {
+                unsigned int interval = THROTL_IDLE_INTERVAL / 2;
 
-		mod_timer(&td->idle_timer,
-			  jiffies + msecs_to_jiffies(interval));
-		return;
-	}
+                mod_timer(&td->idle_timer,
+                          jiffies + msecs_to_jiffies(interval));
+                return;
+        }
 
-	throtl_start_new_slice_weight(td);
+        throtl_start_new_slice_weight(td);
 
-	list_for_each_entry_safe(curr, next, &td->active, node)
-		throtl_dispatch_tg_weight(curr, bios);
+        list_for_each_entry_safe(curr, next, &td->active, node)
+                throtl_dispatch_tg_weight(curr, bios);
 }
 
 static void blk_throtl_kick_queue_fn(struct work_struct *work)
 {
-	struct throtl_data *td = container_of(work, struct throtl_data,
-					      dispatch_work);
-	struct request_queue *q = td->queue;
-	struct bio_list bio_list_on_stack;
-	struct bio *bio;
-	struct blk_plug plug;
+        struct throtl_data *td = container_of(work, struct throtl_data,
+                                              dispatch_work);
+        struct request_queue *q = td->queue;
+        struct bio_list bio_list_on_stack;
+        struct bio *bio;
+        struct blk_plug plug;
 
-	bio_list_init(&bio_list_on_stack);
+        bio_list_init(&bio_list_on_stack);
 
-	spin_lock_irq(q->queue_lock);
-	blk_run_throtl_bios_weight(td, NULL, &bio_list_on_stack);
-	spin_unlock_irq(q->queue_lock);
+        spin_lock_irq(q->queue_lock);
+        blk_run_throtl_bios_weight(td, NULL, &bio_list_on_stack);
+        spin_unlock_irq(q->queue_lock);
 
-	if (!bio_list_empty(&bio_list_on_stack)) {
-		blk_start_plug(&plug);
-		while((bio = bio_list_pop(&bio_list_on_stack)))
-			generic_make_request(bio);
-		blk_finish_plug(&plug);
-	}
+        if (!bio_list_empty(&bio_list_on_stack)) {
+                blk_start_plug(&plug);
+                while((bio = bio_list_pop(&bio_list_on_stack)))
+                        generic_make_request(bio);
+                blk_finish_plug(&plug);
+        }
 }
 
 static void blk_throtl_rescue_timer_fn(unsigned long arg)
 {
-	struct throtl_data *td = (struct throtl_data *)arg;
-	struct request_queue *q = td->queue;
-	unsigned long flags;
+        struct throtl_data *td = (struct throtl_data *)arg;
+        struct request_queue *q = td->queue;
+        unsigned long flags;
 
-	if (ACCESS_ONCE(td->nr_queued[0])) {
-		smp_mb__after_atomic();
-		if (!atomic_read(&td->inflights))
-			queue_work(kthrotld_workqueue, &td->dispatch_work);
+        if (ACCESS_ONCE(td->nr_queued[0])) {
+                smp_mb__after_atomic();
+                if (!atomic_read(&td->inflights))
+                        queue_work(kthrotld_workqueue, &td->dispatch_work);
 
-		mod_timer(&td->rescue_timer,
-			  jiffies + msecs_to_jiffies(THROTL_IDLE_INTERVAL));
-		return;
-	}
+                mod_timer(&td->rescue_timer,
+                          jiffies + msecs_to_jiffies(THROTL_IDLE_INTERVAL));
+                return;
+        }
 
-	spin_lock_irqsave(q->queue_lock, flags);
-	if (ACCESS_ONCE(td->nr_queued[0])) {
-		smp_mb__after_atomic();
-		if (!atomic_read(&td->inflights))
-			queue_work(kthrotld_workqueue, &td->dispatch_work);
+        spin_lock_irqsave(q->queue_lock, flags);
+        if (ACCESS_ONCE(td->nr_queued[0])) {
+                smp_mb__after_atomic();
+                if (!atomic_read(&td->inflights))
+                        queue_work(kthrotld_workqueue, &td->dispatch_work);
 
-		mod_timer(&td->rescue_timer,
-			  jiffies + msecs_to_jiffies(THROTL_IDLE_INTERVAL));
-	}
-	spin_unlock_irqrestore(q->queue_lock, flags);
+                mod_timer(&td->rescue_timer,
+                          jiffies + msecs_to_jiffies(THROTL_IDLE_INTERVAL));
+        }
+        spin_unlock_irqrestore(q->queue_lock, flags);
 }
 
 static void blk_throtl_idle_timer_fn(unsigned long arg)
 {
-	struct throtl_data *td = (struct throtl_data *)arg;
-	struct request_queue *q = td->queue;
-	unsigned long flags;
+        struct throtl_data *td = (struct throtl_data *)arg;
+        struct request_queue *q = td->queue;
+        unsigned long flags;
 
-	spin_lock_irqsave(q->queue_lock, flags);
-	if (td->nr_queued[0])
-		queue_work(kthrotld_workqueue, &td->dispatch_work);
-	spin_unlock_irqrestore(q->queue_lock, flags);
+        spin_lock_irqsave(q->queue_lock, flags);
+        if (td->nr_queued[0])
+                queue_work(kthrotld_workqueue, &td->dispatch_work);
+        spin_unlock_irqrestore(q->queue_lock, flags);
 }
 
 static void tg_drain_bios_weight(struct throtl_grp *tg, struct bio_list *bios)
 {
-	WARN_ON(list_empty(&tg->node));
+        WARN_ON(list_empty(&tg->node));
 
-	list_del_init(&tg->node);
+        list_del_init(&tg->node);
 
-	while (!bio_list_empty(&tg->bios))
-		tg_dispatch_one_bio_weight(tg, bios, false);
+        while (!bio_list_empty(&tg->bios))
+                tg_dispatch_one_bio_weight(tg, bios, false);
 
-	tg->io_cost.bytes_disp[0] = 0;
-	tg->io_cost.io_disp[0] = 0;
+        tg->io_cost.bytes_disp[0] = 0;
+        tg->io_cost.io_disp[0] = 0;
 
-	blkg_put(tg_to_blkg(tg));
+        blkg_put(tg_to_blkg(tg));
 }
 
 static void blk_throtl_drain_weight(struct request_queue *q)
 {
+        struct throtl_data *td = q->td;
+        struct throtl_grp *curr, *next;
+        struct bio *bio;
+        struct bio_list bios;
+
+        bio_list_init(&bios);
+
+        list_for_each_entry_safe(curr, next, &td->active, node)
+                tg_drain_bios_weight(curr, &bios);
+
+        list_for_each_entry_safe(curr, next, &td->expired, node)
+                tg_drain_bios_weight(curr, &bios);
+
+        spin_unlock_irq(q->queue_lock);
+
+        while((bio = bio_list_pop(&bios)))
+                generic_make_request(bio);
+
+        spin_lock_irq(q->queue_lock);
+}
+
+static void tg_drain_node_weight(struct throtl_grp *tg)
+{
+	WARN_ON(list_empty(&tg->node));
+
+	list_del_init(&tg->node);
+	tg->io_cost.bytes_disp[0] = 0;
+	tg->io_cost.io_disp[0] = 0;
+	tg->expired = false;
+
+	wake_up_all(&tg->wait);
+
+	blkg_put(tg_to_blkg(tg));
+}
+
+static void __blk_throtl_drain_weight(struct request_queue *q)
+{
 	struct throtl_data *td = q->td;
 	struct throtl_grp *curr, *next;
-	struct bio *bio;
-	struct bio_list bios;
-
-	bio_list_init(&bios);
 
 	list_for_each_entry_safe(curr, next, &td->active, node)
-		tg_drain_bios_weight(curr, &bios);
+		tg_drain_node_weight(curr);
 
 	list_for_each_entry_safe(curr, next, &td->expired, node)
-		tg_drain_bios_weight(curr, &bios);
-
-	spin_unlock_irq(q->queue_lock);
-
-	while((bio = bio_list_pop(&bios)))
-		generic_make_request(bio);
-
-	spin_lock_irq(q->queue_lock);
+		tg_drain_node_weight(curr);
 }
 
 static bool atomic_inc_below(atomic_t *v, int below)
 {
-	int cur = atomic_read(v);
+        int cur = atomic_read(v);
 
-	for (;;) {
-		int old;
+        for (;;) {
+                int old;
 
-		if (cur >= below)
-			return false;
+                if (cur >= below)
+                        return false;
+                old = atomic_cmpxchg(v, cur, cur + 1);
+                if (old == cur)
+                        break;
+                cur = old;
+        }
 
-		old = atomic_cmpxchg(v, cur, cur + 1);
-		if (old == cur)
-			break;
-
-		cur = old;
-	}
-
-	return true;
+        return true;
 }
 
 static bool io_event_ok(struct throtl_io_limit *io_limit, int limit)
 {
-	if (limit == 0)
-		limit = INT_MAX;
+        if (limit == 0)
+                limit = INT_MAX;
 
-	return atomic_inc_below(&io_limit->inflights, limit);
+        return atomic_inc_below(&io_limit->inflights, limit);
 }
 
 void blk_throtl_update_limit(struct blk_throtl_io_limit *io_limit,
-			     int limit)
+                             int limit)
 {
-	io_limit->max_inflights = limit;
-	wake_up_all(&io_limit->io_limits[0].waitq);
-	wake_up_all(&io_limit->io_limits[1].waitq);
+        io_limit->max_inflights = limit;
+        wake_up_all(&io_limit->io_limits[0].waitq);
+        wake_up_all(&io_limit->io_limits[1].waitq);
 }
 
 static void __throtl_limit_io_done(struct throtl_io_limit *io_limit,
-				   int limit)
+                                   int limit)
 {
-	int inflights;
+        int inflights;
 
-	inflights = atomic_dec_return(&io_limit->inflights);
-	if (inflights >= limit) {
-		if (!limit && waitqueue_active(&io_limit->waitq))
-			wake_up_all(&io_limit->waitq);
-		return;
-	}
+        inflights = atomic_dec_return(&io_limit->inflights);
+        if (inflights >= limit) {
+                if (!limit && waitqueue_active(&io_limit->waitq))
+                        wake_up_all(&io_limit->waitq);
+                return;
+        }
 
-	if (waitqueue_active(&io_limit->waitq)) {
-		int diff = max(limit - inflights, 1);
+        if (waitqueue_active(&io_limit->waitq)) {
+                int diff = max(limit - inflights, 1);
 
-		wake_up_nr(&io_limit->waitq, diff);
-	}
+                wake_up_nr(&io_limit->waitq, diff);
+        }
 }
 
 static void blk_throtl_limit_io_done(struct bio *bio)
 {
-	struct blk_throtl_io_limit *io_limit;
-	int limit;
-	int index = (int)bio_data_dir(bio);
+        struct blk_throtl_io_limit *io_limit;
+        int limit;
+        int index = (int)bio_data_dir(bio);
 
-	io_limit = (struct blk_throtl_io_limit *)bio->bi_throtl_private1;
-	limit = ACCESS_ONCE(io_limit->max_inflights);
-	__throtl_limit_io_done(&io_limit->io_limits[index], limit);
+        io_limit = (struct blk_throtl_io_limit *)bio->bi_throtl_private1;
+        limit = ACCESS_ONCE(io_limit->max_inflights);
+        __throtl_limit_io_done(&io_limit->io_limits[index], limit);
 
-	bio->bi_throtl_private1 = NULL;
-	bio->bi_throtl_end_io1 = NULL;
-	blk_throtl_io_limit_put(io_limit);
+        bio->bi_throtl_private1 = NULL;
+        bio->bi_throtl_end_io1 = NULL;
+        blk_throtl_io_limit_put(io_limit);
 }
 
 /* We must hold rcu lock. */
 static int blk_throtl_io_limit_wait(struct blkcg *blkcg,
-				    struct blk_throtl_io_limit *task_limit,
-				    struct throtl_grp *tg,
-				    struct bio *bio)
+                                    struct blk_throtl_io_limit *task_limit,
+                                    struct throtl_grp *tg,
+                                    struct bio *bio)
 {
-	struct blkcg *new;
-	DEFINE_WAIT(wait);
-	int limit;
-	int index = (int)bio_data_dir(bio);
-	struct throtl_io_limit *io_limit = &task_limit->io_limits[index];
-	int ret;
+        struct blkcg *new;
+        DEFINE_WAIT(wait);
+        int limit;
+        int index = (int)bio_data_dir(bio);
+        struct throtl_io_limit *io_limit = &task_limit->io_limits[index];
+        int ret;
 
-	WARN_ON_ONCE(!rcu_read_lock_held());
+        WARN_ON_ONCE(!rcu_read_lock_held());
 
-	limit = ACCESS_ONCE(task_limit->max_inflights);
-	if (io_event_ok(io_limit, limit))
-		return 0;
+        limit = ACCESS_ONCE(task_limit->max_inflights);
+        if (io_event_ok(io_limit, limit))
+                return 0;
 
-	ret = 0;
-	for (;;) {
-		prepare_to_wait(&io_limit->waitq, &wait, TASK_UNINTERRUPTIBLE);
-		limit = ACCESS_ONCE(task_limit->max_inflights);
+        ret = 0;
+        for (;;) {
+                prepare_to_wait(&io_limit->waitq, &wait, TASK_UNINTERRUPTIBLE);
+                limit = ACCESS_ONCE(task_limit->max_inflights);
+
+                new = bio_blkcg(bio);
+                if (new != blkcg) {
+                        ret = 1;
+                        break;
+                }
+
 		if (io_event_ok(io_limit, limit))
 			break;
 
-		new = bio_blkcg(bio);
-		if (new != blkcg) {
-			ret = 1;
-			break;
-		}
+                if (!tg->td->max_inflights) {
+                        ret = 2;
+                        break;
+                }
 
-		if (!tg->td->max_inflights) {
-			ret = 2;
-			break;
-		}
-
-		task_set_sleep_on_throtl(current);
-		rcu_read_unlock();
-		io_schedule();
-		rcu_read_lock();
-		task_clear_sleep_on_throtl(current);
-	}
-	finish_wait(&io_limit->waitq, &wait);
-	return ret;
+                task_set_sleep_on_throtl(current);
+                rcu_read_unlock();
+#ifdef CONFIG_HUAWEI_IO_TRACING
+                trace_block_throttle_limit_start(bio, tg->td->max_inflights,
+                                                 tg->inflights[bio_data_dir(bio)]);
+#endif
+                io_schedule();
+#ifdef CONFIG_HUAWEI_IO_TRACING
+                trace_block_throttle_limit_end(bio);
+#endif
+                rcu_read_lock();
+                task_clear_sleep_on_throtl(current);
+        }
+        finish_wait(&io_limit->waitq, &wait);
+        return ret;
 }
 
-static u64 tg_prfill_fg_flag(struct seq_file *sf,
-			     struct blkg_policy_data *pd, int off)
+static int tg_print_cgroup_type(struct seq_file *sf, void *v)
 {
-	struct throtl_grp *tg = pd_to_tg(pd);
+	struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
 
-	return __blkg_prfill_u64(sf, pd, (u64)tg->fg_flag);
-}
+	seq_printf(sf, "type: %d\n", blkcg->type);
 
-static int tg_print_fg_flag(struct seq_file *sf, void *v)
-{
-	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), tg_prfill_fg_flag,
-			  &blkcg_policy_throtl, 0, (bool)true);
 	return 0;
 }
 
-static ssize_t tg_set_fg_flag(struct kernfs_open_file *of,
-			      char *buf, size_t nbytes, loff_t off)
+static int tg_set_cgroup_type(struct cgroup_subsys_state *css,
+				struct cftype *cft, u64 val)
 {
-	struct blkcg *blkcg = css_to_blkcg(of_css(of));
-	struct blkg_conf_ctx ctx;
-	struct throtl_grp *tg;
-	int ret;
+	struct blkcg *blkcg = css_to_blkcg(css);
+	unsigned int type = (unsigned int)val;
 
-	ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
-	if (ret)
-		return ret;
+	if (type >= BLK_THROTL_TYPE_NR)
+		return -EINVAL;
 
-	if (ctx.v != 0 && ctx.v != 1) {
-		ret = -EINVAL;
-		goto out;
-	}
-
-	tg = blkg_to_tg(ctx.blkg);
-	tg->fg_flag = (unsigned int)ctx.v;
-
-out:
-	blkg_conf_finish(&ctx);
-	return ret ?: nbytes;
+	blkcg->type = type;
+	return 0;
 }
 
 static u64 tg_prfill_conf_u64(struct seq_file *sf, struct blkg_policy_data *pd,
@@ -1915,7 +1944,7 @@ static u64 tg_prfill_conf_u64(struct seq_file *sf, struct blkg_policy_data *pd,
 
 	if (v == -1)
 		return 0;
-	return __blkg_prfill_u64(sf, pd, (u64)v);
+	return __blkg_prfill_u64(sf, pd, v);
 }
 
 static u64 tg_prfill_conf_uint(struct seq_file *sf, struct blkg_policy_data *pd,
@@ -1948,7 +1977,7 @@ static void tg_conf_updated(struct throtl_grp *tg)
 	struct throtl_service_queue *sq = &tg->service_queue;
 	struct cgroup_subsys_state *pos_css;
 	struct blkcg_gq *blkg;
-	
+
 	throtl_log(&tg->service_queue,
 		   "limit change rbps=%llu wbps=%llu riops=%u wiops=%u",
 		   tg->io_cost.bps[READ], tg->io_cost.bps[WRITE],
@@ -1993,7 +2022,7 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
 	ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
 	if (ret)
 		return ret;
-		
+
 	ret = -EINVAL;
 	if (sscanf(ctx.body, "%llu", &v) != 1)
 		goto out_finish;
@@ -2005,7 +2034,6 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
 		ret = -EBUSY;
 		goto out_finish;
 	}
-
 	if (is_u64)
 		*(u64 *)((void *)tg + of_cft(of)->private) = v;
 	else
@@ -2032,601 +2060,600 @@ static ssize_t tg_set_conf_uint(struct kernfs_open_file *of,
 }
 
 static u64 tg_prfill_mode_device(struct seq_file *sf,
-	struct blkg_policy_data *pd, int off)
+        struct blkg_policy_data *pd, int off)
 {
-	struct throtl_grp *tg = pd_to_tg(pd);
-	const char *dname = blkg_dev_name(pd->blkg);
+        struct throtl_grp *tg = pd_to_tg(pd);
+        const char *dname = blkg_dev_name(pd->blkg);
 
-	if (!dname)
-		return 0;
-	if (tg->td->mode == MODE_NONE)
-		return 0;
-	seq_printf(sf, "%s %s\n", dname, run_mode_name[tg->td->mode]);
-	return 0;
+        if (!dname)
+                return 0;
+        if (tg->td->mode == MODE_NONE)
+                return 0;
+        seq_printf(sf, "%s %s\n", dname, run_mode_name[tg->td->mode]);
+        return 0;
 }
 
 static int throtl_print_mode_device(struct seq_file *sf, void *v)
 {
-	int i;
+        int i;
 
-	seq_printf(sf, "available ");
-	for (i = 0; i < MAX_MODE; i++)
-		seq_printf(sf, "%s(%d) ", run_mode_name[i], i);
-	seq_printf(sf, "\n");
-	seq_printf(sf, "default %s\n", run_mode_name[MODE_NONE]);
+        seq_printf(sf, "available ");
+        for (i = 0; i < MAX_MODE; i++)
+                seq_printf(sf, "%s(%d) ", run_mode_name[i], i);
+        seq_printf(sf, "\n");
+        seq_printf(sf, "default %s\n", run_mode_name[MODE_NONE]);
 
-	mutex_lock(&throtl_mode_lock);
-	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
-		tg_prfill_mode_device,  &blkcg_policy_throtl, 0, false);
-	mutex_unlock(&throtl_mode_lock);
-	return 0;
+        mutex_lock(&throtl_mode_lock);
+        blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
+                tg_prfill_mode_device,  &blkcg_policy_throtl, 0, false);
+        mutex_unlock(&throtl_mode_lock);
+        return 0;
 }
 
 static void tg_update_rules(struct throtl_data *td)
 {
-	struct cgroup_subsys_state *pos_css;
-	struct blkcg_gq *blkg, *top_blkg;
+        struct cgroup_subsys_state *pos_css;
+        struct blkcg_gq *blkg, *top_blkg;
 
-	top_blkg = td->queue->root_blkg;
+        top_blkg = td->queue->root_blkg;
 
-	blkg_for_each_descendant_pre(blkg, pos_css, top_blkg)
-		tg_update_has_rules(blkg_to_tg(blkg));
+        blkg_for_each_descendant_pre(blkg, pos_css, top_blkg)
+                tg_update_has_rules(blkg_to_tg(blkg));
 }
 
 static void tg_change_mode(struct throtl_data *td, int mode)
 {
-	struct request_queue *q = td->queue;
+        struct request_queue *q = td->queue;
 
-	blk_queue_bypass_start(q);
+        blk_queue_bypass_start(q);
 
-	/*
-	 * Maybe it is unnecessary, but we need make sure all bios in the
-	 * block throttle layer are drained.
-	 */
-	spin_lock_irq(q->queue_lock);
-	blkcg_drain_queue(q);
-	spin_unlock_irq(q->queue_lock);
+        /*
+         * Maybe it is unnecessary, but we need make sure all bios in the
+         * block throttle layer are drained.
+         */
+        spin_lock_irq(q->queue_lock);
+        blkcg_drain_queue(q);
+        spin_unlock_irq(q->queue_lock);
 
-	WARN_ON(td->nr_queued[0]);
-	WARN_ON(td->nr_queued[1]);
+        WARN_ON(td->nr_queued[0]);
+        WARN_ON(td->nr_queued[1]);
 
-	wait_event(td->waitq, !atomic_read(&td->inflights));
+        wait_event(td->waitq, !atomic_read(&td->inflights));
 
-	del_timer_sync(&td->rescue_timer);
-	del_timer_sync(&td->idle_timer);
-	flush_work(&td->dispatch_work);
+        del_timer_sync(&td->rescue_timer);
+        del_timer_sync(&td->idle_timer);
+        flush_work(&td->dispatch_work);
 
-	spin_lock_irq(q->queue_lock);
-	td->mode = mode;
+        spin_lock_irq(q->queue_lock);
+        td->mode = mode;
 
-	if (td_weight_based(td))
-		INIT_WORK(&td->dispatch_work, blk_throtl_kick_queue_fn);
-	else
-		INIT_WORK(&td->dispatch_work, blk_throtl_dispatch_work_fn);
+        if (td_weight_based(td))
+                INIT_WORK(&td->dispatch_work, blk_throtl_kick_queue_fn);
+        else
+                INIT_WORK(&td->dispatch_work, blk_throtl_dispatch_work_fn);
 
-	rcu_read_lock();
-	tg_update_share(td, NULL);
-	tg_update_rules(td);
-	rcu_read_unlock();
-	spin_unlock_irq(q->queue_lock);
+        rcu_read_lock();
+        tg_update_share(td, NULL);
+        tg_update_rules(td);
+        rcu_read_unlock();
+        spin_unlock_irq(q->queue_lock);
 
-	blk_queue_bypass_end(q);
+        blk_queue_bypass_end(q);
 }
 
 static ssize_t tg_set_mode_device(struct kernfs_open_file *of,
-				  char *buf, size_t nbytes, loff_t off)
+                                  char *buf, size_t nbytes, loff_t off)
 {
-	struct blkcg *blkcg = css_to_blkcg(of_css(of));
-	struct blkg_conf_ctx ctx;
-	struct throtl_grp *tg;
-	struct throtl_data *td;
-	struct gendisk *disk;
-	int ret;
-	int mode;
-	bool need_change = false;
+        struct blkcg *blkcg = css_to_blkcg(of_css(of));
+        struct blkg_conf_ctx ctx;
+        struct throtl_grp *tg;
+        struct throtl_data *td;
+        struct gendisk *disk;
+        int ret;
+        int mode;
+        bool need_change = false;
 
-	mutex_lock(&throtl_mode_lock);
-	ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
-	if (ret)
-		goto out;
+        mutex_lock(&throtl_mode_lock);
+        ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
+        if (ret)
+                goto out;
 
-	mode = (int)ctx.v;
-
-	ret = -EINVAL;
-	if (mode < 0 || mode >= MAX_MODE)
+	if (sscanf(ctx.body, "%d", &mode) != 1)
 		goto out_finish;
 
-	tg = blkg_to_tg(ctx.blkg);
-	if (tg->td->mode == mode) {
-		ret = 0;
-		goto out_finish;
-	}
+        ret = -EINVAL;
 
-	disk = ctx.disk;
-	if (!get_disk(disk)) {
-		ret = -EBUSY;
-		goto out_finish;
-	}
+        if (mode < 0 || mode >= MAX_MODE)
+                goto out_finish;
 
-	td = tg->td;
-	need_change = true;
-	ret = 0;
+        tg = blkg_to_tg(ctx.blkg);
+        if (tg->td->mode == mode) {
+                ret = 0;
+                goto out_finish;
+        }
+
+        disk = ctx.disk;
+        if (!get_disk(disk)) {
+                ret = -EBUSY;
+                goto out_finish;
+        }
+
+        td = tg->td;
+        need_change = true;
+        ret = 0;
 
 out_finish:
-	blkg_conf_finish(&ctx);
+        blkg_conf_finish(&ctx);
 
-	if (need_change) {
-		tg_change_mode(td, mode);
-		put_disk(disk);
-	}
+        if (need_change) {
+                tg_change_mode(td, mode);
+                put_disk(disk);
+        }
 out:
-	mutex_unlock(&throtl_mode_lock);
-	return ret ?: nbytes;
+        mutex_unlock(&throtl_mode_lock);
+        return ret ?: nbytes;
 }
 
 static u64 tg_prfill_weight_device(struct seq_file *sf,
-		struct blkg_policy_data *pd, int off)
+                struct blkg_policy_data *pd, int off)
 {
-	struct blkcg_gq *blkg = pd_to_blkg(pd);
-	const char *dname = blkg_dev_name(pd->blkg);
+        struct blkcg_gq *blkg = pd_to_blkg(pd);
+        const char *dname = blkg_dev_name(pd->blkg);
 
-	if (!dname)
-		return 0;
-	if (!blkg)
-		return 0;
-	if (blkg->weight == blkg->blkcg->weight)
-		return 0;
-	seq_printf(sf, "%s: weight %u\n", dname, blkg->weight);
-	return 0;
+        if (!dname)
+                return 0;
+        if (!blkg)
+                return 0;
+        if (blkg->weight == blkg->blkcg->weight)
+                return 0;
+        seq_printf(sf, "%s: weight %u\n", dname, blkg->weight);
+        return 0;
 }
 
 static int tg_print_weight(struct seq_file *sf, void *v)
 {
-	struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
+        struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
 
-	seq_printf(sf, "default: %u\n", blkcg->weight);
-	blkcg_print_blkgs(sf, blkcg, tg_prfill_weight_device,
-			  &blkcg_policy_throtl, 0, false);
-	return 0;
+        seq_printf(sf, "default: %u\n", blkcg->weight);
+        blkcg_print_blkgs(sf, blkcg, tg_prfill_weight_device,
+                          &blkcg_policy_throtl, 0, false);
+        return 0;
 }
 
 static int tg_print_weight_device(struct seq_file *sf, void *v)
 {
-	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
-			  tg_prfill_weight_device,
-			  &blkcg_policy_throtl, 0, false);
-	return 0;
+        blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
+                          tg_prfill_weight_device,
+                          &blkcg_policy_throtl, 0, false);
+        return 0;
 }
 
 static ssize_t tg_set_weight_device(struct kernfs_open_file *of,
-			   char *buf, size_t nbytes, loff_t off)
+                           char *buf, size_t nbytes, loff_t off)
 {
-	struct blkcg *blkcg = css_to_blkcg(of_css(of));
-	struct throtl_grp *tg;
-	struct throtl_service_queue *parent_sq;
-	struct blkg_conf_ctx ctx;
-	unsigned int val;
-	int ret;
+        struct blkcg *blkcg = css_to_blkcg(of_css(of));
+        struct throtl_grp *tg;
+        struct throtl_service_queue *parent_sq;
+        struct blkg_conf_ctx ctx;
+        unsigned int val;
+        int ret;
 
-	ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
-	if (ret)
-		return ret;
+        ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
+        if (ret)
+                return ret;
 
-	ret = -EINVAL;
-	val = (unsigned int)ctx.v;
-
-	if (val < BLKIO_WEIGHT_MIN || val > BLKIO_WEIGHT_MAX)
+        ret = -EINVAL;
+	if (sscanf(ctx.body, "%d", &val) != 1)
 		goto out_finish;
 
-	tg = blkg_to_tg(ctx.blkg);
-	parent_sq = tg->service_queue.parent_sq;
-	if (parent_sq) {
-		parent_sq->children_weight -= ctx.blkg->weight;
-		parent_sq->children_weight += val;
-	}
+        if (val < BLKIO_WEIGHT_MIN || val > BLKIO_WEIGHT_MAX)
+                goto out_finish;
 
-	ctx.blkg->weight = val;
+        tg = blkg_to_tg(ctx.blkg);
+        parent_sq = tg->service_queue.parent_sq;
+        if (parent_sq) {
+                parent_sq->children_weight -= ctx.blkg->weight;
+                parent_sq->children_weight += val;
+        }
 
-	tg_update_share(tg->td, tg);
+        ctx.blkg->weight = val;
 
-	ret = 0;
+        tg_update_share(tg->td, tg);
+
+        ret = 0;
 out_finish:
-	blkg_conf_finish(&ctx);
-	return ret ?: nbytes;
+        blkg_conf_finish(&ctx);
+        return ret ?: nbytes;
 }
 
 static ssize_t tg_set_weight_offon(struct kernfs_open_file *of,
-				   char *buf, size_t nbytes,
-				   loff_t off)
+                                   char *buf, size_t nbytes,
+                                   loff_t off)
 {
-	int ret;
-	char offon[5];
+        int ret;
+	char offon[8];
 
-	if (sscanf(buf, "%4s", offon) != 1)
-		return -EINVAL;
+	if (sscanf(buf, "%7s", offon) != 1)
+                return -EINVAL;
 
-	ret = 0;
-	if (strnlen(offon, (size_t)4) == 2 &&
-	    !strncmp(offon, "on", (size_t)3))
-		blk_throtl_weight_offon = 1;
-	else if (strnlen(offon, (size_t)4) == 3 &&
-		 !strncmp(offon, "off", (size_t)4))
-		blk_throtl_weight_offon = 0;
-	else
-		ret = -EINVAL;
+        ret = 0;
+	if (strnlen(offon, (size_t)7) == 5 &&
+	    !strncmp(offon, "on-fs", (size_t)6))
+		blk_throtl_weight_offon = BLK_THROTL_WEIGHT_ON_FS;
+	else if (strnlen(offon, (size_t)7) == 6 &&
+	    !strncmp(offon, "on-blk", (size_t)7))
+		blk_throtl_weight_offon = BLK_THROTL_WEIGHT_ON_BLK;
+        else if (strnlen(offon, (size_t)4) == 3 &&
+                 !strncmp(offon, "off", (size_t)4))
+		blk_throtl_weight_offon = BLK_THROTL_WEIGHT_OFF;
+        else
+                ret = -EINVAL;
 
-	return ret ?: nbytes;
+        return ret ?: nbytes;
 }
 
 static int tg_print_weight_offon(struct seq_file *sf, void *v)
 {
-	seq_printf(sf, "Weight Based Throttle: %s\n",
-		   blk_throtl_weight_offon ? "on" : "off");
-	return 0;
+        seq_printf(sf, "Weight Based Throttle: %s\n",
+		   (blk_throtl_weight_offon == BLK_THROTL_WEIGHT_ON_FS) ?
+		    "on-fs" :
+		    ((blk_throtl_weight_offon == BLK_THROTL_WEIGHT_ON_BLK) ?
+		     "on-blk" : "off"));
+        return 0;
 }
 
 static u64 tg_prfill_max_inflights_device(struct seq_file *sf,
-					  struct blkg_policy_data *pd, int off)
+                                          struct blkg_policy_data *pd, int off)
 {
-	struct throtl_grp *tg = pd_to_tg(pd);
-	const char *dname = blkg_dev_name(pd->blkg);
+        struct throtl_grp *tg = pd_to_tg(pd);
+        const char *dname = blkg_dev_name(pd->blkg);
 
-	if (!dname)
-		return 0;
+        if (!dname)
+                return 0;
 
-	seq_printf(sf, "%s: queued %u, read inflight %d, write inflight %d, devices inflights %d\n",
-		   dname, tg->service_queue.nr_queued[0],
-		   atomic_read(&tg->inflights[0]),
-		   atomic_read(&tg->inflights[1]),
-		   atomic_read(&tg->td->inflights));
+        seq_printf(sf, "%s: queued %u, read inflight %d, write inflight %d, devices inflights %d delay count %d, max delay %d\n\n",
+                   dname, tg->service_queue.nr_queued[0],
+                   atomic_read(&tg->inflights[0]),
+                   atomic_read(&tg->inflights[1]),
+                   atomic_read(&tg->td->inflights),
+                   atomic_read(&tg->delay_cnt),
+                   atomic_read(&tg->max_delay));
 
-	return 0;
+        return 0;
 }
 
 static int tg_print_max_inflights(struct seq_file *sf, void *v)
 {
-	struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
+        struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
 
-	seq_printf(sf, "max limit: %d\n", blkcg->max_inflights);
+        seq_printf(sf, "max limit: %d\n", blkcg->max_inflights);
 
-	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
-			  tg_prfill_max_inflights_device,
-			  &blkcg_policy_throtl, 0, false);
+        blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
+                          tg_prfill_max_inflights_device,
+                          &blkcg_policy_throtl, 0, false);
 
-	return 0;
+        return 0;
 }
 
 static int tg_set_max_inflights(struct cgroup_subsys_state *css,
-				struct cftype *cft, s64 val)
+                                struct cftype *cft, s64 val)
 {
-	struct blkcg *blkcg = css_to_blkcg(css);
-	struct task_struct *task;
-	struct css_task_iter it;
-	int max_inflights = (int)val;
+        struct blkcg *blkcg = css_to_blkcg(css);
+        struct task_struct *task;
+        struct css_task_iter it;
+        int max_inflights = (int)val;
 
-	if (max_inflights < MIN_INFLIGHT || max_inflights > MAX_INFLIGHT)
-		return -EINVAL;
+        if (max_inflights < MIN_INFLIGHT || max_inflights > MAX_INFLIGHT)
+                return -EINVAL;
 
-	spin_lock_irq(&blkcg->lock);
-	if (blkcg->max_inflights == max_inflights)
-		goto out_unlock;
+        spin_lock_irq(&blkcg->lock);
+        if (blkcg->max_inflights == max_inflights)
+                goto out_unlock;
 
-	blkcg->max_inflights = max_inflights;
+        blkcg->max_inflights = max_inflights;
 
-	rcu_read_lock();
-	css_task_iter_start(css, &it);
-	while ((task = css_task_iter_next(&it))) {
-		if (!task->mm)
-			continue;
+        rcu_read_lock();
+        css_task_iter_start(css, &it);
+        while ((task = css_task_iter_next(&it))) {
+                if (!task->mm)
+                        continue;
 
-		if (!task->mm->io_limit)
-			continue;
+                if (!task->mm->io_limit)
+                        continue;
 
-		blk_throtl_update_limit(task->mm->io_limit, max_inflights);
-	}
-	css_task_iter_end(&it);
-	rcu_read_unlock();
+                blk_throtl_update_limit(task->mm->io_limit, max_inflights);
+        }
+        css_task_iter_end(&it);
+        rcu_read_unlock();
 out_unlock:
-	spin_unlock_irq(&blkcg->lock);
-	return 0;
+        spin_unlock_irq(&blkcg->lock);
+        return 0;
 }
 
 static u64 tg_prfill_enable_max_inflights_device(struct seq_file *sf,
-		struct blkg_policy_data *pd, int off)
+                struct blkg_policy_data *pd, int off)
 {
-	struct throtl_grp *tg = pd_to_tg(pd);
-	const char *dname = blkg_dev_name(pd->blkg);
+        struct throtl_grp *tg = pd_to_tg(pd);
+        const char *dname = blkg_dev_name(pd->blkg);
 
-	if (!dname)
-		return 0;
+        if (!dname)
+                return 0;
 
-	seq_printf(sf, "%s: limit %s\n",
-		   dname, (tg->td->max_inflights ? "open" : "close"));
-	return 0;
+        seq_printf(sf, "%s: limit %s\n",
+                   dname, (tg->td->max_inflights ? "open" : "close"));
+        return 0;
 }
 
 static int tg_print_enable_max_inflight_device(struct seq_file *sf, void *v)
 {
-	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
-			  tg_prfill_enable_max_inflights_device,
-			  &blkcg_policy_throtl, 0, false);
-	return 0;
+        blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
+                          tg_prfill_enable_max_inflights_device,
+                          &blkcg_policy_throtl, 0, false);
+        return 0;
 }
 
 static ssize_t tg_set_enable_max_inflights_device(struct kernfs_open_file *of,
-			   char *buf, size_t nbytes, loff_t off)
+                           char *buf, size_t nbytes, loff_t off)
 {
-	struct cgroup_subsys_state *css = of_css(of);
-	struct blkcg *blkcg = css_to_blkcg(css);
-	struct blkcg_gq *blkg;
-	struct blkg_conf_ctx ctx;
-	struct throtl_grp *tg;
-	struct task_struct *task;
-	struct css_task_iter it;
-	unsigned long flags;
-	int max_inflight;
-	int ret;
+        struct cgroup_subsys_state *css = of_css(of);
+        struct blkcg *blkcg = css_to_blkcg(css);
+        struct blkcg_gq *blkg;
+        struct blkg_conf_ctx ctx;
+        struct throtl_grp *tg;
+        struct task_struct *task;
+        struct css_task_iter it;
+        unsigned long flags;
+        int max_inflight;
+        int ret;
 
-	ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
-	if (ret)
-		return ret;
+        ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
+        if (ret)
+                return ret;
 
-	ret = -EINVAL;
-	max_inflight = (int)ctx.v;
+        ret = -EINVAL;
 
-	if (max_inflight != 0 && max_inflight != 1)
+	if (sscanf(ctx.body, "%d", &max_inflight) != 1)
 		goto out_finish;
 
-	ret = 0;
-	tg = blkg_to_tg(ctx.blkg);
-	if (tg->td->max_inflights == max_inflight)
-		goto out_finish;
+        if (max_inflight != 0 && max_inflight != 1)
+                goto out_finish;
 
-	spin_lock_irqsave(&blkcg->lock, flags);
+        ret = 0;
+        tg = blkg_to_tg(ctx.blkg);
+        if (tg->td->max_inflights == max_inflight)
+                goto out_finish;
 
-	if (!max_inflight)
-		goto skip_check;
+        spin_lock_irqsave(&blkcg->lock, flags);
 
-	/* we just open only one device for limit */
-	hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
-		struct throtl_grp *curr_tg = blkg_to_tg(blkg);
+        if (!max_inflight)
+                goto skip_check;
 
-		if (!curr_tg || curr_tg == tg)
-			continue;
+        /* we just open only one device for limit */
+        hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
+                struct throtl_grp *curr_tg = blkg_to_tg(blkg);
 
-		if (curr_tg->td->max_inflights) {
-			ret = -EBUSY;
-			goto out_unlock;
-		}
-	}
+                if (!curr_tg || curr_tg == tg)
+                        continue;
+
+                if (curr_tg->td->max_inflights) {
+                        ret = -EBUSY;
+                        goto out_unlock;
+                }
+        }
 skip_check:
-	tg->td->max_inflights = max_inflight;
-	smp_mb();
-	if (max_inflight)
-		goto out_unlock;
+        tg->td->max_inflights = max_inflight;
+        smp_mb();
+        if (max_inflight)
+                goto out_unlock;
 
-	rcu_read_lock();
+        rcu_read_lock();
 
-	css_task_iter_start(css, &it);
-	while ((task = css_task_iter_next(&it))) {
-		if (task_sleep_on_throtl(task))
-			wake_up_process(task);
-	}
-	css_task_iter_end(&it);
+        css_task_iter_start(css, &it);
+        while ((task = css_task_iter_next(&it))) {
+                if (task_sleep_on_throtl(task))
+                        wake_up_process(task);
+        }
+        css_task_iter_end(&it);
 
-	rcu_read_unlock();
+        rcu_read_unlock();
 out_unlock:
-	spin_unlock_irqrestore(&blkcg->lock, flags);
+        spin_unlock_irqrestore(&blkcg->lock, flags);
 out_finish:
-	blkg_conf_finish(&ctx);
-	return ret ?: nbytes;
+        blkg_conf_finish(&ctx);
+        return ret ?: nbytes;
 }
 
 static u64 tg_prfill_quantum_device(struct seq_file *sf,
-				    struct blkg_policy_data *pd, int off)
+                                    struct blkg_policy_data *pd, int off)
 {
-	struct blkcg_gq *blkg = pd_to_blkg(pd);
-	const char *dname = blkg_dev_name(pd->blkg);
+        struct blkcg_gq *blkg = pd_to_blkg(pd);
+        const char *dname = blkg_dev_name(pd->blkg);
 
-	if (!dname)
-		return 0;
+        if (!dname)
+                return 0;
 
-	if (!blkg)
-		return 0;
+        if (!blkg)
+                return 0;
 
-	if ((blkg_to_tg(blkg)->td->quantum) == QUANTUM_INQUEUE_DEF)
-		return 0;
+        if ((blkg_to_tg(blkg)->td->quantum) == QUANTUM_INQUEUE_DEF)
+                return 0;
 
-	seq_printf(sf, "%s: quantum %u\n", dname,
-		   blkg_to_tg(blkg)->td->quantum);
-	return 0;
+        seq_printf(sf, "%s: quantum %u\n", dname,
+                   blkg_to_tg(blkg)->td->quantum);
+        return 0;
 }
 
 static int tg_print_quantum_device(struct seq_file *sf, void *v)
 {
-	seq_printf(sf, "default: %d\n", QUANTUM_INQUEUE_DEF);
+        seq_printf(sf, "default: %d\n", QUANTUM_INQUEUE_DEF);
 
-	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
-			  tg_prfill_quantum_device,
-			  &blkcg_policy_throtl, 0, false);
-	return 0;
+        blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
+                          tg_prfill_quantum_device,
+                          &blkcg_policy_throtl, 0, false);
+        return 0;
 }
 
 static ssize_t tg_set_quantum_device(struct kernfs_open_file *of,
-				     char *buf, size_t nbytes, loff_t off)
+                                     char *buf, size_t nbytes, loff_t off)
 {
-	struct blkcg *blkcg = css_to_blkcg(of_css(of));
-	struct throtl_grp *tg;
-	struct blkg_conf_ctx ctx;
-	int val;
-	int ret;
+        struct blkcg *blkcg = css_to_blkcg(of_css(of));
+        struct throtl_grp *tg;
+        struct blkg_conf_ctx ctx;
+        int val;
+        int ret;
 
-	ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
-	if (ret)
-		return ret;
+        ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
+        if (ret)
+                return ret;
 
-	ret = -EINVAL;
-	val = (int)ctx.v;
-
-	if (val < QUANTUM_INQUEUE_MIN || val > QUANTUM_INQUEUE_MAX)
+        ret = -EINVAL;
+	if (sscanf(ctx.body, "%d", &val) != 1)
 		goto out_finish;
 
-	tg = blkg_to_tg(ctx.blkg);
-	tg->td->quantum = val;
+        if (val < QUANTUM_INQUEUE_MIN || val > QUANTUM_INQUEUE_MAX)
+                goto out_finish;
 
-	ret = 0;
+        tg = blkg_to_tg(ctx.blkg);
+        tg->td->quantum = val;
+
+        ret = 0;
 out_finish:
-	blkg_conf_finish(&ctx);
-	/*lint -save -e713 -e737*/
-	return ret ?: nbytes;
-	/*lint -restore*/
-/*lint -save -e715*/
+        blkg_conf_finish(&ctx);
+        return ret ?: nbytes;
 }
-/*lint -restore*/
 
 static u64 tg_prfill_bw_slice_device(struct seq_file *sf,
-				     struct blkg_policy_data *pd, int off)
+                                     struct blkg_policy_data *pd, int off)
 {
-	struct blkcg_gq *blkg = pd_to_blkg(pd);
-	const char *dname = blkg_dev_name(pd->blkg);
+        struct blkcg_gq *blkg = pd_to_blkg(pd);
+        const char *dname = blkg_dev_name(pd->blkg);
 
-	if (!dname)
-		return 0;
+        if (!dname)
+                return 0;
 
-	if (!blkg)
-		return 0;
+        if (!blkg)
+                return 0;
 
-	if ((blkg_to_tg(blkg)->td->bw_slice) == BW_SLICE_DEF)
-		return 0;
+        if ((blkg_to_tg(blkg)->td->bw_slice) == BW_SLICE_DEF)
+                return 0;
 
-	seq_printf(sf, "%s: bw_slice %llu\n", dname,
-		   blkg_to_tg(blkg)->td->bw_slice);
-	 return 0;
-/*lint -save -e715*/
+        seq_printf(sf, "%s: bw_slice %llu\n", dname,
+                   blkg_to_tg(blkg)->td->bw_slice);
+         return 0;
 }
-/*lint -restore*/
 
 static int tg_print_bw_slice_device(struct seq_file *sf, void *v)
 {
-	seq_printf(sf, "default: %llu\n", BW_SLICE_DEF);
+        seq_printf(sf, "default: %llu\n", BW_SLICE_DEF);
 
-	/*lint -save -e747*/
-	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
-			  tg_prfill_bw_slice_device,
-			  &blkcg_policy_throtl, 0, false);
-	/*lint -restore*/
-	return 0;
-/*lint -save -e715*/
+        blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
+                          tg_prfill_bw_slice_device,
+                          &blkcg_policy_throtl, 0, false);
+        return 0;
 }
-/*lint -restore*/
 
 static ssize_t tg_set_bw_slice_device(struct kernfs_open_file *of,
-				      char *buf, size_t nbytes, loff_t off)
+                                      char *buf, size_t nbytes, loff_t off)
 {
-	struct blkcg *blkcg = css_to_blkcg(of_css(of));
-	struct throtl_grp *tg;
-	struct blkg_conf_ctx ctx;
-	uint64_t val;
-	int ret;
+        struct blkcg *blkcg = css_to_blkcg(of_css(of));
+        struct throtl_grp *tg;
+        struct blkg_conf_ctx ctx;
+        uint64_t val;
+        int ret;
 
-	ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
-	if (ret)
-		return ret;
+        ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
+        if (ret)
+                return ret;
 
-	ret = -EINVAL;
-	val = (uint64_t)ctx.v;
-
-	if (val < BW_SLICE_MIN || val > BW_SLICE_MAX)
+        ret = -EINVAL;
+	if (sscanf(ctx.body, "%llu", &val) != 1)
 		goto out_finish;
 
-	tg = blkg_to_tg(ctx.blkg);
+        if (val < BW_SLICE_MIN || val > BW_SLICE_MAX)
+                goto out_finish;
 
-	tg->td->bw_slice = val;
+        tg = blkg_to_tg(ctx.blkg);
 
-	tg_update_share(tg->td, NULL);
+        tg->td->bw_slice = val;
 
-	ret = 0;
+        tg_update_share(tg->td, NULL);
+        ret = 0;
 out_finish:
-	blkg_conf_finish(&ctx);
-	/*lint -save -e713 -e737*/
-	return ret ?: nbytes;
-	/*lint -restore*/
-/*lint -save -e715*/
+        blkg_conf_finish(&ctx);
+        return ret ?: nbytes;
 }
-/*lint -restore*/
 
 static u64 tg_prfill_iops_slice_device(struct seq_file *sf,
-				       struct blkg_policy_data *pd,
-				       int off)
+                                       struct blkg_policy_data *pd,
+                                       int off)
 {
-	struct blkcg_gq *blkg = pd_to_blkg(pd);
-	const char *dname = blkg_dev_name(pd->blkg);
+        struct blkcg_gq *blkg = pd_to_blkg(pd);
+        const char *dname = blkg_dev_name(pd->blkg);
 
-	if (!dname)
-		return 0;
+        if (!dname)
+                return 0;
 
-	if (!blkg)
-		return 0;
+        if (!blkg)
+                return 0;
 
-	if (blkg_to_tg(blkg)->td->iops_slice == IOPS_SLICE_DEF)
-		return 0;
+        if (blkg_to_tg(blkg)->td->iops_slice == IOPS_SLICE_DEF)
+                return 0;
 
-	seq_printf(sf, "%s: iops_slice %u\n", dname,
-		   blkg_to_tg(blkg)->td->iops_slice);
-	return 0;
-/*lint -save -e715*/
+        seq_printf(sf, "%s: iops_slice %u\n", dname,
+                   blkg_to_tg(blkg)->td->iops_slice);
+        return 0;
 }
-/*lint -restore*/
 
 static int tg_print_iops_slice_device(struct seq_file *sf, void *v)
 {
-	seq_printf(sf, "default: %d\n", IOPS_SLICE_DEF);
+        seq_printf(sf, "default: %d\n", IOPS_SLICE_DEF);
 
-	/*lint -save -e747*/
-	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
-			  tg_prfill_iops_slice_device,
-			  &blkcg_policy_throtl, 0, false);
-	return 0;
+        blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
+                          tg_prfill_iops_slice_device,
+                          &blkcg_policy_throtl, 0, false);
+        return 0;
 }
 
 static ssize_t tg_set_iops_slice_device(struct kernfs_open_file *of,
-			   char *buf, size_t nbytes, loff_t off)
+                           char *buf, size_t nbytes, loff_t off)
 {
-	struct blkcg *blkcg = css_to_blkcg(of_css(of));
-	struct throtl_grp *tg;
-	struct blkg_conf_ctx ctx;
-	unsigned int val;
-	int ret;
+        struct blkcg *blkcg = css_to_blkcg(of_css(of));
+        struct throtl_grp *tg;
+        struct blkg_conf_ctx ctx;
+        unsigned int val;
+        int ret;
 
-	ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
-	if (ret)
-		return ret;
+        ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
+        if (ret)
+                return ret;
 
-	ret = -EINVAL;
-	val = (unsigned int)ctx.v;
+        ret = -EINVAL;
 
-	if (val < IOPS_SLICE_MIN || val > IOPS_SLICE_MAX)
+	if (sscanf(ctx.body, "%d", &val) != 1)
 		goto out_finish;
 
-	tg = blkg_to_tg(ctx.blkg);
+        if (val < IOPS_SLICE_MIN || val > IOPS_SLICE_MAX)
+                goto out_finish;
 
-	tg->td->iops_slice = val;
+        tg = blkg_to_tg(ctx.blkg);
 
-	tg_update_share(tg->td, NULL);
+        tg->td->iops_slice = val;
 
-	ret = 0;
+        tg_update_share(tg->td, NULL);
+
+        ret = 0;
 out_finish:
-	blkg_conf_finish(&ctx);
-	return ret ?: nbytes;
+        blkg_conf_finish(&ctx);
+        return ret ?: nbytes;
 }
 
 static struct cftype throtl_legacy_files[] = {
-	{
-		.name = "throttle.mode_device",
-		.flags = CFTYPE_ONLY_ON_ROOT,
-		.seq_show = throtl_print_mode_device,
-		.write = tg_set_mode_device,
-	},
+        {
+                .name = "throttle.mode_device",
+                .flags = CFTYPE_ONLY_ON_ROOT,
+                .seq_show = throtl_print_mode_device,
+                .write = tg_set_mode_device,
+        },
 	{
 		.name = "throttle.read_bps_device",
 		.private = offsetof(struct throtl_grp, io_cost.bps[READ]),
@@ -2661,57 +2688,57 @@ static struct cftype throtl_legacy_files[] = {
 		.private = (unsigned long)&blkcg_policy_throtl,
 		.seq_show = blkg_print_stat_ios,
 	},
-	{
-		.name = "throttle.weight_device",
-		.flags = CFTYPE_NOT_ON_ROOT,
-		.seq_show = tg_print_weight_device,
-		.write = tg_set_weight_device,
-	},
-	{
-		.name = "throttle.weight",
-		.flags = CFTYPE_NOT_ON_ROOT,
-		.seq_show = tg_print_weight,
-	},
-	{
-		.name = "throttle.weight_based_offon",
-		.flags = CFTYPE_ONLY_ON_ROOT,
-		.seq_show = tg_print_weight_offon,
-		.write =  tg_set_weight_offon,
-	},
-	{
-		.name = "throttle.max_inflights",
-		.flags = CFTYPE_NOT_ON_ROOT,
-		.seq_show = tg_print_max_inflights,
-		.write_s64 = tg_set_max_inflights,
-	},
-	{
-		.name = "throttle.enable_max_inflights_device",
-		.flags = CFTYPE_ONLY_ON_ROOT,
-		.seq_show = tg_print_enable_max_inflight_device,
-		.write = tg_set_enable_max_inflights_device,
-	},
-	{
-		.name = "throttle.quantum_device",
-		.flags = CFTYPE_ONLY_ON_ROOT,
-		.seq_show = tg_print_quantum_device,
-		.write = tg_set_quantum_device,
-	},
-	{
-		.name = "throttle.bw_slice_device",
-		.flags = CFTYPE_ONLY_ON_ROOT,
-		.seq_show = tg_print_bw_slice_device,
-		.write = tg_set_bw_slice_device,
-	},
-	{
-		.name = "throttle.iops_slice_device",
-		.flags = CFTYPE_ONLY_ON_ROOT,
-		.seq_show = tg_print_iops_slice_device,
-		.write = tg_set_iops_slice_device,
-	},
-	{
-		.name = "throttle.fg_flag",
-		.seq_show = tg_print_fg_flag,
-		.write = tg_set_fg_flag,
+        {
+                .name = "throttle.weight_device",
+                .flags = CFTYPE_NOT_ON_ROOT,
+                .seq_show = tg_print_weight_device,
+                .write = tg_set_weight_device,
+        },
+        {
+                .name = "throttle.weight",
+                .flags = CFTYPE_NOT_ON_ROOT,
+                .seq_show = tg_print_weight,
+        },
+        {
+                .name = "throttle.weight_based_offon",
+                .flags = CFTYPE_ONLY_ON_ROOT,
+                .seq_show = tg_print_weight_offon,
+                .write =  tg_set_weight_offon,
+        },
+        {
+                .name = "throttle.max_inflights",
+                .flags = CFTYPE_NOT_ON_ROOT,
+                .seq_show = tg_print_max_inflights,
+                .write_s64 = tg_set_max_inflights,
+        },
+        {
+                .name = "throttle.enable_max_inflights_device",
+                .flags = CFTYPE_ONLY_ON_ROOT,
+                .seq_show = tg_print_enable_max_inflight_device,
+                .write = tg_set_enable_max_inflights_device,
+        },
+        {
+                .name = "throttle.quantum_device",
+                .flags = CFTYPE_ONLY_ON_ROOT,
+                .seq_show = tg_print_quantum_device,
+                .write = tg_set_quantum_device,
+        },
+        {
+                .name = "throttle.bw_slice_device",
+                .flags = CFTYPE_ONLY_ON_ROOT,
+                .seq_show = tg_print_bw_slice_device,
+                .write = tg_set_bw_slice_device,
+        },
+        {
+                .name = "throttle.iops_slice_device",
+                .flags = CFTYPE_ONLY_ON_ROOT,
+                .seq_show = tg_print_iops_slice_device,
+                .write = tg_set_iops_slice_device,
+        },
+        {
+		.name = "throttle.type",
+		.seq_show = tg_print_cgroup_type,
+		.write_u64 = tg_set_cgroup_type,
 	},
 	{ }	/* terminate */
 };
@@ -2831,8 +2858,8 @@ static void throtl_shutdown_wq(struct request_queue *q)
 {
 	struct throtl_data *td = q->td;
 
-	del_timer_sync(&td->rescue_timer);
-	del_timer_sync(&td->idle_timer);
+        del_timer_sync(&td->rescue_timer);
+        del_timer_sync(&td->idle_timer);
 	cancel_work_sync(&td->dispatch_work);
 }
 
@@ -2843,7 +2870,7 @@ static struct blkcg_policy blkcg_policy_throtl = {
 	.pd_alloc_fn		= throtl_pd_alloc,
 	.pd_init_fn		= throtl_pd_init,
 	.pd_online_fn		= throtl_pd_online,
-	.pd_offline_fn		= throtl_pd_offline,
+	.pd_offline_fn          = throtl_pd_offline,
 	.pd_free_fn		= throtl_pd_free,
 };
 
@@ -2862,8 +2889,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
 	WARN_ON_ONCE(!rcu_read_lock_held());
 
 	/* see throtl_charge_bio() */
-	if (bio->bi_rw & (REQ_THROTTLED | REQ_META | REQ_FLUSH |
-			  REQ_FUA | REQ_DISCARD))
+	if ((bio->bi_rw & (REQ_THROTTLED |REQ_META | REQ_FLUSH |
+		REQ_FUA | REQ_DISCARD | REQ_CHAINED)))
 		goto out;
 
 	/* If we are on the way of memory reclaim, skip throttle */
@@ -2871,28 +2898,26 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
 		goto out;
 
 	if (task_in_pagefault(current))
-		goto out;
-	/*
-	 * A throtl_grp pointer retrieved under rcu can be used to access
-	 * basic fields like stats and io rates. If a group has no rules,
-	 * just update the dispatch stats in lockless manner and return.
-	 */
-	rcu_read_lock();
+                goto out;
 again:
 	if (!blkg)
 		goto out;
-		
+
 	index =  tg_data_index(tg, rw);
 	if (!tg->has_rules[index])
 		goto out;
-		
+
 	blkcg = blkg->blkcg;
 	if (td_weight_based(td) &&
-	    	(blkcg == &blkcg_root || !blk_throtl_weight_offon))
+		(blkcg == &blkcg_root || !blk_throtl_weight_offon))
 		goto out;
 
-	if (tg->fg_flag)
+	if (blkcg->type <= BLK_THROTL_FG)
 		bio->bi_rw |= REQ_FG;
+
+	if (td_weight_based(td) &&
+	    (blk_throtl_weight_offon == BLK_THROTL_WEIGHT_ON_FS))
+		goto out;
 
 	/*
 	 * Now we just support limit control for one layer.
@@ -2906,9 +2931,21 @@ again:
 		blkg_get(tg_to_blkg(tg));
 		ret = blk_throtl_io_limit_wait(blkcg, io_limit, tg, bio);
 		blkg_put(tg_to_blkg(tg));
-		if (ret == 1)
+		if (ret == 1) {
+			blkcg = bio_blkcg(bio);
+
+			blkg = blkg_lookup(blkcg, q);
+			if (unlikely(!blkg)) {
+				spin_lock_irq(q->queue_lock);
+				blkg = blkg_lookup_create(blkcg, q);
+				if (IS_ERR(blkg))
+					blkg = q->root_blkg;
+				spin_unlock_irq(q->queue_lock);
+			}
+
+			tg = blkg_to_tg(blkg ?: q->root_blkg);
 			goto again;
-		else if (ret == 2)
+		} else if (ret == 2)
 			goto skip;
 
 		blk_throtl_io_limit_get(io_limit);
@@ -2916,16 +2953,15 @@ again:
 		bio->bi_throtl_end_io1 = blk_throtl_limit_io_done;
 	}
 skip:
-	/*
-	 * Either group has not been allocated yet or it is not an unlimited
-	 * IO group
-	 */
 	spin_lock_irq(q->queue_lock);
 
 	if (unlikely(blk_queue_bypass(q)))
 		goto out_unlock;
 
 	if (!(tg->flags & THROTL_TG_ONLINE))
+		goto out_unlock;
+
+	if (unlikely(blk_throtl_weight_offon != BLK_THROTL_WEIGHT_ON_BLK))
 		goto out_unlock;
 
 	if (td_weight_based(td)) {
@@ -2945,11 +2981,12 @@ skip:
 		throtl_add_bio_weight(bio, tg);
 		blk_run_throtl_bios_weight(td, tg, &bios);
 		spin_unlock_irq(q->queue_lock);
-		
+
 		rcu_read_unlock();
 		while((bio = bio_list_pop(&bios)))
 			generic_make_request(bio);
-		rcu_read_lock();	
+
+		rcu_read_lock();
 		goto out;
 	}
 
@@ -3029,6 +3066,157 @@ out:
 	return throttled;
 }
 
+static inline void blk_throtl_update_quota(struct throtl_grp *tg,
+					   unsigned int size)
+{
+	tg->intime = jiffies;
+	tg->io_cost.bytes_disp[0] += size;
+	tg->io_cost.io_disp[0]++;
+}
+
+bool blk_throtl_get_quota(struct block_device *bdev, unsigned int size,
+			  unsigned long jiffies_time_out, bool wait)
+{
+	struct request_queue *q;
+	struct throtl_data *td;
+	struct throtl_grp *tg;
+	struct blkcg *blkcg = NULL;
+	struct blkcg *new_blkcg;
+	unsigned long start_jiffies;
+	unsigned long wait_jiffies = jiffies_time_out;
+	int ret;
+
+	if (current->flags & (PF_MEMALLOC | PF_SWAPWRITE |
+			      PF_KSWAPD | PF_MUTEX_GC))
+		return true;
+
+	/*
+	 * bdev has been got at mount(), and will be freed at kill_sb() after
+	 * all files closed and all dirty pages flushed. So it's safe to
+	 * using bdev without lock here.
+	 */
+	if (unlikely(!bdev) || unlikely(!bdev->bd_disk))
+		return true;
+
+	q = bdev_get_queue(bdev);
+	if (unlikely(!q))
+		return true;
+
+	td = q->td;
+
+	start_jiffies = jiffies;
+get_new_group:
+	/*
+	 * A throtl_grp pointer retrieved under rcu can be used to access
+	 * basic fields.
+	 */
+	rcu_read_lock();
+
+	if (!td_weight_based(td))
+		goto out_unlock_rcu;
+
+	if (blk_throtl_weight_offon != BLK_THROTL_WEIGHT_ON_FS)
+		goto out_unlock_rcu;
+
+	new_blkcg = task_blkcg(current);
+	if (new_blkcg == &blkcg_root)
+		goto out_unlock_rcu;
+	if (!blkcg || blkcg != new_blkcg) {
+		struct blkcg_gq *blkg;
+
+		blkcg = new_blkcg;
+
+		blkg = blkg_lookup(blkcg, q);
+		if (unlikely(!blkg)) {
+			spin_lock_irq(q->queue_lock);
+			blkg = blkg_lookup_create(blkcg, q);
+			if (IS_ERR(blkg))
+				blkg = q->root_blkg;
+			spin_unlock_irq(q->queue_lock);
+		}
+
+		tg = blkg_to_tg(blkg);
+	}
+
+	spin_lock_irq(q->queue_lock);
+
+	if (unlikely(blk_queue_bypass(q)))
+		goto out_unlock;
+
+	if (unlikely(!(tg->flags & THROTL_TG_ONLINE)))
+		goto out_unlock;
+
+	if (unlikely(!td_weight_based(td)))
+		goto out_unlock;
+
+	if (unlikely(blk_throtl_weight_offon != BLK_THROTL_WEIGHT_ON_FS))
+		goto out_unlock;
+retry:
+	if (tg_may_dispatch_weight(tg)) {
+		blk_throtl_update_quota(tg, size);
+		if (!list_empty(&tg->node))
+			goto out_unlock;
+		blkg_get(tg_to_blkg(tg));
+		list_add_tail(&tg->node, &td->active);
+		goto out_unlock;
+	} else if (!wait) {
+		spin_unlock_irq(q->queue_lock);
+		rcu_read_unlock();
+		return false;
+	}
+
+	if (!tg->expired) {
+		tg->expired = true;
+		list_move_tail(&tg->node, &td->expired);
+
+		if (list_empty(&td->active))
+			goto start_new_slice;
+	}
+
+	/*
+	 * If jiffies_time_out expires, just return to continue
+	 * to read/write.
+	 */
+	wait_jiffies = jiffies_time_out - (jiffies - start_jiffies);
+	if (jiffies - start_jiffies >= jiffies_time_out)
+		goto out_unlock;
+
+	if (should_start_new_slice(td))
+		goto start_new_slice;
+
+	blkg_get(tg_to_blkg(tg));
+	spin_unlock_irq(q->queue_lock);
+	rcu_read_unlock();
+
+	/* Waiting for starting new slice, max waiting time is 20ms */
+	ret = wait_event_interruptible_timeout(tg->wait, !tg->expired,
+			wait_jiffies >
+			msecs_to_jiffies(THROTL_IDLE_INTERVAL / 2) ?
+			msecs_to_jiffies(THROTL_IDLE_INTERVAL / 2) :
+			wait_jiffies);
+
+	blkg_put(tg_to_blkg(tg));
+
+	/* If this task is interrupted, just return */
+	if (signal_pending_state(TASK_INTERRUPTIBLE, current))
+		return true;
+
+	/* this task may switch to other group, get tg again */
+	goto get_new_group;
+
+start_new_slice:
+	/* Start new slice and wake up waiting tgs */
+	throtl_start_new_slice_weight(td);
+	goto retry;
+
+out_unlock:
+	spin_unlock_irq(q->queue_lock);
+
+out_unlock_rcu:
+	rcu_read_unlock();
+	return true;
+}
+
 /*
  * Dispatch all bios from all children tg's queued on @parent_sq.  On
  * return, @parent_sq is guaranteed to not have any active children tg's
@@ -3038,7 +3226,6 @@ static void tg_drain_bios(struct throtl_service_queue *parent_sq)
 {
 	struct throtl_grp *tg;
 
-	/*lint -save -e747 -e820*/
 	while ((tg = throtl_rb_first(parent_sq))) {
 		struct throtl_service_queue *sq = &tg->service_queue;
 		struct bio *bio;
@@ -3050,7 +3237,6 @@ static void tg_drain_bios(struct throtl_service_queue *parent_sq)
 		while ((bio = throtl_peek_queued(&sq->queued[WRITE])))
 			tg_dispatch_one_bio(tg, bio_data_dir(bio));
 	}
-	/*lint -restore*/
 }
 
 /**
@@ -3069,7 +3255,10 @@ void blk_throtl_drain(struct request_queue *q)
 	int i;
 
 	if (td_weight_based(td)) {
-		blk_throtl_drain_weight(q);
+		if (blk_throtl_weight_offon == BLK_THROTL_WEIGHT_ON_FS)
+			__blk_throtl_drain_weight(q);
+		else
+			blk_throtl_drain_weight(q);
 		return;
 	}
 
@@ -3082,10 +3271,8 @@ void blk_throtl_drain(struct request_queue *q)
 	 * better to walk service_queue tree directly but blkg walk is
 	 * easier.
 	 */
-	/*lint -save -e747 -e820*/
 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg)
 		tg_drain_bios(&blkg_to_tg(blkg)->service_queue);
-	/*lint -restore*/
 
 	/* finally, transfer bios from top-level tg's into the td */
 	tg_drain_bios(&td->service_queue);
@@ -3094,12 +3281,10 @@ void blk_throtl_drain(struct request_queue *q)
 	spin_unlock_irq(q->queue_lock);
 
 	/* all bios now should be in td->service_queue, issue them */
-	/*lint -save -e574 -e737 -e820*/
 	for (i = READ; i <= WRITE; i++)
 		while ((bio = throtl_pop_queued(&td->service_queue.queued[i],
 						NULL)))
 			generic_make_request(bio);
-	/*lint -restore*/
 
 	spin_lock_irq(q->queue_lock);
 }
@@ -3112,7 +3297,6 @@ int blk_throtl_init(struct request_queue *q)
 	td = kzalloc_node(sizeof(*td), GFP_KERNEL, q->node);
 	if (!td)
 		return -ENOMEM;
-
 	INIT_LIST_HEAD(&td->active);
 	INIT_LIST_HEAD(&td->expired);
 
@@ -3121,9 +3305,11 @@ int blk_throtl_init(struct request_queue *q)
 	setup_timer(&td->rescue_timer, blk_throtl_rescue_timer_fn,
 		    (unsigned long)td);
 	setup_timer(&td->idle_timer, blk_throtl_idle_timer_fn,
-		    (unsigned long)td);
+		(unsigned long)td);
+
 	INIT_WORK(&td->dispatch_work, blk_throtl_dispatch_work_fn);
 	throtl_service_queue_init(&td->service_queue);
+
 	td->service_queue.share = MAX_SHARE;
 	td->mode = MODE_NONE;
 
@@ -3143,15 +3329,12 @@ int blk_throtl_init(struct request_queue *q)
 
 void blk_throtl_exit(struct request_queue *q)
 {
-	/*lint -save -e730*/
 	BUG_ON(!q->td);
-	/*lint -restore*/
 	throtl_shutdown_wq(q);
 	blkcg_deactivate_policy(q, &blkcg_policy_throtl);
 	kfree(q->td);
 }
 
-/*lint -e528 -esym(528,*)*/
 static int __init throtl_init(void)
 {
 	kthrotld_workqueue = alloc_workqueue("kthrotld", WQ_MEM_RECLAIM, 0);
@@ -3160,6 +3343,5 @@ static int __init throtl_init(void)
 
 	return blkcg_policy_register(&blkcg_policy_throtl);
 }
-/*lint -e528 +esym(528,*)*/
 
 module_init(throtl_init);

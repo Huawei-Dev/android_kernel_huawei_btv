@@ -1174,7 +1174,7 @@ static void blkcg_fork(struct task_struct *task)
 {
 	struct blkcg *blkcg;
 
-	if (task_css_is_root(task, blkio_cgrp_id))
+	if (task_css_is_root(task, io_cgrp_id))
 		return;
 
 	if (!task->mm)

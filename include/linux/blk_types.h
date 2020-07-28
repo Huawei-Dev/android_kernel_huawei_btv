@@ -111,6 +111,7 @@ struct bio {
 	void			*bi_throtl_private1;
 	bio_throtl_end_io_t	*bi_throtl_end_io2;
 	void			*bi_throtl_private2;
+	unsigned long           bi_throtl_in_queue;
 #endif
 #ifdef CONFIG_BLK_CGROUP
 	/*
@@ -216,6 +217,8 @@ enum rq_flag_bits {
 	__REQ_THROTTLED,	/* This bio has already been subjected to
 				 * throttling rules. Don't do it again. */
 
+	__REQ_CHAINED,
+
 	/* request only flags */
 	__REQ_SORTED,		/* elevator knows about this request */
 	__REQ_SOFTBARRIER,	/* may not be passed by ioscheduler */
@@ -271,6 +274,7 @@ enum rq_flag_bits {
 
 #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
 #define REQ_THROTTLED		(1ULL << __REQ_THROTTLED)
+#define REQ_CHAINED		(1ULL << __REQ_CHAINED)
 
 #define REQ_SORTED		(1ULL << __REQ_SORTED)
 #define REQ_SOFTBARRIER		(1ULL << __REQ_SOFTBARRIER)

@@ -33,6 +33,15 @@
 
 #ifdef CONFIG_BLK_CGROUP
 
+enum blk_throtl_type {
+	BLK_THROTL_TA,
+	BLK_THROTL_FG,
+	BLK_THROTL_KBG,
+	BLK_THROTL_SBG,
+	BLK_THROTL_BG,
+	BLK_THROTL_TYPE_NR,
+};
+
 enum blkg_rwstat_type {
 	BLKG_RWSTAT_READ,
 	BLKG_RWSTAT_WRITE,
@@ -58,6 +67,7 @@ struct blkcg {
 
 #ifdef CONFIG_BLK_DEV_THROTTLING
 	int				max_inflights;
+	unsigned int			type;
 #endif
 
 	struct list_head		all_blkcgs_node;
