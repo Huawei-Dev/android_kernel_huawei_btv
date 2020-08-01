@@ -16,10 +16,6 @@
 #include <asm/pgtable.h>
 #include <asm/tlbflush.h>
 
-#ifdef CONFIG_HW_STAT_MM
-#include <huawei_platform/linux/stat_mm.h>
-#endif
-
 #include "internal.h"
 
 static struct page *no_page_table(struct vm_area_struct *vma,
@@ -987,9 +983,7 @@ int __mm_populate(unsigned long start, unsigned long len, int ignore_errors)
 	}
 	if (locked)
 		up_read(&mm->mmap_sem);
-#ifdef CONFIG_HW_STAT_MM
-	STAT_MM_MLOCK_IF(start, len, current->mm->locked_vm);
-#endif
+
 	return ret;	/* 0 or negative error code */
 }
 
