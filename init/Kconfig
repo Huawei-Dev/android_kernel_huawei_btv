@@ -1648,13 +1648,10 @@ config ADVISE_SYSCALLS
 config USERFAULTFD
 	bool "Enable userfaultfd() system call"
 	select ANON_INODES
-	default y
 	depends on MMU
 	help
 	  Enable the userfaultfd() system call that allows to intercept and
 	  handle page faults in userland.
-
-	  If unsure, say Y.
 
 config PCI_QUIRKS
 	default y
