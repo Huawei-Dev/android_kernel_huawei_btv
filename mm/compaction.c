@@ -486,16 +486,6 @@ static unsigned long isolate_freepages_block(struct compact_control *cc,
 			/* Recheck this is a buddy page under lock */
 			if (!PageBuddy(page))
 				goto isolate_fail;
-
-			/**
-			 * We do not need to do compact for cma pages.
-			 * Currently, cma can only be used for anonymous page.
-			 * The alloced order of anonymous pages always be 0.
-			 * If we do compact for cma pages, it may be compact for
-			 * filesystem. The bufferHead which is a devil for cma migrate.
-			 */
-			if (page_is_cma(page) && !strict)
-				goto isolate_fail;
 		}
 
 		/* Found a free page, break it into order-0 pages */
@@ -697,8 +687,6 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
 	bool locked = false;
 	struct page *page = NULL, *valid_page = NULL;
 	unsigned long start_pfn = low_pfn;
-	int pass = 0;
-	int max_time = 10000;
 
 	/*
 	 * Ensure that there are not too many pages isolated from the LRU
@@ -766,8 +754,8 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
 		 * It's possible to migrate LRU pages and balloon pages
 		 * Skip any other type of page
 		 */
-		is_lru = !PageLRU(page) && !page_is_cma(page);
-		if (is_lru) {
+		is_lru = PageLRU(page);
+		if (!is_lru) {
 			if (unlikely(balloon_page_movable(page))) {
 				if (balloon_page_isolate(page)) {
 					/* Successfully isolated */
@@ -800,32 +788,9 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
 		 * so avoid taking lru_lock and isolating it unnecessarily in an
 		 * admittedly racy check.
 		 */
-again:
-		if (pass > max_time) {
-			pass = 0;
-			continue;
-		}
-
 		if (!page_mapping(page) &&
-		    page_count(page) > page_mapcount(page)) {
-			/**
-			 * There is no long time pinned for cma pages
-			 * wait here until the page_count equals page_mapcount or
-			 * the page_freed.
-			 */
-			if (page_is_cma(page) && cc->mode == MIGRATE_SYNC &&
-			    page_count(page)) {
-				if (locked) {
-					spin_unlock_irqrestore(&zone->lru_lock,
-							       flags);
-					locked = false;
-				}
-				cond_resched();
-				pass ++;
-				goto again;
-			} else
-				continue;
-		}
+		    page_count(page) > page_mapcount(page))
+			continue;
 
 		/* If we already hold the lock, we can skip some rechecking */
 		if (!locked) {
@@ -835,7 +800,7 @@ again:
 				break;
 
 			/* Recheck PageLRU and PageCompound under lock */
-			if (!PageLRU(page) && !page_is_cma(page))
+			if (!PageLRU(page))
 				continue;
 
 			/*
@@ -851,26 +816,9 @@ again:
 
 		lruvec = mem_cgroup_page_lruvec(page, zone);
 
-retry_isolate:
-		if (pass > max_time) {
-			pass = 0;
-			continue;
-		}
-
 		/* Try isolate the page */
-		if (__isolate_lru_page(page, isolate_mode) != 0) {
-			if (page_is_cma(page) && page_count(page) &&
-			    cc->mode == MIGRATE_SYNC) {
-				/**
-				 * If the page is adding to lru list
-				 * wait here for cma pages.
-				 */
-				cond_resched();
-				pass ++;
-				goto retry_isolate;
-			}
+		if (__isolate_lru_page(page, isolate_mode) != 0)
 			continue;
-		}
 
 		VM_BUG_ON_PAGE(PageCompound(page), page);
 

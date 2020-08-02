@@ -362,7 +362,6 @@ static inline int get_page_unless_zero(struct page *page)
 }
 
 extern int page_is_ram(unsigned long pfn);
-extern bool page_is_cma(struct page *page);
 
 enum {
 	REGION_INTERSECTS,

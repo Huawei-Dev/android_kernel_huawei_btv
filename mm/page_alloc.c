@@ -7131,13 +7131,3 @@ bool is_free_buddy_page(struct page *page)
 	return order < MAX_ORDER;
 }
 #endif
-
-bool page_is_cma(struct page *page)
-{
-	int migratetype = get_pfnblock_migratetype(page, page_to_pfn(page));
-
-	if (migratetype == MIGRATE_CMA || migratetype == MIGRATE_ISOLATE)
-		return true;
-	else
-		return false;
-}
