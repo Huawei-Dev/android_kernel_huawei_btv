@@ -29,11 +29,9 @@ static void set_logusertype_flag(int value)
     log_usertype_flag = value;
 }
 
-static int logusertype_info_show(struct seq_file *m, void *v)
+static void logusertype_info_show(struct seq_file *m, void *v)
 {
-    int len = 0;
-    len = seq_printf(m,"%d\n", log_usertype_flag);
-    return 0;
+    seq_printf(m,"%d\n", log_usertype_flag);
 }
 
 int logusertype_write_proc(struct file *file, const char *buffer, unsigned long count, void *data) {

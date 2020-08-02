@@ -8,8 +8,10 @@
 #include <linux/string.h>
 #include <chipset_common/hwstatuscheck/device_status_info.h>
 #include <linux/uaccess.h>
+#include <linux/version.h>
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0))
 #include <linux/module.h>
-
+#endif
 static uint32_t check_device_status_flag_long = 0;
 
 int set_hw_check_dev_status_flag( int check_id )
@@ -29,10 +31,17 @@ int set_hw_check_dev_status_flag( int check_id )
 
 EXPORT_SYMBOL(set_hw_check_dev_status_flag);
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 2, 0))
 static int check_dev_status_proc_show(struct seq_file *m, void *v)
 {
     return seq_printf(m,"%x\n",check_device_status_flag_long);
 }
+#else
+void check_dev_status_proc_show(struct seq_file *m, void *v)
+{
+    seq_printf(m,"%x\n",check_device_status_flag_long);
+}
+#endif
 
 static int check_device_status_proc_open(struct inode *inode, struct file *file)
 {

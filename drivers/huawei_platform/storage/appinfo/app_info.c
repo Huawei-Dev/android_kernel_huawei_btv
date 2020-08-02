@@ -7,25 +7,11 @@
 #include <linux/module.h>
 
 extern unsigned int get_pd_charge_flag(void);
-extern unsigned int resetmode_is_normal(void);
 extern unsigned int get_boot_into_recovery_flag(void);
-/*
+
 static int app_info_show(struct seq_file *m, void *v)
 {
-	int len = 0;
-	len = seq_printf(m,"recovery_flag:\n%d\n"
-                                        "charge_flag:\n%d\n"
-                                        "reset_normal_flag:\n%d\n",
-                                        (int)get_boot_into_recovery_flag(),
-                                        (int)get_pd_charge_flag(),
-                                        (int)resetmode_is_normal());
-	return 0;
-}
-*/
-static int app_info_show(struct seq_file *m, void *v)
-{
-	int len = 0;
-	len = seq_printf(m,"recovery_flag:\n%d\n"
+	(void)seq_printf(m,"recovery_flag:\n%d\n"
                                         "charge_flag:\n%d\n",
                                         (int)get_boot_into_recovery_flag(),
                                         (int)get_pd_charge_flag());

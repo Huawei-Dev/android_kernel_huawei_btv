@@ -49,11 +49,9 @@ int wait_for_postfsdata(unsigned int timeout)
 }
 EXPORT_SYMBOL(wait_for_postfsdata);
 
-static int postfsdata_info_show(struct seq_file *m, void *v)
+static void postfsdata_info_show(struct seq_file *m, void *v)
 {
-	int len = 0;
-	len = seq_printf(m,"%d\n", postfsdata_flag);
-	return 0;
+	seq_printf(m,"%d\n", postfsdata_flag);
 }
 int postfsdata_write_proc(struct file *file, const char *buffer, unsigned long count, void *data) {
 	long value = -1;

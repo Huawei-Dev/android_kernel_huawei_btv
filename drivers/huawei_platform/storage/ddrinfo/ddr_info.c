@@ -79,7 +79,6 @@ static unsigned int get_ddr_info(void)
 
 static int ddr_info_show(struct seq_file *m, void *v)
 {
-	int len = 0;
 	unsigned int tmp_reg_value;
 	unsigned int board_id;
 
@@ -90,7 +89,7 @@ static int ddr_info_show(struct seq_file *m, void *v)
 		tmp_reg_value = (tmp_reg_value & 0xFF) | 0x300;
 
 	tmp_reg_value = tmp_reg_value & 0xfff;
-	len = seq_printf(m, "ddr_info:\n0x%x\n", tmp_reg_value);
+	seq_printf(m, "ddr_info:\n0x%x\n", tmp_reg_value);
 	return 0;
 }
 
@@ -109,6 +108,7 @@ static const struct file_operations proc_ddrinfo_operations = {
 
 static void get_rod_info(void)
 {
+#if defined(DDR_HI3650_PLATFORM)
 	unsigned int tmp_info_value;
 	unsigned int tmp_type_value;
 
@@ -137,22 +137,25 @@ static void get_rod_info(void)
 			memcpy(ddr_rod, "lpddr4", strlen("lpddr4")+1);
 		}
 	} else {
-#if defined(DDR_HI3650_PLATFORM) || defined(DDR_HI6250_PLATFORM)
 		pr_info("ddr_type: lpddr3!!\n");
 		memcpy(ddr_rod, "lpddr3", strlen("lpddr3")+1);
-#else
-		pr_info("ddr_type: lpddr4!!\n");
-		memcpy(ddr_rod, "lpddr4", strlen("lpddr4")+1);
-#endif
 	}
+#elif defined(DDR_HI6250_PLATFORM)
+	pr_info("ddr_type: lpddr3!!\n");
+	memcpy(ddr_rod, "lpddr3", strlen("lpddr3")+1);
+#elif defined(DDR_HI3660_PLATFORM)
+	pr_info("ddr_type: lpddr4!!\n");
+	memcpy(ddr_rod, "lpddr4", strlen("lpddr4")+1);
+#else
+	pr_info("ddr_type: lpddr!!\n");
+	memcpy(ddr_rod, "lpddr", strlen("lpddr")+1);
+#endif
 }
 
 static int ddr_rod_show(struct seq_file *m, void *v)
 {
-	int len = 0;
-
 	get_rod_info();
-	len = seq_printf(m, "%s\n", ddr_rod);
+	seq_printf(m, "%s\n", ddr_rod);
 	return 0;
 }
 
