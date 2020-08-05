@@ -482,7 +482,6 @@ static int hi6402_gpio_irq_map(struct irq_domain *d, unsigned int irq,
 	irq_set_chip_data(irq, d->host_data);
 	irq_set_chip(irq, &hi6402_gpio_irqchip);
 	irq_set_nested_thread(irq, true);
-	set_irq_flags(irq, IRQF_VALID);
 
 	return 0;
 }

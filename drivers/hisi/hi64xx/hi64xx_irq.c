@@ -215,7 +215,6 @@ static int hi64xx_irq_map(struct irq_domain *d, unsigned int virq,
 	irq_set_chip_data(virq, irq);
 	irq_set_chip(virq, &hi64xx_irq_chip);
 	irq_set_nested_thread(virq, true);
-	set_irq_flags(virq, IRQF_VALID);
 
 	return 0;
 }
