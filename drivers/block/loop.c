@@ -926,16 +926,9 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
 	if (error)
 		goto out_putf;
 
-	error = -ENOMEM;
-	lo->wq = alloc_workqueue("kloopd%d",
-			WQ_MEM_RECLAIM | WQ_HIGHPRI | WQ_UNBOUND, 16,
-			lo->lo_number);
-	if (!lo->wq)
-		goto out_putf;
-
 	error = 0;
 
-	set_device_ro(bdev, (lo_flags & LO_FLAGS_READ_ONLY) != 0); /*lint !e730 */
+	set_device_ro(bdev, (lo_flags & LO_FLAGS_READ_ONLY) != 0);
 
 	lo->use_dio = false;
 	lo->lo_blocksize = lo_blocksize;
