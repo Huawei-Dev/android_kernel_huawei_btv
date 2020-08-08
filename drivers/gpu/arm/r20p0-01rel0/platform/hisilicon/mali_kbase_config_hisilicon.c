@@ -580,11 +580,8 @@ static unsigned long hisi_model_dynamic_power(unsigned long freq,
 
 	return (coefficient * v2 * f_mhz) / 1000000; /* mW */
 }
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0))
+
 static struct devfreq_cooling_power hisi_model_ops = {
-#else
-static struct devfreq_cooling_ops hisi_model_ops = {
-#endif
 	.get_static_power = hisi_model_static_power,
 	.get_dynamic_power = hisi_model_dynamic_power,
 };
@@ -660,9 +657,9 @@ static int kbase_platform_init(struct kbase_device *kbdev)
 
 #ifdef CONFIG_DEVFREQ_THERMAL
 	{
-		struct devfreq_cooling_ops *callbacks;
+		struct devfreq_cooling_power *callbacks;
 
-		callbacks = (struct devfreq_cooling_ops *)POWER_MODEL_CALLBACKS;
+		callbacks = (struct devfreq_cooling_power *)POWER_MODEL_CALLBACKS;
 
 		kbdev->devfreq_cooling = of_devfreq_cooling_register_power(
 				kbdev->dev->of_node,

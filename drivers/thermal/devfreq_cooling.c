@@ -56,7 +56,7 @@ static DEFINE_IDR(devfreq_idr);
  * @freq_table:	Pointer to a table with the frequencies sorted in descending
  *		order.  You can index the table by cooling device state
  * @freq_table_size:	Size of the @freq_table and @power_table
- * @power_ops:	Pointer to devfreq_cooling_ops, used to generate the
+ * @power_ops:	Pointer to devfreq_cooling_power, used to generate the
  *		@power_table.
  */
 struct devfreq_cooling_device {
@@ -67,7 +67,7 @@ struct devfreq_cooling_device {
 	u32 *power_table;
 	u32 *freq_table;
 	size_t freq_table_size;
-	struct devfreq_cooling_ops *power_ops;
+	struct devfreq_cooling_power *power_ops;
 };
 
 /**
@@ -290,7 +290,7 @@ get_static_power(struct devfreq_cooling_device *dfc, unsigned long freq)
  *
  * Calculate the dynamic power in milliwatts consumed by the device at
  * frequency @freq and voltage @voltage.  If the get_dynamic_power()
- * was supplied as part of the devfreq_cooling_ops struct, then that
+ * was supplied as part of the devfreq_cooling_power struct, then that
  * function is used.  Otherwise, a simple power model (Pdyn = Coeff *
  * Voltage^2 * Frequency) is used.
  */
@@ -300,7 +300,7 @@ get_dynamic_power(struct devfreq_cooling_device *dfc, unsigned long freq,
 {
 	u64 power;
 	u32 freq_mhz;
-	struct devfreq_cooling_ops *dfc_power = dfc->power_ops;
+	struct devfreq_cooling_power *dfc_power = dfc->power_ops;
 
 	if (dfc_power->get_dynamic_power)
 		return dfc_power->get_dynamic_power(freq, voltage);
@@ -407,7 +407,7 @@ static int devfreq_cooling_power2state(struct thermal_cooling_device *cdev,
 	return 0;
 }
 
-static struct thermal_cooling_device_ops devfreq_cooling_ops = {
+static struct thermal_cooling_device_ops devfreq_cooling_power = {
 	.get_max_state = devfreq_cooling_get_max_state,
 	.get_cur_state = devfreq_cooling_get_cur_state,
 	.set_cur_state = devfreq_cooling_set_cur_state,
@@ -421,7 +421,7 @@ static struct thermal_cooling_device_ops devfreq_cooling_ops = {
  * device's maximum power usage at each cooling state (OPP).  The
  * static and dynamic power using the appropriate voltage and
  * frequency for the state, is acquired from the struct
- * devfreq_cooling_ops, and summed to make the maximum power draw.
+ * devfreq_cooling_power, and summed to make the maximum power draw.
  *
  * The frequency table holds the frequencies in descending order.
  * That way its indexed by cooling device state.
@@ -576,7 +576,7 @@ static int devfreq_power2freq(struct thermal_cooling_device *cdev, u32 power, u3
  *                                      with OF and power information.
  * @np:	Pointer to OF device_node.
  * @df:	Pointer to devfreq device.
- * @dfc_power:	Pointer to devfreq_cooling_ops.
+ * @dfc_power:	Pointer to devfreq_cooling_power.
  *
  * Register a devfreq cooling device.  The available OPPs must be
  * registered on the device.
@@ -588,7 +588,7 @@ static int devfreq_power2freq(struct thermal_cooling_device *cdev, u32 power, u3
  */
 struct thermal_cooling_device *
 of_devfreq_cooling_register_power(struct device_node *np, struct devfreq *df,
-				  struct devfreq_cooling_ops *dfc_power)
+				  struct devfreq_cooling_power *dfc_power)
 {
 	struct thermal_cooling_device *cdev;
 	struct devfreq_cooling_device *dfc;
@@ -607,10 +607,10 @@ of_devfreq_cooling_register_power(struct device_node *np, struct devfreq *df,
 	if (dfc_power) {
 		dfc->power_ops = dfc_power;
 
-		devfreq_cooling_ops.get_requested_power =
+		devfreq_cooling_power.get_requested_power =
 			devfreq_cooling_get_requested_power;
-		devfreq_cooling_ops.state2power = devfreq_cooling_state2power;
-		devfreq_cooling_ops.power2state = devfreq_cooling_power2state;
+		devfreq_cooling_power.state2power = devfreq_cooling_state2power;
+		devfreq_cooling_power.power2state = devfreq_cooling_power2state;
 	}
 
 	err = devfreq_cooling_gen_tables(dfc);
@@ -624,7 +624,7 @@ of_devfreq_cooling_register_power(struct device_node *np, struct devfreq *df,
 	snprintf(dev_name, sizeof(dev_name), "thermal-devfreq-%d", dfc->id);
 
 	cdev = thermal_of_cooling_device_register(np, dev_name, dfc,
-						  &devfreq_cooling_ops);
+						  &devfreq_cooling_power);
 	if (IS_ERR(cdev)) {
 		err = PTR_ERR(cdev);
 		dev_err(df->dev.parent,

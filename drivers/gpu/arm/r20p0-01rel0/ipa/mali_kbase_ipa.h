@@ -146,11 +146,7 @@ int kbase_get_real_power(struct devfreq *df, u32 *power,
 				unsigned long voltage);
 #endif /* MALI_UNIT_TEST */
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 4, 0)
-extern struct devfreq_cooling_ops kbase_ipa_power_model_ops;
-#else
 extern struct devfreq_cooling_power kbase_ipa_power_model_ops;
-#endif
 
 #else /* !(defined(CONFIG_MALI_DEVFREQ) && defined(CONFIG_DEVFREQ_THERMAL)) */
 

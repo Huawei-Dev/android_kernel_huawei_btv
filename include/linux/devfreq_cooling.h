@@ -23,7 +23,7 @@
 #ifdef CONFIG_DEVFREQ_THERMAL
 
 /**
- * struct devfreq_cooling_ops - Devfreq cooling power ops
+ * struct devfreq_cooling_power - Devfreq cooling power ops
  * @get_static_power:	Take voltage, in mV, and return the static power
  *			in mW.  If NULL, the static power is assumed
  *			to be 0.
@@ -36,7 +36,7 @@
  *			dynamic power is calculated as
  *			@dyn_power_coeff * frequency * voltage^2
  */
-struct devfreq_cooling_ops {
+struct devfreq_cooling_power {
 	unsigned long (*get_static_power)(unsigned long voltage);
 	unsigned long (*get_dynamic_power)(unsigned long freq,
 					   unsigned long voltage);
@@ -45,7 +45,7 @@ struct devfreq_cooling_ops {
 
 struct thermal_cooling_device *
 of_devfreq_cooling_register_power(struct device_node *np, struct devfreq *df,
-				  struct devfreq_cooling_ops *dfc_power);
+				  struct devfreq_cooling_power *dfc_power);
 struct thermal_cooling_device *
 of_devfreq_cooling_register(struct device_node *np, struct devfreq *df);
 struct thermal_cooling_device *devfreq_cooling_register(struct devfreq *df);
@@ -55,7 +55,7 @@ void devfreq_cooling_unregister(struct thermal_cooling_device *dfc);
 
 struct thermal_cooling_device *
 of_devfreq_cooling_register_power(struct device_node *np, struct devfreq *df,
-				  struct devfreq_cooling_ops *dfc_power)
+				  struct devfreq_cooling_power *dfc_power)
 {
 	return ERR_PTR(-EINVAL);
 }
