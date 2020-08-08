@@ -2090,21 +2090,9 @@ hotplug_update_tasks_legacy(struct cpuset *cs,
 	bool is_empty;
 
 	spin_lock_irq(&callback_lock);
-#ifndef CONFIG_ARCH_HISI
-	/* Note: on cgroup-v1, if cpu down because of hotplug,
-	 * cs->cpus_allowed clear the bit of that cpu, then hotplug
-	 * up, no way to set the bit of that cpu, because
-	 * new_cpus = cs->cpus_allowed & cpu_active_mask.
-	 * So, don't update cpus_allowed and mems_allowed of all
-	 * cpuset during hotplug, effective_cpus and effective_mems
-	 * work well tracing online cpus and mems.
-	 */
 	cpumask_copy(cs->cpus_allowed, new_cpus);
-#endif
 	cpumask_copy(cs->effective_cpus, new_cpus);
-#ifndef CONFIG_ARCH_HISI
 	cs->mems_allowed = *new_mems;
-#endif
 	cs->effective_mems = *new_mems;
 	spin_unlock_irq(&callback_lock);
 
@@ -2219,9 +2207,7 @@ static void cpuset_hotplug_workfn(struct work_struct *work)
 	static cpumask_t new_cpus;
 	static nodemask_t new_mems;
 	bool cpus_updated, mems_updated;
-#ifndef CONFIG_ARCH_HISI
 	bool on_dfl = cgroup_subsys_on_dfl(cpuset_cgrp_subsys);
-#endif
 
 	mutex_lock(&cpuset_mutex);
 
@@ -2235,10 +2221,8 @@ static void cpuset_hotplug_workfn(struct work_struct *work)
 	/* synchronize cpus_allowed to cpu_active_mask */
 	if (cpus_updated) {
 		spin_lock_irq(&callback_lock);
-#ifndef CONFIG_ARCH_HISI
 		if (!on_dfl)
 			cpumask_copy(top_cpuset.cpus_allowed, &new_cpus);
-#endif
 		cpumask_copy(top_cpuset.effective_cpus, &new_cpus);
 		spin_unlock_irq(&callback_lock);
 		/* we don't mess with cpumasks of tasks in top_cpuset */
@@ -2247,10 +2231,8 @@ static void cpuset_hotplug_workfn(struct work_struct *work)
 	/* synchronize mems_allowed to N_MEMORY */
 	if (mems_updated) {
 		spin_lock_irq(&callback_lock);
-#ifndef CONFIG_ARCH_HISI
 		if (!on_dfl)
 			top_cpuset.mems_allowed = new_mems;
-#endif
 		top_cpuset.effective_mems = new_mems;
 		spin_unlock_irq(&callback_lock);
 		update_tasks_nodemask(&top_cpuset);
