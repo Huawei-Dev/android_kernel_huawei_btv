@@ -170,7 +170,7 @@ static int __xfrm6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
 	}
 
 	if (toobig || dst_allfrag(skb_dst(skb)))
-		return ip6_fragment(sk, skb,
+		return ip6_fragment(net, sk, skb,
 				    __xfrm6_output_finish);
 
 skip_frag:
