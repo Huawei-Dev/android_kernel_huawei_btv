@@ -1056,7 +1056,7 @@ hwcam_cfgstream_vo_get_buf(
     }
     spin_unlock_irqrestore(&stm->lock_bufq, flags);
     if (ret) {
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 4, 0))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
         bufstatus->id = ret->buf.v4l2_buf.index;
         bufstatus->tv.tv_sec = ret->buf.v4l2_buf.timestamp.tv_sec;
         bufstatus->tv.tv_usec = ret->buf.v4l2_buf.timestamp.tv_usec;
@@ -1083,7 +1083,7 @@ hwcam_cfgstream_vo_put_buf(
 
     spin_lock_irqsave(&stm->lock_bufq, flags);
     list_for_each_entry_safe(entry, tmp, &stm->bufq_busy, node) {
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 4, 0))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
         if (entry->buf.v4l2_buf.index == bufstatus->id) {
 #else
         if (entry->buf.index == bufstatus->id) {
@@ -1109,7 +1109,7 @@ hwcam_cfgstream_vo_buf_done(
 
     spin_lock_irqsave(&stm->lock_bufq, flags);
     list_for_each_entry_safe(entry, tmp, &stm->bufq_busy, node) {
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 4, 0))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
         if (entry->buf.v4l2_buf.index == bufstatus->id) {
 #else
         if (entry->buf.index == bufstatus->id) {
