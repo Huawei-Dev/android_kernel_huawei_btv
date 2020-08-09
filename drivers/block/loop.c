@@ -475,7 +475,7 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
 		ret = -EIO;
 
 	rq->errors = ret;
-	blk_mq_complete_request(rq);
+	blk_mq_complete_request(rq, ret);
 }
 
 static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
