@@ -3365,6 +3365,8 @@ CONFIG_ANDROID_BINDER_IPC=y
 CONFIG_ANDROID_BINDER_DEVICES="binder,hwbinder,vndbinder"
 CONFIG_HW_BINDER_FG_REQ_FIRST=y
 # CONFIG_LIBNVDIMM is not set
+# CONFIG_NVMEM is not set
+# CONFIG_STM is not set
 
 #
 # Hisilicon platform
