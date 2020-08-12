@@ -35,10 +35,10 @@ DEFINE_MUTEX(opp_table_lock);
 
 #define opp_rcu_lockdep_assert()					\
 do {									\
-	rcu_lockdep_assert(rcu_read_lock_held() ||			\
-			   lockdep_is_held(&opp_table_lock),		\
-			   "Missing rcu_read_lock() or "		\
-			   "opp_table_lock protection");		\
+	RCU_LOCKDEP_WARN(!rcu_read_lock_held() &&			\
+			 !lockdep_is_held(&opp_table_lock),		\
+			 "Missing rcu_read_lock() or "			\
+			 "opp_table_lock protection");			\
 } while (0)
 
 static struct opp_device *_find_opp_dev(const struct device *dev,
