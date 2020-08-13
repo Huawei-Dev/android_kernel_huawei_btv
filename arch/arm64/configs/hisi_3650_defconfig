@@ -3357,6 +3357,12 @@ CONFIG_MALI_IDLE_AUTO_CLK_DIV=y
 # CONFIG_MCB is not set
 
 #
+# Performance monitor support
+#
+CONFIG_ARM_PMU=y
+# CONFIG_RAS is not set
+
+#
 # Android
 #
 CONFIG_ANDROID=y
@@ -3366,6 +3372,11 @@ CONFIG_HW_BINDER_FG_REQ_FIRST=y
 # CONFIG_LIBNVDIMM is not set
 # CONFIG_NVMEM is not set
 # CONFIG_STM is not set
+
+#
+# FPGA Configuration Support
+#
+# CONFIG_FPGA is not set
 
 #
 # Hisilicon platform
