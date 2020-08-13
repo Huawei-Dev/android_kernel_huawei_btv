@@ -63,9 +63,6 @@ struct arm_pmu {
 	atomic_t		active_events;
 	struct mutex		reserve_mutex;
 	u64			max_period;
-#ifdef CONFIG_HISI_HW_PERF_EVENTS
-	u64			min_period;
-#endif
 	struct platform_device	*plat_device;
 	struct pmu_hw_events	*(*get_hw_events)(void);
 };
