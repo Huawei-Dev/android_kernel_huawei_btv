@@ -4433,7 +4433,12 @@ OAL_STATIC oal_void  wal_cfg80211_print_sched_scan_req_info(oal_cfg80211_sched_s
     oal_int32     l_loop = 0;
 
     /* 打印基本参数 */
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+    OAM_WARNING_LOG3(0, OAM_SF_SCAN,"wal_cfg80211_print_sched_scan_req_info::channels[%d],flags[%d],rssi_thold[%d]",
+                pst_request->n_channels,
+                pst_request->flags,
+                pst_request->min_rssi_thold);
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
     OAM_WARNING_LOG4(0, OAM_SF_SCAN,"wal_cfg80211_print_sched_scan_req_info::channels[%d],interval[%d]ms,flags[%d],rssi_thold[%d]",
                 pst_request->n_channels,
                 pst_request->interval,
