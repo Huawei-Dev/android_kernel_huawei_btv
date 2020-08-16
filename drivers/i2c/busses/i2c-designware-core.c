@@ -221,7 +221,7 @@ static char *abort_sources[] = {
 };
 #endif
 
-static u32 dw_readl(struct dw_i2c_dev *dev, int offset)
+u32 dw_readl(struct dw_i2c_dev *dev, int offset)
 {
 	u32 value;
 
@@ -237,7 +237,7 @@ static u32 dw_readl(struct dw_i2c_dev *dev, int offset)
 		return value;
 }
 
-static void dw_writel(struct dw_i2c_dev *dev, u32 b, int offset)
+void dw_writel(struct dw_i2c_dev *dev, u32 b, int offset)
 {
 	if (dev->accessor_flags & ACCESS_SWAP)
 		b = swab32(b);
@@ -962,6 +962,7 @@ u32 i2c_dw_func(struct i2c_adapter *adap)
 	struct dw_i2c_dev *dev = i2c_get_adapdata(adap);
 	return dev->functionality;
 }
+EXPORT_SYMBOL_GPL(i2c_dw_func);
 
 static struct i2c_algorithm i2c_dw_algo = {
 	.master_xfer	= i2c_dw_xfer,
@@ -1092,6 +1093,7 @@ tx_aborted:
 #endif
 	return IRQ_HANDLED;
 }
+EXPORT_SYMBOL_GPL(i2c_dw_isr);
 
 void i2c_dw_disable(struct dw_i2c_dev *dev)
 {
