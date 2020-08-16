@@ -1002,6 +1002,7 @@ static inline struct f_serial_opts *to_f_serial_opts(struct config_item *item)
 			func_inst.group);
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,3,0)
 CONFIGFS_ATTR_STRUCT(f_serial_opts);
 static ssize_t f_acm_attr_show(struct config_item *item,
 				 struct configfs_attribute *attr,
@@ -1016,6 +1017,7 @@ static ssize_t f_acm_attr_show(struct config_item *item,
 		ret = f_serial_opts_attr->show(opts, page);
 	return ret;
 }
+#endif
 
 static void acm_attr_release(struct config_item *item)
 {
@@ -1026,7 +1028,9 @@ static void acm_attr_release(struct config_item *item)
 
 static struct configfs_item_operations acm_item_ops = {
 	.release                = acm_attr_release,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,3,0)
 	.show_attribute		= f_acm_attr_show,
+#endif
 };
 
 static ssize_t f_acm_port_num_show(struct f_serial_opts *opts, char *page)
@@ -1034,6 +1038,13 @@ static ssize_t f_acm_port_num_show(struct f_serial_opts *opts, char *page)
 	return sprintf(page, "%u\n", opts->port_num);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,3,0)
+CONFIGFS_ATTR_RO(f_acm_port_, num);
+static struct configfs_attribute *acm_attrs[] = {
+	&f_acm_port_attr_num,
+	NULL,
+};
+#else
 static struct f_serial_opts_attribute f_acm_port_num =
 	__CONFIGFS_ATTR_RO(port_num, f_acm_port_num_show);
 
@@ -1042,6 +1053,7 @@ static struct configfs_attribute *acm_attrs[] = {
 	&f_acm_port_num.attr,
 	NULL,
 };
+#endif
 
 static struct config_item_type acm_func_type = {
 	.ct_item_ops    = &acm_item_ops,
