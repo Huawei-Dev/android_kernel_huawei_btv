@@ -46,7 +46,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_BrPreRoutingHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_BRIDGE,
             .hooknum    = NF_BR_PRE_ROUTING,
@@ -58,7 +60,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_BrPostRoutingHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_BRIDGE,
             .hooknum    = NF_BR_POST_ROUTING,
@@ -70,7 +74,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_BrForwardHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_BRIDGE,
             .hooknum    = NF_BR_FORWARD,
@@ -82,7 +88,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_BrLocalInHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_BRIDGE,
             .hooknum    = NF_BR_LOCAL_IN,
@@ -94,7 +102,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_BrLocalOutHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_BRIDGE,
             .hooknum    = NF_BR_LOCAL_OUT,
@@ -106,7 +116,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_ArpInHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_ARP,
             .hooknum    = NF_ARP_IN,
@@ -118,7 +130,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_ArpOutHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_ARP,
             .hooknum    = NF_ARP_OUT,
@@ -130,7 +144,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip4PreRoutingHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_IPV4,
             .hooknum    = NF_INET_PRE_ROUTING,
@@ -142,7 +158,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip4PostRoutingHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_IPV4,
             .hooknum    = NF_INET_POST_ROUTING,
@@ -154,7 +172,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip4LocalInHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_IPV4,
             .hooknum    = NF_INET_LOCAL_IN,
@@ -166,7 +186,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip4LocalOutHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_IPV4,
             .hooknum    = NF_INET_LOCAL_OUT,
@@ -178,7 +200,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip4ForwardHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_IPV4,
             .hooknum    = NF_INET_FORWARD,
@@ -190,7 +214,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip6PreRoutingHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_IPV6,
             .hooknum    = NF_INET_PRE_ROUTING,
@@ -202,7 +228,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip6PostRoutingHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_IPV6,
             .hooknum    = NF_INET_POST_ROUTING,
@@ -214,7 +242,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip6LocalInHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_IPV6,
             .hooknum    = NF_INET_LOCAL_IN,
@@ -226,7 +256,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip6LocalOutHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_IPV6,
             .hooknum    = NF_INET_LOCAL_OUT,
@@ -238,7 +270,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip6ForwardHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_IPV6,
             .hooknum    = NF_INET_FORWARD,
@@ -250,7 +284,9 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_BrForwardFlowCtrlHook,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
             .owner      = THIS_MODULE,
+#endif
             .priv       = NULL,
             .pf         = NFPROTO_BRIDGE,
             .hooknum    = NF_BR_FORWARD,
