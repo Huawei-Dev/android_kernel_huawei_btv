@@ -320,16 +320,6 @@ static int create_attr_file(struct device *dev)
 		usb_dbg("create attr file error!\n");
 	}
 
-#ifdef CONFIG_USB_F_BALONG_ACM
-#ifdef CONFIG_HISI_DEBUG_FS
-	hiusb_debug_quick_register(
-			platform_get_drvdata(to_platform_device(dev)),
-			(hiusb_debug_show_ops)fakecharger_show,
-			(hiusb_debug_store_ops)fakecharger_store);
-	hiusb_debug_init(platform_get_drvdata(to_platform_device(dev)));
-#endif
-#endif
-
 	usb_dbg("-\n");
 	return 0;
 
