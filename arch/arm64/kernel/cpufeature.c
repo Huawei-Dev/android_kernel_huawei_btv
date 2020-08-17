@@ -601,7 +601,7 @@ static bool has_useable_gicv3_cpuif(const struct arm64_cpu_capabilities *entry)
 {
 	bool has_sre;
 
-	if (!has_id_aa64pfr0_feature(entry))
+	if (!has_cpuid_feature(entry))
 		return false;
 
 	has_sre = gic_enable_sre();
