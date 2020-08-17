@@ -217,7 +217,6 @@ void __read_once_size(const volatile void *p, void *res, int size)
 {
 	__READ_ONCE_SIZE;
 }
-#endif
 
 #ifdef CONFIG_KASAN
 /*
