@@ -400,9 +400,17 @@ __acquires(&port->port_lock)
 		 * NOTE that we may keep sending data for a while after
 		 * the TTY closed (dev->ioport->port_tty is NULL).
 		 */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,3,0)
+		port->write_busy = true;
 		spin_unlock(&port->port_lock);
 		status = usb_ep_queue(in, req, GFP_ATOMIC);
 		spin_lock(&port->port_lock);
+		port->write_busy = false;
+#else
+		spin_unlock(&port->port_lock);
+		status = usb_ep_queue(in, req, GFP_ATOMIC);
+		spin_lock(&port->port_lock);
+#endif
 
 		if (status) {
 			pr_debug("%s: %s %s err %d\n",
@@ -867,6 +875,12 @@ static void gs_close(struct tty_struct *tty, struct file *file)
 	struct gs_port *port = tty->driver_data;
 	struct gserial	*gser;
 
+	if(NULL == port)
+	{
+		pr_err("%s:  port null\n", __func__);
+		return;
+	}
+
 	spin_lock_irq(&port->port_lock);
 
 	if (port->port.count != 1) {
@@ -909,15 +923,15 @@ static void gs_close(struct tty_struct *tty, struct file *file)
 		gs_buf_free(&port->port_write_buf);
 	else
 		gs_buf_clear(&port->port_write_buf);
-
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,3,0)
 	tty->driver_data = NULL;
+#endif
 	port->port.tty = NULL;
 
 	port->openclose = false;
 
 	pr_debug("gs_close: ttyGS%d (%p,%p) done!\n",
 			port->port_num, tty, file);
-
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,3,0)
 	wake_up(&port->close_wait);
 #else
@@ -932,7 +946,6 @@ static int gs_write(struct tty_struct *tty, const unsigned char *buf, int count)
 {
 	struct gs_port	*port = tty->driver_data;
 	unsigned long	flags;
-	int		status;
 
 	pr_vdebug("gs_write: ttyGS%d (%p) writing %d bytes\n",
 			port->port_num, tty, count);
@@ -942,7 +955,7 @@ static int gs_write(struct tty_struct *tty, const unsigned char *buf, int count)
 		count = gs_buf_put(&port->port_write_buf, buf, count);
 	/* treat count == 0 as flush_chars() */
 	if (port->port_usb)
-		status = gs_start_tx(port);
+		gs_start_tx(port);
 	spin_unlock_irqrestore(&port->port_lock, flags);
 
 	return count;
@@ -982,6 +995,12 @@ static int gs_write_room(struct tty_struct *tty)
 	struct gs_port	*port = tty->driver_data;
 	unsigned long	flags;
 	int		room = 0;
+
+	if(NULL == port)
+	{
+		pr_err("%s:  port null\n", __func__);
+		return room;
+	}
 
 	spin_lock_irqsave(&port->port_lock, flags);
 	if (port->port_usb)
@@ -1083,6 +1102,9 @@ gs_port_alloc(unsigned port_num, struct usb_cdc_line_coding *coding)
 	tty_port_init(&port->port);
 	spin_lock_init(&port->port_lock);
 	init_waitqueue_head(&port->drain_wait);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,3,0)
+	init_waitqueue_head(&port->close_wait);
+#endif
 
 	tasklet_init(&port->push, gs_rx_push, (unsigned long) port);
 
@@ -1270,7 +1292,9 @@ int hw_gserial_connect(struct gserial *gser, u8 port_num)
 
 fail_out:
 	usb_ep_disable(gser->in);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,3,0)
 	gser->in->driver_data = NULL;
+#endif
 	return status;
 }
 EXPORT_SYMBOL_GPL(hw_gserial_connect);
@@ -1309,6 +1333,10 @@ void hw_gserial_disconnect(struct gserial *gser)
 	spin_unlock_irqrestore(&port->port_lock, flags);
 
 	/* disable endpoints, aborting down any active I/O */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,3,0)
+	usb_ep_disable(gser->out);
+	usb_ep_disable(gser->in);
+#else
 	usb_ep_disable(gser->out);
 	gser->out->driver_data = NULL;
 	gser->out->desc = NULL;
@@ -1316,7 +1344,7 @@ void hw_gserial_disconnect(struct gserial *gser)
 	usb_ep_disable(gser->in);
 	gser->in->driver_data = NULL;
 	gser->in->desc = NULL;
-
+#endif
 	/* finally, free any unused/unusable I/O buffers */
 	spin_lock_irqsave(&port->port_lock, flags);
 	if (port->port.count == 0 && !port->openclose)
