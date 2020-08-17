@@ -117,7 +117,10 @@ struct gs_port {
 	int write_allocated;
 	struct gs_buf		port_write_buf;
 	wait_queue_head_t	drain_wait;	/* wait while writes drain */
-
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,3,0)
+	bool                    write_busy;
+	wait_queue_head_t	close_wait;
+#endif
 	/* REVISIT this state ... */
 	struct usb_cdc_line_coding port_line_coding;	/* 8-N-1 etc */
 };
@@ -915,7 +918,11 @@ static void gs_close(struct tty_struct *tty, struct file *file)
 	pr_debug("gs_close: ttyGS%d (%p,%p) done!\n",
 			port->port_num, tty, file);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,3,0)
+	wake_up(&port->close_wait);
+#else
 	wake_up(&port->port.close_wait);
+#endif
 exit:
 	spin_unlock_irq(&port->port_lock);
 }
@@ -1107,7 +1114,11 @@ static void gserial_free_port(struct gs_port *port)
 {
 	tasklet_kill(&port->push);
 	/* wait for old opens to finish */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,3,0)
+	wait_event(port->close_wait, gs_closed(port));
+#else
 	wait_event(port->port.close_wait, gs_closed(port));
+#endif
 	WARN_ON(port->port_usb != NULL);
 	tty_port_destroy(&port->port);
 	kfree(port);
