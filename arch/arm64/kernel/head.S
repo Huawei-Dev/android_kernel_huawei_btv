@@ -48,6 +48,9 @@
 #error TEXT_OFFSET must be less than 2MB
 #endif
 
+#define KERNEL_START	_text
+#define KERNEL_END	_end
+
 /*
  * Kernel startup entry point.
  * ---------------------------
@@ -539,7 +542,7 @@ ENDPROC(el2_setup)
  * Sets the __boot_cpu_mode flag depending on the CPU boot mode passed
  * in x20. See arch/arm64/include/asm/virt.h for more info.
  */
-ENTRY(set_cpu_boot_mode_flag)
+set_cpu_boot_mode_flag:
 	adr_l	x1, __boot_cpu_mode
 	cmp	w20, #BOOT_CPU_MODE_EL2
 	b.ne	1f
@@ -592,7 +595,7 @@ ENTRY(secondary_entry)
 	b	secondary_startup
 ENDPROC(secondary_entry)
 
-ENTRY(secondary_startup)
+secondary_startup:
 	/*
 	 * Common entry point for secondary CPUs.
 	 */
@@ -605,7 +608,7 @@ ENTRY(secondary_startup)
 	b	__enable_mmu
 ENDPROC(secondary_startup)
 
-ENTRY(__secondary_switched)
+__secondary_switched:
 	ldr	x0, [x21]			// get secondary_data.stack
 	mov	sp, x0
 	mov	x29, #0
@@ -624,7 +627,7 @@ ENDPROC(__secondary_switched)
  * If it isn't, park the CPU
  */
 	.section	".idmap.text", "ax"
-ENTRY(__enable_mmu)
+__enable_mmu:
 	mrs	x1, ID_AA64MMFR0_EL1
 	ubfx	x2, x1, #ID_AA64MMFR0_TGRAN_SHIFT, 4
 	cmp	x2, #ID_AA64MMFR0_TGRAN_SUPPORTED

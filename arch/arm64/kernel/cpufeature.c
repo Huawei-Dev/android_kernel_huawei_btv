@@ -27,8 +27,6 @@
 #include <asm/processor.h>
 #include <asm/sysreg.h>
 
-#include <linux/irqchip/arm-gic-v3.h>
-
 unsigned long elf_hwcap __read_mostly;
 EXPORT_SYMBOL_GPL(elf_hwcap);
 
@@ -579,6 +577,8 @@ u64 read_system_reg(u32 id)
 	BUG_ON(!regp);
 	return regp->sys_val;
 }
+
+#include <linux/irqchip/arm-gic-v3.h>
 
 static bool
 feature_matches(u64 reg, const struct arm64_cpu_capabilities *entry)
