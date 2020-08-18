@@ -457,60 +457,6 @@ static void blk_account_io_merge(struct request *req)
 	}
 }
 
-#ifdef CONFIG_HISI_BLK_INLINE_CRYPTO
-static int blk_bio_key_compare(struct request *rq, struct bio *bio)
-{
-	if (!is_blk_queue_support_crypto(rq->q))
-		return true;
-
-	/*
-	 * check if both the bio->key & last merged request->key
-	 * do not exist, wo shall tell block that this bio may merge to the rq.
-	 */
-	if (!bio->ci_key && !rq->ci_key)
-		return true;
-
-	/*
-	 * check if the bio->key or last merged request->key
-	 * does not exist, but the other's was existing,
-	 * wo shall tell block that the bio should not be merged to the rq.
-	 */
-	if (!bio->ci_key || !rq->ci_key)
-		return false;
-
-	if (bio->ci_key_len != rq->ci_key_len)
-		return false;
-
-	if (bio->ci_key_len != FS_AES_256_XTS_KEY_SIZE) {
-		pr_err("[%s]key len not 64\n", __func__);
-		//BUG_ON(1);
-	}
-
-	if (bio->ci_key == rq->ci_key) {
-		struct bio *prev = rq->biotail;
-		int ret;
-
-		ret = blk_try_merge(rq, bio);
-		switch (ret) {
-		case ELEVATOR_BACK_MERGE:
-			if (prev->index + prev->bi_vcnt != bio->index)
-				return false;
-			break;
-		case ELEVATOR_FRONT_MERGE:
-			if (bio->index + bio->bi_vcnt != rq->bio->index)
-				return false;
-			break;
-		default:
-			return false;
-		}
-
-		return true;
-	}
-
-	return false;
-}
-#endif
-
 /*
  * Has to be called with the request spinlock acquired
  */
@@ -546,15 +492,6 @@ static int attempt_merge(struct request_queue *q, struct request *req,
 	 */
 	if (!ll_merge_requests_fn(q, req, next))
 		return 0;
-
-#ifdef CONFIG_HISI_BLK_INLINE_CRYPTO
-	/*
-	 * check current bio->key to last-merged request key,
-	 * which is submitted only by f2fs file system now.
-	 */
-	if (!blk_bio_key_compare(req, next->bio))
-		return 0;
-#endif
 
 	/*
 	 * If failfast settings disagree or any of the two is already
@@ -635,15 +572,6 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
 
 	if (!blk_check_merge_flags(rq->cmd_flags, bio->bi_rw))
 		return false;
-
-#ifdef CONFIG_HISI_BLK_INLINE_CRYPTO
-	/*
-	 * check current bio->key to last-merged request key,
-	 * which is submitted only by f2fs file system now.
-	 */
-	if (!blk_bio_key_compare(rq, bio))
-		return false;
-#endif
 
 	/* different data direction or already started, don't merge */
 	if (bio_data_dir(bio) != rq_data_dir(rq))

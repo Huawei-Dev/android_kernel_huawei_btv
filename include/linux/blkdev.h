@@ -146,22 +146,12 @@ struct request {
 
 	unsigned char req_iosche_bypass;
 
-#ifdef CONFIG_HISI_IO_LATENCY_TRACE
-	unsigned long req_stage_jiffies[REQ_PROC_STAGE_MAX];
-	unsigned char from_submit_bio_flag;
-#endif
 	/* the following two fields are internal, NEVER access directly */
 	unsigned int __data_len;	/* total data len */
 	sector_t __sector;		/* sector cursor */
 
 	struct bio *bio;
 	struct bio *biotail;
-
-#ifdef CONFIG_HISI_BLK_INLINE_CRYPTO
-	/* only for inline crypto */
-	void	*ci_key;
-	int ci_key_len;
-#endif
 
 	/*
 	 * The hash is used inside the scheduler, and killed once the
@@ -530,10 +520,6 @@ struct request_queue {
 	struct rcu_head		rcu_head;
 	wait_queue_head_t	mq_freeze_wq;
 
-#ifdef CONFIG_HISI_BLK_INLINE_CRYPTO
-	unsigned int crypto_flag;
-#endif
-
 	struct percpu_ref	q_usage_counter;
 	struct list_head	all_q_node;
 
@@ -549,23 +535,6 @@ struct request_queue {
 
 	bool			mq_sysfs_init_done;
 };
-
-#ifdef CONFIG_HISI_BLK_INLINE_CRYPTO
-#define BLK_CRYPTO_SUPPORT		(1U << 1)
-static inline void blk_queue_set_crypto_flag(struct request_queue *q)
-{
-	q->crypto_flag |= BLK_CRYPTO_SUPPORT;
-}
-static inline void blk_queue_clr_crypto_flag(struct request_queue *q)
-{
-	q->crypto_flag &= ~BLK_CRYPTO_SUPPORT;
-}
-
-static inline int is_blk_queue_support_crypto(struct request_queue *q)
-{
-	return (q->crypto_flag & BLK_CRYPTO_SUPPORT);
-}
-#endif
 
 #define QUEUE_FLAG_QUEUED	1	/* uses generic tag queueing */
 #define QUEUE_FLAG_STOPPED	2	/* queue is stopped */
@@ -788,11 +757,8 @@ static inline unsigned int blk_queue_depth(struct request_queue *q)
 
 	return q->nr_requests;
 }
-#ifdef CONFIG_HISI_IO_LATENCY_TRACE
-void req_latency_check(struct request *req,enum req_process_stage_enum req_stage);
-#else
+
 static inline void req_latency_check(struct request *req,enum req_process_stage_enum req_stage){}
-#endif
 
 /*
  * q->prep_rq_fn return values
