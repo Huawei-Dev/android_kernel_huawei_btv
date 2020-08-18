@@ -18,6 +18,7 @@
 #include <linux/fs.h>
 #include <linux/string.h>
 #include <linux/slab.h>
+#include <linux/version.h>
 
 #include "huawei_platform/log/hw_log.h"
 #include "huawei_platform/log/log_exception.h"
@@ -570,7 +571,11 @@ static void imonitor_file_lock(struct file *filp, int cmd)
 	fl->fl_flags = FL_FLOCK;
 	fl->fl_type = cmd;
 	fl->fl_end = OFFSET_MAX;
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
 	flock_lock_file_wait(filp, fl);
+#else
+	locks_lock_file_wait(filp, fl);
+#endif
 	locks_free_lock(fl);
 }
 
