@@ -185,12 +185,6 @@ static int mmc_bus_suspend(struct device *dev)
 		return ret;
 	}
 
-#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
-	if (mmc_card_sd(card) && mmc_bus_needs_resume(host)) {
-		pr_err("[Deferred_resume] %s:%d--\n", __func__, __LINE__);
-		return 0;
-	}
-#endif
 	ret = host->bus_ops->suspend(host);
 	/*if bus_ops->suspend failed, need to pm_generic_resume*/
 #ifdef CONFIG_HISI_MMC
@@ -210,22 +204,12 @@ static int mmc_bus_resume(struct device *dev)
 	struct mmc_host *host = card->host;
 	int ret;
 
-#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
-	if (mmc_card_sd(card) && mmc_bus_manual_resume(host)) {
-		pr_err("[Deferred_resume] %s:%d ++\n", __func__, __LINE__);
-		host->bus_resume_flags |= MMC_BUSRESUME_NEEDS_RESUME;
-		goto skip_full_resume;
-	}
-#endif
 	printk("%s:%d ++\n", __func__, __LINE__);
 	ret = host->bus_ops->resume(host);
 	if (ret)
 		pr_warn("%s: error %d during resume (card was removed?)\n",
 			mmc_hostname(host), ret);
 
-#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
-skip_full_resume:
-#endif
 	ret = pm_generic_resume(dev);
 	printk("%s:%d %d--\n", __func__, __LINE__, ret);
 	return ret;

@@ -28,10 +28,6 @@
 #define MMC_FFU_DOWNLOAD_OP 302
 #define MMC_FFU_INSTALL_OP 303
 
-#ifdef CONFIG_MMC_FFU_SAMSUNG45
-#define MMC_FFU_SAMSUNG45_OP 304
-#endif
-
 #define MMC_FFU_MODE_SET 0x1
 #define MMC_FFU_MODE_NORMAL 0x0
 #define MMC_FFU_INSTALL_SET 0x1
@@ -52,11 +48,6 @@ int mmc_ffu_download(struct mmc_card *card, struct mmc_command *cmd,
 	u8 *data, unsigned int buf_bytes);
 int mmc_ffu_install(struct mmc_card *card);
 
-#ifdef CONFIG_MMC_FFU_SAMSUNG45
-int mmc_ffu_execute(struct mmc_card *card, struct mmc_command *cmd,
-	u8 *data, int buf_bytes);
-#endif
-
 #else
 static inline int mmc_ffu_download(struct mmc_card *card,
 	struct mmc_command *cmd, u8 *data, unsigned int buf_bytes)
@@ -67,14 +58,6 @@ static inline int mmc_ffu_install(struct mmc_card *card)
 {
 	return -ENOSYS;
 }
-
-#ifdef CONFIG_MMC_FFU_SAMSUNG45
-static inline int mmc_ffu_execute(struct mmc_card *card,
-	struct mmc_command *cmd, u8 *data, int buf_bytes)
-{
-	return -ENOSYS;
-}
-#endif
 
 #endif
 #endif /* FFU_H_ */

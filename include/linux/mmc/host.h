@@ -292,12 +292,6 @@ struct mmc_host {
 	u32			max_current_300;
 	u32			max_current_180;
 
-#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
-       unsigned int            bus_resume_flags;
-#define MMC_BUSRESUME_MANUAL_RESUME    (1 << 0)
-#define MMC_BUSRESUME_NEEDS_RESUME             (1 << 1)
-#endif
-
 #define MMC_VDD_165_195		0x00000080	/* VDD voltage 1.65 - 1.95 */
 #define MMC_VDD_20_21		0x00000100	/* VDD voltage 2.0 ~ 2.1 */
 #define MMC_VDD_21_22		0x00000200	/* VDD voltage 2.1 ~ 2.2 */
@@ -529,21 +523,6 @@ static inline void *mmc_priv(struct mmc_host *host)
 #define mmc_dev(x)	((x)->parent)
 #define mmc_classdev(x)	(&(x)->class_dev)
 #define mmc_hostname(x)	(dev_name(&(x)->class_dev))
-
-#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
-#define mmc_bus_needs_resume(host) ((host)->bus_resume_flags & MMC_BUSRESUME_NEEDS_RESUME)
-#define mmc_bus_manual_resume(host) ((host)->bus_resume_flags & MMC_BUSRESUME_MANUAL_RESUME)
-
-static inline void mmc_set_bus_resume_policy(struct mmc_host *host, int manual)
-{
-       if (manual)
-               host->bus_resume_flags |= MMC_BUSRESUME_MANUAL_RESUME;
-       else
-               host->bus_resume_flags &= ~MMC_BUSRESUME_MANUAL_RESUME;
-}
-
-extern int mmc_resume_bus(struct mmc_host *host);
-#endif
 
 #ifdef CONFIG_HISI_MMC
 int mmc_suspend_host(struct mmc_host *);

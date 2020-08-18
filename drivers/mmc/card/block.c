@@ -529,13 +529,6 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
 		goto cmd_done;
 	}
 
-#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
-	if (mmc_bus_needs_resume(card->host)) {
-		pr_err("[Deferred_resume] %s:Start to resume the sdcard\n", __func__);
-		mmc_resume_bus(card->host);
-	}
-#endif
-
 	cmd.opcode = idata->ic.opcode;
 	cmd.arg = idata->ic.arg;
 	cmd.flags = idata->ic.flags;
@@ -595,16 +588,6 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
 
         goto cmd_rel_host;
     }
-
-#ifdef CONFIG_MMC_FFU_SAMSUNG45
-    if (cmd.opcode == MMC_FFU_SAMSUNG45_OP) {
-        pr_debug("[emmc5.0]:%s cmd.opcode == MMC_FFU_SAMSUNG45_OP\n", __func__);
-
-        err = mmc_ffu_execute(card, &cmd, idata->buf, idata->buf_bytes);
-
-        goto cmd_rel_host;
-    }
-#endif
 
 	err = mmc_blk_part_switch(card, md);
 	if (err)
@@ -2193,13 +2176,6 @@ static int mmc_blk_issue_rq(struct mmc_queue *mq, struct request *req)
 	unsigned long flags;
 	unsigned int cmd_flags = req ? req->cmd_flags : 0;
 
-#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
-	if (mmc_bus_needs_resume(card->host)) {
-		pr_err("[Deferred_resume] %s:Start to resume the sdcard\n", __func__);
-		mmc_resume_bus(card->host);
-	}
-#endif
-
 	if (req && !mq->mqrq_prev->req && !mq->tmp_get_card_flag) {
 		/* claim host only for the first request */
 		mmc_get_card(card);
@@ -2719,13 +2695,6 @@ static int mmc_blk_probe(struct mmc_card *card)
 
 	dev_set_drvdata(&card->dev, md);
 
-#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
-	if (mmc_card_sd(card)) {
-		pr_err("[Deferred_resume] enable the sdcard deferred_resume function\n");
-		mmc_set_bus_resume_policy(card->host, 1);
-	}
-#endif
-
 	if (mmc_add_disk(md))
 		goto out;
 
@@ -2769,13 +2738,6 @@ static void mmc_blk_remove(struct mmc_card *card)
 	mmc_blk_remove_req(md);
 	dev_set_drvdata(&card->dev, NULL);
 
-#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
-	if (mmc_card_sd(card)) {
-		pr_err("[Deferred_resume] disable the sdcard deferred_resume function\n");
-		mmc_set_bus_resume_policy(card->host, 0);
-		card->host->bus_resume_flags &= ~MMC_BUSRESUME_NEEDS_RESUME;
-	}
-#endif
 }
 
 /*add para wait

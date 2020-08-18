@@ -732,12 +732,6 @@ EXPORT_SYMBOL(mmc_start_req);
  */
 void mmc_wait_for_req(struct mmc_host *host, struct mmc_request *mrq)
 {
-#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
-	if (mmc_bus_needs_resume(host)) {
-		pr_err("[Deferred_resume] %s:Start to resume the sdcard\n", __func__);
-		mmc_resume_bus(host);
-	}
-#endif
 	__mmc_start_req(host, mrq);
 	mmc_wait_for_req_done(host, mrq);
 }
@@ -1963,63 +1957,6 @@ void mmc_bus_put(struct mmc_host *host)
 	spin_unlock_irqrestore(&host->lock, flags);
 }
 
-#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
-int mmc_resume_bus(struct mmc_host *host)
-{
-#if 0
-	unsigned long flags;
-
-	if (!mmc_bus_needs_resume(host))
-		return -EINVAL;
-
-	pr_err("%s: Starting deferred resume\n", mmc_hostname(host));
-	spin_lock_irqsave(&host->lock, flags);
-	host->bus_resume_flags &= ~MMC_BUSRESUME_NEEDS_RESUME;
-	host->rescan_disable = 0;
-	spin_unlock_irqrestore(&host->lock, flags);
-
-	mmc_bus_get(host);
-	if (host->bus_ops && !host->bus_dead) {
-		mmc_power_up(host, host->card->ocr);
-		BUG_ON(!host->bus_ops->resume);
-		host->bus_ops->resume(host);
-	}
-
-	if (host->bus_ops && host->bus_ops->detect && !host->bus_dead)
-		host->bus_ops->detect(host);
-
-	mmc_bus_put(host);
-	pr_err("%s: Deferred resume completed\n", mmc_hostname(host));
-	return 0;
-#endif
-	unsigned long flags;
-
-	mmc_claim_host(host);
-	spin_lock_irqsave(&host->lock, flags);
-	if (!mmc_bus_needs_resume(host)) {
-		spin_unlock_irqrestore(&host->lock, flags);
-		mmc_release_host(host);
-		return 0;
-	}
-	host->bus_resume_flags &= ~MMC_BUSRESUME_NEEDS_RESUME;
-	host->rescan_disable = 0;
-	spin_unlock_irqrestore(&host->lock, flags);
-	pr_err("%s:[Deferred_resume] Starting deferred resume\n", mmc_hostname(host));
-	mmc_bus_get(host);
-	if (host->bus_ops && !host->bus_dead) {
-		mmc_power_up(host, host->card->ocr);
-		BUG_ON(!host->bus_ops->resume);
-		host->bus_ops->resume(host);
-	}
-	mmc_bus_put(host);
-	mmc_release_host(host);
-	mmc_detect_change(host, 0);
-
-	pr_err("%s:[Deferred_resume] Deferred resume completed\n", mmc_hostname(host));
-	return 0;
-}
-EXPORT_SYMBOL(mmc_resume_bus);
-#endif
 /*
  * Assign a mmc bus handler to a host. Only one bus handler may control a
  * host at any given time.
@@ -2847,13 +2784,6 @@ void mmc_rescan(struct work_struct *work)
 		goto out;
 	}
 
-#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
-	if (mmc_bus_needs_resume(host)) {
-		pr_err("[Deferred_resume] Do not rescan the sdcard when it is in the suspend status\n");
-		goto out;
-	}
-#endif
-
 #ifdef CONFIG_MMC_HISI_TRACE
 	mmc_trace_init_begin(host);
 #endif
@@ -3047,12 +2977,6 @@ int mmc_pm_notify(struct notifier_block *notify_block,
 	case PM_SUSPEND_PREPARE:
 	case PM_RESTORE_PREPARE:
 		spin_lock_irqsave(&host->lock, flags);
-#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
-		if (mmc_bus_needs_resume(host)) {
-			spin_unlock_irqrestore(&host->lock, flags);
-			break;
-		}
-#endif
 		host->rescan_disable = 1;
 		spin_unlock_irqrestore(&host->lock, flags);
 		if (cancel_delayed_work_sync(&host->detect))
@@ -3081,12 +3005,6 @@ int mmc_pm_notify(struct notifier_block *notify_block,
 	case PM_POST_RESTORE:
 		spin_lock_irqsave(&host->lock, flags);
 		host->rescan_disable = 0;
-#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
-		if (mmc_bus_manual_resume(host)) {
-			spin_unlock_irqrestore(&host->lock, flags);
-			break;
-		}
-#endif
 		spin_unlock_irqrestore(&host->lock, flags);
 		if (host->caps2 & MMC_CAP2_SUPPORT_VIA_MODEM) {
 			/*cbp no need detect change in resume*/
