@@ -630,11 +630,6 @@ static int __mmc_blk_ioctl_cmd(struct mmc_card *card, struct mmc_blk_data *md,
 	if (idata->ic.postsleep_min_us)
 		usleep_range(idata->ic.postsleep_min_us, idata->ic.postsleep_max_us);
 
-	if (copy_to_user(&(ic_ptr->response), cmd.resp, sizeof(cmd.resp))) {
-		err = -EFAULT;
-		goto cmd_rel_host;
-	}
-
 	memcpy(&(idata->ic.response), cmd.resp, sizeof(cmd.resp));
 
 #ifndef CONFIG_HISI_MMC_SECURE_RPMB
