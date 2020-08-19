@@ -2451,7 +2451,7 @@ int dw_mci_start_signal_voltage_switch(struct mmc_host *mmc,
     const struct dw_mci_drv_data *drv_data = host->drv_data;
     int err = -ENOSYS;
 
-    if(drv_data&&drv_data->start_signal_voltage_switch)
+    if (drv_data && drv_data->start_signal_voltage_switch)
         err = drv_data->start_signal_voltage_switch(mmc,ios);
 
     return err;

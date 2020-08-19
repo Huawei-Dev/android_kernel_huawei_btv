@@ -1524,7 +1524,7 @@ static int dw_mci_execute_tuning(struct mmc_host *mmc,u32 opcode)
 	struct dw_mci_tuning_data tuning_data;
 	int err = -ENOSYS;
 
-	if(drv_data&&drv_data->execute_tuning)
+	if (drv_data && drv_data->execute_tuning)
 		err = drv_data->execute_tuning(slot, opcode, &tuning_data);
 
 	return err;
