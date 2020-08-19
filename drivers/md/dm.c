@@ -2904,12 +2904,6 @@ int dm_setup_md_queue(struct mapped_device *md)
 		dm_init_old_md_queue(md);
 		blk_queue_make_request(md->queue, dm_make_request);
 		blk_queue_merge_bvec(md->queue, dm_merge_bvec);
-		/*
-		 * DM handles splitting bios as needed.  Free the bio_split bioset
-		 * since it won't be used (saves 1 process per bio-based DM device).
-		 */
-		bioset_free(md->queue->bio_split);
-		md->queue->bio_split = NULL;
 		break;
 	}
 
