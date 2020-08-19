@@ -981,11 +981,6 @@ static int evdev_handle_mt_request(struct input_dev *dev,
 	return 0;
 }
 
-/*
- * HACK: disable conflicting EVIOCREVOKE until Android userspace stops using
- * EVIOCSSUSPENDBLOCK
- */
-/*
 static int evdev_revoke(struct evdev *evdev, struct evdev_client *client,
 			struct file *file)
 {
@@ -993,36 +988,6 @@ static int evdev_revoke(struct evdev *evdev, struct evdev_client *client,
 	evdev_ungrab(evdev, client);
 	input_flush_device(&evdev->handle, file);
 	wake_up_interruptible(&evdev->wait);
-
-	return 0;
-}
-*/
-
-static int evdev_enable_suspend_block(struct evdev *evdev,
-				      struct evdev_client *client)
-{
-	if (client->use_wake_lock)
-		return 0;
-
-	spin_lock_irq(&client->buffer_lock);
-	wake_lock_init(&client->wake_lock, WAKE_LOCK_SUSPEND, client->name);
-	client->use_wake_lock = true;
-	if (client->packet_head != client->tail)
-		wake_lock(&client->wake_lock);
-	spin_unlock_irq(&client->buffer_lock);
-	return 0;
-}
-
-static int evdev_disable_suspend_block(struct evdev *evdev,
-				       struct evdev_client *client)
-{
-	if (!client->use_wake_lock)
-		return 0;
-
-	spin_lock_irq(&client->buffer_lock);
-	client->use_wake_lock = false;
-	wake_lock_destroy(&client->wake_lock);
-	spin_unlock_irq(&client->buffer_lock);
 
 	return 0;
 }
@@ -1212,15 +1177,6 @@ static long evdev_do_ioctl(struct file *file, unsigned int cmd,
 
 	case EVIOCSKEYCODE_V2:
 		return evdev_handle_set_keycode_v2(dev, p);
-
-	case EVIOCGSUSPENDBLOCK:
-		return put_user(client->use_wake_lock, ip);
-
-	case EVIOCSSUSPENDBLOCK:
-		if (p)
-			return evdev_enable_suspend_block(evdev, client);
-		else
-			return evdev_disable_suspend_block(evdev, client);
 	}
 
 	size = _IOC_SIZE(cmd);
