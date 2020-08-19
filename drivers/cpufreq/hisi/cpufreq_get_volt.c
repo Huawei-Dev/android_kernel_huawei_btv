@@ -30,6 +30,7 @@
 #include <linux/mutex.h>
 #include <linux/compiler.h>
 #include <asm/compiler.h>
+#include <linux/proc_fs.h>
 
 #define CPU_VOLT_FN_GET_VAL				(0xc800aa01)
 #define AVS_VOLT_MAX_BYTE				(192)
@@ -41,6 +42,8 @@ struct tag_cpu_volt_data {
 };
 
 static struct tag_cpu_volt_data g_cpu_volt_data;
+extern char *g_lpmcu_rdr_ddr_addr;
+extern u32 rdr_lpm3_buf_len;
 
 noinline int atfd_hisi_service_get_val_smc(u64 function_id, u64 arg0, u64 arg1, u64 arg2)
 {
@@ -55,50 +58,56 @@ noinline int atfd_hisi_service_get_val_smc(u64 function_id, u64 arg0, u64 arg1, 
 
 	return (int)function_id;
 }
-/*********************************************************************
- *                          SYSFS INTERFACE                          *
- *********************************************************************/
-static ssize_t show_param(struct kobject *kobj,
-			  struct attribute *attr, char *buf)
+
+static int get_volt_show(struct seq_file *m, void *v)
 {
 	int i = 0;
 	int ret = 0;
-	ssize_t cnt = 0;
 
 	mutex_lock(&g_cpu_volt_data.cpu_mutex);
 
-	ret = atfd_hisi_service_get_val_smc(CPU_VOLT_FN_GET_VAL,
+	ret = atfd_hisi_service_get_val_smc((u64)CPU_VOLT_FN_GET_VAL,
 					    g_cpu_volt_data.phy_addr,
-					    AVS_VOLT_MAX_BYTE, 0);
+					    (u64)AVS_VOLT_MAX_BYTE, 0ULL);
 	if (ret != 0) {
-		(void)snprintf(buf, strlen("get val failed.\n") + 1, "%s", "get val failed.\n");
+		(void)seq_printf(m, "get val failed.\n");
 		mutex_unlock(&g_cpu_volt_data.cpu_mutex);
-		return cnt;
+		return -EAGAIN;
 	}
+
 	for (i = 0; i < AVS_VOLT_MAX_BYTE; i++) {
-		cnt +=
-		    snprintf(buf + cnt, 5, "0x%-2x ", g_cpu_volt_data.virt_addr[i]);
+		seq_printf(m, "0x%-2x ", g_cpu_volt_data.virt_addr[i]);
 		if ((i != 0) && (i % 16 == 15))
-			cnt += snprintf(buf + cnt, strlen("\n") + 1, "%s", "\n");
+			seq_printf(m, "\n");
 	}
+
+	if (rdr_lpm3_buf_len < AVS_VOLT_MAX_BYTE) {
+		mutex_unlock(&g_cpu_volt_data.cpu_mutex);
+		return -ENOSPC;
+	}
+
+	memcpy((void *)(g_lpmcu_rdr_ddr_addr+rdr_lpm3_buf_len-AVS_VOLT_MAX_BYTE), g_cpu_volt_data.virt_addr, (size_t)AVS_VOLT_MAX_BYTE);
 
 	mutex_unlock(&g_cpu_volt_data.cpu_mutex);
 
-	return cnt;
-}
-
-static ssize_t store_param(struct kobject *kobj, struct attribute *attr,
-			   const char *buf, size_t count)
-{
 	return 0;
 }
 
-/* the param is avs volt,just for security*/
-define_one_global_rw(param);
+static int get_volt_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, get_volt_show, NULL);
+}
+
+static const struct file_operations get_volt_operations = {
+	.open		= get_volt_open,
+	.read		= seq_read,
+	.llseek		= seq_lseek,
+	.release	= single_release,
+};
 
 static int __init cpufreq_get_volt_init(void)
 {
-	int ret = 0;
+	int ret;
 	struct device_node *np = NULL;
 	uint32_t data[2] = { 0 };
 
@@ -107,32 +116,30 @@ static int __init cpufreq_get_volt_init(void)
 	np = of_find_compatible_node(NULL, NULL, "hisilicon, get_val");
 	if (!np) {
 		pr_err("%s: no compatible node found.\n", __func__);
-		return ret;
+		return -EPERM;
 	}
 
-	ret = of_property_read_u32_array(np, "hisi,bl31-share-mem", &data[0], 2);
+	ret = of_property_read_u32_array(np, "hisi,bl31-share-mem", &data[0], 2UL);
 	if (ret) {
 		pr_err("%s , get val mem compatible node err.\n",
 		     __func__);
-		return ret;
+		return -EPERM;
 	}
 
 	g_cpu_volt_data.phy_addr = bl31_smem_base + data[0];
 	g_cpu_volt_data.virt_addr =
-	    (unsigned char *)ioremap(bl31_smem_base + data[0], data[1]);
+	    (unsigned char *)ioremap(bl31_smem_base + data[0], (size_t)data[1]);
 	if (NULL == g_cpu_volt_data.virt_addr) {
 		pr_err
 		    ("%s: %d: allocate memory for g_cpu_volt_data.virt_addr failed.\n",
 		     __func__, __LINE__);
-		return ret;
+		return -EPERM;
 	}
 	mutex_init(&(g_cpu_volt_data.cpu_mutex));
 
-	ret = cpufreq_sysfs_create_file(&param.attr);
-	if (ret)
-		pr_err("%s: cannot register get_volt sysfs file\n", __func__);
+	proc_create("param", 0660, NULL, &get_volt_operations);
 
-	return ret;
+	return 0;
 }
 
 module_init(cpufreq_get_volt_init);
