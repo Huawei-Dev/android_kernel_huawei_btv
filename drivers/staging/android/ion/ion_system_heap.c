@@ -450,7 +450,7 @@ int ion_system_heap_create_pools(struct ion_page_pool **pools,
 			gfp_flags = high_order_gfp_flags;
 
 		if (orders[i] == 8)
-			gfp_flags = high_order_gfp_flags | __GFP_NO_KSWAPD;
+			gfp_flags = high_order_gfp_flags & (~__GFP_KSWAPD_RECLAIM);
 
 		pool = ion_page_pool_create(gfp_flags, orders[i],
 					graphic_buffer_flag);
