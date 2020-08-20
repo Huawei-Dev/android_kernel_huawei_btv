@@ -173,7 +173,6 @@ static void blk_mq_rq_ctx_init(struct request_queue *q, struct blk_mq_ctx *ctx,
 	/* csd/requeue_work/fifo_time is initialized before use */
 	rq->q = q;
 	rq->mq_ctx = ctx;
-	rq->mq_ctx_dispatch = ctx;
 	rq->cmd_flags |= rw_flags;
 	/* do not touch atomic flags, it needs atomic ops against the timer */
 	rq->cpu = -1;
@@ -418,7 +417,7 @@ void blk_mq_complete_request(struct request *rq, int error)
 	if (unlikely(blk_should_fake_timeout(q)))
 		return;
 
-	req_latency_check(rq,REQ_PROC_STAGE_MQ_COMPLETE);
+	req_latency_check(rq, REQ_PROC_STAGE_MQ_COMPLETE);
 
 	if (!blk_mark_rq_complete(rq)) {
 		rq->errors = error;
@@ -445,7 +444,7 @@ void blk_mq_start_request(struct request *rq)
 
 	wbt_issue(q->rq_wb, &rq->wb_stat, (bool)(rq->cmd_flags & REQ_FG));
 
-	req_latency_check(rq,REQ_PROC_STAGE_MQ_START);
+	req_latency_check(rq, REQ_PROC_STAGE_MQ_START);
 
 	blk_add_timer(rq);
 
@@ -1058,13 +1057,11 @@ void blk_mq_insert_request(struct request *rq, bool at_head, bool run_queue,
 {
 	struct request_queue *q = rq->q;
 	struct blk_mq_hw_ctx *hctx;
-	struct blk_mq_ctx *ctx = rq->mq_ctx_dispatch, *current_ctx;
+	struct blk_mq_ctx *ctx = rq->mq_ctx, *current_ctx;
 
 	current_ctx = blk_mq_get_ctx(q);
-	if (!cpu_online(ctx->cpu)) {
-		ctx = current_ctx;
-		rq->mq_ctx_dispatch = current_ctx;
-	}
+	if (!cpu_online(ctx->cpu))
+		rq->mq_ctx = ctx = current_ctx;
 
 	hctx = q->mq_ops->map_queue(q, ctx->cpu);
 
@@ -1682,7 +1679,7 @@ static int blk_mq_hctx_cpu_offline(struct blk_mq_hw_ctx *hctx, int cpu)
 		struct request *rq;
 
 		rq = list_first_entry(&tmp, struct request, queuelist);
-		rq->mq_ctx_dispatch = ctx;
+		rq->mq_ctx = ctx;
 		list_move_tail(&rq->queuelist, &ctx->rq_list);
 	}
 
@@ -1931,12 +1928,10 @@ static void blk_mq_map_swqueue(struct request_queue *q,
 		 * disable it and free the request entries.
 		 */
 		if (!hctx->nr_ctx) {
-#if 0
 			if (set->tags[i]) {
 				blk_mq_free_rq_map(set, set->tags[i], i);
 				set->tags[i] = NULL;
 			}
-#endif
 			hctx->tags = NULL;
 			continue;
 		}

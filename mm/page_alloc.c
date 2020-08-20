@@ -77,7 +77,7 @@
 /* prevent >1 _updater_ of zone percpu pageset ->high and ->batch fields */
 static DEFINE_MUTEX(pcp_batch_high_lock);
 #define MIN_PERCPU_PAGELIST_FRACTION	(8)
-
+#define SERVICE_ADJ (500)
 #ifdef CONFIG_USE_PERCPU_NUMA_NODE_ID
 DEFINE_PER_CPU(int, numa_node);
 EXPORT_PER_CPU_SYMBOL(numa_node);
@@ -1821,6 +1821,12 @@ static struct page *__rmqueue(struct zone *zone, unsigned int order,
 				int migratetype, gfp_t gfp_flags)
 {
 	struct page *page;
+	
+	if (migratetype == MIGRATE_CMA) {
+		if (!in_interrupt()
+		    && current->signal->oom_score_adj > SERVICE_ADJ)
+			migratetype = MIGRATE_MOVABLE;
+	}
 
 	page = __rmqueue_smallest(zone, order, migratetype);
 
