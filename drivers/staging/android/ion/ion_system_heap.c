@@ -34,9 +34,9 @@
 #include "hisi/hisi_ion_smart_pool.h"
 #endif
 
-/*for pclin*/
-/*lint -save -e732 -e713 -e794 -e846 -e514 -e866 -e30*/
-/*lint -save -e84 -e737*/
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+#include "hisi/hisi_ion_scene_pool.h"
+#endif
 
 static gfp_t high_order_gfp_flags = (GFP_USER | __GFP_NOWARN |
 				     __GFP_NORETRY) & ~__GFP_DIRECT_RECLAIM;
@@ -68,9 +68,28 @@ struct ion_system_heap {
 	struct ion_smart_pool *smart_pool;
 #endif
 
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+	struct ion_scene_pool *scene_pool;
+#endif
+
 	struct ion_page_pool *uncached_pools[NUM_ORDERS];
 	struct ion_page_pool *cached_pools[NUM_ORDERS];
 };
+
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+void *ion_get_scene_pool(struct ion_heap *ptr_heap)
+{
+	void *pool = NULL;
+
+	if (ptr_heap) {
+		struct ion_system_heap *sys_heap = container_of(ptr_heap,
+							struct ion_system_heap,
+							heap);
+		pool = (void *)sys_heap->scene_pool;
+	}
+	return pool;
+}
+#endif
 
 static struct page *alloc_buffer_page(struct ion_system_heap *heap,
 				      struct ion_buffer *buffer,
@@ -175,6 +194,9 @@ static int ion_system_heap_allocate(struct ion_heap *heap,
 	int i = 0;
 	unsigned long size_remaining = PAGE_ALIGN(size);
 	unsigned int max_order = orders[0];
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+	struct ion_scene_pool *scene_pool = NULL;
+#endif
 
 	if (size / PAGE_SIZE > totalram_pages / 2) {
 		pr_err("%s: (size/PAGE_SIZE > totalram_pages/2)\n", __func__);
@@ -200,6 +222,12 @@ static int ion_system_heap_allocate(struct ion_heap *heap,
 
 		max_order = orders[0];
 	}
+#endif
+
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+	ION_SCENE_POOL_TRY_ALLOC_ENTER(sys_heap->scene_pool, size,
+				       size_remaining, scene_pool,
+				       i, pages);
 #endif
 
 	while (size_remaining > 0) {
@@ -236,6 +264,10 @@ static int ion_system_heap_allocate(struct ion_heap *heap,
 	}
 
 	buffer->priv_virt = table;
+	
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+	ION_SCENE_POOL_TRY_ALLOC_EXIT(scene_pool);
+#endif
 
 #ifdef CONFIG_HISI_SMARTPOOL_OPT
 	if (ion_smart_is_graphic_buffer(buffer))
@@ -248,6 +280,9 @@ free_table:
 free_pages:
 	list_for_each_entry_safe(page, tmp_page, &pages, lru)
 		free_buffer_page(sys_heap, buffer, page);
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+	ION_SCENE_POOL_TRY_ALLOC_EXIT(scene_pool);
+#endif
 	return -ENOMEM;
 }
 
@@ -317,6 +352,13 @@ static int ion_system_heap_shrink(struct ion_heap *heap, gfp_t gfp_mask,
 						gfp_mask,
 						nr_to_scan);
 #endif
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+			nr_total += ion_scene_pool_shrink(
+						sys_heap->scene_pool,
+						sys_heap->scene_pool->pools[i],
+						gfp_mask,
+						nr_to_scan);
+#endif
 			nr_total += ion_page_pool_shrink(uncached_pool,
 							 gfp_mask,
 							 nr_to_scan);
@@ -330,6 +372,17 @@ static int ion_system_heap_shrink(struct ion_heap *heap, gfp_t gfp_mask,
 			nr_freed = ion_smart_pool_shrink(
 						sys_heap->smart_pool,
 						sys_heap->smart_pool->pools[i],
+						gfp_mask,
+						nr_to_scan);
+			nr_to_scan -= nr_freed;
+			nr_total += nr_freed;
+			if (nr_to_scan <= 0)
+				break;
+#endif
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+			nr_freed = ion_scene_pool_shrink(
+						sys_heap->scene_pool,
+						sys_heap->scene_pool->pools[i],
 						gfp_mask,
 						nr_to_scan);
 			nr_to_scan -= nr_freed;
@@ -425,6 +478,28 @@ static int ion_system_heap_debug_show(struct ion_heap *heap, struct seq_file *s,
 	}
 #endif
 
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+	if (sys_heap->scene_pool) {
+		ion_scene_pool_debug_show_total(s, sys_heap->scene_pool);
+
+		for (i = 0; i < NUM_ORDERS; i++) {/*lint !e574*/
+			struct ion_page_pool *pool =
+				sys_heap->scene_pool->pools[i];
+
+			seq_printf(s, "%d order %u highmem pages",
+				   pool->high_count, pool->order);
+			seq_printf(s, " in special scenes pool = %lu total\n",
+				   (PAGE_SIZE << pool->order)
+				   * pool->high_count);
+			seq_printf(s, "%d order %u lowmem pages",
+				   pool->low_count, pool->order);
+			seq_printf(s, " in special scenes pool = %lu total\n",
+				   (PAGE_SIZE << pool->order)
+				   * pool->low_count);
+		}
+	}
+#endif
+
 	return 0;
 }
 
@@ -487,11 +562,23 @@ struct ion_heap *ion_system_heap_create(struct ion_platform_heap *unused)
 			graphic_buffer_flag))
 		goto destroy_uncached_pools;
 
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+	heap->scene_pool = ion_scene_pool_create();
+	if (!heap->scene_pool) {
+		pr_err("%s: create special scene pool failed!\n", __func__);
+		goto destroy_pools;
+	}
+#endif
+
 #ifdef CONFIG_HISI_SMARTPOOL_OPT
 	heap->smart_pool = ion_smart_pool_create();
 	if (!heap->smart_pool) {
 		pr_err("%s: create smart_pool failed!\n", __func__);
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+		goto detroy_smart_pool;
+#else
 		goto destroy_pools;
+#endif
 	}
 #endif
 
@@ -500,6 +587,11 @@ struct ion_heap *ion_system_heap_create(struct ion_platform_heap *unused)
 	return &heap->heap;
 
 #ifdef CONFIG_HISI_SMARTPOOL_OPT
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+detroy_smart_pool:
+	ion_scene_pool_destroy(heap->scene_pool);
+	heap->scene_pool = NULL;
+#endif
 destroy_pools:
 	ion_system_heap_destroy_pools(heap->cached_pools);
 #endif
@@ -531,6 +623,11 @@ void ion_system_heap_destroy(struct ion_heap *heap)
 #ifdef CONFIG_HISI_SMARTPOOL_OPT
 	kfree(sys_heap->smart_pool);
 	sys_heap->smart_pool = NULL;
+#endif
+
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+	ion_scene_pool_destroy(sys_heap->scene_pool);
+	sys_heap->scene_pool = NULL;
 #endif
 
 	kfree(sys_heap);
@@ -651,4 +748,3 @@ void ion_system_contig_heap_destroy(struct ion_heap *heap)
 {
 	kfree(heap);
 }
-/*lint -restore*/

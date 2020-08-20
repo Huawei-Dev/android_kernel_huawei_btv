@@ -92,6 +92,14 @@ struct ion_smart_pool_info_data {
 	int water_mark;
 };
 
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+struct ion_special_scene_pool_info_data {
+	int water_mark;
+	int worker_mask;
+	int autostop_timeout;
+};
+#endif
+
 #define HISI_ION_NAME_LEN 16
 
 struct ion_heap_info_data{
@@ -128,6 +136,10 @@ enum ION_HISI_CUSTOM_CMD {
     ION_HISI_CUSTOM_GET_MEDIA_HEAP_MODE,
     ION_HISI_CUSTOM_SET_FLAG,
     ION_HISI_CUSTOM_SET_SMART_POOL_INFO,
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+	ION_HISI_CUSTOM_SPECIAL_SCENE_ENTER,
+	ION_HISI_CUSTOM_SPECIAL_SCENE_EXIT,
+#endif
 };
 
 enum ION_HISI_HEAP_MODE {

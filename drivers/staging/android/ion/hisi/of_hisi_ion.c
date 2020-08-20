@@ -42,6 +42,9 @@
 #include "hisi/hisi_ion_smart_pool.h"
 #endif
 
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+#include "hisi/hisi_ion_scene_pool.h"
+#endif
 
 #define MAX_HISI_ION_DYNAMIC_AREA_NAME_LEN  64
 struct hisi_ion_dynamic_area {
@@ -154,6 +157,27 @@ RESERVEDMEM_OF_DECLARE(hisi_ion, "hisi_ion", hisi_ion_reserve_area);
 struct ion_device *get_ion_device(void) {
 	return idev;
 }
+
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+struct ion_heap *ion_get_system_heap(void)
+{
+	int i;
+	struct ion_heap *ptr_heap;
+
+	for (i = 0; i < num_heaps; i++) {
+		ptr_heap = heaps[i];
+
+		if (!ptr_heap)
+			continue;
+		if (ptr_heap->type == ION_HEAP_TYPE_SYSTEM)
+			break;
+	}
+	if (i >= num_heaps)
+		ptr_heap = NULL;
+
+	return ptr_heap;
+}
+#endif
 
 static void ion_pm_init(void)
 {
@@ -294,6 +318,39 @@ static long hisi_ion_custom_ioctl(struct ion_client *client,
 		}
 		if (smart_pool_info.water_mark < MAX_POOL_SIZE)
 			ion_smart_set_water_mark(smart_pool_info.water_mark);
+		break;
+	}
+#endif
+
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+	case ION_HISI_CUSTOM_SPECIAL_SCENE_ENTER:
+	{
+		struct ion_special_scene_pool_info_data scene_pool_info;
+		void *pool;
+
+		if (copy_from_user(&scene_pool_info, (void __user *)arg,
+				   sizeof(scene_pool_info))) {
+			return -EFAULT;
+		}
+		/*Translate KB to number of pages.*/
+		scene_pool_info.water_mark >>= 2;
+		if (scene_pool_info.water_mark > MAX_SPECIAL_SCENE_POOL_SIZE)
+			scene_pool_info.water_mark =
+				MAX_SPECIAL_SCENE_POOL_SIZE;
+		pool = ion_get_scene_pool(ion_get_system_heap());
+		ion_scene_pool_wakeup_process(pool, F_WAKEUP_AUTOFREE,
+					      &scene_pool_info);
+		break;
+	}
+
+	case ION_HISI_CUSTOM_SPECIAL_SCENE_EXIT:
+	{
+		struct ion_special_scene_pool_info_data scene_pool_info
+				= {0, SPECIAL_SCENE_ALL_WORKERS_MASK, 0};
+		void *pool = ion_get_scene_pool(ion_get_system_heap());
+
+		ion_scene_pool_wakeup_process(pool, F_FORCE_STOP,
+					      &scene_pool_info);
 		break;
 	}
 #endif

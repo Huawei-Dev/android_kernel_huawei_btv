@@ -1,3 +1,9 @@
+/**
+ * This C file is included by ion.c, so it is the extension of ion.c
+ * in fact. Function hisi_ion_total is  called at lowmemory case.
+ * Function hisi_ion_memory_info is called at mapping iommu failed.
+ */
+
 static size_t ion_client_total(struct ion_client *client)
 {
 	size_t size = 0;
@@ -21,17 +27,32 @@ static size_t ion_client_total(struct ion_client *client)
 
 unsigned long hisi_ion_total(void)
 {
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+	return (unsigned long)atomic_long_read(&ion_total_size) +
+		ion_scene_pool_total_size();
+#else
 	return (unsigned long)atomic_long_read(&ion_total_size);
+#endif
 }
 
 int hisi_ion_memory_info(bool verbose)
 {
 	struct rb_node *n;
 	struct ion_device *dev = get_ion_device();
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+	unsigned long scenepool_size;
+#endif
 
 	if (!dev)
 		return -1;
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+	scenepool_size = ion_scene_pool_total_size();
+	pr_info("ion total size:%ld, scenepool size:%ld\n",
+		atomic_long_read(&ion_total_size) + scenepool_size,
+		scenepool_size);
+#else
 	pr_info("ion total size:%ld\n", atomic_long_read(&ion_total_size));
+#endif
 	if (!verbose)
 		return 0;
 	down_read(&dev->lock);

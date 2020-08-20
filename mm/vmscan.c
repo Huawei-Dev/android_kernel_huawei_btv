@@ -2070,6 +2070,32 @@ enum scan_balance {
 	SCAN_FILE,
 };
 
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+static void get_scan_count_ext(struct lruvec *lruvec,
+			int *swappiness, bool *force_scan)
+{
+	/*
+	 * If the zone or memcg is small, nr[l] can be 0.  This
+	 * results in no scanning on this priority and a potential
+	 * priority drop.  Global direct reclaim can go to the next
+	 * zone and tends to have no problems. Global kswapd is for
+	 * zone balancing and it needs to scan a minimum amount. When
+	 * reclaiming for a memcg, a priority drop can cause high
+	 * latencies, so it's better to scan a minimum amount there as
+	 * well.
+	 */
+	if (current_is_kswapd()
+		|| (current->flags & PF_SPECIAL_SCENE_SHRINK)) {
+		struct zone *zone = lruvec_zone(lruvec);
+
+		if (!zone_reclaimable(zone))
+			*force_scan = true;
+		if (!mem_cgroup_lruvec_online(lruvec))
+			*force_scan = true;
+	}
+}
+#endif
+
 /*
  * Determine how aggressively the anon and file LRU lists should be
  * scanned.  The relative value of each set of LRU lists is determined
@@ -2096,6 +2122,9 @@ static void get_scan_count(struct lruvec *lruvec, int swappiness,
 	bool some_scanned;
 	int pass;
 
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+	get_scan_count_ext(lruvec, &swappiness, &force_scan);
+#else
 	/*
 	 * If the zone or memcg is small, nr[l] can be 0.  This
 	 * results in no scanning on this priority and a potential
@@ -2112,6 +2141,8 @@ static void get_scan_count(struct lruvec *lruvec, int swappiness,
 		if (!mem_cgroup_lruvec_online(lruvec))
 			force_scan = true;
 	}
+#endif
+
 	if (!global_reclaim(sc))
 		force_scan = true;
 

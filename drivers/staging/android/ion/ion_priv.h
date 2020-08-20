@@ -331,6 +331,12 @@ size_t ion_heap_freelist_size(struct ion_heap *heap);
  * architectures can add their own custom architecture specific
  * heaps as appropriate.
  */
+ 
+#ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+void *ion_get_scene_pool(struct ion_heap *ptr_heap);
+struct ion_heap *ion_get_system_heap(void);
+unsigned long ion_scene_pool_total_size(void);
+#endif
 
 struct ion_heap *ion_heap_create(struct ion_platform_heap *);
 void ion_heap_destroy(struct ion_heap *);

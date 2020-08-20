@@ -57,6 +57,14 @@ enum {
 #endif
 	MIGRATE_PCPTYPES,	/* the number of types on the pcp lists */
 	MIGRATE_HIGHATOMIC = MIGRATE_PCPTYPES,
+#ifdef CONFIG_HUAWEI_UNMOVABLE_ISOLATE
+	/*
+	 * MIGRATE_UNMOVABLE_ISOLATEx migration type is designed to
+	 * allocate the appointed-order unmovable pages.
+	 */
+	MIGRATE_UNMOVABLE_ISOLATE1,
+	MIGRATE_UNMOVABLE_ISOLATE2,
+#endif
 #ifdef CONFIG_MEMORY_ISOLATION
 	MIGRATE_ISOLATE,	/* can't allocate from here */
 #endif
@@ -67,6 +75,13 @@ enum {
 #  define is_migrate_cma(migratetype) unlikely((migratetype) == MIGRATE_CMA)
 #else
 #  define is_migrate_cma(migratetype) false
+#endif
+
+#ifdef CONFIG_HUAWEI_UNMOVABLE_ISOLATE
+#  define is_unmovable_isolate1(migratetype) \
+			unlikely((migratetype) == MIGRATE_UNMOVABLE_ISOLATE1)
+#  define is_unmovable_isolate2(migratetype) \
+			unlikely((migratetype) == MIGRATE_UNMOVABLE_ISOLATE2)
 #endif
 
 #define for_each_migratetype_order(order, type) \
@@ -157,6 +172,10 @@ enum zone_stat_item {
 	WORKINGSET_NODERECLAIM,
 	NR_ANON_TRANSPARENT_HUGEPAGES,
 	NR_FREE_CMA_PAGES,
+#ifdef CONFIG_HUAWEI_UNMOVABLE_ISOLATE
+	NR_FREE_UNMOVABLE_ISOLATE1_PAGES,
+	NR_FREE_UNMOVABLE_ISOLATE2_PAGES,
+#endif
 	NR_IONCACHE_PAGES,
 	NR_MALI_PAGES,
 	NR_VM_ZONE_STAT_ITEMS };
@@ -433,6 +452,14 @@ struct zone {
 	unsigned long		present_pages;
 
 	const char		*name;
+#ifdef CONFIG_HUAWEI_UNMOVABLE_ISOLATE
+	/*
+	 * Number of MIGRATE_UNMOVABLE_ISOLATEx page block. To maintain for just
+	 * optimization. Protected by zone->lock.
+	 */
+	long long			nr_migrate_unmovable_isolate1_block;
+	long long			nr_migrate_unmovable_isolate2_block;
+#endif
 
 #ifdef CONFIG_MEMORY_ISOLATION
 	/*
@@ -856,6 +883,12 @@ int sysctl_min_slab_ratio_sysctl_handler(struct ctl_table *, int,
 
 extern int numa_zonelist_order_handler(struct ctl_table *, int,
 			void __user *, size_t *, loff_t *);
+
+#ifdef CONFIG_HUAWEI_UNMOVABLE_ISOLATE
+int unmovable_isolate_disabled_sysctl_handler(struct ctl_table *, int,
+			void __user *, size_t *, loff_t *);
+#endif
+
 extern char numa_zonelist_order[];
 #define NUMA_ZONELIST_ORDER_LEN 16	/* string buffer size */
 

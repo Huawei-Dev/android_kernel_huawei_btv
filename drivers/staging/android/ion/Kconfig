@@ -81,3 +81,9 @@ config HISI_SMARTPOOL_OPT
 	default n
 	help
 	  This driver supports Hisilicon Smartpool.
+
+config HISI_SPECIAL_SCENE_POOL
+	bool "Support Hisilicon Special Scenes Pool"
+	default n
+	help
+	  This driver supports Hisilicon Special Scenes Pool.
