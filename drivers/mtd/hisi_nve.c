@@ -31,7 +31,7 @@
 #ifdef CONFIG_CRC_SUPPORT
 #include "hisi_nve_crc.h"
 #endif
-#if CONFIG_HISI_NVE_WHITELIST
+#ifdef CONFIG_HISI_NVE_WHITELIST
 #include "hisi_nve_whitelist.h"
 #endif
 
@@ -42,7 +42,7 @@ static int hisi_nv_setup_ok = 0;
 static char *nve_block_device_name = NULL;
 static char log_nv_info[NV_INFO_LEN];
 static char temp_nv_info[NV_INFO_LEN];
-#if CONFIG_HISI_NVE_WHITELIST
+#ifdef CONFIG_HISI_NVE_WHITELIST
 extern unsigned int get_userlock(void);
 #endif
 
@@ -1057,7 +1057,7 @@ int nve_check_crc_and_recover(int nv_item_start, int check_items, struct NVE_str
 }
 #endif
 
-#if CONFIG_HISI_NVE_WHITELIST
+#ifdef CONFIG_HISI_NVE_WHITELIST
 static bool nve_number_in_whitelist(uint32_t nv_number)
 {
 	unsigned int i;
@@ -1112,7 +1112,7 @@ int hisi_nve_direct_access_for_ramdisk(struct hisi_nve_info_user *user_info){
 	struct NV_items_struct nv_item_backup;
 	struct NVE_partition_header *nve_partition_header;
 
-#if CONFIG_HISI_NVE_WHITELIST
+#ifdef CONFIG_HISI_NVE_WHITELIST
 	if (hisi_nve_whitelist_check(user_info)) {
 		pr_err("%s hisi_nve_whitelist_check Failed!\n", __func__);
 		ret = -EINVAL;
