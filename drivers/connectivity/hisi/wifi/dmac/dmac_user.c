@@ -47,6 +47,10 @@ extern "C" {
 #include "dmac_resource.h"
 #include "dmac_config.h"
 
+#ifdef _PRE_PLAT_FEATURE_CUSTOMIZE
+#include "hal_device.h"
+#endif
+
 
 #undef  THIS_FILE_ID
 #define THIS_FILE_ID OAM_FILE_ID_DMAC_USER_C
@@ -239,6 +243,14 @@ OAL_STATIC oal_uint32  dmac_user_init(dmac_user_stru *pst_dmac_user)
     pst_dmac_user->ul_tx_minrate  = 0;
     pst_dmac_user->ul_tx_maxrate  = 0;
 #endif
+
+#ifdef _PRE_WLAN_FEATURE_PN_BUGFIX
+    pst_dmac_user->ull_sn = 0;
+#endif
+
+    pst_dmac_user->bit_ptk_need_install      = OAL_FALSE;
+    pst_dmac_user->bit_is_rx_eapol_key_open  = OAL_TRUE;
+    pst_dmac_user->bit_eapol_key_4_4_tx_succ = OAL_FALSE;
     return OAL_SUCC;
 }
 
@@ -958,7 +970,8 @@ oal_bool_enum_uint8 dmac_user_check_rsp_soft_ctl(mac_vap_stru *pst_mac_vap, mac_
         }
     }
 
-    if ((WLAN_VHT_MODE == pst_mac_user->en_cur_protocol_mode) || (WLAN_VHT_ONLY_MODE == pst_mac_user->en_cur_protocol_mode))
+    /* DTS2017062805575 5G 信道下带宽大于20M, 则在整个带宽都回复CTS */
+    //if ((WLAN_VHT_MODE == pst_mac_user->en_cur_protocol_mode) || (WLAN_VHT_ONLY_MODE == pst_mac_user->en_cur_protocol_mode))
     {
         if (pst_mac_user->en_cur_bandwidth > WLAN_BW_CAP_20M)
         {
@@ -2024,8 +2037,10 @@ oal_uint32  dmac_user_add(frw_event_mem_stru *pst_event_mem)
         return OAL_ERR_CODE_PTR_NULL;
     }
 
-
-
+#ifdef _PRE_WLAN_FEATURE_CCA_OPT
+    /* 添加用户时，恢复CCA门限 */
+    hal_set_ed_high_th(pst_mac_device->pst_device_stru, HAL_CCA_OPT_ED_HIGH_20TH_DEF, HAL_CCA_OPT_ED_HIGH_40TH_DEF);
+#endif
     /* mac user初始化 */
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
     mac_user_init(&(pst_dmac_user->st_user_base_info), us_user_idx, pst_add_user_payload->auc_user_mac_addr,
@@ -2420,6 +2435,7 @@ oal_void dmac_full_phy_freq_user_del(dmac_user_stru *pst_dmac_user,mac_device_st
 #endif
 
 #ifdef _PRE_WLAN_SW_CTRL_RSP
+
 /*****************************************************************************
  函 数 名  : dmac_user_del_p2p_in_dyn_bw
  功能描述  : 在动态带宽模式下删除p2p用户，要查看一下是否还有有业务的sta，如果有，
@@ -2474,9 +2490,8 @@ oal_void dmac_user_del_p2p_in_dyn_bw(dmac_device_stru *pst_dmac_dev, dmac_vap_st
             continue;
         }
 
-        /* VHT 40/80 */
-        if ((WLAN_VHT_MODE == pst_tmp_vap->en_protocol || WLAN_VHT_ONLY_MODE == pst_tmp_vap->en_protocol)
-        && (pst_tmp_vap->st_channel.en_bandwidth > WLAN_BAND_WIDTH_20M))
+        /* DTS2017062805575 5G 信道下带宽大于20M, 则在整个带宽都回复CTS */
+        if ((pst_tmp_vap->st_channel.en_bandwidth > WLAN_BAND_WIDTH_20M))
         {
 
             pst_mac_user = mac_res_get_mac_user(pst_tmp_vap->uc_assoc_vap_id);
@@ -2511,7 +2526,79 @@ oal_void dmac_user_del_p2p_in_dyn_bw(dmac_device_stru *pst_dmac_dev, dmac_vap_st
         }
     }
 }
+/*****************************************************************************
+ 函 数 名  : dmac_update_dyn_bw_info
+ 功能描述  : 1、STAUT删用户时需恢复正常模式。
+             2、在动态带宽模式下删除p2p用户，要查看一下是否还有有业务的sta，如果有，
+                并且该sta支持动态带宽模式，要开启软件配置响应帧的phy tx mode模式
+ 输入参数  : 无
+ 输出参数  : 无
+ 返 回 值  :
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年1月17日
+    作    者   : l00357925
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+ OAL_STATIC oal_void dmac_update_dyn_bw_info(dmac_vap_stru *pst_dmac_vap)
+{
+    dmac_device_stru *pst_dmac_dev;
+
+    pst_dmac_dev = dmac_res_get_mac_dev(pst_dmac_vap->st_vap_base_info.uc_device_id);
+    if (OAL_PTR_NULL == pst_dmac_dev)
+    {
+        OAM_WARNING_LOG1(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_ANY, "{dmac_del_user_reset_dyn_bw::pst_dmac_dev null.dev id [%d]}", pst_dmac_vap->st_vap_base_info.uc_device_id);
+        return;
+    }
+    if (OAL_TRUE == pst_dmac_dev->en_state_in_sw_ctrl_mode)
+    {
+        hal_cfg_rsp_dyn_bw(OAL_FALSE, WLAN_BAND_ASSEMBLE_20M);
+        pst_dmac_dev->en_state_in_sw_ctrl_mode = OAL_FALSE;
+    }
+    else
+    {
+        /* p2p删用户时，如果之前有wlan业务，在只剩wlan时，再开启动态带宽 */
+        if ((WLAN_P2P_GO_MODE == pst_dmac_vap->st_vap_base_info.en_p2p_mode)
+            || (WLAN_P2P_CL_MODE == pst_dmac_vap->st_vap_base_info.en_p2p_mode))
+        {
+            dmac_user_del_p2p_in_dyn_bw(pst_dmac_dev, pst_dmac_vap);
+        }
+    }
+}
+
 #endif
+/*****************************************************************************
+ 函 数 名  : dmac_alg_stat_info_reset
+ 功能描述  : 当DMAC删除一个关联用户时，删除用户相关统计信息。
+ 输入参数  : 无
+ 输出参数  : 无
+ 返 回 值  :
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2013年8月22日
+    作    者   : l00357925
+    修改内容   : 新生成函数
+*****************************************************************************/
+OAL_STATIC oal_void dmac_alg_stat_info_reset(dmac_vap_stru *pst_dmac_vap)
+{
+    dmac_device_stru *pst_dmac_dev;
+
+    pst_dmac_dev = dmac_res_get_mac_dev(pst_dmac_vap->st_vap_base_info.uc_device_id);
+    if (OAL_PTR_NULL == pst_dmac_dev)
+    {
+        OAM_WARNING_LOG1(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_ANY, "{dmac_alg_stat_info_reset::pst_dmac_dev null.dev id [%d]}", pst_dmac_vap->st_vap_base_info.uc_device_id);
+        return;
+    }
+    pst_dmac_dev->st_dmac_alg_stat.en_cca_intf_state            = DMAC_ALG_CCA_OPT_NO_INTF;
+    pst_dmac_dev->st_dmac_alg_stat.en_co_intf_state             = OAL_FALSE;
+    pst_dmac_dev->st_dmac_alg_stat.en_dmac_device_distance_enum = DMAC_ALG_TPC_NORMAL_DISTANCE;
+}
+
 /*****************************************************************************
  函 数 名  : dmac_user_del
  功能描述  : 删除用户
@@ -2539,9 +2626,6 @@ oal_uint32  dmac_user_del(frw_event_mem_stru *pst_event_mem)
     dmac_ctx_del_user_stru         *pst_del_user_payload;
     mac_device_stru                *pst_mac_device;
     oal_uint32                      ul_rslt = OAL_FAIL;
-#ifdef _PRE_WLAN_SW_CTRL_RSP
-    dmac_device_stru               *pst_dmac_dev = OAL_PTR_NULL;
-#endif
 
     if (OAL_UNLIKELY((OAL_PTR_NULL == pst_event_mem)))
     {
@@ -2603,6 +2687,28 @@ oal_uint32  dmac_user_del(frw_event_mem_stru *pst_event_mem)
 
     /* dmac user相关操作去注册 */
     dmac_alg_del_assoc_user_notify(pst_dmac_vap, pst_dmac_user);
+
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+    /* 清空ip过滤的黑名单，目前仅支持staut模式(只有一个用户) */
+    if (OAL_TRUE == pst_dmac_vap->st_vap_base_info.st_cap_flag.bit_ip_filter)
+    {
+        dmac_clear_ip_filter_btable(&(pst_dmac_vap->st_vap_base_info));
+    }
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
+
+    /* DTS20170112013833 删除用户时，初始化distance信息和cca门限 */
+    dmac_alg_stat_info_reset(pst_dmac_vap);
+#ifdef _PRE_WLAN_FEATURE_CCA_OPT
+#ifdef _PRE_PLAT_FEATURE_CUSTOMIZE
+    {
+        oal_int8 c_delta_cca_ed_high_20th_default = HAL_CCA_OPT_GET_DEFAULT_ED_20TH(pst_dmac_vap->st_vap_base_info.st_channel.en_band, g_st_customize);
+        oal_int8 c_delta_cca_ed_high_40th_default = HAL_CCA_OPT_GET_DEFAULT_ED_40TH(pst_dmac_vap->st_vap_base_info.st_channel.en_band, g_st_customize);
+        hal_set_ed_high_th(pst_mac_device->pst_device_stru, c_delta_cca_ed_high_20th_default, c_delta_cca_ed_high_40th_default);
+    }
+#else
+    hal_set_ed_high_th(pst_mac_device->pst_device_stru, HAL_CCA_OPT_ED_HIGH_20TH_DEF, HAL_CCA_OPT_ED_HIGH_40TH_DEF);
+#endif
+#endif
 
     /* 如果是STA删除用户，表示此STA去关联了，调用vap down通知链 */
     if (WLAN_VAP_MODE_BSS_STA == pst_dmac_vap->st_vap_base_info.en_vap_mode)
@@ -2702,27 +2808,7 @@ oal_uint32  dmac_user_del(frw_event_mem_stru *pst_event_mem)
     }
 
 #ifdef _PRE_WLAN_SW_CTRL_RSP
-    pst_dmac_dev = dmac_res_get_mac_dev(pst_dmac_vap->st_vap_base_info.uc_device_id);
-    if (OAL_PTR_NULL == pst_dmac_dev)
-    {
-        OAM_WARNING_LOG1(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_ANY, "{dmac_user_del::pst_dmac_dev null.dev id [%d]}", pst_dmac_vap->st_vap_base_info.uc_device_id);
-        return OAL_ERR_CODE_PTR_NULL;
-    }
-
-    if (OAL_TRUE == pst_dmac_dev->en_state_in_sw_ctrl_mode)
-    {
-        hal_cfg_rsp_dyn_bw(OAL_FALSE, WLAN_BAND_ASSEMBLE_20M);
-        pst_dmac_dev->en_state_in_sw_ctrl_mode = OAL_FALSE;
-    }
-    else
-    {
-        /* p2p删用户时，如果之前有wlan业务，在只剩wlan时，再开启动态带宽 */
-        if ((WLAN_P2P_GO_MODE == pst_dmac_vap->st_vap_base_info.en_p2p_mode)
-            || (WLAN_P2P_CL_MODE == pst_dmac_vap->st_vap_base_info.en_p2p_mode))
-        {
-            dmac_user_del_p2p_in_dyn_bw(pst_dmac_dev, pst_dmac_vap);
-        }
-    }
+    dmac_update_dyn_bw_info(pst_dmac_vap);
 #endif
 
 #ifdef _PRE_DEBUG_MODE_USER_TRACK

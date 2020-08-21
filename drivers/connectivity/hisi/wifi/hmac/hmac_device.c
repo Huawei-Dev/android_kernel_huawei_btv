@@ -153,7 +153,7 @@ oal_uint32  hmac_device_exit(mac_board_stru *pst_board, mac_chip_stru *pst_chip,
 
     if (OAL_PTR_NULL == pst_vap)
     {
-        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{hmac_device_exit::pst_vap null.}");
+        OAM_ERROR_LOG1(0, OAM_SF_ANY, "{hmac_device_exit::cfg_vap null. cfg_vap_id %d}", uc_vap_idx);
 
         return OAL_ERR_CODE_PTR_NULL;
     }
@@ -591,7 +591,22 @@ int hmac_fb_notify(struct notifier_block *nb,
     int                 *blank = NULL;
     hmac_device_stru    *pst_hmac_device;
 
-    /*struct fb_event *event = data;*/
+    /* 本接口只处理FB_EARLY_EVENT_BLANK一种事件 */
+    if(FB_EARLY_EVENT_BLANK != action)
+    {
+        return NOTIFY_OK;
+    }
+
+    if((NULL == fb_event)||(NULL == fb_event->data))
+    {
+        return NOTIFY_OK;
+    }
+
+    if(NULL == nb)
+    {
+        return NOTIFY_OK;
+    }
+
     pst_hmac_device = OAL_CONTAINER_OF(nb,hmac_device_stru, pm_notifier);
 
     blank = fb_event->data;

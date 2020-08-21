@@ -56,6 +56,20 @@ extern oal_int32 g_l_rf_fem_switch;
 #define HAL_RSSI_SIGNAL_MAX                    (50)     /*信号跨度最大值*/
 #define HAL_INVALID_SIGNAL_INITIAL             (1000)    /*非法初始信号极大值*/
 
+#define HAL_CCA_OPT_ED_HIGH_20TH_DEF    (-62)
+#define HAL_CCA_OPT_ED_HIGH_40TH_DEF    (-59)
+
+#ifdef _PRE_PLAT_FEATURE_CUSTOMIZE
+#define HAL_CCA_OPT_GET_DEFAULT_ED_20TH(_band, _cust) \
+    ((WLAN_BAND_2G == (_band)) ? \
+     ((_cust).st_rf.c_delta_cca_ed_high_20th_2g + HAL_CCA_OPT_ED_HIGH_20TH_DEF) : \
+     ((_cust).st_rf.c_delta_cca_ed_high_20th_5g + HAL_CCA_OPT_ED_HIGH_20TH_DEF))
+#define HAL_CCA_OPT_GET_DEFAULT_ED_40TH(_band, _cust) \
+    ((WLAN_BAND_2G == (_band)) ? \
+     ((_cust).st_rf.c_delta_cca_ed_high_40th_2g + HAL_CCA_OPT_ED_HIGH_40TH_DEF) : \
+     ((_cust).st_rf.c_delta_cca_ed_high_40th_5g + HAL_CCA_OPT_ED_HIGH_40TH_DEF))
+#endif
+
 /*****************************************************************************
   8 UNION定义
 *****************************************************************************/
@@ -2450,6 +2464,21 @@ OAL_STATIC  OAL_INLINE oal_void  hal_set_tx_pn(hal_to_dmac_device_stru *pst_hal_
 OAL_STATIC  OAL_INLINE oal_void  hal_get_tx_pn(hal_to_dmac_device_stru *pst_hal_device,hal_pn_lut_cfg_stru* pst_pn_lut_cfg)
 {
     HAL_PUBLIC_HOOK_FUNC(_get_tx_pn)( pst_hal_device, pst_pn_lut_cfg);
+}
+
+OAL_STATIC  OAL_INLINE oal_void hal_dscr_set_iv_value(hal_tx_dscr_stru *pst_tx_dscr, oal_uint32 ul_iv_ls_word, oal_uint32 ul_iv_ms_word)
+{
+    HAL_PUBLIC_HOOK_FUNC(_dscr_set_iv_value)( pst_tx_dscr, ul_iv_ls_word, ul_iv_ms_word);
+}
+
+OAL_STATIC  OAL_INLINE oal_void hal_dscr_set_tx_pn_hw_bypass(hal_tx_dscr_stru *pst_tx_dscr, oal_bool_enum_uint8 en_bypass)
+{
+    HAL_PUBLIC_HOOK_FUNC(_dscr_set_tx_pn_hw_bypass)( pst_tx_dscr, en_bypass);
+}
+
+OAL_STATIC  OAL_INLINE oal_void hal_dscr_get_tx_pn_hw_bypass(hal_tx_dscr_stru *pst_tx_dscr, oal_bool_enum_uint8 *pen_bypass)
+{
+    HAL_PUBLIC_HOOK_FUNC(_dscr_get_tx_pn_hw_bypass)( pst_tx_dscr, pen_bypass);
 }
 
 /*****************************************************************************

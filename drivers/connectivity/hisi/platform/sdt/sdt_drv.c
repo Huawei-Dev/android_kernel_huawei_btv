@@ -318,6 +318,11 @@ oal_int32  sdt_drv_send_data_to_wifi(oal_uint8  *puc_param, oal_int32  l_len)
         return -OAL_EFAIL;
     }
 
+    if (0 > l_len)
+    {
+        OAL_IO_PRINT("sdt_drv_send_data_to_wifi::data len little then zero!\n");
+        return -OAL_EFAIL;
+    }
     i_len = (oal_int)l_len > 300 ? (oal_int)l_len: 300;
 
     /* 接收消息不用填充头，直接使用 */
@@ -335,6 +340,15 @@ oal_int32  sdt_drv_send_data_to_wifi(oal_uint8  *puc_param, oal_int32  l_len)
     i_len = i_len - OAM_RESERVE_SKB_LEN;
 
     puc_data = oal_netbuf_data(pst_netbuf);
+
+    if (0 > i_len)
+    {
+        OAL_IO_PRINT("sdt_drv_send_data_to_wifi::need len large then zero!! \n");
+#if (_PRE_OS_VERSION_RAW != _PRE_OS_VERSION)
+        oal_mem_sdt_netbuf_free(pst_netbuf, OAL_TRUE);
+#endif
+        return -OAL_EFAIL;
+    }
 
     switch(pc_buf[1])
     {
@@ -526,37 +540,47 @@ oal_uint32  sdt_drv_netlink_send(oal_netbuf_stru *pst_netbuf, oal_uint32  ul_len
   1.日    期   : 2014年1月28日
     作    者   : z00237171
     修改内容   : 新生成函数
+  2.日    期   : 2017年6月24日
+    作    者   : xwx404372
+    修改内容   : 入参skb由内核维护，并非来自sdt子内存池,增加对入参正确性的检查
 
 *****************************************************************************/
 oal_void  sdt_drv_netlink_recv(oal_netbuf_stru  *pst_netbuf)
 {
-    oal_netbuf_stru                *pst_net_buf = OAL_PTR_NULL;
     oal_nlmsghdr_stru              *pst_nlhdr = OAL_PTR_NULL;
     sdt_drv_netlink_msg_hdr_stru    st_msg_hdr;
-    oal_int32                       l_len;
+    oal_uint32                      ul_len;
+
     if (OAL_PTR_NULL == pst_netbuf)
     {
         OAL_IO_PRINT("sdt_drv_netlink_recv::pst_netbuf is null!\n");
         return;
     }
-    pst_net_buf = oal_netbuf_get(pst_netbuf);
-    OAL_MEMZERO(g_st_sdt_drv_mng_entry.puc_data, DATA_BUF_LEN);
-    if (OAL_NETBUF_LEN(pst_net_buf) >= OAL_NLMSG_SPACE(0))
-    {
-        pst_nlhdr = oal_nlmsg_hdr((OAL_CONST oal_netbuf_stru *)pst_net_buf);
-        l_len   = (oal_int32)OAL_NLMSG_PAYLOAD(pst_nlhdr, 0);
 
-        if(l_len <= DATA_BUF_LEN)
+    OAL_MEMZERO(g_st_sdt_drv_mng_entry.puc_data, DATA_BUF_LEN);
+
+    if (OAL_NETBUF_LEN(pst_netbuf) >= OAL_NLMSG_SPACE(0))
+    {
+        pst_nlhdr = oal_nlmsg_hdr((OAL_CONST oal_netbuf_stru *)pst_netbuf);
+        /* 对报文长度进行检查 */
+        if (!OAL_NLMSG_OK(pst_nlhdr, OAL_NETBUF_LEN(pst_netbuf)))
+        {
+            OAL_IO_PRINT("[ERROR]invaild netlink buff data packge data len = :%u,skb_buff data len = %u\n",
+                                                    pst_nlhdr->nlmsg_len,OAL_NETBUF_LEN(pst_netbuf));
+            return;
+        }
+        ul_len   = OAL_NLMSG_PAYLOAD(pst_nlhdr, 0);
+        /* 后续需要拷贝OAL_SIZEOF(st_msg_hdr)故判断之 */
+        if(ul_len <= DATA_BUF_LEN && ul_len >= (oal_uint32)OAL_SIZEOF(st_msg_hdr))
         {
             oal_memcopy((oal_void *)g_st_sdt_drv_mng_entry.puc_data,
                         (const oal_void *)OAL_NLMSG_DATA(pst_nlhdr),
-                        (oal_uint32)l_len);
+                        ul_len);
         }
         else
         {
             /*overflow*/
-            OAL_IO_PRINT("[ERROR]invaild netlink buff len:%u,max len:%u\n",(oal_uint32)l_len,DATA_BUF_LEN);
-            oal_mem_sdt_netbuf_free(pst_net_buf, OAL_TRUE);
+            OAL_IO_PRINT("[ERROR]invaild netlink buff len:%u,max len:%u\n",ul_len,DATA_BUF_LEN);
             return;
         }
 
@@ -569,18 +593,16 @@ oal_void  sdt_drv_netlink_recv(oal_netbuf_stru  *pst_netbuf)
             g_st_sdt_drv_mng_entry.ul_usepid = pst_nlhdr->nlmsg_pid;   /*pid of sending process */
             OAL_IO_PRINT("%s pid is-->%d \n", OAL_FUNC_NAME, g_st_sdt_drv_mng_entry.ul_usepid);
         }
-#if defined(PLATFORM_DEBUG_ENABLE) || (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1151)
         else
         {
-            sdt_drv_send_data_to_wifi(&g_st_sdt_drv_mng_entry.puc_data[OAL_SIZEOF(st_msg_hdr)], l_len - (oal_int32)OAL_SIZEOF(st_msg_hdr));
-        }
+#if defined(PLATFORM_DEBUG_ENABLE) || (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1151)
+            sdt_drv_send_data_to_wifi(&g_st_sdt_drv_mng_entry.puc_data[OAL_SIZEOF(st_msg_hdr)],
+                                                        ul_len - (oal_uint32)OAL_SIZEOF(st_msg_hdr));
 #else
-        OAL_IO_PRINT("user mode not accept msg except hello from sdt!\n");
+            OAL_IO_PRINT("user mode not accept msg except hello from sdt!\n");
 #endif
+        }
     }
-
-	oal_mem_sdt_netbuf_free(pst_net_buf, OAL_TRUE);
-    //oal_netbuf_free(pst_net_buf);
 }
 
 /*****************************************************************************
@@ -697,10 +719,21 @@ oal_int32  sdt_drv_main_init(oal_void)
     {
         OAL_IO_PRINT("sdt_drv_main_init::create netlink returns fail! l_nl_return_val--> \
                       %d\n", l_nl_return_val);
+        oal_free(g_st_sdt_drv_mng_entry.puc_data);
+        g_st_sdt_drv_mng_entry.puc_data = OAL_PTR_NULL;
         return -l_nl_return_val;
     }
 
     g_st_sdt_drv_mng_entry.oam_rx_workqueue = oal_create_singlethread_workqueue("oam_rx_queue");
+    if(OAL_PTR_NULL == g_st_sdt_drv_mng_entry.oam_rx_workqueue)
+    {
+        OAL_IO_PRINT("alloc g_st_sdt_drv_mng_entry.oam_rx_workqueue fail!\n");
+        oal_netlink_kernel_release(g_st_sdt_drv_mng_entry.pst_nlsk);
+        g_st_sdt_drv_mng_entry.pst_nlsk = OAL_PTR_NULL;
+        oal_free(g_st_sdt_drv_mng_entry.puc_data);
+        g_st_sdt_drv_mng_entry.puc_data = OAL_PTR_NULL;
+        return -OAL_EFAIL;
+    }
     OAL_INIT_WORK(&g_st_sdt_drv_mng_entry.rx_wifi_work, sdt_drv_push_wifi_log_work);
     oal_spin_lock_init(&g_st_sdt_drv_mng_entry.st_spin_lock);
     oal_netbuf_list_head_init(&g_st_sdt_drv_mng_entry.rx_wifi_dbg_seq);
@@ -748,8 +781,11 @@ oal_void  sdt_drv_main_exit(oal_void)
     {
         oal_free(g_st_sdt_drv_mng_entry.puc_data);
     }
-
-    oal_destroy_workqueue(g_st_sdt_drv_mng_entry.oam_rx_workqueue);
+    
+    if(OAL_PTR_NULL != g_st_sdt_drv_mng_entry.oam_rx_workqueue)
+    {
+        oal_destroy_workqueue(g_st_sdt_drv_mng_entry.oam_rx_workqueue);
+    }
     oal_netbuf_queue_purge(&g_st_sdt_drv_mng_entry.rx_wifi_dbg_seq);
 
     return;

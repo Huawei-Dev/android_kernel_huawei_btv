@@ -73,11 +73,18 @@ extern "C" {
   2 全局变量定义
 *****************************************************************************/
 #define HMAC_NETDEVICE_WDT_TIMEOUT      (5*OAL_TIME_HZ)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,10,44))
+OAL_STATIC oal_int32  hmac_cfg_vap_if_open(oal_net_device_stru *pst_dev);
+OAL_STATIC oal_int32  hmac_cfg_vap_if_close(oal_net_device_stru *pst_dev);
+OAL_STATIC oal_net_dev_tx_enum  hmac_cfg_vap_if_xmit(oal_netbuf_stru *pst_buf, oal_net_device_stru *pst_dev);
+#endif
 
 #if (_PRE_OS_VERSION_LINUX == _PRE_OS_VERSION)
     OAL_STATIC oal_net_device_ops_stru gst_vap_net_dev_cfg_vap_ops = {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,10,44))
-        /* TBD */
+        .ndo_open               = hmac_cfg_vap_if_open,
+        .ndo_stop               = hmac_cfg_vap_if_close,
+        .ndo_start_xmit         = hmac_cfg_vap_if_xmit,
 #else
         .ndo_get_stats          = oal_net_device_get_stats,
         .ndo_open               = oal_net_device_open,
@@ -1616,13 +1623,26 @@ oal_void hmac_del_virtual_inf_worker(oal_work_stru *pst_del_virtual_inf_work)
     hmac_device_stru            *pst_hmac_device;
 
     pst_hmac_vap     = OAL_CONTAINER_OF(pst_del_virtual_inf_work, hmac_vap_stru, st_del_virtual_inf_worker);
+    if (OAL_PTR_NULL == pst_hmac_vap)
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_P2P, "{hmac_del_virtual_inf_worker:: hmac_vap is null}");
+        return;
+    }
+
     pst_net_dev      = pst_hmac_vap->pst_del_net_device;
+    if (OAL_PTR_NULL == pst_net_dev)
+    {
+        OAM_ERROR_LOG0(pst_hmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_P2P,
+                        "{hmac_del_virtual_inf_worker:: net_dev is null}");
+        return;
+    }
+
     pst_wireless_dev = OAL_NETDEVICE_WDEV(pst_net_dev);
 
     /* 不存在rtnl_lock锁问题 */
     oal_net_unregister_netdev(pst_net_dev);
 
-	/* 在释放net_device 后释放wireless_device 内存 */
+    /* 在释放net_device 后释放wireless_device 内存 */
     OAL_MEM_FREE(pst_wireless_dev, OAL_TRUE);
 
     pst_hmac_vap->pst_del_net_device = OAL_PTR_NULL;
@@ -1789,6 +1809,31 @@ oal_uint32 hmac_tx_get_mac_vap(oal_uint8 uc_vap_id, mac_vap_stru **pst_vap_stru)
 
     return OAL_ERR_CODE_CONFIG_UNSUPPORT;
 }
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,10,44))
+OAL_STATIC oal_int32  hmac_cfg_vap_if_open(oal_net_device_stru *pst_dev)
+{
+    pst_dev->flags |= OAL_IFF_RUNNING;
+
+    return OAL_SUCC;
+}
+
+OAL_STATIC oal_int32  hmac_cfg_vap_if_close(oal_net_device_stru *pst_dev)
+{
+    pst_dev->flags &= ~OAL_IFF_RUNNING;
+
+    return OAL_SUCC;
+}
+
+OAL_STATIC oal_net_dev_tx_enum  hmac_cfg_vap_if_xmit(oal_netbuf_stru *pst_buf, oal_net_device_stru *pst_dev)
+{
+    if (pst_buf)
+    {
+        oal_netbuf_free(pst_buf);
+    }
+    return OAL_NETDEV_TX_OK;
+}
+#endif
 
 /*lint -e19*/
 oal_module_symbol(hmac_vap_get_priv_cfg);

@@ -221,17 +221,25 @@ oal_uint32  dmac_custom_init(oal_uint32 ul_psta_enable)
     修改内容   : 新生成函数
 
 *****************************************************************************/
+#ifdef _PRE_WLAN_DFT_LOG
 oal_uint32 oam_exception_stat_timeout(oal_void *p_arg)
 {
+
     oal_uint8                       uc_vap_idx;
 
     for (uc_vap_idx = 0; uc_vap_idx < WLAN_VAP_SUPPOTR_MAX_NUM_SPEC; uc_vap_idx++)
     {
         oam_exception_stat_handler(OM_WIFI, uc_vap_idx);
     }
-
     return OAL_SUCC;
 }
+#else
+oal_uint32 oam_exception_stat_timeout(oal_void *p_arg)
+{
+    return OAL_SUCC;
+}
+
+#endif /* _PRE_WLAN_DFT_LOG */
 
 oal_uint32 dmac_dfx_init(oal_void)
 {

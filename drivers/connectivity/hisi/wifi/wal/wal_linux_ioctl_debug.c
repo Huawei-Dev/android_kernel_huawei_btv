@@ -981,7 +981,7 @@ oal_uint32  wal_hipriv_set_rd_by_ie_switch(oal_net_device_stru *pst_net_dev,oal_
     return OAL_SUCC;
 }
 #endif
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_set_nss
  功能描述  : 设置空间流个数
@@ -1070,7 +1070,8 @@ OAL_STATIC oal_uint32  wal_hipriv_set_nss(oal_net_device_stru *pst_net_dev, oal_
 #endif
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_set_rfch
  功能描述  : 设置通道
@@ -1162,8 +1163,8 @@ OAL_STATIC oal_uint32  wal_hipriv_set_rfch(oal_net_device_stru *pst_net_dev, oal
 #endif
     return OAL_SUCC;
 }
-
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_always_tx
  功能描述  : 数据常发
@@ -1304,7 +1305,8 @@ OAL_STATIC oal_uint32  wal_hipriv_always_tx(oal_net_device_stru *pst_net_dev, oa
 #endif
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_get_thruput
  功能描述  : 获取芯片吞吐量信息
@@ -1380,7 +1382,8 @@ OAL_STATIC oal_uint32  wal_hipriv_get_thruput(oal_net_device_stru *pst_net_dev, 
     return OAL_SUCC;
 
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_set_freq_skew
  功能描述  : 设置频率纠偏参数
@@ -1462,8 +1465,8 @@ OAL_STATIC oal_uint32  wal_hipriv_set_freq_skew(oal_net_device_stru *pst_net_dev
 
     return OAL_SUCC;
 }
-
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_adjust_ppm
  功能描述  : 设置ppm
@@ -1541,6 +1544,7 @@ OAL_STATIC oal_uint32  wal_hipriv_adjust_ppm(oal_net_device_stru *pst_net_dev, o
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : wal_hipriv_event_switch
@@ -1729,13 +1733,6 @@ OAL_STATIC oal_uint32  wal_hipriv_ota_rx_dscr_switch(oal_net_device_stru *pst_ne
         return ul_ret;
     }
 
-    /* 解析参数 */
-    ul_ret = wal_get_cmd_one_arg(pc_param + ul_off_set, ac_name, &ul_off_set);
-    if (OAL_SUCC != ul_ret)
-    {
-        OAM_WARNING_LOG0(0, OAM_SF_ANY, "{wal_hipriv_ota_rx_dscr_switch::wal_get_cmd_one_arg fails!}\r\n");
-        return ul_ret;
-    }
     l_param = oal_atoi((const oal_int8 *)ac_name);
 
 
@@ -2372,6 +2369,7 @@ OAL_STATIC oal_uint32  wal_hipriv_set_dhcp_arp_switch(oal_net_device_stru *pst_n
 }
 
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_report_vap_info
  功能描述  : 根据下发的对应标记位，上报对应的vap信息
@@ -2431,6 +2429,7 @@ OAL_STATIC oal_uint32  wal_hipriv_report_vap_info(oal_net_device_stru *pst_net_d
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 /*****************************************************************************
@@ -2603,7 +2602,7 @@ OAL_STATIC oal_uint32  wal_hipriv_set_probe_switch(oal_net_device_stru *pst_net_
 
     return OAL_SUCC;
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_get_mpdu_num
  功能描述  : 获取device和每一个tid下当前mpdu数目
@@ -2662,6 +2661,7 @@ OAL_STATIC oal_uint32  wal_hipriv_get_mpdu_num(oal_net_device_stru *pst_net_dev,
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : wal_hipriv_set_all_ota
@@ -3778,6 +3778,7 @@ OAL_STATIC oal_uint32  wal_hipriv_mem_leak(oal_net_device_stru *pst_cfg_net_dev,
 }
 
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_mem_leak
  功能描述  : 检查指定内存池泄漏内存块(hipriv "Hisilicon0 memleak poolid")
@@ -3836,6 +3837,7 @@ OAL_STATIC oal_uint32  wal_hipriv_device_mem_leak(oal_net_device_stru *pst_cfg_n
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : wal_hipriv_memory_info
@@ -4268,7 +4270,7 @@ OAL_STATIC oal_uint32  wal_hipriv_dbb_scaling_amend(oal_net_device_stru *pst_net
 
     return OAL_SUCC;
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_chain_beacon_switch
  功能描述  : 调整beacon帧的发送策略(0表示关闭双路轮流发送，1表示开启)
@@ -4346,6 +4348,7 @@ OAL_STATIC oal_uint32  wal_hipriv_beacon_chain_switch(oal_net_device_stru *pst_n
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : wal_hipriv_2040_channel_switch_prohibited
@@ -5142,7 +5145,7 @@ OAL_STATIC oal_uint32  wal_hipriv_start_deauth(oal_net_device_stru *pst_net_dev,
 
     return OAL_SUCC;
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_start_deauth
  功能描述  : 触发sta初始扫描
@@ -5183,7 +5186,7 @@ OAL_STATIC oal_uint32  wal_hipriv_dump_timer(oal_net_device_stru *pst_net_dev, o
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_kick_user
  功能描述  : 删除1个用户
@@ -5612,7 +5615,7 @@ OAL_STATIC oal_uint32  wal_hipriv_event_queue_info(oal_net_device_stru *pst_net_
 {
     return frw_event_queue_info();
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_set_user_vip
  功能描述  : 设置用户的vip flag;
@@ -5687,8 +5690,8 @@ OAL_STATIC oal_uint32  wal_hipriv_set_user_vip(oal_net_device_stru *pst_net_dev,
 
     return OAL_SUCC;
 }
-
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_set_vap_host
  功能描述  : 设置vap的host flag;
@@ -5748,8 +5751,8 @@ OAL_STATIC oal_uint32  wal_hipriv_set_vap_host(oal_net_device_stru *pst_net_dev,
 
     return OAL_SUCC;
 }
-
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_send_bar
  功能描述  : 指定用户指定tid 发送bar
@@ -5821,7 +5824,7 @@ OAL_STATIC oal_uint32  wal_hipriv_send_bar(oal_net_device_stru *pst_net_dev, oal
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_ampdu_tx_on
  功能描述  : 开启或关闭ampdu发送功能
@@ -6010,7 +6013,7 @@ OAL_STATIC oal_uint32  wal_hipriv_wmm_switch(oal_net_device_stru *pst_net_dev, o
 
     return OAL_SUCC;
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_hide_ssid
  功能描述  : 测试命令，打开/关闭隐藏ssid
@@ -6070,6 +6073,7 @@ OAL_STATIC oal_uint32  wal_hipriv_hide_ssid(oal_net_device_stru *pst_net_dev, oa
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : wal_hipriv_ampdu_tx_on
@@ -6190,8 +6194,7 @@ OAL_STATIC oal_uint32  wal_hipriv_txbf_switch(oal_net_device_stru *pst_net_dev, 
 
     return OAL_SUCC;
 }
-
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_reset_device
  功能描述  :
@@ -6239,6 +6242,7 @@ OAL_STATIC oal_uint32  wal_hipriv_reset_device(oal_net_device_stru *pst_cfg_net_
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : wal_hipriv_reset_operate
@@ -6260,6 +6264,11 @@ OAL_STATIC oal_uint32  wal_hipriv_reset_operate(oal_net_device_stru *pst_cfg_net
     wal_msg_write_stru              st_write_msg;
     oal_int32                       l_ret;
     oal_uint16                      us_len;
+    if (OAL_UNLIKELY(WAL_MSG_WRITE_MAX_LEN <= OAL_STRLEN(pc_param)))
+    {
+        OAM_WARNING_LOG1(0, OAM_SF_ANY, "{wal_hipriv_reset_operate:: pc_param overlength is %d}\n", OAL_STRLEN(pc_param));
+        return OAL_FAIL;
+    }
 
     /***************************************************************************
                                 抛事件到wal层处理
@@ -6311,6 +6320,12 @@ OAL_STATIC oal_uint32  wal_hipriv_uapsd_debug(oal_net_device_stru *pst_cfg_net_d
     oal_int32                       l_ret;
     oal_uint16                      us_len;
 
+    if (OAL_UNLIKELY(WAL_MSG_WRITE_MAX_LEN <= OAL_STRLEN(pc_param)))
+    {
+        OAM_WARNING_LOG1(0, OAM_SF_ANY, "{wal_hipriv_uapsd_debug:: pc_param overlength is %d}\n", OAL_STRLEN(pc_param));
+        return OAL_FAIL;
+    }
+
     /***************************************************************************
                                 抛事件到wal层处理
     ***************************************************************************/
@@ -6340,6 +6355,7 @@ OAL_STATIC oal_uint32  wal_hipriv_uapsd_debug(oal_net_device_stru *pst_cfg_net_d
 #endif
 
 #ifdef _PRE_WLAN_DFT_STAT
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_set_phy_stat_en
  功能描述  : 设置phy统计使能节点的编号
@@ -6413,7 +6429,8 @@ OAL_STATIC oal_uint32  wal_hipriv_set_phy_stat_en(oal_net_device_stru *pst_cfg_n
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_dbb_env_param
  功能描述  : 上报或者停止上报空口环境类的维测参数
@@ -6472,7 +6489,7 @@ OAL_STATIC oal_uint32  wal_hipriv_dbb_env_param(oal_net_device_stru *pst_net_dev
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_usr_queue_stat
  功能描述  : 上报或者清零用户队列统计信息，包括tid队列，节能队列
@@ -6542,7 +6559,7 @@ OAL_STATIC oal_uint32  wal_hipriv_usr_queue_stat(oal_net_device_stru *pst_net_de
 
     return OAL_SUCC;
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_report_vap_stat
  功能描述  : 上报或者停止上报vap吞吐统计信息
@@ -6601,7 +6618,8 @@ OAL_STATIC oal_uint32  wal_hipriv_report_vap_stat(oal_net_device_stru *pst_net_d
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_report_all_stat
  功能描述  : 上报或者清零所有维测统计信息
@@ -6648,6 +6666,7 @@ OAL_STATIC oal_uint32  wal_hipriv_report_all_stat(oal_net_device_stru *pst_net_d
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 /*****************************************************************************
@@ -7161,7 +7180,7 @@ OAL_STATIC oal_uint32  wal_hipriv_show_tx_dscr_addr(oal_net_device_stru *pst_cfg
 #endif
     return OAL_SUCC;
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_dump_ba_bitmap
  功能描述  : 打印发送ba的bitmap
@@ -7234,6 +7253,7 @@ OAL_STATIC oal_uint32  wal_hipriv_dump_ba_bitmap(oal_net_device_stru *pst_net_de
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : wal_hipriv_packet_xmit
@@ -7782,6 +7802,12 @@ OAL_STATIC oal_uint32  wal_hipriv_clear_vap_stat_info(oal_net_device_stru *pst_n
 {
     oal_uint8                   uc_vap_id;
 
+    if (OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_net_dev))
+    {
+        OAM_WARNING_LOG0(0, OAM_SF_ANY, "{wal_hipriv_clear_vap_stat_info::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
+
     uc_vap_id = ((mac_vap_stru *)OAL_NET_DEV_PRIV(pst_net_dev))->uc_vap_id;
     oam_stats_clear_vap_stat_info(uc_vap_id);
 
@@ -7820,6 +7846,11 @@ OAL_STATIC oal_uint32 wal_hipriv_test_dfr_start(oal_net_device_stru *pst_net_dev
     }
 
     pst_wiphy_priv  = (mac_wiphy_priv_stru *)oal_wiphy_priv(pst_wdev->wiphy);
+    if (OAL_PTR_NULL == pst_wiphy_priv)
+    {
+        OAM_WARNING_LOG0(0, OAM_SF_ANY, "{wal_hipriv_test_dfr_start::pst_wiphy_priv is null!}\r\n");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
     pst_mac_device  = pst_wiphy_priv->pst_mac_device;
     if(OAL_PTR_NULL == pst_mac_device)
     {
@@ -8237,6 +8268,11 @@ OAL_STATIC oal_uint32  wal_hipriv_set_edca_opt_weight_sta(oal_net_device_stru *p
     oal_int8            ac_name[WAL_HIPRIV_CMD_NAME_MAX_LEN];
 
     // sh hipriv.sh "vap0 set_edca_weight_sta 1"
+    if (OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_net_dev))
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_hipriv_set_edca_opt_weight_sta::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
 
     /* 获取mac_vap */
     pst_mac_vap = OAL_NET_DEV_PRIV(pst_net_dev);
@@ -8316,6 +8352,11 @@ OAL_STATIC oal_uint32  wal_hipriv_set_edca_opt_switch_ap(oal_net_device_stru *ps
     oal_int8         ac_name[WAL_HIPRIV_CMD_NAME_MAX_LEN];
 
     // sh hipriv.sh "vap0 set_edca_switch_ap 1/0"
+    if (OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_net_dev))
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_hipriv_set_edca_opt_switch_ap::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
 
     /* 获取mac_vap */
     pst_mac_vap = OAL_NET_DEV_PRIV(pst_net_dev);
@@ -8393,6 +8434,11 @@ OAL_STATIC oal_uint32  wal_hipriv_set_edca_opt_cycle_ap(oal_net_device_stru *pst
     oal_int8         ac_name[WAL_HIPRIV_CMD_NAME_MAX_LEN];
 
     // sh hipriv.sh "vap0 set_edca_cycle_ap 200"
+    if (OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_net_dev))
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_hipriv_set_edca_opt_cycle_ap::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
 
     /* 获取mac_vap */
     pst_mac_vap = OAL_NET_DEV_PRIV(pst_net_dev);
@@ -8821,7 +8867,7 @@ OAL_STATIC oal_uint32  wal_hipriv_get_mib(oal_net_device_stru *pst_net_dev, oal_
 
     return OAL_SUCC;
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_set_thruput_bypass
  功能描述  : 设置thruput_bypass维测点
@@ -8895,6 +8941,7 @@ OAL_STATIC oal_uint32  wal_hipriv_set_thruput_bypass(oal_net_device_stru *pst_ne
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : wal_hipriv_set_thruput_bypass
@@ -8973,6 +9020,7 @@ OAL_STATIC oal_uint32  wal_hipriv_set_auto_freq(oal_net_device_stru *pst_net_dev
 #endif
 
 #ifdef _PRE_WLAN_DFT_STAT
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_performance_log_switch
  功能描述  : 设置性能打印控制开关
@@ -9047,6 +9095,7 @@ OAL_STATIC oal_uint32  wal_hipriv_performance_log_switch(oal_net_device_stru *ps
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 /*****************************************************************************
@@ -9502,7 +9551,7 @@ OAL_STATIC oal_uint32  wal_hipriv_get_user_nssbw(oal_net_device_stru *pst_net_de
 }
 
 #endif
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_set_vap_nss
  功能描述  : 设置VAP的空间流个数
@@ -9562,6 +9611,7 @@ OAL_STATIC oal_uint32  wal_hipriv_set_vap_nss(oal_net_device_stru *pst_net_dev, 
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 #ifdef _PRE_WLAN_FEATURE_CUSTOM_SECURITY
 
@@ -10161,6 +10211,7 @@ OAL_STATIC oal_uint32  wal_hipriv_sta_pm_on(oal_net_device_stru *pst_cfg_net_dev
 #endif
 
 #ifdef _PRE_WLAN_FEATURE_P2P
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_p2p_test
  功能描述  : P2P 测试命令
@@ -10221,6 +10272,13 @@ OAL_STATIC oal_uint32  wal_hipriv_p2p_test(oal_net_device_stru *pst_net_dev, oal
         }
 
         pst_mac_vap     = OAL_NET_DEV_PRIV(pst_net_dev);
+        if (OAL_PTR_NULL == pst_mac_vap)
+        {
+            OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_hipriv_p2p_test::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+            return OAL_ERR_CODE_PTR_NULL;
+        }
+
+
         pst_hmac_device = hmac_res_get_mac_dev(pst_mac_vap->uc_device_id);
         if (pst_hmac_device == OAL_PTR_NULL)
         {
@@ -10272,7 +10330,8 @@ OAL_STATIC oal_uint32  wal_hipriv_p2p_test(oal_net_device_stru *pst_net_dev, oal
 
     return OAL_SUCC;
 }
-#endif
+#endif  /* _PRE_DEBUG_MODE */
+#endif  /* _PRE_WLAN_FEATURE_P2P */
 
 #ifdef _PRE_WLAN_TCP_OPT
 /*****************************************************************************
@@ -12784,6 +12843,11 @@ OAL_STATIC oal_uint32  wal_hipriv_stat_tid_thrpt(oal_net_device_stru *pst_net_de
     mac_cfg_stat_param_stru        *pst_stat_param;
 
     /* vap0 stat_tid_thrpt xx xx xx xx xx xx(mac地址) tid_num stat_period(统计周期ms) stat_num(统计次数) */
+    if (OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_net_dev))
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_hipriv_stat_tid_thrpt::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
 
     /* 申请事件内存 */
     WAL_WRITE_MSG_HDR_INIT(&st_write_msg, WLAN_CFGID_PFM_STAT, OAL_SIZEOF(mac_cfg_stat_param_stru));
@@ -12881,6 +12945,11 @@ OAL_STATIC oal_uint32  wal_hipriv_stat_user_thrpt(oal_net_device_stru *pst_net_d
     mac_cfg_stat_param_stru        *pst_stat_param;
 
     /* vap0 stat_user_thrpt xx xx xx xx xx xx(mac地址) stat_period(统计周期ms) stat_num(统计次数) */
+    if (OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_net_dev))
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_hipriv_stat_user_thrpt::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
 
     /* 申请事件内存 */
     WAL_WRITE_MSG_HDR_INIT(&st_write_msg, WLAN_CFGID_PFM_STAT, OAL_SIZEOF(mac_cfg_stat_param_stru));
@@ -12964,6 +13033,11 @@ OAL_STATIC oal_uint32  wal_hipriv_stat_vap_thrpt(oal_net_device_stru *pst_net_de
     mac_cfg_stat_param_stru        *pst_stat_param;
 
     /* vap0 stat_vap_thrpt stat_period(统计周期ms) stat_num(统计次数) */
+    if (OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_net_dev))
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_hipriv_stat_vap_thrpt::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
 
     /* 申请事件内存 */
     WAL_WRITE_MSG_HDR_INIT(&st_write_msg, WLAN_CFGID_PFM_STAT, OAL_SIZEOF(mac_cfg_stat_param_stru));
@@ -13038,6 +13112,11 @@ OAL_STATIC oal_uint32  wal_hipriv_stat_tid_per(oal_net_device_stru *pst_net_dev,
     oal_uint32                      ul_total_offset = 0;
 
     /* vap0 stat_tid_per xx xx xx xx xx xx(mac地址) tid_num stat_period(统计周期ms) stat_num(统计次数) */
+    if (OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_net_dev))
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_hipriv_stat_vap_thrpt::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
 
     /* 申请事件内存 */
     WAL_WRITE_MSG_HDR_INIT(&st_write_msg, WLAN_CFGID_PFM_STAT, OAL_SIZEOF(mac_cfg_stat_param_stru));
@@ -13135,6 +13214,11 @@ OAL_STATIC oal_uint32  wal_hipriv_stat_tid_delay(oal_net_device_stru *pst_net_de
     oal_uint32                      ul_total_offset = 0;
 
     /* vap0 stat_tid_delay xx xx xx xx xx xx(mac地址) tid_num stat_period(统计周期ms) stat_num(统计次数) */
+    if (OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_net_dev))
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_hipriv_stat_tid_delay::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
 
     /* 申请事件内存 */
     WAL_WRITE_MSG_HDR_INIT(&st_write_msg, WLAN_CFGID_PFM_STAT, OAL_SIZEOF(mac_cfg_stat_param_stru));
@@ -13233,6 +13317,11 @@ OAL_STATIC oal_uint32  wal_hipriv_display_tid_thrpt(oal_net_device_stru *pst_net
     oal_uint32                      ul_total_offset = 0;
 
     /* vap0 stat_tid_thrpt xx xx xx xx xx xx(mac地址) tid_num stat_period(统计周期ms) stat_num(统计次数) */
+    if (OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_net_dev))
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_hipriv_display_tid_thrpt::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
 
     /* 申请事件内存 */
     WAL_WRITE_MSG_HDR_INIT(&st_write_msg, WLAN_CFGID_PFM_DISPLAY, OAL_SIZEOF(mac_cfg_display_param_stru));
@@ -13306,6 +13395,11 @@ OAL_STATIC oal_uint32  wal_hipriv_display_user_thrpt(oal_net_device_stru *pst_ne
     oal_uint32                      ul_total_offset = 0;
 
     /* vap0 stat_user_thrpt xx xx xx xx xx xx(mac地址) stat_period(统计周期ms) stat_num(统计次数) */
+    if (OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_net_dev))
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_hipriv_display_user_thrpt::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
 
     /* 申请事件内存 */
     WAL_WRITE_MSG_HDR_INIT(&st_write_msg, WLAN_CFGID_PFM_DISPLAY, OAL_SIZEOF(mac_cfg_display_param_stru));
@@ -13365,6 +13459,11 @@ OAL_STATIC oal_uint32  wal_hipriv_display_vap_thrpt(oal_net_device_stru *pst_net
     mac_cfg_display_param_stru     *pst_display_param;
 
     /* vap0 stat_vap_thrpt stat_period(统计周期ms) stat_num(统计次数) */
+    if (OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_net_dev))
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_hipriv_display_vap_thrpt::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
 
     /* 申请事件内存 */
     WAL_WRITE_MSG_HDR_INIT(&st_write_msg, WLAN_CFGID_PFM_DISPLAY, OAL_SIZEOF(mac_cfg_display_param_stru));
@@ -13419,6 +13518,11 @@ OAL_STATIC oal_uint32  wal_hipriv_display_tid_per(oal_net_device_stru *pst_net_d
     oal_uint32                      ul_total_offset = 0;
 
     /* vap0 stat_tid_per xx xx xx xx xx xx(mac地址) tid_num stat_period(统计周期ms) stat_num(统计次数) */
+    if (OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_net_dev))
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_hipriv_display_tid_per::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
 
     /* 申请事件内存 */
     WAL_WRITE_MSG_HDR_INIT(&st_write_msg, WLAN_CFGID_PFM_DISPLAY, OAL_SIZEOF(mac_cfg_display_param_stru));
@@ -13494,6 +13598,11 @@ OAL_STATIC oal_uint32  wal_hipriv_display_tid_delay(oal_net_device_stru *pst_net
     oal_uint32                      ul_total_offset = 0;
 
     /* vap0 stat_tid_delay xx xx xx xx xx xx(mac地址) tid_num stat_period(统计周期ms) stat_num(统计次数) */
+    if (OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_net_dev))
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_hipriv_display_tid_delay::OAL_NET_DEV_PRIV(pst_net_dev) is null!}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
 
     /* 申请事件内存 */
     WAL_WRITE_MSG_HDR_INIT(&st_write_msg, WLAN_CFGID_PFM_DISPLAY, OAL_SIZEOF(mac_cfg_display_param_stru));
@@ -13565,6 +13674,11 @@ OAL_STATIC oal_uint32  wal_hipriv_data_acq(oal_net_device_stru *pst_net_dev, oal
     wal_msg_write_stru              st_write_msg;
     oal_int32                       l_ret;
     oal_uint16                      us_len;
+    if (OAL_UNLIKELY(WAL_MSG_WRITE_MAX_LEN <= OAL_STRLEN(pc_param)))
+    {
+        OAM_WARNING_LOG1(0, OAM_SF_ANY, "{wal_hipriv_data_acq:: pc_param overlength is %d}\n", OAL_STRLEN(pc_param));
+        return OAL_FAIL;
+    }
 
     /***************************************************************************
                               抛事件到wal层处理
@@ -15286,7 +15400,6 @@ OAL_STATIC oal_uint32   wal_parse_noa_param(oal_int8 *pc_param, mac_cfg_p2p_noa_
 
     return OAL_SUCC;
 }
-
 /*****************************************************************************
  函 数 名  : wal_hipriv_set_p2p_ps
  功能描述  : 芯片验证，设置P2P 节能寄存器
@@ -15358,6 +15471,7 @@ OAL_STATIC oal_uint32  wal_hipriv_set_p2p_ps(oal_net_device_stru *pst_net_dev, o
     }
     else if (0 == (oal_strcmp("statistics", ac_name)))
     {
+#ifdef _PRE_DEBUG_MODE
         /* 获取P2P节能统计 */
         /* 解析参数，查看节能统计 */
         ul_ret = wal_get_cmd_one_arg(pc_param, ac_name, &ul_off_set);
@@ -15386,6 +15500,10 @@ OAL_STATIC oal_uint32  wal_hipriv_set_p2p_ps(oal_net_device_stru *pst_net_dev, o
         oal_memcopy(st_write_msg.auc_value, &st_p2p_stat_param, us_len);
         OAM_INFO_LOG2(0, OAM_SF_CFG, "{wal_hipriv_set_p2p_ps statistics::ctrl[%d], len:%d!}\r\n",
                         st_p2p_stat_param.uc_p2p_statistics_ctrl, us_len);
+#else
+        return OAL_SUCC;
+#endif //#ifdef _PRE_DEBUG_MODE
+
     }
     else
     {
@@ -16650,6 +16768,7 @@ OAL_STATIC oal_uint32  wal_hipriv_set_ampdu_mmss(oal_net_device_stru *pst_net_de
 #endif
 
 #ifdef _PRE_WLAN_FEATURE_ARP_OFFLOAD
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_arp_offload_enable
  功能描述  : 用命令打开/关闭ARP offload功能
@@ -16704,7 +16823,8 @@ oal_uint32 wal_hipriv_arp_offload_enable(oal_net_device_stru *pst_net_dev, oal_i
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_hipriv_show_arpoffload_info
  功能描述  : 显示Device侧记录的IP地址
@@ -16776,6 +16896,7 @@ oal_uint32 wal_hipriv_show_arpoffload_info(oal_net_device_stru *pst_net_dev, oal
     }
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 #ifdef _PRE_WLAN_FEATURE_ROAM
@@ -17863,7 +17984,9 @@ OAL_CONST wal_hipriv_cmd_entry_stru  g_ast_hipriv_cmd_debug[] =
     {"meminfo",                 wal_hipriv_mem_info},               /* 打印内存池信息: hipriv "Hisilicon0 meminfo poolid" */
     {"memleak",                 wal_hipriv_mem_leak},               /* 打印内存池信息: hipriv "Hisilicon0 memleak poolid" */
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
+#ifdef _PRE_DEBUG_MODE
     {"devicememleak",           wal_hipriv_device_mem_leak},         /* 打印内存池信息: hipriv "Hisilicon0 devicememleak poolid" */
+#endif //#ifdef _PRE_DEBUG_MODE
     {"memoryinfo",              wal_hipriv_memory_info},             /* 打印内存池信息: hipriv "Hisilicon0 memoryinfo host/device" */
 #endif
 #if (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1151)
@@ -17883,8 +18006,9 @@ OAL_CONST wal_hipriv_cmd_entry_stru  g_ast_hipriv_cmd_debug[] =
     {"max_user_num",            wal_hipriv_max_user_num_each_device},  /* 设置各设备关联用户个数: hipriv "Hisilicon0|1 max_user_num num"，0<=num<=32 */
 #endif
     {"dbb_scaling_amend",       wal_hipriv_dbb_scaling_amend}, /*调整dbb scaling值: hipriv "wlan0 dbb_scaling_amend <param name> <value>" */
-
+#ifdef _PRE_DEBUG_MODE
     {"beacon_chain_switch",     wal_hipriv_beacon_chain_switch},    /* 设置beacon帧发送策略配置命令: hipriv "vap0 beacon_chain_switch 0/1" 目前采取的是单通道模式(使用通道0)，0表示关闭双路轮流发送，1表示开启，该命令针对某一个VAP */
+#endif //#ifdef _PRE_DEBUG_MODE
 #if 0
     {"tdls_prohi",              wal_hipriv_tdls_prohibited},                       /* 设置tdls prohibited策略配置命令: hipriv "vap0  tdls_prohi 0/1" 0表示不禁用，1表示禁用 */
     {"tdls_chaswi_prohi",       wal_hipriv_tdls_channel_switch_prohibited},        /* 设置tdls channel switch prohibited策略配置命令: hipriv "vap0 tdls_chaswi_prohi 0/1" 0表示不禁用，1表示禁用 */
@@ -17899,34 +18023,55 @@ OAL_CONST wal_hipriv_cmd_entry_stru  g_ast_hipriv_cmd_debug[] =
 #ifdef _PRE_WLAN_FEATURE_WEB_CFG_FIXED_RATE
     {"set_mode_ucast_data",     wal_hipriv_set_mode_ucast_data_dscr_param},         /* 设置指定模式单播数据帧描述符: hipriv "vap0 set_mode_ucast_data <protocol_mode> <param name> <value>" */
 #endif
+#ifdef _PRE_DEBUG_MODE
     {"nss",                     wal_hipriv_set_nss  },               /* 设置HT模式下的空间流个数:   hipriv "vap0 nss   <value>" */
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {"txch",                    wal_hipriv_set_rfch },               /* 设置发射通道:               hipriv "vap0 rfch  <value>" */
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {"al_tx",                   wal_hipriv_always_tx},               /* 设置常发模式:               hipriv "vap0 al_tx <value: 0/1/2> <ack policy: 0/1> <payload> <len>" value:0:关闭；1:RF；2:聚合。ack policy: 0:normal；1:no ack。*/
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {"get_thruput",             wal_hipriv_get_thruput},             /* 获取芯片的吞吐量数据        hipriv "vap0 get_thruput >" */
+#endif //#ifdef _PRE_DEBUG_MODE
 #ifdef _PRE_DEBUG_MODE
     {"rxch",                    wal_hipriv_set_rxch},                /* 设置常收接收通道            hipriv "vap0 rxch <value:0001/0010/0011>" */
     {"dync_txpower",            wal_hipriv_dync_txpower},            /* 设置动态功率校准开关         hipriv "Hisilicon0 dync_txpower 0/1" 0:关闭 1:打开 */
 #endif
+#ifdef _PRE_DEBUG_MODE
     {"set_freq_skew",           wal_hipriv_set_freq_skew},          /* 设置频偏数据                 hipriv "Hisilicon0 set_freq_skew
                                                                      * <idx chn T0Int20M T0Frac20M T1Int20M T1Frac20M T0Int40M T0Frac40M T1Int40M T1Frac40M>" */
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {"adjust_ppm",              wal_hipriv_adjust_ppm},             /* 设置ppm         hipriv "Hisilicon0 adjust_ppm ppm clock" */
+#endif //#ifdef _PRE_DEBUG_MODE
     {"amsdu_start",             wal_hipriv_amsdu_start},            /* 打印寄存器信息: hipriv "vap0 amsdu_start xx xx xx xx xx xx(mac地址10进制oal_atoi) <max num> <max size> " */
     {"list_ap",                 wal_hipriv_list_ap},                /* 打印STA扫描到的AP列表: hipriv "sta0 list_ap" */
     {"list_sta",                wal_hipriv_list_sta},               /* 打印AP关联的STA列表: hipriv "sta0 list_sta" */
     {"start_scan",              wal_hipriv_start_scan},             /* 触发sta扫描: hipriv "sta0 start_scan" */
     {"start_join",              wal_hipriv_start_join},             /* 触发sta加入并认证关联: hipriv "sta0 start_join 1" 1表示扫描到的AP在device写数组下标号*/
     {"start_deauth",            wal_hipriv_start_deauth},           /* 触发sta去认证: hipriv "vap0 start_deauth" */
+#ifdef _PRE_DEBUG_MODE
     {"dump_timer",              wal_hipriv_dump_timer},             /* 打印所有timer的维测信息 hipriv "vap0 dump_timer" */
+#endif //#ifdef _PRE_DEBUG_MODE
     {"kick_user",               wal_hipriv_kick_user},              /* 删除1个用户 hipriv "vap0 kick_user xx xx xx xx xx xx(mac地址)" */
     {"pause_tid",               wal_hipriv_pause_tid},              /* 暂停指定用户的指定tid hipriv "vap0 pause_tid xx xx xx xx xx xx(mac地址) tid_num 0\1" */
+#ifdef _PRE_DEBUG_MODE
     {"set_user_vip",            wal_hipriv_set_user_vip},           /* 设置某个用户为VIP或者非VIP，sh hipriv.sh "vap0 set_user_vip xx xx xx xx xx xx(mac地址) 0\1" */
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {"set_vap_host",            wal_hipriv_set_vap_host},           /* 设置某个vap为host或者guest vap: sh hipriv.sh "vap0 st_vap_host 0\1" */
+#endif //#ifdef _PRE_DEBUG_MODE
     {"ampdu_tx_on",             wal_hipriv_ampdu_tx_on},            /* 开启或关闭ampdu发送功能 hipriv "vap0 ampdu_tx_on 0\1" */
     {"amsdu_tx_on",             wal_hipriv_amsdu_tx_on},            /* 开启或关闭ampdu发送功能 hipriv "vap0 amsdu_tx_on 0\1" */
+#ifdef _PRE_DEBUG_MODE
     {"send_bar",                wal_hipriv_send_bar},               /* 指定tid发送bar hipriv "vap0 send_bar A6C758662817(mac地址) tid_num" */
-
+#endif //#ifdef _PRE_DEBUG_MODE
     {"packet_xmit",             wal_hipriv_packet_xmit},            /* 向目标STA/AP发送数据帧: hipriv "vap0 packet_xmit (tid_no) (报文个数) (报文长度) (RA MAC)" */
+#ifdef _PRE_DEBUG_MODE
     {"dump_ba_bitmap",          wal_hipriv_dump_ba_bitmap},         /* 打印发送ba的bitmap hipriv "vap0 dump_ba_bitmap (tid_no) (RA)" */
+#endif //#ifdef _PRE_DEBUG_MODE
     {"wifi_stat_info",          wal_hipriv_show_stat_info},         /* 获取所有维测统计信息: hipriv "Hisilicon0 wifi_stat_info" */
     {"vap_pkt_stat",            wal_hipriv_show_vap_pkt_stat},      /* 获取某一个vap下的收发包统计信息: sh hipriv.sh "vap_name vap_pkt_stat" */
     {"clear_stat_info",         wal_hipriv_clear_stat_info},        /* 清零所有维测统计信息: hipriv "Hisilicon0 clear_stat_info" */
@@ -17934,10 +18079,12 @@ OAL_CONST wal_hipriv_cmd_entry_stru  g_ast_hipriv_cmd_debug[] =
     {"timer_start",             wal_hipriv_timer_start},            /* 开启5115硬件定时器: hipriv "Hisilicon0 timer_start 0/1" */
     {"show_profiling",          wal_hipriv_show_profiling},         /* 开启5115硬件定时器: hipriv "Hisilicon0 show_profiling 0/1/2 (0是rx 1是tx 2是chipstart)" */
     {"ampdu_amsdu",             wal_hipriv_ampdu_amsdu_switch},     /* 设置amsdu ampdu联合聚合功能的开关:hipriv "vap0  ampdu_amsdu 0 | 1" 该命令针对某一个VAP */
+#ifdef _PRE_DEBUG_MODE
    // {"reset_hw",                wal_hipriv_reset_device},           /* 复位硬件phy&mac: hipriv "Hisilicon0 reset_hw 0|1|2|3(all|phy|mac|debug) 0|1(reset phy reg) 0|1(reset mac reg) */
     {"reset_hw",                wal_hipriv_reset_device},           /* 复位硬件phy&mac: hipriv "Hisilicon0 reset_hw 0|1|2|3|4|5|6|8|9|10|11
                                                                                                                     (all|phy|mac|debug|mac_tsf|mac_cripto|mac_non_cripto|phy_AGC|phy_HT_optional|phy_VHT_optional|phy_dadar )
                                                                                                                     0|1(reset phy reg) 0|1(reset mac reg) */
+#endif //#ifdef _PRE_DEBUG_MODE
     {"reset_operate",           wal_hipriv_reset_operate},          /* 复位硬件phy&mac: hipriv "Hisilicon0 reset_hw 0|1|2|3(all|phy|mac|debug) 0|1(reset phy reg) 0|1(reset mac reg) */
     {"dump_rx_dscr",            wal_hipriv_dump_rx_dscr},           /* dump出来接收描述符队列，hipriv "Hisilicon0 dump_rx_dscr 0|1", 0:高优先级队列 1:普通优先级队列  */
     {"dump_tx_dscr",            wal_hipriv_dump_tx_dscr},           /* dump出来发送描述符队列，hipriv "Hisilicon0 dump_tx_dscr value", value取值0~3代表AC发送队列，4代表管理帧 */
@@ -17948,16 +18095,22 @@ OAL_CONST wal_hipriv_cmd_entry_stru  g_ast_hipriv_cmd_debug[] =
     {"event_queue",             wal_hipriv_event_queue_info},       /* 打印事件队列信息，将打印出每一个非空事件队列中事件的个数，以及每一个事件头信息, hipriv "Hisilicon0 event_queue" */
     {"frag_threshold",          wal_hipriv_frag_threshold},         /* 设置分片门限的配置命令: hipriv "vap0 frag_threshold (len)" 该命令针对某一个VAP */
     {"wmm_switch",              wal_hipriv_wmm_switch},             /* 动态开启或者关闭wmm hipriv "vap0 wmm_switch 0|1"(0不使能，1使能)  */
+#ifdef _PRE_DEBUG_MODE
     {"hide_ssid",               wal_hipriv_hide_ssid},              /*  隐藏ssid功能开启或者关闭 wmm hipriv "Hisilicon0 hide_ssid 0|1"(0不使能，1使能)  */
+#endif //#ifdef _PRE_DEBUG_MODE
     {"ether_switch",            wal_hipriv_set_ether_switch},       /* 设置以太网帧上报的开关，sh hipriv.sh "vap0 ether_switch user_macaddr oam_ota_frame_direction_type_enum(帧方向) 0|1(开关)" */
     {"80211_uc_switch",         wal_hipriv_set_80211_ucast_switch}, /* 设置80211单播帧上报的开关，sh hipriv.sh "vap0 80211_uc_switch user_macaddr 0|1(帧方向tx|rx) 0|1(帧类型:管理帧|数据帧) 0|1(帧内容开关) 0|1(CB开关) 0|1(描述符开关)" */
     {"80211_mc_switch",         wal_hipriv_set_80211_mcast_switch}, /* 设置80211组播\广播帧上报的开关，sh hipriv.sh "Hisilicon0 80211_mc_switch 0|1(帧方向tx|rx) 0|1(帧类型:管理帧|数据帧) 0|1(帧内容开关) 0|1(CB开关) 0|1(描述符开关)" */
     {"probe_switch",            wal_hipriv_set_probe_switch},       /* 设置probe req与rsp上报的开关，sh hipriv.sh "Hisilicon0 probe_switch 0|1(帧方向tx|rx) 0|1(帧内容开关) 0|1(CB开关) 0|1(描述符开关)" */
     {"rssi_switch",             wal_hipriv_set_rssi_switch},        /* 设置打印接收报文rssi信息的开关，sh hipriv.sh "Hisilicon0 rssi_switch 0|1(打开|关闭) N(间隔N个帧打印)" */
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
+#ifdef _PRE_DEBUG_MODE
     {"report_vap_info",         wal_hipriv_report_vap_info},        /* 根据标记位上报vap的对应信息 sh hipriv.sh "wlan0 report_vap_info 1" */
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
+#ifdef _PRE_DEBUG_MODE
     {"mpdu_num",                wal_hipriv_get_mpdu_num},           /* 获取device下和每一个tid下当前mpdu个数，sh hipriv.sh "vap_name mpdu_num user_macaddr" */
+#endif //#ifdef _PRE_DEBUG_MODE
     {"set_all_ota",             wal_hipriv_set_all_ota},            /* 设置所有ota上报，如果为1，则所有类型帧的cb描述符都报，如果为0，什么都不报，sh hipriv.sh "Hisilicon0 set_all_ota 0|1" */
     {"80211_uc_all",            wal_hipriv_set_all_80211_ucast},    /* 设置所有用户的单播开关，sh hipriv.sh "Hisilicon0 80211_uc_all 0|1(帧方向tx|rx) 0|1(帧类型:管理帧|数据帧) 0|1(帧内容开关) 0|1(CB开关) 0|1(描述符开关)" */
     {"ether_all",               wal_hipriv_set_all_ether_switch},   /* 设置所有用户的以太网开关，sh hipriv.sh "Hisilicon0 ether_all 0|1(帧方向tx|rx) 0|1(开关)" */
@@ -17975,12 +18128,19 @@ OAL_CONST wal_hipriv_cmd_entry_stru  g_ast_hipriv_cmd_debug[] =
     {"uapsd_debug",             wal_hipriv_uapsd_debug},            /* uapsd维测信息，sh hipriv "vap0 uapsd_debug 0|1|2(单用户|all user|清空统计计数器) xx:xx:xx:xx:xx:xx(mac地址)" */
 #endif
 #ifdef _PRE_WLAN_DFT_STAT
+#ifdef _PRE_DEBUG_MODE
     {"phy_stat_en",             wal_hipriv_set_phy_stat_en},        /* 设置phy统计使能节点编号，一次可以设置4个，参数范围1~16，sh hipriv.sh "Hisilicon0 phy_stat_en idx1 idx2 idx3 idx4" */
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {"dbb_env_param",           wal_hipriv_dbb_env_param},          /* 上报或者停止上报空口环境类参数信息: sh hipriv.sh "Hisilicon0 dbb_env_param 0|1" */
+#endif //#ifdef _PRE_DEBUG_MODE
     {"usr_queue_stat",          wal_hipriv_usr_queue_stat},         /* 上报或者清零用户队列统计信息: sh hipriv.sh "vap_name usr_queue_stat XX:XX:XX:XX:XX:XX 0|1" */
+#ifdef _PRE_DEBUG_MODE
     {"vap_stat",                wal_hipriv_report_vap_stat},        /* 上报或者停止上报vap吞吐统计信息: sh hipriv.sh "vap_name vap _stat  0|1" */
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {"reprt_all_stat",          wal_hipriv_report_all_stat},        /* 上报或者清零所有维测统计信息: sh hipriv.sh "Hisilicon0 reprt_all_stat type(phy/machw/mgmt/irq/all)  0|1" */
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 #ifdef _PRE_DEBUG_MODE
     {"ampdu_stat",             wal_hipriv_report_ampdu_stat},      /* 上报或者清零ampdu维测统计信息: sh hipriv.sh "vap_name ampdu_stat XX:XX:XX:XX:XX:XX tid_no 0|1" */
@@ -18087,7 +18247,9 @@ OAL_CONST wal_hipriv_cmd_entry_stru  g_ast_hipriv_cmd_debug[] =
 
     {"set_mib",                 wal_hipriv_set_mib},                   /* 设置VAP mib值 */
     {"get_mib",                 wal_hipriv_get_mib},                   /* 获取VAP mib值 */
+#ifdef _PRE_DEBUG_MODE
     {"thruput_bypass",          wal_hipriv_set_thruput_bypass},        /* 设置thruput bypass维测点 */
+#endif //#ifdef _PRE_DEBUG_MODE
     {"auto_protection",         wal_hipriv_set_auto_protection},       /* 设置自动保护开关 */
 
     /* 共存维测相关 */
@@ -18116,8 +18278,9 @@ OAL_CONST wal_hipriv_cmd_entry_stru  g_ast_hipriv_cmd_debug[] =
 
     {"dump_reg_info",            wal_hipriv_dump_reg_info},            /* 显示寄存器读取相关调试信息 */
 #endif
-
+#ifdef _PRE_DEBUG_MODE
     {"set_vap_nss",              wal_hipriv_set_vap_nss},               /* 设置VAP的空间流个数:hipriv "vap0 set_vap_nss <value>" */
+#endif //#ifdef _PRE_DEBUG_MODE
 
 #ifdef _PRE_WLAN_FEATURE_CUSTOM_SECURITY
 
@@ -18184,7 +18347,9 @@ OAL_CONST wal_hipriv_cmd_entry_stru  g_ast_hipriv_cmd_debug[] =
                                                                 /* sh hipriv.sh "vap0 p2p_ps ops 0/1(0不使能，1使能) [0~255] 设置OPS 节能下ct_window 参数 */
                                                                 /* sh hipriv.sh "vap0 p2p_ps noa start_time duration interval count 设置NOA 节能参数 */
                                                                 /* sh hipriv.sh "vap0 p2p_ps statistics 0/1(0 清空统计，1查看统计) P2P 中断统计 */
+#ifdef _PRE_DEBUG_MODE
     {"p2p_test",                wal_hipriv_p2p_test},
+#endif
 #endif  /* _PRE_WLAN_FEATURE_P2P */
 
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC != _PRE_MULTI_CORE_MODE)
@@ -18196,8 +18361,10 @@ OAL_CONST wal_hipriv_cmd_entry_stru  g_ast_hipriv_cmd_debug[] =
 #endif
 
 #ifdef _PRE_WLAN_FEATURE_ARP_OFFLOAD
+#ifdef _PRE_DEBUG_MODE
     {"arp_offload_enable",      wal_hipriv_arp_offload_enable},    /* ARP/ND处理下移和广播/组播过滤开关:sh hipriv.sh "wlan0 arp_offload_enable  0/1(0关闭，1打开)" */
     {"show_arpoffload_info",    wal_hipriv_show_arpoffload_info},          /* 显示Device侧记录的IP地址:sh hipriv.sh "wlan0 show_ip_addr" */
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 #ifdef _PRE_WLAN_TCP_OPT
@@ -18217,6 +18384,7 @@ OAL_CONST wal_hipriv_cmd_entry_stru  g_ast_hipriv_cmd_debug[] =
 
 
 #ifdef _PRE_WLAN_DFT_STAT
+#ifdef _PRE_DEBUG_MODE
     {"performance_log_debug",          wal_hipriv_performance_log_switch},        /* 设置性能打印控制开关 sh hipriv.sh "wlan0 performance_log_debug X Y,*/
                                                                                                                                                         /*其中X是打印点，见oal_performance_log_switch_enum定义，Y是使能开关,0关闭，1打开。*/                                                                                                                                                        /*X=255时，配置所有的打印开关*/
                                                                                                                                                         /*使用说明:                                                     */
@@ -18227,6 +18395,7 @@ OAL_CONST wal_hipriv_cmd_entry_stru  g_ast_hipriv_cmd_debug[] =
                                                                                                                                                         /*sh hipriv.sh "wlan0 performance_log_debug 255 0 :清除所有控制开关*/
                                                                                                                                                         /*sh hipriv.sh "wlan0 performance_log_debug 255 1 :设置所有控制开关*/
 
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 #ifdef _PRE_WLAN_FEATURE_ROAM
     {"roam_enable",      wal_hipriv_roam_enable},   /* 设置漫游开关 */

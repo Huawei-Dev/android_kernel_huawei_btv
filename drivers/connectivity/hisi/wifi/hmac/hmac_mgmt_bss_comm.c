@@ -3354,6 +3354,7 @@ oal_void  hmac_send_mgmt_to_host(hmac_vap_stru  *pst_hmac_vap,
     pst_mgmt_data = (oal_uint8*)oal_memalloc(us_len);
     if(OAL_PTR_NULL == pst_mgmt_data)
     {
+        FRW_EVENT_FREE(pst_event_mem);
         OAM_ERROR_LOG0(pst_hmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_SCAN, "{hmac_send_mgmt_to_host::pst_mgmt_data null.}");
         return;
     }

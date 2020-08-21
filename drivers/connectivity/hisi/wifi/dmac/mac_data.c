@@ -486,6 +486,43 @@ oal_bool_enum_uint8 mac_is_eapol_key_ptk(mac_eapol_header_stru  *pst_eapol_heade
     return OAL_FALSE;
 }
 
+/*****************************************************************************
+ 函 数 名  : mac_is_eapol_key_ptk_4_4
+ 功能描述  : 判断该帧是否为4 次握手的4/4 EAPOL KEY 单播密钥协商帧
+ 输入参数  : oal_netbuf_stru *pst_netbuff
+ 输出参数  : 无
+ 返 回 值  : oal_bool_enum_uint8
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年9月6日
+    作    者   : duankaiyong 00194999
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+oal_bool_enum_uint8 mac_is_eapol_key_ptk_4_4(oal_netbuf_stru *pst_netbuff)
+{
+    mac_eapol_header_stru   *pst_eapol_header;
+    mac_eapol_key_stru      *pst_eapol_key;
+
+    if ((mac_get_data_type(pst_netbuff) == MAC_DATA_EAPOL))
+    {
+        pst_eapol_header = (mac_eapol_header_stru *)(oal_netbuf_payload(pst_netbuff) + OAL_SIZEOF(mac_llc_snap_stru));
+        if (mac_is_eapol_key_ptk(pst_eapol_header) == OAL_TRUE)
+        {
+            pst_eapol_key = (mac_eapol_key_stru *)(pst_eapol_header + 1);
+            if (pst_eapol_key->auc_key_data_length[0] == 0
+                && pst_eapol_key->auc_key_data_length[1] == 0)
+            {
+                return OAL_TRUE;
+            }
+        }
+    }
+
+    return OAL_FALSE;
+}
+
 /*lint -e19*/
 oal_module_symbol(mac_is_dhcp_port);
 oal_module_symbol(mac_is_dhcp6);

@@ -1377,6 +1377,14 @@ typedef enum
     WLAN_CFGID_WMMAC_SWITCH                 = 660,      /* 设置WMMAC SWITCH开关的配置命令 */
 #endif
 
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+    WLAN_CFGID_IP_FILTER                  = 661,      /* 配置IP端口过滤的命令 */
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
+
+#ifdef _PRE_WLAN_DOWNLOAD_PM
+    WLAN_CFGID_SET_CUS_DOWNLOAD_RATE_LIMIT,           /* 限流参数定制化 */
+#endif
+
     /************************************************************************
         第三段 非MIB的内部数据同步，需要严格受控
     *************************************************************************/

@@ -648,6 +648,23 @@ enum nl80211_channel_type {
 };
 typedef enum nl80211_channel_type oal_nl80211_channel_type;
 
+enum ieee80211_channel_flags {
+	IEEE80211_CHAN_DISABLED		= 1<<0,
+	IEEE80211_CHAN_NO_IR		= 1<<1,
+	/* hole at 1<<2 */
+	IEEE80211_CHAN_RADAR		= 1<<3,
+	IEEE80211_CHAN_NO_HT40PLUS	= 1<<4,
+	IEEE80211_CHAN_NO_HT40MINUS	= 1<<5,
+	IEEE80211_CHAN_NO_OFDM		= 1<<6,
+	IEEE80211_CHAN_NO_80MHZ		= 1<<7,
+	IEEE80211_CHAN_NO_160MHZ	= 1<<8,
+	IEEE80211_CHAN_INDOOR_ONLY	= 1<<9,
+	IEEE80211_CHAN_IR_CONCURRENT	= 1<<10,
+	IEEE80211_CHAN_NO_20MHZ		= 1<<11,
+	IEEE80211_CHAN_NO_10MHZ		= 1<<12,
+};
+typedef enum ieee80211_channel_flags oal_ieee80211_channel_flags;
+
 enum nl80211_key_type {
     NL80211_KEYTYPE_GROUP,
     NL80211_KEYTYPE_PAIRWISE,
@@ -746,6 +763,7 @@ struct beacon_parameters {
 };
 typedef struct beacon_parameters    oal_beacon_parameters;
 
+/* lm add new code begin */
 /* 3.10内核中下发的修改beacon帧参数的结构体 */
 struct cfg80211_beacon_data
 {
@@ -830,6 +848,7 @@ struct cfg80211_ap_settings {
 	oal_uint32                       radar_required;
 };
 typedef struct cfg80211_ap_settings oal_ap_settings_stru;
+/* lm add new code end */
 
 struct cfg80211_update_ft_ies_params {
     oal_uint16                   md;
@@ -857,6 +876,7 @@ enum wiphy_flags {
     WIPHY_FLAG_4ADDR_AP             = BIT(5),
     WIPHY_FLAG_4ADDR_STATION        = BIT(6),
     WIPHY_FLAG_SUPPORTS_SCHED_SCAN  = BIT(11),
+    WIPHY_FLAG_SUPPORTS_FW_ROAM     = BIT(13),
     WIPHY_FLAG_HAVE_AP_SME          = BIT(17),
     WIPHY_FLAG_HAS_REMAIN_ON_CHANNEL= BIT(21),
 };
@@ -1403,7 +1423,7 @@ typedef struct oal_cfg80211_scan_request_tag
     /* internal */
     oal_wiphy_stru         *wiphy;
     oal_net_device_stru    *dev;
-
+    struct wireless_dev    *wdev;
     oal_bool_enum_uint8     aborted;
     oal_uint8               auc_arry[3];
 
@@ -1475,6 +1495,7 @@ typedef struct oal_cfg80211_connect_params_tag
     oal_ieee80211_channel_stru          *channel;
 
     oal_uint8                           *bssid;
+    oal_uint8                           *bssid_hint;
     oal_uint8                           *ssid;
     oal_uint8                           *ie;
 
@@ -1531,11 +1552,13 @@ typedef struct oal_cfg80211_ops_tag
     oal_int32 (*change_station)(oal_wiphy_stru *pst_wiphy, oal_net_device_stru *pst_dev, oal_uint8 *puc_mac, oal_station_parameters_stru *pst_sta_parms);
     oal_int32 (*get_station)(oal_wiphy_stru *pst_wiphy, oal_net_device_stru *pst_dev, oal_uint8 *puc_mac, oal_station_info_stru *pst_sta_info);
     oal_int32 (*dump_station)(oal_wiphy_stru *wiphy, oal_net_device_stru *dev, oal_int32 idx, oal_uint8 *mac, oal_station_info_stru *pst_sta_info);
+    /* lm add new code begin */
     oal_int32 (*change_beacon)(oal_wiphy_stru *pst_wiphy, oal_net_device_stru *pst_netdev, oal_beacon_data_stru *pst_beacon_info);
     oal_int32 (*start_ap)(oal_wiphy_stru *pst_wiphy, oal_net_device_stru *pst_netdev, oal_ap_settings_stru *pst_ap_settings);
     oal_int32 (*stop_ap)(oal_wiphy_stru *pst_wiphy, oal_net_device_stru *pst_netdev);
     oal_int32 (*change_bss)(oal_wiphy_stru *pst_wiphy, oal_net_device_stru *pst_netdev, oal_bss_parameters *pst_bss_params);
     oal_int32 (*set_power_mgmt)(oal_wiphy_stru  *pst_wiphy,oal_net_device_stru *pst_ndev, oal_bool_enum  enabled,oal_int32 ul_timeout);
+    /* lm add new code end */
 }oal_cfg80211_ops_stru;
 
 typedef struct
@@ -1650,7 +1673,7 @@ typedef struct wiphy_vendor_command {
 /*lint -e545*/
 #define OAL_NETLINK_CB(_skb)            (*(oal_netlink_skb_parms_stru*)&((_skb)->cb))
 
-#define OAL_NLA_FOR_EACH_ATTR(pos, head, len, rem) 
+#define OAL_NLA_FOR_EACH_ATTR(pos, head, len, rem)
 
 #define OAL_AF_BRIDGE   7   /* Multiprotocol bridge     */
 #define OAL_PF_BRIDGE   OAL_AF_BRIDGE
@@ -2145,7 +2168,13 @@ OAL_STATIC OAL_INLINE oal_void oal_netbuf_list_purge(oal_netbuf_head_stru *pst_l
     {
         netbuf = oal_netbuf_delist(pst_list_head);
         if(netbuf)
+        {
             oal_netbuf_free(netbuf);
+        }
+        else
+        {
+            break;
+        }
     }
     return;
 }

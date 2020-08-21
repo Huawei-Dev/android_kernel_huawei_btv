@@ -306,7 +306,7 @@ OAL_STATIC oal_uint32 hmac_blacklist_get(mac_vap_stru *pst_mac_vap, oal_uint8 *p
 *****************************************************************************/
 oal_uint32 hmac_backlist_get_drop(mac_vap_stru *pst_mac_vap, oal_uint8 *puc_mac_addr)
 {
-    mac_blacklist_stru *pst_blacklist = OAL_PTR_NULL;
+    mac_blacklist_stru *pst_blacklist = OAL_PTR_NULL;	/* 2014.9.2 Add UT and found no init value set to it ! add initial value null */
 
     /* 1.1 入参检查 */
     if (OAL_PTR_NULL == pst_mac_vap)
@@ -342,7 +342,7 @@ oal_uint32 hmac_backlist_get_drop(mac_vap_stru *pst_mac_vap, oal_uint8 *puc_mac_
 OAL_STATIC oal_uint32 hmac_backlist_sub_drop(mac_vap_stru *pst_mac_vap, oal_uint8 *puc_mac_addr)
 {
     oal_uint32  ul_ret;
-    mac_blacklist_stru *pst_blacklist = OAL_PTR_NULL;
+    mac_blacklist_stru *pst_blacklist = OAL_PTR_NULL;	/* 2014.9.2 Add UT and found no init value set to it ! add initial value null */
 
     ul_ret = hmac_blacklist_get(pst_mac_vap, puc_mac_addr, &pst_blacklist);
 
@@ -1323,7 +1323,7 @@ oal_uint32 hmac_autoblacklist_enable(mac_vap_stru *pst_mac_vap, oal_uint8 uc_ena
     }
     else    /* 关闭自动黑名单，清零相关数据 */
     {
-        hmac_blacklist_init(pst_mac_vap, CS_BLACKLIST_MODE_NONE);
+        hmac_blacklist_init(pst_mac_vap, CS_BLACKLIST_MODE_NONE);   /* 2013.7.23 add clean */
     }
 
     OAM_INFO_LOG1(pst_mac_vap->uc_vap_id, OAM_SF_ANY,
@@ -1540,6 +1540,7 @@ oal_uint32 hmac_isolation_set_mode(mac_vap_stru *pst_mac_vap, oal_uint8 uc_mode)
     if (0 == uc_mode)
     {
         OAM_WARNING_LOG0(pst_mac_vap->uc_vap_id, OAM_SF_ANY, "{hmac_isolation_set_mode invalid, The valid Para is:(1~7)}\n");
+        /* add mode check chenchongbao 2014.7.7 */
         return OAL_ERR_CODE_SECURITY_MODE_INVALID;
     }
 

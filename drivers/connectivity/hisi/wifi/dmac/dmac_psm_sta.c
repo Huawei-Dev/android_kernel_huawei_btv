@@ -49,7 +49,10 @@ oal_uint32 g_device_wlan_pm_timeout = 50;
 oal_uint32 g_pm_timer_restart_cnt   =  4;
 oal_uint8  g_uc_max_powersave = OAL_FALSE;
 oal_uint8  g_uc_max_powersave_limit = 100;		/*beacon*dtim<=100ms*/
-
+#ifdef _PRE_WLAN_DOWNLOAD_PM
+oal_uint16 g_us_download_rate_limit_pps = 0;
+oal_uint32 g_ul_drop_time;
+#endif
 oal_uint32 dmac_send_null_frame_to_ap(dmac_vap_stru *pst_dmac_vap, oal_uint8  uc_psm, oal_bool_enum_uint8 en_qos);
 oal_uint32 dmac_psm_alarm_callback(void *p_arg);
 oal_uint8  dmac_psm_is_hw_queues_empty(mac_device_stru  *pst_device);
@@ -1021,7 +1024,7 @@ oal_void dmac_psm_process_tim_elm(dmac_vap_stru *pst_dmac_vap, oal_netbuf_stru *
     修改内容   : 新生成函数
 
 *****************************************************************************/
-oal_void  dmac_psm_rx_process_data_sta(dmac_vap_stru *pst_dmac_vap, oal_netbuf_stru *pst_buf)
+oal_uint32  dmac_psm_rx_process_data_sta(dmac_vap_stru *pst_dmac_vap, oal_netbuf_stru *pst_buf)
 {
     oal_uint8                *puc_dest_addr;      /* 目的地址 */
     mac_ieee80211_frame_stru *pst_frame_hdr;
@@ -1030,8 +1033,8 @@ oal_void  dmac_psm_rx_process_data_sta(dmac_vap_stru *pst_dmac_vap, oal_netbuf_s
     pst_mac_sta_pm_handle = (mac_sta_pm_handler_stru *)(pst_dmac_vap->pst_pm_handler);
     if (OAL_PTR_NULL == pst_mac_sta_pm_handle)
     {
-        OAM_WARNING_LOG0(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_PWR, "{dmac_psm_rx_process_data_sta::pst_mac_sta_pm_handle null}");
-        return;
+       // OAM_WARNING_LOG0(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_PWR, "{dmac_psm_rx_process_data_sta::pst_mac_sta_pm_handle null}");
+        return DMAC_RX_FRAME_CTRL_GOON;
     }
 
     pst_frame_hdr = (mac_ieee80211_frame_stru *)OAL_NETBUF_HEADER(pst_buf);
@@ -1048,19 +1051,34 @@ oal_void  dmac_psm_rx_process_data_sta(dmac_vap_stru *pst_dmac_vap, oal_netbuf_s
             //OAM_INFO_LOG2(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_KEEPALIVE, "keepalive rx data:type:[%d],subtype:[%d]", pst_frame_hdr->st_frame_control.bit_type, pst_frame_hdr->st_frame_control.bit_sub_type);
             dmac_psm_sta_incr_activity_cnt(pst_mac_sta_pm_handle);
         }
-        return;
+        return DMAC_RX_FRAME_CTRL_GOON;
     }
 
+#ifdef _PRE_WLAN_DOWNLOAD_PM
     if (STA_PWR_SAVE_STATE_ACTIVE == STA_GET_PM_STATE(pst_mac_sta_pm_handle))
     {
-        if ((WLAN_NULL_FRAME != pst_frame_hdr->st_frame_control.bit_sub_type)
-                && (WLAN_QOS_NULL_FRAME != pst_frame_hdr->st_frame_control.bit_sub_type))
+        if (g_us_download_rate_limit_pps && (WLAN_NULL_FRAME != pst_frame_hdr->st_frame_control.bit_sub_type)
+           && (WLAN_QOS_NULL_FRAME != pst_frame_hdr->st_frame_control.bit_sub_type))
         {
-            pst_mac_sta_pm_handle->ul_psm_pkt_cnt++;
-        }
+            dmac_rx_ctl_stru  *pst_cb_ctrl = (dmac_rx_ctl_stru*)oal_netbuf_cb(pst_buf);
+            pst_mac_sta_pm_handle->ul_rx_cnt++;
 
+            if((pst_mac_sta_pm_handle->ul_rx_cnt >= g_us_download_rate_limit_pps) && (0 == pst_cb_ctrl->st_rx_info.bit_is_key_frame))
+            {
+                if(pst_mac_sta_pm_handle->ul_rx_cnt == g_us_download_rate_limit_pps)
+                {
+                    g_ul_drop_time = (oal_uint32)OAL_TIME_GET_STAMP_MS();
+                    //OAM_WARNING_LOG2(0,OAM_SF_PWR,"wifi download pm version,rx %d pkts drop timestamp[%d]",pst_mac_sta_pm_handle->ul_rx_cnt,g_ul_drop_time);
+                }
+
+                return DMAC_RX_FRAME_CTRL_DROP;
+            }
+        }
     }
     else
+#else
+    if (STA_PWR_SAVE_STATE_ACTIVE != STA_GET_PM_STATE(pst_mac_sta_pm_handle))
+#endif
     {
         /* 如果此时处于doze状态先切到awake状态 */
         if (STA_PWR_SAVE_STATE_DOZE == STA_GET_PM_STATE(pst_mac_sta_pm_handle))
@@ -1112,6 +1130,8 @@ oal_void  dmac_psm_rx_process_data_sta(dmac_vap_stru *pst_dmac_vap, oal_netbuf_s
             dmac_process_rx_process_data_sta_prot(pst_dmac_vap, pst_buf);
         }
     }
+
+    return DMAC_RX_FRAME_CTRL_GOON;
 }
 /*****************************************************************************
  函 数 名  : dmac_psm_tx_process_data_sta
@@ -1136,7 +1156,7 @@ oal_uint8 dmac_psm_tx_process_data_sta(dmac_vap_stru *pst_dmac_vap, mac_tx_ctl_s
     pst_mac_sta_pm_handle = (mac_sta_pm_handler_stru *)(pst_dmac_vap->pst_pm_handler);
     if (OAL_PTR_NULL == pst_mac_sta_pm_handle)
     {
-        OAM_WARNING_LOG0(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_PWR, "{dmac_psm_tx_process_data_sta::pst_mac_sta_pm_handle null}");
+       // OAM_WARNING_LOG0(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_PWR, "{dmac_psm_tx_process_data_sta::pst_mac_sta_pm_handle null}");
         return OAL_ERR_CODE_PTR_NULL;
     }
 
@@ -1709,6 +1729,20 @@ oal_void dmac_psm_process_tbtt_sta(dmac_vap_stru *pst_dmac_vap, mac_device_stru 
             dmac_pm_sta_post_event(pst_dmac_vap, STA_PWR_EVENT_TBTT, 0, OAL_PTR_NULL);
         }
     }
+
+#ifdef _PRE_WLAN_DOWNLOAD_PM
+    if(g_us_download_rate_limit_pps)
+    {
+        if ((OAL_TIME_GET_STAMP_MS() - g_ul_drop_time) >= g_uc_max_powersave_limit)
+        {
+            pst_sta_pm_handle->ul_rx_cnt = 0;
+        }
+        else
+        {
+            dmac_pm_sta_post_event(pst_dmac_vap, STA_PWR_EVENT_NOT_EXCEED_MAX_SLP_TIME, 0, OAL_PTR_NULL);
+        }
+    }
+#endif
 }
 
 /*****************************************************************************
@@ -2117,7 +2151,11 @@ oal_uint32 dmac_psm_alarm_callback(void *p_arg)
         dmac_psm_start_activity_timer(pst_dmac_vap,pst_sta_pm_handle);
         pst_sta_pm_handle->aul_pmDebugCount[PM_MSG_PSM_TIMEOUT_QUEUE_NO_EMPTY]++;
     }
+#ifdef _PRE_WLAN_DOWNLOAD_PM
+    else if(!g_us_download_rate_limit_pps && pst_sta_pm_handle->ul_psm_pkt_cnt)
+#else
     else if(pst_sta_pm_handle->ul_psm_pkt_cnt)
+#endif
     {
         dmac_psm_start_activity_timer(pst_dmac_vap,pst_sta_pm_handle);
         pst_sta_pm_handle->aul_pmDebugCount[PM_MSG_PSM_TIMEOUT_PKT_CNT]++;

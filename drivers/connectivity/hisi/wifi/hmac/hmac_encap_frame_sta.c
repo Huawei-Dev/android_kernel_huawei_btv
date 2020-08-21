@@ -51,6 +51,37 @@ extern "C" {
   3 函数实现
 *****************************************************************************/
 /*****************************************************************************
+ 函 数 名  : hmac_sta_check_need_set_ext_cap_ie
+ 功能描述  : 判断是否需要在assoc req 中包含Extended Capability IE
+ 输入参数  : pst_mac_vap: 指向vap
+ 输出参数  : 无
+ 返 回 值  : OAL_TRUE    需要包含Extended Capability IE
+             OAL_FALSE 不需要包含Extended Capability IE
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年8月18日
+    作    者   : duankaiyong 00194999
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+OAL_STATIC oal_bool_enum hmac_sta_check_need_set_ext_cap_ie(mac_vap_stru *pst_mac_vap)
+{
+    oal_uint8       *puc_ext_cap_ie;
+    oal_uint16       us_ext_cap_index;
+
+    puc_ext_cap_ie = hmac_sta_find_ie_in_probe_rsp(pst_mac_vap, MAC_EID_EXT_CAPS, &us_ext_cap_index);
+    if (OAL_PTR_NULL == puc_ext_cap_ie)
+    {
+        return OAL_FALSE;
+    }
+
+    return OAL_TRUE;
+}
+
+
+/*****************************************************************************
  函 数 名  : mac_set_supported_rates_ie
  功能描述  : 设置速率集
  输入参数  : pst_hmac_sta: 指向vap
@@ -365,8 +396,12 @@ oal_uint32 hmac_mgmt_encap_asoc_req_sta(hmac_vap_stru *pst_hmac_sta, oal_uint8 *
 #endif //_PRE_WLAN_FEATURE_11K
 
     /* 设置 Extended Capability IE */
-    mac_set_ext_capabilities_ie((oal_void *)pst_mac_vap, puc_req_frame, &uc_ie_len);
-    puc_req_frame += uc_ie_len;
+    /* DTS2017081707172: 如果AP 不包含Extended Capability IE，则在assoc req 中不包含该IE */
+    if (hmac_sta_check_need_set_ext_cap_ie(pst_mac_vap) == OAL_TRUE)
+    {
+        mac_set_ext_capabilities_ie((oal_void *)pst_mac_vap, puc_req_frame, &uc_ie_len);
+        puc_req_frame += uc_ie_len;
+    }
 
     /* 设置 VHT Capability IE */
     mac_set_vht_capabilities_ie((oal_void *) pst_mac_vap, puc_req_frame, &uc_ie_len);

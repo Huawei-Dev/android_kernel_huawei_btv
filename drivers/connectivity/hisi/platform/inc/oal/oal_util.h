@@ -257,6 +257,7 @@ struct _hwifi_panic_log_
 
 *****************************************************************************/
 extern oal_void hwifi_panic_log_register(hwifi_panic_log* log, void* data);
+extern oal_void hwifi_panic_log_unregister(hwifi_panic_log* log);
 extern oal_void hwifi_panic_log_dump(char* print_level);
 #else
 OAL_STATIC OAL_INLINE oal_void hwifi_panic_log_dump(char* print_level)

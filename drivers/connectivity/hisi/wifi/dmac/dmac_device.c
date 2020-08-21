@@ -58,6 +58,66 @@ extern "C" {
 #undef  THIS_FILE_ID
 #define THIS_FILE_ID OAM_FILE_ID_DMAC_DEVICE_C
 
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+
+/*****************************************************************************
+ 函 数 名  : dmac_port_filter_exit
+ 功能描述  :  device侧功能去初始化操作
+ 输入参数  : 无
+ 输出参数  : 无
+ 返 回 值  : oal._void
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年4月17日
+    作    者   : z00273164
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+OAL_STATIC oal_void dmac_ip_filter_exit(oal_void)
+{
+    g_st_dmac_board.st_rx_ip_filter.en_state = MAC_RX_IP_FILTER_STOPED;
+    g_st_dmac_board.st_rx_ip_filter.uc_btable_size      = 0;
+    g_st_dmac_board.st_rx_ip_filter.uc_btable_items_num = 0;
+
+    OAL_MEMZERO(g_auc_ip_filter_btable, OAL_SIZEOF(g_auc_ip_filter_btable));
+    g_st_dmac_board.st_rx_ip_filter.pst_filter_btable = OAL_PTR_NULL;
+
+
+    return;
+}
+/*****************************************************************************
+ 函 数 名  : dmac_port_filter_init
+ 功能描述  : device侧功能初始化操作
+ 输入参数  : pst_dmac_device
+ 输出参数  : 无
+ 返 回 值  : oal_void
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年4月17日
+    作    者   : z00273164
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+OAL_STATIC oal_void dmac_ip_filter_init(oal_void)
+{
+
+    /* 初始化功能控制变量 */
+    g_st_dmac_board.st_rx_ip_filter.en_state = MAC_RX_IP_FILTER_STOPED;
+    g_st_dmac_board.st_rx_ip_filter.uc_btable_size      = OAL_SIZEOF(g_auc_ip_filter_btable) / OAL_SIZEOF(mac_ip_filter_item_stru);
+    g_st_dmac_board.st_rx_ip_filter.uc_btable_items_num = 0;
+    g_st_dmac_board.st_rx_ip_filter.pst_filter_btable   = OAL_PTR_NULL;
+
+    OAL_MEMZERO(g_auc_ip_filter_btable, OAL_SIZEOF(g_auc_ip_filter_btable));
+    g_st_dmac_board.st_rx_ip_filter.pst_filter_btable = (mac_ip_filter_item_stru *)g_auc_ip_filter_btable;
+
+
+    return;
+}
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 
 /*****************************************************************************
  函 数 名  : dmac_free_hd_tx_dscr_queue
@@ -320,6 +380,10 @@ oal_uint32  dmac_board_exit(mac_board_stru *pst_board)
 
     /*公共部分的初始化*/
     mac_board_exit(pst_board);
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+    /* rx ip数据包过滤功能的去初始化 */
+    dmac_ip_filter_exit();
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 
     return OAL_SUCC;
 }
@@ -881,6 +945,11 @@ oal_uint32  dmac_board_init(mac_board_stru *pst_board)
 
     /*公共部分初始化*/
     mac_board_init(pst_board);
+
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+    /* rx ip数据包过滤功能的初始化 */
+    dmac_ip_filter_init();
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 
     /* chip支持的最大数由PCIe总线处理提供; */
     for (uc_chip = 0; uc_chip < oal_bus_get_chip_num(); uc_chip++)

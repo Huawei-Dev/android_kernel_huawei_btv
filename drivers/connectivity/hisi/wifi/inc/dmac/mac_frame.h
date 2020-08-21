@@ -1133,6 +1133,27 @@ typedef struct
     oal_uint16   us_check_sum;
 }udp_hdr_stru;
 
+/* CCMP/TKIP 加密头部 */
+/* CCMP 加密IV 字段结构
+ * PN0 PN1 RSVD [KEY_ID] PN2 PN3 PN4 PN5
+ *              |      |
+ *          b0  b4  b5  b6~b7
+ *          00000    1  key_id
+*/
+/* TKIP 加密IV 字段结构
+ * TSC1 WEPSeed[1] TSC0 [KEY_ID] TSC2 TSC3 TSC4 TSC5
+ *                      |      |
+ *                  b0  b4  b5  b6~b7
+ *                  00000    1  key_id
+ * WEPSeed[1] = (TSC1 | 0x20) & 0x7f
+*/
+
+typedef union {
+    oal_uint64 ull_pn64;
+    oal_uint32 ul_pn32[2];
+    oal_uint8  uc_pn8[8];
+} mac_pn_union;
+
 /* frame control字段结构体 */
 struct mac_header_frame_control
 {

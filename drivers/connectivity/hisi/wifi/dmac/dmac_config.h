@@ -148,9 +148,13 @@ extern  oal_uint32  dmac_config_set_p2p_ps_ops(mac_vap_stru *pst_mac_vap, oal_ui
 
 
 #ifdef _PRE_WLAN_FEATURE_ARP_OFFLOAD
+#ifdef _PRE_DEBUG_MODE
 extern  oal_uint32  dmac_config_enable_arp_offload(mac_vap_stru *pst_mac_vap, oal_uint8 uc_len, oal_uint8 *puc_param);
+#endif //#ifdef _PRE_DEBUG_MODE
 extern  oal_uint32  dmac_config_set_ip_addr(mac_vap_stru *pst_mac_vap, oal_uint8 uc_len, oal_uint8 *puc_param);
+#ifdef _PRE_DEBUG_MODE
 extern  oal_uint32  dmac_config_show_arpoffload_info(mac_vap_stru *pst_mac_vap, oal_uint8 uc_len, oal_uint8 *puc_param);
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 #ifdef _PRE_WLAN_RF_110X_CALI_DPD
@@ -163,6 +167,10 @@ extern oal_uint32 dmac_cali_to_hmac(frw_event_mem_stru *pst_event_mem);
 extern oal_void  dmac_config_get_tx_rate_info(hal_tx_txop_alg_stru    *pst_tx_alg,
                                        mac_data_rate_stru      *pst_mac_rates_11g,
                                        mac_rate_info_stru      *pst_rate_info);
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+extern oal_void dmac_clear_ip_filter_btable(mac_vap_stru *pst_mac_vap);
+extern oal_uint32 dmac_config_update_ip_filter(frw_event_mem_stru *pst_event_mem);
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 #ifdef _PRE_WLAN_FEATURE_PKT_MEM_OPT
 extern oal_uint32 dmac_pkt_mem_opt_stat_event_process(frw_event_mem_stru *pst_event_mem);
 #endif /* */

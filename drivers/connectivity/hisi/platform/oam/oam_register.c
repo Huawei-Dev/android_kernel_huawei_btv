@@ -2385,6 +2385,13 @@ oal_void oam_reg_init(oal_void)
     /* 初始化工作队列 */
     OAL_MEMZERO((void *)&g_st_oam_reg_mng.st_wq, OAL_SIZEOF(oam_reg_workqueue_stru));
     g_st_oam_reg_mng.st_wq.pst_wq = OAL_CREATE_SINGLETHREAD_WORKQUEUE("oam_reg_tx_queue");
+    if(OAL_PTR_NULL == g_st_oam_reg_mng.st_wq.pst_wq)
+    {
+        OAL_MEM_FREE(g_st_oam_reg_mng.puc_send_buff, OAL_TRUE);
+        g_st_oam_reg_mng.puc_send_buff = OAL_PTR_NULL;
+        OAL_IO_PRINT("oam_reg_init: create workqueue oam_reg_tx_queue failed!\n");
+        return;
+    }
     OAL_INIT_WORK(&g_st_oam_reg_mng.st_wq.st_wk, oam_reg_wq);
     oal_netbuf_list_head_init(&g_st_oam_reg_mng.st_wq.st_netbuf_head);
 
@@ -2429,6 +2436,11 @@ oal_void oam_reg_exit(oal_void)
 
     /* 删除工作队列 */
     oal_destroy_workqueue(g_st_oam_reg_mng.st_wq.pst_wq);
+    if(OAL_PTR_NULL != g_st_oam_reg_mng.st_wq.pst_wq)
+    {
+        oal_destroy_workqueue(g_st_oam_reg_mng.st_wq.pst_wq);
+    }
+    
     oal_netbuf_queue_purge(&g_st_oam_reg_mng.st_wq.st_netbuf_head);
 
 

@@ -432,6 +432,67 @@ OAL_STATIC oal_uint32  hmac_rx_transmit_to_wlan(
 }
 
 /*****************************************************************************
+ 函 数 名  : hmac_rx_free_amsdu_netbuf
+ 功能描述  : 释放amsdu netbuf
+ 输入参数  :
+ 输出参数  : 无
+ 返 回 值  : 无
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年07月25日
+    作    者   : hanyunfeng
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+OAL_STATIC oal_void  hmac_rx_free_amsdu_netbuf(oal_netbuf_stru *pst_netbuf)
+{
+    oal_netbuf_stru        *pst_netbuf_next;
+    while (OAL_PTR_NULL != pst_netbuf)
+    {
+        pst_netbuf_next = oal_get_netbuf_next(pst_netbuf);
+        oal_netbuf_free(pst_netbuf);
+        pst_netbuf = pst_netbuf_next;
+    }
+}
+
+/*****************************************************************************
+ 函 数 名  : hmac_rx_clear_amsdu_last_netbuf_pointer
+ 功能描述  : 设置amsdu 最后一个 netbuf next指针为null
+ 输入参数  :
+ 输出参数  : 无
+ 返 回 值  : 无
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年07月25日
+    作    者   : hanyunfeng
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+OAL_STATIC oal_void  hmac_rx_clear_amsdu_last_netbuf_pointer(oal_netbuf_stru *pst_netbuf, oal_uint8 uc_num_buf)
+{
+    if (0 == uc_num_buf)
+    {
+        pst_netbuf->next = OAL_PTR_NULL;
+        return;
+    }
+
+    while (pst_netbuf != OAL_PTR_NULL)
+    {
+        uc_num_buf--;
+        if (0 == uc_num_buf)
+        {
+            pst_netbuf->next = OAL_PTR_NULL;
+            break;
+        }
+        pst_netbuf = oal_get_netbuf_next(pst_netbuf);
+    }
+}
+
+/*****************************************************************************
  函 数 名  : hmac_parse_amsdu
  功能描述  : 解析出每一个AMSDU中的MSDU
  输入参数  : 指向MPDU的第一个netbuf的指针
@@ -500,6 +561,7 @@ oal_uint32  hmac_rx_parse_amsdu(
     {
         OAM_ERROR_LOG0(0, OAM_SF_RX, "{hmac_rx_parse_amsdu::pst_netbuf null.}");
         OAM_STAT_VAP_INCR(0, rx_no_buff_dropped, 1);
+        hmac_rx_free_amsdu_netbuf(pst_msdu_state->pst_curr_netbuf);
         return OAL_FAIL;
     }
 
@@ -549,8 +611,7 @@ oal_uint32  hmac_rx_parse_amsdu(
            *pen_proc_state = MAC_PROC_ERROR;
 
            OAM_WARNING_LOG0(0, OAM_SF_RX, "{hmac_rx_parse_amsdu::pen_proc_state is err for uc_procd_netbuf_nums > uc_netbuf_nums_in_mpdul.}");
-           oal_netbuf_free(pst_netbuf_prev);
-
+           hmac_rx_free_amsdu_netbuf(pst_msdu_state->pst_curr_netbuf);
            return OAL_FAIL;
         }
         oal_netbuf_free(pst_netbuf_prev);
@@ -559,7 +620,7 @@ oal_uint32  hmac_rx_parse_amsdu(
     {
         *pen_proc_state = MAC_PROC_ERROR;
         OAM_WARNING_LOG0(0, OAM_SF_RX, "{hmac_rx_parse_amsdu::pen_proc_state is err for uc_procd_netbuf_nums > uc_netbuf_nums_in_mpdul.}");
-        oal_netbuf_free(pst_msdu_state->pst_curr_netbuf);
+        hmac_rx_free_amsdu_netbuf(pst_msdu_state->pst_curr_netbuf);
         return OAL_FAIL;
     }
 
@@ -688,6 +749,9 @@ OAL_STATIC oal_uint32  hmac_rx_prepare_msdu_list_to_wlan(
     {
         st_msdu_state.uc_procd_netbuf_nums    = 0;
         st_msdu_state.uc_procd_msdu_in_netbuf = 0;
+
+        /* amsdu 最后一个netbuf next指针设为 NULL 出错时方便释放amsdu netbuf */
+        hmac_rx_clear_amsdu_last_netbuf_pointer(pst_netbuf, pst_rx_ctrl->st_rx_info.bit_buff_nums);
 
         do
         {
@@ -1291,6 +1355,9 @@ oal_void  hmac_rx_lan_frame_classify(
             return;
         }
 
+        /* 重新获取该MPDU的控制信息 */
+        pst_rx_ctrl = (hmac_rx_ctl_stru *)oal_netbuf_cb(pst_netbuf);
+
         /* 打印出关键帧(dhcp)信息 */
         uc_datatype = mac_get_data_type_from_80211(pst_netbuf, pst_rx_ctrl->st_rx_info.uc_mac_header_len);
         if ((uc_datatype <= MAC_DATA_VIP) && (uc_datatype != MAC_DATA_ARP_REQ))
@@ -1326,6 +1393,9 @@ oal_void  hmac_rx_lan_frame_classify(
     {
         st_msdu_state.uc_procd_netbuf_nums    = 0;
         st_msdu_state.uc_procd_msdu_in_netbuf = 0;
+
+        /* amsdu 最后一个netbuf next指针设为 NULL 出错时方便释放amsdu netbuf */
+        hmac_rx_clear_amsdu_last_netbuf_pointer(pst_netbuf, pst_rx_ctrl->st_rx_info.bit_buff_nums);
 
         do
         {

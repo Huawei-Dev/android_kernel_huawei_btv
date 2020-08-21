@@ -3533,6 +3533,13 @@ oal_uint32 mac_vap_exit(mac_vap_stru *pst_vap)
         return OAL_ERR_CODE_PTR_NULL;
     }
 
+    /* 防止重入导致后续的uc_vap_num或者uc_sta_num等计数值重复执行减操作 */
+    if (MAC_VAP_STATE_BUTT == pst_vap->en_vap_state)
+    {
+        OAM_WARNING_LOG0(pst_vap->uc_vap_id, OAM_SF_ANY, "{mac_vap_exit::vap_state is already MAC_VAP_STATE_BUTT, and then return!! }");
+        return OAL_SUCC;
+    }
+
     pst_vap->uc_init_flag = MAC_VAP_INVAILD;
 
     /* 释放与hmac有关的内存 */
@@ -3570,15 +3577,38 @@ oal_uint32 mac_vap_exit(mac_vap_stru *pst_vap)
         }
     }
 
-    /* device下的vap总数减1 */
-    pst_device->uc_vap_num--;
+    /* begin: DTS2017100700403:删除vap 时，如果vap_num 非0 才--， 否则输出error 日志 */
+    if (pst_device->uc_vap_num != 0)
+    {
+        /* device下的vap总数减1 */
+        pst_device->uc_vap_num--;
+    }
+    else
+    {
+        OAM_ERROR_LOG1(pst_vap->uc_vap_id, OAM_SF_CFG,
+                            "{mac_vap_exit::mac_device's vap_num is zero. sta_num = %d}",
+                            pst_device->uc_sta_num);
+    }
+    /* end: DTS2017100700403:删除vap 时，如果vap_num 非0 才--， 否则输出error 日志 */
+
     /* 清除数组中已删除的vap id，保证非零数组元素均为未删除vap */
     pst_device->auc_vap_id[pst_device->uc_vap_num] = 0;
 
     /* device下sta个数减1 */
     if (WLAN_VAP_MODE_BSS_STA == pst_vap->en_vap_mode)
     {
-        pst_device->uc_sta_num--;
+        /* begin: DTS2017100700403:删除vap 时，如果sta_num 非0 才--， 否则输出error 日志 */
+        if (pst_device->uc_sta_num != 0)
+        {
+            pst_device->uc_sta_num--;
+        }
+        else
+        {
+            OAM_ERROR_LOG1(pst_vap->uc_vap_id, OAM_SF_CFG,
+                            "{mac_vap_exit::mac_device's sta_num is zero. vap_num = %d}",
+                            pst_device->uc_vap_num);
+        }
+        /* end: DTS2017100700403:删除vap 时，如果sta_num 非0 才--， 否则输出error 日志 */
     }
 #ifdef _PRE_WLAN_FEATURE_P2P
     mac_dec_p2p_num(pst_vap);
@@ -4078,6 +4108,17 @@ oal_uint32 mac_vap_init(
     pst_vap->st_cap_flag.bit_disable_2ght40 = OAL_FALSE;
 #endif
 
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+    if (IS_STA(pst_vap) && (WLAN_LEGACY_VAP_MODE == pst_param->en_p2p_mode))
+    {
+        /* 仅LEGACY_STA支持 */
+        pst_vap->st_cap_flag.bit_ip_filter = OAL_TRUE;
+    }
+    else
+#endif /* _PRE_WLAN_FEATURE_IP_FILTER */
+    {
+        pst_vap->st_cap_flag.bit_ip_filter = OAL_FALSE;
+    }
 
     switch(pst_vap->en_vap_mode)
     {

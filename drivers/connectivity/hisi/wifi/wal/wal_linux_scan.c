@@ -817,7 +817,7 @@ oal_int32 wal_force_scan_complete(oal_net_device_stru   *pst_net_dev,
     mac_vap_stru            *pst_mac_vap;
     hmac_vap_stru           *pst_hmac_vap;
     hmac_device_stru        *pst_hmac_device;
-    hmac_scan_stru           *pst_scan_mgmt;
+    hmac_scan_stru          *pst_scan_mgmt;
 
     pst_mac_vap  = OAL_NET_DEV_PRIV(pst_net_dev);
     if (OAL_PTR_NULL == pst_mac_vap)
@@ -834,16 +834,6 @@ oal_int32 wal_force_scan_complete(oal_net_device_stru   *pst_net_dev,
                          "{wal_force_scan_complete::pst_hmac_device[%d] is null!}",
                          pst_mac_vap->uc_device_id);
         return -OAL_EINVAL;
-    }
-
-    /* stop的vap和正在扫描的vap不相同则直接返回 */
-    if (pst_mac_vap->uc_vap_id != pst_hmac_device->st_scan_mgmt.st_scan_record_mgmt.uc_vap_id)
-    {
-        OAM_WARNING_LOG2(pst_mac_vap->uc_vap_id, OAM_SF_SCAN,
-                         "{wal_force_scan_complete::stop_vap[%d] is different scan_vap[%d]!}",
-                         pst_mac_vap->uc_vap_id,
-                         pst_hmac_device->st_scan_mgmt.st_scan_record_mgmt.uc_vap_id);
-        return OAL_SUCC;
     }
 
     pst_scan_mgmt = &(pst_hmac_device->st_scan_mgmt);
@@ -873,18 +863,20 @@ oal_int32 wal_force_scan_complete(oal_net_device_stru   *pst_net_dev,
         return -OAL_EINVAL;
     }
 
-    /* 删除等待扫描超时定时器 */
-    if (OAL_TRUE == pst_hmac_vap->st_scan_timeout.en_is_registerd)
-    {
-        FRW_TIMER_IMMEDIATE_DESTROY_TIMER(&(pst_hmac_vap->st_scan_timeout));
-    }
-
     /* 对于内核下发的扫描request资源加锁 */
     oal_spin_lock(&(pst_scan_mgmt->st_scan_request_spinlock));
 
     /* 如果是上层下发的扫描请求，则通知内核扫描结束，内部扫描不需通知 */
-    if (OAL_PTR_NULL != pst_scan_mgmt->pst_request)
+    /* DTS2017021709078: 停止本vap 发起的扫描 */
+    if ((OAL_PTR_NULL != pst_scan_mgmt->pst_request)
+        && (pst_net_dev->ieee80211_ptr == pst_scan_mgmt->pst_request->wdev))
     {
+        /* 删除等待扫描超时定时器 */
+        if (OAL_TRUE == pst_hmac_vap->st_scan_timeout.en_is_registerd)
+        {
+            FRW_TIMER_IMMEDIATE_DESTROY_TIMER(&(pst_hmac_vap->st_scan_timeout));
+        }
+
         /* 上报内核扫描结果 */
         wal_inform_all_bss(pst_hmac_device->pst_device_base_info->pst_wiphy,
                            &(pst_hmac_device->st_scan_mgmt.st_scan_record_mgmt.st_bss_mgmt),

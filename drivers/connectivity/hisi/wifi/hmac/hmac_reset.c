@@ -177,15 +177,20 @@ oal_uint32  hmac_proc_query_response_event(mac_vap_stru *pst_mac_vap, oal_uint8 
          *    RATE_INFO_FLAGS_160_MHZ_WIDTH   = BIT(5),
          *    RATE_INFO_FLAGS_SHORT_GI        = BIT(6),
          *    RATE_INFO_FLAGS_60G             = BIT(7),
-         * 
+         *
          *linux >= 4.0.0
-         *    RATE_INFO_FLAGS_MCS               = BIT(0),
-         *    RATE_INFO_FLAGS_VHT_MCS       = BIT(1),
-         *    RATE_INFO_FLAGS_SHORT_GI      = BIT(6),
-         *    RATE_INFO_FLAGS_60G                = BIT(7),
-         *    RATE_INFO_BW_40                       ÄÚºËrate_info_bw
-         *    RATE_INFO_BW_80                      ÄÚºËrate_info_bw
-         *    RATE_INFO_BW_160                     ÄÚºËrate_info_bw
+         * rate_info_flags
+         *    RATE_INFO_FLAGS_MCS             = BIT(0),
+         *    RATE_INFO_FLAGS_VHT_MCS         = BIT(1),
+         *    RATE_INFO_FLAGS_SHORT_GI        = BIT(2),
+         *    RATE_INFO_FLAGS_60G             = BIT(3),
+         * rate_info_bw
+         *    RATE_INFO_BW_5
+         *    RATE_INFO_BW_10
+         *    RATE_INFO_BW_20
+         *    RATE_INFO_BW_40
+         *    RATE_INFO_BW_80
+         *    RATE_INFO_BW_160
          */
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 8, 0))
          {
@@ -202,20 +207,18 @@ oal_uint32  hmac_proc_query_response_event(mac_vap_stru *pst_mac_vap, oal_uint8 
              uc_flag  = pst_query_station_reponse_event->st_txrate.flags;
         }
 #else
-        {  
+        {
             uc_flag |= ((pst_query_station_reponse_event->st_txrate.flags & MAC_RATE_INFO_FLAGS_MCS) ? RATE_INFO_FLAGS_MCS : 0);
             uc_flag |= ((pst_query_station_reponse_event->st_txrate.flags & MAC_RATE_INFO_FLAGS_VHT_MCS) ? RATE_INFO_FLAGS_VHT_MCS : 0);
             uc_flag |= ((pst_query_station_reponse_event->st_txrate.flags & MAC_RATE_INFO_FLAGS_SHORT_GI) ? RATE_INFO_FLAGS_SHORT_GI : 0);
             uc_flag |= ((pst_query_station_reponse_event->st_txrate.flags & MAC_RATE_INFO_FLAGS_60G) ? RATE_INFO_FLAGS_60G : 0);
-            pst_hmac_vap->station_info.txrate.bw  = 
-                       ((pst_query_station_reponse_event->st_txrate.flags & MAC_RATE_INFO_FLAGS_40_MHZ_WIDTH) ?  RATE_INFO_BW_40: 0);
-            pst_hmac_vap->station_info.txrate.bw |= 
-                       ((pst_query_station_reponse_event->st_txrate.flags & MAC_RATE_INFO_FLAGS_80_MHZ_WIDTH) ?  RATE_INFO_BW_80: 0);
-            pst_hmac_vap->station_info.txrate.bw |= 
-                       ((pst_query_station_reponse_event->st_txrate.flags & MAC_RATE_INFO_FLAGS_160_MHZ_WIDTH) ?  RATE_INFO_BW_160: 0);
-            
+            pst_hmac_vap->station_info.txrate.bw =
+                       pst_query_station_reponse_event->st_txrate.flags & MAC_RATE_INFO_FLAGS_40_MHZ_WIDTH ? RATE_INFO_BW_40:
+                       (pst_query_station_reponse_event->st_txrate.flags & MAC_RATE_INFO_FLAGS_80_MHZ_WIDTH ? RATE_INFO_BW_80:
+                       (pst_query_station_reponse_event->st_txrate.flags & MAC_RATE_INFO_FLAGS_160_MHZ_WIDTH ?  RATE_INFO_BW_160:
+                        RATE_INFO_BW_20));
         }
-#endif        
+#endif
         pst_hmac_vap->station_info.txrate.flags = uc_flag;
 
         pst_hmac_vap->center_freq  = oal_ieee80211_channel_to_frequency(pst_mac_vap->st_channel.uc_chan_number,(enum ieee80211_band)pst_mac_vap->st_channel.en_band);

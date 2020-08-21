@@ -696,6 +696,7 @@ oal_void hmac_wifi_auto_freq_ctrl_deinit(void)
     hmac_wifi_auto_ddr_exit();
 #endif
 
+    g_freq_lock_control.en_is_inited = OAL_FALSE;
     mutex_unlock(&g_freq_lock_control.st_lock_freq_mtx);
     mutex_destroy(&g_freq_lock_control.st_lock_freq_mtx);
 #endif

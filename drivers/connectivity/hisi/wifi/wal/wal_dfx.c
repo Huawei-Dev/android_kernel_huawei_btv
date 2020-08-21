@@ -346,7 +346,7 @@ OAL_STATIC oal_int32  wal_dfr_destroy_vap(oal_net_device_stru *pst_netdev)
 
     if (OAL_UNLIKELY(OAL_SUCC != l_ret))
     {
-        OAL_IO_PRINT("DFR DESTROY_VAP[name:%s] fail, return[%d]!", pst_netdev->name, l_ret);
+        OAL_IO_PRINT("DFR DESTROY_VAP[name:%.16s] fail, return[%d]!", pst_netdev->name, l_ret);
         OAM_WARNING_LOG2(0, OAM_SF_DFR, "{wal_dfr_excp_process::DESTROY_VAP return err code [%d], iftype[%d]!}\r\n",
                         l_ret,
                         pst_netdev->ieee80211_ptr->iftype);
@@ -438,6 +438,8 @@ OAL_STATIC oal_uint32  wal_dfr_recovery_env(void)
             }
 
             ul_ret = wal_setup_ap(pst_netdev);
+            /*DTS2017042000492:修改NL80211_IFTYPE_STATION和NL80211_IFTYPE_P2P_DEVICE模式下，触发dfr的同时关闭wifi出现vap清除了，OAL_NETDEVICE_FLAGS(pst_netdev)还是up的问题*/
+            oal_net_device_open(pst_netdev);
             en_err_type = DFR_ERR_TYPE_AP;
 
 
@@ -461,15 +463,13 @@ OAL_STATIC oal_uint32  wal_dfr_recovery_env(void)
 
         if (OAL_UNLIKELY(OAL_SUCC != l_ret) || OAL_UNLIKELY(OAL_SUCC != ul_ret))
         {
-            OAL_IO_PRINT("DFR BOOT_VAP[name:%s] fail! error_code[%d]", pst_netdev->name, ((oal_uint8)l_ret | ul_ret));
+            OAL_IO_PRINT("DFR BOOT_VAP[name:%.16s] fail! error_code[%d]", pst_netdev->name, ((oal_uint8)l_ret | ul_ret));
             OAM_WARNING_LOG2(0, OAM_SF_ANY, "{wal_dfr_excep_process:: Boot vap Failure, vap_iftype[%d], error_code[%d]!}\r\n",
                             pst_netdev->ieee80211_ptr->iftype,
                             ((oal_uint8)l_ret | ul_ret));
             continue;
         }
 
-        //需要恢复扫描么???
-        oal_net_device_open(pst_netdev);
 
         /* 上报异常 */
         oal_cfg80211_rx_exception(pst_netdev,
@@ -806,7 +806,7 @@ oal_void wal_dfr_init_param(oal_void)
 }
 
 /*****************************************************************************
- 函 数 名  : wal_init_dev_excp_handler
+ 函 数 名  : wal_dfr_excp_init_handler
  功能描述  : 初始化device异常的各种设置
  输入参数  : 无
  输出参数  : 无
@@ -841,17 +841,27 @@ OAL_STATIC oal_uint32 wal_dfr_excp_init_handler(oal_void)
         OAL_INIT_WORK(&g_pst_exception_info->wifi_excp_worker, wal_dfr_excp_work);
         OAL_INIT_WORK(&g_pst_exception_info->wifi_excp_recovery_worker, wal_dfr_recovery_work);
         g_pst_exception_info->wifi_exception_workqueue= OAL_CREATE_SINGLETHREAD_WORKQUEUE("wifi_exception_queue");
+        if (OAL_PTR_NULL == g_pst_exception_info->wifi_exception_workqueue)
+        {
+            OAM_WARNING_LOG0(0, OAM_SF_DFR, "DFR wal_dfr_excp_init_handler: create work queue \"wifi_exception_queue\" fail.\n");
+            return OAL_ERR_CODE_PTR_NULL;
+        }
+        else
+        {
+            OAM_WARNING_LOG1(0, OAM_SF_DFR, "DFR wal_dfr_excp_init_handler: create work queue \"wifi_exception_queue\" succ. %p\n",
+                            g_pst_exception_info->wifi_exception_workqueue);
+        }
     }
 
     pst_wifi_callback = (struct st_wifi_dfr_callback *)OAL_MEM_ALLOC(OAL_MEM_POOL_ID_LOCAL, OAL_SIZEOF(struct st_wifi_dfr_callback), OAL_TRUE);
     if (OAL_PTR_NULL == pst_wifi_callback)
     {
-        OAM_ERROR_LOG1(0 , OAM_SF_DFR, "wal_init_dev_excp_handler:can not alloc mem,size[%d]!", OAL_SIZEOF(struct st_wifi_dfr_callback));
+        OAM_ERROR_LOG1(0 , OAM_SF_DFR, "DFR wal_init_dev_excp_handler:can not alloc mem,size[%d]!", OAL_SIZEOF(struct st_wifi_dfr_callback));
         g_st_wifi_callback = OAL_PTR_NULL;
         return OAL_ERR_CODE_PTR_NULL;
     }
     g_st_wifi_callback = pst_wifi_callback;
-    pst_wifi_callback->wifi_recovery_complete = wal_dfr_signal_complete;
+    pst_wifi_callback->wifi_recovery_complete  = wal_dfr_signal_complete;
     pst_wifi_callback->notify_wifi_to_recovery = wal_dfr_bfgx_excp;
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)&&(_PRE_OS_VERSION_LINUX == _PRE_OS_VERSION)
     plat_wifi_exception_rst_register(pst_wifi_callback);
@@ -892,9 +902,14 @@ OAL_STATIC oal_void wal_dfr_excp_exit_handler(oal_void)
     {
         oal_cancel_work_sync(&g_pst_exception_info->wifi_excp_worker);
         oal_cancel_work_sync(&g_pst_exception_info->wifi_excp_recovery_worker);
-        oal_destroy_workqueue(g_pst_exception_info->wifi_exception_workqueue);
+        if (g_pst_exception_info->wifi_exception_workqueue)
+        {
+            oal_destroy_workqueue(g_pst_exception_info->wifi_exception_workqueue);
+            g_pst_exception_info->wifi_exception_workqueue = OAL_PTR_NULL;
+        }
     }
     OAL_MEM_FREE(g_st_wifi_callback, OAL_TRUE);
+    g_st_wifi_callback = OAL_PTR_NULL;
 
     OAM_WARNING_LOG0(0, OAM_SF_DFR, "wal_dfr_excp_exit_handler::DFR dev_excp_handler remove ok.");
 

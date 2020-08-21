@@ -585,7 +585,7 @@ oal_uint32  hmac_user_del(mac_vap_stru *pst_mac_vap, hmac_user_stru *pst_hmac_us
     mac_ap_type_enum_uint8          en_ap_type = MAC_AP_TYPE_BUTT;
 
 #ifdef _PRE_PLAT_FEATURE_CUSTOMIZE
-    oal_int8                        pc_param[16]    = {0};
+    oal_int8                        pc_param[18]    = {0};
     oal_int8                        pc_tmp[8]       = {0};
     oal_uint16                      us_len;
 #endif
@@ -780,7 +780,7 @@ oal_uint32  hmac_user_del(mac_vap_stru *pst_mac_vap, hmac_user_stru *pst_hmac_us
     if (pst_mac_vap->us_user_nums == 5)
     {
         /* AP用户达到5时，调整流控参数为配置文件原有值 */
-        oal_itoa(hwifi_get_init_value(CUS_TAG_INI, WLAN_CFG_INIT_USED_MEM_FOR_START), pc_param, 16);
+        oal_itoa(hwifi_get_init_value(CUS_TAG_INI, WLAN_CFG_INIT_USED_MEM_FOR_START), pc_param, 8);
         oal_itoa(hwifi_get_init_value(CUS_TAG_INI, WLAN_CFG_INIT_USED_MEM_FOR_STOP), pc_tmp, 8);
         pc_param[OAL_STRLEN(pc_param)] = ' ';
         oal_memcopy(pc_param + OAL_STRLEN(pc_param), pc_tmp, OAL_STRLEN(pc_tmp));

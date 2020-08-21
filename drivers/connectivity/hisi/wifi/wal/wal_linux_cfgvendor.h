@@ -43,6 +43,19 @@ extern "C" {
                                     VENDOR_SUBCMD_OVERHEAD + \
                                     VENDOR_DATA_OVERHEAD)
 
+/* Feature set */
+#define VENDOR_DBG_MEMORY_DUMP_SUPPORTED    (1 << (0))  /* Memory dump of FW */
+
+#define VENDOR_BG_BAND_MASK             (1 << 0)    /* 2.4 GHZ Band */
+#define VENDOR_A_BAND_MASK              (1 << 1)    /* 5 GHZ Band */
+
+/* 2G信道与5G信道总数 */
+#define VENDOR_CHANNEL_LIST_ALL  (MAC_CHANNEL_FREQ_2_BUTT + MAC_CHANNEL_FREQ_5_BUTT)
+
+/* firmware event ring, ring id 2 */
+#define VENDOR_FW_EVENT_RING_NAME    "fw_event"
+#define VENDOR_FW_EVENT_RING_SIZE    (64 * 1024)
+
 /* Feature enums *//* 需和wifi_hal.h中定义保持一致 */
 #define WIFI_FEATURE_INFRA              0x0001      /** Basic infrastructure mode */
 #define WIFI_FEATURE_INFRA_5G           0x0002      /** Support for 5 GHz Band */
@@ -269,6 +282,236 @@ typedef enum wal_vendor_event {
     GOOGLE_MKEEP_ALIVE_EVENT
 } wal_vendor_event_enum;
 
+enum wal_vendor_debug_attributes {
+    DEBUG_ATTRIBUTE_GET_DRIVER,
+    DEBUG_ATTRIBUTE_GET_FW,
+    DEBUG_ATTRIBUTE_RING_ID,
+    DEBUG_ATTRIBUTE_RING_NAME,
+    DEBUG_ATTRIBUTE_RING_FLAGS,
+    DEBUG_ATTRIBUTE_LOG_LEVEL,
+    DEBUG_ATTRIBUTE_LOG_TIME_INTVAL,
+    DEBUG_ATTRIBUTE_LOG_MIN_DATA_SIZE,
+    DEBUG_ATTRIBUTE_FW_DUMP_LEN,
+    DEBUG_ATTRIBUTE_FW_DUMP_DATA,
+    DEBUG_ATTRIBUTE_RING_DATA,
+    DEBUG_ATTRIBUTE_RING_STATUS,
+    DEBUG_ATTRIBUTE_RING_NUM
+};
+
+enum {
+    DEBUG_RING_ID_INVALID	= 0,
+    FW_VERBOSE_RING_ID,
+    FW_EVENT_RING_ID,
+    DHD_EVENT_RING_ID,
+    /* add new id here */
+    DEBUG_RING_ID_MAX
+};
+
+typedef struct debug_ring_status_st {
+    oal_uint8 uc_name[32];
+    oal_uint32 ul_flags;
+    oal_int ring_id; /* unique integer representing the ring */
+    /* total memory size allocated for the buffer */
+    oal_uint32 ul_ring_buffer_byte_size;
+    oal_uint32 ul_verbose_level;
+    /* number of bytes that was written to the buffer by driver */
+    oal_uint32 ul_written_bytes;
+    /* number of bytes that was read from the buffer by user land */
+    oal_uint32 ul_read_bytes;
+    /* number of records that was read from the buffer by user land */
+    oal_uint32 ul_written_records;
+} debug_ring_status_st;
+
+typedef enum wifi_channel_width {
+    WIFI_CHAN_WIDTH_20    = 0,
+    WIFI_CHAN_WIDTH_40    = 1,
+    WIFI_CHAN_WIDTH_80    = 2,
+    WIFI_CHAN_WIDTH_160   = 3,
+    WIFI_CHAN_WIDTH_80P80 = 4,
+    WIFI_CHAN_WIDTH_5     = 5,
+    WIFI_CHAN_WIDTH_10    = 6,
+    WIFI_CHAN_WIDTH_INVALID = -1
+} wal_wifi_channel_width;
+
+#define VENDOR_NUM_RATE 32
+#define VENDOR_NUM_PEER 1
+#define VENDOR_NUM_CHAN 11
+
+/* channel information */
+typedef struct {
+   wal_wifi_channel_width width;      /* channel width (20, 40, 80, 80+80, 160) */
+   int l_center_freq;      /* primary 20 MHz channel */
+   int l_center_freq0;     /* center frequency (MHz) first segment */
+   int l_center_freq1;     /* center frequency (MHz) second segment */
+} wal_wifi_channel_info_stru;
+
+/* channel statistics */
+typedef struct {
+   wal_wifi_channel_info_stru channel;
+   oal_uint32 ul_on_time;        /* msecs the radio is awake */
+   oal_uint32 ul_cca_busy_time;
+} wal_wifi_channel_stat_stru;
+
+/* radio statistics */
+typedef struct {
+   int        l_radio;
+   oal_uint32 ul_on_time;
+   oal_uint32 ul_tx_time;
+   oal_uint32 ul_rx_time;
+   oal_uint32 ul_on_time_scan;
+   oal_uint32 ul_on_time_nbd;
+   oal_uint32 ul_on_time_gscan;
+   oal_uint32 ul_on_time_roam_scan;
+   oal_uint32 ul_on_time_pno_scan;
+   oal_uint32 ul_on_time_hs20;
+   oal_uint32 ul_num_channels;
+   wal_wifi_channel_stat_stru channels[VENDOR_NUM_CHAN];
+} wal_wifi_radio_stat_stru;
+
+typedef struct
+{
+    oal_uint64 ull_wifi_on_time_stamp;
+    oal_uint32 ul_wifi_on_time;
+    oal_uint32 ul_wifi_tx_time;
+    oal_uint32 ul_wifi_rx_time;
+} wal_cfgvendor_radio_stat_stru;
+
+
+/* access categories */
+typedef enum {
+   WAL_WIFI_AC_VO  = 0,
+   WAL_WIFI_AC_VI  = 1,
+   WAL_WIFI_AC_BE  = 2,
+   WAL_WIFI_AC_BK  = 3,
+   WAL_WIFI_AC_MAX = 4,
+} wal_wifi_traffic_ac;
+
+/* wifi peer type */
+typedef enum
+{
+    WIFI_PEER_STA,
+    WIFI_PEER_AP,
+    WIFI_PEER_P2P_GO,
+    WIFI_PEER_P2P_CLIENT,
+    WIFI_PEER_NAN,
+    WIFI_PEER_TDLS,
+    WIFI_PEER_INVALID,
+} wal_wifi_peer_type;
+
+typedef enum {
+    WIFI_INTERFACE_STA = 0,
+    WIFI_INTERFACE_SOFTAP = 1,
+    WIFI_INTERFACE_IBSS = 2,
+    WIFI_INTERFACE_P2P_CLIENT = 3,
+    WIFI_INTERFACE_P2P_GO = 4,
+    WIFI_INTERFACE_NAN = 5,
+    WIFI_INTERFACE_MESH = 6,
+} wal_wifi_interface_mode;
+
+
+typedef enum {
+    WIFI_DISCONNECTED = 0,
+    WIFI_AUTHENTICATING = 1,
+    WIFI_ASSOCIATING = 2,
+    WIFI_ASSOCIATED = 3,
+    WIFI_EAPOL_STARTED = 4,
+    WIFI_EAPOL_COMPLETED = 5,
+} wal_wifi_connection_state;
+
+
+typedef enum {
+    VENDOR_WIFI_ROAMING_IDLE = 0,
+    VENDOR_WIFI_ROAMING_ACTIVE = 1,
+} wal_wifi_roam_state;
+
+/* interface info */
+typedef struct {
+   wal_wifi_interface_mode mode;
+   oal_uint8 uc_mac_addr[6];        /* interface mac address (self) */
+   wal_wifi_connection_state state;  /* connection state (valid for STA, CLI only) */
+   wal_wifi_roam_state roaming;
+   oal_uint32 ul_capabilities;      /* WIFI_CAPABILITY_XXX (self) */
+   oal_uint8 uc_ssid[33];           /* null terminated SSID */
+   oal_uint8 uc_bssid[6];
+   oal_uint8 uc_ap_country_str[3];
+   oal_uint8 uc_country_str[3];
+} wal_wifi_interface_info_stru;
+
+typedef wal_wifi_interface_info_stru *wifi_interface_handle;
+
+
+/* wifi rate */
+typedef struct {
+   oal_uint32 ul_preamble   :3;   /* 0: OFDM, 1:CCK, 2:HT 3:VHT 4..7 reserved */
+   oal_uint32 ul_nss        :2;   /* 0:1x1, 1:2x2, 3:3x3, 4:4x4  */
+   oal_uint32 ul_bw         :3;   /* 0:20MHz, 1:40Mhz, 2:80Mhz, 3:160Mhz */
+   oal_uint32 ul_rateMcsIdx :8;   /* OFDM/CCK rate code would be as per ieee std in the units of 0.5mbps */
+                               /* HT/VHT it would be mcs index */
+   oal_uint32 ul_reserved  :16;
+   oal_uint32 ul_bitrate;         /* units of 100 Kbps */
+} wal_wifi_rate_stru;
+
+/* per rate statistics */
+typedef struct {
+   wal_wifi_rate_stru  rate;
+   oal_uint32 ul_tx_mpdu;
+   oal_uint32 ul_rx_mpdu;
+   oal_uint32 ul_mpdu_lost;
+   oal_uint32 ul_retries;
+   oal_uint32 ul_retries_short;
+   oal_uint32 ul_retries_long;
+} wal_wifi_rate_stat_stru;
+
+/* per peer statistics */
+typedef struct {
+   wal_wifi_peer_type type;   /* peer type (AP, TDLS, GO etc.) */
+   oal_uint8   uc_peer_mac_address[6];
+   oal_uint32  ul_capabilities;
+   oal_uint32  ul_num_rate;
+   wal_wifi_rate_stat_stru rate_stats[VENDOR_NUM_RATE];
+} wal_wifi_peer_info_stru;
+
+/* per access category statistics */
+typedef struct {
+   wal_wifi_traffic_ac ac;    /* access category (VI, VO, BE, BK) */
+   oal_uint32 ul_tx_mpdu;
+   oal_uint32 ul_rx_mpdu;
+   oal_uint32 ul_tx_mcast;    /* number of succesfully transmitted multicast data packets */
+   oal_uint32 ul_rx_mcast;
+   oal_uint32 ul_rx_ampdu;
+   oal_uint32 ul_tx_ampdu;
+   oal_uint32 ul_mpdu_lost;
+   oal_uint32 ul_retries;
+   oal_uint32 ul_retries_short;
+   oal_uint32 ul_retries_long;
+   oal_uint32 ul_contention_time_min;
+   oal_uint32 ul_contention_time_max;
+   oal_uint32 ul_contention_time_avg;
+   oal_uint32 ul_contention_num_samples;
+} wal_wifi_wmm_ac_stat_stru;
+
+
+/* wifi interface statistics */
+typedef struct {
+   wifi_interface_handle iface;
+   wal_wifi_interface_info_stru info;
+   oal_uint32 ul_beacon_rx;
+   oal_uint64 ull_average_tsf_offset;    /* average beacon offset encountered (beacon_TSF - TBTT) */
+   oal_uint32 ul_leaky_ap_detected;    /* indicate that this AP typically leaks packets beyond the driver guard time. */
+   oal_uint32 ul_leaky_ap_avg_num_frames_leaked;    /* average number of frame leaked by AP after frame with PM bit set was ACK'ed by AP */
+   oal_uint32 ul_leaky_ap_guard_time;
+   oal_uint32 ul_mgmt_rx;
+   oal_uint32 ul_mgmt_action_rx;
+   oal_uint32 ul_mgmt_action_tx;
+   int  l_rssi_mgmt;
+   int  l_rssi_data;
+   int  l_rssi_ack;
+   wal_wifi_wmm_ac_stat_stru ac[WAL_WIFI_AC_MAX];
+   oal_uint32  ul_num_peers;
+   wal_wifi_peer_info_stru peer_info[VENDOR_NUM_PEER];
+} wal_wifi_iface_stat_stru;
+
+extern wal_cfgvendor_radio_stat_stru g_st_wifi_radio_stat;
 
 extern oal_void wal_cfgvendor_init(oal_wiphy_stru *wiphy);
 extern oal_void wal_cfgvendor_deinit(oal_wiphy_stru *wiphy);

@@ -134,6 +134,10 @@ extern oal_uint32 g_ul_desc_addr[HAL_TX_QUEUE_BUTT];
 #endif
 
 extern mac_board_stru g_st_dmac_board;
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+extern oal_uint8 g_auc_ip_filter_btable[MAC_MAX_IP_FILTER_BTABLE_SIZE];  /* rx ip过滤功能的黑名单 */
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
+
 /*****************************************************************************
   3 枚举定义
 *****************************************************************************/
@@ -224,7 +228,9 @@ typedef enum
 #endif
     DMAC_WLAN_CTX_EVENT_SUB_TYPE_CALI_HMAC2DMAC,
     DMAC_WLAN_CTX_EVENT_SUB_TYPE_DSCR_OPT,
-
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+    DMAC_WLAN_CTX_EVENT_SUB_TYPE_IP_FILTER,
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
     DMAC_WLAN_CTX_EVENT_SUB_TYPE_BUTT
 }dmac_wlan_ctx_event_sub_type_enum;
 typedef oal_uint8 dmac_wlan_ctx_event_sub_type_enum_uint8;
@@ -764,7 +770,7 @@ typedef struct
     oal_uint8                   bit_ta_user_idx       :4;
     oal_uint8                   bit_mac_header_len    :6;   /* mac header帧头长度 */
     oal_uint8                   bit_is_beacon         :1;
-    oal_uint8                   bit_reserved1         :1;
+    oal_uint8                   bit_is_key_frame      :1;
     /*word 1*/
     oal_uint16                  us_frame_len;               /* 帧头与帧体的总长度 */
     oal_uint8                   uc_mac_vap_id         :4;
@@ -1328,6 +1334,7 @@ typedef struct
     oal_uint8                         auc_resv[2];
 
     oal_uint8                         auc_ip_addr[OAL_IP_ADDR_MAX_SIZE];
+    oal_uint8                         auc_mask_addr[OAL_IP_ADDR_MAX_SIZE];
 }dmac_ip_addr_config_stru;
 #endif
 

@@ -1401,7 +1401,38 @@ oal_uint32   hmac_send_cali_data_tx_adapt(frw_event_mem_stru *pst_event_mem)
     //OAL_IO_PRINT("hmac_send_cali_data_tx_adapt : pst_dmac_tx_event->us_frame_len %d\r\n", pst_dmac_tx_event->us_frame_len);
     return hmac_hcc_tx_event_buf_to_netbuf(pst_event_mem, (oal_uint8*)OAL_NETBUF_DATA(pst_dmac_tx_event->pst_netbuf), pst_dmac_tx_event->us_frame_len);
 }
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+/*****************************************************************************
+ 函 数 名  : hmac_config_update_ip_filter_tx_adapt
+ 功能描述  : rx ip包过滤功能参数配置流程的hmac侧适配函数
+ 输入参数  : frw_event_mem_stru *pst_event_mem
+ 输出参数  : 无
+ 返 回 值  : oal_uint32
+ 调用函数  :
+ 被调函数  :
 
+ 修改历史      :
+  1.日    期   : 2017年4月18日
+    作    者   : z00273164
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+oal_uint32 hmac_config_update_ip_filter_tx_adapt(frw_event_mem_stru *pst_event_mem)
+{
+    dmac_tx_event_stru          *pst_dmac_tx_event;
+
+    if(OAL_PTR_NULL == pst_event_mem)
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{hmac_config_update_ip_filter_tx_adapt:: pst_event_mem null.}");
+        return OAL_ERR_CODE_PTR_NULL;
+    }
+
+    pst_dmac_tx_event = (dmac_tx_event_stru *)frw_get_event_payload(pst_event_mem);
+    return hmac_hcc_tx_event_buf_to_netbuf(pst_event_mem, (oal_uint8*)OAL_NETBUF_DATA(pst_dmac_tx_event->pst_netbuf), pst_dmac_tx_event->us_frame_len);
+
+}
+
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 /*****************************************************************************
  函 数 名  : hmac_scan_proc_sched_scan_req_event_tx_adapt
  功能描述  : 通过SDIO下发PNO调度扫描配置前的适配函数
@@ -1821,6 +1852,14 @@ oal_int32 hmac_hcc_adapt_init(oal_void)
     hcc_rx_register(hcc_get_default_handler(), HCC_ACTION_TYPE_WIFI, hmac_rx_wifi_post_action_function, NULL);
 #ifdef _PRE_CONFIG_HISI_PANIC_DUMP_SUPPORT
     hwifi_panic_log_register(&hmac_panic_hcc_adapt,NULL);
+#endif
+    return OAL_SUCC;
+}
+oal_int32 hmac_hcc_adapt_deinit(oal_void)
+{
+    hcc_rx_unregister(hcc_get_default_handler(), HCC_ACTION_TYPE_WIFI);
+#ifdef _PRE_CONFIG_HISI_PANIC_DUMP_SUPPORT
+    hwifi_panic_log_unregister(&hmac_panic_hcc_adapt);
 #endif
     return OAL_SUCC;
 }

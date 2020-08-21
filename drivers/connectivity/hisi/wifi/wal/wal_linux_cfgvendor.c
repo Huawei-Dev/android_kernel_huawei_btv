@@ -37,6 +37,9 @@ extern "C" {
 #define OUI_HISI    0x001018
 
 #if (defined(_PRE_PRODUCT_ID_HI110X_HOST) || (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))) && (_PRE_OS_VERSION_LINUX == _PRE_OS_VERSION)
+extern oal_uint32 band_5g_enabled;
+
+wal_cfgvendor_radio_stat_stru g_st_wifi_radio_stat;
 
 /*****************************************************************************
  函 数 名  : wal_cfgvendor_del_radar_channel
@@ -111,21 +114,44 @@ OAL_STATIC oal_uint32 wal_cfgvendor_copy_channel_list(mac_vendor_cmd_channel_lis
 {
     oal_uint8  *puc_chanel_list;
     oal_uint32  ul_loop;
+    oal_uint32  ul_channel_num = 0;
 
-    *pul_num_channels = (band == WLAN_BAND_2G)?pst_channel_list->uc_channel_num_2g:pst_channel_list->uc_channel_num_5g;
-    if (*pul_num_channels == 0)
+    *pul_num_channels = 0;
+
+    if ((0 == pst_channel_list->uc_channel_num_5g) && (0 == pst_channel_list->uc_channel_num_2g))
     {
+        OAM_WARNING_LOG1(0, OAM_SF_ANY, "{wal_cfgvendor_copy_channel_list::get 5G or 2G channel list fail,band = %d",band);
         return OAL_FAIL;
     }
 
-    *pul_num_channels = OAL_MIN(*pul_num_channels, (band == WLAN_BAND_2G)?MAC_CHANNEL_FREQ_2_BUTT:MAC_CHANNEL_FREQ_5_BUTT);
-
-    puc_chanel_list = (band == WLAN_BAND_2G)?pst_channel_list->auc_channel_list_2g:pst_channel_list->auc_channel_list_5g;
-    for (ul_loop = 0; ul_loop < *pul_num_channels; ul_loop++)
+    /* 获取2G,信道列表 */
+    if ((band & VENDOR_BG_BAND_MASK) && (0 != pst_channel_list->uc_channel_num_2g))
     {
-        pl_channel_list[ul_loop] = oal_ieee80211_channel_to_frequency(puc_chanel_list[ul_loop],
-                                                                    (band == WLAN_BAND_2G)?IEEE80211_BAND_2GHZ:IEEE80211_BAND_5GHZ);
+        puc_chanel_list = pst_channel_list->auc_channel_list_2g;
+        for (ul_loop = 0; ul_loop < pst_channel_list->uc_channel_num_2g; ul_loop++)
+        {
+            pl_channel_list[ul_channel_num++] = oal_ieee80211_channel_to_frequency(puc_chanel_list[ul_loop],IEEE80211_BAND_2GHZ);
+        }
     }
+
+    /* 获取5G,信道列表 */
+    if ((band & VENDOR_A_BAND_MASK) && (0 != pst_channel_list->uc_channel_num_5g))
+    {
+        puc_chanel_list = pst_channel_list->auc_channel_list_5g;
+
+        for (ul_loop = 0; ul_loop < pst_channel_list->uc_channel_num_5g; ul_loop++)
+        {
+            pl_channel_list[ul_channel_num++] = oal_ieee80211_channel_to_frequency(puc_chanel_list[ul_loop],IEEE80211_BAND_5GHZ);
+        }
+    }
+
+    if (0 == ul_channel_num)
+    {
+        OAM_WARNING_LOG1(0, OAM_SF_ANY, "{wal_cfgvendor_copy_channel_list::get 5G or 2G channel list fail,ul_channel_num = %d",ul_channel_num);
+        return OAL_FAIL;
+    }
+
+    *pul_num_channels = ul_channel_num;
 
     return OAL_SUCC;
 }
@@ -133,7 +159,7 @@ OAL_STATIC oal_uint32 wal_cfgvendor_copy_channel_list(mac_vendor_cmd_channel_lis
 /*****************************************************************************
  函 数 名  : wal_cfgvendor_get_current_channel_list
  功能描述  : 根据band ，获取当前信道列表
- 输入参数  : oal_uint32 band: 0:2GHz 信道列表, others:5GHz 信道列表
+ 输入参数  : oal_uint32 band: bit0:2G信道列表 bit1:5G信道列表
              oal_int32  al_channel_list
              oal_uint32 * num_channels
  输出参数  : 无
@@ -160,7 +186,7 @@ OAL_STATIC oal_uint32 wal_cfgvendor_get_current_channel_list(oal_net_device_stru
 
     if (OAL_PTR_NULL == pst_netdev || OAL_PTR_NULL == pl_channel_list || OAL_PTR_NULL == pul_num_channels)
     {
-        OAM_ERROR_LOG3(0, OAM_SF_ANY, "{wal_get_current_channel_list::channel_list or num_channel is NULL!"
+        OAM_ERROR_LOG3(0, OAM_SF_ANY, "{wal_cfgvendor_get_current_channel_list::channel_list or num_channel is NULL!"
                                         "netdev %p, channel_list %p, num_channels %p.}",
                                         pst_netdev, pl_channel_list, pul_num_channels);
         return OAL_ERR_CODE_PTR_NULL;
@@ -169,7 +195,7 @@ OAL_STATIC oal_uint32 wal_cfgvendor_get_current_channel_list(oal_net_device_stru
     /* 上层在任何时候都可能下发此命令，需要先判断当前netdev的状态并及时返回 */
     if (OAL_UNLIKELY(OAL_PTR_NULL == OAL_NET_DEV_PRIV(pst_netdev)))
     {
-        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_get_current_channel_list::NET_DEV_PRIV is NULL.}");
+        OAM_ERROR_LOG0(0, OAM_SF_ANY, "{wal_cfgvendor_get_current_channel_list::NET_DEV_PRIV is NULL.}");
         return OAL_ERR_CODE_PTR_NULL;
     }
 
@@ -189,7 +215,7 @@ OAL_STATIC oal_uint32 wal_cfgvendor_get_current_channel_list(oal_net_device_stru
 
     if (OAL_SUCC != l_ret)
     {
-        OAM_WARNING_LOG1(0, OAM_SF_ANY, "{wal_get_current_channel_list:: wal_send_cfg_event return err code %d!}\r\n", l_ret);
+        OAM_WARNING_LOG1(0, OAM_SF_ANY, "{wal_cfgvendor_get_current_channel_list:: wal_send_cfg_event return err code %d!}\r\n", l_ret);
         if (OAL_PTR_NULL != pst_rsp_msg)
         {
             oal_free(pst_rsp_msg);
@@ -219,8 +245,8 @@ OAL_STATIC oal_int32 wal_cfgvendor_get_channel_list(oal_wiphy_stru *wiphy,
 {
     oal_int32  err = 0;
     oal_int32  type;
-    oal_int32  al_channel_list[MAC_MAX_SUPP_CHANNEL] = {0};
-    oal_uint32 band;
+    oal_int32  al_channel_list[VENDOR_CHANNEL_LIST_ALL + 1] = {0};
+    oal_uint32 band = 0; /* 上层下发的band值 */
     oal_uint32 mem_needed;
     oal_uint32 num_channels = 0;
     oal_uint32 reply_len = 0;
@@ -236,6 +262,7 @@ OAL_STATIC oal_int32 wal_cfgvendor_get_channel_list(oal_wiphy_stru *wiphy,
     type = oal_nla_type(data);
     if (type == GSCAN_ATTRIBUTE_BAND)
     {
+        /* 获取band值 bit0:2G信道列表 bit1:5G信道列表 */
         band = oal_nla_get_u32(data);
     }
     else
@@ -244,9 +271,6 @@ OAL_STATIC oal_int32 wal_cfgvendor_get_channel_list(oal_wiphy_stru *wiphy,
         return -OAL_EFAIL;
     }
 
-    /* band = 0,      返回2.4GHz 信道
-     * band = others, 返回5GHz 信道
-    */
     ul_ret = wal_cfgvendor_get_current_channel_list(wdev->netdev, band, al_channel_list, &num_channels);
     if (ul_ret != OAL_SUCC)
     {
@@ -325,6 +349,13 @@ OAL_STATIC oal_int32 wal_cfgvendor_do_get_feature_set(oal_void)
 #ifdef _PRE_WLAN_FEATURE_HS20
     l_feature_set |= WIFI_FEATURE_HOTSPOT;
 #endif
+
+    if (band_5g_enabled)
+    {
+        l_feature_set |= WIFI_FEATURE_INFRA_5G;
+    }
+
+    l_feature_set |= WIFI_FEATURE_LINK_LAYER_STATS; /** 0x10000 Link layer stats collection */
 
     return l_feature_set;
 }
@@ -464,6 +495,288 @@ OAL_STATIC oal_int32 wal_cfgvendor_set_random_mac_oui(oal_wiphy_stru *pst_wiphy,
     return OAL_SUCC;
 }
 
+/*****************************************************************************
+ 函 数 名  : wal_cfgvendor_dbg_get_feature
+ 功能描述  : 获取特性值
+ 输入参数  : oal_wiphy_stru *pst_wiphy,
+             oal_wireless_dev_stru *pst_wdev,
+             OAL_CONST oal_void  *p_data, oal_int32 l_len
+ 输出参数  : 无
+ 返 回 值  :
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年8月18日
+    作    者   :
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+OAL_STATIC oal_int32 wal_cfgvendor_dbg_get_feature(oal_wiphy_stru *wiphy,
+        oal_wireless_dev_stru *wdev, OAL_CONST oal_void  *data, oal_int32 len)
+{
+    oal_int32 l_ret;
+    oal_uint32 supported_features = VENDOR_DBG_MEMORY_DUMP_SUPPORTED;
+    oal_netbuf_stru *skb;
+
+    skb = oal_cfg80211_vendor_cmd_alloc_reply_skb(wiphy, OAL_SIZEOF(oal_uint32));
+    if (OAL_UNLIKELY(!skb))
+    {
+        OAM_WARNING_LOG1(0, OAM_SF_ANY, "wal_cfgvendor_dbg_get_feature::skb alloc failed. len %d\r\n", OAL_SIZEOF(oal_uint32));
+        return -OAL_ENOMEM;
+    }
+
+    oal_nla_put_nohdr(skb, OAL_SIZEOF(oal_uint32), &supported_features);
+
+    l_ret = oal_cfg80211_vendor_cmd_reply(skb);
+    if (OAL_UNLIKELY(l_ret))
+    {
+        OAM_ERROR_LOG1(0, OAM_SF_ANY, "wal_cfgvendor_dbg_get_feature::Vendor Command reply failed. ret:%d.\r\n", l_ret);
+    }
+    OAM_WARNING_LOG1(0, OAM_SF_ANY, "wal_cfgvendor_dbg_get_feature::SUCCESS. supported feature:0x%X.\r\n", supported_features);
+
+    return l_ret;
+}
+
+/*****************************************************************************
+ 函 数 名  : wal_cfgvendor_dbg_get_version
+ 功能描述  : 获取driver版本号
+ 输入参数  : oal_wiphy_stru *pst_wiphy,
+             oal_wireless_dev_stru *pst_wdev,
+             OAL_CONST oal_void  *p_data, oal_int32 l_len
+ 输出参数  : 无
+ 返 回 值  :
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年8月18日
+    作    者   :
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+OAL_STATIC oal_int32 wal_cfgvendor_dbg_get_version(oal_wiphy_stru *wiphy,
+        oal_wireless_dev_stru *wdev, OAL_CONST oal_void  *data, oal_int32 len)
+{
+    oal_int8 auc_driver_version[] = "Hisi Host Driver, version Hi1102 V100";
+    oal_int32 l_ret;
+    oal_int32 l_buf_len = OAL_SIZEOF(auc_driver_version);
+    oal_netbuf_stru *skb;
+
+    skb = oal_cfg80211_vendor_cmd_alloc_reply_skb(wiphy, l_buf_len);
+    if (OAL_UNLIKELY(!skb))
+    {
+        OAM_WARNING_LOG1(0, OAM_SF_ANY, "wal_cfgvendor_dbg_get_version::skb alloc failed.len %d\r\n", l_buf_len);
+        return -OAL_ENOMEM;
+    }
+
+    oal_nla_put_nohdr(skb, l_buf_len, auc_driver_version);
+
+    l_ret = oal_cfg80211_vendor_cmd_reply(skb);
+    if (OAL_UNLIKELY(l_ret))
+    {
+        OAM_ERROR_LOG1(0, OAM_SF_ANY, "wal_cfgvendor_dbg_get_version::Vendor Command reply failed. ret:%d.\r\n", l_ret);
+    }
+
+    OAM_WARNING_LOG1(0, OAM_SF_ANY, "wal_cfgvendor_dbg_get_version::SUCCESS. driver version len %d\r\n", l_buf_len);
+    return l_ret;
+}
+
+/*****************************************************************************
+ 函 数 名  : wal_cfgvendor_dbg_get_ring_status
+ 功能描述  :
+ 输入参数  : oal_wiphy_stru *pst_wiphy,
+             oal_wireless_dev_stru *pst_wdev,
+             OAL_CONST oal_void  *p_data, oal_int32 l_len
+ 输出参数  : 无
+ 返 回 值  :
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年8月18日
+    作    者   :
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+oal_int32 wal_cfgvendor_dbg_get_ring_status(oal_wiphy_stru *wiphy,
+        oal_wireless_dev_stru *wdev, OAL_CONST oal_void  *data, oal_int32 len)
+{
+    oal_int32 l_ret,l_buf_len;
+    debug_ring_status_st debug_ring_status = {{VENDOR_FW_EVENT_RING_NAME},0,FW_EVENT_RING_ID,
+                                                VENDOR_FW_EVENT_RING_SIZE,0,0,0,0};
+    oal_netbuf_stru *skb;
+    l_buf_len = OAL_SIZEOF(debug_ring_status_st);
+
+    skb = oal_cfg80211_vendor_cmd_alloc_reply_skb(wiphy, l_buf_len+100);
+    if (OAL_UNLIKELY(!skb))
+    {
+        OAM_WARNING_LOG1(0, OAM_SF_ANY, "wal_cfgvendor_dbg_get_ring_status::skb alloc failed.len %d\r\n", l_buf_len+100);
+        return -OAL_ENOMEM;
+    }
+
+    oal_nla_put_u32(skb, DEBUG_ATTRIBUTE_RING_NUM, 1);
+    oal_nla_put(skb, DEBUG_ATTRIBUTE_RING_STATUS, l_buf_len,&debug_ring_status);
+
+    l_ret = oal_cfg80211_vendor_cmd_reply(skb);
+    if (OAL_UNLIKELY(l_ret))
+    {
+        OAM_ERROR_LOG1(0, OAM_SF_ANY, "wal_cfgvendor_dbg_get_ring_status::Vendor Command reply failed. ret:%d.\r\n", l_ret);
+    }
+
+    OAM_WARNING_LOG1(0, OAM_SF_ANY, "wal_cfgvendor_dbg_get_ring_status::SUCCESS. driver version len %d\r\n", l_buf_len);
+    return l_ret;
+}
+
+/*****************************************************************************
+ 函 数 名  : wal_cfgvendor_dbg_trigger_mem_dump
+ 功能描述  :
+ 输入参数  : oal_wiphy_stru *pst_wiphy,
+             oal_wireless_dev_stru *pst_wdev,
+             OAL_CONST oal_void  *p_data, oal_int32 l_len
+ 输出参数  : 无
+ 返 回 值  :
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年8月18日
+    作    者   :
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+oal_int32 wal_cfgvendor_dbg_trigger_mem_dump(oal_wiphy_stru *wiphy,
+        oal_wireless_dev_stru *wdev, OAL_CONST oal_void  *data, oal_int32 len)
+{
+    OAM_WARNING_LOG0(0, OAM_SF_ANY, "wal_cfgvendor_dbg_trigger_mem_dump::ENTER");
+    return 0;
+}
+
+/*****************************************************************************
+ 函 数 名  : wal_cfgvendor_dbg_start_logging
+ 功能描述  :
+ 输入参数  : oal_wiphy_stru *pst_wiphy,
+             oal_wireless_dev_stru *pst_wdev,
+             OAL_CONST oal_void  *p_data, oal_int32 l_len
+ 输出参数  : 无
+ 返 回 值  :
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年8月18日
+    作    者   :
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+OAL_STATIC oal_int32 wal_cfgvendor_dbg_start_logging(oal_wiphy_stru *wiphy,
+        oal_wireless_dev_stru *wdev, OAL_CONST oal_void  *data, oal_int32 len)
+{
+    OAM_WARNING_LOG0(0, OAM_SF_ANY, "wal_cfgvendor_dbg_start_logging::ENTER");
+    return 0;
+}
+
+/*****************************************************************************
+ 函 数 名  : wal_cfgvendor_dbg_get_ring_data
+ 功能描述  :
+ 输入参数  : oal_wiphy_stru *pst_wiphy,
+             oal_wireless_dev_stru *pst_wdev,
+             OAL_CONST oal_void  *p_data, oal_int32 l_len
+ 输出参数  : 无
+ 返 回 值  :
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年8月18日
+    作    者   :
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+OAL_STATIC oal_int32 wal_cfgvendor_dbg_get_ring_data(oal_wiphy_stru *wiphy,
+        oal_wireless_dev_stru *wdev, OAL_CONST oal_void  *data, oal_int32 len)
+{
+    OAM_WARNING_LOG0(0, OAM_SF_ANY, "wal_cfgvendor_dbg_get_ring_data::ENTER");
+    return 0;
+}
+
+/*****************************************************************************
+ 函 数 名  : wal_cfgvendor_lstats_get_info
+ 功能描述  : 获取连接状态
+ 输入参数  : oal_wiphy_stru         *pst_wiphy
+             oal_wireless_dev_stru  *pst_wdev
+             OAL_CONST oal_void     *p_data
+             oal_int32               l_len
+ 输出参数  : 无
+ 返 回 值  :
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年9月20日
+    作    者   :
+    修改内容   : 新生成函数
+*****************************************************************************/
+OAL_STATIC oal_int32 wal_cfgvendor_lstats_get_info(oal_wiphy_stru *pst_wiphy,
+        oal_wireless_dev_stru *pst_wdev, OAL_CONST oal_void  *p_data, oal_int32 l_len)
+{
+    oal_int32            l_err = 0;
+    oal_uint32           ul_reply_len;
+    oal_void            *p_out_data;
+    oal_netbuf_stru     *pst_skb;
+    wal_wifi_radio_stat_stru *pst_radio_stat;
+    wal_wifi_iface_stat_stru *pst_iface_stat;
+
+    if (pst_wiphy == OAL_PTR_NULL || pst_wdev == OAL_PTR_NULL)
+    {
+        OAM_ERROR_LOG2(0, OAM_SF_ANY,
+                        "{wal_cfgvendor_lstats_get_info:wiphy or wdev or data is null. %p, %p}",
+                        pst_wiphy,
+                        pst_wdev);
+        return -OAL_EFAUL;
+    }
+
+    ul_reply_len = OAL_SIZEOF(*pst_radio_stat) + OAL_SIZEOF(*pst_iface_stat) ;
+    p_out_data = (oal_void *)oal_memalloc(ul_reply_len);
+    if (p_out_data == OAL_PTR_NULL)
+    {
+        OAM_WARNING_LOG1(0, OAM_SF_ANY, "{wal_cfgvendor_lstats_get_info:alloc memory fail.[%d]}", ul_reply_len);
+        return -OAL_ENOMEM;
+    }
+    OAL_MEMZERO(p_out_data, ul_reply_len);
+
+    /* 获取radio 统计 */
+    pst_radio_stat = (wal_wifi_radio_stat_stru *)p_out_data;
+    pst_radio_stat->ul_num_channels = VENDOR_NUM_CHAN;
+    pst_radio_stat->ul_on_time      = OAL_JIFFIES_TO_MSECS(OAL_TIME_JIFFY - g_st_wifi_radio_stat.ull_wifi_on_time_stamp);
+    pst_radio_stat->ul_tx_time      = 0;
+    pst_radio_stat->ul_rx_time      = 0;
+
+    /* 获取interfac 统计 */
+    pst_iface_stat = (wal_wifi_iface_stat_stru *)(p_out_data + OAL_SIZEOF(*pst_radio_stat));
+    pst_iface_stat->ul_num_peers           = VENDOR_NUM_PEER;
+    pst_iface_stat->peer_info->ul_num_rate = VENDOR_NUM_RATE;
+
+    /* 上报link 统计 */
+    pst_skb = oal_cfg80211_vendor_cmd_alloc_reply_skb(pst_wiphy, ul_reply_len);
+    if (OAL_UNLIKELY(!pst_skb))
+    {
+        oal_free(p_out_data);
+        OAM_WARNING_LOG1(0, OAM_SF_ANY, "{wal_cfgvendor_lstats_get_info::skb alloc failed.len %d}", ul_reply_len);
+        return -OAL_ENOMEM;
+    }
+
+    oal_nla_put_nohdr(pst_skb, ul_reply_len, p_out_data);
+
+    l_err =  oal_cfg80211_vendor_cmd_reply(pst_skb);
+    OAM_WARNING_LOG4(0, OAM_SF_ANY, "{wal_cfgvendor_lstats_get_info::on_time %d, tx_time %d, rx_time %d, err %d",
+                    pst_radio_stat->ul_on_time,
+                    pst_radio_stat->ul_tx_time,
+                    pst_radio_stat->ul_rx_time,
+                    l_err);
+    oal_free(p_out_data);
+    return l_err;
+}
 
 OAL_STATIC OAL_CONST oal_wiphy_vendor_command_stru wal_vendor_cmds[] =
 {
@@ -499,6 +812,62 @@ OAL_STATIC OAL_CONST oal_wiphy_vendor_command_stru wal_vendor_cmds[] =
         },
         .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
         .doit = wal_cfgvendor_set_random_mac_oui
+    },
+    {
+        {
+            .vendor_id = OUI_GOOGLE,
+            .subcmd = DEBUG_GET_FEATURE
+        },
+        .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+        .doit = wal_cfgvendor_dbg_get_feature
+    },
+    {
+        {
+            .vendor_id = OUI_GOOGLE,
+            .subcmd = DEBUG_GET_VER
+        },
+        .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+        .doit = wal_cfgvendor_dbg_get_version
+    },
+    {
+        {
+            .vendor_id = OUI_GOOGLE,
+            .subcmd = DEBUG_GET_RING_STATUS
+        },
+        .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+        .doit = wal_cfgvendor_dbg_get_ring_status
+    },
+    {
+        {
+            .vendor_id = OUI_GOOGLE,
+            .subcmd = DEBUG_TRIGGER_MEM_DUMP
+        },
+        .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+        .doit = wal_cfgvendor_dbg_trigger_mem_dump
+    },
+    {
+        {
+            .vendor_id = OUI_GOOGLE,
+            .subcmd = DEBUG_START_LOGGING
+        },
+        .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+        .doit = wal_cfgvendor_dbg_start_logging
+    },
+    {
+        {
+            .vendor_id = OUI_GOOGLE,
+            .subcmd = DEBUG_GET_RING_DATA
+        },
+        .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+        .doit = wal_cfgvendor_dbg_get_ring_data
+    },
+    {
+        {
+            .vendor_id = OUI_GOOGLE,
+            .subcmd = LSTATS_SUBCMD_GET_INFO
+        },
+        .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+        .doit = wal_cfgvendor_lstats_get_info
     }
 };
 

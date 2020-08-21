@@ -111,7 +111,9 @@ extern oal_uint32 hmac_scan_proc_scan_req_event_tx_adapt(frw_event_mem_stru *pst
 extern oal_uint32   hmac_dpd_data_processed_event_tx_adapt(frw_event_mem_stru *pst_event_mem);
 #endif
 extern oal_uint32   hmac_send_cali_data_tx_adapt(frw_event_mem_stru *pst_event_mem);
-
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+extern oal_uint32 hmac_config_update_ip_filter_tx_adapt(frw_event_mem_stru *pst_event_mem);
+#endif  //_PRE_WLAN_FEATURE_IP_FILTER
 extern oal_uint32 hmac_scan_proc_sched_scan_req_event_tx_adapt(frw_event_mem_stru *pst_event_mem);
 extern oal_uint32 hmac_mgmt_update_user_qos_table_tx_adapt(frw_event_mem_stru *pst_event_mem);
 extern oal_uint32 hmac_proc_join_set_dtim_reg_event_tx_adapt(frw_event_mem_stru *pst_event_mem);

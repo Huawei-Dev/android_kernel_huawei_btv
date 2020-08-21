@@ -92,7 +92,7 @@ OAL_STATIC OAL_INLINE oal_int32 dmac_hcc_adapt_extend_hdr_init(frw_event_mem_str
     if (OAL_PTR_NULL == pst_hcc_event_mem || OAL_PTR_NULL == pst_netbuf)
     {
         OAM_ERROR_LOG0(0,OAM_SF_ANY,"{dmac_hcc_adapt_extend_hdr_init::pst_hcc_event_mem or pst_netbuf is null}");
-        return OAL_ERR_CODE_PTR_NULL;        
+        return OAL_ERR_CODE_PTR_NULL;
     }
     pst_event_hdr = frw_get_event_hdr(pst_hcc_event_mem);
     pst_hdr = dmac_get_hcc_tx_extend_hdr_addr(pst_netbuf);
@@ -1202,7 +1202,67 @@ frw_event_mem_stru*   dmac_cali_hmac2dmac_rx_adapt(frw_event_mem_stru *pst_hcc_e
 
    return pst_event_mem;
 }
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+/*****************************************************************************
+ 函 数 名  : dmac_config_update_ip_filter_rx_adapt
+ 功能描述  : rx ip数据包过滤功能参数配置流程 device的的适配函数
+ 输入参数  : frw_event_mem_stru *pst_hcc_event_mem
+ 输出参数  : 无
+ 返 回 值  : frw_event_mem_stru*
+ 调用函数  :
+ 被调函数  :
 
+ 修改历史      :
+  1.日    期   : 2017年4月18日
+    作    者   : z00273164
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+frw_event_mem_stru* dmac_config_update_ip_filter_rx_adapt(frw_event_mem_stru *pst_hcc_event_mem)
+{
+
+    frw_event_hdr_stru         *pst_hcc_event_hdr;
+    oal_netbuf_stru            *pst_netbuf_info;
+    frw_event_mem_stru         *pst_event_mem;
+    dmac_tx_event_stru         *pst_dmac_tx_event;
+
+
+    if (OAL_PTR_NULL == pst_hcc_event_mem)
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_CALIBRATE, "{dmac_config_update_ip_filter_rx_adapt:: pst_hcc_event_mem null.}");
+        return OAL_PTR_NULL;
+    }
+    pst_netbuf_info   = ((dmac_tx_event_stru *)frw_get_event_payload(pst_hcc_event_mem))->pst_netbuf;
+    pst_hcc_event_hdr     = frw_get_event_hdr(pst_hcc_event_mem);
+
+    pst_event_mem = FRW_EVENT_ALLOC(OAL_SIZEOF(dmac_tx_event_stru));
+    if (OAL_PTR_NULL == pst_event_mem)
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_CALIBRATE, "{dmac_config_update_ip_filter_rx_adapt:: pst_event_mem null.}");
+        OAL_MEM_NETBUF_FREE(pst_netbuf_info);
+        return OAL_PTR_NULL;
+    }
+
+    FRW_EVENT_HDR_INIT(frw_get_event_hdr(pst_event_mem),
+                        pst_hcc_event_hdr->en_type,
+                        pst_hcc_event_hdr->uc_sub_type,
+                        OAL_WIFI_CALI_DATA_DOWNLOAD_LEN,
+                        FRW_EVENT_PIPELINE_STAGE_1,
+                        pst_hcc_event_hdr->uc_chip_id,
+                        pst_hcc_event_hdr->uc_device_id,
+                        pst_hcc_event_hdr->uc_vap_id);
+
+
+    pst_dmac_tx_event = (dmac_tx_event_stru *)frw_get_event_payload(pst_event_mem);
+    pst_dmac_tx_event->pst_netbuf = pst_netbuf_info;
+    pst_dmac_tx_event->us_frame_len = ((dmac_tx_event_stru *)frw_get_event_payload(pst_hcc_event_mem))->us_frame_len;
+    //pst_dmac_tx_event->us_remain = ((dmac_tx_event_stru *)frw_get_event_payload(pst_hcc_event_mem))->us_remain;
+
+    return pst_event_mem;
+
+}
+
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 /*****************************************************************************
  函 数 名  : dmac_scan_proc_sched_scan_req_event_rx_adapt
  功能描述  : 通过SDIO下发PNO调度扫描请求信息

@@ -26,7 +26,7 @@ typedef struct _hisi_conn_softwdt_
 
 OAL_STATIC hisi_conn_softwdt g_hisi_softwdt;
 
-OAL_STATIC oal_int32 disable_wdt_flag = 0;
+OAL_STATIC oal_int32 disable_wdt_flag = 1;
 module_param(disable_wdt_flag, int, S_IRUGO | S_IWUSR);
 
 #if 0
@@ -127,7 +127,10 @@ oal_void oal_softwdt_exit(oal_void)
 
     oal_timer_delete_sync(&g_hisi_softwdt.wdt_timer);
     oal_cancel_delayed_work_sync(&g_hisi_softwdt.wdt_delayed_work);
-    oal_destroy_workqueue(g_hisi_softwdt.wdt_wq);
+    if(NULL != g_hisi_softwdt.wdt_wq)
+    {
+        oal_destroy_workqueue(g_hisi_softwdt.wdt_wq);
+    }
 }
 oal_module_symbol(oal_softwdt_exit);
 #endif

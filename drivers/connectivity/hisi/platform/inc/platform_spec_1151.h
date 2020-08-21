@@ -156,18 +156,23 @@ extern "C" {
 #define WLAN_MEM_SHARED_TX_DSCR_CNT1        ((WLAN_TID_MPDU_NUM_LIMIT * 2) * WLAN_DEVICE_SUPPORT_MAX_NUM_SPEC) /* 发送描述符512 */
 #define WLAN_MEM_SHARED_TX_DSCR_SIZE2       256                          /*比实际发送描述符结构体稍大些，预留出后面对发送描述符的修改*/
 #define WLAN_MEM_SHARED_TX_DSCR_CNT2        (256 * WLAN_DEVICE_SUPPORT_MAX_NUM_SPEC) /* 发送amsdu的描述符 */
+#define TOTAL_WLAN_MEM_SHARED_DSCR_SIZE     ((WLAN_MEM_SHARED_RX_DSCR_SIZE + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)*WLAN_MEM_SHARED_RX_DSCR_CNT \
+                                            + (WLAN_MEM_SHARED_TX_DSCR_SIZE1 + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)*WLAN_MEM_SHARED_TX_DSCR_CNT1 \
+                                            + (WLAN_MEM_SHARED_TX_DSCR_SIZE2 + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)*WLAN_MEM_SHARED_TX_DSCR_CNT2)
 
 /*****************************************************************************
   2.4.3 共享管理帧内存池配置信息
 *****************************************************************************/
 #define WLAN_MEM_SHARED_MGMT_PKT_SIZE1      1300
 #define WLAN_MEM_SHARED_MGMT_PKT_CNT1       (8 * WLAN_DEVICE_SUPPORT_MAX_NUM_SPEC)
+#define TOTAL_WLAN_MEM_SHARED_MGMT_PKT_SIZE ((WLAN_MEM_SHARED_MGMT_PKT_SIZE1 + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)*WLAN_MEM_SHARED_MGMT_PKT_CNT1)
 
 /*****************************************************************************
   2.4.4 共享数据帧内存池配置信息
 *****************************************************************************/
 #define WLAN_MEM_SHARED_DATA_PKT_SIZE       44              /* 80211mac帧头大小 */
 #define WLAN_MEM_SHARED_DATA_PKT_CNT        ((256 + 1024) * WLAN_DEVICE_SUPPORT_MAX_NUM_SPEC) /* skb(接收的帧头个数) + 发送描述符个数(发送的帧头个数) 768 */
+#define TOTAL_WLAN_MEM_SHARED_DATA_PKT_SIZE ((WLAN_MEM_SHARED_DATA_PKT_SIZE + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)*WLAN_MEM_SHARED_DATA_PKT_CNT)
 
 /*****************************************************************************
   2.4.5 本地内存池配置信息

@@ -117,8 +117,8 @@ int read_from_dts(char *buf, int buf_len, char *node_name, char *property_name)
 static ssize_t hwconn_read_proc_chiptype(struct file *filp, char __user *buffer, size_t len, loff_t *off)
 {
     printk(KERN_DEBUG "[HW_CONN] hwconn_read_proc_chiptype\n");
-    if (len < 1 || NULL == g_chip_type[HW_PROC_CHIPTYPE]) {
-        printk(KERN_ERR "[HW_CONN] hwconn_read_proc_chiptype g_chip_type is NULL or read length = 0.\n");
+    if (NULL == g_chip_type[HW_PROC_CHIPTYPE] || len < strlen(g_chip_type[HW_PROC_CHIPTYPE])) {
+        printk(KERN_ERR "[HW_CONN] hwconn_read_proc_chiptype g_chip_type is NULL or read length = %lu.\n", len);
         return -EINVAL;
     }
 
@@ -146,8 +146,8 @@ static ssize_t hwconn_read_proc_chiptype(struct file *filp, char __user *buffer,
 static ssize_t hwconn_read_proc_supp(struct file *filp, char __user *buffer, size_t len, loff_t *off)
 {
     printk(KERN_INFO "[HW_CONN] hwconn_read_proc_chiptype\n");
-    if (len < 1 || NULL == g_chip_type[HW_PROC_SUPP]) {
-        printk(KERN_ERR "[HW_CONN] hwconn_read_proc_chiptype g_chip_type is NULL or read length = 0.\n");
+    if (NULL == g_chip_type[HW_PROC_SUPP] || len < strlen(g_chip_type[HW_PROC_SUPP])) {
+        printk(KERN_ERR "[HW_CONN] hwconn_read_proc_chiptype g_chip_type is NULL or read length = %lu.\n", len);
         return -EINVAL;
     }
 
@@ -174,8 +174,8 @@ static ssize_t hwconn_read_proc_supp(struct file *filp, char __user *buffer, siz
 static ssize_t hwconn_read_proc_p2p(struct file *filp, char __user *buffer, size_t len, loff_t *off)
 {
     printk(KERN_DEBUG "[HW_CONN] hwconn_read_proc_chiptype\n");
-    if (len < 1 || NULL == g_chip_type[HW_PROC_P2P]) {
-        printk(KERN_ERR "[HW_CONN] hwconn_read_proc_chiptype g_chip_type is NULL or read length = 0.\n");
+    if (NULL == g_chip_type[HW_PROC_P2P] || len < strlen(g_chip_type[HW_PROC_P2P])) {
+        printk(KERN_ERR "[HW_CONN] hwconn_read_proc_chiptype g_chip_type is NULL or read length = %lu.\n", len);
         return -EINVAL;
     }
 
@@ -202,8 +202,8 @@ static ssize_t hwconn_read_proc_p2p(struct file *filp, char __user *buffer, size
 static ssize_t hwconn_read_proc_apd(struct file *filp, char __user *buffer, size_t len, loff_t *off)
 {
     printk(KERN_DEBUG "[HW_CONN] hwconn_read_proc_chiptype\n");
-    if (len < 1 || NULL == g_chip_type[HW_PROC_HOSTAPD]) {
-        printk(KERN_ERR "[HW_CONN] hwconn_read_proc_chiptype g_chip_type is NULL or read length = 0.\n");
+    if (NULL == g_chip_type[HW_PROC_HOSTAPD] || len < strlen(g_chip_type[HW_PROC_HOSTAPD])) {
+        printk(KERN_ERR "[HW_CONN] hwconn_read_proc_chiptype g_chip_type is NULL or read length = %lu.\n", len);
         return -EINVAL;
     }
 
@@ -230,8 +230,8 @@ static ssize_t hwconn_read_proc_apd(struct file *filp, char __user *buffer, size
 static ssize_t hwconn_read_proc_firmware(struct file *filp, char __user *buffer, size_t len, loff_t *off)
 {
     printk(KERN_DEBUG "[HW_CONN] hwconn_read_proc_chiptype\n");
-    if (len < 1 || NULL == g_chip_type[HW_PROC_FIRMWARE]) {
-        printk(KERN_ERR "[HW_CONN] hwconn_read_proc_chiptype g_chip_type is NULL or read length = 0.\n");
+    if (NULL == g_chip_type[HW_PROC_FIRMWARE] || len < strlen(g_chip_type[HW_PROC_FIRMWARE])) {
+        printk(KERN_ERR "[HW_CONN] hwconn_read_proc_chiptype g_chip_type is NULL or read length = %lu.\n", len);
         return -EINVAL;
     }
 

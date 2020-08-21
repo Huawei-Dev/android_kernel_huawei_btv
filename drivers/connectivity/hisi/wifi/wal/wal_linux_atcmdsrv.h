@@ -83,6 +83,7 @@ enum WAL_ATCMDSRV_IOCTL_CMD
 #define WAL_ATCMDSRV_EFUSE_ADC_ERR_FLAG           0x0C
 #define WAL_ATCMDSRV_EFUSE_BUFF_LEN               16
 #define WAL_ATCMDSRV_EFUSE_REG_WIDTH              0x10
+#define WAL_ATCMDSRV_CHANNEL_NUM                  6
 
 
 /*****************************************************************************
@@ -115,6 +116,7 @@ enum WAL_ATCMDSRV_IOCTL_CMD
     WAL_ATCMDSRV_IOCTL_CMD_SET_ANT,
     WAL_ATCMDSRV_IOCTL_CMD_DIEID_INFORM,
     WAL_ATCMDSRV_IOCTL_CMD_SET_COUNTRY,
+    WAL_ATCMDSRV_IOCTL_CMD_GET_UPCCODE,
     WAL_ATCMDSRV_IOCTL_CMD_TEST_BUTT
 
 
@@ -177,6 +179,7 @@ typedef struct wal_atcmdsrv_wifi_priv_cmd {
     oal_int32 l_sdio_loop_set;
     oal_int32 l_efuse_check_result;
     oal_int32 l_set_ant;
+    oal_int32 upc_code;
     oal_uint8 auc_mac_addr[WAL_ATCMDSRV_IOCTL_MAC_LEN];         /* 6 */
     oal_int8  auc_dbb[WAL_ATCMDSRV_IOCTL_DBB_LEN];              /* 12 */
     oal_uint8 auc_caldata[WAL_ATCMDSRV_NV_WINVRAM_LENGTH];      /* 104 */

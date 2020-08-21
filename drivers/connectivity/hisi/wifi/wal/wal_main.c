@@ -37,6 +37,11 @@ extern "C" {
 #include "hmac_ext_if.h"
 
 #include "wal_main.h"
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+#ifdef CONFIG_DOZE_FILTER
+#include <huawei_platform/power/wifi_filter/wifi_filter.h>
+#endif
+#endif /* _PRE_WLAN_FEATURE_IP_FILTER */
 #include "wal_config.h"
 #include "wal_linux_ioctl.h"
 #include "wal_linux_cfg80211.h"
@@ -73,6 +78,18 @@ oal_wakelock_stru   g_st_wal_wakelock;
 #ifdef _PRE_E5_722_PLATFORM
 oal_wakelock_stru   g_st_wifi_wakelock;
 #endif
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+#if (_PRE_OS_VERSION_LINUX == _PRE_OS_VERSION)
+wal_hw_wlan_filter_ops g_st_ip_filter_ops = {
+    .set_filter_enable = wal_set_ip_filter_enable,
+    .add_filter_items = wal_add_ip_filter_items,
+    .clear_filters = wal_clear_ip_filter,
+    .get_filter_pkg_stat = NULL,
+};
+#else
+wal_hw_wlan_filter_ops g_st_ip_filter_ops;
+#endif
+#endif /* _PRE_WLAN_FEATURE_IP_FILTER */
 /*****************************************************************************
   3 函数实现
 *****************************************************************************/
@@ -460,13 +477,15 @@ oal_int32  wal_main_init(oal_void)
     oam_wal_func_fook_register(&g_st_wal_drv_func_hook);
 
 #ifdef _PRE_WLAN_FEATURE_P2P
-    /* DTSxxxxxx 初始化cfg80211 删除网络设备工作队列 */
+    /* 初始化cfg80211 删除网络设备工作队列 */
     g_pst_del_virtual_inf_workqueue = OAL_CREATE_SINGLETHREAD_WORKQUEUE("cfg80211_del_virtual_inf");
     if (!g_pst_del_virtual_inf_workqueue)
     {
-        OAM_WARNING_LOG0(0, OAM_SF_ANY, "{mac_device_init::Failed to create cfg80211 del virtual infterface workqueue!}");
+        wal_cfg80211_exit();
+        frw_timer_delete_all_timer();
+        OAM_WARNING_LOG0(0, OAM_SF_ANY, "{wal_main_init::Failed to create cfg80211 del virtual infterface workqueue!}");
 
-        return OAL_FAIL;
+        return -OAL_EFAIL;
     }
 #endif /* _PRE_WLAN_FEATURE_P2P */
 
@@ -482,9 +501,12 @@ oal_int32  wal_main_init(oal_void)
     wal_dfx_init();
 #endif //#ifdef _PRE_WLAN_FEATURE_DFR
 #ifdef _PRE_PLAT_FEATURE_CUSTOMIZE
-
-    wal_set_custom_process_func();
+    wal_set_custom_process_func(wal_custom_cali);
 #endif
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+    wal_register_ip_filter(&g_st_ip_filter_ops);
+#endif /* _PRE_WLAN_FEATURE_IP_FILTER */
+
     return OAL_SUCC;
 }
 
@@ -509,9 +531,9 @@ oal_void  wal_destroy_all_vap(oal_void)
 
     oal_uint8               uc_vap_id = 0;
     oal_net_device_stru    *pst_net_dev;
+    oal_wireless_dev_stru  *pst_wdev;
     oal_int8                ac_param[10] = {0};
     OAL_IO_PRINT("wal_destroy_all_vap start");
-
     /* 删除业务vap，双芯片id从2开始，增加编译宏表示板级业务vap起始id 后续业务vap的处理，采用此宏 DTS2015062404971  */
     for (uc_vap_id = WLAN_SERVICE_VAP_START_ID_PER_BOARD; uc_vap_id < WLAN_VAP_SUPPORT_MAX_NUM_LIMIT; uc_vap_id++)
     {
@@ -524,6 +546,32 @@ oal_void  wal_destroy_all_vap(oal_void)
             frw_event_process_all_event(0);
         }
     }
+
+    pst_net_dev=oal_dev_get_by_name("wlan0");
+    if(OAL_PTR_NULL != pst_net_dev)
+    {
+        oal_dev_put(pst_net_dev);
+        pst_wdev = OAL_NETDEVICE_WDEV(pst_net_dev);
+        oal_net_unregister_netdev(pst_net_dev);
+        if (pst_wdev)
+        {
+            OAL_IO_PRINT("%s:free wlan0 wdev\n", __func__);
+            OAL_MEM_FREE(pst_wdev, OAL_TRUE);
+        }
+    }
+    pst_net_dev=oal_dev_get_by_name("p2p0");
+    if(OAL_PTR_NULL != pst_net_dev)
+    {
+        oal_dev_put(pst_net_dev);
+        pst_wdev = OAL_NETDEVICE_WDEV(pst_net_dev);
+        oal_net_unregister_netdev(pst_net_dev);
+        if (pst_wdev)
+        {
+            OAL_IO_PRINT("%s:free p2p0 wdev\n", __func__);
+            OAL_MEM_FREE(pst_wdev, OAL_TRUE);
+        }
+    }
+
 #endif
 
     return;
@@ -546,15 +594,18 @@ oal_void  wal_destroy_all_vap(oal_void)
 *****************************************************************************/
 oal_void  wal_main_exit(oal_void)
 {
+#ifdef _PRE_PLAT_FEATURE_CUSTOMIZE
+    wal_set_custom_process_func(OAL_PTR_NULL);
+#endif
+
 #if defined(_PRE_CONFIG_CONN_HISI_SYSFS_SUPPORT) && (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
 /*debug sysfs*/
     wal_sysfs_entry_exit();
 #endif
     /* down掉所有的vap */
     wal_destroy_all_vap();
-#if (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1151)
-    /* 此处02加载ko时出现，找不到符号的错误，待后续解决 TBD */
 
+#if (_PRE_OS_VERSION_LINUX == _PRE_OS_VERSION)
     /* 卸载每个device硬件设备对应的wiphy */
     wal_cfg80211_exit();
 #endif
@@ -567,11 +618,18 @@ oal_void  wal_main_exit(oal_void)
     /* 卸载成功时，将初始化状态置为HMAC初始化成功 */
     frw_set_init_state(FRW_INIT_STATE_HMAC_CONFIG_VAP_SUCC);
 
+    /* wal钩子函数去初始化 */
+    wal_drv_cfg_func_hook_deinit();
+
     /* 去注册钩子函数 */
     oam_wal_func_fook_unregister();
 #ifdef _PRE_WLAN_FEATURE_P2P
-    /* DTSxxxxxx 删除cfg80211 删除网络设备工作队列 */
-    oal_destroy_workqueue(g_pst_del_virtual_inf_workqueue);
+    /* 删除cfg80211 删除网络设备工作队列 */
+    if (g_pst_del_virtual_inf_workqueue)
+    {
+        oal_destroy_workqueue(g_pst_del_virtual_inf_workqueue);
+        g_pst_del_virtual_inf_workqueue = OAL_PTR_NULL;
+    }
 #endif
 
 #ifdef _PRE_SUPPORT_ACS
@@ -586,6 +644,11 @@ oal_void  wal_main_exit(oal_void)
     wifi_wake_unlock();
     oal_wake_lock_exit(&g_st_wifi_wakelock);
 #endif
+
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+    wal_unregister_ip_filter();
+#endif /* _PRE_WLAN_FEATURE_IP_FILTER */
+
 }
 
 /*lint -e578*//*lint -e19*/

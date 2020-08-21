@@ -50,6 +50,7 @@ extern "C" {
 /* 1个device支持的最大关联用户数 */
 #if (defined(_PRE_PRODUCT_ID_HI110X_DEV) || defined(_PRE_PRODUCT_ID_HI110X_HOST))
 oal_uint16      g_us_max_asoc_user = 8;
+
 #else
 oal_uint16      g_us_max_asoc_user = 32;
 #endif
@@ -161,8 +162,6 @@ oal_uint32  mac_res_check_spec(oal_void)
 oal_uint32  mac_res_user_init(oal_void)
 {
     oal_uint16      us_max_asoc_user_per_board;
-    oal_uint16      us_max_service_vap_num_per_board;
-    oal_uint16      us_max_user;
     oal_uint32      ul_loop;
     oal_void       *p_user_info = OAL_PTR_NULL;
     oal_void       *p_idx       = OAL_PTR_NULL;
@@ -182,13 +181,11 @@ oal_uint32  mac_res_user_init(oal_void)
     最大组播用户 = 1个device支持的最大业务vap数 * board上面的device数目;
     最大用户数 = 最大关联用户 + 组播用户个数 */
     us_max_asoc_user_per_board = (oal_uint16)(g_us_max_asoc_user * MAC_RES_MAX_DEV_NUM);
-    us_max_service_vap_num_per_board = WLAN_SERVICE_VAP_MAX_NUM_PER_DEVICE * MAC_RES_MAX_DEV_NUM;
-    us_max_user = us_max_asoc_user_per_board + us_max_service_vap_num_per_board;
 
     /* 检查申请的资源池大小是否合适 */
-    us_user_info_size = (oal_uint16)(OAL_SIZEOF(mac_res_mem_user_stru) * us_max_user);
-    us_idx_size       = (oal_uint16)(OAL_SIZEOF(oal_uint)* us_max_user);
-    us_user_cnt_size  = (oal_uint16)(OAL_SIZEOF(oal_uint8) * us_max_user);
+    us_user_info_size = (oal_uint16)(OAL_SIZEOF(mac_res_mem_user_stru) * MAC_RES_MAX_USER_NUM);
+    us_idx_size       = (oal_uint16)(OAL_SIZEOF(oal_uint)* MAC_RES_MAX_USER_NUM);
+    us_user_cnt_size  = (oal_uint16)(OAL_SIZEOF(oal_uint8) * MAC_RES_MAX_USER_NUM);
     if (WLAN_MEM_LOCAL_SIZE6 < (us_user_info_size + us_idx_size + us_user_cnt_size))
     {
 
@@ -212,9 +209,9 @@ oal_uint32  mac_res_user_init(oal_void)
 
 
     /* 内存初始清0 */
-    OAL_MEMZERO(p_user_info, (OAL_SIZEOF(mac_res_mem_user_stru) * us_max_user));
-    OAL_MEMZERO(p_idx,       (OAL_SIZEOF(oal_uint) * us_max_user));
-    OAL_MEMZERO(p_user_cnt,  (OAL_SIZEOF(oal_uint8) * us_max_user));
+    OAL_MEMZERO(p_user_info, (OAL_SIZEOF(mac_res_mem_user_stru) * MAC_RES_MAX_USER_NUM));
+    OAL_MEMZERO(p_idx,       (OAL_SIZEOF(oal_uint) * MAC_RES_MAX_USER_NUM));
+    OAL_MEMZERO(p_user_cnt,  (OAL_SIZEOF(oal_uint8) * MAC_RES_MAX_USER_NUM));
 
     g_st_mac_res.st_user_res.pst_user_info  = p_user_info;
     g_st_mac_res.st_user_res.pul_idx        = p_idx;
@@ -222,7 +219,7 @@ oal_uint32  mac_res_user_init(oal_void)
 
     g_st_mac_res.st_user_res.us_hmac_priv_size = 0;
 
-    for (ul_loop = 0; ul_loop < us_max_user; ul_loop++)
+    for (ul_loop = 0; ul_loop < MAC_RES_MAX_USER_NUM; ul_loop++)
     {
 
         /* 初始化对应的引用计数值为0 */
@@ -414,7 +411,7 @@ oal_uint32  mac_res_init(oal_void)
 *****************************************************************************/
 oal_uint32  mac_res_free_mac_user(oal_uint16 us_idx)
 {
-    if (OAL_UNLIKELY(us_idx >= g_us_max_asoc_user * MAC_RES_MAX_DEV_NUM + WLAN_SERVICE_VAP_MAX_NUM_PER_DEVICE * MAC_RES_MAX_DEV_NUM))
+    if (OAL_UNLIKELY(us_idx >= MAC_RES_MAX_USER_NUM))
     {
         return OAL_FAIL;
     }
@@ -476,6 +473,9 @@ oal_uint32  mac_res_free_mac_vap(oal_uint32 ul_idx)
 }
 
 #else
+#if (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1102_HOST)
+mac_res_mem_user_stru g_ast_mac_user_res[MAC_RES_MAX_USER_NUM];
+#endif
 
 /*****************************************************************************
  函 数 名  : mac_res_user_init
@@ -495,8 +495,6 @@ oal_uint32  mac_res_free_mac_vap(oal_uint32 ul_idx)
 oal_uint32  mac_res_user_init(oal_void)
 {
     oal_uint16      us_max_asoc_user_per_board;
-    oal_uint16      us_max_service_vap_num_per_board;
-    oal_uint16      us_max_user;
     oal_uint        ul_loop;
     oal_void       *p_user_info = OAL_PTR_NULL;
     oal_void       *p_idx       = OAL_PTR_NULL;
@@ -513,22 +511,25 @@ oal_uint32  mac_res_user_init(oal_void)
     最大组播用户 = 1个device支持的最大业务vap数 * board上面的device数目;
     最大用户数 = 最大关联用户 + 组播用户个数 */
     us_max_asoc_user_per_board = (oal_uint16)(g_us_max_asoc_user * MAC_RES_MAX_DEV_NUM);
-    us_max_service_vap_num_per_board = WLAN_SERVICE_VAP_MAX_NUM_PER_DEVICE * MAC_RES_MAX_DEV_NUM;
-    us_max_user = us_max_asoc_user_per_board + us_max_service_vap_num_per_board;
 
     /* 动态申请用户资源池相关内存 */
-    p_user_info = oal_memalloc(OAL_SIZEOF(mac_res_mem_user_stru) * us_max_user);
-    p_idx       = oal_memalloc(OAL_SIZEOF(oal_uint) * us_max_user);
-    p_user_cnt  = oal_memalloc(OAL_SIZEOF(oal_uint8) * us_max_user);
+#if (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1102_HOST)
+    p_user_info = (oal_void *)g_ast_mac_user_res;
+#else
+    p_user_info = oal_memalloc(OAL_SIZEOF(mac_res_mem_user_stru) * MAC_RES_MAX_USER_NUM);
+#endif
+    p_idx       = oal_memalloc(OAL_SIZEOF(oal_uint) * MAC_RES_MAX_USER_NUM);
+    p_user_cnt  = oal_memalloc(OAL_SIZEOF(oal_uint8) * MAC_RES_MAX_USER_NUM);
     if ((OAL_PTR_NULL == p_user_info) || (OAL_PTR_NULL == p_idx) || (OAL_PTR_NULL == p_user_cnt))
     {
         OAM_ERROR_LOG0(0, OAM_SF_ANY, "{mac_res_user_init::param null.}");
-
+#if (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1102_HOST)
+#else
         if (OAL_PTR_NULL != p_user_info)
         {
             oal_free(p_user_info);
         }
-
+#endif
         if (OAL_PTR_NULL != p_idx)
         {
             oal_free(p_idx);
@@ -544,9 +545,9 @@ oal_uint32  mac_res_user_init(oal_void)
 
 
     /* 内存初始清0 */
-    OAL_MEMZERO(p_user_info, (OAL_SIZEOF(mac_res_mem_user_stru) * us_max_user));
-    OAL_MEMZERO(p_idx,       (OAL_SIZEOF(oal_uint) * us_max_user));
-    OAL_MEMZERO(p_user_cnt,  (OAL_SIZEOF(oal_uint8) * us_max_user));
+    OAL_MEMZERO(p_user_info, (OAL_SIZEOF(mac_res_mem_user_stru) * MAC_RES_MAX_USER_NUM));
+    OAL_MEMZERO(p_idx,       (OAL_SIZEOF(oal_uint) * MAC_RES_MAX_USER_NUM));
+    OAL_MEMZERO(p_user_cnt,  (OAL_SIZEOF(oal_uint8) * MAC_RES_MAX_USER_NUM));
 
     g_st_mac_res.st_user_res.pst_user_info  = p_user_info;
     g_st_mac_res.st_user_res.pul_idx        = p_idx;
@@ -554,10 +555,10 @@ oal_uint32  mac_res_user_init(oal_void)
 
     oal_queue_set(&(g_st_mac_res.st_user_res.st_queue),
                   g_st_mac_res.st_user_res.pul_idx,
-                  (oal_uint8)us_max_user);
+                  (oal_uint8)MAC_RES_MAX_USER_NUM);
     g_st_mac_res.st_user_res.us_hmac_priv_size = 0;
 
-    for (ul_loop = 0; ul_loop < us_max_user; ul_loop++)
+    for (ul_loop = 0; ul_loop < MAC_RES_MAX_USER_NUM; ul_loop++)
     {
         /* 初始值保存的是对应数组下标值加1 */
         oal_queue_enqueue(&(g_st_mac_res.st_user_res.st_queue), (oal_void *)(ul_loop + 1));
@@ -592,7 +593,10 @@ oal_uint32  mac_res_user_init(oal_void)
         }
 
         /* 释放用户资源池申请的内存 */
+#if (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1102_HOST)
+#else
         oal_free(p_user_info);
+#endif
         oal_free(p_idx);
         oal_free(p_user_cnt);
 
@@ -644,7 +648,10 @@ oal_uint32  mac_res_user_init(oal_void)
 *****************************************************************************/
 oal_uint32  mac_res_exit(void)
 {
+#if (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1102_HOST)
+#else
     oal_free(g_st_mac_res.st_user_res.pst_user_info);
+#endif
     oal_free(g_st_mac_res.st_user_res.pul_idx);
     oal_free(g_st_mac_res.st_user_res.puc_user_cnt);
 
@@ -684,6 +691,13 @@ oal_uint32  mac_res_init(oal_void)
     oal_uint        ul_loop;
     oal_uint32      ul_ret;
 
+    ul_ret = mac_res_check_spec();
+    if (OAL_SUCC != ul_ret)
+    {
+        OAM_ERROR_LOG1(0, OAM_SF_ANY, "{mac_res_init::mac_res_user_init failed[%d].}", ul_ret);
+        return ul_ret;
+    }
+
     OAL_MEMZERO(&g_st_mac_res, OAL_SIZEOF(mac_res_stru));
     /***************************************************************************
             初始化DEV的资源管理内容
@@ -691,13 +705,6 @@ oal_uint32  mac_res_init(oal_void)
     oal_queue_set(&(g_st_mac_res.st_dev_res.st_queue),
                   g_st_mac_res.st_dev_res.aul_idx,
                   MAC_RES_MAX_DEV_NUM);
-
-    ul_ret = mac_res_check_spec();
-    if (OAL_SUCC != ul_ret)
-    {
-        OAM_ERROR_LOG1(0, OAM_SF_ANY, "{mac_res_init::mac_res_user_init failed[%d].}", ul_ret);
-        return ul_ret;
-    }
 
     for (ul_loop = 0; ul_loop < MAC_RES_MAX_DEV_NUM; ul_loop++)
     {
@@ -758,7 +765,7 @@ oal_uint32  mac_res_init(oal_void)
 *****************************************************************************/
 oal_uint32  mac_res_free_mac_user(oal_uint16 us_idx)
 {
-    if (OAL_UNLIKELY(us_idx >= g_us_max_asoc_user * MAC_RES_MAX_DEV_NUM + WLAN_SERVICE_VAP_MAX_NUM_PER_DEVICE * MAC_RES_MAX_DEV_NUM))
+    if (OAL_UNLIKELY(us_idx >= MAC_RES_MAX_USER_NUM))
     {
         return OAL_FAIL;
     }

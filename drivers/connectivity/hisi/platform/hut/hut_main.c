@@ -1356,6 +1356,7 @@ oal_int32 hut_main_init(oal_void)
         HUT_ERR_LOG(0, "hut_main_init, create singlethread workqueue fail.");
 
         oal_free(g_st_base_addr.puc_base_addr_origin);
+        g_st_base_addr.puc_base_addr_origin = OAL_PTR_NULL;
 
         return OAL_ERR_CODE_PTR_NULL;
     }
@@ -1409,7 +1410,10 @@ oal_void  hut_main_exit(oal_void)
     hal_to_hut_irq_isr_unregister();
 
     /* 销毁工作队列 */
-    oal_destroy_workqueue(g_st_hut_workqueue.pst_rx_workqueue);
+    if (OAL_PTR_NULL != g_st_hut_workqueue.pst_rx_workqueue)
+    {
+        oal_destroy_workqueue(g_st_hut_workqueue.pst_rx_workqueue);
+    }
 
     /* 卸载HUT模块netlink接收函数 */
     oam_netlink_ops_unregister(OAM_NL_CMD_HUT);

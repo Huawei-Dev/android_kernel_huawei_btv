@@ -858,7 +858,7 @@ typedef struct tag_hal_tx_dscr_stru
 #ifdef _PRE_WLAN_FEATURE_PROXYSTA
     oal_uint8                           bit_tx_hal_vap_id       :4; /* Proxy STAµÄtx hal_vap_id */
 #else
-    oal_uint8                           bit_resv                 : 4;
+    oal_uint8                           bit_resv                :4;
 #endif
     oal_uint8                           data[4];
 }hal_tx_dscr_stru;
@@ -2375,6 +2375,9 @@ extern oal_void hi1151_rf_cali_set_vref(wlan_channel_band_enum_uint8 en_band, oa
                                     oal_uint8  uc_band_idx, oal_uint16 us_vref_value);
 extern oal_void hi1151_rf_auto_cali(hal_to_dmac_device_stru * pst_hal_device);
 #endif
+extern oal_void hi1151_dscr_set_iv_value(hal_tx_dscr_stru *pst_tx_dscr, oal_uint32 ul_iv_ls_word, oal_uint32 ul_iv_ms_word);
+extern oal_void hi1151_dscr_set_tx_pn_hw_bypass(hal_tx_dscr_stru *pst_tx_dscr, oal_bool_enum_uint8 en_bypass);
+extern oal_void hi1151_dscr_get_tx_pn_hw_bypass(hal_tx_dscr_stru *pst_tx_dscr, oal_bool_enum_uint8 *pen_bypass);
 
 #elif ((_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1102_DEV) || (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1102_HOST))
 
@@ -2908,7 +2911,9 @@ extern oal_void hi1102_config_always_rx(hal_to_dmac_device_stru *pst_hal_device_
 
 extern oal_uint32 hi1102_rf_get_pll_div_idx(wlan_channel_band_enum_uint8 en_band,oal_uint8  uc_channel_idx,
                                             wlan_channel_bandwidth_enum_uint8 en_bandwidth,oal_uint8  *puc_pll_div_idx);
-
+extern oal_void hi1102_dscr_set_iv_value(hal_tx_dscr_stru *pst_tx_dscr, oal_uint32 ul_iv_ls_word, oal_uint32 ul_iv_ms_word);
+extern oal_void hi1102_dscr_set_tx_pn_hw_bypass(hal_tx_dscr_stru *pst_tx_dscr, oal_bool_enum_uint8 en_bypass);
+extern oal_void hi1102_dscr_get_tx_pn_hw_bypass(hal_tx_dscr_stru *pst_tx_dscr, oal_bool_enum_uint8 *pen_bypass);
 #elif ((_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1103_DEV) || (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1103_HOST))
 
 /************************  1103  CHIP********************************************/

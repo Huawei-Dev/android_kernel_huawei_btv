@@ -414,31 +414,21 @@ OAL_STATIC oal_void  hmac_cfg80211_prepare_scan_req_sta(mac_vap_stru *pst_mac_va
         pst_scan_params->uc_max_scan_count_per_channel    = 1;
     }
 
-    if ('\0' == pst_cfg80211_scan_param->st_ssids[0].auc_ssid[0])
+    for (uc_loop = 0; uc_loop < pst_cfg80211_scan_param->l_ssid_num; uc_loop++)
     {
-        pst_scan_params->ast_mac_ssid_set[0].auc_ssid[0] = '\0';   /* 通配ssid */
-
-        /* 如果上层未下发指定ssid，则采用默认值(后续根据bcm的行为做对应调整) */
-        pst_scan_params->uc_max_send_probe_req_count_per_channel = WLAN_DEFAULT_SEND_PROBE_REQ_COUNT_PER_CHANNEL;
+        oal_memcopy(pst_scan_params->ast_mac_ssid_set[uc_loop].auc_ssid, pst_cfg80211_scan_param->st_ssids[uc_loop].auc_ssid,
+                    pst_cfg80211_scan_param->st_ssids[uc_loop].uc_ssid_len);
+        pst_scan_params->ast_mac_ssid_set[uc_loop].auc_ssid[pst_cfg80211_scan_param->st_ssids[uc_loop].uc_ssid_len] = '\0';   /* ssid末尾置'\0' */
     }
-    else
+
+    /* 如果上层下发了指定ssid，则每次扫描发送的probe req帧的个数为下发的ssid个数 */
+    pst_scan_params->uc_max_send_probe_req_count_per_channel = (oal_uint8)pst_cfg80211_scan_param->l_ssid_num;
+
+    if((pst_scan_params->uc_max_send_probe_req_count_per_channel > 3)
+       && (WLAN_SCAN_TYPE_ACTIVE == pst_scan_params->en_scan_type))
     {
-        for (uc_loop = 0; uc_loop < pst_cfg80211_scan_param->l_ssid_num; uc_loop++)
-        {
-            oal_memcopy(pst_scan_params->ast_mac_ssid_set[uc_loop].auc_ssid, pst_cfg80211_scan_param->st_ssids[uc_loop].auc_ssid,
-                        pst_cfg80211_scan_param->st_ssids[uc_loop].uc_ssid_len);
-            pst_scan_params->ast_mac_ssid_set[uc_loop].auc_ssid[pst_cfg80211_scan_param->st_ssids[uc_loop].uc_ssid_len] = '\0';   /* ssid末尾置'\0' */
-        }
-
-        /* 如果上层下发了指定ssid，则每次扫描发送的probe req帧的个数为下发的ssid个数 */
-        pst_scan_params->uc_max_send_probe_req_count_per_channel = (oal_uint8)pst_cfg80211_scan_param->l_ssid_num;
-
-        if((pst_scan_params->uc_max_send_probe_req_count_per_channel > 3)
-           && (WLAN_SCAN_TYPE_ACTIVE == pst_scan_params->en_scan_type))
-        {
-            /* 如果指定SSID个数大于3个,则调整发送超时时间为40ms,默认发送等待超时20ms */
-            pst_scan_params->us_scan_time = WLAN_LONG_ACTIVE_SCAN_TIME;
-        }
+        /* 如果指定SSID个数大于3个,则调整发送超时时间为40ms,默认发送等待超时20ms */
+        pst_scan_params->us_scan_time = WLAN_LONG_ACTIVE_SCAN_TIME;
     }
 
     pst_scan_params->uc_ssid_num = (oal_uint8)pst_cfg80211_scan_param->l_ssid_num;
@@ -798,6 +788,7 @@ oal_uint32  hmac_cfg80211_start_sched_scan(mac_vap_stru *pst_mac_vap, oal_uint16
     pst_hmac_device = hmac_res_get_mac_dev(pst_hmac_vap->st_vap_base_info.uc_device_id);
     if (OAL_PTR_NULL == pst_hmac_device)
     {
+        OAL_MEM_FREE(pst_cfg80211_pno_scan_params, OAL_TRUE);
         OAM_WARNING_LOG1(pst_hmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_SCAN, "{hmac_cfg80211_start_sched_scan::device id[%d],hmac_device null.}",pst_hmac_vap->st_vap_base_info.uc_device_id);
         return OAL_ERR_CODE_MAC_DEVICE_NULL;
     }
@@ -829,7 +820,7 @@ oal_uint32  hmac_cfg80211_start_sched_scan(mac_vap_stru *pst_mac_vap, oal_uint16
     hmac_scan_set_sour_mac_addr_in_probe_req(pst_hmac_vap, st_pno_scan_params.auc_sour_mac_addr,
                                              en_is_random_mac_addr_scan, OAL_FALSE);
 
-    /* 状态机调用: hmac_scan_proc_scan_req_event */
+    /* 状态机调用: hmac_scan_proc_sched_scan_req_event */
     ul_ret = hmac_fsm_call_func_sta(pst_hmac_vap, HMAC_FSM_INPUT_SCHED_SCAN_REQ, (oal_void *)(&st_pno_scan_params));
     if (OAL_SUCC != ul_ret)
     {
@@ -976,16 +967,19 @@ oal_uint32  hmac_cfg80211_start_scan_sta(mac_vap_stru *pst_mac_vap, oal_uint16 u
     /* 释放wal层alloc的内存 */
     OAL_MEM_FREE(pst_cfg80211_scan_param_pst->pst_mac_cfg80211_scan_param, OAL_FALSE);
 
-    /* 状态机调用: hmac_scan_proc_scan_req_event */
+    /* 状态机调用: hmac_scan_proc_scan_req_event, hmac_scan_proc_scan_req_event_exception */
     ul_ret = hmac_fsm_call_func_sta(pst_hmac_vap, HMAC_FSM_INPUT_SCAN_REQ, (oal_void *)(&st_scan_params));
     if (OAL_SUCC != ul_ret)
     {
         OAM_WARNING_LOG1(pst_hmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_SCAN, "{hmac_cfg80211_start_scan_sta::hmac_fsm_call_func_sta fail[%d].}", ul_ret);
+
+        /* BEGIN: DTS2017021709078:如果hmac 扫描执行失败，则上报wal 层扫描失败事件,不用等待wal 层扫描定时器超时 */
+        hmac_scan_proc_scan_req_event_exception(pst_hmac_vap, &ul_ret);
+        /* END: DTS2017021709078:如果hmac 扫描执行失败，则上报wal 层扫描失败事件,不用等待wal 层扫描定时器超时 */
         return ul_ret;
     }
 
     return OAL_SUCC;
-
 
 ERROR_STEP:
 #if (_PRE_OS_VERSION_WIN32 == _PRE_OS_VERSION) && (_PRE_TEST_MODE == _PRE_TEST_MODE_UT)

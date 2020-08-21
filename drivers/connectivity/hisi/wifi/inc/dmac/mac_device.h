@@ -115,6 +115,10 @@ extern "C" {
 #define MAC_FCS_DBAC_NEED_OPEN        2   /* DBAC需要开启 */
 
 
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+#define MAC_MAX_IP_FILTER_BTABLE_SIZE 512 /* rx ip数据包过滤功能的黑名单大小 */
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
+
 /*****************************************************************************
   3 枚举定义
 *****************************************************************************/
@@ -393,6 +397,40 @@ typedef enum
     HMAC_FBT_SCAN_USER_BUTT
 }hmac_fbt_scan_user_used_state;
 #endif
+
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+
+/* rx ip数据包过滤的配置命令 */
+typedef enum
+{
+    MAC_IP_FILTER_ENABLE         = 0, /* 开/关ip数据包过滤功能 */
+    MAC_IP_FILTER_UPDATE_BTABLE  = 1, /* 更新黑名单 */
+    MAC_IP_FILTER_CLEAR          = 2, /* 清除黑名单 */
+
+    MAC_IP_FILTER_BUTT
+}mac_ip_filter_cmd_enum;
+typedef oal_uint8 mac_ip_filter_cmd_enum_uint8;
+
+/* 黑名单条目格式 */
+typedef struct
+{
+    oal_uint16                 us_port;          /* 目的端口号，以主机字节序格式存储 */
+    oal_uint8                  uc_protocol;
+    oal_uint8                  uc_resv;
+    //oal_uint32                  ul_filter_cnt; /* 目前未接受"统计过滤包数量"的需求，此成员暂不使用 */
+}mac_ip_filter_item_stru;
+
+/* 配置命令格式 */
+typedef struct
+{
+    oal_uint8                       uc_item_count;
+    oal_bool_enum_uint8             en_enable;      /* 下发功能使能标志 */
+    mac_ip_filter_cmd_enum_uint8    en_cmd;
+    oal_uint8                       uc_resv;
+    mac_ip_filter_item_stru         ast_filter_items_items[1];
+}mac_ip_filter_cmd_stru;
+
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 /*****************************************************************************
   4 全局变量声明
 *****************************************************************************/
@@ -1217,12 +1255,35 @@ typedef struct
 
 }mac_chip_stru;
 
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+typedef enum
+{
+    MAC_RX_IP_FILTER_STOPED  = 0, //功能关闭，未使能、或者其他状况不允许过滤动作。
+    MAC_RX_IP_FILTER_WORKING = 1, //功能打开，按照规则正常过滤
+    MAC_RX_IP_FILTER_BUTT
+}mac_ip_filter_state_enum;
+typedef oal_uint8 mac_ip_filter_state_enum_uint8;
+
+typedef struct
+{
+    mac_ip_filter_state_enum_uint8 en_state;     //功能状态：过滤、非过滤等
+    oal_uint8                  uc_btable_items_num; //黑名单中目前存储的items个数
+    oal_uint8                  uc_btable_size;      //黑名单大小，表示最多存储的items个数
+    oal_uint8                  uc_resv;
+    mac_ip_filter_item_stru   *pst_filter_btable;   //黑名单指针
+}mac_rx_ip_filter_struc;
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
+
+
 /* board结构体 */
 typedef struct
 {
     mac_chip_stru               ast_chip[WLAN_CHIP_MAX_NUM_PER_BOARD];              /* board挂接的芯片 */
     oal_uint8                   uc_chip_id_bitmap;                                  /* 标识chip是否被分配的位图 */
     oal_uint8                   auc_resv[3];                                        /* 字节对齐 */
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+    mac_rx_ip_filter_struc      st_rx_ip_filter;                      /* rx ip过滤功能的管理结构体 */
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 }mac_board_stru;
 
 typedef struct

@@ -237,6 +237,13 @@ oal_void dmac_auto_set_device_freq(oal_void)
         return;
     }
 
+#ifdef _PRE_WLAN_DOWNLOAD_PM
+    if (g_us_download_rate_limit_pps)
+    {
+        us_device_freq = PM_40MHZ;
+    }
+#endif
+
     PM_WLAN_SetMaxCpuFreq(us_device_freq);
 
     OAM_WARNING_LOG2(0, OAM_SF_ANY, "{dmac_auto_set_device_freq:change freq to[%d] [%d].}", g_device_freq_type.uc_curr_freq_level, g_device_freq_type.uc_req_freq_level);
@@ -245,8 +252,11 @@ oal_void dmac_auto_set_device_freq(oal_void)
     if (us_device_freq < PM_80MHZ)
     {
         g_device_wlan_pm_timeout       = DMAC_PSM_TIMER_IDLE_TIMEOUT;
+#ifdef _PRE_WLAN_DOWNLOAD_PM
+        g_pm_timer_restart_cnt         = (g_us_download_rate_limit_pps ? 1 : DMAC_PSM_TIMER_IDLE_CNT);
+#else
         g_pm_timer_restart_cnt         = DMAC_PSM_TIMER_IDLE_CNT;
-
+#endif
     }
     else if ((us_device_freq >= PM_80MHZ) && (us_device_freq < PM_160MHZ))
     {

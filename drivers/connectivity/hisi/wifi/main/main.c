@@ -518,7 +518,7 @@ oal_uint32 hwifi_config_host_global_dts_param(oal_void)
 }
 #endif /* #ifdef _PRE_PLAT_FEATURE_CUSTOMIZE */
 
-extern      oal_int32 wlan_pm_open(oal_void);
+extern oal_int32  wlan_pm_open(oal_void);
 extern oal_uint32 wlan_pm_close(oal_void);
 /*****************************************************************************
  函 数 名  : host_main_init
@@ -774,6 +774,7 @@ oal_int32  hi1102_host_main_init(oal_void)
 {
     //oal_uint32 ul_return = OAL_FAIL;
     oal_int32  l_return = OAL_FAIL;
+    OAL_IO_PRINT("hi1102_host_main_init:: Hi1102_host_main_init enter!\n");
 
 #ifdef _PRE_WLAN_FEATURE_OFFLOAD_FLOWCTL
     hcc_flowctl_get_device_mode_register(hmac_flowctl_check_device_is_sta_mode);
@@ -795,7 +796,7 @@ oal_int32  hi1102_host_main_init(oal_void)
 #endif
 
     /*启动完成后，输出打印*/
-    OAL_IO_PRINT("Hi1102_host_main_init:: Hi1102_host_main_init finish!\n");
+    OAL_IO_PRINT("hi1102_host_main_init:: Hi1102_host_main_init finish!\n");
 
     return OAL_SUCC;
 
@@ -819,13 +820,28 @@ oal_void  hi1102_host_main_exit(oal_void)
 {
     oal_uint16 us_bitmap = 0;
 
+    OAL_IO_PRINT("hi1102_host_main_exit:: Hi1102_host_main_exit enter!\n");
+
 #ifdef _PRE_WLAN_FEATURE_ARP_OFFLOAD
     wal_hipriv_unregister_inetaddr_notifier();
     wal_hipriv_unregister_inet6addr_notifier();
 #endif
 
+
+    OAL_IO_PRINT("hi1102_host_main_exit:: begin remove wifi module!\n");
     us_bitmap =  BIT6 | BIT7 | BIT8;
     builder_module_exit(us_bitmap);
+    OAL_IO_PRINT("hi1102_host_main_exit:: wifi module removed!\n");
+
+    /* 流控函数去初始化 */
+#ifdef _PRE_WLAN_FEATURE_OFFLOAD_FLOWCTL
+    hcc_flowctl_get_device_mode_register(OAL_PTR_NULL);
+    hcc_flowctl_operate_subq_register(OAL_PTR_NULL, OAL_PTR_NULL);
+#else
+    hcc_tx_flow_ctrl_cb_register(OAL_PTR_NULL, OAL_PTR_NULL);
+#endif
+
+    OAL_IO_PRINT("hi1102_host_main_exit:: Hi1102_host_main_exit finish!\n");
 
     return ;
 }

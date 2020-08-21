@@ -126,6 +126,54 @@ oal_void  dmac_null_fn(mac_device_stru *pst_device, oal_uint32 ul_param)
     return;
 }
 
+/*****************************************************************************
+ 函 数 名  : dmac_rx_update_user_eapol_key_open
+ 功能描述  : 更新用户bit_is_rx_eapol_key_open 标识。
+             如果接收到的eapol-key 是open，设置bit_is_rx_eapol_key_open OAL_TRUE
+             其他值，设置bit_is_rx_eapol_key_open OAL_FALSE
+ 输入参数  : mac_vap_stru *pst_mac_vap
+             oal_netbuf_stru *pst_netbuf
+ 输出参数  : 无
+ 返 回 值  :
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年9月8日
+    作    者   : duankaiyong 00194999
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+OAL_STATIC oal_void dmac_rx_update_user_eapol_key_open(mac_vap_stru *pst_mac_vap, oal_netbuf_stru *pst_netbuf)
+{
+    dmac_rx_ctl_stru       *pst_rx_cb;
+    dmac_user_stru         *pst_dmac_user;
+    mac_eapol_header_stru  *pst_eapol_header;
+
+    pst_rx_cb = (dmac_rx_ctl_stru *)OAL_NETBUF_CB(pst_netbuf);
+
+    if (IS_STA(pst_mac_vap)
+        && pst_rx_cb->st_rx_status.bit_dscr_status == HAL_RX_SUCCESS)
+    {
+        pst_eapol_header = (mac_eapol_header_stru *)(oal_netbuf_payload(pst_netbuf) + OAL_SIZEOF(mac_llc_snap_stru));
+        if (mac_is_eapol_key_ptk(pst_eapol_header) == OAL_TRUE)
+        {
+            pst_dmac_user = mac_res_get_dmac_user(pst_mac_vap->uc_assoc_vap_id);
+            if (pst_dmac_user == OAL_PTR_NULL)
+            {
+                OAM_WARNING_LOG1(pst_mac_vap->uc_vap_id, OAM_SF_RX,
+                            "{dmac_rx_update_user_eapol_key_open::dmac_user is null. user_id %d}",
+                            pst_mac_vap->uc_assoc_vap_id);
+                return;
+            }
+            pst_dmac_user->bit_is_rx_eapol_key_open
+                          = (pst_rx_cb->st_rx_status.bit_cipher_protocol_type == HAL_NO_ENCRYP);
+        }
+    }
+
+    return;
+}
+
 
 /*****************************************************************************
  函 数 名  : dmac_rx_vap_stat
@@ -1662,26 +1710,6 @@ oal_uint32  dmac_fbt_scan_rx_process_frame(hal_to_dmac_device_stru *pst_hal_devi
     return OAL_SUCC;
 }
 #endif
-/*****************************************************************************
- 函 数 名  : dmac_rx_process_data_event
- 功能描述  : DMAC模块下，处理接收到帧的事件的入口函数，包括管理帧和数据帧
- 输入参数  : 指向事件结构体的指针
- 输出参数  : 无
- 返 回 值  : 成功或者失败原因
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2012年11月13日
-    作    者   : huxiaotong
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-#ifndef _PRE_WLAN_PROFLING_MIPS
-#if (_PRE_OS_VERSION_RAW == _PRE_OS_VERSION)
-#pragma arm section rwdata = "BTCM", code ="ATCM", zidata = "BTCM", rodata = "ATCM"
-#endif
-#endif
 
 #ifdef _PRE_WLAN_SW_CTRL_RSP
 /*****************************************************************************
@@ -1780,6 +1808,27 @@ oal_void dmac_rx_set_rsp_rate(oal_uint8 uc_device_id, dmac_rx_ctl_stru    *pst_c
     }
 }
 
+#endif
+
+/*****************************************************************************
+ 函 数 名  : dmac_rx_process_data_event
+ 功能描述  : DMAC模块下，处理接收到帧的事件的入口函数，包括管理帧和数据帧
+ 输入参数  : 指向事件结构体的指针
+ 输出参数  : 无
+ 返 回 值  : 成功或者失败原因
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2012年11月13日
+    作    者   : huxiaotong
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+#ifndef _PRE_WLAN_PROFLING_MIPS
+#if (_PRE_OS_VERSION_RAW == _PRE_OS_VERSION)
+#pragma arm section rwdata = "BTCM", code ="ATCM", zidata = "BTCM", rodata = "ATCM"
+#endif
 #endif
 
 oal_uint32  dmac_rx_process_data_event(frw_event_mem_stru *pst_event_mem)
@@ -2114,7 +2163,12 @@ oal_uint32  dmac_rx_process_data_event(frw_event_mem_stru *pst_event_mem)
                     /*lint -e666*/
                     OAM_WARNING_LOG1(pst_vap->uc_vap_id, OAM_SF_ANY, "{dmac_rx_process_data_event::rx eapol, info is %x }", OAL_NET2HOST_SHORT(mac_get_eapol_keyinfo(pst_curr_netbuf)));
                     /*lint +e666*/
+
+                    dmac_rx_update_user_eapol_key_open(pst_vap, pst_curr_netbuf);
                 }
+#ifdef _PRE_WLAN_DOWNLOAD_PM
+                pst_cb_ctrl->st_rx_info.bit_is_key_frame = 1;
+#endif
             }
 #ifdef _PRE_WLAN_FEATURE_DBAC
             pst_mac_device = mac_res_get_dev(pst_vap->uc_device_id);
@@ -3574,6 +3628,24 @@ dmac_rx_frame_ctrl_enum_uint8  dmac_rx_process_frame(
             DMAC_VAP_DFT_STATS_PKT_INCR(pst_dmac_vap->st_query_stats.ul_rx_replay_fail_dropped, 1);
             goto rx_pkt_drop;
         }
+
+        /* DTS2017102706677:WPA2 安全漏洞测试用例会重放ARP REQ, 过滤重放广播ARP REQ帧 */
+        if (HAL_RX_CCMP_REPLAY_FAILURE == us_dscr_status)
+        {
+            if (OAL_PTR_NULL != pst_ta_dmac_user)
+            {
+                DMAC_USER_STATS_PKT_INCR(pst_ta_dmac_user->st_query_stats.ul_rx_replay,1);
+            }
+            if (OAL_TRUE == ETHER_IS_BROADCAST(puc_dest_addr)
+                && mac_get_data_type(pst_netbuf) == MAC_DATA_ARP_REQ)/*lint !e731 */
+            {
+                if (OAL_PTR_NULL != pst_ta_dmac_user)
+                {
+                    DMAC_USER_STATS_PKT_INCR(pst_ta_dmac_user->st_query_stats.ul_rx_replay_droped,1);
+                }
+                goto rx_pkt_drop;
+            }
+        }
     }
 
     /* 获取的用户index存放在在cb字段中，后续过滤使用(dmac_rx_filter_frame) */
@@ -3619,6 +3691,14 @@ dmac_rx_frame_ctrl_enum_uint8  dmac_rx_process_frame(
             //OAM_INFO_LOG1(pst_vap->uc_vap_id, OAM_SF_RX, "{dmac_rx_process_frame::dmac_rx_process_data_frame failed[%d].}", ul_ret);
             goto rx_pkt_drop;
         }
+
+        /*低功耗报文计数增加，在此处调用，广播包，ARP包，null帧都已被drop，不被统计*/
+#ifdef _PRE_WLAN_FEATURE_STA_PM
+        if (WLAN_VAP_MODE_BSS_STA == dmac_vap_get_bss_type(pst_vap))
+        {
+            dmac_psm_rx_inc_pkt_cnt(pst_vap,pst_netbuf);
+        }
+#endif
     }
 
 
@@ -3792,7 +3872,132 @@ oal_uint32 dmac_get_stat_rate(dmac_user_stru *pst_dmac_user, oal_uint32 *pul_tx_
 
     return OAL_SUCC;
 }
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+/*****************************************************************************
+ 函 数 名  : dmac_check_port_btable
+ 功能描述  : 检查目标端口信息是否在ip黑名单中
+ 输入参数  : 无
+ 输出参数  : 无
+ 返 回 值  : oal_bool_emun
+ 调用函数  :
+ 被调函数  :
 
+ 修改历史      :
+  1.日    期   : 2017年4月19日
+    作    者   : z00273164
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+OAL_STATIC oal_bool_enum dmac_check_ip_btable(mac_ip_filter_item_stru *pst_filter_item)
+{
+    oal_uint8 uc_items_indx;
+
+    /* 黑名单不存在，返回检查失败的状态 */
+    if (OAL_PTR_NULL == g_st_dmac_board.st_rx_ip_filter.pst_filter_btable)
+    {
+        return OAL_FALSE;
+    }
+
+    /* 开始检查 */
+    for (uc_items_indx = 0; uc_items_indx < g_st_dmac_board.st_rx_ip_filter.uc_btable_items_num; uc_items_indx++)
+    {
+        if ((pst_filter_item->uc_protocol == g_st_dmac_board.st_rx_ip_filter.pst_filter_btable[uc_items_indx].uc_protocol)&&
+            (pst_filter_item->us_port == g_st_dmac_board.st_rx_ip_filter.pst_filter_btable[uc_items_indx].us_port))
+        {
+            return OAL_TRUE;
+        }
+    }
+
+    return OAL_FALSE;
+}
+
+/*****************************************************************************
+ 函 数 名  : dmac_rx_ip_filter_process
+ 功能描述  : rx方向依据一定的规则过滤固定端口&固定协议的数据包
+ 输入参数  : dmac_vap_stru *pst_dmac_vap
+             dmac_user_stru *pst_dmac_user
+             oal_netbuf_stru *pst_netbuf
+ 输出参数  : 无
+ 返 回 值  : dmac_rx_frame_ctrl_enum_uint8
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年4月18日
+    作    者   : wal_ioctl_set_vowifi_param
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+dmac_rx_frame_ctrl_enum_uint8 dmac_rx_ip_filter_process(dmac_vap_stru *pst_dmac_vap, oal_netbuf_stru *pst_netbuf, dmac_rx_ctl_stru *pst_cb_ctrl)
+{
+    mac_llc_snap_stru   *pst_snap;
+    oal_bool_enum_uint8  en_is_need_filter;
+    mac_ip_header_stru  *pst_ip;
+    mac_ip_filter_item_stru st_filter_btable;
+
+    /* AMSDU包不处理 */
+    if(OAL_TRUE == pst_cb_ctrl->st_rx_info.bit_amsdu_enable)
+    {
+        return DMAC_RX_FRAME_CTRL_GOON;
+    }
+
+    /* 功能未打开&不在工作 & 表格为空 状态均不需要对帧进行解析 */
+    if ((OAL_TRUE != pst_dmac_vap->st_vap_base_info.st_cap_flag.bit_ip_filter) ||
+        (MAC_RX_IP_FILTER_WORKING != g_st_dmac_board.st_rx_ip_filter.en_state) ||
+        (0 == g_st_dmac_board.st_rx_ip_filter.uc_btable_items_num))
+    {
+        return DMAC_RX_FRAME_CTRL_GOON;
+    }
+
+    /* 仅过滤IP报文 */
+    pst_snap = (mac_llc_snap_stru *)oal_netbuf_payload(pst_netbuf);
+    if(OAL_PTR_NULL == pst_snap)
+    {
+        return DMAC_RX_FRAME_CTRL_GOON;
+    }
+
+    /* 获取协议&目的端口号 */
+    switch (pst_snap->us_ether_type)
+    {
+        case OAL_HOST2NET_SHORT(ETHER_TYPE_IP):
+            pst_ip = (mac_ip_header_stru *)(((oal_uint8 *)pst_snap) + (oal_uint16)OAL_SIZEOF(mac_llc_snap_stru));
+            st_filter_btable.uc_protocol = pst_ip->uc_protocol;
+
+            if (MAC_UDP_PROTOCAL == pst_ip->uc_protocol)
+            {
+                udp_hdr_stru *pst_udp_hdr;
+                pst_udp_hdr = (udp_hdr_stru *)(pst_ip + 1);
+                st_filter_btable.us_port = pst_udp_hdr->us_des_port;
+            }
+            else if (MAC_TCP_PROTOCAL == pst_ip->uc_protocol)
+            {
+                mac_tcp_header_stru *pst_tcp_hdr;
+                pst_tcp_hdr = (mac_tcp_header_stru *)(pst_ip + 1);
+                st_filter_btable.us_port = pst_tcp_hdr->us_dport;
+            }
+            else
+            {
+                return DMAC_RX_FRAME_CTRL_GOON;
+            }
+
+            break;
+        /* IPV6包暂不处理 */
+
+        default:
+            return DMAC_RX_FRAME_CTRL_GOON;
+    }
+
+    /* 黑名单过滤 */
+    en_is_need_filter = dmac_check_ip_btable(&st_filter_btable);
+    if (OAL_TRUE == en_is_need_filter)
+    {
+        return DMAC_RX_FRAME_CTRL_DROP;
+    }
+
+    return DMAC_RX_FRAME_CTRL_GOON;
+}
+
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 #if 0
 /*****************************************************************************
  函 数 名  : dmac_stop_stat_rate

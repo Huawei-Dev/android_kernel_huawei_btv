@@ -668,9 +668,10 @@ extern oal_uint32  dmac_flush_txq_to_tid(hal_to_dmac_device_stru *pst_hal_device
 #endif
 extern oal_uint32  dmac_tx_update_protection_all_txop_alg(dmac_vap_stru *pst_dmac_vap);
 extern oal_uint32  dmac_tx_mgmt(dmac_vap_stru *pst_dmac_vap, oal_netbuf_stru *pst_netbuf_mgmt, oal_uint16 us_len);
-
-
-
+#ifdef _PRE_WLAN_MAC_BUGFIX_PN
+oal_uint32 dmac_tx_sw_restore_ccmp_PN_from_mac_hdr(hal_to_dmac_device_stru *pst_hal_device,
+                                                    hal_tx_dscr_stru       *pst_dscr);
+#endif
 #ifdef __cplusplus
     #if __cplusplus
         }

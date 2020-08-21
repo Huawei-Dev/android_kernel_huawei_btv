@@ -479,6 +479,8 @@ oal_uint32  hmac_del_p2p_cl_vap(mac_vap_stru *pst_vap, oal_uint16 us_len, oal_ui
         OAM_ERROR_LOG1(pst_vap->uc_vap_id, OAM_SF_CFG, "{hmac_config_del_vap::mac_res_get_hmac_vap fail.vap_id[%d]}", uc_vap_id);
         return OAL_ERR_CODE_PTR_NULL;
     }
+    /*DTS2017042000492:p2p关联过程中，开始作为cl模式，切换到GO模式时需要停用vap，置为NULL*/
+    OAL_NET_DEV_PRIV(pst_hmac_vap->pst_net_device) = OAL_PTR_NULL;
     pst_hmac_vap->pst_net_device = pst_hmac_vap->pst_p2p0_net_device;
 
     mac_dec_p2p_num(&pst_hmac_vap->st_vap_base_info);

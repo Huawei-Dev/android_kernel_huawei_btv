@@ -216,7 +216,7 @@ extern oal_uint32   g_ul_wlan_vap_max_num_per_device;
 #else
 #define WLAN_JOIN_START_TIMEOUT                 10000
 #define WLAN_AUTH_TIMEOUT                       300
-#define WLAN_ASSOC_TIMEOUT                      300
+#define WLAN_ASSOC_TIMEOUT                      600
 #endif
 
 /*****************************************************************************

@@ -32,7 +32,6 @@ extern "C" {
 *****************************************************************************/
 #include "oal_ext_if.h"
 #include "oam_ext_if.h"
-
 #undef  THIS_FILE_ID
 #define THIS_FILE_ID OAM_FILE_ID_WAL_MAIN_H
 

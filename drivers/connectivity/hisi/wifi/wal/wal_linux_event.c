@@ -169,7 +169,7 @@ oal_uint32  wal_cfg80211_start_scan(oal_net_device_stru *pst_net_dev, mac_cfg802
     if(OAL_SUCC != ul_ret)
     {
         /* œ¬∑¢…®√Ë ß∞‹£¨ Õ∑≈ */
-        OAL_MEM_FREE(pst_mac_cfg80211_scan_param, OAL_FALSE);
+        OAL_MEM_FREE(pst_mac_cfg80211_scan_param, OAL_TRUE);
         return ul_ret;
     }
 
@@ -210,7 +210,7 @@ oal_uint32  wal_cfg80211_start_sched_scan(oal_net_device_stru *pst_net_dev, mac_
 
     if(OAL_SUCC != ul_ret)
     {
-        OAL_MEM_FREE(pst_pno_scan_params, OAL_FALSE);
+        OAL_MEM_FREE(pst_pno_scan_params, OAL_TRUE);
         return ul_ret;
     }
 

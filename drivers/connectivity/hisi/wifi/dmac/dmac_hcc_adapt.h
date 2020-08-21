@@ -92,7 +92,9 @@ extern frw_event_mem_stru* dmac_scan_proc_scan_req_event_rx_adapt(frw_event_mem_
 extern  frw_event_mem_stru* dmac_dpd_data_processed_event_rx_adapt(frw_event_mem_stru *pst_hcc_event_mem);
 #endif
 extern frw_event_mem_stru*   dmac_cali_hmac2dmac_rx_adapt(frw_event_mem_stru *pst_hcc_event_mem);
-
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+extern frw_event_mem_stru* dmac_config_update_ip_filter_rx_adapt(frw_event_mem_stru *pst_hcc_event_mem);
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 extern frw_event_mem_stru* dmac_scan_proc_sched_scan_req_event_rx_adapt(frw_event_mem_stru *pst_hcc_event_mem);
 
 /*Tx  ≈‰≤ø∑÷*/

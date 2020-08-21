@@ -39,6 +39,13 @@ extern "C" {
 #include "wal_config.h"
 #include "dmac_alg_if.h"
 
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+#ifdef CONFIG_DOZE_FILTER
+#include <huawei_platform/power/wifi_filter/wifi_filter.h>
+#endif /* CONFIG_DOZE_FILTER */
+#endif /* _PRE_WLAN_FEATURE_IP_FILTER */
+
+
 #undef  THIS_FILE_ID
 #define THIS_FILE_ID OAM_FILE_ID_WAL_LINUX_IOCTL_H
 /*****************************************************************************
@@ -128,6 +135,27 @@ typedef enum
 }wal_dscr_param_enum;
 typedef oal_uint8 wal_dscr_param_enum_uint8;
 
+
+/* rx ip数据包过滤功能和上层协定(格式)结构体，TBD 上层接口尚未明确，需澄清后修改 */
+#ifdef CONFIG_DOZE_FILTER
+typedef hw_wifi_filter_item wal_hw_wifi_filter_item;
+typedef struct hw_wlan_filter_ops wal_hw_wlan_filter_ops;
+
+#else
+typedef struct {
+    unsigned short protocol;  //协议类型
+    unsigned short port;      //目的端口号
+    unsigned int   filter_cnt;    //过滤报文数
+}wal_hw_wifi_filter_item;
+
+typedef struct {
+    int (*set_filter_enable)(int);
+    int (*add_filter_items)(wal_hw_wifi_filter_item*, int);
+    int (*clear_filters)(void);
+    int (*get_filter_pkg_stat)(wal_hw_wifi_filter_item*, int, int*);
+}wal_hw_wlan_filter_ops;
+#endif
+
 /*****************************************************************************
   4 全局变量声明
 *****************************************************************************/
@@ -213,7 +241,9 @@ extern oal_int32  wal_regdomain_update_for_dfs(oal_net_device_stru *pst_net_dev,
 extern oal_uint32  wal_hipriv_set_mcs(oal_net_device_stru *pst_net_dev, oal_int8 *pc_param);
 extern oal_uint32  wal_hipriv_set_mcsac(oal_net_device_stru *pst_net_dev, oal_int8 *pc_param);
 extern oal_uint32  wal_hipriv_vap_info(oal_net_device_stru *pst_net_dev, oal_int8 *pc_param);
-
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+extern oal_uint32  wal_hipriv_set_ip_filter(oal_net_device_stru *pst_net_dev, oal_int8 *pc_param);
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 extern oal_uint32  wal_hipriv_create_proc(oal_void *p_proc_arg);
 extern oal_int32   wal_netdev_stop(oal_net_device_stru *pst_net_dev);
 extern oal_int32   wal_netdev_open(oal_net_device_stru *pst_net_dev);
@@ -233,10 +263,12 @@ extern oal_int32   wal_send_cfg_event(
 extern oal_int32 wal_start_vap(oal_net_device_stru *pst_net_dev);
 extern oal_int32  wal_stop_vap(oal_net_device_stru *pst_net_dev);
 extern oal_int32 wal_init_wlan_vap(oal_net_device_stru *pst_net_dev);
+extern oal_int32 wal_netdev_stop_ap(oal_net_device_stru *pst_net_dev);
 extern oal_int32 wal_deinit_wlan_vap(oal_net_device_stru *pst_net_dev);
 extern oal_int32 wal_init_wlan_netdev(oal_wiphy_stru *pst_wiphy, char *dev_name);
 extern oal_int32  wal_setup_ap(oal_net_device_stru *pst_net_dev);
 extern oal_int32  wal_host_dev_init(oal_net_device_stru *pst_net_dev);
+extern oal_int32  wal_host_dev_exit(oal_net_device_stru *pst_net_dev);
 #endif
 
 #ifdef _PRE_WLAN_FEATURE_11D
@@ -250,15 +282,17 @@ oal_int32  wal_set_random_mac_to_mib(oal_net_device_stru *pst_net_dev);
 
 wlan_p2p_mode_enum_uint8 wal_wireless_iftype_to_mac_p2p_mode(enum nl80211_iftype en_iftype);
 #ifdef _PRE_WLAN_FEATURE_ARP_OFFLOAD
+#ifdef _PRE_DEBUG_MODE
 extern oal_uint32 wal_hipriv_arp_offload_enable(oal_net_device_stru *pst_net_dev, oal_int8 *pc_param);
 oal_uint32 wal_hipriv_show_arpoffload_info(oal_net_device_stru *pst_net_dev, oal_int8 *pc_param);
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 extern oal_int32  wal_cfg_vap_h2d_event(oal_net_device_stru *pst_net_dev);
 
 #ifdef _PRE_PLAT_FEATURE_CUSTOMIZE
 extern oal_uint32 hwifi_config_init_dts_main(oal_net_device_stru *pst_cfg_net_dev);
-extern oal_int32 wal_set_custom_process_func(oal_void);
+extern oal_int32 wal_set_custom_process_func(custom_cali_func p_fun);
 extern oal_bool_enum hwifi_config_init_nvram_main(oal_net_device_stru * pst_cfg_net_dev);
 
 extern oal_uint32 wal_custom_cali(oal_void);
@@ -285,6 +319,16 @@ oal_int32  wal_hipriv_wait_rsp(oal_net_device_stru *pst_net_dev, oal_int8 *pc_pa
 #endif
 
 extern oal_uint32  wal_hipriv_parse_cmd(oal_int8 *pc_cmd);
+
+extern oal_int32 wal_set_ip_filter_enable(oal_int32 l_on);
+extern oal_int32 wal_add_ip_filter_items(wal_hw_wifi_filter_item *pst_items, oal_int32 l_count);
+extern oal_int32 wal_clear_ip_filter(void);
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+extern oal_int32 wal_register_ip_filter(wal_hw_wlan_filter_ops *pg_st_ip_filter_ops);
+extern oal_int32 wal_unregister_ip_filter(void);
+#endif /* _PRE_WLAN_FEATURE_IP_FILTER */
+
+
 
 #ifdef __cplusplus
     #if __cplusplus

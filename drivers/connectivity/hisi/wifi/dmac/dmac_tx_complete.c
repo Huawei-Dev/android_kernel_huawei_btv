@@ -57,6 +57,7 @@ extern "C" {
 #include "mac_board.h"
 #include "dmac_device.h"
 #endif
+#include "dmac_tx_bss_comm.h"
 
 #undef  THIS_FILE_ID
 #define THIS_FILE_ID OAM_FILE_ID_DMAC_TX_COMPLETE_C
@@ -120,6 +121,7 @@ extern oal_uint32  dmac_send_sys_event(
                 wlan_cfgid_enum_uint16            en_cfg_id,
                 oal_uint16                        us_len,
                 oal_uint8                        *puc_param);
+oal_uint32  dmac_config_11i_add_key_set_reg(mac_vap_stru *pst_mac_vap, oal_uint8 uc_key_index, oal_uint8 *puc_mac_addr);
 
 /*****************************************************************************
  函 数 名  : dmac_tx_complete_dump_dscr
@@ -940,65 +942,87 @@ oal_void  dmac_tx_complete_free_dscr_list(hal_tx_dscr_stru *pst_dscr, oal_uint8 
     修改内容   : 新生成函数
 
 *****************************************************************************/
-OAL_STATIC OAL_INLINE oal_void  dmac_tx_set_retry_dscr(hal_to_dmac_device_stru *pst_hal_device, hal_tx_dscr_stru *pst_dscr, oal_uint8 uc_tx_status, oal_uint8 uc_tx_chiper_type, oal_uint8 uc_chiper_key_id)
+OAL_STATIC OAL_INLINE oal_void  dmac_tx_set_retry_dscr(hal_to_dmac_device_stru *pst_hal_device,
+                                                        hal_tx_dscr_stru *pst_dscr,
+                                                        oal_uint8 uc_tx_status,
+                                                        oal_uint8 uc_tx_chiper_type,
+                                                        oal_uint8 uc_chiper_key_id)
 {
     oal_uint32 ul_iv_ls_word = 0xFF;
     oal_uint32 ul_iv_ms_word = 0xFF;
+#ifdef _PRE_WLAN_MAC_BUGFIX_PN
+    oal_bool_enum_uint8      en_tx_pn_hw_bypass;
+#endif
+
     pst_dscr->bit_is_retried = OAL_TRUE;
     hal_tx_set_dscr_status(pst_hal_device, pst_dscr, uc_tx_status);
 
-    if ((uc_tx_status == DMAC_TX_TIMEOUT)
-       || (uc_tx_status == DMAC_TX_RTS_FAIL)
-#if defined(_PRE_PRODUCT_ID_HI110X_DEV)
-       || (uc_tx_status == DMAC_TX_RTS_FAIL_CTS_ERROR)
-#endif
-       || (uc_tx_status == DMAC_TX_SOFT_PSM_BACK))
+#ifdef _PRE_WLAN_MAC_BUGFIX_PN
+    hal_dscr_get_tx_pn_hw_bypass(pst_dscr, &en_tx_pn_hw_bypass);
+    if (en_tx_pn_hw_bypass == OAL_TRUE)
     {
-        if (OAL_TRUE == pst_dscr->bit_is_first)
+        pst_dscr->bit_is_first = OAL_FALSE;
+        hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_dscr, 1);
+        dmac_tx_sw_restore_ccmp_PN_from_mac_hdr(pst_hal_device, pst_dscr);
+    }
+    else
+#endif  /* _PRE_WLAN_MAC_BUGFIX_PN */
+    {
+        if ((uc_tx_status == DMAC_TX_TIMEOUT)
+           || (uc_tx_status == DMAC_TX_RTS_FAIL)
+#if defined(_PRE_PRODUCT_ID_HI110X_DEV)
+           || (uc_tx_status == DMAC_TX_RTS_FAIL_CTS_ERROR)
+#endif
+           || (uc_tx_status == DMAC_TX_SOFT_PSM_BACK))
         {
-            hal_tx_get_dscr_iv_word(pst_dscr, &ul_iv_ms_word, &ul_iv_ls_word, uc_tx_chiper_type, uc_chiper_key_id);
+            if (OAL_TRUE == pst_dscr->bit_is_first)
+            {
+                hal_tx_get_dscr_iv_word(pst_dscr, &ul_iv_ms_word, &ul_iv_ls_word, uc_tx_chiper_type, uc_chiper_key_id);
+                pst_dscr->bit_is_first = OAL_FALSE;
+                hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_dscr, 0);
+                hal_tx_set_dscr_status(pst_hal_device, pst_dscr, DMAC_TX_INVALID);
+                return;
+            }
+            else
+            {
+                hal_tx_get_dscr_iv_word(pst_dscr, &ul_iv_ms_word, &ul_iv_ls_word, uc_tx_chiper_type, uc_chiper_key_id);
+                if (0 == ul_iv_ls_word)
+                {
+                    hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_dscr, 0);
+                }
+                else
+                {
+                    hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_dscr, 1);
+                }
+            }
+        }
+        else if ((uc_tx_status == DMAC_TX_KEY_SEARCH_FAIL)
+           || (uc_tx_status == DMAC_TX_AMPDU_MISMATCH)
+#if defined(_PRE_PRODUCT_ID_HI110X_DEV)
+           || (uc_tx_status == DMAC_TX_FAIL_ABORT)
+           || (uc_tx_status == DMAC_TX_FAIL_STATEMACHINE_PHY_ERROR)
+#endif
+           || (uc_tx_status == DMAC_TX_PENDING))
+        {
             pst_dscr->bit_is_first = OAL_FALSE;
             hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_dscr, 0);
             hal_tx_set_dscr_status(pst_hal_device, pst_dscr, DMAC_TX_INVALID);
             return;
         }
-
-        hal_tx_get_dscr_iv_word(pst_dscr, &ul_iv_ms_word, &ul_iv_ls_word, uc_tx_chiper_type, uc_chiper_key_id);
-        if (0 == ul_iv_ls_word)
-        {
-            hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_dscr, 0);
-        }
         else
         {
-            hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_dscr, 1);
-        }
-    }
-    else if ((uc_tx_status == DMAC_TX_KEY_SEARCH_FAIL)
-       || (uc_tx_status == DMAC_TX_AMPDU_MISMATCH)
-#if defined(_PRE_PRODUCT_ID_HI110X_DEV)
-       || (uc_tx_status == DMAC_TX_FAIL_ABORT)
-       || (uc_tx_status == DMAC_TX_FAIL_STATEMACHINE_PHY_ERROR)
-#endif
-       || (uc_tx_status == DMAC_TX_PENDING))
-    {
-        pst_dscr->bit_is_first = OAL_FALSE;
-        hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_dscr, 0);
-        hal_tx_set_dscr_status(pst_hal_device, pst_dscr, DMAC_TX_INVALID);
-        return;
-    }
-    else
-    {
-        hal_tx_get_dscr_iv_word(pst_dscr, &ul_iv_ms_word, &ul_iv_ls_word, uc_tx_chiper_type, uc_chiper_key_id);
-        pst_dscr->bit_is_first = OAL_FALSE;
-        if (0 == ul_iv_ls_word)
-        {
-            hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_dscr, 0);
-        }
-        else
-        {
-            hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_dscr, 1);
-        }
+            hal_tx_get_dscr_iv_word(pst_dscr, &ul_iv_ms_word, &ul_iv_ls_word, uc_tx_chiper_type, uc_chiper_key_id);
+            pst_dscr->bit_is_first = OAL_FALSE;
+            if (0 == ul_iv_ls_word)
+            {
+                hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_dscr, 0);
+            }
+            else
+            {
+                hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_dscr, 1);
+            }
 
+        }
     }
 
     hal_tx_set_dscr_status(pst_hal_device, pst_dscr, DMAC_TX_INVALID);
@@ -1916,6 +1940,28 @@ OAL_STATIC oal_uint32  dmac_tx_complete_normal_buffer(hal_to_dmac_device_stru *p
 
             /* 抛事件到HMAC执行删除动作 */
             dmac_tx_delete_ba(pst_dmac_user);
+        }
+    }
+    else if((pst_dmac_user->bit_is_rx_eapol_key_open == OAL_FALSE)
+            && (OAL_TRUE == mac_is_eapol_key_ptk_4_4(pst_buf)))
+    {
+        /* 如果用户需要加密EAPOL-KEY, 且4/4 EAPOL-KEY 发送成功，则设置秘钥 */
+        pst_dmac_user->bit_eapol_key_4_4_tx_succ = OAL_TRUE;
+        if (pst_dmac_user->bit_ptk_need_install == OAL_TRUE)
+        {
+            /* 更新单播秘钥 */
+            ul_ret = dmac_config_11i_add_key_set_reg(&(pst_dmac_vap->st_vap_base_info),
+                                                    pst_dmac_user->bit_ptk_key_idx,
+                                                    pst_dmac_user->st_user_base_info.auc_user_mac_addr);
+            OAM_WARNING_LOG4(0, OAM_SF_TX, "{dmac_tx_complete_normal_buffer::set ptk succ.ret %d, key_idx %d. %02X:XX:XX:XX:XX:%02X",
+                    ul_ret,
+                    pst_dmac_user->bit_ptk_key_idx,
+                    pst_dmac_user->st_user_base_info.auc_user_mac_addr[0],
+                    pst_dmac_user->st_user_base_info.auc_user_mac_addr[5]);
+
+            pst_dmac_user->bit_ptk_need_install      = OAL_FALSE;
+            pst_dmac_user->bit_eapol_key_4_4_tx_succ = OAL_FALSE;
+            pst_dmac_user->bit_ptk_key_idx           = 0;
         }
     }
 

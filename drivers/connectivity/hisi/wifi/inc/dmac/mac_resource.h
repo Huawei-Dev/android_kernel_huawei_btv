@@ -54,9 +54,9 @@ extern "C" {
 
 #ifdef _PRE_WLAN_FEATURE_TX_DSCR_OPT
     /* mac_user_stru, hmac_user_stru私有部分, dmac_user_stru私有部分总规格，必须四字节对齐 */
-#define MAC_RES_USER_SIZE       (1524 + 48)
+#define MAC_RES_USER_SIZE       (1532 + 48)
 #else
-#define MAC_RES_USER_SIZE       (1400 + 48)
+#define MAC_RES_USER_SIZE       (1408 + 48)
 #endif /* _PRE_WLAN_FEATURE_TX_DSCR_OPT */
 
 #elif (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1103_DEV)
@@ -77,30 +77,30 @@ extern "C" {
 
     /* mac_vap_stru, hmac_vap_stru私有部分, dmac_vap_stru私有部分总规格 */
 #ifdef _PRE_WLAN_FEATURE_CUSTOM_SECURITY
-#define MAC_RES_VAP_SIZE        6600 /* 适配Android N版本，从5928 调整到6600 */
+#define MAC_RES_VAP_SIZE        8216 /* 适配Linux 4.1 增加debug 宏，从6600 调整到8216 */
 #else
-#define MAC_RES_VAP_SIZE        6600 /*适配ARM64 都对齐到8B*/
+#define MAC_RES_VAP_SIZE        8216 /*适配ARM64 都对齐到8B*/
 #endif
 
 #ifdef CONFIG_ARM64
 /*when arm64, c pointer change to 8 bytes*/
 #ifdef _PRE_WLAN_FEATURE_TX_CLASSIFY_LAN_TO_WLAN
-#define FEATURE_TX_CLASSIFY_LAN_TO_WLAN_RES_SIZE 1700 /* 增加业务识别功能后，hmac_user_stru结构体中增加用户业务信息，扩充规格为1700 */
+#define FEATURE_TX_CLASSIFY_LAN_TO_WLAN_RES_SIZE 704 /* 增加业务识别功能后，hmac_user_stru结构体中增加用户业务信息，扩充规格为1700 */
 #else
 #define FEATURE_TX_CLASSIFY_LAN_TO_WLAN_RES_SIZE 0
 #endif  /* end of _PRE_WLAN_FEATURE_TX_CLASSIFY_LAN_TO_WLAN */
 
-#define MAC_RES_USER_SIZE       (4072 + FEATURE_TX_CLASSIFY_LAN_TO_WLAN_RES_SIZE)
+#define MAC_RES_USER_SIZE       (5376 + FEATURE_TX_CLASSIFY_LAN_TO_WLAN_RES_SIZE)   /* 适配Linux 4.1 增加debug 宏，从4072 调整到4368 */
 #else
 
     /* mac_user_stru, hmac_user_stru私有部分, dmac_user_stru私有部分总规格，考虑到ARM64都对齐到8B */
 #ifdef _PRE_WLAN_FEATURE_TX_CLASSIFY_LAN_TO_WLAN
-#define FEATURE_TX_CLASSIFY_LAN_TO_WLAN_RES_SIZE 1700 /* 增加业务识别功能后，hmac_user_stru结构体中增加用户业务信息，扩充规格为1700 */
+#define FEATURE_TX_CLASSIFY_LAN_TO_WLAN_RES_SIZE 704 /* 增加业务识别功能后，hmac_user_stru结构体中增加用户业务信息，扩充规格为1700 */
 #else
 #define FEATURE_TX_CLASSIFY_LAN_TO_WLAN_RES_SIZE 0
 #endif  /* end of _PRE_WLAN_FEATURE_TX_CLASSIFY_LAN_TO_WLAN */
 
-#define MAC_RES_USER_SIZE       (2992 + FEATURE_TX_CLASSIFY_LAN_TO_WLAN_RES_SIZE + 240)
+#define MAC_RES_USER_SIZE       (3312 + FEATURE_TX_CLASSIFY_LAN_TO_WLAN_RES_SIZE)
 #endif  /* end of CONFIG_ARM64 */
 
 #elif (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1103_HOST)
@@ -161,6 +161,21 @@ extern "C" {
 
 /* 最大dev数量 */
 #define MAC_RES_MAX_DEV_NUM     (WLAN_CHIP_MAX_NUM_PER_BOARD * WLAN_DEVICE_MAX_NUM_PER_CHIP)
+
+#if ((_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1102_DEV) || (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1102_HOST))
+/* 最大的用户数(单播用户+组播用户) */
+/*
+1102软件规格:P2P_dev/CL以STA模式存在，P2P_GO以AP模式存在，用户数量(组播+单播用户)最大9个
+    1)AP 模式:  1个组播用户 + 8个单播用户
+    2)STA+P2P CL 共存模式:  2个组播用户 + 2个单播用户
+    3)STA+P2P GO 共存模式:  3个组播用户 + 5个单播用户
+    4)STA+Proxy STA共存模式:  1102没有proxy sta模式
+*/
+#define MAC_RES_MAX_USER_NUM 10
+#else
+#define MAC_RES_MAX_USER_NUM (g_us_max_asoc_user * MAC_RES_MAX_DEV_NUM + WLAN_SERVICE_VAP_MAX_NUM_PER_DEVICE * MAC_RES_MAX_DEV_NUM)
+#endif /* #if ((_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1102_DEV) || (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1102_HOST)) */
+
 
 /*****************************************************************************
   3 枚举定义
@@ -437,7 +452,7 @@ OAL_STATIC OAL_INLINE oal_uint32  mac_res_alloc_dmac_vap(oal_uint8 uc_idx)
 *****************************************************************************/
 OAL_STATIC OAL_INLINE oal_uint32  mac_res_alloc_dmac_user(oal_uint16 us_idx)
 {
-    if (OAL_UNLIKELY((us_idx) >= (g_us_max_asoc_user * MAC_RES_MAX_DEV_NUM + WLAN_SERVICE_VAP_MAX_NUM_PER_DEVICE * MAC_RES_MAX_DEV_NUM)))
+    if (OAL_UNLIKELY((us_idx) >= MAC_RES_MAX_USER_NUM))
     {
         return OAL_FAIL;
     }
@@ -606,7 +621,7 @@ OAL_STATIC OAL_INLINE oal_uint32  mac_res_alloc_hmac_user(oal_uint16 *pus_idx, o
 *****************************************************************************/
 OAL_STATIC OAL_INLINE oal_void*  _mac_res_get_hmac_user(oal_uint16 us_idx)
 {
-    if (OAL_UNLIKELY(us_idx >= g_us_max_asoc_user * MAC_RES_MAX_DEV_NUM + WLAN_SERVICE_VAP_MAX_NUM_PER_DEVICE * MAC_RES_MAX_DEV_NUM))
+    if (OAL_UNLIKELY(us_idx >= MAC_RES_MAX_USER_NUM))
     {
         return OAL_PTR_NULL;
     }
@@ -631,7 +646,7 @@ OAL_STATIC OAL_INLINE oal_void*  _mac_res_get_hmac_user(oal_uint16 us_idx)
 *****************************************************************************/
 OAL_STATIC OAL_INLINE oal_void*  _mac_res_get_mac_user(oal_uint16 us_idx)
 {
-    if (OAL_UNLIKELY(us_idx >= (g_us_max_asoc_user * MAC_RES_MAX_DEV_NUM + WLAN_SERVICE_VAP_MAX_NUM_PER_DEVICE * MAC_RES_MAX_DEV_NUM)))
+    if (OAL_UNLIKELY(us_idx >= MAC_RES_MAX_USER_NUM))
     {
         return OAL_PTR_NULL;
     }

@@ -174,7 +174,7 @@ oal_void  hmac_scan_ct_exit(oal_void)
     }
 }
 #endif
-
+#if 0
 /*****************************************************************************
  函 数 名  : hmac_snprintf_hex
  功能描述  : 打印16进制数据
@@ -222,7 +222,7 @@ oal_int32 hmac_snprintf_hex(oal_uint8 *puc_buf, oal_int32 l_buf_size, oal_uint8 
     puc_buf[l_buf_size - 1] = '\0';
     return puc_pos - puc_buf;
 }
-
+#endif
 /*****************************************************************************
  函 数 名  : hmac_scan_print_scan_params
  功能描述  : 打印扫描到的bss信息
@@ -2319,12 +2319,12 @@ oal_uint32  hmac_scan_proc_scan_req_event_exception(hmac_vap_stru *pst_hmac_vap,
 
     if (OAL_UNLIKELY((OAL_PTR_NULL == pst_hmac_vap) || (OAL_PTR_NULL == p_params)))
     {
-        OAM_ERROR_LOG2(0, OAM_SF_SCAN, "{hmac_mgmt_scan_req_exception::param null, %d %d.}", pst_hmac_vap, p_params);
+        OAM_ERROR_LOG2(0, OAM_SF_SCAN, "{hmac_scan_proc_scan_req_event_exception::param null, %d %d.}", pst_hmac_vap, p_params);
         return OAL_ERR_CODE_PTR_NULL;
     }
 
     /* 不支持发起扫描的状态发起了扫描 */
-    OAM_WARNING_LOG1(pst_hmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_SCAN, "{hmac_mgmt_scan_req_exception::vap state is=%x.}",
+    OAM_WARNING_LOG1(pst_hmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_SCAN, "{hmac_scan_proc_scan_req_event_exception::vap state is=%x.}",
                      pst_hmac_vap->st_vap_base_info.en_vap_state);
 
     OAL_MEMZERO(&st_scan_rsp, OAL_SIZEOF(hmac_scan_rsp_stru));
@@ -2333,7 +2333,7 @@ oal_uint32  hmac_scan_proc_scan_req_event_exception(hmac_vap_stru *pst_hmac_vap,
     pst_event_mem = FRW_EVENT_ALLOC(OAL_SIZEOF(hmac_scan_rsp_stru));
     if (OAL_PTR_NULL == pst_event_mem)
     {
-        OAM_ERROR_LOG0(pst_hmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_SCAN, "{hmac_mgmt_scan_req_exception::pst_event_mem null.}");
+        OAM_ERROR_LOG0(pst_hmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_SCAN, "{hmac_scan_proc_scan_req_event_exception::pst_event_mem null.}");
         return OAL_ERR_CODE_PTR_NULL;
     }
 
@@ -2798,11 +2798,19 @@ oal_uint32  hmac_scan_proc_scan_req_event(hmac_vap_stru *pst_hmac_vap, oal_void 
     }
 
     /* 更新此次扫描请求的扫描参数 */
+    if (pst_scan_params->uc_scan_func == MAC_SCAN_FUNC_P2P_LISTEN)
+    {
+        /* DTS2017042708713:监听状态下不设置随机MAC地址扫描，避免wlan0 监听状态下发送管理帧失败 */
+        ul_ret = hmac_scan_update_scan_params(pst_hmac_vap, pst_scan_params, OAL_FALSE);
+    }
+    else
+    {
 #ifdef _PRE_PLAT_FEATURE_CUSTOMIZE
-    ul_ret = hmac_scan_update_scan_params(pst_hmac_vap, pst_scan_params, g_st_wlan_customize.uc_random_mac_addr_scan);
+        ul_ret = hmac_scan_update_scan_params(pst_hmac_vap, pst_scan_params, g_st_wlan_customize.uc_random_mac_addr_scan);
 #else
-    ul_ret = hmac_scan_update_scan_params(pst_hmac_vap, pst_scan_params, pst_hmac_device->st_scan_mgmt.en_is_random_mac_addr_scan);
+        ul_ret = hmac_scan_update_scan_params(pst_hmac_vap, pst_scan_params, pst_hmac_device->st_scan_mgmt.en_is_random_mac_addr_scan);
 #endif
+    }
     if (OAL_SUCC != ul_ret)
     {
         OAM_WARNING_LOG1(pst_hmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_SCAN,

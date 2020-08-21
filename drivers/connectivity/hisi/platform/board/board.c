@@ -50,7 +50,7 @@ DOWNLOAD_MODE device_download_mode_list[MODE_DOWNLOAD_BUTT] = {
 **************************************************************************/
 extern irqreturn_t bfg_wake_host_isr(int irq, void *dev_id);
 
-inline BOARD_INFO * get_board_info(void)
+inline BOARD_INFO * get_hi110x_board_info(void)
 {
 	return &g_board_info;
 }

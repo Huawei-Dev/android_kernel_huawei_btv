@@ -1112,6 +1112,12 @@ oal_void  hmac_up_rx_bar(hmac_vap_stru *pst_hmac_vap, dmac_rx_ctl_stru *pst_rx_c
     /*************************************************************************/
 
     uc_tidno        = (puc_payload[1] & 0xF0) >> 4;
+    if (WLAN_TID_MAX_NUM <= uc_tidno)
+    {
+        OAM_WARNING_LOG1(0, OAM_SF_ANY, "{hmac_up_rx_bar::uc_tidno is wrong! uc_tidno:%u}",uc_tidno);
+        return;
+    }
+
     us_start_seqnum = mac_get_bar_start_seq_num(puc_payload);
 
     pst_ba_rx_info  = pst_ta_user->ast_tid_info[uc_tidno].pst_ba_rx_info;

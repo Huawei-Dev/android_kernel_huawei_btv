@@ -214,6 +214,7 @@ typedef struct
 
 #ifdef _PRE_WLAN_NEW_IQ
     oal_new_rxiq_comp_val_stru   ast_new_rxiq_cmp_val_5G[OAL_5G_80M_CHANNEL_NUM];
+    oal_new_rxiq_comp_val_stru   ast_new_rxiq_cmp_val_5G_40M[OAL_5G_80M_CHANNEL_NUM];
 
     oal_new_txiq_comp_val_stru   ast_new_txiq_cmp_val_5G[OAL_5G_80M_CHANNEL_NUM];
 #endif

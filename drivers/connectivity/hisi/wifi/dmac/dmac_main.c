@@ -105,6 +105,10 @@ extern "C" {
 /* dmac模块板子的全局控制变量 */
 mac_board_stru g_st_dmac_board;
 
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+oal_uint8 g_auc_ip_filter_btable[MAC_MAX_IP_FILTER_BTABLE_SIZE];  /* rx ip过滤功能的黑名单 */
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
+
 oal_uint32 g_device_main_init = 0;
 
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
@@ -787,7 +791,9 @@ OAL_STATIC oal_void dmac_event_fsm_rx_adapt_subtable_register(oal_void)
 #endif
     g_ast_dmac_wlan_ctx_event_sub_table[DMAC_WLAN_CTX_EVENT_SUB_TYPE_CALI_HMAC2DMAC].p_rx_adapt_func = dmac_cali_hmac2dmac_rx_adapt;
     g_ast_dmac_wlan_ctx_event_sub_table[DMAC_WLAN_CTX_EVENT_SUB_TYPE_SCHED_SCAN_REQ].p_rx_adapt_func = dmac_scan_proc_sched_scan_req_event_rx_adapt;
-
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+    g_ast_dmac_wlan_ctx_event_sub_table[DMAC_WLAN_CTX_EVENT_SUB_TYPE_IP_FILTER].p_rx_adapt_func = dmac_config_update_ip_filter_rx_adapt;
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
     /* 注册DMAC模块WLAN_DTX事件 */
 }
 
@@ -852,6 +858,9 @@ OAL_STATIC oal_void  dmac_event_fsm_action_subtable_register(oal_void)
     g_ast_dmac_wlan_ctx_event_sub_table[DMAC_WLAN_CTX_EVENT_SUB_TYPE_DPD_DATA_PROCESSED].p_func     = dmac_dpd_data_processed_recv;
 #endif
     g_ast_dmac_wlan_ctx_event_sub_table[DMAC_WLAN_CTX_EVENT_SUB_TYPE_CALI_HMAC2DMAC].p_func     = dmac_cali_hmac2dmac_recv;
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+    g_ast_dmac_wlan_ctx_event_sub_table[DMAC_WLAN_CTX_EVENT_SUB_TYPE_IP_FILTER].p_func     = dmac_config_update_ip_filter;
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 
 #if 0
 #ifdef _PRE_WLAN_FEATURE_TXOPPS

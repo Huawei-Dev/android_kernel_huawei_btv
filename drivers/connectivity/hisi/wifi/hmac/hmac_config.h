@@ -103,13 +103,19 @@ extern oal_void hcc_msg_slave_thruput_bypass(oal_void);
 #ifdef _PRE_WLAN_FEATURE_STA_PM
 extern oal_uint32  hmac_config_sta_pm_on_syn(mac_vap_stru *pst_mac_vap);
 extern oal_uint32  hmac_set_ipaddr_timeout(void   *puc_para);
+extern oal_uint32  hmac_suspend_state_sync(hmac_vap_stru  *pst_hmac_vap);
+extern oal_void  hmac_do_suspend_action(hmac_device_stru    *pst_hmac_device, oal_uint8  uc_in_suspend);
 #endif
 #endif
 
 #ifdef _PRE_WLAN_FEATURE_ARP_OFFLOAD
+#ifdef _PRE_DEBUG_MODE
 extern oal_uint32 hmac_config_enable_arp_offload(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param);
+#endif //#ifdef _PRE_DEBUG_MODE
 extern oal_uint32 hmac_config_set_ip_addr(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param);
+#ifdef _PRE_DEBUG_MODE
 extern oal_uint32 hmac_config_show_arpoffload_info(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param);
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 #ifdef _PRE_WLAN_FEATURE_ROAM

@@ -105,6 +105,9 @@ typedef enum {
     STA_PWR_EVENT_DEASSOCIATE,              /* 去关联*/
     STA_PWR_EVENT_TX_MGMT,                  /* 发送管理帧开启前端 */
     STA_PWR_EVENT_TX_COMPLETE,              /* 发送完成事件 */
+#ifdef _PRE_WLAN_DOWNLOAD_PM
+    STA_PWR_EVENT_NOT_EXCEED_MAX_SLP_TIME,  /* 限流模式下距离上次开始丢弃接收帧的时间未超过最大允许睡眠时间事件 */
+#endif
     STA_PWR_EVENT_BUTT
 }sta_pwr_save_event;
 
@@ -204,6 +207,10 @@ typedef struct _mac_sta_pm_handler
     mac_fsm_stru                    *p_mac_fsm;                                 /*节能状态机*/
     frw_timeout_stru                st_inactive_timer;                          /* 定时器 */
     frw_timeout_stru                st_mcast_timer;                             /* 接收广播组播超时定时器 */
+
+#ifdef _PRE_WLAN_DOWNLOAD_PM
+    oal_uint32                      ul_rx_cnt ;                                 /*wifi下载功耗测试版本，接收报文单独统计限速*/
+#endif
 
     oal_uint32                      ul_tx_rx_activity_cnt;                      /* ACTIVE统计值，由超时进入DOZE复位 */
     oal_uint32                      ul_activity_timeout;                        /* 睡眠超时定时器超时时间 */

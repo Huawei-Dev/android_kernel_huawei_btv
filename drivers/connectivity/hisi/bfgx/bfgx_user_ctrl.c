@@ -240,7 +240,7 @@ STATIC ssize_t show_device_board_version(struct device *dev, struct kobj_attribu
         PS_PRINT_ERR("buf is NULL\n");
         return -FAILURE;
     }
-    board_info = get_board_info();
+    board_info = get_hi110x_board_info();
     if(NULL == board_info)
     {
         PS_PRINT_ERR("board_info is null");
@@ -257,7 +257,7 @@ STATIC ssize_t show_download_mode(struct device *dev, struct kobj_attribute *att
         PS_PRINT_ERR("buf is NULL\n");
         return -FAILURE;
     }
-    board_info = get_board_info();
+    board_info = get_hi110x_board_info();
     if(NULL == board_info)
     {
         PS_PRINT_ERR("board_info is null");
@@ -1233,18 +1233,18 @@ STATIC ssize_t store_wifi_mem_dump(struct device *dev, struct kobj_attribute *at
 }
 
 /*****************************************************************************
- \BA\AF \CA\FD \C3\FB  : show_bfgx_dump
- \B9\A6\C4\DC\C3\E8\CA\F6  : \CF\D4示SDIO\C9媳\A8BFGX\B5\C4reg
- \CA\E4\C8\EB\B2\CE\CA\FD  :
- \CA\E4\B3\F6\B2\CE\CA\FD  :
- \B7\B5 \BB\D8 值  : void
- \B5\F7\D3煤\AF\CA\FD  :
- \B1\BB\B5\F7\BA\AF\CA\FD  :
+ 函 数 名  : show_bfgx_dump
+ 功能描述  : 显示SDIO上报BFGX的reg
+ 输入参数  :
+ 输出参数  :
+ 返 回 值  : void
+ 调用函数  :
+ 被调函数  :
 
- \D0薷\C4\C0\FA史      :
-  1.\C8\D5    \C6\DA   : 2015\C4\EA12\D4\C22\C8\D5
-    \D7\F7    \D5\DF   : c00351912
-    \D0薷\C4\C4\DA\C8\DD   : \D0\C2\C9\FA\B3珊\AF\CA\FD
+ 修改历史      :
+  1.日    期   : 2015年12月2日
+    作    者   : c00351912
+    修改内容   : 新生成函数
 
 *****************************************************************************/
 STATIC ssize_t show_bfgx_dump(struct device *dev, struct kobj_attribute *attr, int8 *buf)
@@ -1264,19 +1264,19 @@ STATIC ssize_t show_bfgx_dump(struct device *dev, struct kobj_attribute *attr, i
                         " 4    equal cmd 1+2+3         \n");
 }
 /*****************************************************************************
- \BA\AF \CA\FD \C3\FB  : store_bfgx_reg_and_reg_dump
- \B9\A6\C4\DC\C3\E8\CA\F6  : SDIO\C9媳\A8BFGX\B5\C4reg
- \CA\E4\C8\EB\B2\CE\CA\FD  :
+ 函 数 名  : store_bfgx_reg_and_reg_dump
+ 功能描述  : SDIO上报BFGX的reg
+ 输入参数  :
 
- \CA\E4\B3\F6\B2\CE\CA\FD  :
- \B7\B5 \BB\D8 值  : void
- \B5\F7\D3煤\AF\CA\FD  :
- \B1\BB\B5\F7\BA\AF\CA\FD  :
+ 输出参数  :
+ 返 回 值  : void
+ 调用函数  :
+ 被调函数  :
 
- \D0薷\C4\C0\FA史      :
-  1.\C8\D5    \C6\DA   : 2015\C4\EA12\D4\C22\C8\D5
-    \D7\F7    \D5\DF   : c00351912
-    \D0薷\C4\C4\DA\C8\DD   : \D0\C2\C9\FA\B3珊\AF\CA\FD
+ 修改历史      :
+  1.日    期   : 2015年12月2日
+    作    者   : c00351912
+    修改内容   : 新生成函数
 
 *****************************************************************************/
 STATIC ssize_t store_bfgx_reg_and_reg_dump(struct device *dev, struct kobj_attribute *attr, const char *buf, size_t count)

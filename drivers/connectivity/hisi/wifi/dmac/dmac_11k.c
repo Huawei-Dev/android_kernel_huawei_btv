@@ -1453,6 +1453,11 @@ oal_void dmac_rrm_parse_beacon_req(dmac_vap_stru *pst_dmac_vap, mac_meas_req_ie_
             pst_rrm_info->st_bcn_req_info.uc_ssid_len = *(puc_ssid_sub_element + 1);
             if (0 != pst_rrm_info->st_bcn_req_info.uc_ssid_len)
             {
+                if (pst_rrm_info->st_bcn_req_info.uc_ssid_len > (WLAN_SSID_MAX_LEN - 1))
+                {
+                    OAM_ERROR_LOG1(0, OAM_SF_RRM, "{dmac_rrm_parse_beacon_req::ssid_len(%d) invalid}", pst_rrm_info->st_bcn_req_info.uc_ssid_len);
+                    return;
+                }
                 pst_rrm_info->st_bcn_req_info.puc_ssid = OAL_MEM_ALLOC(OAL_MEM_POOL_ID_LOCAL, pst_rrm_info->st_bcn_req_info.uc_ssid_len, OAL_TRUE);
                 if (OAL_PTR_NULL == pst_rrm_info->st_bcn_req_info.puc_ssid)
                 {

@@ -192,6 +192,8 @@ struct oal_sdio
     oal_int32           sdio_excp_type;
     oal_spin_lock_stru  sdio_excp_lock;
 
+    oal_wakelock_stru           st_sdio_rx_wakelock;
+
 };
 
 extern struct semaphore sdio_wake_sema;

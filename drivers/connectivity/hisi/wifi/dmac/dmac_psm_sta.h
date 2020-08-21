@@ -67,6 +67,7 @@ extern "C" {
 extern oal_uint32 g_device_wlan_pm_timeout;
 extern oal_uint32 g_pm_timer_restart_cnt;
 extern oal_uint8  g_uc_max_powersave;
+extern oal_uint16 g_us_download_rate_limit_pps;
 
 /*****************************************************************************
   5 消息头定义
@@ -438,6 +439,48 @@ OAL_STATIC OAL_INLINE oal_void dmac_send_ps_poll_to_ap_prot(dmac_vap_stru *pst_d
 #endif /* #if  defined(_PRE_WLAN_FEATURE_P2P)*/
 }
 
+/*****************************************************************************
+ 函 数 名  : dmac_psm_rx_inc_pkt_cnt
+ 功能描述  : 低功耗在active状态下收包报文统计数加1, 在所有的帧过滤处理完后再调用，仅统计需要真正处理的业务包个数。
+ 输入参数  :
+ 输出参数  : 无
+ 返 回 值  : oal_uint32
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2014年11月25日
+    作    者   : z00274374
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+OAL_STATIC OAL_INLINE oal_void  dmac_psm_rx_inc_pkt_cnt(mac_vap_stru *pst_mac_vap, oal_netbuf_stru *pst_buf)
+{
+    mac_sta_pm_handler_stru  *pst_mac_sta_pm_handle;
+    dmac_vap_stru               *pst_dmac_vap;
+
+    pst_dmac_vap = (dmac_vap_stru *)mac_res_get_dmac_vap(pst_mac_vap->uc_vap_id);
+    if (OAL_PTR_NULL == pst_dmac_vap)
+    {
+        OAM_WARNING_LOG1(0, OAM_SF_PWR, "mac_res_get_dmac_vap::pst_dmac_vap null. vap_id[%u]",pst_mac_vap->uc_vap_id);
+        return;
+    }
+
+    pst_mac_sta_pm_handle = (mac_sta_pm_handler_stru *)(pst_dmac_vap->pst_pm_handler);
+    if (OAL_PTR_NULL == pst_mac_sta_pm_handle)
+    {
+        OAM_WARNING_LOG0(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_PWR, "{dmac_psm_rx_inc_pkt_cnt::pst_mac_sta_pm_handle null}");
+        return;
+    }
+
+
+    if (STA_PWR_SAVE_STATE_ACTIVE == STA_GET_PM_STATE(pst_mac_sta_pm_handle))
+    {
+         pst_mac_sta_pm_handle->ul_psm_pkt_cnt++;
+    }
+
+    return;
+}
 
 /*****************************************************************************
   10 函数声明
@@ -448,7 +491,7 @@ extern oal_void dmac_psm_tx_complete_sta(dmac_vap_stru *pst_dmac_vap, hal_tx_dsc
 
 extern oal_void dmac_psm_process_tbtt_sta(dmac_vap_stru *pst_dmac_vap,mac_device_stru  *pst_mac_device);
 
-extern oal_void  dmac_psm_rx_process_data_sta(dmac_vap_stru *pst_dmac_vap, oal_netbuf_stru *pst_buf);
+extern oal_uint32 dmac_psm_rx_process_data_sta(dmac_vap_stru *pst_dmac_vap, oal_netbuf_stru *pst_buf);
 
 extern oal_uint8 dmac_psm_tx_process_data_sta(dmac_vap_stru *pst_dmac_vap, mac_tx_ctl_stru *pst_tx_ctl);
 extern oal_void dmac_psm_max_powersave_enable(mac_device_stru *pst_mac_device);

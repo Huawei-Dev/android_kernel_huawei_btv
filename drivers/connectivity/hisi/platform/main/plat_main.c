@@ -46,7 +46,7 @@ extern void  low_power_exit(void);
 extern int hw_ps_init(void);
 extern void hw_ps_exit(void);
 
-#if (defined(CONFIG_HISI_GPS_REF_CLK) || defined(CONFIG_CONNECTIVITY_HI110X_HI6250) || defined(CONFIG_CONNECTIVITY_HI110X_HI3650) || defined(CONFIG_CONNECTIVITY_HI110X_HI3660))
+#if (defined(CONFIG_HISI_GPS_REF_CLK) || defined(CONFIG_CONNECTIVITY_HI110X_HI6250) || defined(CONFIG_CONNECTIVITY_HI110X_HI3650) || defined(CONFIG_CONNECTIVITY_HI110X_HI3660) || defined(CONFIG_CONNECTIVITY_HI110X_KIRIN970))
 extern int hi_gps_plat_init(void);
 extern void hi_gps_plat_exit(void);
 #endif
@@ -202,7 +202,7 @@ oal_int32  plat_init(oal_void)
         goto hw_ps_init_fail;
     }
 
-#if (defined(CONFIG_HISI_GPS_REF_CLK) || defined(CONFIG_CONNECTIVITY_HI110X_HI6250) || defined(CONFIG_CONNECTIVITY_HI110X_HI3650) || defined(CONFIG_CONNECTIVITY_HI110X_HI3660))
+#if (defined(CONFIG_HISI_GPS_REF_CLK) || defined(CONFIG_CONNECTIVITY_HI110X_HI6250) || defined(CONFIG_CONNECTIVITY_HI110X_HI3650) || defined(CONFIG_CONNECTIVITY_HI110X_HI3660) || defined(CONFIG_CONNECTIVITY_HI110X_KIRIN970))
     l_return = hi_gps_plat_init();
     if (OAL_SUCC != l_return)
     {
@@ -221,7 +221,7 @@ oal_int32  plat_init(oal_void)
 
     return OAL_SUCC;
 
-#if (defined(CONFIG_HISI_GPS_REF_CLK) || defined(CONFIG_CONNECTIVITY_HI110X_HI6250) || defined(CONFIG_CONNECTIVITY_HI110X_HI3650) || defined(CONFIG_CONNECTIVITY_HI110X_HI3660))
+#if (defined(CONFIG_HISI_GPS_REF_CLK) || defined(CONFIG_CONNECTIVITY_HI110X_HI6250) || defined(CONFIG_CONNECTIVITY_HI110X_HI3650) || defined(CONFIG_CONNECTIVITY_HI110X_HI3660) || defined(CONFIG_CONNECTIVITY_HI110X_KIRIN970))
 gps_plat_init_fail:
     hw_ps_exit();
 #endif
@@ -283,7 +283,7 @@ customize_init_failed:
 *****************************************************************************/
 oal_void plat_exit(oal_void)
 {
-#if (defined(CONFIG_HISI_GPS_REF_CLK) || defined(CONFIG_CONNECTIVITY_HI110X_HI6250) || defined(CONFIG_CONNECTIVITY_HI110X_HI3650) || defined(CONFIG_CONNECTIVITY_HI110X_HI3660))
+#if (defined(CONFIG_HISI_GPS_REF_CLK) || defined(CONFIG_CONNECTIVITY_HI110X_HI6250) || defined(CONFIG_CONNECTIVITY_HI110X_HI3650) || defined(CONFIG_CONNECTIVITY_HI110X_HI3660) || defined(CONFIG_CONNECTIVITY_HI110X_KIRIN970))
     hi_gps_plat_exit();
 #endif
 

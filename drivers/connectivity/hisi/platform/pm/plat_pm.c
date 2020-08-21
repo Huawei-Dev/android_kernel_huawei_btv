@@ -352,6 +352,7 @@ void host_wkup_dev_work(struct work_struct *work)
 {
 #define RETRY_TIMES (3)
     int i = 0;
+    int j;
     uint8 zero_num = 0;
     int bwkup_gpio_val = 0;
     uint64 timeleft;
@@ -424,12 +425,20 @@ void host_wkup_dev_work(struct work_struct *work)
             {
                 bwkup_gpio_val = board_get_bwkup_gpio_val();
                 PS_PRINT_INFO("bfg wkup OK, gpio level:%d\n", bwkup_gpio_val);
-                ret = ps_change_uart_baud_rate(DEFAULT_BAUD_RATE, FLOW_CTRL_ENABLE);
-                if (0 != ret)
+
+                j = RETRY_TIMES;
+                while(0 != ps_change_uart_baud_rate(DEFAULT_BAUD_RATE, FLOW_CTRL_ENABLE))
                 {
-                    PS_PRINT_ERR("It is bad!!!, change uart rate fail\n");
+                    PS_PRINT_WARNING("change default uart rate fail,left retry cnt:%d,do retry\n", j);
                     DECLARE_DFT_TRACE_KEY_INFO("change uart rate fail",OAL_DFT_TRACE_FAIL);
-                }
+                    if (--j){
+                       msleep(100);
+                    }else{
+                       PS_PRINT_ERR("change default uart rate fail,retried but not succ\n");
+                       break;
+                    }
+                };
+
                 break;
             }
             else
@@ -455,16 +464,20 @@ void host_wkup_dev_work(struct work_struct *work)
     }
 }
 
+#ifdef CONFIG_INPUTHUB
 /* sensorbub模块的函数，睡眠唤醒时用来查询sensorhub的状态 */
 extern int getSensorMcuMode(void);
 extern int get_iomcu_power_state(void);
+#endif
 
 void host_send_disallow_msg(struct work_struct *work)
 {
 #define MAX_TTYRESUME_LOOPCNT (300)
 #define MAX_SENSORHUB_LOOPCNT (30)
     uint32 loop_tty_resume_cnt = 0;
+#ifdef CONFIG_INPUTHUB
     uint32 loop_sensorhub_resume_cnt = 0;
+#endif
     struct ps_core_s *ps_core_d = NULL;
     struct pm_drv_data *pm_data = pm_get_drvdata();
 
@@ -498,6 +511,7 @@ void host_send_disallow_msg(struct work_struct *work)
             msleep(10);
         }
 
+#ifdef CONFIG_INPUTHUB
         if (UART_PCLK_FROM_SENSORHUB == get_uart_pclk_source())
         {
             /*查询sensorhub状态，如果不是wkup状态，uart的时钟可能会不对*/
@@ -516,6 +530,7 @@ void host_send_disallow_msg(struct work_struct *work)
                 }
             }
         }
+#endif
     }
     else
     {
@@ -1589,7 +1604,7 @@ STATIC int low_power_probe(void)
     INIT_WORK(&pm_data->wkup_dev_work, host_wkup_dev_work);
     INIT_WORK(&pm_data->send_disallow_msg_work, host_send_disallow_msg);
 
-	pm_data->board					= get_board_info();
+	pm_data->board					= get_hi110x_board_info();
 
     pm_data->bfg_irq = pm_data->board->bfgn_irq;
 

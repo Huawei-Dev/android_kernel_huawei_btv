@@ -58,6 +58,17 @@ extern "C" {
 #define MORE_PWR_MAX                    (50)                                /* 根据温度额外补偿的发射功率的最大有效值 */
 #define COUNTRY_CODE_LEN                (3)                                 /* 国家码位数 */
 #define MAX_COUNTRY_COUNT               (300)                               /* 支持定制的国家的最大个数 */
+#define DELTA_CCA_ED_HIGH_TH_RANGE      15     /* δ调整上限，最大向上或向下调整15dB */
+
+/*
+ * 计算绝对值
+ */
+#define CUS_ABS(val)                                ((val) > 0 ? (val) : -(val))
+/*
+ * 判断CCA能量门限调整值是否超出范围
+ * 最大调整幅度:DELTA_CCA_ED_HIGH_TH_RANGE
+ */
+#define CUS_DELTA_CCA_ED_HIGH_TH_OUT_OF_RANGE(val)  (CUS_ABS(val) > DELTA_CCA_ED_HIGH_TH_RANGE ? 1 : 0)
 
 
 /*****************************************************************************
@@ -251,6 +262,13 @@ typedef enum
     WLAN_ATCMDSRV_LTE_RX_ACT,
     WLAN_ATCMDSRV_LTE_TX_ACT,
     WLAN_CFG_INIT_FAR_DIST_DSSS_SCALE_PROMOTE_SWITCH,    /* 超远距11b 1m 2m dbb scale提升使能开关 */
+    WLAN_CFG_INIT_DELTA_CCA_ED_HIGH_20TH_2G,
+    WLAN_CFG_INIT_DELTA_CCA_ED_HIGH_40TH_2G,
+    WLAN_CFG_INIT_DELTA_CCA_ED_HIGH_20TH_5G,
+    WLAN_CFG_INIT_DELTA_CCA_ED_HIGH_40TH_5G,
+#ifdef _PRE_WLAN_DOWNLOAD_PM
+    WLAN_CFG_INIT_DOWNLOAD_RATE_LIMIT_PPS,
+#endif
     WLAN_CFG_INIT_BUTT,
 }WLAN_CFG_INIT;
 

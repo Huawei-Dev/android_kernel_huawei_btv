@@ -1,4 +1,4 @@
-HI1102_DRIVER_BUILTIN_PATH := drivers/connectivity/hisi
+HI1102_DRIVER_BUILTIN_PATH ?= $(subst ",,$(CONFIG_HI110X_DRIVER_PATH))
 DRIVER_FLODER = platform
 
 export _PRE_PRODUCT_VERSION  ?= 1102
@@ -61,6 +61,9 @@ ifeq ($(CONFIG_CONNECTIVITY_HI110X_HI3650),y)
 pm-objs += gps_plat_hi3650.o
 endif
 ifeq ($(CONFIG_CONNECTIVITY_HI110X_HI3660),y)
+pm-objs += gps_plat_hi3660.o
+endif
+ifeq ($(CONFIG_CONNECTIVITY_HI110X_KIRIN970),y)
 pm-objs += gps_plat_hi3660.o
 endif
 

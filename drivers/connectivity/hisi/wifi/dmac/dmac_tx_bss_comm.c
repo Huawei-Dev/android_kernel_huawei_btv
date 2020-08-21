@@ -701,8 +701,8 @@ oal_void  dmac_tx_pause_info(hal_to_dmac_device_stru *pst_hal_device, dmac_vap_s
     */
     OAM_WARNING_LOG_ALTER(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_TX, "{dmac_tx_pause_info:TX_pkts: total = %u, tx_dropped = %u, tx_succ = %u, total_retry = %u, hw_tx_fail = %u.}", 5,
         pst_query_stats->ul_tx_total, pst_query_stats->ul_tx_failed, pst_query_stats->ul_hw_tx_pkts, pst_query_stats->ul_tx_retries, pst_query_stats->ul_hw_tx_failed);
-    OAM_WARNING_LOG4(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_TX, "{dmac_tx_pause_info:RSSI = %d ; RX_pkts: total = %u, drv_dropped = %u, hcc_flowctrl_miss = %u.}",
-        pst_dmac_vap->st_query_stats.ul_signal, pst_query_stats->ul_drv_rx_pkts, pst_query_stats->ul_rx_dropped_misc,g_sdio_stats.ulHccPktMiss);
+    OAM_WARNING_LOG_ALTER(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_TX, "{dmac_tx_pause_info:RSSI = %d ; RX_pkts: total = %u, drv_dropped = %u, hcc_flowctrl_miss = %u, replay = %u, replay_droped = %u.}", 6,
+        pst_dmac_vap->st_query_stats.ul_signal, pst_query_stats->ul_drv_rx_pkts, pst_query_stats->ul_rx_dropped_misc,g_sdio_stats.ulHccPktMiss, pst_query_stats->ul_rx_replay, pst_query_stats->ul_rx_replay_droped);
 
     dmac_config_get_tx_rate_info(&(pst_dmac_vap->st_tx_alg), &(pst_mac_device->st_mac_rates_11g[0]), &st_txrate);
     OAM_WARNING_LOG_ALTER(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_TX, "{dmac_tx_pause_info: tx rate info legacy = %d, mcs = %d, flags = %d, nss = %d, rx rate(kbps) = %d}", 5,
@@ -798,6 +798,224 @@ oal_void  dmac_tx_excp_free_dscr(oal_dlist_head_stru *pst_tx_dscr_list_hdr, hal_
 
     return;
 }
+
+#ifdef _PRE_WLAN_MAC_BUGFIX_PN
+OAL_STATIC oal_uint64 dmac_tx_generate_tkip_PN(oal_uint64 ull_sn, oal_uint8 uc_key_id)
+{
+    /* TKIP 加密IV 字段结构
+     * TSC1 WEPSeed[1] TSC0 [KEY_ID] TSC2 TSC3 TSC4 TSC5
+     *                      |      |
+     *                  b0  b4  b5  b6~b7
+     *                  00000    1  key_id
+     * WEPSeed[1] = (TSC1 | 0x20) & 0x7f
+    */
+    mac_pn_union   un_tkip_pn;
+
+    un_tkip_pn.uc_pn8[0] = (ull_sn & 0x000000000000FF00) >> 8;
+    un_tkip_pn.uc_pn8[1] = (un_tkip_pn.uc_pn8[0] | 0x20) & 0x7F;//WEPSeed[1]
+    un_tkip_pn.uc_pn8[2] = (ull_sn & 0x00000000000000FF);
+    un_tkip_pn.uc_pn8[3] = ((uc_key_id & 0x03) << 6) | BIT5;
+    un_tkip_pn.uc_pn8[4] = (ull_sn & 0x0000000000FF0000) >> 16;
+    un_tkip_pn.uc_pn8[5] = (ull_sn & 0x00000000FF000000) >> 24;
+    un_tkip_pn.uc_pn8[6] = (ull_sn & 0x000000FF00000000) >> 32;
+    un_tkip_pn.uc_pn8[7] = (ull_sn & 0x0000FF0000000000) >> 40;
+
+    return un_tkip_pn.ull_pn64;
+}
+
+OAL_STATIC oal_uint64 dmac_tx_generate_ccmp_PN(oal_uint64 ull_sn, oal_uint8 uc_key_id)
+{
+    /* CCMP 加密IV 字段结构
+     * PN0 PN1 RSVD [KEY_ID] PN2 PN3 PN4 PN5
+     *              |      |
+     *          b0  b4  b5  b6~b7
+     *          00000    1  key_id
+    */
+
+    mac_pn_union   un_ccmp_pn;
+
+    un_ccmp_pn.uc_pn8[0] = (ull_sn & 0xFF);
+    un_ccmp_pn.uc_pn8[1] = (ull_sn & 0x000000000000FF00) >> 8;
+    un_ccmp_pn.uc_pn8[2] = 0;
+    un_ccmp_pn.uc_pn8[3] = ((uc_key_id & 0x03) << 6) | BIT5;
+    un_ccmp_pn.uc_pn8[4] = (ull_sn & 0x0000000000FF0000) >> 16;
+    un_ccmp_pn.uc_pn8[5] = (ull_sn & 0x00000000FF000000) >> 24;
+    un_ccmp_pn.uc_pn8[6] = (ull_sn & 0x000000FF00000000) >> 32;
+    un_ccmp_pn.uc_pn8[7] = (ull_sn & 0x0000FF0000000000) >> 40;
+
+    return un_ccmp_pn.ull_pn64;
+}
+
+
+OAL_STATIC oal_uint64 dmac_set_tx_dscr_PN(dmac_user_stru *pst_dmac_user, hal_tx_dscr_stru *pst_tx_dscr)
+{
+    mac_pn_union un_pn;
+
+    /* 通过sn 生成CCMP/TKIP IV 值 */
+    if (pst_dmac_user->st_user_base_info.st_key_info.en_cipher_type == WLAN_80211_CIPHER_SUITE_CCMP)
+    {
+        un_pn.ull_pn64 = dmac_tx_generate_ccmp_PN(pst_dmac_user->ull_sn, pst_dmac_user->st_user_base_info.st_key_info.uc_default_index);
+    }
+    else
+    {
+        un_pn.ull_pn64 = dmac_tx_generate_tkip_PN(pst_dmac_user->ull_sn, pst_dmac_user->st_user_base_info.st_key_info.uc_default_index);
+    }
+    (pst_dmac_user->ull_sn)++;
+
+    /* 填充描述符iv 字段，目前仅支持填充CCMP header */
+    hal_dscr_set_iv_value(pst_tx_dscr, un_pn.ul_pn32[0], un_pn.ul_pn32[1]);
+
+    /* 设置描述符tx_pn_hw_bypass bit 为1 ，表示软件填写IV 值 */
+    hal_dscr_set_tx_pn_hw_bypass(pst_tx_dscr, 1);
+
+    return un_pn.ull_pn64;
+}
+
+OAL_STATIC oal_uint8 dmac_tx_sw_set_ccmp_PN(hal_to_dmac_device_stru *pst_hal_device,
+                                                        dmac_user_stru *pst_dmac_user,
+                                                        hal_tx_dscr_stru *pst_tx_dscr,
+                                                        oal_netbuf_stru *pst_netbuf)
+{
+    oal_uint8 *puc_pn_hdr;
+    oal_uint64 ull_iv;
+
+    /*
+     * 软件设置PN 值条件
+     */
+    if ((OAL_FALSE == pst_dmac_user->st_user_base_info.st_cap_info.bit_qos)
+        || (OAL_TRUE == pst_dmac_user->st_user_base_info.en_is_multi_user))
+    {
+        return OAL_FALSE;
+    }
+
+    if (pst_dmac_user->st_user_base_info.st_key_info.en_cipher_type != WLAN_80211_CIPHER_SUITE_CCMP
+        && pst_dmac_user->st_user_base_info.st_key_info.en_cipher_type != WLAN_80211_CIPHER_SUITE_TKIP)
+    {
+        return OAL_FALSE;
+    }
+
+    /* 保存SN 值到描述符中 */
+    ull_iv = dmac_set_tx_dscr_PN(pst_dmac_user, pst_tx_dscr);
+
+    /* 保存iv 值到MAC_HEADER 的最后8 字节中，以便重传时候取出直接使用 */
+    puc_pn_hdr = oal_netbuf_get_pn_hdr_addr(pst_netbuf);
+    if (puc_pn_hdr == OAL_PTR_NULL)
+    {
+        OAM_ERROR_LOG2(0, OAM_SF_TX, "{dmac_tx_sw_generate_iv::pn_hdr poiter null.iv_h %x, iv_l %x}",
+                        (ull_iv >> 32)&0xFFFFFFFF,
+                        (ull_iv)&0xFFFFFFFF);
+        return OAL_FALSE;
+    }
+    *(oal_uint64 *)puc_pn_hdr = ull_iv;
+
+#ifdef _PRE_WLAN_MAC_BUGFIX_PN_DEBUG
+    {
+        mac_tx_ctl_stru      *pst_cb;
+        OAL_STATIC oal_uint32 ul_seq;
+        OAL_STATIC oal_uint8  uc_is_qos = OAL_TRUE;
+        pst_cb  = (mac_tx_ctl_stru *)oal_netbuf_cb(pst_netbuf);
+        /* 获取用户指定TID的单播帧的发送完成的次数 */
+        uc_is_qos = mac_get_cb_is_qosdata(pst_cb);
+        if( OAL_TRUE == uc_is_qos)
+        {
+            hal_tx_get_dscr_seq_num(pst_hal_device, pst_tx_dscr, (oal_uint16 *)&ul_seq);
+        }
+        else
+        {
+            hal_get_tx_sequence_num(pst_hal_device, 0, 0, 0, &ul_seq);
+        }
+
+        OAM_WARNING_LOG3(0, OAM_SF_TX, "{dmac_tx_sw_generate_iv::seq %04d, iv_h 0x%08X, iv_l 0x%08X}",
+                        ul_seq,
+                        (ull_iv >> 32)&0xFFFFFFFF,
+                        (ull_iv)&0xFFFFFFFF);
+        OAM_WARNING_LOG3(0, OAM_SF_TX, "{dmac_tx_sw_generate_iv::uc_is_qos %d, SN_H 0x%08X, SN_L 0x%08X}",
+                        uc_is_qos,
+                        (pst_dmac_user->ull_sn >>  32) & 0xFFFFFFFF,
+                        (pst_dmac_user->ull_sn) & 0xFFFFFFFF);
+    }
+#endif  /* _PRE_WLAN_MAC_BUGFIX_PN_DEBUG */
+    return OAL_TRUE;
+}
+
+oal_uint32 dmac_tx_sw_restore_ccmp_PN_from_mac_hdr(hal_to_dmac_device_stru *pst_hal_device,
+                                                    hal_tx_dscr_stru       *pst_dscr)
+{
+    oal_uint8               *puc_pn_hdr;
+    oal_netbuf_stru         *pst_buf;
+
+    pst_buf = pst_dscr->pst_skb_start_addr;
+    if (pst_buf == OAL_PTR_NULL)
+    {
+        OAM_ERROR_LOG1(0, OAM_SF_TX, "{dmac_tx_sw_restore_ccmp_PN_from_mac_hdr::net_buffer is null.q_num = %d}", pst_dscr->uc_q_num);
+        return OAL_FAIL;
+    }
+
+    puc_pn_hdr = oal_netbuf_get_pn_hdr_addr(pst_buf);
+    if (puc_pn_hdr == OAL_PTR_NULL)
+    {
+        OAM_ERROR_LOG0(0, OAM_SF_TX, "{dmac_tx_sw_restore_ccmp_PN_from_mac_hdr::pn_hdr null.}");
+        return OAL_FAIL;
+    }
+
+    hal_dscr_set_iv_value(pst_dscr,
+        ((mac_pn_union*)puc_pn_hdr)->ul_pn32[0],
+        ((mac_pn_union*)puc_pn_hdr)->ul_pn32[1]);
+    return OAL_SUCC;
+}
+
+#endif /* _PRE_WLAN_MAC_BUGFIX_PN */
+
+#ifdef _PRE_WLAN_FEATURE_VOWIFI
+/*****************************************************************************
+ 函 数 名  : dmac_vowifi_update_arp_timestamp
+ 功能描述  : 更新VoWiFi的检测状态，并决定是否触发上报vowifi切换申请
+ 输入参数  :
+ 输出参数  : 无
+ 返 回 值  : oal_int32
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2016年4月19日
+    作    者   : z00273164
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+OAL_STATIC oal_void dmac_vowifi_update_arp_timestamp(dmac_vap_stru *pst_dmac_vap, oal_uint16 us_idx)
+{
+    dmac_user_stru *pst_dmac_user;
+
+    if ((!IS_STA(&pst_dmac_vap->st_vap_base_info)) || (!IS_LEGACY_VAP(&pst_dmac_vap->st_vap_base_info)))
+    {
+        return ;
+    }
+
+    if (OAL_PTR_NULL == pst_dmac_vap->pst_vowifi_status)
+    {
+        return ;
+    }
+
+    /* 非业务用户的帧 */
+    if (us_idx != pst_dmac_vap->st_vap_base_info.uc_assoc_vap_id)
+    {
+        return ;
+    }
+
+    pst_dmac_user = (dmac_user_stru *)mac_res_get_dmac_user(us_idx);
+    if (OAL_UNLIKELY(OAL_PTR_NULL == pst_dmac_user))
+    {
+        OAM_WARNING_LOG1(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_VOWIFI,
+                    "{dmac_vowifi_update_arp_timestamp::pst_dmac_user[%d] null!}", us_idx);
+        return;
+    }
+
+    pst_dmac_vap->pst_vowifi_status->ull_arp_timestamp_ms = OAL_TIME_GET_STAMP_MS();
+    pst_dmac_vap->pst_vowifi_status->ul_arp_rx_succ_pkts  = (pst_dmac_user->st_query_stats.ul_drv_rx_pkts >= pst_dmac_user->st_query_stats.ul_rx_dropped_misc)?
+                                                     (pst_dmac_user->st_query_stats.ul_drv_rx_pkts - pst_dmac_user->st_query_stats.ul_rx_dropped_misc):
+                                                     0;
+}
+#endif /* _PRE_WLAN_FEATURE_VOWIFI */
 
 #if (_PRE_OS_VERSION_RAW == _PRE_OS_VERSION)
 #pragma arm section rwdata = "BTCM", code ="ATCM", zidata = "BTCM", rodata = "ATCM"
@@ -1844,12 +2062,13 @@ oal_uint32  dmac_tx_data(
 
     dmac_tx_get_txop(pst_dmac_vap, pst_dmac_user, &st_txop_feature, pst_tx_ctl->en_ismcast);
 
-    /* DTS2015080507103 发送4 次握手eapol key 帧设置为不加密 */
-    if (pst_tx_ctl->bit_is_eapol_key_ptk == OAL_TRUE)
+    /* begin:DTS2017081511038 如果接收到的EAPOL-KEY不加密，则STA 发送的4/4 也不加密 */
+    if ((pst_tx_ctl->bit_is_eapol_key_ptk == OAL_TRUE)
+        && (pst_dmac_user->bit_is_rx_eapol_key_open == OAL_TRUE))
     {
         st_txop_feature.pst_security->en_cipher_protocol_type = WLAN_80211_CIPHER_SUITE_NO_ENCRYP;
     }
-    /* DTS2015080507103 发送4 次握手eapol key 帧设置为不加密 */
+    /* end:DTS2017081511038 如果接收到的EAPOL-KEY不加密，则STA 发送的4/4 也不加密 */
 
     /*如果用户处于节能状态，则需要考虑设置当前帧的more data*/
     if (OAL_TRUE == pst_dmac_user->bit_ps_mode)
@@ -2969,6 +3188,10 @@ OAL_INLINE oal_uint32  dmac_tx_process_data(hal_to_dmac_device_stru *pst_hal_dev
     dmac_save_frag_seq(pst_dmac_user, pst_tx_ctl_first);
     dmac_tx_seqnum_set(pst_dmac_user, pst_tx_ctl_first);
 
+#ifdef _PRE_WLAN_MAC_BUGFIX_PN
+    /* 软件设置PN 值 */
+    dmac_tx_sw_set_ccmp_PN(pst_hal_device, pst_dmac_user, pst_tx_dscr, pst_netbuf);
+#endif
 
     /* 不是以太网来的不统计 */
     if (FRW_EVENT_TYPE_HOST_DRX == MAC_GET_CB_EVENT_TYPE(pst_tx_ctl_first))
@@ -2989,56 +3212,7 @@ OAL_INLINE oal_uint32  dmac_tx_process_data(hal_to_dmac_device_stru *pst_hal_dev
 
     return OAL_SUCC;
 }
-#ifdef _PRE_WLAN_FEATURE_VOWIFI
-/*****************************************************************************
- 函 数 名  : dmac_vap_update_vowifi_status
- 功能描述  : 更新VoWiFi的检测状态，并决定是否触发上报vowifi切换申请
- 输入参数  :
- 输出参数  : 无
- 返 回 值  : oal_int32
- 调用函数  :
- 被调函数  :
 
- 修改历史      :
-  1.日    期   : 2016年4月19日
-    作    者   : z00273164
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-OAL_STATIC oal_void dmac_vowifi_update_arp_timestamp(dmac_vap_stru *pst_dmac_vap, oal_uint16 us_idx)
-{
-    dmac_user_stru *pst_dmac_user;
-
-    if ((!IS_STA(&pst_dmac_vap->st_vap_base_info)) || (!IS_LEGACY_VAP(&pst_dmac_vap->st_vap_base_info)))
-    {
-        return ;
-    }
-
-    if (OAL_PTR_NULL == pst_dmac_vap->pst_vowifi_status)
-    {
-        return ;
-    }
-
-    /* 非业务用户的帧 */
-    if (us_idx != pst_dmac_vap->st_vap_base_info.uc_assoc_vap_id)
-    {
-        return ;
-    }
-
-    pst_dmac_user = (dmac_user_stru *)mac_res_get_dmac_user(us_idx);
-    if (OAL_UNLIKELY(OAL_PTR_NULL == pst_dmac_user))
-    {
-        OAM_WARNING_LOG1(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_VOWIFI,
-                    "{dmac_vowifi_update_arp_timestamp::pst_dmac_user[%d] null!}", us_idx);
-        return;
-    }
-
-    pst_dmac_vap->pst_vowifi_status->ull_arp_timestamp_ms = OAL_TIME_GET_STAMP_MS();
-    pst_dmac_vap->pst_vowifi_status->ul_arp_rx_succ_pkts  = (pst_dmac_user->st_query_stats.ul_drv_rx_pkts >= pst_dmac_user->st_query_stats.ul_rx_dropped_misc)?
-                                                     (pst_dmac_user->st_query_stats.ul_drv_rx_pkts - pst_dmac_user->st_query_stats.ul_rx_dropped_misc):
-                                                     0;
-}
-#endif /* _PRE_WLAN_FEATURE_VOWIFI */
 
 /*****************************************************************************
  函 数 名  : dmac_tx_process_data_event
@@ -3556,6 +3730,12 @@ oal_uint32  dmac_tx_force(dmac_vap_stru *pst_dmac_vap, oal_netbuf_stru *pst_netb
     else
     {
         dmac_tx_seqnum_set(pst_dmac_user, pst_tx_ctl);
+
+#ifdef _PRE_WLAN_MAC_BUGFIX_PN
+        /* 软件设置PN 值 */
+        dmac_tx_sw_set_ccmp_PN(pst_hal_device, pst_dmac_user, pst_tx_dscr, pst_netbuf);
+#endif
+
         ul_ret = dmac_tx_get_mpdu_params(pst_netbuf, pst_tx_ctl, &st_mpdu);
         if (OAL_UNLIKELY(OAL_SUCC != ul_ret))
         {
@@ -4162,7 +4342,8 @@ oal_uint32  dmac_tx_mgmt(dmac_vap_stru *pst_dmac_vap, oal_netbuf_stru *pst_netbu
     }
 
 #ifdef _PRE_WLAN_FEATURE_BTCOEX
-    if (pst_mac_device->pst_device_stru->st_btcoex_btble_status.un_ble_status.st_ble_status.bit_ble_scan)
+    if ((pst_mac_device->pst_device_stru->st_btcoex_btble_status.un_ble_status.st_ble_status.bit_ble_scan)
+        && (!(pst_mac_device->pst_device_stru->st_btcoex_btble_status.un_bt_status.st_bt_status.bit_bt_sco)))
     {
         if ((WLAN_AUTH == uc_mgmt_subtype) || (WLAN_ASSOC_REQ == uc_mgmt_subtype))
         {
@@ -4786,7 +4967,13 @@ oal_uint32  dmac_tid_tx_queue_remove_ampdu(
         /*非重传包才设置seq num并调整窗口*/
         if (OAL_FALSE == pst_tx_dscr->bit_is_retried)
         {
+            /* 设置seq num */
             dmac_tx_seqnum_set_ampdu(pst_user, pst_cb);
+
+#ifdef _PRE_WLAN_MAC_BUGFIX_PN
+            /* 软件设置PN 值 */
+            dmac_tx_sw_set_ccmp_PN(pst_hal_device, pst_user, pst_tx_dscr, pst_netbuf);
+#endif
             /*发送窗口调整*/
             dmac_ba_addto_baw(pst_tx_ba_handle);
         }
@@ -5030,6 +5217,11 @@ oal_uint32  dmac_tid_tx_dequeue(hal_to_dmac_device_stru    *pst_hal_device,
     {
         dmac_save_frag_seq(pst_user, pst_cb);
         dmac_tx_seqnum_set(pst_user, pst_cb);
+
+#ifdef _PRE_WLAN_MAC_BUGFIX_PN
+        /* 软件设置PN 值 */
+        dmac_tx_sw_set_ccmp_PN(pst_hal_device, pst_user, pst_tx_dscr, pst_netbuf);
+#endif
     }
 
     return OAL_SUCC;
@@ -5676,11 +5868,26 @@ oal_void dmac_proc_save_tx_queue(hal_to_dmac_device_stru       *pst_hal_device,
                 do
                 {
                     pst_tx_dscr_tmp->bit_is_retried = OAL_TRUE;
-#if 0
-                    hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_tx_dscr_tmp, 1);
+
+#ifdef _PRE_WLAN_MAC_BUGFIX_PN
+                    {
+                        oal_bool_enum_uint8      en_tx_pn_hw_bypass;
+                        hal_dscr_get_tx_pn_hw_bypass(pst_tx_dscr_tmp, &en_tx_pn_hw_bypass);
+                        if (en_tx_pn_hw_bypass == OAL_TRUE)
+                        {
+                            pst_tx_dscr_tmp->bit_is_first = OAL_FALSE;
+                            hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_tx_dscr_tmp, 1);
+                            dmac_tx_sw_restore_ccmp_PN_from_mac_hdr(pst_hal_device, pst_tx_dscr_tmp);
+                        }
+                        else
+                        {
+                            hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_tx_dscr_tmp, 0);
+                        }
+                    }
 #else
                     hal_tx_set_dscr_seqno_sw_generate(pst_hal_device, pst_tx_dscr_tmp, 0);
-#endif
+#endif // _PRE_WLAN_MAC_BUGFIX_PN
+
                     hal_tx_set_dscr_status(pst_hal_device, pst_tx_dscr_tmp, DMAC_TX_INVALID);
                     hal_get_tx_dscr_next(pst_hal_device, pst_tx_dscr_tmp, &pst_tx_dscr_tmp);
                 }while(OAL_PTR_NULL != pst_tx_dscr_tmp);

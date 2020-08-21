@@ -1076,6 +1076,9 @@ OAL_STATIC oal_uint32 sta_power_state_awake_event(oal_void   *p_ctx,
        /* Ë¯ÃßÊÂ¼þ */
        case STA_PWR_EVENT_BEACON_TIMEOUT:
        case STA_PWR_EVENT_NORMAL_SLEEP:
+#ifdef _PRE_WLAN_DOWNLOAD_PM
+       case STA_PWR_EVENT_NOT_EXCEED_MAX_SLP_TIME:
+#endif
             dmac_pm_sta_state_trans(pst_pm_handler, STA_PWR_SAVE_STATE_DOZE, us_event);
        break;
 

@@ -294,15 +294,64 @@ oal_bool_enum_uint8 dmac_ao_is_ipv4_addr_owner(dmac_vap_stru *pst_dmac_vap, oal_
 {
     oal_uint32 ul_loop;
 
+    /*target ip all 0,not mine*/
+    if((puc_ipv4_addr[0]==0)&&(puc_ipv4_addr[1]==0)&&(puc_ipv4_addr[2]==0)&&(puc_ipv4_addr[3]==0))
+    {
+        return OAL_FALSE;
+    }
+
     for (ul_loop = 0; ul_loop < DMAC_MAX_IPV4_ENTRIES; ul_loop++)
     {
-        if (0 == oal_memcmp(pst_dmac_vap->pst_ip_addr_info->ast_ipv4_entry[ul_loop].auc_ip_addr, puc_ipv4_addr, OAL_IPV4_ADDR_SIZE))
+        if (0 == oal_memcmp(pst_dmac_vap->pst_ip_addr_info->ast_ipv4_entry[ul_loop].un_local_ip.auc_value, puc_ipv4_addr, OAL_IPV4_ADDR_SIZE))
         {
             return OAL_TRUE;
         }
     }
     return OAL_FALSE;
 }
+
+/*****************************************************************************
+ 函 数 名  : dmac_ao_is_ipv4_broadcast
+ 功能描述  : 查询IPV4地址是否广播IP 地址
+ 输入参数  : dmac_vap_stru *pst_dmac_vap
+             oal_uint8 *puc_ipv4_addr
+ 输出参数  : 无
+ 返 回 值  : OAL_STATIC oal_bool_enum_uint8
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年8月31日
+    作    者   : duankayong 00194999
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+oal_bool_enum_uint8 dmac_ao_is_ipv4_broadcast(dmac_vap_stru *pst_dmac_vap, oal_uint32 ul_ipv4_addr)
+{
+    oal_uint32 ul_loop;
+    oal_uint32 ul_local_ip, ul_mask;
+
+    if (ul_ipv4_addr == 0xFFFFFFFFU || ul_ipv4_addr == 0)
+    {
+        return OAL_TRUE;
+    }
+
+    /* 如果网段相同且mask 后ip 地址是全1，则认为该IP 地址是广播IP 地址 */
+    for (ul_loop = 0; ul_loop < DMAC_MAX_IPV4_ENTRIES; ul_loop++)
+    {
+        ul_local_ip = pst_dmac_vap->pst_ip_addr_info->ast_ipv4_entry[ul_loop].un_local_ip.ul_value;
+        ul_mask     = pst_dmac_vap->pst_ip_addr_info->ast_ipv4_entry[ul_loop].un_mask.ul_value;
+
+        if ((((ul_local_ip ^ ul_ipv4_addr) & ul_mask) == 0) /* 相同子网 */
+            && ((~ul_mask & ul_ipv4_addr) == (~ul_mask)))
+        {
+            return OAL_TRUE;
+        }
+    }
+
+    return OAL_FALSE;
+}
+
 
 /*****************************************************************************
  函 数 名  : dmac_ao_process_arp_offload
@@ -621,6 +670,12 @@ OAL_STATIC dmac_rx_frame_ctrl_enum_uint8 dmac_ao_encap_na(dmac_vap_stru *pst_dma
 OAL_STATIC oal_bool_enum_uint8 dmac_ao_is_ipv6_addr_owner(dmac_vap_stru *pst_dmac_vap, oal_uint8 *puc_ipv6_addr)
 {
     oal_uint32  ul_loop;
+    oal_uint32  u6_addr32_zero[4]={0x0,0x0,0x0,0x0};
+
+    if( 0 == oal_memcmp((oal_uint8*)u6_addr32_zero, puc_ipv6_addr, OAL_IPV6_ADDR_SIZE))
+    {
+        return OAL_FALSE;
+    }
 
     for (ul_loop = 0; ul_loop < DMAC_MAX_IPV6_ENTRIES; ul_loop++)
     {
@@ -1168,7 +1223,12 @@ OAL_STATIC dmac_rx_frame_ctrl_enum_uint8 dmac_ao_sta_process_multicast_filter(dm
     {
         pst_ipv4 = (oal_ip_header_stru *)(pst_snap + 1);
 
-        if (OAL_IPV4_IS_BROADCAST((oal_uint8 *)(&(pst_ipv4->ul_daddr)))
+        if (pst_ipv4->uc_protocol == MAC_TCP_PROTOCAL)
+        {
+            return DMAC_RX_FRAME_CTRL_GOON;
+        }
+
+        if (dmac_ao_is_ipv4_broadcast(pst_dmac_vap, pst_ipv4->ul_daddr)
             || OAL_IPV4_IS_MULTICAST((oal_uint8 *)(&(pst_ipv4->ul_daddr))))
         {
             return DMAC_RX_FRAME_CTRL_DROP;

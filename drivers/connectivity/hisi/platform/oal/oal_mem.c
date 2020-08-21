@@ -138,6 +138,12 @@ OAL_STATIC  oal_mem_subpool_cfg_stru g_ast_shared_data_cfg_table[] =
 #define TOTAL_WLAN_MEM_LOCAL_SIZE4  (WLAN_MEM_LOCAL_SIZE4 + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)
 #define TOTAL_WLAN_MEM_LOCAL_SIZE5  (WLAN_MEM_LOCAL_SIZE5 + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)
 #define TOTAL_WLAN_MEM_LOCAL_SIZE6  (WLAN_MEM_LOCAL_SIZE6 + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)
+#define TOTAL_WLAN_MEM_LOCAL_SIZE   (TOTAL_WLAN_MEM_LOCAL_SIZE1*WLAN_MEM_LOCAL_CNT1 \
+                                    + TOTAL_WLAN_MEM_LOCAL_SIZE2*WLAN_MEM_LOCAL_CNT2 \
+                                    + TOTAL_WLAN_MEM_LOCAL_SIZE3*WLAN_MEM_LOCAL_CNT3 \
+                                    + TOTAL_WLAN_MEM_LOCAL_SIZE4*WLAN_MEM_LOCAL_CNT4 \
+                                    + TOTAL_WLAN_MEM_LOCAL_SIZE5*WLAN_MEM_LOCAL_CNT5 \
+                                    + TOTAL_WLAN_MEM_LOCAL_SIZE6*WLAN_MEM_LOCAL_CNT6)
 OAL_STATIC  oal_mem_subpool_cfg_stru g_ast_local_cfg_table[] =
 {
     {TOTAL_WLAN_MEM_LOCAL_SIZE1, WLAN_MEM_LOCAL_CNT1},  /* 第一级大小，块数 */
@@ -173,6 +179,8 @@ OAL_STATIC  oal_mem_subpool_cfg_stru g_ast_local_cfg_table[] =
 *******************************************************************************/
 #define TOTAL_WLAN_MEM_EVENT_SIZE1 (WLAN_MEM_EVENT_SIZE1 + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)
 #define TOTAL_WLAN_MEM_EVENT_SIZE2 (WLAN_MEM_EVENT_SIZE2 + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)
+#define TOTAL_WLAN_MEM_EVENT_SIZE  (TOTAL_WLAN_MEM_EVENT_SIZE1*WLAN_MEM_EVENT_CNT1 \
+                                   + TOTAL_WLAN_MEM_EVENT_SIZE2*WLAN_MEM_EVENT_CNT2)
 OAL_STATIC  oal_mem_subpool_cfg_stru g_ast_event_cfg_table[] =
 {
     {TOTAL_WLAN_MEM_EVENT_SIZE1, WLAN_MEM_EVENT_CNT1},
@@ -190,6 +198,8 @@ OAL_STATIC  oal_mem_subpool_cfg_stru g_ast_event_cfg_table[] =
     MIB内存池配置信息全局变量
 *******************************************************************************/
 #define TOTAL_WLAN_MEM_MIB_SIZE1    (WLAN_MEM_MIB_SIZE1 + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)
+#define TOTAL_WLAN_MEM_MIB_SIZE     (TOTAL_WLAN_MEM_MIB_SIZE1*WLAN_MEM_MIB_CNT1)
+
 OAL_STATIC  oal_mem_subpool_cfg_stru g_ast_mib_cfg_table[] =
 {
     {TOTAL_WLAN_MEM_MIB_SIZE1, WLAN_MEM_MIB_CNT1},
@@ -205,6 +215,7 @@ OAL_STATIC  oal_mem_subpool_cfg_stru g_ast_mib_cfg_table[] =
 #define TOTAL_WLAN_MEM_NETBUF_SIZE1 (WLAN_MEM_NETBUF_SIZE1 + OAL_NETBUF_MAINTAINS_SIZE + OAL_DOG_TAG_SIZE)
 #define TOTAL_WLAN_MEM_NETBUF_SIZE2 (WLAN_MEM_NETBUF_SIZE2 + OAL_NETBUF_MAINTAINS_SIZE + OAL_DOG_TAG_SIZE)
 #define TOTAL_WLAN_MEM_NETBUF_SIZE3 (WLAN_MEM_NETBUF_SIZE3 + OAL_NETBUF_MAINTAINS_SIZE + OAL_DOG_TAG_SIZE)
+
  oal_mem_subpool_cfg_stru g_ast_netbuf_cfg_table[] =
 {
     {TOTAL_WLAN_MEM_NETBUF_SIZE1, WLAN_MEM_NETBUF_CNT1},      /* 克隆用netbuf */
@@ -241,6 +252,15 @@ OAL_STATIC  oal_mem_pool_cfg_stru g_ast_mem_pool_cfg_table[] =
     {OAL_MEM_POOL_ID_SHARED_DSCR,     OAL_ARRAY_SIZE(g_ast_shared_dscr_cfg_table), {0, 0}, g_ast_shared_dscr_cfg_table},
     {OAL_MEM_POOL_ID_SDT_NETBUF,      OAL_ARRAY_SIZE(g_ast_sdt_netbuf_cfg_table),  {0, 0}, g_ast_sdt_netbuf_cfg_table}
 };
+
+OAL_STATIC oal_uint8 *g_pauc_mem_pool[OAL_MEM_POOL_ID_BUTT] = {0};
+OAL_STATIC oal_uint8 g_auc_mem_pool_event[TOTAL_WLAN_MEM_EVENT_SIZE];
+OAL_STATIC oal_uint8 g_auc_mem_pool_shared_data_pkt[TOTAL_WLAN_MEM_SHARED_DATA_PKT_SIZE];
+OAL_STATIC oal_uint8 g_auc_mem_pool_shared_mgmt_pkt[TOTAL_WLAN_MEM_SHARED_MGMT_PKT_SIZE];
+OAL_STATIC oal_uint8 g_auc_mem_pool_local[TOTAL_WLAN_MEM_LOCAL_SIZE];
+OAL_STATIC oal_uint8 g_auc_mem_pool_mib[TOTAL_WLAN_MEM_MIB_SIZE];
+OAL_STATIC oal_uint8 g_auc_mem_pool_shared_dscr[TOTAL_WLAN_MEM_SHARED_DSCR_SIZE];
+
 
 /******************************************************************************
     用于索引netbuf内存块与内存池ID的映射关系
@@ -604,7 +624,7 @@ OAL_STATIC oal_netbuf_stru* oal_mem_find_available_netbuf(oal_mem_subpool_stru *
     修改内容   : 新生成函数
 
 *****************************************************************************/
-OAL_STATIC oal_uint32  oal_mem_get_total_bytes_in_pool(
+oal_uint32  oal_mem_get_total_bytes_in_pool(
                 oal_mem_pool_id_enum_uint8    en_pool_id,
                 oal_uint32                   *pul_total_bytes)
 {
@@ -667,7 +687,7 @@ OAL_STATIC oal_void  oal_mem_release(oal_void)
     {
         if (OAL_PTR_NULL != g_pauc_pool_base_addr[ul_pool_id])
         {
-
+#if 0
 #ifdef _PRE_WLAN_CACHE_COHERENT_SUPPORT
             if(ul_pool_id == OAL_MEM_POOL_ID_SHARED_DSCR)
             {
@@ -685,7 +705,7 @@ OAL_STATIC oal_void  oal_mem_release(oal_void)
             {
                 oal_free((void *)g_pauc_pool_base_addr[ul_pool_id]);
             }
-
+#endif
             g_pauc_pool_base_addr[ul_pool_id] = OAL_PTR_NULL;
         }
     }
@@ -1244,6 +1264,47 @@ OAL_STATIC oal_uint32  oal_mem_create_pool(oal_mem_pool_id_enum_uint8 en_pool_id
 }
 
 /*****************************************************************************
+ 函 数 名  : oal_mem_init_static_mem_map
+ 功能描述  : 初始化静态内存池
+ 输入参数  : 无
+ 输出参数  : 无
+ 返 回 值  : 无
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年6月17日
+    作    者   : duankaiyong 00194999
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+oal_void oal_mem_init_static_mem_map(oal_void)
+{
+    //驱动host 内存池
+    //OAL_MEM_POOL_ID_EVENT = 0,              /* 事件内存池 */
+    //OAL_MEM_POOL_ID_SHARED_DATA_PKT,        /* 共享数据帧内存池 */
+    //OAL_MEM_POOL_ID_SHARED_MGMT_PKT,        /* 共享管理帧内存池 */
+    //OAL_MEM_POOL_ID_LOCAL,                  /* 本地变量内存池  */
+    //OAL_MEM_POOL_ID_MIB,                    /* MIB内存池 */
+    //OAL_MEM_POOL_ID_SHARED_DSCR,            /* 共享描述符内存池 */
+    //OAL_MEM_POOL_ID_SDT_NETBUF,             /* SDT netbuf内存池 */
+
+    OAL_MEMZERO(g_auc_mem_pool_event, OAL_SIZEOF(g_auc_mem_pool_event));
+    OAL_MEMZERO(g_auc_mem_pool_shared_data_pkt, OAL_SIZEOF(g_auc_mem_pool_shared_data_pkt));
+    OAL_MEMZERO(g_auc_mem_pool_shared_mgmt_pkt, OAL_SIZEOF(g_auc_mem_pool_shared_mgmt_pkt));
+    OAL_MEMZERO(g_auc_mem_pool_local, OAL_SIZEOF(g_auc_mem_pool_local));
+    OAL_MEMZERO(g_auc_mem_pool_mib, OAL_SIZEOF(g_auc_mem_pool_mib));
+    OAL_MEMZERO(g_auc_mem_pool_shared_dscr, OAL_SIZEOF(g_auc_mem_pool_shared_dscr));
+
+    g_pauc_mem_pool[OAL_MEM_POOL_ID_EVENT]              = g_auc_mem_pool_event;
+    g_pauc_mem_pool[OAL_MEM_POOL_ID_SHARED_DATA_PKT]    = g_auc_mem_pool_shared_data_pkt;
+    g_pauc_mem_pool[OAL_MEM_POOL_ID_SHARED_MGMT_PKT]    = g_auc_mem_pool_shared_mgmt_pkt;
+    g_pauc_mem_pool[OAL_MEM_POOL_ID_LOCAL]              = g_auc_mem_pool_local;
+    g_pauc_mem_pool[OAL_MEM_POOL_ID_MIB]                = g_auc_mem_pool_mib;
+    g_pauc_mem_pool[OAL_MEM_POOL_ID_SHARED_DSCR]        = g_auc_mem_pool_shared_dscr;
+}
+
+/*****************************************************************************
  函 数 名  : oal_mem_init_pool
  功能描述  : 初始化全部内存池
  输入参数  : 无
@@ -1274,8 +1335,12 @@ oal_uint32  oal_mem_init_pool(oal_void)
     /* 初始化控制块内存 */
     oal_mem_init_ctrl_blk();
 
+    /* 初始化静态内存对应关系 */
+    oal_mem_init_static_mem_map();
+
     for (ul_pool_id = 0; ul_pool_id < OAL_MEM_POOL_ID_SDT_NETBUF; ul_pool_id++)
     {
+#if 0
         ul_ret = oal_mem_get_total_bytes_in_pool((oal_uint8)ul_pool_id, &ul_total_bytes);
         if (OAL_SUCC != ul_ret)
         {
@@ -1295,7 +1360,9 @@ oal_uint32  oal_mem_init_pool(oal_void)
         {
             puc_base_addr = (oal_uint8 *)oal_memalloc(ul_total_bytes + OAL_MEM_MAX_WORD_ALIGNMENT_BUFFER);
         }
-
+#else
+        puc_base_addr = g_pauc_mem_pool[ul_pool_id];
+#endif
 
         if (OAL_PTR_NULL == puc_base_addr)
         {

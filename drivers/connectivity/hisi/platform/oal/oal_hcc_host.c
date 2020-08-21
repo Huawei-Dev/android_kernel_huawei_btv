@@ -2557,6 +2557,11 @@ failed_sdio_init:
 
 oal_void hcc_module_exit(struct hcc_handler* hcc)
 {
+    if(NULL == hcc)
+    {
+        return;
+    }
+
     oal_wake_lock_exit(&hcc->tx_wake_lock);
     hcc_test_exit_module(hcc);
     hcc_message_unregister(hcc,D2H_MSG_FLOWCTRL_OFF);

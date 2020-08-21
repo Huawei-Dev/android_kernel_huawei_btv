@@ -62,8 +62,12 @@ extern "C" {
 #define OAL_BYTE_ORDER OAL_BIG_ENDIAN
 
 #if (_PRE_OS_VERSION_LINUX == _PRE_OS_VERSION) && defined (_PRE_WLAN_FEATURE_DFR)
-/* hi1102  由于内核注册端口28 NETLINK_HISI_WIFI_MSG已被占用，所以此处使用未使用的27 NETLINK_HISI_WIFI_PMF */
+/* NETLINK_WIFI_DFR_HISI(27) 和 NETLINK_WIFI_SDT_HISI(28) 分别在4.1&4.4内核文件中申明 */
+#ifdef NETLINK_WIFI_DFR_HISI
+#define NETLINK_DEV_ERROR NETLINK_WIFI_DFR_HISI
+#else
 #define NETLINK_DEV_ERROR 27
+#endif
 #endif
 /*****************************************************************************
   2.10 IP宏定义
@@ -178,11 +182,13 @@ OAL_STATIC OAL_INLINE oal_uint8 a2x(const char c)
 #define OAL_IPV6_ADDR_SIZE                    16
 #define OAL_IP_ADDR_MAX_SIZE                  OAL_IPV6_ADDR_SIZE
 
-/* IPv4受限广播: 255.255.255.255 , IPv4直接广播: 如192.168.10.255 */
-#define OAL_IPV4_IS_BROADCAST(_a)             ((oal_uint8)((_a)[3]) == 0xff)
 
 /* IPv4多播范围: 224.0.0.0--239.255.255.255 */
 #define OAL_IPV4_IS_MULTICAST(_a)             ((oal_uint8)((_a)[0]) >= 224 && ((oal_uint8)((_a)[0]) <= 239))
+
+/* IPv4永久组地址判断: 224.0.0.0～224.0.0.255为永久组地址 */
+#define OAL_IPV4_PERMANET_GROUP_ADDR           0x000000E0
+#define OAL_IPV4_IS_PERMANENT_GROUP(_a)       ((((_a) & 0x00FFFFFF) ^ OAL_IPV4_PERMANET_GROUP_ADDR) == 0)
 
 /* IPv6组播地址: FFXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX(第一个字节全一) */
 #define OAL_IPV6_IS_MULTICAST(_a)             ((oal_uint8)((_a)[0]) == 0xff)

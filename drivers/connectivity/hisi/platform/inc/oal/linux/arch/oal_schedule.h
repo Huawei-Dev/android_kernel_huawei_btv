@@ -254,7 +254,7 @@ typedef struct _oal_task_lock_stru_
 OAL_STATIC OAL_INLINE oal_void  oal_spin_lock_init(oal_spin_lock_stru *pst_lock)
 {
     spin_lock_init(&pst_lock->lock);
-#ifdef CONFIG_SPIN_LOCK_MAGIC_DEBUG	
+#ifdef CONFIG_SPIN_LOCK_MAGIC_DEBUG
     pst_lock->magic = OAL_SPIN_LOCK_MAGIC_TAG;
 #endif
 }
@@ -947,7 +947,7 @@ OAL_STATIC OAL_INLINE oal_void  oal_timer_start_on(oal_timer_list_stru *pst_time
  输入参数  : p_to: 目的地
              p_from : 源
              ul_size : 需要拷贝的长度
- 输出参数  : 无
+ 输出参数  : 如果数据拷贝成功返回0；否则，返回没有拷贝成功的数据字节数
  返 回 值  :
  调用函数  :
  被调函数  :
@@ -969,7 +969,7 @@ OAL_STATIC OAL_INLINE oal_uint32  oal_copy_from_user(oal_void *p_to, const oal_v
  输入参数  : p_to: 目的地
              p_from : 源
              ul_size : 需要拷贝的长度
- 输出参数  : 无
+ 输出参数  : 如果数据拷贝成功，则返回零；否则，返回没有拷贝成功的数据字节数
  返 回 值  :
  调用函数  :
  被调函数  :
@@ -1104,8 +1104,8 @@ OAL_STATIC OAL_INLINE oal_uint32  oal_wait_for_completion_timeout(oal_completion
 /*****************************************************************************
  函 数 名  : oal_smp_task_lock
  功能描述  : lock the task, the lock can be double locked by the same process
- 输入参数  : 
-             
+ 输入参数  :
+
  输出参数  : 无
  返 回 值  :
  调用函数  :
@@ -1113,7 +1113,7 @@ OAL_STATIC OAL_INLINE oal_uint32  oal_wait_for_completion_timeout(oal_completion
 
  修改历史      :
   1.日    期   : 2015年9月28日
-    作    者   : 
+    作    者   :
     修改内容   : 新生成函数
 
 *****************************************************************************/
@@ -1123,8 +1123,8 @@ extern oal_void _oal_smp_task_lock_(oal_task_lock_stru* pst_lock,oal_ulong  clai
 /*****************************************************************************
  函 数 名  : oal_smp_task_unlock
  功能描述  : unlock the task
- 输入参数  : 
-             
+ 输入参数  :
+
  输出参数  : 无
  返 回 值  :
  调用函数  :
@@ -1168,8 +1168,8 @@ OAL_STATIC OAL_INLINE oal_void oal_smp_task_unlock(oal_task_lock_stru* pst_lock)
 /*****************************************************************************
  函 数 名  : oal_smp_task_lock_init
  功能描述  : task struct init
- 输入参数  : 
-             
+ 输入参数  :
+
  输出参数  : 无
  返 回 值  :
  调用函数  :

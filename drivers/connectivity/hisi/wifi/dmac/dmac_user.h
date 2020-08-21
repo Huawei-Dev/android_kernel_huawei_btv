@@ -167,17 +167,18 @@ typedef struct
 typedef struct
 {
     oal_int32    ul_signal;
-    oal_uint32   ul_drv_rx_pkts;      /* 接收数据(硬件上报，包含rx描述符不成功的帧)数目，仅仅统计数据帧 */
+    oal_uint32   ul_drv_rx_pkts;     /* 接收数据(硬件上报，包含rx描述符不成功的帧)数目，仅仅统计数据帧 */
     oal_uint32   ul_hw_tx_pkts;      /* 发送完成中断上报发送成功的个数 ，仅仅统计数据帧 */
     oal_uint32   ul_drv_rx_bytes;    /* 驱动接收字节数，不包括80211头尾 */
     oal_uint32   ul_hw_tx_bytes;     /* 发送完成中断上报发送成功字节数 */
-    oal_uint32   ul_tx_retries;      /*发送重传次数*/
-    oal_uint32   ul_rx_dropped_misc; /*接收失败(决定丢弃的帧)次数*/
-    oal_uint32   ul_tx_failed;      /* 发送失败最终丢弃的次数，仅仅统计数据帧  */
+    oal_uint32   ul_tx_retries;      /* 发送重传次数*/
+    oal_uint32   ul_rx_dropped_misc; /* 接收失败(决定丢弃的帧)次数*/
+    oal_uint32   ul_tx_failed;       /* 发送失败最终丢弃的次数，仅仅统计数据帧  */
 
-    oal_uint32   ul_hw_tx_failed;   /* 发送完成中断上报发送失败的个数，仅仅统计数据帧 */
-    oal_uint32   ul_tx_total;       /* 发送总计，仅仅统计数据帧  */
-
+    oal_uint32   ul_hw_tx_failed;    /* 发送完成中断上报发送失败的个数，仅仅统计数据帧 */
+    oal_uint32   ul_tx_total;        /* 发送总计，仅仅统计数据帧  */
+    oal_uint32   ul_rx_replay;       /* 接收重放帧个数 */
+    oal_uint32   ul_rx_replay_droped;    /* 接收重放帧被过滤个数 */
 }dmac_user_query_stats_stru;
 
 /* 软件平均rssi统计信息结构体 */
@@ -277,7 +278,14 @@ typedef struct
 #ifdef _PRE_WLAN_FEATURE_BTCOEX
     dmac_user_btcoex_stru                       st_dmac_user_btcoex_stru;
 #endif
+
+    oal_uint64                                  ull_sn;                                 /* 软件填写单播加密SN */
     /* 当前VAP工作在STA模式，以下字段为user是AP时独有字段，新添加字段请注意!!! */
+    oal_uint8                                   bit_ptk_need_install      : 1,          /* 需要更新单播秘钥 */
+                                                bit_is_rx_eapol_key_open  : 1,          /* 记录接收的eapol-key 是否为加密 */
+                                                bit_eapol_key_4_4_tx_succ : 1,          /* eapol-key 4/4 发送成功 */
+                                                bit_ptk_key_idx           : 3,          /* 保存单播秘钥key_idx */
+                                                bit_resv2                 : 2;
 }dmac_user_stru;
 
 /*****************************************************************************

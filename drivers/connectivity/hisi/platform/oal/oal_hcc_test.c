@@ -78,7 +78,9 @@ struct hcc_test_stru g_hcc_test_stru[HCC_TEST_CASE_COUNT] = {
 
 #ifdef _PRE_CONFIG_HISI_PANIC_DUMP_SUPPORT
 oal_uint32 wifi_panic_debug = 0;
+#ifdef PLATFORM_DEBUG_ENABLE
 module_param(wifi_panic_debug, int, S_IRUGO|S_IWUSR);
+#endif
 OAL_STATIC LIST_HEAD(wifi_panic_log_head);
 #endif
 
@@ -112,7 +114,17 @@ oal_void hwifi_panic_log_register(hwifi_panic_log* pst_log, oal_void* data)
     list_add_tail(&pst_log->list, &wifi_panic_log_head);
     OAL_IO_PRINT("Log module %s added![%pF]\n", pst_log->name,(void*)_RET_IP_);
 }
+
+oal_void hwifi_panic_log_unregister(hwifi_panic_log* pst_log)
+{
+    OAL_BUG_ON(!pst_log);
+
+    list_del(&pst_log->list);
+    pst_log->data = NULL;
+}
+
 oal_module_symbol(hwifi_panic_log_register);
+oal_module_symbol(hwifi_panic_log_unregister);
 
 /*should't use dynamic mem when panic*/
 OAL_STATIC char g_panic_mem[PAGE_SIZE];
@@ -171,7 +183,7 @@ oal_int32 hcc_flowctrl_info_print(struct hcc_handler* hcc,char* buf, oal_int32 b
     ret +=  snprintf(buf + ret , buf_len - ret,"flowctrl on:%d\n", hcc->hcc_transer_info.tx_flow_ctrl.flowctrl_on_count);
     ret +=  snprintf(buf + ret , buf_len - ret,"flowctrl off:%d\n", hcc->hcc_transer_info.tx_flow_ctrl.flowctrl_off_count);
     ret +=  snprintf(buf + ret , buf_len - ret,"flowctrl reset count:%d\n", hcc->hcc_transer_info.tx_flow_ctrl.flowctrl_reset_count);
-    ret +=  snprintf(buf + ret , buf_len - ret,"flowctrl hi update count:%d,hi credit value:%u\n", 
+    ret +=  snprintf(buf + ret , buf_len - ret,"flowctrl hi update count:%d,hi credit value:%u\n",
                         hcc->hcc_transer_info.tx_flow_ctrl.flowctrl_hipri_update_count,
                         hcc->hcc_transer_info.tx_flow_ctrl.uc_hipriority_cnt);
     return ret;
@@ -1147,7 +1159,7 @@ OAL_STATIC struct attribute *hcc_test_sysfs_entries[] = {
         NULL
 };
 
-OAL_STATIC struct attribute_group hcc_test_attribute_group = {
+struct attribute_group hcc_test_attribute_group = {
         .name = "test",
         .attrs = hcc_test_sysfs_entries,
 };
@@ -1384,6 +1396,7 @@ oal_int32  hcc_test_init_module(struct hcc_handler* hcc)
         goto fail_create_sdio_group;
     }
 
+#ifdef PLATFORM_DEBUG_ENABLE
     /* create the files associated with this kobject */
     ret = sysfs_create_group(g_conn_syfs_hcc_object, &hcc_test_attribute_group);
     if (ret)
@@ -1392,6 +1405,7 @@ oal_int32  hcc_test_init_module(struct hcc_handler* hcc)
         OAL_IO_PRINT("sysfs create test group fail.ret=%d\n",ret);
         goto fail_create_hcc_test_group;
     }
+#endif
 
     ret = sysfs_create_group(g_conn_syfs_hcc_object,&hcc_attribute_group);
     if (ret)
@@ -1466,8 +1480,10 @@ fail_rx_cb_register:
 fail_g_hcc_test_event:
     sysfs_remove_group(g_conn_syfs_hcc_object, &hcc_attribute_group);
 fail_create_hcc_group:
+#ifdef PLATFORM_DEBUG_ENABLE
     sysfs_remove_group(g_conn_syfs_hcc_object, &hcc_test_attribute_group);
 fail_create_hcc_test_group:
+#endif
     sysfs_remove_group(g_conn_syfs_hcc_object, &hsdio_attribute_group);
 fail_create_sdio_group:
     kobject_put(g_conn_syfs_hcc_object);
@@ -1488,7 +1504,9 @@ oal_void  hcc_test_exit_module(struct hcc_handler* hcc)
         g_hcc_test_event->test_workqueue = NULL;
     }
     sysfs_remove_group(g_conn_syfs_hcc_object, &hcc_attribute_group);
+#ifdef PLATFORM_DEBUG_ENABLE
     sysfs_remove_group(g_conn_syfs_hcc_object, &hcc_test_attribute_group);
+#endif
     sysfs_remove_group(g_conn_syfs_hcc_object, &hsdio_attribute_group);
     kobject_put(g_conn_syfs_hcc_object);
     hcc_rx_unregister(hcc,HCC_ACTION_TYPE_TEST);

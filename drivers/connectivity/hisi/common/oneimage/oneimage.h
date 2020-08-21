@@ -10,18 +10,22 @@
   2 Define macro
 *****************************************************************************/
 #define DTS_COMP_HW_CONNECTIVITY_NAME           "hisilicon,hisi_wifi"
+/* 2015-12-15 modify by ouyangxiaoyu for nfc one image beg */
 //#define DTS_COMP_HISI_NFC_NAME                  "hisilicon,hisi_bfgx"
 #define DTS_COMP_HISI_NFC_NAME                  "hisilicon,hisi_nfc"
+/* 2015-12-15 modify by ouyangxiaoyu for nfc one image end */
 
 #define DTS_COMP_HW_HISI_SUPP_CONFIG_NAME       "hisi,wifi_supp"
 #define DTS_COMP_HW_HISI_P2P_CONFIG_NAME        "hisi,wifi_p2p"
 #define DTS_COMP_HW_HISI_HOSTAPD_CONFIG_NAME    "hisi,wifi_hostapd"
 #define DTS_COMP_HW_HISI_FIRMWARE_CONFIG_NAME   "hisi,wifi_firmware"
 
+/* 2015-12-15 modify by ouyangxiaoyu for nfc one image beg */
 //#define DTS_COMP_HW_HISI_NFC_CONFIG_NAME        "nfc_hisi_name"
 //#define DTS_COMP_HW_BRCM_NFC_CONFIG_NAME        "nfc_brcm_conf_name"
 #define DTS_COMP_HW_HISI_NFC_CONFIG_NAME        "nfc_hisi_conf_name"
 #define DTS_COMP_HW_BRCM_NFC_CONFIG_NAME        "nfc_default_hisi_conf_name"
+/* 2015-12-15 modify by ouyangxiaoyu for nfc one image end */
 
 #define PROC_CONN_DIR    "/proc/connectivity"
 

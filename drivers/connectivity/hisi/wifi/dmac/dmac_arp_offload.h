@@ -89,6 +89,7 @@ extern    oal_uint32  g_ul_arpoffload_drop_frame;
 *****************************************************************************/
 extern dmac_rx_frame_ctrl_enum_uint8 dmac_ao_process_arp_and_mcast(dmac_vap_stru *pst_dmac_vap, dmac_user_stru *pst_dmac_user, oal_netbuf_stru *pst_netbuf);
 extern oal_bool_enum_uint8 dmac_ao_is_ipv4_addr_owner(dmac_vap_stru *pst_dmac_vap, oal_uint8 *puc_ipv4_addr);
+oal_bool_enum_uint8 dmac_ao_is_ipv4_broadcast(dmac_vap_stru *pst_dmac_vap, oal_uint32 ul_ipv4_addr);
 #endif
 
 

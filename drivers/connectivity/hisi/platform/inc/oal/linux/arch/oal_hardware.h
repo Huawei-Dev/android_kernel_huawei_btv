@@ -58,6 +58,7 @@ extern "C" {
 *****************************************************************************/
 typedef irq_handler_t oal_irq_handler_t;
 
+/*BEGIN:Added by zhouqingsong/2012/2/15 for SD5115V100*/
 #define OAL_HI_TIMER_REG_BASE               (0x10105000)
 
 #define OAL_HI_TIMER_NUM                    2

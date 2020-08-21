@@ -205,6 +205,9 @@ OAL_STATIC oal_uint32  wal_config_rts_threshold(mac_vap_stru *pst_mac_vap, oal_u
 #ifdef _PRE_WLAN_FEATURE_VOWIFI
 OAL_STATIC oal_uint32  wal_config_vowifi_info(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param);
 #endif /* _PRE_WLAN_FEATURE_VOWIFI */
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+OAL_STATIC oal_uint32  wal_config_update_ip_filter(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param);
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 #ifdef _PRE_WLAN_FEATURE_SMARTANT
 OAL_STATIC oal_uint32  wal_config_get_ant_info(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param);
 OAL_STATIC oal_uint32  wal_config_double_ant_switch(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param);
@@ -322,6 +325,9 @@ OAL_STATIC oal_uint32  wal_config_set_chn_est_ctrl(mac_vap_stru *pst_mac_vap, oa
 OAL_STATIC oal_uint32  wal_config_set_power_ref(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param);
 OAL_STATIC oal_uint32  wal_config_set_pm_cfg_param(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param);
 OAL_STATIC oal_uint32  wal_config_set_cus_rf(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param);
+#ifdef _PRE_WLAN_DOWNLOAD_PM
+OAL_STATIC oal_uint32  wal_config_set_down_load_rate_limit(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param);
+#endif
 OAL_STATIC oal_uint32  wal_config_set_cus_dts_cali(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param);
 OAL_STATIC oal_uint32  wal_config_set_cus_nvram_params(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param);
 OAL_STATIC oal_uint32  wal_config_dev_customize_info(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param);
@@ -515,6 +521,9 @@ OAL_STATIC OAL_CONST wal_wid_op_stru g_ast_board_wid_op[] =
 #ifdef _PRE_WLAN_FEATURE_VOWIFI
     {WLAN_CFGID_VOWIFI_INFO,       OAL_FALSE,  {0},   OAL_PTR_NULL,             wal_config_vowifi_info},
 #endif
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+    {WLAN_CFGID_IP_FILTER,       OAL_FALSE,  {0},   OAL_PTR_NULL,             wal_config_update_ip_filter},
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 #ifdef _PRE_WLAN_FEATURE_SMARTANT
     {WLAN_CFGID_GET_ANT_INFO,           OAL_FALSE,  {0},   OAL_PTR_NULL,             wal_config_get_ant_info},
     {WLAN_CFGID_DOUBLE_ANT_SW,          OAL_FALSE,  {0},   OAL_PTR_NULL,             wal_config_double_ant_switch},
@@ -607,6 +616,9 @@ OAL_STATIC OAL_CONST wal_wid_op_stru g_ast_board_wid_op[] =
     {WLAN_CFGID_SET_POWER_REF,             OAL_FALSE,  {0},  OAL_PTR_NULL,        wal_config_set_power_ref},
     {WLAN_CFGID_SET_PM_CFG_PARAM,          OAL_FALSE,  {0},  OAL_PTR_NULL,        wal_config_set_pm_cfg_param},
     {WLAN_CFGID_SET_CUS_RF,                OAL_FALSE,  {0},  OAL_PTR_NULL,        wal_config_set_cus_rf},
+#ifdef _PRE_WLAN_DOWNLOAD_PM
+    {WLAN_CFGID_SET_CUS_DOWNLOAD_RATE_LIMIT, OAL_FALSE,  {0},  OAL_PTR_NULL,        wal_config_set_down_load_rate_limit},
+#endif
     {WLAN_CFGID_SET_CUS_DTS_CALI,          OAL_FALSE,  {0},  OAL_PTR_NULL,        wal_config_set_cus_dts_cali},
     {WLAN_CFGID_SET_CUS_NVRAM_PARAM,       OAL_FALSE,  {0},  OAL_PTR_NULL,        wal_config_set_cus_nvram_params},
     /* SHOW DEIVCE CUSTOMIZE INFOS */
@@ -3827,6 +3839,28 @@ OAL_STATIC oal_uint32  wal_config_vowifi_info(mac_vap_stru *pst_mac_vap, oal_uin
 }
 
 #endif /* _PRE_WLAN_FEATURE_VOWIFI */
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+/*****************************************************************************
+ 函 数 名  : wal_config_set_rx_filter
+ 功能描述  : 配置rx ip数据包过滤的参数
+ 输入参数  : 无
+ 输出参数  : 无
+ 返 回 值  :
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2017年4月17日
+    作    者   : z00273164
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+OAL_STATIC oal_uint32  wal_config_update_ip_filter(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param)
+{
+    return hmac_config_update_ip_filter(pst_mac_vap, us_len, puc_param);
+}
+
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 /*****************************************************************************
  函 数 名  : wal_config_get_version
  功能描述  : 获取版本
@@ -4451,6 +4485,29 @@ oal_void wal_drv_cfg_func_hook_init(oal_void)
     g_st_wal_drv_func_hook.p_wal_recv_reg_data_func     = wal_recv_reg_cmd;
     g_st_wal_drv_func_hook.p_wal_recv_global_var_func   = wal_recv_global_var_cmd;
 }
+
+/*****************************************************************************
+ 函 数 名  : wal_drv_cfg_func_hook_deinit
+ 功能描述  : wal对外钩子函数去初始化
+ 输出参数  : 无
+ 返 回 值  : oal_void
+ 调用函数  :
+ 被调函数  :
+
+ 修改历史      :
+  1.日    期   : 2014年3月13日,星期四
+    作    者   : y00201072
+    修改内容   : 新生成函数
+
+*****************************************************************************/
+oal_void wal_drv_cfg_func_hook_deinit(oal_void)
+{
+    g_st_wal_drv_func_hook.p_wal_recv_cfg_data_func     = OAL_PTR_NULL;
+    g_st_wal_drv_func_hook.p_wal_recv_mem_data_func     = OAL_PTR_NULL;
+    g_st_wal_drv_func_hook.p_wal_recv_reg_data_func     = OAL_PTR_NULL;
+    g_st_wal_drv_func_hook.p_wal_recv_global_var_func   = OAL_PTR_NULL;
+}
+
 
 /*****************************************************************************
  函 数 名  : wal_config_set_pmksa
@@ -5192,6 +5249,28 @@ OAL_STATIC oal_uint32  wal_config_set_cus_rf(mac_vap_stru *pst_mac_vap, oal_uint
 {
     return hmac_config_set_cus_rf(pst_mac_vap, us_len, puc_param);
 }
+#ifdef _PRE_WLAN_DOWNLOAD_PM
+extern oal_uint16 g_us_download_rate_limit_pps;
+OAL_STATIC oal_uint32  wal_config_set_down_load_rate_limit(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param)
+{
+    oal_uint32      ul_ret;
+
+    g_us_download_rate_limit_pps = *(oal_uint16*)puc_param;
+
+    OAM_WARNING_LOG1(0, OAM_SF_PWR, "{wal_config_set_down_load_rate_limit:[%d]}\r\n", g_us_download_rate_limit_pps);
+
+    /***************************************************************************
+        抛事件到DMAC层, 同步DMAC数据
+    ***************************************************************************/
+    ul_ret = hmac_config_send_event(pst_mac_vap, WLAN_CFGID_SET_CUS_DOWNLOAD_RATE_LIMIT, us_len, puc_param);
+    if (OAL_UNLIKELY(OAL_SUCC != ul_ret))
+    {
+        OAM_WARNING_LOG1(pst_mac_vap->uc_vap_id, OAM_SF_CFG, "{wal_config_set_down_load_rate_limit::hmac_config_send_event failed[%d].}", ul_ret);
+    }
+
+    return ul_ret;
+}
+#endif
 /*****************************************************************************
  函 数 名  : wal_config_dev_customize_info
  功能描述  :
@@ -5412,6 +5491,7 @@ OAL_STATIC oal_uint32  wal_config_vendor_cmd_get_channel_list(mac_vap_stru *pst_
 
 /*lint -e19*/
 oal_module_symbol(wal_drv_cfg_func_hook_init);
+oal_module_symbol(wal_drv_cfg_func_hook_deinit);
 /*lint +e19*/
 #ifdef _PRE_WLAN_FEATURE_HILINK
 oal_module_symbol(wal_config_set_okc_ie);

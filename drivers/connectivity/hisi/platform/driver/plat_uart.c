@@ -22,6 +22,7 @@
 *****************************************************************************/
 STATIC struct ps_uart_state_s g_uart_state = {0};
 STATIC struct ps_uart_state_s g_uart_state_pre = {0};
+struct mutex  g_tty_mutex;
 /*****************************************************************************
   3 Function Definition
 *****************************************************************************/
@@ -291,6 +292,9 @@ STATIC void ps_tty_close(struct tty_struct *tty)
         PS_PRINT_ERR("tty or tty->disc_data is NULL\n");
         return;
     }
+
+    mutex_lock(&g_tty_mutex);
+
     ps_core_d = tty->disc_data;
 
     /* Flush any pending characters in the driver and discipline. */
@@ -300,6 +304,8 @@ STATIC void ps_tty_close(struct tty_struct *tty)
 
     /* signal to complate that N_HW_BFG ldisc is un-installed */
     ps_tty_complete(ps_core_d->pm_data, TTY_LDISC_UNINSTALL);
+
+    mutex_unlock(&g_tty_mutex);
 
     PS_PRINT_INFO("uninstall complete done!\n");
 
@@ -483,11 +489,10 @@ int32 ps_change_uart_baud_rate(int64 baud_rate, uint8 enable_flowctl)
 
     PS_PRINT_INFO("ldisc_install = %d\n", TTY_LDISC_RECONFIG);
     sysfs_notify(g_sysfs_hi110x_bfgx, NULL, "install");
-    ps_uart_state_pre(ps_core_d->tty);
+
     timeleft = wait_for_completion_timeout(&ps_plat_d->ldisc_reconfiged, msecs_to_jiffies(HISI_LDISC_TIME));
     if (!timeleft)
     {
-        ps_uart_state_dump(ps_core_d->tty);
         PS_PRINT_ERR("hisi bfgx ldisc reconfig timeout\n");
         CHR_EXCEPTION(CHR_GNSS_DRV(CHR_GNSS_DRV_EVENT_PLAT, CHR_PLAT_DRV_ERROR_CFG_UART));
 
@@ -546,11 +551,9 @@ int32 open_tty_drv(void *pm_data)
 
         PS_PRINT_INFO("ldisc_install = %d\n", TTY_LDISC_INSTALL);
         sysfs_notify(g_sysfs_hi110x_bfgx, NULL, "install");
-        ps_uart_state_pre(ps_core_d->tty);
         timeleft = wait_for_completion_timeout(&ps_plat_d->ldisc_installed, msecs_to_jiffies(HISI_LDISC_TIME));
         if (!timeleft)
         {
-            ps_uart_state_dump(ps_core_d->tty);
             PS_PRINT_ERR("hisi bfgx ldisc installation timeout\n");
             PS_BUG_ON(1);
             continue;
@@ -561,7 +564,6 @@ int32 open_tty_drv(void *pm_data)
             ps_core_d->tty_have_open = true;
             return 0;
         }
-
     } while (retry--);
 
     CHR_EXCEPTION(CHR_GNSS_DRV(CHR_GNSS_DRV_EVENT_PLAT, CHR_PLAT_DRV_ERROR_OPEN_UART));
@@ -604,7 +606,6 @@ int32 release_tty_drv(void *pm_data)
 
     ps_plat_d = (struct ps_plat_s *)pm_data;
     ps_core_d = ps_plat_d->core_data;
-    tty = ps_core_d->tty;
 
     if (false == ps_core_d->tty_have_open)
     {
@@ -620,6 +621,8 @@ int32 release_tty_drv(void *pm_data)
     }
     msleep(200);
 
+    mutex_lock(&g_tty_mutex);
+    tty = ps_core_d->tty;
     if (tty)
     {   /* can be called before ldisc is installed */
         /* Flush any pending characters in the driver and discipline. */
@@ -627,6 +630,7 @@ int32 release_tty_drv(void *pm_data)
         tty_ldisc_flush(tty);
         tty_driver_flush_buffer(tty);
     }
+    mutex_unlock(&g_tty_mutex);
 
     INIT_COMPLETION(ps_plat_d->ldisc_uninstalled);
     ps_plat_d->ldisc_install = TTY_LDISC_UNINSTALL;
@@ -634,11 +638,9 @@ int32 release_tty_drv(void *pm_data)
     PS_PRINT_INFO("ldisc_install = %d\n", TTY_LDISC_UNINSTALL);
     sysfs_notify(g_sysfs_hi110x_bfgx, NULL, "install");
 
-    ps_uart_state_pre(ps_core_d->tty);
     timeleft = wait_for_completion_timeout(&ps_plat_d->ldisc_uninstalled, msecs_to_jiffies(HISI_LDISC_TIME));
     if (!timeleft)
     {
-        ps_uart_state_dump(ps_core_d->tty);
         PS_PRINT_ERR("hisi bfgx ldisc uninstall timeout\n");
         error = -ETIMEDOUT;
     }
@@ -668,6 +670,8 @@ STATIC struct tty_ldisc_ops ps_ldisc_ops = {
 
 int32 plat_uart_init(void)
 {
+    mutex_init(&g_tty_mutex);
+
     return tty_register_ldisc(N_HW_BFG, &ps_ldisc_ops);
 }
 

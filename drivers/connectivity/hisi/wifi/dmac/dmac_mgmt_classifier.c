@@ -997,7 +997,8 @@ oal_uint32  dmac_rx_filter_mgmt(dmac_vap_stru *pst_dmac_vap, oal_netbuf_stru *ps
 #endif /* #if(_PRE_WLAN_FEATURE_PMF != _PRE_PMF_NOT_SUPPORT) */
 
 #ifdef _PRE_WLAN_FEATURE_BTCOEX
-    if(pst_mac_device->pst_device_stru->st_btcoex_btble_status.un_ble_status.st_ble_status.bit_ble_scan)
+    if ((pst_mac_device->pst_device_stru->st_btcoex_btble_status.un_ble_status.st_ble_status.bit_ble_scan)
+        && (!(pst_mac_device->pst_device_stru->st_btcoex_btble_status.un_bt_status.st_bt_status.bit_bt_sco)))
     {
         if ((WLAN_ASSOC_RSP == pst_frame_hdr->st_frame_control.bit_sub_type)
             ||(WLAN_REASSOC_RSP == pst_frame_hdr->st_frame_control.bit_sub_type))
@@ -1158,7 +1159,21 @@ oal_uint32  dmac_rx_filter_mgmt(dmac_vap_stru *pst_dmac_vap, oal_netbuf_stru *ps
     {
         if (WLAN_PROBE_RSP == pst_frame_hdr->st_frame_control.bit_sub_type)
         {
-            dmac_vap_linkloss_clean(pst_dmac_vap);
+            /* BEGIN:DTS2017022700518:判断接收到的probe rsp 帧和本VAP 是相同信道，才清零linkloss 计数
+               防止由于ap 切换信道后，sta 在其他信道扫描到ap 信号不能触发linkloss 去关联 */
+            /* 获取probe rsp 帧中的信道 */
+            oal_uint8                   uc_frame_channel;
+            uc_frame_channel = mac_ie_get_chan_num(MAC_GET_RX_PAYLOAD_ADDR(&(pst_rx_ctl->st_rx_info), pst_netbuf),
+                                                    ((oal_uint16)oal_netbuf_get_len(pst_netbuf) - MAC_80211_FRAME_LEN),
+                                                    MAC_TIME_STAMP_LEN + MAC_BEACON_INTERVAL_LEN + MAC_CAP_INFO_LEN,
+                                                    pst_rx_ctl->st_rx_info.uc_channel_number);
+            if ((pst_dmac_vap->st_vap_base_info.st_channel.uc_chan_number == uc_frame_channel)
+                && (0 != uc_frame_channel))
+            {
+                dmac_vap_linkloss_clean(pst_dmac_vap);
+            }
+            /* END:DTS2017022700518:判断接收到的probe rsp 帧和本VAP 是相同信道，才清零linkloss 计数
+               防止由于ap 切换信道后，sta 在其他信道扫描到ap 信号不能触发linkloss 去关联 */
         }
         else
         {
@@ -2312,6 +2327,17 @@ oal_uint32 dmac_join_set_reg_event_process(frw_event_mem_stru *pst_event_mem)
     }
 
 #endif //_PRE_WLAN_FEATURE_ROAM
+
+    /* BEGIN: DTS2017110400498 关联前，用真实MAC 地址发送一次probe req */
+    oal_set_mac_addr(pst_device->st_scan_params.auc_sour_mac_addr,
+                    pst_dmac_vap->st_vap_base_info.pst_mib_info->st_wlan_mib_sta_config.auc_dot11StationID);
+
+    if (OAL_SUCC != dmac_scan_send_probe_req_frame(pst_dmac_vap, pst_reg_params->auc_bssid, (oal_int8 *)pst_reg_params->auc_ssid))
+    {
+        OAM_WARNING_LOG0(pst_dmac_vap->st_vap_base_info.uc_vap_id, OAM_SF_SCAN,
+                        "{dmac_join_set_reg_event_process::dmac_scan_send_probe_req_frame failed.}");
+    }
+    /* END: DTS2017110400498 关联前，用真实MAC 地址发送一次probe req */
 
 #if 0
 OAM_ERROR_LOG0(pst_event_hdr->uc_vap_id, OAM_SF_SCAN, "{call DPD Calibration Start function}");

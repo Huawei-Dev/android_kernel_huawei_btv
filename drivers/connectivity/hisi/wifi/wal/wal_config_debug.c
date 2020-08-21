@@ -367,6 +367,7 @@ OAL_STATIC oal_uint32  wal_config_rssi_switch(mac_vap_stru *pst_mac_vap, oal_uin
 }
 
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_report_vap_info
  功能描述  : 根据flag位上报对应的vap信息
@@ -388,7 +389,7 @@ OAL_STATIC oal_uint32  wal_config_report_vap_info(mac_vap_stru *pst_mac_vap, oal
 {
     return hmac_config_report_vap_info(pst_mac_vap, us_len, puc_param);
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
 #if 0
 /*****************************************************************************
  函 数 名  : wal_config_ota_switch
@@ -941,7 +942,7 @@ OAL_STATIC oal_uint32  wal_config_start_deauth(mac_vap_stru *pst_mac_vap, oal_ui
     return OAL_SUCC;
 }
 
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_start_scan
  功能描述  : 触发初始扫描
@@ -961,7 +962,7 @@ OAL_STATIC oal_uint32  wal_config_dump_timer(mac_vap_stru *pst_mac_vap, oal_uint
 {
     return hmac_config_dump_timer(pst_mac_vap, us_len, puc_param);
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_kick_user
  功能描述  : 去关联1个用户
@@ -981,7 +982,7 @@ OAL_STATIC oal_uint32  wal_config_pause_tid(mac_vap_stru *pst_mac_vap, oal_uint1
 {
     return hmac_config_pause_tid(pst_mac_vap, us_len, puc_param);
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_set_user_vip
  功能描述  : 设置某个用户为vip
@@ -1001,7 +1002,8 @@ OAL_STATIC oal_uint32  wal_config_set_user_vip(mac_vap_stru *pst_mac_vap, oal_ui
 {
     return hmac_config_set_user_vip(pst_mac_vap, us_len, puc_param);
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_set_vap_host
  功能描述  : 设置某个VAP为host vap
@@ -1021,7 +1023,8 @@ OAL_STATIC oal_uint32  wal_config_set_vap_host(mac_vap_stru *pst_mac_vap, oal_ui
 {
     return hmac_config_set_vap_host(pst_mac_vap, us_len, puc_param);
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_send_bar
  功能描述  : 去关联1个用户
@@ -1041,6 +1044,7 @@ OAL_STATIC oal_uint32  wal_config_send_bar(mac_vap_stru *pst_mac_vap, oal_uint16
 {
     return hmac_config_send_bar(pst_mac_vap, us_len, puc_param);
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 OAL_STATIC oal_uint32  wal_config_alg(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param)
 {
@@ -1187,7 +1191,7 @@ OAL_STATIC oal_uint32  wal_config_packet_xmit(mac_vap_stru *pst_mac_vap, oal_uin
 
     return OAL_SUCC;
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_dump_ba_bitmap
  功能描述  : 发包配置命令
@@ -1207,6 +1211,7 @@ OAL_STATIC oal_uint32  wal_config_dump_ba_bitmap(mac_vap_stru *pst_mac_vap, oal_
 {
     return hmac_config_dump_ba_bitmap(pst_mac_vap, us_len, puc_param);
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : wal_config_timer_start
@@ -1375,7 +1380,7 @@ OAL_STATIC oal_uint32  wal_config_txbf_switch(mac_vap_stru *pst_mac_vap, oal_uin
 
     return OAL_SUCC;
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_set_country
  功能描述  : 设置国家码
@@ -1395,7 +1400,7 @@ OAL_STATIC oal_uint32  wal_config_reset_hw(mac_vap_stru *pst_mac_vap, oal_uint16
 {
     return hmac_config_reset_hw(pst_mac_vap, us_len, puc_param);
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_set_country
  功能描述  : 设置国家码
@@ -1490,7 +1495,7 @@ OAL_STATIC oal_uint32  wal_config_uapsd_debug(mac_vap_stru *pst_mac_vap, oal_uin
 #endif
 
 #ifdef _PRE_WLAN_DFT_STAT
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_set_phy_stat_en
  功能描述  : 设置phy统计使能节点
@@ -1510,7 +1515,8 @@ OAL_STATIC oal_uint32  wal_config_set_phy_stat_en(mac_vap_stru *pst_mac_vap, oal
 {
     return hmac_config_set_phy_stat_en(pst_mac_vap, us_len, puc_param);
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_dbb_env_param
  功能描述  : 上报或者停止上报空口环境类维测参数
@@ -1530,7 +1536,7 @@ OAL_STATIC oal_uint32  wal_config_dbb_env_param(mac_vap_stru *pst_mac_vap, oal_u
 {
     return hmac_config_dbb_env_param(pst_mac_vap, us_len, puc_param);
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_usr_queue_stat
  功能描述  : 上报或者清零用户队列统计信息
@@ -1550,7 +1556,7 @@ OAL_STATIC oal_uint32  wal_config_usr_queue_stat(mac_vap_stru *pst_mac_vap, oal_
 {
     return hmac_config_usr_queue_stat(pst_mac_vap, us_len, puc_param);
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_report_vap_stat
  功能描述  : 上报或者停止上报vap吞吐统计信息
@@ -1570,7 +1576,8 @@ OAL_STATIC oal_uint32  wal_config_report_vap_stat(mac_vap_stru *pst_mac_vap, oal
 {
     return hmac_config_report_vap_stat(pst_mac_vap, us_len, puc_param);
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_report_all_stat
  功能描述  : 上报或者清零所有统计信息
@@ -1590,7 +1597,7 @@ OAL_STATIC oal_uint32  wal_config_report_all_stat(mac_vap_stru *pst_mac_vap, oal
 {
     return hmac_config_report_all_stat(pst_mac_vap, us_len, puc_param);
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
 
 #endif
 
@@ -1778,7 +1785,7 @@ OAL_STATIC oal_uint32 wal_config_set_log_lowpower(mac_vap_stru *pst_mac_vap, oal
 
 }
 #endif
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_set_nss
  功能描述  : 设置空间流个数
@@ -1814,7 +1821,8 @@ OAL_STATIC oal_uint32  wal_config_set_nss(mac_vap_stru *pst_mac_vap, oal_uint16 
 
     return ul_ret;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_set_rfch
  功能描述  : 设置发射通道
@@ -1850,6 +1858,7 @@ OAL_STATIC oal_uint32  wal_config_set_rfch(mac_vap_stru *pst_mac_vap, oal_uint16
 
     return ul_ret;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : wal_config_create_al_tx_packet
@@ -1918,6 +1927,7 @@ oal_netbuf_stru*  wal_config_create_al_tx_packet(oal_uint32 ul_size,
     return pst_buf;
 }
 #if defined (_PRE_WLAN_CHIP_TEST) || defined (_PRE_WLAN_FEATURE_ALWAYS_TX)
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_bcast_pkt
  功能描述  : 广播数据包
@@ -2023,6 +2033,7 @@ OAL_STATIC oal_uint32  wal_config_always_tx(mac_vap_stru *pst_mac_vap, oal_uint1
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 #ifdef _PRE_DEBUG_MODE
@@ -2100,7 +2111,7 @@ OAL_STATIC oal_uint32  wal_config_dync_txpower(mac_vap_stru *pst_mac_vap, oal_ui
     return OAL_SUCC;
 }
 #endif
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_get_thruput
  功能描述  : 获取芯片吞吐量
@@ -2135,7 +2146,8 @@ OAL_STATIC oal_uint32  wal_config_get_thruput(mac_vap_stru *pst_mac_vap, oal_uin
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_set_freq_skew
  功能描述  : 设置频偏
@@ -2170,7 +2182,8 @@ OAL_STATIC oal_uint32  wal_config_set_freq_skew(mac_vap_stru *pst_mac_vap, oal_u
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_adjust_ppm
  功能描述  : 设置频偏
@@ -2205,6 +2218,7 @@ OAL_STATIC oal_uint32  wal_config_adjust_ppm(mac_vap_stru *pst_mac_vap, oal_uint
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : wal_config_dbb_scaling
@@ -2225,7 +2239,7 @@ OAL_STATIC oal_uint32  wal_config_dbb_scaling_amend(mac_vap_stru *pst_mac_vap, o
 {
      return hmac_config_dbb_scaling_amend(pst_mac_vap, us_len, puc_param);
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_beacon_chain_switch
  功能描述  : beacon帧通道(0/1)切换开关
@@ -2245,6 +2259,7 @@ OAL_STATIC oal_uint32  wal_config_beacon_chain_switch(mac_vap_stru *pst_mac_vap,
 {
     return hmac_config_beacon_chain_switch(pst_mac_vap, us_len, puc_param);
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : wal_config_2040_channel_switch_prohibited
@@ -2878,7 +2893,7 @@ OAL_STATIC oal_uint32  wal_config_clear_all_stat(mac_vap_stru *pst_mac_vap, oal_
 }
 
 #endif /* #ifdef _PRE_WLAN_CHIP_TEST */
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_hide_ssid
  功能描述  : 测试命令，打开/关闭隐藏ssid
@@ -2900,8 +2915,7 @@ OAL_STATIC oal_uint32  wal_config_hide_ssid(mac_vap_stru *pst_mac_vap, oal_uint1
 {
     return hmac_config_hide_ssid(pst_mac_vap, us_len, puc_param);
 }
-
-
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : wal_config_set_mib
@@ -2946,7 +2960,7 @@ OAL_STATIC oal_uint32  wal_config_get_mib(mac_vap_stru *pst_mac_vap, oal_uint16 
 {
     return hmac_config_get_mib(pst_mac_vap, WLAN_CFGID_GET_MIB, us_len, puc_param);
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_set_thruput_bypass
  功能描述  : 设置thruput_bypass维测点
@@ -2966,7 +2980,7 @@ OAL_STATIC oal_uint32  wal_config_set_thruput_bypass(mac_vap_stru *pst_mac_vap, 
 {
     return hmac_config_set_thruput_bypass(pst_mac_vap, WLAN_CFGID_SET_THRUPUT_BYPASS, us_len, puc_param);
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : wal_config_set_auto_protection
@@ -3204,7 +3218,7 @@ OAL_STATIC oal_uint32  wal_config_get_user_rssbw(mac_vap_stru *pst_mac_vap, oal_
 }
 
 #endif
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_set_vap_rx_nss
  功能描述  : 设置VAP的RX NSS
@@ -3225,6 +3239,7 @@ OAL_STATIC oal_uint32  wal_config_set_vap_nss(mac_vap_stru *pst_mac_vap, oal_uin
 {
     return hmac_config_set_vap_nss(pst_mac_vap, us_len, puc_param);
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 #ifdef _PRE_WLAN_DFT_REG
 /*****************************************************************************
@@ -3263,7 +3278,7 @@ oal_uint32  wal_config_dump_reg(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oa
 	return OAL_SUCC;
 }
 #endif
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_get_mpdu_num
  功能描述  :
@@ -3283,6 +3298,7 @@ OAL_STATIC oal_uint32  wal_config_get_mpdu_num(mac_vap_stru *pst_mac_vap, oal_ui
 {
     return hmac_config_get_mpdu_num(pst_mac_vap, us_len, puc_param);
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 #ifdef _PRE_WLAN_FEATURE_CUSTOM_SECURITY
 /*****************************************************************************
@@ -4085,10 +4101,12 @@ OAL_STATIC oal_uint32  wal_config_pm_enable(mac_vap_stru *pst_mac_vap, oal_uint1
 
 
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
+#ifdef _PRE_DEBUG_MODE
 OAL_STATIC oal_uint32  wal_config_show_device_memleak(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param)
 {
     return hmac_config_sync_cmd_common(pst_mac_vap, WLAN_CFGID_DEVICE_MEM_LEAK, us_len, puc_param);
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 OAL_STATIC oal_uint32  wal_config_show_device_meminfo(mac_vap_stru *pst_mac_vap, oal_uint16 us_len, oal_uint8 *puc_param)
 {
@@ -4184,6 +4202,7 @@ OAL_STATIC oal_uint32  wal_config_bgscan_enable(mac_vap_stru *pst_mac_vap, oal_u
 }
 
 #ifdef _PRE_WLAN_FEATURE_P2P
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_set_p2p_ps_stat
  功能描述  : 设置P2P 节能统计控制
@@ -4205,6 +4224,7 @@ OAL_STATIC oal_uint32  wal_config_set_p2p_ps_stat(mac_vap_stru *pst_mac_vap, oal
 {
     return hmac_config_set_p2p_ps_stat(pst_mac_vap, us_len, puc_param);
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 #ifdef _PRE_WLAN_PROFLING_MIPS
@@ -4254,6 +4274,7 @@ OAL_STATIC oal_uint32  wal_config_show_mips(mac_vap_stru *pst_mac_vap, oal_uint1
 #endif
 
 #ifdef _PRE_WLAN_FEATURE_ARP_OFFLOAD
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_arp_offload_enable
  功能描述  : 打开/关闭ARP offload功能
@@ -4275,7 +4296,8 @@ OAL_STATIC oal_uint32 wal_config_enable_arp_offload(mac_vap_stru *pst_mac_vap, o
 {
     return hmac_config_enable_arp_offload(pst_mac_vap, us_len, puc_param);
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_show_arpoffload_info
  功能描述  : 显示Device侧记录的IP地址
@@ -4297,6 +4319,7 @@ OAL_STATIC oal_uint32 wal_config_show_arpoffload_info(mac_vap_stru *pst_mac_vap,
 {
     return hmac_config_show_arpoffload_info(pst_mac_vap, us_len, puc_param);
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 #ifdef _PRE_WLAN_TCP_OPT
@@ -4409,6 +4432,7 @@ OAL_STATIC oal_uint32  wal_config_rx_tcp_ack_limit(mac_vap_stru *pst_mac_vap, oa
 
 #if (_PRE_OS_VERSION_LINUX == _PRE_OS_VERSION) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 44)) && (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
 #ifdef _PRE_WLAN_DFT_STAT
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : wal_config_set_performance_log_switch
  功能描述  : 设置性能打印控制开关
@@ -4428,6 +4452,7 @@ OAL_STATIC oal_uint32  wal_config_set_performance_log_switch(mac_vap_stru *pst_m
 {
     return hmac_config_set_performance_log_switch(pst_mac_vap, WLAN_CFGID_SET_PERFORMANCE_LOG_SWITCH, us_len, puc_param);
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 #endif
 
@@ -4844,9 +4869,13 @@ OAL_CONST wal_wid_op_stru g_ast_board_wid_op_debug[] =
     {WLAN_CFGID_PROBE_SWITCH,           OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_probe_switch},
     {WLAN_CFGID_RSSI_SWITCH,            OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_rssi_switch},
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_REPORT_VAP_INFO,        OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_report_vap_info},
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_GET_MPDU_NUM,           OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_get_mpdu_num},
+#endif //#ifdef _PRE_DEBUG_MODE
 #ifdef _PRE_WLAN_CHIP_TEST
     {WLAN_CFGID_SET_BEACON_OFFLOAD_TEST,   OAL_FALSE,  {0},    OAL_PTR_NULL,         wal_config_beacon_offload_test},
 #endif
@@ -4884,20 +4913,32 @@ OAL_CONST wal_wid_op_stru g_ast_board_wid_op_debug[] =
     {WLAN_CFGID_START_SCAN,             OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_start_scan},
     {WLAN_CFGID_START_JOIN,             OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_start_join},
     {WLAN_CFGID_START_DEAUTH,           OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_start_deauth},
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_DUMP_TIEMR,             OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_dump_timer},
+#endif //#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_PAUSE_TID,              OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_pause_tid},
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_USER_VIP,           OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_set_user_vip},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_VAP_HOST,           OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_set_vap_host},
+#endif //#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_AMPDU_TX_ON,            OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_ampdu_tx_on},
     {WLAN_CFGID_AMSDU_TX_ON,            OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_amsdu_tx_on},
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SEND_BAR,               OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_send_bar},
+#endif //#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_PACKET_XMIT,            OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_packet_xmit},
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_DUMP_BA_BITMAP,         OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_dump_ba_bitmap},
+#endif //#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_VAP_PKT_STAT,           OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_vap_pkt_stat},
     {WLAN_CFGID_TIMER_START,            OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_timer_start},
     {WLAN_CFGID_SHOW_PROFILING,         OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_show_profiling},
     {WLAN_CFGID_AMSDU_AMPDU_SWITCH,     OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_amsdu_ampdu_switch},
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_RESET_HW,               OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_reset_hw},
+#endif //#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_RESET_HW_OPERATE,       OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_reset_operate},
 
 #ifdef _PRE_WLAN_FEATURE_DFR
@@ -4911,17 +4952,27 @@ OAL_CONST wal_wid_op_stru g_ast_board_wid_op_debug[] =
     {WLAN_CFGID_UAPSD_DEBUG,            OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_uapsd_debug},
 #endif
 #ifdef _PRE_WLAN_DFT_STAT
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_PHY_STAT_EN,            OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_set_phy_stat_en},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_DBB_ENV_PARAM,          OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_dbb_env_param},
+#endif //#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_USR_QUEUE_STAT,         OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_usr_queue_stat},
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_VAP_STAT,               OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_report_vap_stat},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_ALL_STAT,               OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_report_all_stat},
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
     {WLAN_CFGID_DUMP_RX_DSCR,           OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_dump_rx_dscr},
     {WLAN_CFGID_DUMP_TX_DSCR,           OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_dump_tx_dscr},
     {WLAN_CFGID_DUMP_MEMORY,            OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_dump_memory},
     {WLAN_CFGID_ALG,                    OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_alg},
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_BEACON_CHAIN_SWITCH,    OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_beacon_chain_switch},
+#endif //#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_2040_CHASWI_PROHI,      OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_2040_channel_switch_prohibited},
     {WLAN_CFGID_2040_INTOLERANT,        OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_set_FortyMHzIntolerant},
     {WLAN_CFGID_2040_COEXISTENCE,       OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_set_2040_coext_support},
@@ -4932,18 +4983,30 @@ OAL_CONST wal_wid_op_stru g_ast_board_wid_op_debug[] =
     {WLAN_CFGID_ACS_CONFIG,             OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_acs},
 #endif
     {WLAN_CFGID_LIST_CHAN,              OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_list_channel},
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_NSS,                OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_set_nss},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_RFCH,               OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_set_rfch},
+#endif //#ifdef _PRE_DEBUG_MODE
 #if defined (_PRE_WLAN_CHIP_TEST) || defined (_PRE_WLAN_FEATURE_ALWAYS_TX)
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_ALWAYS_TX,          OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_always_tx},
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 #ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_RXCH,               OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_set_rxch},
     {WLAN_CFGID_DYNC_TXPOWER,           OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_dync_txpower},
 #endif
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_GET_THRUPUT,            OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_get_thruput},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_FREQ_SKEW,          OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_set_freq_skew},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_ADJUST_PPM,             OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_adjust_ppm},
+#endif //#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_DBB_SCALING_AMEND,      OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_dbb_scaling_amend},
     {WLAN_CFGID_TXBF_SWITCH,            OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_txbf_switch},
 #ifdef _PRE_WLAN_PERFORM_STAT
@@ -4983,10 +5046,14 @@ OAL_CONST wal_wid_op_stru g_ast_board_wid_op_debug[] =
     {WLAN_CFGID_SEND_PSPOLL,        OAL_FALSE,  {0},    OAL_PTR_NULL,           wal_config_send_pspoll},
     {WLAN_CFGID_SEND_NULLDATA,      OAL_FALSE,  {0},    OAL_PTR_NULL,           wal_config_send_nulldata},
 #endif /* #ifdef _PRE_WLAN_CHIP_TEST */
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_HIDE_SSID,          OAL_FALSE,  {0},   OAL_PTR_NULL,            wal_config_hide_ssid},
+#endif //#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_MIB,            OAL_FALSE,  {0},   OAL_PTR_NULL,            wal_config_set_mib},
     {WLAN_CFGID_GET_MIB,            OAL_FALSE,  {0},   OAL_PTR_NULL,            wal_config_get_mib},
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_THRUPUT_BYPASS, OAL_FALSE,  {0},   OAL_PTR_NULL,            wal_config_set_thruput_bypass},
+#endif //#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_AUTO_PROTECTION,OAL_FALSE,  {0},   OAL_PTR_NULL,            wal_config_set_auto_protection},
     {WLAN_CFGID_SEND_2040_COEXT,    OAL_FALSE,  {0},   OAL_PTR_NULL,            wal_config_send_2040_coext},
     {WLAN_CFGID_2040_COEXT_INFO,    OAL_FALSE,  {0},   OAL_PTR_NULL,            wal_config_2040_coext_info},
@@ -5004,7 +5071,9 @@ OAL_CONST wal_wid_op_stru g_ast_board_wid_op_debug[] =
     {WLAN_CFGID_SET_OPMODE_NOTIFY,  OAL_FALSE,  {0},   OAL_PTR_NULL,            wal_config_set_opmode_notify},
     {WLAN_CFGID_GET_USER_RSSBW,     OAL_FALSE,  {0},   OAL_PTR_NULL,            wal_config_get_user_rssbw},
 #endif
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_VAP_NSS,        OAL_FALSE,  {0},   OAL_PTR_NULL,            wal_config_set_vap_nss},
+#endif //#ifdef _PRE_DEBUG_MODE
 #ifdef _PRE_WLAN_DFT_REG
     {WLAN_CFGID_DUMP_REG,       OAL_FALSE,  {0},   OAL_PTR_NULL,                wal_config_dump_reg},
 #endif
@@ -5077,7 +5146,9 @@ OAL_CONST wal_wid_op_stru g_ast_board_wid_op_debug[] =
 #endif
     {WLAN_CFIGD_BGSCAN_ENABLE,      OAL_FALSE,  {0},    OAL_PTR_NULL,           wal_config_bgscan_enable},
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_DEVICE_MEM_LEAK,       OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_show_device_memleak},
+#endif //#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_DEVICE_MEM_INFO,       OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_show_device_meminfo},
 #endif
 #ifdef _PRE_WLAN_FEATURE_STA_PM
@@ -5087,7 +5158,9 @@ OAL_CONST wal_wid_op_stru g_ast_board_wid_op_debug[] =
     {WLAN_CFGID_SET_RD_IE_SWITCH,      OAL_FALSE, {0},      OAL_PTR_NULL,       wal_config_set_rd_by_ie_switch},
 #endif
 #ifdef _PRE_WLAN_FEATURE_P2P
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_P2P_PS_STAT,    OAL_FALSE,  {0},   OAL_PTR_NULL,            wal_config_set_p2p_ps_stat},
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 #ifdef _PRE_WLAN_PROFLING_MIPS
@@ -5100,8 +5173,12 @@ OAL_CONST wal_wid_op_stru g_ast_board_wid_op_debug[] =
 #endif
 
 #ifdef _PRE_WLAN_FEATURE_ARP_OFFLOAD
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_ENABLE_ARP_OFFLOAD,             OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_enable_arp_offload},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SHOW_ARPOFFLOAD_INFO,           OAL_FALSE,  {0},    OAL_PTR_NULL,            wal_config_show_arpoffload_info},
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 #ifdef _PRE_WLAN_TCP_OPT
@@ -5113,7 +5190,9 @@ OAL_CONST wal_wid_op_stru g_ast_board_wid_op_debug[] =
 #endif
 #if (_PRE_OS_VERSION_LINUX == _PRE_OS_VERSION) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 44)) && (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
 #ifdef _PRE_WLAN_DFT_STAT
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_PERFORMANCE_LOG_SWITCH,         OAL_FALSE,  {0},  OAL_PTR_NULL,          wal_config_set_performance_log_switch},
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 #endif
 #ifdef _PRE_WLAN_FEATURE_ROAM

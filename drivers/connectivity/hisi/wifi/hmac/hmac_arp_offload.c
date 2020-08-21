@@ -65,14 +65,19 @@ extern "C" {
 oal_uint32 hmac_arp_offload_set_ip_addr(mac_vap_stru *pst_mac_vap,
                                         dmac_ip_type_enum_uint8 en_type,
                                         dmac_ip_oper_enum_uint8 en_oper,
-                                        oal_void *pst_ip_addr)
+                                        oal_void *pst_ip_addr,
+                                        oal_void *pst_mask_addr)
 {
     dmac_ip_addr_config_stru  st_ip_addr_config;
     oal_uint32                ul_ret;
 
-    if (OAL_UNLIKELY(NULL == pst_ip_addr))
+    if (OAL_UNLIKELY((OAL_PTR_NULL == pst_mac_vap) || (OAL_PTR_NULL == pst_ip_addr) || (OAL_PTR_NULL == pst_mask_addr)))
     {
-        OAM_ERROR_LOG0(pst_mac_vap->uc_vap_id, OAM_SF_PWR, "{hmac_arp_offload_set_ip_addr::The pst_mac_vap point is NULL.}");
+        OAM_ERROR_LOG3(0, OAM_SF_PWR,
+                        "{hmac_arp_offload_set_ip_addr::The pst_mac_vap or ip_addr or mask_addr is NULL. %p, %p, %p}",
+                        pst_mac_vap,
+                        pst_ip_addr,
+                        pst_mask_addr);
         return OAL_ERR_CODE_PTR_NULL;
     }
 
@@ -81,6 +86,7 @@ oal_uint32 hmac_arp_offload_set_ip_addr(mac_vap_stru *pst_mac_vap,
     if (DMAC_CONFIG_IPV4 == en_type)
     {
         oal_memcopy(st_ip_addr_config.auc_ip_addr, pst_ip_addr, OAL_IPV4_ADDR_SIZE);
+        oal_memcopy(st_ip_addr_config.auc_mask_addr, pst_mask_addr, OAL_IPV4_ADDR_SIZE);
     }
     else if (DMAC_CONFIG_IPV6 == en_type)
     {
@@ -103,7 +109,7 @@ oal_uint32 hmac_arp_offload_set_ip_addr(mac_vap_stru *pst_mac_vap,
     ul_ret = hmac_config_set_ip_addr(pst_mac_vap, OAL_SIZEOF(dmac_ip_addr_config_stru), (oal_uint8 *)&st_ip_addr_config);
     return ul_ret;
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : hmac_arp_offload_enable
  功能描述  : host侧打开/关闭ARP offload功能的接口
@@ -139,6 +145,8 @@ oal_uint32 hmac_arp_offload_enable(mac_vap_stru *pst_mac_vap, oal_switch_enum_ui
     ul_ret = hmac_config_enable_arp_offload(pst_mac_vap, OAL_SIZEOF(oal_switch_enum_uint8), (oal_switch_enum_uint8 *)&en_switch);
     return ul_ret;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
+
 #endif
 
 #ifdef __cplusplus

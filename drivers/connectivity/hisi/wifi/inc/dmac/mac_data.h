@@ -128,6 +128,7 @@ oal_bool_enum_uint8 mac_is_eapol_key_ptk(mac_eapol_header_stru  *pst_eapol_heade
 extern  oal_uint8 mac_get_data_type_from_80211(oal_netbuf_stru *pst_netbuff, oal_uint16 us_mac_hdr_len);
 extern oal_uint16 mac_get_eapol_keyinfo(oal_netbuf_stru *pst_netbuff);
 extern oal_uint8 mac_get_eapol_type(oal_netbuf_stru *pst_netbuff);
+extern oal_bool_enum_uint8 mac_is_eapol_key_ptk_4_4(oal_netbuf_stru *pst_netbuff);
 #ifdef __cplusplus
     #if __cplusplus
         }

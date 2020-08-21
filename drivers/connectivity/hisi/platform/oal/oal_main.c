@@ -198,6 +198,11 @@ oal_void  ATTR_OAL_NO_FUNC_TRACE oal_main_exit(oal_void)
     oal_softwdt_exit();
 #endif
 
+#if defined(_PRE_PRODUCT_ID_HI110X_HOST)
+    /* HCC–∂‘ÿ*/
+    hcc_module_exit(hcc_get_default_handler());
+#endif
+
 #if (_PRE_PRODUCT_ID_HI1151 == _PRE_PRODUCT_ID)
 
     /* pci«˝∂Ø–∂‘ÿ */

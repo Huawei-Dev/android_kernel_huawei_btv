@@ -101,6 +101,9 @@ typedef struct
 /*****************************************************************************
   9 OTHERS定义
 *****************************************************************************/
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+extern dmac_rx_frame_ctrl_enum_uint8 dmac_rx_ip_filter_process(dmac_vap_stru *pst_dmac_vap, oal_netbuf_stru *pst_netbuf, dmac_rx_ctl_stru *pst_cb_ctrl);
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 extern oal_uint32  dmac_rx_filter_frame_ap(
                 mac_vap_stru               *pst_vap,
                 dmac_rx_ctl_stru           *pst_cb_ctrl);
@@ -227,8 +230,12 @@ OAL_STATIC OAL_INLINE oal_uint32  dmac_rx_data_ps_process(
     if (WLAN_VAP_MODE_BSS_STA == dmac_vap_get_bss_type(&(pst_dmac_vap->st_vap_base_info)))
     {
 #ifdef _PRE_WLAN_FEATURE_STA_PM
-        /* 节能特性处理 */
-        dmac_psm_rx_process_data_sta(pst_dmac_vap, pst_netbuf);
+        /* 节能特性处理。
+           限流模式此处可能会丢弃接收到的数据帧，正常业务不应该返回DMAC_RX_FRAME_CTRL_DROP */
+        if (DMAC_RX_FRAME_CTRL_DROP == dmac_psm_rx_process_data_sta(pst_dmac_vap, pst_netbuf))
+        {
+            return OAL_FAIL;
+        }
 #endif
     }
     else if (WLAN_VAP_MODE_BSS_AP == dmac_vap_get_bss_type(&(pst_dmac_vap->st_vap_base_info)))
@@ -252,6 +259,7 @@ OAL_STATIC OAL_INLINE oal_uint32  dmac_rx_data_ps_process(
     }
 #endif
 #endif /* _PRE_WLAN_PROFLING_MIPS */
+
     return OAL_SUCC;
 }
 
@@ -367,6 +375,14 @@ OAL_STATIC OAL_INLINE oal_uint32  dmac_rx_process_data_frame(
 
         return OAL_FAIL;
     }
+
+    /* 过滤五:删出ip黑名单中的包 */
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+    if (DMAC_RX_FRAME_CTRL_DROP == dmac_rx_ip_filter_process(pst_dmac_vap, pst_netbuf, pst_cb_ctrl))
+    {
+        return OAL_FAIL;
+    }
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 
     return OAL_SUCC;
 }

@@ -152,23 +152,38 @@ extern "C" {
 #define WLAN_TID_MPDU_NUM_LIMIT             (1 << WLAN_TID_MPDU_NUM_BIT)
 
 #define WLAN_MEM_SHARED_RX_DSCR_SIZE        68              /*比实际接收描述符结构体稍大些，预留出后面对接收描述符的修改*/
-#define WLAN_MEM_SHARED_RX_DSCR_CNT         110              /* 接收512(数据帧描述符) + 64(管理帧描述符) */ /* 注意! 新增一个子内存池要更新oal_mem.c里的OAL_MEM_BLK_TOTAL_CNT */
 #define WLAN_MEM_SHARED_TX_DSCR_SIZE1       88              /*比实际发送描述符结构体稍大些，预留出后面对发送描述符的修改*/
-#define WLAN_MEM_SHARED_TX_DSCR_CNT1        172             /* 发送描述符512 */
 #define WLAN_MEM_SHARED_TX_DSCR_SIZE2       88              /*比实际发送描述符结构体稍大些，预留出后面对发送描述符的修改*/
-#define WLAN_MEM_SHARED_TX_DSCR_CNT2        0               /* 发送amsdu的描述符 */
 
+#if defined(_PRE_DEBUG_MODE)  || defined(_PRE_WLAN_CACHE_COHERENT_SUPPORT)
+#define WLAN_MEM_SHARED_RX_DSCR_CNT         110             /* 接收512(数据帧描述符) + 64(管理帧描述符) */ /* 注意! 新增一个子内存池要更新oal_mem.c里的OAL_MEM_BLK_TOTAL_CNT */
+#define WLAN_MEM_SHARED_TX_DSCR_CNT1        172             /* 发送描述符512 */
+#define WLAN_MEM_SHARED_TX_DSCR_CNT2        0               /* 发送amsdu的描述符 */
+#else
+#define WLAN_MEM_SHARED_RX_DSCR_CNT         0
+#define WLAN_MEM_SHARED_TX_DSCR_CNT1        0
+#define WLAN_MEM_SHARED_TX_DSCR_CNT2        0
+#endif
+#define TOTAL_WLAN_MEM_SHARED_DSCR_SIZE     ((WLAN_MEM_SHARED_RX_DSCR_SIZE + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)*WLAN_MEM_SHARED_RX_DSCR_CNT \
+                                            + (WLAN_MEM_SHARED_TX_DSCR_SIZE1 + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)*WLAN_MEM_SHARED_TX_DSCR_CNT1 \
+                                            + (WLAN_MEM_SHARED_TX_DSCR_SIZE2 + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)*WLAN_MEM_SHARED_TX_DSCR_CNT2)
 /*****************************************************************************
   2.4.3 共享管理帧内存池配置信息
 *****************************************************************************/
 #define WLAN_MEM_SHARED_MGMT_PKT_SIZE1      800
-#define WLAN_MEM_SHARED_MGMT_PKT_CNT1       2
+#if (_PRE_OS_VERSION_LINUX == _PRE_OS_VERSION)
+#define WLAN_MEM_SHARED_MGMT_PKT_CNT1       0  /* 此池子在host使用不到 */
+#else
+#define WLAN_MEM_SHARED_MGMT_PKT_CNT1       1  /* 此池子在 UT 中使用 */
+#endif
+#define TOTAL_WLAN_MEM_SHARED_MGMT_PKT_SIZE ((WLAN_MEM_SHARED_MGMT_PKT_SIZE1 + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)*WLAN_MEM_SHARED_MGMT_PKT_CNT1)
 
 /*****************************************************************************
   2.4.4 共享数据帧内存池配置信息
 *****************************************************************************/
 #define WLAN_MEM_SHARED_DATA_PKT_SIZE       44              /* 80211mac帧头大小 */
-#define WLAN_MEM_SHARED_DATA_PKT_CNT        (256 + 512)     /* skb(接收的帧头个数) + 发送描述符个数(发送的帧头个数) 768 */
+#define WLAN_MEM_SHARED_DATA_PKT_CNT        200             /* Hi1102目前极少使用此池子，缩减此池子数量 */
+#define TOTAL_WLAN_MEM_SHARED_DATA_PKT_SIZE ((WLAN_MEM_SHARED_DATA_PKT_SIZE + OAL_MEM_INFO_SIZE + OAL_DOG_TAG_SIZE)*WLAN_MEM_SHARED_DATA_PKT_CNT)
 
 /*****************************************************************************
   2.4.5 本地内存池配置信息
@@ -202,7 +217,8 @@ extern "C" {
 #define WLAN_MEM_LOCAL_CNT5                 64
 
 #define WLAN_MEM_LOCAL_SIZE6                16000           /* 资源池用户初始化使用 */
-#define WLAN_MEM_LOCAL_CNT6                 1               /* 目前1片*/
+#define WLAN_MEM_LOCAL_CNT6                 0               /* host用户资源单独直接kmalloc申请,此处不用额外预留 */
+
 /*****************************************************************************
   2.4.6 高速本地内存池(放在TCM中)配置信息
 *****************************************************************************/

@@ -233,6 +233,9 @@ oal_void frw_task_exit(oal_void)
     {
         if (g_ast_event_task[ul_core_id].pst_event_kthread)
         {
+#if (_PRE_OS_VERSION_LINUX == _PRE_OS_VERSION)
+            send_sig(SIGTERM, g_ast_event_task[ul_core_id].pst_event_kthread, 1);
+#endif
             oal_kthread_stop(g_ast_event_task[ul_core_id].pst_event_kthread);
             g_ast_event_task[ul_core_id].pst_event_kthread = OAL_PTR_NULL;
         }

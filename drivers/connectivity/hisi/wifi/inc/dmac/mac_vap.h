@@ -719,7 +719,8 @@ typedef struct
                 bit_11ntxbf                        : 1,                 /* 11n txbf能力 */
                 bit_disable_2ght40                 : 1,                 /* 2ght40禁止位，1-禁止，0-不禁止 */
                 bit_peer_obss_scan                 : 1,                 /* 对端支持obss scan能力: 0-不支持, 1-支持 */
-                bit_resv                           : 13;
+                bit_ip_filter                      : 1,                 /* rx方向ip包过滤的功能 */
+                bit_resv                           : 12;
 }mac_cap_flag_stru;
 
 /* VAP收发包统计 */
@@ -2747,6 +2748,11 @@ typedef struct
     oal_uint8                   uc_ext_lna_isexist_5g;              /* 是否使用外部lna */
     oal_uint8                   uc_far_dist_pow_gain_switch;        /* 超远距离功率增益开关 */
     oal_uint8                   uc_far_dist_dsss_scale_promote_switch;   /* 超远距11b 1m 2m dbb scale提升使能开关 */
+
+    oal_int8                    c_delta_cca_ed_high_20th_2g;
+    oal_int8                    c_delta_cca_ed_high_40th_2g;
+    oal_int8                    c_delta_cca_ed_high_20th_5g;
+    oal_int8                    c_delta_cca_ed_high_40th_5g;
 }mac_cfg_customize_rf;
 typedef struct
 {

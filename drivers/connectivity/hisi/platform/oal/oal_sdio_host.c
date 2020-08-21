@@ -330,7 +330,7 @@ struct task_struct *oal_thread_create(int (*threadfn)(void *data),
     tsk = kthread_create(threadfn, data, namefmt);
     if (IS_ERR_OR_NULL(tsk))
     {
-        OAL_IO_PRINT("failed to run theread:%s\n", namefmt);
+        OAL_IO_PRINT("failed to run thread:%s\n", namefmt);
         return NULL;
     }
 
@@ -1142,7 +1142,7 @@ OAL_STATIC oal_int32 oal_gpio_rxdata_thread(oal_void *data)
     func        = hi_sdio->func;
 
     OAL_IO_PRINT("hisi wifi sched ctrl rx thread high speed\n");
-    param.sched_priority = 99;
+    param.sched_priority = HISDIO_GPIO_RXDATA_THREAD_PRIORITY;
     oal_set_thread_property(current,
                             HISDIO_SDIO_RX_THREAD_POLICY,
                             &param,
@@ -1165,7 +1165,9 @@ OAL_STATIC oal_int32 oal_gpio_rxdata_thread(oal_void *data)
 	        /* start to read GPIO interrupt */
 	        oal_sdio_rx_transfer_lock(hi_sdio);
 	        sdio_claim_host(func);
+	        oal_wake_lock(&hi_sdio->st_sdio_rx_wakelock);
 	        ret = oal_sdio_do_isr(hi_sdio);
+	        oal_wake_unlock(&hi_sdio->st_sdio_rx_wakelock);
             if(OAL_UNLIKELY(ret))
             {
                 oal_sdio_exception_submit(hi_sdio, SDIO_TRANS_FAIL);
@@ -1246,7 +1248,7 @@ OAL_STATIC irqreturn_t wlan_gpio_irq(oal_int32 irq, oal_void *dev_id)
 oal_int32 oal_register_gpio_intr(struct oal_sdio *hi_sdio)
 {
     oal_int32 ret = OAL_SUCC;
-    BOARD_INFO * pst_board = get_board_info();
+    BOARD_INFO * pst_board = get_hi110x_board_info();
 
     unsigned int wlan_irq = pst_board->wlan_irq;
 
@@ -1682,6 +1684,7 @@ OAL_STATIC oal_int32 oal_sdio_probe(struct sdio_func *func, const struct sdio_de
     }
 
     oal_wake_lock_init(&hi_sdio->st_sdio_wakelock, "wlan_sdio_lock");
+    oal_wake_lock_init(&hi_sdio->st_sdio_rx_wakelock, "wlan_sdio_rx_lock");
 
     sema_init(&sdio_wake_sema, 1);
 
@@ -2249,6 +2252,7 @@ OAL_STATIC oal_void oal_sdio_remove(struct sdio_func *func)
     }
     hi_sdio->pst_pm_callback = OAL_PTR_NULL;
     oal_wake_lock_exit(&hi_sdio->st_sdio_wakelock);
+    oal_wake_lock_exit(&hi_sdio->st_sdio_rx_wakelock);
     oal_sdio_dev_deinit(hi_sdio);
     oal_sdio_free(hi_sdio);
     sdio_set_drvdata(func, NULL);
@@ -2537,6 +2541,12 @@ oal_int32 oal_dev2host_gpio_hold_time_check(oal_uint32 switch_timeout, oal_uint3
                 }
                 else
                 {
+                    /*wifi power*/
+                    if(wlan_is_shutdown())
+                    {
+                        OAL_IO_PRINT("[E]hold_time_check:wifi is shutdown!\n");
+                        return OAL_FALSE;
+                    }
                     usleep_range(10, 20);
                     cpu_relax();
                     continue;
@@ -2685,6 +2695,12 @@ void  oal_sdio_exception_handler(oal_work_stru *work)
     {
         /*device is't panic, reset sdio ip from host*/
         hi_sdio->sdio_excp_type = SDIO_TRANS_FAIL;
+    }
+
+    if(wlan_is_shutdown())
+    {
+        OAL_IO_PRINT("[E]dfr ignored, wifi shutdown");
+        return;
     }
 
     /*close sdio data transfer when device panic.*/

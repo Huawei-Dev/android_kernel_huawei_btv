@@ -446,8 +446,10 @@ OAL_STATIC OAL_INLINE oal_dlist_head_stru* oal_dlist_delete_head(oal_dlist_head_
 
     pst_node = pst_head->pst_next;
 
-    OAL_BUG_ON(pst_node==pst_head);
-    OAL_BUG_ON(OAL_PTR_NULL == pst_node);
+    if((pst_node==pst_head) || (OAL_PTR_NULL == pst_node))
+    {
+        return OAL_PTR_NULL;
+    }
 
     oal_dlist_delete_entry(pst_node);
 

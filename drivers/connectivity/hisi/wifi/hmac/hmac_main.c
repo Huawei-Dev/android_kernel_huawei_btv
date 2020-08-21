@@ -144,6 +144,7 @@ extern  oal_int32   hmac_alg_test_main_common_exit(oal_void);
 #endif
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
 extern oal_int32 hmac_hcc_adapt_init(oal_void);
+extern oal_uint32 hmac_hcc_adapt_deinit(oal_void);
 #endif
 #ifdef _PRE_WLAN_FEATURE_BTCOEX
 oal_uint32 hmac_btcoex_check_by_ba_size(hmac_user_stru *pst_hmac_user);
@@ -307,6 +308,9 @@ OAL_STATIC oal_void hmac_event_fsm_tx_adapt_subtable_register(oal_void)
         g_ast_dmac_wlan_ctx_event_sub_table[DMAC_WLAN_CTX_EVENT_SUB_TYPE_DPD_DATA_PROCESSED].p_tx_adapt_func = hmac_dpd_data_processed_event_tx_adapt;
 #endif
     g_ast_dmac_wlan_ctx_event_sub_table[DMAC_WLAN_CTX_EVENT_SUB_TYPE_CALI_HMAC2DMAC].p_tx_adapt_func = hmac_send_cali_data_tx_adapt;
+#ifdef _PRE_WLAN_FEATURE_IP_FILTER
+    g_ast_dmac_wlan_ctx_event_sub_table[DMAC_WLAN_CTX_EVENT_SUB_TYPE_IP_FILTER].p_tx_adapt_func = hmac_config_update_ip_filter_tx_adapt;
+#endif //_PRE_WLAN_FEATURE_IP_FILTER
 
     g_ast_dmac_wlan_ctx_event_sub_table[DMAC_WLAN_CTX_EVENT_SUB_TYPE_SCHED_SCAN_REQ].p_tx_adapt_func = hmac_scan_proc_sched_scan_req_event_tx_adapt;
     g_ast_dmac_wlan_ctx_event_sub_table[DMAC_WLAN_CTX_EVENT_SUB_TYPE_ASOC_WRITE_REG].p_tx_adapt_func = hmac_mgmt_update_user_qos_table_tx_adapt;
@@ -708,7 +712,7 @@ OAL_STATIC ssize_t  hmac_show_roam_status(struct device *dev, struct device_attr
             continue;
         }
 
-        if ((WLAN_VAP_MODE_BSS_STA != pst_hmac_vap->st_vap_base_info.en_vap_mode) 
+        if ((WLAN_VAP_MODE_BSS_STA != pst_hmac_vap->st_vap_base_info.en_vap_mode)
             || (MAC_VAP_STATE_BUTT == pst_hmac_vap->st_vap_base_info.en_vap_state))
         {
             continue;
@@ -808,7 +812,7 @@ OAL_STATIC struct attribute_group hmac_attribute_group = {
 OAL_STATIC oal_int32 hmac_sysfs_entry_init(oal_void)
 {
     oal_int32       ret = OAL_SUCC;
-    oal_kobject*     pst_root_object = NULL;
+    oal_kobject    *pst_root_object = NULL;
     pst_root_object = oal_get_sysfs_root_object();
     if(NULL == pst_root_object)
     {
@@ -957,7 +961,7 @@ OAL_STATIC oal_int32 hmac_rxdata_thread(oal_void* p_data)
     return OAL_SUCC;
 }
 
-OAL_STATIC oal_void hmac_hisi_thread_init(oal_void)
+OAL_STATIC oal_uint32 hmac_hisi_thread_init(oal_void)
 {
 #if defined(_PRE_WLAN_TCP_OPT) && !defined(WIN32)
     hmac_set_hmac_tcp_ack_process_func(hmac_tcp_ack_process);
@@ -972,10 +976,11 @@ OAL_STATIC oal_void hmac_hisi_thread_init(oal_void)
                                         -1);
     if(!hcc_get_default_handler()->hcc_transer_info.hcc_transfer_thread)
     {
-        OAL_IO_PRINT("hcc thread create failed!\n");
+        OAL_IO_PRINT("hisi_hcc thread create failed!\n");
 #if (_PRE_OS_VERSION_LINUX == _PRE_OS_VERSION)
         mutex_destroy(&hcc_get_default_handler()->tx_transfer_lock);
 #endif
+        return OAL_FAIL;
     }
 #endif
 
@@ -993,19 +998,32 @@ OAL_STATIC oal_void hmac_hisi_thread_init(oal_void)
                                             SCHED_FIFO,
                                             97,
                                             -1);
-
-    return;
+#ifndef WIN32
+    if (OAL_PTR_NULL == g_st_rxdata_thread.pst_rxdata_thread)
+    {
+        OAL_IO_PRINT("hisi_rxdata thread create failed!\n");
+        oal_thread_stop(hcc_get_default_handler()->hcc_transer_info.hcc_transfer_thread, NULL);
+        hcc_get_default_handler()->hcc_transer_info.hcc_transfer_thread = NULL;
+        return OAL_FAIL;
+    }
+#endif
+    return OAL_SUCC;
 }
 
 OAL_STATIC oal_void hmac_hisi_thread_exit(oal_void)
 {
 #if defined(_PRE_WLAN_TCP_OPT) && !defined(WIN32)
-    oal_thread_stop(hcc_get_default_handler()->hcc_transer_info.hcc_transfer_thread, NULL);
-    hcc_get_default_handler()->hcc_transer_info.hcc_transfer_thread = NULL;
+    if (hcc_get_default_handler()->hcc_transer_info.hcc_transfer_thread)
+    {
+        oal_thread_stop(hcc_get_default_handler()->hcc_transer_info.hcc_transfer_thread, NULL);
+        hcc_get_default_handler()->hcc_transer_info.hcc_transfer_thread = NULL;
+    }
 #endif
-
-    oal_thread_stop(g_st_rxdata_thread.pst_rxdata_thread, &g_st_rxdata_thread.st_rxdata_sema);
-    g_st_rxdata_thread.pst_rxdata_thread = NULL;
+    if (g_st_rxdata_thread.pst_rxdata_thread)
+    {
+        oal_thread_stop(g_st_rxdata_thread.pst_rxdata_thread, &g_st_rxdata_thread.st_rxdata_sema);
+        g_st_rxdata_thread.pst_rxdata_thread = NULL;
+    }
 }
 #endif
 /*****************************************************************************
@@ -1047,7 +1065,6 @@ oal_int32  hmac_main_init(oal_void)
 
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
     hmac_hcc_adapt_init();
-
 #endif
 
     en_init_state = frw_get_init_state();
@@ -1069,7 +1086,14 @@ oal_int32  hmac_main_init(oal_void)
 #endif
 
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
-    hmac_hisi_thread_init();
+    ul_return = hmac_hisi_thread_init();
+    if (OAL_SUCC != ul_return)
+    {
+        frw_timer_delete_all_timer();
+        OAL_IO_PRINT("hmac_main_init: hmac_hisi_thread_init failed\n");
+
+        return -OAL_EFAIL;
+    }
 
     ul_return = mac_res_init();
     if (OAL_SUCC != ul_return)
@@ -1108,7 +1132,7 @@ oal_int32  hmac_main_init(oal_void)
             return OAL_FAIL;
         }
 #else
-    	/* 抛事件给dmac */
+        /* 抛事件给dmac */
         pst_event_mem = FRW_EVENT_ALLOC(0);
         if (OAL_UNLIKELY(OAL_PTR_NULL == pst_event_mem))
         {
@@ -1206,6 +1230,11 @@ oal_int32  hmac_main_init(oal_void)
 oal_void  hmac_main_exit(oal_void)
 {
     oal_uint32 ul_return;
+
+#ifdef _PRE_CONFIG_HISI_PANIC_DUMP_SUPPORT
+    hwifi_panic_log_unregister(&hmac_panic_vap_stat);
+#endif
+
 #if defined(_PRE_CONFIG_CONN_HISI_SYSFS_SUPPORT) && (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
     hmac_sysfs_entry_exit();
 #endif
@@ -1229,6 +1258,12 @@ oal_void  hmac_main_exit(oal_void)
         OAM_WARNING_LOG1(0, OAM_SF_ANY, "{hmac_main_exit::hmac_board_exit failed[%d].}", ul_return);
         return ;
     }
+#endif
+
+    mac_res_exit();
+
+#if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
+    hmac_hcc_adapt_deinit();
 #endif
 
 #ifdef _PRE_WLAN_FEATURE_DAQ

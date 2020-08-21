@@ -303,7 +303,7 @@ OAL_STATIC oal_uint32  dmac_config_pause_tid(mac_vap_stru *pst_mac_vap, oal_uint
 
     return OAL_SUCC;
 }
-
+#ifdef _PRE_DEBUG_MODE
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
 /*****************************************************************************
  函 数 名  : dmac_config_dump_timer
@@ -323,37 +323,11 @@ OAL_STATIC oal_uint32  dmac_config_pause_tid(mac_vap_stru *pst_mac_vap, oal_uint
 OAL_STATIC oal_uint32  dmac_config_dump_timer(mac_vap_stru *pst_mac_vap, oal_uint8 uc_len, oal_uint8 *puc_param)
 {
     frw_timer_dump_timer(pst_mac_vap->ul_core_id);
-#if 0
-    oal_dlist_head_stru *pst_entry;
-    oal_dlist_head_stru *pst_user_list_head;
-    mac_user_stru       *pst_user_tmp;
-    dmac_user_stru      *pst_dmac_user_tmp;
-
-    pst_user_list_head = &(pst_mac_vap->st_mac_user_list_head);
-
-    /* 遍历VAP下面的用户，dump用户last active timestamp  */
-    for (pst_entry = pst_user_list_head->pst_next; pst_entry != pst_user_list_head;)
-    {
-        pst_user_tmp      = OAL_DLIST_GET_ENTRY(pst_entry, mac_user_stru, st_user_dlist);
-        pst_dmac_user_tmp = mac_res_get_dmac_user(pst_user_tmp->us_assoc_id);
-
-        /* 指向双向链表下一个节点 */
-        pst_entry = pst_entry->pst_next;
-
-        if (OAL_PTR_NULL == pst_dmac_user_tmp)
-        {
-            OAM_ERROR_LOG1(pst_mac_vap->uc_vap_id, OAM_SF_KEEPALIVE, "dmac_config_dump_timer::user is null. us_assoc_id is %d", pst_user_tmp->us_assoc_id);
-            continue;
-        }
-
-        OAM_WARNING_LOG2(pst_mac_vap->uc_vap_id, OAM_SF_KEEPALIVE, "dmac_config_dump_timer::us_assoc_id is %d, last_active_timestamp[%u]",
-                         pst_user_tmp->us_assoc_id, pst_dmac_user_tmp->ul_last_active_timestamp);
-
-    }
-#endif
     return OAL_SUCC;
 }
 #endif
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_set_user_vip
  功能描述  : 配置用户的vip flag
@@ -389,7 +363,8 @@ OAL_STATIC oal_uint32  dmac_config_set_user_vip(mac_vap_stru *pst_mac_vap, oal_u
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_set_vap_host
  功能描述  : 配置vap为host vap;
@@ -421,7 +396,8 @@ OAL_STATIC oal_uint32  dmac_config_set_vap_host(mac_vap_stru *pst_mac_vap, oal_u
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_send_bar
  功能描述  : 配置命令去关联1个用户
@@ -464,6 +440,7 @@ OAL_STATIC oal_uint32  dmac_config_send_bar(mac_vap_stru *pst_mac_vap, oal_uint8
 
     return dmac_ba_send_bar(pst_tid->pst_ba_tx_hdl, pst_dmac_user, pst_tid);
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : dmac_config_alg
@@ -533,7 +510,7 @@ oal_uint32  dmac_config_alg(mac_vap_stru *pst_mac_vap, oal_uint8 uc_len, oal_uin
 
     return ul_ret;
 }
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_dump_ba_bitmap
  功能描述  : 显示各类中断个数次数
@@ -551,140 +528,10 @@ oal_uint32  dmac_config_alg(mac_vap_stru *pst_mac_vap, oal_uint8 uc_len, oal_uin
 *****************************************************************************/
 OAL_STATIC oal_uint32  dmac_config_dump_ba_bitmap(mac_vap_stru *pst_mac_vap, oal_uint8 uc_len, oal_uint8 *puc_param)
 {
-#ifdef _PRE_DEBUG_MODE
-#if (_PRE_OS_VERSION_LINUX == _PRE_OS_VERSION)
-//#if ((_PRE_TARGET_PRODUCT_TYPE_5610DMB != _PRE_CONFIG_TARGET_PRODUCT) )
-#if 0
-        hal_to_dmac_device_stru          *pst_hal_device;
-        dmac_vap_stru                    *pst_dmac_vap;
-	 dmac_user_stru			 *pst_dmac_user;
-        oal_uint16                        us_track_index;
-        oal_uint16                        us_seq_index;
-        oal_uint8                         uc_num = 0;
-        oal_uint8                         uc_lut_idx;
-        dmac_tx_ba_track_stru            *pst_tx_ba_track;
-        mac_cfg_mpdu_ampdu_tx_param_stru *pst_aggr_tx_on_param;
-        oal_file                         *pst_fs = OAL_PTR_NULL;
-        oal_mm_segment_t                  old_fs;
-        dmac_seq_track_stru               *pst_seq_track = OAL_PTR_NULL;
-
-        pst_aggr_tx_on_param = (mac_cfg_mpdu_ampdu_tx_param_stru *)puc_param;
-
-        pst_dmac_vap    = mac_res_get_dmac_vap(pst_mac_vap->uc_vap_id);
-        pst_hal_device  = pst_dmac_vap->pst_hal_device;
-        pst_dmac_user = (dmac_user_stru *)mac_vap_get_user_by_addr(pst_mac_vap, pst_aggr_tx_on_param->auc_ra_mac);
-
-	 if (OAL_PTR_NULL == pst_dmac_user)
-	 {
-	     OAM_ERROR_LOG0(pst_mac_vap->uc_vap_id, OAM_SF_CFG, "{dmac_config_dump_ba_bitmap::dmac_user_null!\n.}");
-	     return OAL_FAIL;
-	 }
-
-	 if ( (pst_aggr_tx_on_param->uc_tid >= WLAN_TIDNO_BUTT) || (pst_aggr_tx_on_param->uc_tid < WLAN_TIDNO_BEST_EFFORT) )
-	 {
-	     OAM_ERROR_LOG1(0, OAM_SF_BA, "{dmac_config_dump_ba_bitmap::invalid input tid number[%d]\n.}", pst_aggr_tx_on_param->uc_tid);
-	     return OAL_FAIL;
-	 }
-
-	 if ( OAL_PTR_NULL == (pst_dmac_user->ast_tx_tid_queue[pst_aggr_tx_on_param->uc_tid].pst_ba_tx_hdl) )
-	 {
-	     OAM_ERROR_LOG0(pst_mac_vap->uc_vap_id, OAM_SF_CFG, "{dmac_config_dump_ba_bitmap::pst_tx_ba_handle null\n.}");
-	     return OAL_FAIL;
-	 }
-
-	 uc_lut_idx = pst_dmac_user->ast_tx_tid_queue[pst_aggr_tx_on_param->uc_tid].pst_ba_tx_hdl->uc_tx_ba_lut;
-
-	 if (uc_lut_idx >= HAL_MAX_AMPDU_LUT_SIZE)
-	 {
-	     OAM_ERROR_LOG1(pst_mac_vap->uc_vap_id, OAM_SF_CFG, "{dmac_config_dump_ba_bitmap::invalid uc_lut_idx[%d].}", uc_lut_idx);
-	     return OAL_FAIL;
-	 }
-
-        pst_tx_ba_track = &g_ast_tx_ba_track[pst_mac_vap->uc_device_id][uc_lut_idx];
-        us_track_index  = pst_tx_ba_track->us_track_head;
-
-        pst_fs = oal_kernel_file_open(DMAC_DUMP_BA_BITMAP_PATH, OAL_O_RDWR|OAL_O_CREAT|OAL_O_APPEND);
-        if(!pst_fs)
-        {
-            OAM_ERROR_LOG0(pst_mac_vap->uc_vap_id, OAM_SF_CFG, "witp_reset_dump_mac_reg,fail to open file!\n");
-            return OAL_FAIL;
-        }
-
-        old_fs = oal_get_fs();
-        oal_set_fs(OAL_KERNEL_DS);                  //扩展内核空间到用户空间
-
-        if (pst_tx_ba_track->us_track_head > OAM_SEQ_TRACK_NUM - 1 || pst_tx_ba_track->us_track_tail > OAM_SEQ_TRACK_NUM - 1)
-        {
-            oal_kernel_file_print(pst_fs, "head: %d  tail:%d \n", pst_tx_ba_track->us_track_head, pst_tx_ba_track->us_track_tail);
-            return OAL_FAIL;
-        }
-        oal_kernel_file_print(pst_fs, "tid %d \n", pst_tx_ba_track->ast_seq_bitmap_log[us_track_index].uc_tid);
-
-        while (pst_tx_ba_track->us_track_tail != us_track_index)
-        {
-            pst_seq_track = &(pst_tx_ba_track->ast_seq_bitmap_log[us_track_index]);
-            oal_kernel_file_print(pst_fs, "********************************************************************\n");
-            oal_kernel_file_print(pst_fs, "No.%d \n", uc_num);
-            uc_num++;
-
-            /*发送完成， 上报描述符链打印*/
-            if (pst_seq_track->en_is_before_tx_track == OAL_FALSE)
-            {
-                oal_kernel_file_print(pst_fs, "ba track AFTER tx \n");
-                oal_kernel_file_print(pst_fs, "tx status =  %d, report_dscr_num = %d \n", pst_seq_track->un_mix_dscr.st_report.uc_tx_status, pst_seq_track->un_mix_dscr.st_report.uc_report_mpdu_num);
-                oal_kernel_file_print(pst_fs, "report seqnum by hw : ");
-
-                for (us_seq_index = 0; us_seq_index < pst_seq_track->un_mix_dscr.st_report.uc_report_mpdu_num; us_seq_index++)
-                {
-                    oal_kernel_file_print(pst_fs, "%d ", pst_seq_track->un_mix_dscr.st_report.aus_report_seqnum[us_seq_index]);
-                }
-
-                oal_kernel_file_print(pst_fs, "\n");
-            }
-            else /*发送前， 调度描述符链打印*/
-            {
-                oal_kernel_file_print(pst_fs, "ba track BEFORE tx \n");
-                oal_kernel_file_print(pst_fs, "schedule_mpdu_num = %d \n", pst_seq_track->un_mix_dscr.st_schedule.uc_schedule_mpdu_num);
-                oal_kernel_file_print(pst_fs, "schedule seqnum : ");
-                for (us_seq_index = 0; us_seq_index < pst_seq_track->un_mix_dscr.st_schedule.uc_schedule_mpdu_num; us_seq_index++)
-                {
-                     oal_kernel_file_print(pst_fs, "%d ", pst_seq_track->un_mix_dscr.st_schedule.aus_schedule_seqnum[us_seq_index]);
-                }
-
-                oal_kernel_file_print(pst_fs, "\n");
-            }
-
-            /*tid 队列信息打印*/
-            oal_kernel_file_print(pst_fs, "tid_total_mpdu_num = %d, tid_retry_mpdu_num = %d)\n", pst_seq_track->us_tid_total_mpdu_num, pst_seq_track->uc_tid_retry_mpdu_num);
-            oal_kernel_file_print(pst_fs, "tid_queue_seqnum : ");
-            for (us_seq_index = 0; us_seq_index < pst_seq_track->uc_tid_record_mpdu_num; us_seq_index++)
-            {
-                oal_kernel_file_print(pst_fs, "%d ", pst_tx_ba_track->ast_seq_bitmap_log[us_track_index].aus_tid_seqnum[us_seq_index]);
-            }
-            oal_kernel_file_print(pst_fs, "\n");
-
-            /*ba handle信息打印*/
-            oal_kernel_file_print(pst_fs, "ba bitmap : %08x %08x %08x %08x \n",
-                         pst_seq_track->aul_bitmap[0],
-                         pst_seq_track->aul_bitmap[1],
-                         pst_seq_track->aul_bitmap[2],
-                         pst_seq_track->aul_bitmap[3]);
-
-            oal_kernel_file_print(pst_fs, "baw_start: %d , baw_lsn: %d, baw_head: %d, baw_tail: %d \n",
-                         pst_seq_track->us_seq_start,
-                         pst_seq_track->us_lsn,
-                         pst_seq_track->us_baw_head,
-                         pst_seq_track->us_baw_tail);
-
-            us_track_index = (us_track_index + 1) & (OAM_SEQ_TRACK_NUM - 1);
-        }
-//#endif
-#endif
-#endif
-#endif
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_get_mpdu_num
  功能描述  : 获取mpdu数目
@@ -735,6 +582,7 @@ OAL_STATIC oal_uint32  dmac_config_get_mpdu_num(mac_vap_stru *pst_mac_vap, oal_u
 
     return oam_report_mpdu_num(pst_dmac_user->st_user_base_info.auc_user_mac_addr, &st_mpdu_num);
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 #ifdef _PRE_WLAN_RF_110X_CALI_DPD
 OAL_STATIC oal_uint32 dmac_config_start_dpd(mac_vap_stru *pst_mac_vap, oal_uint8 uc_len, oal_uint8 *puc_param)
@@ -1099,7 +947,7 @@ OAL_STATIC oal_uint32  dmac_config_80211_ucast_switch(mac_vap_stru *pst_mac_vap,
     return OAL_SUCC;
 }
 #endif
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_reset_hw
  功能描述  : 复位硬件
@@ -1178,6 +1026,7 @@ OAL_STATIC oal_uint32  dmac_config_reset_hw(mac_vap_stru *pst_mac_vap, oal_uint8
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : dmac_config_dump_rx_dscr
@@ -1396,6 +1245,7 @@ OAL_STATIC oal_uint32  dmac_config_report_thrput_stat(mac_vap_stru *pst_mac_vap,
 #endif
 
 #ifdef _PRE_WLAN_DFT_STAT
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_report_irq_info
  功能描述  : 显示各类中断个数次数
@@ -1429,9 +1279,9 @@ OAL_STATIC oal_uint32  dmac_config_report_irq_info(mac_vap_stru *pst_mac_vap, oa
 #endif
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_phy_stat_info
  功能描述  : 上报phy统计收发包数目信息
@@ -1449,25 +1299,6 @@ OAL_STATIC oal_uint32  dmac_config_report_irq_info(mac_vap_stru *pst_mac_vap, oa
 *****************************************************************************/
 OAL_STATIC oal_uint32  dmac_config_phy_stat_info(mac_vap_stru *pst_mac_vap, oal_uint8 uc_len, oal_uint8 *puc_param)
 {
-#if 0
-    oam_stats_phy_stat_stru         st_phy_stat;
-    mac_device_stru                *pst_macdev;
-    oal_uint8                       auc_user_macaddr[WLAN_MAC_ADDR_LEN] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-
-    pst_macdev = mac_res_get_dev(pst_mac_vap->uc_device_id);
-    if (OAL_UNLIKELY(OAL_PTR_NULL == pst_macdev))
-    {
-        OAM_ERROR_LOG0(pst_mac_vap->uc_vap_id, OAM_SF_CFG, "{dmac_config_phy_stat_info::dev is null!}");
-        return OAL_ERR_CODE_PTR_NULL;
-    }
-
-    OAL_MEMZERO(&st_phy_stat, OAL_SIZEOF(oam_stats_phy_stat_stru));
-
-    hal_dft_get_phyhw_stat_info(pst_macdev->pst_device_stru,&st_phy_stat);
-
-    /* 将获取到的统计值上报 */
-    return oam_report_dft_params(auc_user_macaddr, (oal_uint8 *)&st_phy_stat,(oal_uint16)OAL_SIZEOF(oam_stats_phy_stat_stru), OAM_OTA_TYPE_PHY_STAT);
-#endif
     return OAL_SUCC;
 }
 
@@ -1489,59 +1320,6 @@ OAL_STATIC oal_uint32  dmac_config_phy_stat_info(mac_vap_stru *pst_mac_vap, oal_
 *****************************************************************************/
 OAL_STATIC oal_uint32  dmac_config_machw_stat_info(mac_vap_stru *pst_mac_vap, oal_uint8 uc_len, oal_uint8 *puc_param)
 {
-#if 0
-    mac_device_stru                 *pst_mac_dev;
-#if 0
-    oal_uint8                        uc_loop;
-    oal_uint32                       ul_reg_addr;
-    oal_uint32                       ul_reg_val = 0;
-#endif
-    oam_stats_machw_stat_stru        st_machw_stat;
-    oal_uint8                        auc_user_macaddr[WLAN_MAC_ADDR_LEN] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-
-    pst_mac_dev = mac_res_get_dev(pst_mac_vap->uc_device_id);
-    if (OAL_UNLIKELY(OAL_PTR_NULL == pst_mac_dev))
-    {
-        OAM_ERROR_LOG0(pst_mac_vap->uc_vap_id, OAM_SF_CFG, "{dmac_config_machw_stat_info::dev is null!}");
-        return OAL_ERR_CODE_PTR_NULL;
-    }
-
-    if (OAL_FALSE == *puc_param)
-    {
-        /* 清零mac统计,mac统计清零寄存器的bit2~bit22,bit4是发送beacon帧数目，bit9是高优先级队列发送数目，不清零，
-           这两个统计值放在管理帧统计功能控制
-        */
-        hal_dft_clear_machw_stat_info(pst_mac_dev->pst_device_stru);
-        return OAL_SUCC;
-    }
-    else
-    {
-        OAL_MEMZERO(&st_machw_stat, OAL_SIZEOF(oam_stats_machw_stat_stru));
-
-        /* 从MAC寄存器获取统计值 */
-        dmac_dft_get_machw_stat_info(pst_mac_dev->pst_device_stru, &st_machw_stat);
-    #if 0
-        /* 获取mac rx统计信息，直接读mac寄存器 */
-        for (ul_reg_addr = (oal_uint32)WITP_PA_RX_AMPDU_COUNT_REG, uc_loop = 0;
-             ul_reg_addr <= (oal_uint32)WITP_PA_RX_FILTERED_CNT_REG && uc_loop < OAM_MACHW_STAT_RX_MEMBER_CNT;
-             ul_reg_addr += 4, uc_loop++)
-        {
-            hal_reg_info(pst_mac_dev->pst_device_stru, ul_reg_addr, &ul_reg_val);
-            st_machw_stat.aul_machw_stat_rx_cnt[uc_loop] = ul_reg_val;
-        }
-
-        /* 获取mac tx统计信息，直接读mac寄存器 */
-        for (ul_reg_addr = (oal_uint32)WITP_PA_TX_HI_PRI_MPDU_CNT_REG, uc_loop = 0;
-             ul_reg_addr <= (oal_uint32)WITP_PA_HI_PRI_RETRY_CNT_REG && uc_loop < OAM_MACHW_STAT_TX_MEMBER_CNT;
-             ul_reg_addr += 4, uc_loop++)
-        {
-            hal_reg_info(pst_mac_dev->pst_device_stru, ul_reg_addr, &ul_reg_val);
-            st_machw_stat.aul_machw_stat_tx_cnt[uc_loop] = ul_reg_val;
-        }
-    #endif
-        return oam_report_dft_params(auc_user_macaddr, (oal_uint8 *)&st_machw_stat,(oal_uint16)OAL_SIZEOF(oam_stats_machw_stat_stru), OAM_OTA_TYPE_MACHW_STAT);
-    }
-#endif
     return OAL_SUCC;
 }
 
@@ -1608,8 +1386,9 @@ OAL_STATIC oal_uint32  dmac_config_report_mgmt_stat(mac_vap_stru *pst_mac_vap, o
         return oam_report_dft_params(BROADCAST_MACADDR, (oal_uint8 *)&st_mgmt_stat, (oal_uint16)OAL_SIZEOF(oam_stats_mgmt_stat_stru),OAM_OTA_TYPE_MGMT_STAT);
     }
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
 #else
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_phy_stat_info
  功能描述  : 上报phy统计收发包数目信息
@@ -1763,6 +1542,8 @@ OAL_STATIC oal_uint32  dmac_config_report_mgmt_stat(mac_vap_stru *pst_mac_vap, o
         return oam_report_dft_params(BROADCAST_MACADDR, (oal_uint8 *)&st_mgmt_stat,(oal_uint16)OAL_SIZEOF(oam_stats_mgmt_stat_stru), OAM_OTA_TYPE_MGMT_STAT);
     }
 }
+#endif //#ifdef _PRE_DEBUG_MODE
+
 /*****************************************************************************
  函 数 名  : dmac_config_usr_queue_stat
  功能描述  : 上报或者清零用户队列统计信息
@@ -1805,6 +1586,7 @@ OAL_STATIC oal_uint32  dmac_config_usr_queue_stat(mac_vap_stru *pst_mac_vap, oal
 }
 
 #endif
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_report_vap_stat
  功能描述  : 上报或者停止上报vap吞吐统计信息
@@ -1847,6 +1629,7 @@ OAL_STATIC oal_uint32  dmac_config_report_vap_stat(mac_vap_stru *pst_mac_vap, oa
 
     return oam_report_dft_params(BROADCAST_MACADDR, (oal_uint8 *)&st_vap_dft_stats,(oal_uint16)OAL_SIZEOF(dmac_vap_query_stats_stru),OAM_OTA_TYPE_VAP_STAT);
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 #ifdef _PRE_WLAN_FEATURE_DFR
 #ifdef _PRE_DEBUG_MODE
@@ -1945,7 +1728,7 @@ OAL_STATIC oal_uint32  dmac_config_trig_pcie_reset(mac_vap_stru *pst_mac_vap, oa
 
 #endif
 
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_set_phy_stat_en
  功能描述  : 设置phy统计使能节点
@@ -1977,7 +1760,8 @@ OAL_STATIC oal_uint32  dmac_config_set_phy_stat_en(mac_vap_stru *pst_mac_vap, oa
 
     return dmac_dft_set_phy_stat_node(pst_mac_dev, pst_phy_node_idx);
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_dbb_env_param
  功能描述  : 上报或者停止上报空口环境类维测参数
@@ -2006,7 +1790,8 @@ OAL_STATIC oal_uint32  dmac_config_dbb_env_param(mac_vap_stru *pst_mac_vap, oal_
         return dmac_dft_start_report_dbb_env(pst_mac_vap);
     }
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_report_all_stat
  功能描述  : 上报或者清零所有维测统计信息
@@ -2077,9 +1862,11 @@ OAL_STATIC oal_uint32  dmac_config_report_all_stat(mac_vap_stru *pst_mac_vap, oa
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_report_vap_info
  功能描述  : 根据flags标记位上报对应的vap信息
@@ -2163,6 +1950,7 @@ OAL_STATIC oal_uint32 dmac_config_report_vap_info(mac_vap_stru *pst_mac_vap, oal
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 /*****************************************************************************
@@ -2244,6 +2032,7 @@ OAL_STATIC oal_uint32 dmac_config_chip_check(mac_vap_stru *pst_mac_vap, oal_uint
 #endif
 
 #if defined (_PRE_WLAN_CHIP_TEST) || defined (_PRE_WLAN_FEATURE_ALWAYS_TX)
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_event_set_nss
  功能描述  : 设置描述符参数
@@ -2289,7 +2078,8 @@ OAL_STATIC oal_uint32  dmac_config_set_nss(mac_vap_stru *pst_mac_vap, oal_uint8 
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_event_set_rfch
  功能描述  : 设置描述符参数
@@ -2342,7 +2132,8 @@ OAL_STATIC oal_uint32  dmac_config_set_rfch(mac_vap_stru *pst_mac_vap, oal_uint8
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_set_always_tx
  功能描述  : 设置描述符参数
@@ -2482,6 +2273,7 @@ OAL_STATIC oal_uint32  dmac_config_set_always_tx(mac_vap_stru *pst_mac_vap, oal_
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 #ifdef _PRE_DEBUG_MODE
@@ -2603,7 +2395,7 @@ OAL_STATIC oal_uint32  dmac_config_dync_txpower(mac_vap_stru *pst_mac_vap, oal_u
     return OAL_SUCC;
 }
 #endif
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_get_thruput
  功能描述  : 获取芯片吞吐量信息
@@ -2781,7 +2573,8 @@ OAL_STATIC oal_uint32  dmac_config_get_thruput(mac_vap_stru *pst_mac_vap, oal_ui
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_set_freq_skew
  功能描述  : 设置频率纠偏参数
@@ -2829,7 +2622,8 @@ OAL_STATIC oal_uint32  dmac_config_set_freq_skew(mac_vap_stru *pst_mac_vap, oal_
 #endif
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_adjust_ppm
  功能描述  : 设置PPM校准
@@ -2873,7 +2667,7 @@ OAL_STATIC oal_uint32  dmac_config_adjust_ppm(mac_vap_stru *pst_mac_vap, oal_uin
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
 
  函 数 名  : dmac_config_dbb_scaling_amend
@@ -3271,7 +3065,7 @@ oal_uint32  dmac_config_fbt_scan_enable(mac_vap_stru *pst_mac_vap, oal_uint16 us
     return ul_ret;
 }
 #endif
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_beacon_chain_switch
  功能描述  : dmac 配置关闭/开启beacon帧双路轮流发送策略
@@ -3306,7 +3100,8 @@ OAL_STATIC oal_uint32  dmac_config_beacon_chain_switch(mac_vap_stru *pst_mac_vap
 
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_hide_ssid
  功能描述  : 使能隐藏ssid
@@ -3335,6 +3130,7 @@ OAL_STATIC oal_uint32  dmac_config_hide_ssid(mac_vap_stru *pst_mac_vap, oal_uint
 #endif
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : dmac_config_wifi_en
@@ -4905,7 +4701,7 @@ OAL_STATIC oal_uint32  dmac_config_set_mib(mac_vap_stru *pst_mac_vap, oal_uint8 
     return mac_config_set_mib(pst_mac_vap, uc_len, puc_param);
 }
 #endif
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_set_thruput_bypass
  功能描述  : 设置thruput_bypass维测点
@@ -4929,6 +4725,8 @@ OAL_STATIC oal_uint32  dmac_config_set_thruput_bypass(mac_vap_stru *pst_mac_vap,
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_set_performance_log_switch
  功能描述  : 设置性能打印控制开关
@@ -4997,7 +4795,8 @@ OAL_STATIC oal_uint32  dmac_config_set_performance_log_switch(mac_vap_stru *pst_
     return OAL_SUCC;
 }
 #endif
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_set_vap_nss
  功能描述  : dmac设置vap nss
@@ -5026,6 +4825,7 @@ OAL_STATIC oal_uint32  dmac_config_set_vap_nss(mac_vap_stru *pst_mac_vap, oal_ui
 
 	return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC != _PRE_MULTI_CORE_MODE)
 /*****************************************************************************
@@ -5225,7 +5025,7 @@ OAL_STATIC oal_uint32  dmac_config_freq_adjust(mac_vap_stru *pst_mac_vap, oal_ui
     return OAL_SUCC;
 }
 #endif
-
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_show_device_memleak
  功能描述  : device侧memleak配置命令接口
@@ -5269,6 +5069,7 @@ oal_uint32 dmac_config_show_device_memleak(mac_vap_stru *pst_mac_vap, oal_uint8 
 #endif
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 
 /*****************************************************************************
  函 数 名  : dmac_config_show_device_meminfo
@@ -5308,6 +5109,7 @@ oal_uint32 dmac_config_show_device_meminfo(mac_vap_stru *pst_mac_vap, oal_uint8 
 }
 
 #ifdef _PRE_WLAN_FEATURE_P2P
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_set_p2p_ps_stat
  功能描述  : 设置P2P 节能统计
@@ -5353,6 +5155,7 @@ OAL_STATIC oal_uint32  dmac_config_set_p2p_ps_stat(mac_vap_stru *pst_mac_vap, oa
 
     return OAL_SUCC;
 }
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 #ifdef _PRE_WLAN_PROFLING_MIPS
@@ -5487,6 +5290,7 @@ OAL_STATIC oal_uint32 dmac_config_show_mips(mac_vap_stru *pst_mac_vap, oal_uint8
 #endif
 
 #ifdef _PRE_WLAN_FEATURE_ARP_OFFLOAD
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_enable_arp_offload
  功能描述  : 配置ARP offload信息
@@ -5511,7 +5315,8 @@ oal_uint32 dmac_config_enable_arp_offload(mac_vap_stru *pst_mac_vap, oal_uint8 u
     pst_dmac_vap->en_arp_offload_switch = *(oal_switch_enum_uint8 *)puc_param;
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
 /*****************************************************************************
  函 数 名  : dmac_config_show_arpoffload_info
  功能描述  : 查看Device侧ARPOFFLOAD维测信息
@@ -5554,10 +5359,11 @@ oal_uint32 dmac_config_show_arpoffload_info(mac_vap_stru *pst_mac_vap, oal_uint8
     {
         for (ul_loop = 0; ul_loop < DMAC_MAX_IPV4_ENTRIES; ul_loop++)
         {
-            OAM_WARNING_LOG3(pst_mac_vap->uc_vap_id, OAM_SF_PWR, "{dmac_config_show_ip_addr::IPv4 index[%d]: %d.X.X.%d.}",
+            OAM_WARNING_LOG4(pst_mac_vap->uc_vap_id, OAM_SF_PWR, "{dmac_config_show_ip_addr::IPv4 index[%d]: %d.X.X.%d. MASK[0x%08X]}",
                              ul_loop,
-                             pst_dmac_vap->pst_ip_addr_info->ast_ipv4_entry[ul_loop].auc_ip_addr[0],
-                             pst_dmac_vap->pst_ip_addr_info->ast_ipv4_entry[ul_loop].auc_ip_addr[3]);
+                             pst_dmac_vap->pst_ip_addr_info->ast_ipv4_entry[ul_loop].un_local_ip.auc_value[0],
+                             pst_dmac_vap->pst_ip_addr_info->ast_ipv4_entry[ul_loop].un_local_ip.auc_value[3],
+                             pst_dmac_vap->pst_ip_addr_info->ast_ipv4_entry[ul_loop].un_mask.ul_value);
         }
 
         for (ul_loop = 0; ul_loop < DMAC_MAX_IPV6_ENTRIES; ul_loop++)
@@ -5584,7 +5390,7 @@ oal_uint32 dmac_config_show_arpoffload_info(mac_vap_stru *pst_mac_vap, oal_uint8
     }
     return OAL_SUCC;
 }
-
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 
 #ifdef _PRE_WLAN_FEATURE_20_40_80_COEXIST
@@ -5710,7 +5516,9 @@ OAL_CONST dmac_config_syn_stru g_ast_dmac_config_syn_debug[] =
 #endif
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
     {WLAN_CFGID_80211_UCAST_SWITCH, {0, 0},         dmac_config_80211_ucast_switch},
+#ifdef _PRE_DEBUG_MODE
 	{WLAN_CFGID_REPORT_VAP_INFO,         {0, 0},    dmac_config_report_vap_info},
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 #ifdef _PRE_DEBUG_MODE_USER_TRACK
     {WLAN_CFGID_USR_THRPUT_STAT,            {0, 0},         dmac_config_report_thrput_stat},
@@ -5726,7 +5534,9 @@ OAL_CONST dmac_config_syn_stru g_ast_dmac_config_syn_debug[] =
     {WLAN_CFGID_WMMAC_SWITCH,        {0, 0},        dmac_config_wmmac_switch},
 #endif
 #endif
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_GET_MPDU_NUM,       {0, 0},         dmac_config_get_mpdu_num},
+#endif //#ifdef _PRE_DEBUG_MODE
 #ifdef _PRE_WLAN_CHIP_TEST
     {WLAN_CFGID_SET_BEACON_OFFLOAD_TEST, {0, 0},    dmac_config_beacon_offload_test},
 #endif
@@ -5739,17 +5549,28 @@ OAL_CONST dmac_config_syn_stru g_ast_dmac_config_syn_debug[] =
     {WLAN_CFGID_OAM_OUTPUT_TYPE,    {0, 0},         dmac_config_oam_output},
     {WLAN_CFGID_SET_FEATURE_LOG,    {0, 0},         dmac_config_set_feature_log},
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_DUMP_TIEMR,         {0, 0},         dmac_config_dump_timer},
-
+#endif //#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_STBC_CAP,       {0, 0},         dmac_config_set_stbc_cap},
     {WLAN_CFGID_SET_LDPC_CAP,       {0, 0},         dmac_config_set_ldpc_cap},
 #endif
     {WLAN_CFGID_PAUSE_TID,          {0, 0},         dmac_config_pause_tid},
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_USER_VIP,       {0, 0},         dmac_config_set_user_vip},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_VAP_HOST,       {0, 0},         dmac_config_set_vap_host},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SEND_BAR,                   {0, 0},         dmac_config_send_bar},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_DUMP_BA_BITMAP,    {0, 0},              dmac_config_dump_ba_bitmap},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_RESET_HW,                   {0, 0},         dmac_config_reset_hw},
+#endif //#ifdef _PRE_DEBUG_MODE
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
     {WLAN_CFGID_RESET_HW_OPERATE,           {0, 0},         dmac_reset_sys_event},
     {WLAN_CFGID_SET_MIB,            {0, 0},             dmac_config_set_mib},
@@ -5759,18 +5580,28 @@ OAL_CONST dmac_config_syn_stru g_ast_dmac_config_syn_debug[] =
 #endif
 
 #ifdef _PRE_WLAN_DFT_STAT
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_PHY_STAT_EN,                {0, 0},         dmac_config_set_phy_stat_en},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_DBB_ENV_PARAM,              {0, 0},         dmac_config_dbb_env_param},
+#endif //#ifdef _PRE_DEBUG_MODE
 #if (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1151)
     {WLAN_CFGID_USR_QUEUE_STAT,             {0, 0},         dmac_config_usr_queue_stat},
 #endif
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_VAP_STAT,                   {0, 0},         dmac_config_report_vap_stat},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_ALL_STAT,                   {0, 0},         dmac_config_report_all_stat},
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
     {WLAN_CFGID_DUMP_RX_DSCR,               {0, 0},         dmac_config_dump_rx_dscr},
     {WLAN_CFGID_DUMP_TX_DSCR,               {0, 0},         dmac_config_dump_tx_dscr},
     {WLAN_CFGID_ALG,               {0, 0},              dmac_config_alg},
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_BEACON_CHAIN_SWITCH,       {0, 0},      dmac_config_beacon_chain_switch},
+#endif //#ifdef _PRE_DEBUG_MODE
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC != _PRE_MULTI_CORE_MODE)
     {WLAN_CFGID_RESUME_RX_INTR_FIFO, {0, 0},            dmac_config_resume_rx_intr_fifo},
 #endif
@@ -5788,17 +5619,29 @@ OAL_CONST dmac_config_syn_stru g_ast_dmac_config_syn_debug[] =
 #endif
 #endif
 #if defined (_PRE_WLAN_CHIP_TEST) || defined (_PRE_WLAN_FEATURE_ALWAYS_TX)
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_NSS,           {0, 0},              dmac_config_set_nss},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_RFCH,          {0, 0},              dmac_config_set_rfch},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_ALWAYS_TX,     {0, 0},              dmac_config_set_always_tx},
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 #ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_RXCH,          {0, 0},              dmac_config_set_rxch},
     {WLAN_CFGID_DYNC_TXPOWER,      {0, 0},              dmac_config_dync_txpower},
 #endif
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_GET_THRUPUT,       {0, 0},              dmac_config_get_thruput},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_FREQ_SKEW,     {0, 0},              dmac_config_set_freq_skew},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_ADJUST_PPM,        {0, 0},              dmac_config_adjust_ppm},
+#endif //#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_DBB_SCALING_AMEND,          {0, 0},     dmac_config_dbb_scaling_amend},
 #ifdef _PRE_WLAN_PERFORM_STAT
     {WLAN_CFGID_PFM_STAT,                  {0, 0},      dmac_config_pfm_stat},
@@ -5831,15 +5674,21 @@ OAL_CONST dmac_config_syn_stru g_ast_dmac_config_syn_debug[] =
     {WLAN_CFGID_PMF_ENABLE,         {0, 0},             dmac_config_enable_pmf},
 #endif
 #endif
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_HIDE_SSID,                 {0, 0},      dmac_config_hide_ssid},
+#endif //#ifdef _PRE_DEBUG_MODE
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_THRUPUT_BYPASS,  {0, 0},            dmac_config_set_thruput_bypass},
+#endif //#ifdef _PRE_DEBUG_MODE
 #ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_GET_ALL_REG_VALUE,   {0, 0},            dmac_config_get_all_reg_value},
 #endif
 #ifdef _PRE_WLAN_FEATURE_DAQ
     {WLAN_CFGID_DATA_ACQ,            {0, 0},            dmac_config_data_acq},
 #endif
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_VAP_NSS,         {0, 0},            dmac_config_set_vap_nss},
+#endif //#ifdef _PRE_DEBUG_MODE
 #ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_REPORT_AMPDU_STAT,   {0, 0},            dmac_config_report_ampdu_stat},
 #endif
@@ -5853,22 +5702,31 @@ OAL_CONST dmac_config_syn_stru g_ast_dmac_config_syn_debug[] =
     {WLAN_CFGID_PM_INFO,          {0, 0},               dmac_config_pm_info},
     {WLAN_CFGID_PM_EN,          {0, 0},                 dmac_config_pm_en},
 #endif
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_DEVICE_MEM_LEAK,   {0, 0},              dmac_config_show_device_memleak},
+#endif //#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_DEVICE_MEM_INFO,   {0, 0},              dmac_config_show_device_meminfo},
 #ifdef _PRE_WLAN_FEATURE_P2P
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_SET_P2P_PS_STAT,    {0, 0},                 dmac_config_set_p2p_ps_stat},
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
 #ifdef _PRE_WLAN_PROFLING_MIPS
     {WLAN_CFGID_SET_MIPS,           {0, 0},             dmac_config_set_mips},
     {WLAN_CFGID_SHOW_MIPS,          {0, 0},             dmac_config_show_mips},
 #endif
 #ifdef _PRE_WLAN_FEATURE_ARP_OFFLOAD
+#ifdef _PRE_DEBUG_MODE
     {WLAN_CFGID_ENABLE_ARP_OFFLOAD,         {0, 0},     dmac_config_enable_arp_offload},
     {WLAN_CFGID_SHOW_ARPOFFLOAD_INFO,       {0, 0},     dmac_config_show_arpoffload_info},
+#endif //#ifdef _PRE_DEBUG_MODE
 #endif
+#ifdef _PRE_DEBUG_MODE
 #ifdef _PRE_WLAN_DFT_STAT
     {WLAN_CFGID_SET_PERFORMANCE_LOG_SWITCH,  {0, 0},            dmac_config_set_performance_log_switch},
 #endif
+#endif //#ifdef _PRE_DEBUG_MODE
+
 #ifdef _PRE_WLAN_FEATURE_20_40_80_COEXIST
     {WLAN_CFGID_2040BSS_ENABLE,     {0, 0},             dmac_config_enable_2040bss},
 #endif

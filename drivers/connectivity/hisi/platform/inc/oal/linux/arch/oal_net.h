@@ -559,6 +559,7 @@ typedef struct netlink_skb_parms    oal_netlink_skb_parms;
 #define OAL_NLMSG_SPACE(_len)            NLMSG_SPACE(_len)
 #define OAL_NLMSG_DATA(_nlh)             NLMSG_DATA(_nlh)
 #define OAL_NLMSG_PAYLOAD(_nlh, _len)    NLMSG_PAYLOAD(_nlh, _len)
+#define OAL_NLMSG_OK(_nlh, _len)         NLMSG_OK(_nlh, _len)
 #define OAL_NETLINK_CB(_skb)             NETLINK_CB(_skb)
 
 #define OAL_NLA_FOR_EACH_ATTR(pos, head, len, rem)            nla_for_each_attr(pos, head, len, rem)

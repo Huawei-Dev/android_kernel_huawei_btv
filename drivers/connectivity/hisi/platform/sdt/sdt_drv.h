@@ -42,7 +42,13 @@ extern "C" {
 #if(_PRE_TARGET_PRODUCT_TYPE_E5 == _PRE_CONFIG_TARGET_PRODUCT)
 #define NETLINK_TEST                        23   /* E5平台定为23 */
 #else
+
+#ifdef  NETLINK_WIFI_SDT_HISI
+#define NETLINK_TEST                        NETLINK_WIFI_SDT_HISI
+#else
 #define NETLINK_TEST                        28   /* 适配5610 ATP工程，防止协议号冲突，归一修改为28 */
+#endif
+
 #endif
 #define DATA_BUF_LEN                        2048
 

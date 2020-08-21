@@ -237,9 +237,17 @@ typedef struct
 #ifdef _PRE_WLAN_FEATURE_ARP_OFFLOAD
 #define DMAC_MAX_IPV4_ENTRIES         8
 #define DMAC_MAX_IPV6_ENTRIES         8
+
+typedef union
+{
+    oal_uint32                    ul_value;
+    oal_uint8                     auc_value[OAL_IPV4_ADDR_SIZE];
+}un_ipv4_addr;
+
 typedef struct
 {
-    oal_uint8                         auc_ip_addr[OAL_IPV4_ADDR_SIZE];
+    un_ipv4_addr        un_local_ip;
+    un_ipv4_addr        un_mask;
 }dmac_vap_ipv4_addr_stru;
 
 typedef struct

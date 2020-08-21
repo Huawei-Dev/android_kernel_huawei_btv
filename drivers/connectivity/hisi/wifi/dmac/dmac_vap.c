@@ -312,7 +312,8 @@ oal_uint32  dmac_vap_init(
         }
 
         /* DTS2015050301014,双芯片实现时bitmap_len计算要乘以device(也即是chip)个数  */
-        pst_dmac_vap->uc_tim_bitmap_len = (oal_uint8)(2 + (((g_us_max_asoc_user + WLAN_SERVICE_VAP_MAX_NUM_PER_DEVICE)* MAC_RES_MAX_DEV_NUM + 7 ) >> 3));
+        /* 下述计算tim_bitmap需要的字节数((user_num + 7)>>3表示多少字节的bitmap能表达所有的用户 ) */
+        pst_dmac_vap->uc_tim_bitmap_len = (oal_uint8)(2 + ((MAC_RES_MAX_USER_NUM + 7 ) >> 3));
         pst_dmac_vap->puc_tim_bitmap = OAL_MEM_ALLOC(OAL_MEM_POOL_ID_LOCAL, pst_dmac_vap->uc_tim_bitmap_len, OAL_TRUE);
         if (OAL_PTR_NULL == pst_dmac_vap->puc_tim_bitmap)
         {

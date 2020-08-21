@@ -241,6 +241,7 @@ extern oal_uint32  wal_config_get_assoc_req_ie(mac_vap_stru *pst_mac_vap, oal_ui
 extern oal_uint32 wal_config_get_all_sta_info(mac_vap_stru *pst_mac_vap, oal_uint16 *pus_len, oal_uint8 *puc_param);
 #endif
 extern oal_void    wal_drv_cfg_func_hook_init(oal_void);
+extern oal_void    wal_drv_cfg_func_hook_deinit(oal_void);
 extern oal_uint32  hmac_config_send_event(
                 mac_vap_stru                     *pst_mac_vap,
                 wlan_cfgid_enum_uint16            en_cfg_id,
