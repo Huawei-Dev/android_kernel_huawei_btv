@@ -2406,7 +2406,7 @@ int32 firmware_cfg_init(void)
     int32  l_ret;
     uint32 i;
 
-#ifndef _PRE_HI110X_FIRMWARE_NOT_BUILDIN
+#ifdef _PRE_HI110X_FIRMWARE_NOT_BUILDIN
     int32  firmware_in_boot = 1;
 
     l_ret = get_cust_conf_int32(INI_MODU_PLAT, "firmware_buildin", &firmware_in_boot);
