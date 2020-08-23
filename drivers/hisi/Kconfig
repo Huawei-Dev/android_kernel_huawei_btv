@@ -40,7 +40,6 @@ source "drivers/hisi/hisi_page_tracker/Kconfig"
 source "drivers/hisi/hisi_page_ext/Kconfig"
 source "drivers/hisi/hilog/Kconfig"
 source "drivers/hisi/timekeeper/Kconfig"
-source "drivers/hisi/tlb_conflict/Kconfig"
 
 endif #HISILICON_PLATFORM
 
