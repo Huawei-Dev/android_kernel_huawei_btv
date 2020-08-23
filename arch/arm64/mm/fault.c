@@ -404,11 +404,6 @@ static int do_bad(unsigned long addr, unsigned int esr, struct pt_regs *regs)
 	return 1;
 }
 
-#ifdef CONFIG_TLB_CONFLICT_WORKAROUND
-extern int do_tlb_conflict(unsigned long addr, unsigned int esr,
-			struct pt_regs *regs);
-#endif
-
 static struct fault_info {
 	int	(*fn)(unsigned long addr, unsigned int esr, struct pt_regs *regs);
 	int	sig;
@@ -463,11 +458,7 @@ static struct fault_info {
 	{ do_bad,		SIGBUS,  0,		"unknown 45"			},
 	{ do_bad,		SIGBUS,  0,		"unknown 46"			},
 	{ do_bad,		SIGBUS,  0,		"unknown 47"			},
-#ifdef CONFIG_TLB_CONFLICT_WORKAROUND
-	{ do_tlb_conflict,	SIGBUS,  0,		"tlb conflict"			},
-#else
 	{ do_bad,		SIGBUS,  0,		"TLB conflict abort"		},
-#endif
 	{ do_bad,		SIGBUS,  0,		"unknown 49"			},
 	{ do_bad,		SIGBUS,  0,		"unknown 50"			},
 	{ do_bad,		SIGBUS,  0,		"unknown 51"			},

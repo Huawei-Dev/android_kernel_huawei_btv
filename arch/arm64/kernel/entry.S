@@ -308,10 +308,6 @@ el1_sync:
 	b.eq	el1_sp_pc
 	cmp	x24, #ESR_ELx_EC_UNKNOWN	// unknown exception in EL1
 	b.eq	el1_undef
-#ifdef CONFIG_TLB_CONFLICT_WORKAROUND
-	cmp	x24, #ESR_ELx_EC_IABT_CUR	// IABT (current EL)
-	b.eq	el1_iabt_curr_el
-#endif
 	cmp	x24, #ESR_ELx_EC_BREAKPT_CUR	// debug exception in EL1
 	b.ge	el1_dbg
 	b	el1_inv
@@ -364,13 +360,6 @@ el1_inv:
 	mov	x2, x1
 	mov	x1, #BAD_SYNC
 	b	bad_mode
-#ifdef CONFIG_TLB_CONFLICT_WORKAROUND
-el1_iabt_curr_el:
-	mrs	x0, far_el1
-	mov	x2, sp
-	bl	do_iabt_curr_el
-	kernel_exit 1
-#endif
 ENDPROC(el1_sync)
 
 	.align	6
