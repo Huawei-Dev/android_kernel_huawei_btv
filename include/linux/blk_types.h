@@ -99,13 +99,6 @@ struct bio {
 	bio_end_io_t		*bi_end_io;
 
 	void			*bi_private;
-#ifdef CONFIG_BLK_DEV_THROTTLING
-	bio_throtl_end_io_t	*bi_throtl_end_io1;
-	void			*bi_throtl_private1;
-	bio_throtl_end_io_t	*bi_throtl_end_io2;
-	void			*bi_throtl_private2;
-	unsigned long           bi_throtl_in_queue;
-#endif
 #ifdef CONFIG_BLK_CGROUP
 	/*
 	 * Optional ioc and css associated with this bio.  Put on bio

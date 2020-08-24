@@ -1810,13 +1810,6 @@ void bio_endio(struct bio *bio)
 			bio_put(bio);
 			bio = parent;
 		} else {
-#ifdef CONFIG_BLK_DEV_THROTTLING
-			if (bio->bi_throtl_end_io2)
-				bio->bi_throtl_end_io2(bio);
-
-			if (bio->bi_throtl_end_io1)
-				bio->bi_throtl_end_io1(bio);
-#endif
 			if (bio->bi_end_io)
 				bio->bi_end_io(bio);
 			bio = NULL;

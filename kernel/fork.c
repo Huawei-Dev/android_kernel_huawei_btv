@@ -625,24 +625,12 @@ static struct mm_struct *mm_init(struct mm_struct *mm, struct task_struct *p)
 	if (mm_alloc_pgd(mm))
 		goto fail_nopgd;
 
-#ifdef CONFIG_BLK_DEV_THROTTLING
-	mm->io_limit = kmalloc(sizeof(struct blk_throtl_io_limit), GFP_KERNEL);
-	if (!mm->io_limit)
-		goto fail_nocontext;
-
-	blk_throtl_io_limit_init(mm->io_limit);
-#endif
-
 	if (init_new_context(p, mm))
 		goto fail_io_limit;
 
 	return mm;
 
 fail_io_limit:
-#ifdef CONFIG_BLK_DEV_THROTTLING
-	kfree(mm->io_limit);
-fail_nocontext:
-#endif
 	mm_free_pgd(mm);
 fail_nopgd:
 	free_mm(mm);
@@ -700,9 +688,6 @@ void __mmdrop(struct mm_struct *mm)
 	destroy_context(mm);
 	mmu_notifier_mm_destroy(mm);
 	check_mm(mm);
-#ifdef CONFIG_BLK_DEV_THROTTLING
-	blk_throtl_io_limit_put(mm->io_limit);
-#endif
 	free_mm(mm);
 }
 EXPORT_SYMBOL_GPL(__mmdrop);
