@@ -1,10 +1,9 @@
 #include <linux/device.h>
-#include <linux/version.h>
 #include <linux/module.h>
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 13, 0))
+#include <linux/hisi/hisi_devfreq.h>
+
 #include <linux/pm_opp.h>
 #include <linux/slab.h>
-#include <linux/hisi/hisi_devfreq.h>
 
 int hisi_devfreq_init_freq_table(struct device *dev,
 				unsigned int **table)
@@ -57,4 +56,3 @@ int hisi_devfreq_free_freq_table(struct device *dev,
 	return 0;
 }
 EXPORT_SYMBOL(hisi_devfreq_free_freq_table);
-#endif
