@@ -1144,33 +1144,6 @@ void blkcg_exit_queue(struct request_queue *q)
 }
 
 #ifdef CONFIG_BLK_DEV_THROTTLING
-static void blkcg_attach(struct cgroup_subsys_state *css,
-			 struct cgroup_taskset *tset)
-{
-	struct task_struct *task;
-	struct blkcg *blkcg = css_to_blkcg(css);
-
-	spin_lock_irq(&blkcg->lock);
-	rcu_read_lock();
-
-	cgroup_taskset_for_each(task, tset) {
-		if (!task->mm)
-			continue;
-
-		if (!task->mm->io_limit)
-			continue;
-
-		if (task->mm->io_limit->max_inflights == blkcg->max_inflights)
-			continue;
-
-		blk_throtl_update_limit(task->mm->io_limit,
-					blkcg->max_inflights);
-	}
-
-	rcu_read_unlock();
-	spin_unlock_irq(&blkcg->lock);
-}
-
 static void blkcg_fork(struct task_struct *task)
 {
 	struct blkcg *blkcg;
@@ -1251,7 +1224,6 @@ struct cgroup_subsys io_cgrp_subsys = {
 	.css_free = blkcg_css_free,
 	.can_attach = blkcg_can_attach,
 #ifdef CONFIG_BLK_DEV_THROTTLING
-	.attach = blkcg_attach,
 	.fork = blkcg_fork,
 #endif
 	.bind = blkcg_bind,

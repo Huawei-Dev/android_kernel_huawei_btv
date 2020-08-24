@@ -1434,8 +1434,7 @@ out_unlock:
 	return ret;
 }
 
-static void cpuset_cancel_attach(struct cgroup_subsys_state *css,
-				 struct cgroup_taskset *tset)
+static void cpuset_cancel_attach(struct cgroup_taskset *tset)
 {
 	struct cgroup_subsys_state *css;
 	struct cpuset *cs;
