@@ -44,6 +44,11 @@ struct wb_stat_ops {
 	void (*clear)(void *);
 };
 
+enum wbt_mode {
+	WBT_FS,
+	WBT_BLK,
+};
+
 struct rq_wb {
 	/*
 	 * Settings that govern how we throttle
@@ -53,6 +58,7 @@ struct rq_wb {
 	unsigned int wb_max;			/* max throughput writeback */
 	unsigned int scale_step;
 
+	enum wbt_mode mode;
 	u64 win_nsec;				/* default window size */
 	u64 cur_win_nsec;			/* current window size */
 
@@ -84,13 +90,18 @@ struct rq_wb {
 	void *ops_data;
 };
 
+static inline enum wbt_mode wbt_mode(struct rq_wb *rwb)
+{
+	return rwb->mode;
+}
+
 struct backing_dev_info;
 
 void __wbt_done(struct rq_wb *);
 
 #ifdef CONFIG_WBT
 void wbt_done(struct rq_wb *, struct wb_issue_stat *, bool);
-bool wbt_wait(struct rq_wb *, struct bio *, spinlock_t *);
+bool wbt_wait(struct rq_wb *, unsigned int, spinlock_t *);
 struct rq_wb *wbt_init(struct backing_dev_info *, struct wb_stat_ops *, void *);
 void wbt_exit(struct rq_wb *);
 void wbt_update_limits(struct rq_wb *);
@@ -99,11 +110,23 @@ void wbt_issue(struct rq_wb *, struct wb_issue_stat *, bool);
 void wbt_disable(struct rq_wb *);
 void wbt_set_queue_depth(struct rq_wb *, unsigned int);
 void wbt_set_write_cache(struct rq_wb *, bool);
+int wbt_max_bio_blocks(struct block_device *bdev, int rw, int max, bool *nomerge);
+bool wbt_need_kick_bio(struct bio *bio);
+bool wbt_fs_get_quota(struct request_queue *q, struct writeback_control *wbc);
+void wbt_fs_wait(struct request_queue *q, struct writeback_control *wbc);
 #else
+static inline bool wbt_need_kick_bio(struct bio *bio)
+{
+	return false;
+}
+static inline int wbt_max_bio_blocks(struct block_device *bdev, int rw, int max, bool *nomerge)
+{
+	return BIO_MAX_PAGES;
+}
 static inline void wbt_done(struct rq_wb *rwb, struct wb_issue_stat *stat, bool fg)
 {
 }
-static inline bool wbt_wait(struct rq_wb *rwb, struct bio *bio, spinlock_t *lock)
+static inline bool wbt_wait(struct rq_wb *rwb, unsigned long rw, spinlock_t *lock)
 {
 	return false;
 }

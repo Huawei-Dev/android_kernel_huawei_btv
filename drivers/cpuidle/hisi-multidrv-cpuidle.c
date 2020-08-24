@@ -21,7 +21,6 @@
 
 #include <asm/cpuidle.h>
 #include <asm/suspend.h>
-#include <linux/version.h>
 #include <linux/sched.h>
 #include <linux/cpu.h>
 #include "dt_idle_states.h"
@@ -34,7 +33,28 @@ enum {
 	BIG_CLUSTER_ID,
 	MAX_CLUSTER_ID,
 };
+
 static unsigned long cpu_on_hotplug = 0;
+static struct cpumask idle_cpus_mask;
+static spinlock_t idle_spin_lock;
+bool hisi_cluster_cpu_all_pwrdn(void)
+{
+	struct cpuidle_driver *drv = cpuidle_get_driver();
+	struct cpumask cluster_cpu_mask;
+	int all_pwrdn;
+
+	if (!drv)
+		return false;
+	cpumask_copy(&cluster_cpu_mask, drv->cpumask);
+
+	spin_lock(&idle_spin_lock);
+	all_pwrdn = cpumask_subset(&cluster_cpu_mask, &idle_cpus_mask);
+	spin_unlock(&idle_spin_lock);
+
+	return !!all_pwrdn;
+}
+EXPORT_SYMBOL(hisi_cluster_cpu_all_pwrdn);
+
 /*
  * hisi_enter_idle_state - Programs CPU to enter the specified state
  *
@@ -49,6 +69,7 @@ static int hisi_enter_idle_state(struct cpuidle_device *dev,
 				  struct cpuidle_driver *drv, int idx)
 {
 	int ret;
+	int cpu;
 
 	if ((dev == NULL) || (drv == NULL)) {
 		idx = -1;
@@ -66,6 +87,15 @@ static int hisi_enter_idle_state(struct cpuidle_device *dev,
 		return idx;
 	}
 
+	cpu = dev->cpu;
+	/* we assume the deepest state is cluster_idle */
+	if (idx == (drv->state_count - 1)) {
+		spin_lock(&idle_spin_lock);
+		cpumask_set_cpu(cpu, &idle_cpus_mask);
+		smp_wmb();
+		spin_unlock(&idle_spin_lock);
+	}
+
 	ret = cpu_pm_enter();
 	if (!ret) {
 #ifdef CONFIG_ARCH_HISI
@@ -76,11 +106,7 @@ static int hisi_enter_idle_state(struct cpuidle_device *dev,
 		 * call the CPU ops suspend protocol with idle index as a
 		 * parameter.
 		 */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,14)
 		ret = arm_cpuidle_suspend(idx);
-#else
-		ret = cpu_suspend(idx);
-#endif
 #ifdef CONFIG_HISI_CORESIGHT_TRACE
 		/*Restore ETM registers */
 		_etm4_cpuilde_restore();
@@ -91,9 +117,16 @@ static int hisi_enter_idle_state(struct cpuidle_device *dev,
 		cpu_pm_exit();
 	}
 
+	if (idx == (drv->state_count - 1)) {
+		spin_lock(&idle_spin_lock);
+		cpumask_clear_cpu(cpu, &idle_cpus_mask);
+		smp_wmb();
+		spin_unlock(&idle_spin_lock);
+	}
+
 	return ret ? -1 : idx;
 }
-/*lint -e64 -e785 -e651*/
+
 static struct cpuidle_driver hisi_little_cluster_idle_driver = {
 	.name = "hisi_little_cluster_idle",
 	.owner = THIS_MODULE,
@@ -109,13 +142,11 @@ static struct cpuidle_driver hisi_little_cluster_idle_driver = {
 		.exit_latency           = 1,
 		.target_residency       = 1,
 		.power_usage		= (int)UINT_MAX,
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,14)
-		.flags                  = CPUIDLE_FLAG_TIME_VALID,
-#endif
 		.name                   = "WFI",
 		.desc                   = "ARM64 WFI",
 	}
 };
+
 static struct cpuidle_driver hisi_big_cluster_idle_driver = {
 	.name = "hisi_big_cluster_idle",
 	.owner = THIS_MODULE,
@@ -131,9 +162,6 @@ static struct cpuidle_driver hisi_big_cluster_idle_driver = {
 		.exit_latency           = 1,
 		.target_residency       = 1,
 		.power_usage		= (int)UINT_MAX,
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,14)
-		.flags                  = CPUIDLE_FLAG_TIME_VALID,
-#endif
 		.name                   = "WFI",
 		.desc                   = "ARM64 WFI",
 	}
@@ -144,7 +172,7 @@ static const struct of_device_id arm64_idle_state_match[] __initconst = {
 	  .data = hisi_enter_idle_state },
 	{ },
 };
-/*lint +e64 +e785 +e651*/
+
 static int __init hisi_idle_drv_cpumask_init(struct cpuidle_driver *drv, int cluster_id)
 {
 	struct cpumask *cpumask;
@@ -154,7 +182,7 @@ static int __init hisi_idle_drv_cpumask_init(struct cpuidle_driver *drv, int clu
 	if (!cpumask)
 		return -ENOMEM;
 
-	for_each_possible_cpu(cpu) {//lint !e713
+	for_each_possible_cpu(cpu) {
 		if (cpu_topology[cpu].cluster_id == cluster_id)
 			cpumask_set_cpu((unsigned int)cpu, cpumask);
 	}
@@ -190,12 +218,8 @@ static int __init hisi_idle_drv_init(struct cpuidle_driver *drv)
 	 * Call arch CPU operations in order to initialize
 	 * idle states suspend back-end specific data
 	 */
-	for_each_possible_cpu(cpu) {//lint !e713
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,14)
+	for_each_possible_cpu(cpu) {
 		ret = arm_cpuidle_init((unsigned int)cpu);
-#else
-		ret = cpu_init_idle(cpu);
-#endif
 		if (ret) {
 			pr_err("CPU %d failed to init idle CPU ops\n", cpu);
 			return ret;
@@ -235,14 +259,13 @@ static int __init hisi_multidrv_idle_init(struct cpuidle_driver *drv, int cluste
 	return 0;
 }
 
-
 static int cpuidle_decoup_hotplug_notify(struct notifier_block *nb,
 		unsigned long action, void *hcpu)
 {
 	long cpu = (long)hcpu;
 	if (nb == NULL)
 		return -1;
-	if(action & CPU_TASKS_FROZEN)
+	if (action & CPU_TASKS_FROZEN)
 		return NOTIFY_OK;
 	switch (action & ~CPU_TASKS_FROZEN) {
 	case CPU_UP_PREPARE:
@@ -262,11 +285,11 @@ static int cpuidle_decoup_hotplug_notify(struct notifier_block *nb,
 	}
 	return NOTIFY_OK;
 }
-/*lint -e785*/
+
 static struct notifier_block cpuidle_decoup_hotplug_notifier = {
 	.notifier_call = cpuidle_decoup_hotplug_notify,
 };
-/*lint +e785*/
+
 /*
  * hisi_idle_init
  *
@@ -277,6 +300,9 @@ static struct notifier_block cpuidle_decoup_hotplug_notifier = {
 static int __init hisi_idle_init(void)
 {
 	int ret;
+
+	spin_lock_init(&idle_spin_lock);
+	cpumask_clear(&idle_cpus_mask);
 
 	ret = hisi_multidrv_idle_init(&hisi_little_cluster_idle_driver, LITTLE_CLUSTER_ID);
 	if (ret) {
@@ -289,15 +315,14 @@ static int __init hisi_idle_init(void)
 		pr_err("fail to register big cluster cpuidle drv.\n");
 		return ret;
 	}
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,14)
+
 	ret = register_cpu_notifier(&cpuidle_decoup_hotplug_notifier);
 	if (ret) {
 		pr_err("fail to register cpuidle_coupled_cpu_notifier.\n");
 		return ret;
 	}
-#endif
+
 	return 0;
 }
-/*lint -e528 -esym(528,*)*/
+
 device_initcall(hisi_idle_init);
-/*lint -e528 +esym(528,*)*/

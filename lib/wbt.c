@@ -24,9 +24,15 @@
 #include <linux/slab.h>
 #include <linux/backing-dev.h>
 #include <linux/wbt.h>
+#include <linux/blkdev.h>
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/wbt.h>
+
+#ifdef CONFIG_DIRTY_PAGES_CONTROL
+#include <linux/dirty_pages_control.h>
+bool dirty_pages_controlled = true;
+#endif
 
 enum {
 	/*
@@ -63,9 +69,8 @@ static inline bool rwb_enabled(struct rq_wb *rwb)
  */
 static bool atomic_inc_below(atomic_t *v, int below)
 {
-	/*lint -save -e438 -e529*/
+	/*lint -save -e438 -e529 -e571*/
 	int cur = atomic_read(v);
-	/*lint -restore*/
 
 	for (;;) {
 		int old;
@@ -77,6 +82,7 @@ static bool atomic_inc_below(atomic_t *v, int below)
 			break;
 		cur = old;
 	}
+	/*lint -restore*/
 
 	return true;
 }
@@ -129,9 +135,11 @@ void __wbt_done(struct rq_wb *rwb)
 		int diff = limit - inflight;
 
 		/*lint -save -e574 -e737*/
-		if (!inflight || diff >= rwb->wb_background / 2)
-		/*lint -restore*/
+		if (!inflight)
+			wake_up_all(&rwb->wait);
+		else if (diff >= rwb->wb_background / 2)
 			wake_up_nr(&rwb->wait, 1);
+		/*lint -restore*/
 	}
 }
 
@@ -234,6 +242,7 @@ static int __latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
 {
 	u64 thislat;
 	u32 io_type;
+
 	io_type = 0;
 
 	/*
@@ -434,7 +443,7 @@ static inline bool may_queue(struct rq_wb *rwb, unsigned long rw)
 	 * this only happens if the task was sleeping in __wbt_wait(),
 	 * and someone turned it off at the same time.
 	 */
-	if (!rwb_enabled(rwb)) {
+	if (!rwb_enabled(rwb) || wbt_mode(rwb) != WBT_BLK) {
 		atomic_inc(&rwb->inflight);
 		return true;
 	}
@@ -450,19 +459,31 @@ static inline bool may_queue(struct rq_wb *rwb, unsigned long rw)
  */
 static void __wbt_wait(struct rq_wb *rwb, unsigned long rw, spinlock_t *lock)
 {
+	int task = TASK_UNINTERRUPTIBLE;
 	/*lint -save -e446*/
 	DEFINE_WAIT(wait);
 	/*lint -restore*/
 
 	if (may_queue(rwb, rw))
 		return;
+#ifdef CONFIG_DIRTY_PAGES_CONTROL
+        if (dirty_pages_controlled) {
+                if (!is_wbt_controlled())
+                        return;
+                task = TASK_INTERRUPTIBLE;
+        }
+#endif
 
 	do {
-		prepare_to_wait_exclusive(&rwb->wait, &wait,
-						TASK_UNINTERRUPTIBLE);
+		prepare_to_wait_exclusive(&rwb->wait, &wait, task);
 
 		if (may_queue(rwb, rw))
 			break;
+
+#ifdef CONFIG_DIRTY_PAGES_CONTROL
+                if (dirty_pages_controlled && !is_wbt_controlled())
+                        break;
+#endif
 
 		if (lock)
 			spin_unlock_irq(lock);
@@ -477,7 +498,7 @@ static void __wbt_wait(struct rq_wb *rwb, unsigned long rw, spinlock_t *lock)
 }
 
 /*lint -save -e715*/
-static inline bool wbt_should_throttle(struct rq_wb *rwb, unsigned long rw)
+static inline bool wbt_should_throttle(struct rq_wb *rwb, unsigned int rw)
 {
 	/*
 	 * If not a WRITE (or a discard), do nothing
@@ -496,18 +517,29 @@ static inline bool wbt_should_throttle(struct rq_wb *rwb, unsigned long rw)
 /*lint -restore*/
 
 /*
+ * It's a simply and rough way to kick bio, bio which
+ * has been tracked by wbt(on fs) set NOMERGE after bio_alloc,
+ * so we kick the bio with NOMERGE once it's full of pages.
+ */
+bool wbt_need_kick_bio(struct bio *bio)
+{
+	return (bio->bi_vcnt == bio->bi_max_vecs)
+		&& (bio->bi_rw & REQ_NOMERGE);
+}
+
+static void wbt_add_inflight(struct rq_wb *rwb)
+{
+	atomic_inc(&rwb->inflight);
+}
+
+/*
  * Returns true if the IO request should be accounted, false if not.
  * May sleep, if we have exceeded the writeback limits. Caller can pass
  * in an irq held spinlock, if it holds one when calling this function.
  * If we do sleep, we'll release and re-grab it.
  */
-bool wbt_wait(struct rq_wb *rwb, struct bio *bio, spinlock_t *lock)
+bool wbt_wait(struct rq_wb *rwb, unsigned int rw, spinlock_t *lock)
 {
-	unsigned long rw = bio->bi_rw;
-
-	if(bio->bi_iosche_bypass)
-		return false;
-
 	if (!rwb_enabled(rwb))
 		return false;
 
@@ -517,13 +549,129 @@ bool wbt_wait(struct rq_wb *rwb, struct bio *bio, spinlock_t *lock)
 	}
 
 	/*lint -save -e747*/
-	__wbt_wait(rwb, rw, lock);
+	if (wbt_mode(rwb) == WBT_FS)
+		wbt_add_inflight(rwb);
+	else
+		__wbt_wait(rwb, rw, lock);
 	/*lint -restore*/
 
 	if (!timer_pending(&rwb->window_timer))
 		rwb_arm_timer(rwb);
 
 	return true;
+}
+
+/* min wbt io size = 128k(32 pages) */
+#define wbt_min_sectors	32
+
+int wbt_max_bio_blocks(struct block_device *bdev, int rw,
+		int max, bool *nomerge)
+{
+	int wbt_max;
+	struct request_queue *q;
+	struct rq_wb *rwb;
+
+	wbt_max = max;
+	*nomerge = false;
+	if (unlikely(!bdev) || unlikely(!bdev->bd_disk))
+		goto out;
+
+	q = bdev_get_queue(bdev);
+	if (unlikely(!q))
+		goto out;
+
+	rwb = q->rq_wb;
+	if (!rwb_enabled(rwb) || (wbt_mode(rwb) != WBT_FS)
+			|| !wbt_should_throttle(rwb, rw))
+		goto out;
+
+	wbt_max = max;
+	if (rwb->scale_step) {
+		wbt_max = wbt_min_sectors;
+		*nomerge = true;
+	}
+
+out:
+	return wbt_max;
+}
+
+static unsigned int wbt_get_wbc_limit(struct rq_wb *rwb,
+		struct writeback_control *wbc)
+{
+	unsigned long rw = 0;
+
+	if (wbc->for_kupdate || wbc->for_background)
+		rw |= REQ_BG;
+	if (wbc->sync_mode == WB_SYNC_ALL || wbc->for_sync == 1)
+		rw |= REQ_SYNC;
+
+	return get_limit(rwb, rw);
+}
+
+bool wbt_fs_get_quota(struct request_queue *q, struct writeback_control *wbc)
+{
+	struct rq_wb *rwb = q->rq_wb;
+
+	if (!rwb_enabled(rwb) || wbt_mode(rwb) != WBT_FS
+			|| wbc->sync_mode == WB_SYNC_ALL
+			|| wbc->for_sync == 1)
+		return true;
+
+	/*lint -save -e574*/
+	if (atomic_read(&rwb->inflight) < wbt_get_wbc_limit(rwb, wbc))
+		return true;
+	/*lint -restore*/
+
+	return false;
+}
+
+void wbt_fs_wait(struct request_queue *q, struct writeback_control *wbc)
+{
+	unsigned int limit;
+	DEFINE_WAIT(wait);
+	struct rq_wb *rwb = q->rq_wb;
+	int task = TASK_UNINTERRUPTIBLE;
+
+	limit = wbt_get_wbc_limit(rwb, wbc);
+	/*
+	 * inc it here even if disabled, since we'll dec it at completion.
+	 * this only happens if the task was sleeping in __wbt_wait(),
+	 * and someone turned it off at the same time.
+	 */
+	/*lint -save -e574*/
+	if (!rwb_enabled(rwb)
+			|| atomic_read(&rwb->inflight) < limit)
+		return;
+	/*lint -restore*/
+#ifdef CONFIG_DIRTY_PAGES_CONTROL
+	if (dirty_pages_controlled) {
+		if (!is_wbt_controlled())
+			return;
+		task = TASK_INTERRUPTIBLE;
+	}
+#endif
+
+	do {
+		prepare_to_wait_exclusive(&rwb->wait, &wait, task);
+
+		if (wbt_mode(rwb) != WBT_FS)
+			break;
+
+		/*lint -save -e574*/
+		if (!rwb_enabled(rwb)
+				|| atomic_read(&rwb->inflight) < limit)
+			break;
+		/*lint -restore*/
+
+#ifdef CONFIG_DIRTY_PAGES_CONTROL
+		if (dirty_pages_controlled && !is_wbt_controlled())
+			break;
+#endif
+
+		io_schedule();
+	} while (1);
+
+	finish_wait(&rwb->wait, &wait);
 }
 
 void wbt_issue(struct rq_wb *rwb, struct wb_issue_stat *stat, bool fg)
@@ -541,12 +689,10 @@ void wbt_issue(struct rq_wb *rwb, struct wb_issue_stat *stat, bool fg)
 	 * only use the address to compare with, which is why we store the
 	 * sync_issue time locally.
 	 */
-	/*lint -save -e713*/
 	if (!wbt_tracked(stat) && !rwb->sync_issue) {
-			rwb->sync_cookie = stat;
-			rwb->sync_issue = wbt_issue_stat_get_time(stat);
+		rwb->sync_cookie = stat;
+		rwb->sync_issue = wbt_issue_stat_get_time(stat);
 	}
-	/*lint -restore*/
 }
 
 void wbt_requeue(struct rq_wb *rwb, struct wb_issue_stat *stat)
@@ -587,10 +733,9 @@ struct rq_wb *wbt_init(struct backing_dev_info *bdi, struct wb_stat_ops *ops,
 	struct rq_wb *rwb;
 
 	rwb = kzalloc(sizeof(*rwb), GFP_KERNEL);
-	/*lint -save -e747*/
+	/*lint -save -e747 -e1058*/
 	if (!rwb)
 		return ERR_PTR(-ENOMEM);
-	/*lint -restore*/
 
 	atomic_set(&rwb->inflight, 0);
 	init_waitqueue_head(&rwb->wait);
@@ -604,6 +749,7 @@ struct rq_wb *wbt_init(struct backing_dev_info *bdi, struct wb_stat_ops *ops,
 	rwb->ops_data = ops_data;
 	wbt_update_limits(rwb);
 	return rwb;
+	/*lint -restore*/
 }
 
 void wbt_exit(struct rq_wb *rwb)
