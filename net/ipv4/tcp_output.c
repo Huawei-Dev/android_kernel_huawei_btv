@@ -297,6 +297,9 @@ static u16 tcp_select_window(struct sock *sk)
 	/* Make sure we do not exceed the maximum possible
 	 * scaled window.
 	 */
+#ifdef CONFIG_TCP_AUTOTUNING
+	new_win = min(tp->rcv_rate.rcv_wnd, new_win);
+#endif
 	if (!tp->rx_opt.rcv_wscale && sysctl_tcp_workaround_signed_windows)
 		new_win = min(new_win, MAX_TCP_WINDOW);
 	else
