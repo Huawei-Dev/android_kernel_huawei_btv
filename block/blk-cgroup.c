@@ -1143,35 +1143,6 @@ void blkcg_exit_queue(struct request_queue *q)
 	blk_throtl_exit(q);
 }
 
-#ifdef CONFIG_BLK_DEV_THROTTLING
-static void blkcg_fork(struct task_struct *task)
-{
-	struct blkcg *blkcg;
-
-	if (task_css_is_root(task, io_cgrp_id))
-		return;
-
-	if (!task->mm)
-		return;
-
-	if (!task->mm->io_limit)
-		return;
-
-	rcu_read_lock();
-	blkcg = task_blkcg(task);
-	if (task->mm->io_limit->max_inflights == blkcg->max_inflights) {
-		rcu_read_unlock();
-		return;
-	}
-
-	spin_lock_irq(&blkcg->lock);
-	blk_throtl_update_limit(task->mm->io_limit,
-				blkcg->max_inflights);
-	spin_unlock_irq(&blkcg->lock);
-	rcu_read_unlock();
-}
-#endif
-
 /*
  * We cannot support shared io contexts, as we have no mean to support
  * two tasks with the same ioc in two different groups without major rework
@@ -1223,9 +1194,6 @@ struct cgroup_subsys io_cgrp_subsys = {
 	.css_offline = blkcg_css_offline,
 	.css_free = blkcg_css_free,
 	.can_attach = blkcg_can_attach,
-#ifdef CONFIG_BLK_DEV_THROTTLING
-	.fork = blkcg_fork,
-#endif
 	.bind = blkcg_bind,
 	.dfl_cftypes = blkcg_files,
 	.legacy_cftypes = blkcg_legacy_files,
