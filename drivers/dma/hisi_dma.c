@@ -28,7 +28,7 @@
 #include <linux/delay.h>
 
 #include "virt-dma.h"
-/*lint -e750 -esym(750,*) */
+
 #define DRIVER_NAME		"hisi-dma"
 #define DMA_ALIGN		3
 #define DMA_MAX_SIZE		0x1ffc
@@ -61,7 +61,7 @@
 #define CCFG_PER2MEM		(0x2 << 2)
 #define CCFG_SRCINCR		(0x1 << 31)
 #define CCFG_DSTINCR		(0x1 << 30)
-/*lint -e750 +esym(750,*) */
+
 struct hisi_desc_hw {
 	u32 lli;
 	u32 reserved[3];
@@ -211,17 +211,6 @@ static void hisi_dma_enable_dma(struct hisi_dma_dev *d, bool on)
 	}
 }
 
-#if 0
-static void print_desc(struct hisi_dma_phy *phy)
-{
-	printk("hw->lli is 0x%x\n", readl(phy->base + CX_LLI));
-	printk("hw->count is 0x%x\n", readl(phy->base + CX_CNT));
-	printk("hw->saddr is 0x%x\n", readl(phy->base + CX_SRC));
-	printk("hw->daddr is 0x%x\n", readl(phy->base + CX_DST));
-	printk("hw->config is 0x%x\n", readl(phy->base + CX_CONFIG));
-}
-#endif
-
 static irqreturn_t hisi_dma_int_handler(int irq, void *dev_id)
 {
 	struct hisi_dma_dev *d = (struct hisi_dma_dev *)dev_id;
@@ -240,21 +229,41 @@ static irqreturn_t hisi_dma_int_handler(int irq, void *dev_id)
 		if (likely(tc1 & BIT(i))) {
 			p = &d->phy[i];
 			c = p->vchan;
+
+			if (c->vc.chan.dmas_callback) {
+				c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 23);
+			}
 			if (c) {
 				unsigned long flags;
 
+				if (c->vc.chan.dmas_callback) {
+					c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 24);
+				}
 				spin_lock_irqsave(&c->vc.lock, flags);
-				if(p->ds_run != NULL)
+				if(p->ds_run != NULL) {
+
+					if (c->vc.chan.dmas_callback) {
+						c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 25);
+					}
 					vchan_cookie_complete(&p->ds_run->vd);
+				}
 				p->ds_done = p->ds_run;
 				spin_unlock_irqrestore(&c->vc.lock, flags);
 			} else {
+
+				if (c->vc.chan.dmas_callback) {
+					c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 26);
+				}
 				dev_err(d->slave.dev, "%s: phy[%d] stats[0x%x]\n",
 						__func__, p->idx, stats);
 			}
 			tc1_irq |= BIT(i);
 		}
 
+
+		if (c->vc.chan.dmas_callback) {
+			c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 27);
+		}
 		if (unlikely((err1 & BIT(i)) || (err2 & BIT(i)))) {
 			p = &d->phy[i];
 			c = p->vchan;
@@ -270,6 +279,9 @@ static irqreturn_t hisi_dma_int_handler(int irq, void *dev_id)
 
 	}
 
+	if (c->vc.chan.dmas_callback) {
+		c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 28);
+	}
 	writel(tc1_irq, d->base + INT_TC1_RAW);
 	writel(err1_irq, d->base + INT_ERR1_RAW);
 	writel(err2_irq, d->base + INT_ERR2_RAW);
@@ -288,15 +300,28 @@ static int hisi_dma_start_txd(struct hisi_dma_chan *c)
 	struct virt_dma_desc *vd = vchan_next_desc(&c->vc);
 
 
+
+	if (c->vc.chan.dmas_callback) {
+		c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 18);
+	}
 	if (!c->phy)
 		return -ENODEV;
 
 	if (BIT(c->phy->idx) & hisi_dma_get_chan_stat(d)) {
+
+
+		if (c->vc.chan.dmas_callback) {
+			c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 19);
+		}
         dev_err(d->slave.dev,  "%s: chan[%d] phy[%d] stat[0x%x]\n", __func__,
             c->vc.chan.chan_id, c->phy->idx, hisi_dma_get_chan_stat(d));
 		return -EBUSY;
     }
 
+
+	if (c->vc.chan.dmas_callback) {
+		c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 20);
+	}
 	if (vd) {
 		struct hisi_dma_desc_sw *ds =
 		    container_of(vd, struct hisi_dma_desc_sw, vd);
@@ -308,10 +333,18 @@ static int hisi_dma_start_txd(struct hisi_dma_chan *c)
 		list_del(&ds->vd.node);
 		c->phy->ds_run = ds;
 		c->phy->ds_done = NULL;
+
+		if (c->vc.chan.dmas_callback) {
+			c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 21);
+		}
 		/* start dma */
 		hisi_dma_set_desc(c->phy, &ds->desc_hw[0]);
 
 		return 0;
+	}
+
+	if (c->vc.chan.dmas_callback) {
+		c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 22);
 	}
 	c->phy->ds_done = NULL;
 	c->phy->ds_run = NULL;
@@ -329,25 +362,49 @@ static void hisi_dma_tasklet(unsigned long arg)
 
 	/* check new dma request of running channel in vc->desc_issued */
 	list_for_each_entry_safe(c, cn, &d->slave.channels, vc.chan.device_node) {
+
+		if (c->vc.chan.dmas_callback) {
+			c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 8);
+		}
 		spin_lock_irqsave(&c->vc.lock,flags);
 		p = c->phy;
 
 		if (p && p->ds_done) {
+
+			if (c->vc.chan.dmas_callback) {
+				c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 9);
+			}
             ret = hisi_dma_start_txd(c);
+
+			if (c->vc.chan.dmas_callback) {
+				c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 10);
+			}
 			if (-EAGAIN == ret) {
 #ifdef CONFIG_HISI_DMA_PM_RUNTIME
 				pm_runtime_mark_last_busy(d->slave.dev);
 				pm_runtime_put_autosuspend(d->slave.dev);
 #endif
+
+				if (c->vc.chan.dmas_callback) {
+					c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 11);
+				}
 				/* No current txd associated with this channel */
 				dev_dbg(d->slave.dev, "pchan %u: free\n", p->idx);
 				/* Mark this channel free */
 				c->phy = NULL;
 				p->vchan = NULL;
 			} else if (0 != ret) {
+
+				if (c->vc.chan.dmas_callback) {
+					c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 12);
+				}
                 continue;
             }
 		} else if(p && c->status == DMA_ERROR) {
+
+			if (c->vc.chan.dmas_callback) {
+				c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 13);
+			}
 			hisi_dma_terminate_chan(p, d);
 #ifdef CONFIG_HISI_DMA_PM_RUNTIME
 			pm_runtime_mark_last_busy(d->slave.dev);
@@ -376,10 +433,17 @@ static void hisi_dma_tasklet(unsigned long arg)
 #ifdef CONFIG_HISI_DMA_PM_RUNTIME
 			pm_runtime_get_sync(d->slave.dev);
 #endif
+
+			if (c->vc.chan.dmas_callback) {
+				c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 14);
+			}
 			/* Mark this channel allocated */
 			p->vchan = c;
 			c->phy = p;
-			dev_dbg(d->slave.dev, "pchan %u: alloc vchan %p\n", pch, &c->vc);
+			if (c->vc.chan.dmas_callback) {
+				c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, pch + 50);
+			}
+			dev_dbg(d->slave.dev, "pchan %u: alloc vchan %pK\n", pch, &c->vc);
 		}
 	}
 	spin_unlock_irqrestore(&d->lock,flags);
@@ -389,9 +453,18 @@ static void hisi_dma_tasklet(unsigned long arg)
 
 			p = &d->phy[pch];
 			c = p->vchan;
+
 			if (c) {
 				spin_lock_irqsave(&c->vc.lock,flags);
+
+				if (c->vc.chan.dmas_callback) {
+					c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 16);
+				}
 				hisi_dma_start_txd(c);
+
+				if (c->vc.chan.dmas_callback) {
+					c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 17);
+				}
 				spin_unlock_irqrestore(&c->vc.lock,flags);
 			}
 		}
@@ -481,22 +554,48 @@ static void hisi_dma_issue_pending(struct dma_chan *chan)
 	struct hisi_dma_dev *d = to_hisi_dma(chan->device);
 	unsigned long flags;
 
+	if (c->vc.chan.dmas_callback) {
+		c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 0);
+	}
 	spin_lock_irqsave(&c->vc.lock, flags);
 	/* add request to vc->desc_issued */
 	if (vchan_issue_pending(&c->vc)) {
 		spin_lock(&d->lock);
+		if (c->vc.chan.dmas_callback) {
+			c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 2);
+		}
 		if (!c->phy) {
+
+			if (c->vc.chan.dmas_callback) {
+				c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 3);
+			}
 			if (list_empty(&c->node)) {
 				/* if new channel, add chan_pending */
 				list_add_tail(&c->node, &d->chan_pending);
+
+				if (c->vc.chan.dmas_callback) {
+					c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 4);
+				}
 				/* check in tasklet */
 				tasklet_schedule(&d->task);
-				dev_dbg(d->slave.dev, "vchan %p: issued\n", &c->vc);
+				dev_dbg(d->slave.dev, "vchan %pK: issued\n", &c->vc);
+
+				if (c->vc.chan.dmas_callback) {
+					c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 5);
+				}
+			}
+		} else {
+			if (c->vc.chan.dmas_callback) {
+				c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 6);
 			}
 		}
 		spin_unlock(&d->lock);
-	} else
-		dev_dbg(d->slave.dev, "vchan %p: nothing to issue\n", &c->vc);
+	} else {
+		if (c->vc.chan.dmas_callback) {
+			c->vc.chan.dmas_callback(c->vc.chan.dmas_callback_param, 7);
+		}
+		dev_dbg(d->slave.dev, "vchan %pK: nothing to issue\n", &c->vc);
+	}
 	spin_unlock_irqrestore(&c->vc.lock, flags);
 }
 
@@ -527,7 +626,7 @@ static struct dma_async_tx_descriptor *hisi_dma_prep_memcpy(
 	num = DIV_ROUND_UP(len, DMA_MAX_SIZE);
 	ds = kzalloc(sizeof(*ds) + num * sizeof(ds->desc_hw[0]), GFP_ATOMIC | GFP_DMA);
 	if (!ds) {
-		dev_dbg(chan->device->dev, "vchan %p: kzalloc fail\n", (void*)&c->vc);
+		dev_dbg(chan->device->dev, "vchan %pK: kzalloc fail\n", (void*)&c->vc);
 		return NULL;
 	}
 	ds->desc_hw_lli = __virt_to_phys((unsigned long)&ds->desc_hw[0]);
@@ -586,7 +685,7 @@ static struct dma_async_tx_descriptor *hisi_dma_prep_slave_sg(
 
 	ds = kzalloc(sizeof(*ds) + num * sizeof(ds->desc_hw[0]), GFP_ATOMIC | GFP_DMA);
 	if (!ds) {
-		dev_dbg(chan->device->dev, "vchan %p: kzalloc fail\n", &c->vc);
+		dev_dbg(chan->device->dev, "vchan %pK: kzalloc fail\n", &c->vc);
 		return NULL;
 	}
 	ds->desc_hw_lli = __virt_to_phys((unsigned long)&ds->desc_hw[0]);
@@ -697,7 +796,7 @@ static int hisi_dma_pause(struct dma_chan *chan)
 		return -EINVAL;
 	}
 
-    dev_dbg(d->slave.dev, "vchan %p: pause\n", &c->vc);
+    dev_dbg(d->slave.dev, "vchan %pK: pause\n", &c->vc);
 	if (c->status == DMA_IN_PROGRESS) {
 		c->status = DMA_PAUSED;
 		spin_lock_irqsave(&d->lock,flags);
@@ -725,7 +824,7 @@ static int hisi_dma_resume(struct dma_chan *chan)
 		return -EINVAL;
 	}
 
-    dev_dbg(d->slave.dev, "vchan %p: resume\n", &c->vc);
+    dev_dbg(d->slave.dev, "vchan %pK: resume\n", &c->vc);
 	spin_lock_irqsave(&c->vc.lock, flags);
 	p = c->phy;
 	if (c->status == DMA_PAUSED) {
@@ -755,7 +854,7 @@ static int hisi_dma_terminate_all(struct dma_chan *chan)
 		return -EINVAL;
 	}
 
-    dev_dbg(d->slave.dev, "vchan %p: terminate all\n", &c->vc);
+    dev_dbg(d->slave.dev, "vchan %pK: terminate all\n", &c->vc);
 	/* Prevent this channel being scheduled */
 	spin_lock_irqsave(&d->lock,flags);
 	list_del_init(&c->node);
@@ -852,7 +951,7 @@ static int hisi_dma_control(struct dma_chan *chan, enum dma_ctrl_cmd cmd,
 		break;
 
 	case DMA_TERMINATE_ALL:
-		dev_dbg(d->slave.dev, "vchan %p: terminate all\n", &c->vc);
+		dev_dbg(d->slave.dev, "vchan %pK: terminate all\n", &c->vc);
 		/* Prevent this channel being scheduled */
 		spin_lock_irqsave(&d->lock,flags);
 		list_del_init(&c->node);
@@ -882,7 +981,7 @@ static int hisi_dma_control(struct dma_chan *chan, enum dma_ctrl_cmd cmd,
 		break;
 
 	case DMA_PAUSE:
-		dev_dbg(d->slave.dev, "vchan %p: pause\n", &c->vc);
+		dev_dbg(d->slave.dev, "vchan %pK: pause\n", &c->vc);
 		if (c->status == DMA_IN_PROGRESS) {
 			c->status = DMA_PAUSED;
 			spin_lock_irqsave(&d->lock,flags);
@@ -898,7 +997,7 @@ static int hisi_dma_control(struct dma_chan *chan, enum dma_ctrl_cmd cmd,
 		break;
 
 	case DMA_RESUME:
-		dev_dbg(d->slave.dev, "vchan %p: resume\n", &c->vc);
+		dev_dbg(d->slave.dev, "vchan %pK: resume\n", &c->vc);
 		spin_lock_irqsave(&c->vc.lock, flags);
 		p = c->phy;
 		if (c->status == DMA_PAUSED) {
@@ -931,7 +1030,7 @@ void show_dma_reg(struct dma_chan *chan)
 	    return;
 	}
 
-    printk(KERN_ERR "%s: chan[0x%p] id[%d] cookie[%d-%d]!\n", __func__,
+    printk(KERN_ERR "%s: chan[0x%pK] id[%d] cookie[%d-%d]!\n", __func__,
             chan, chan->chan_id, chan->cookie, chan->completed_cookie);
 
 	if (!chan->device) {
@@ -968,18 +1067,10 @@ void show_dma_reg(struct dma_chan *chan)
 	}
 
     p = c->phy;
-    printk(KERN_ERR "%s: chan[%p] ccfg[0x%x] dir[%d] dev_addr[0x%llx] status[%d]\n",
+    printk(KERN_ERR "%s: chan[%pK] ccfg[0x%x] dir[%d] dev_addr[0x%llx] status[%d]\n",
             __func__, c, c->ccfg, c->dir, c->dev_addr, c->status);
-    printk(KERN_ERR "%s: phy idx[0x%x] ds_run[%p] ds_done[p%p]\n",
+    printk(KERN_ERR "%s: phy idx[0x%x] ds_run[%pK] ds_done[%pK]\n",
             __func__, p->idx, p->ds_run, p->ds_done);
-#if 0
-    dev_info(d->slave.dev, "CX_CONFIG =%x\n",   readl(c->phy->base + CX_CONFIG));
-    dev_info(d->slave.dev, "CX_AXI_CONF =%x\n", readl(c->phy->base + AXI_CONFIG));
-    dev_info(d->slave.dev, "SRC =%x\n",         readl(c->phy->base + CX_SRC));
-    dev_info(d->slave.dev, "DST =%x\n",         readl(c->phy->base + CX_DST));
-    dev_info(d->slave.dev, "CNT0 =%x\n",        readl(c->phy->base + CX_CNT));
-    dev_info(d->slave.dev, "CX_CURR_CNT0 =%x\n",readl(c->phy->base + CX_CUR_CNT));
-#endif
 
 	for (i = d->dma_min_chan; i < d->dma_channels; i++) {
 		p = &d->phy[i];

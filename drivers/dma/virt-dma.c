@@ -86,8 +86,13 @@ static void vchan_complete(unsigned long arg)
 
 		vc->desc_free(vd);
 
-		if (cb)
+		if (cb) {
+			if (vc->chan.dmas_callback) {
+				vc->chan.dmas_callback(vc->chan.dmas_callback_param, 30);
+			}
 			cb(cb_data);
+		}
+
 	}
 }
 
