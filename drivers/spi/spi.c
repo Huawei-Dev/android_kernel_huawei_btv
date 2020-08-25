@@ -376,6 +376,7 @@ static void spi_drv_shutdown(struct device *dev)
 
 /**
  * __spi_register_driver - register a SPI driver
+ * @owner: owner module of the driver to register
  * @sdrv: the driver to register
  * Context: can sleep
  *
@@ -684,21 +685,30 @@ static int spi_map_buf(struct spi_master *master, struct device *dev,
 		       enum dma_data_direction dir)
 {
 	const bool vmalloced_buf = is_vmalloc_addr(buf);
-	const int desc_len = vmalloced_buf ? PAGE_SIZE : master->max_dma_len;
-	const int sgs = DIV_ROUND_UP(len, desc_len);
+	int desc_len;
+	int sgs;
 	struct page *vm_page;
 	void *sg_buf;
 	size_t min;
 	int i, ret;
+
+	if (vmalloced_buf) {
+		desc_len = PAGE_SIZE;
+		sgs = DIV_ROUND_UP(len + offset_in_page(buf), desc_len);
+	} else {
+		desc_len = master->max_dma_len;
+		sgs = DIV_ROUND_UP(len, desc_len);
+	}
 
 	ret = sg_alloc_table(sgt, sgs, GFP_KERNEL);
 	if (ret != 0)
 		return ret;
 
 	for (i = 0; i < sgs; i++) {
-		min = min_t(size_t, len, desc_len);
 
 		if (vmalloced_buf) {
+			min = min_t(size_t,
+				    len, desc_len - offset_in_page(buf));
 			vm_page = vmalloc_to_page(buf);
 			if (!vm_page) {
 				sg_free_table(sgt);
@@ -707,6 +717,7 @@ static int spi_map_buf(struct spi_master *master, struct device *dev,
 			sg_set_page(&sgt->sgl[i], vm_page,
 				    min, offset_in_page(buf));
 		} else {
+			min = min_t(size_t, len, desc_len);
 			sg_buf = buf;
 			sg_set_buf(&sgt->sgl[i], sg_buf, min);
 		}
@@ -1034,17 +1045,20 @@ static void __spi_pump_messages(struct spi_master *master, bool in_kthread)
 	bool was_busy = false;
 	int ret;
 
+	master->xfers |= 1<<2;
 	/* Lock queue */
 	spin_lock_irqsave(&master->queue_lock, flags);
 
 	/* Make sure we are not already running a message */
 	if (master->cur_msg) {
+		master->xfers |= 1<<3;
 		spin_unlock_irqrestore(&master->queue_lock, flags);
 		return;
 	}
 
 	/* If another context is idling the device then defer */
 	if (master->idling) {
+		master->xfers |= 1<<4;
 		queue_kthread_work(&master->kworker, &master->pump_messages);
 		spin_unlock_irqrestore(&master->queue_lock, flags);
 		return;
@@ -1064,7 +1078,7 @@ static void __spi_pump_messages(struct spi_master *master, bool in_kthread)
 			spin_unlock_irqrestore(&master->queue_lock, flags);
 			return;
 		}
-
+		master->xfers |= 1<<30;
 		master->busy = false;
 		master->idling = true;
 		spin_unlock_irqrestore(&master->queue_lock, flags);
@@ -1078,8 +1092,15 @@ static void __spi_pump_messages(struct spi_master *master, bool in_kthread)
 			dev_err(&master->dev,
 				"failed to unprepare transfer hardware\n");
 		if (master->auto_runtime_pm) {
+#if defined CONFIG_HISI_SPI
+			mutex_lock(&master->msg_mutex);
 			pm_runtime_mark_last_busy(master->dev.parent);
 			pm_runtime_put_autosuspend(master->dev.parent);
+			mutex_unlock(&master->msg_mutex);
+#else
+			pm_runtime_mark_last_busy(master->dev.parent);
+			pm_runtime_put_autosuspend(master->dev.parent);
+#endif
 		}
 		trace_spi_master_idle(master);
 
@@ -1099,10 +1120,11 @@ static void __spi_pump_messages(struct spi_master *master, bool in_kthread)
 	else
 		master->busy = true;
 	spin_unlock_irqrestore(&master->queue_lock, flags);
-
+	master->xfers |= 1<<5;
 	if (!was_busy && master->auto_runtime_pm) {
 		ret = pm_runtime_get_sync(master->dev.parent);
 		if (ret < 0) {
+			master->xfers |= 1<<6;
 			dev_err(&master->dev, "Failed to power device: %d\n",
 				ret);
 			return;
@@ -1115,6 +1137,7 @@ static void __spi_pump_messages(struct spi_master *master, bool in_kthread)
 	if (!was_busy && master->prepare_transfer_hardware) {
 		ret = master->prepare_transfer_hardware(master);
 		if (ret) {
+			master->xfers |= 1<<7;
 			dev_err(&master->dev,
 				"failed to prepare transfer hardware\n");
 
@@ -1129,6 +1152,7 @@ static void __spi_pump_messages(struct spi_master *master, bool in_kthread)
 	if (master->prepare_message) {
 		ret = master->prepare_message(master, master->cur_msg);
 		if (ret) {
+			master->xfers |= 1<<8;
 			dev_err(&master->dev,
 				"failed to prepare message: %d\n", ret);
 			master->cur_msg->status = ret;
@@ -1140,11 +1164,12 @@ static void __spi_pump_messages(struct spi_master *master, bool in_kthread)
 
 	ret = spi_map_msg(master, master->cur_msg);
 	if (ret) {
+		master->xfers |= 1<<9;
 		master->cur_msg->status = ret;
 		spi_finalize_current_message(master);
 		return;
 	}
-
+	master->xfers |= 1<<10;
 	ret = master->transfer_one_message(master, master->cur_msg);
 	if (ret) {
 		dev_err(&master->dev,
@@ -1257,14 +1282,18 @@ void spi_finalize_current_message(struct spi_master *master)
 	spin_lock_irqsave(&master->queue_lock, flags);
 	master->cur_msg = NULL;
 	master->cur_msg_prepared = false;
+	master->xfers |= 1<<27;
 	queue_kthread_work(&master->kworker, &master->pump_messages);
 	spin_unlock_irqrestore(&master->queue_lock, flags);
 
 	trace_spi_message_done(mesg);
 
 	mesg->state = NULL;
-	if (mesg->complete)
+	master->xfers |= 1<<28;
+	if (mesg->complete) {
+		master->xfers |= 1<<29;
 		mesg->complete(mesg->context);
+	}
 }
 EXPORT_SYMBOL_GPL(spi_finalize_current_message);
 
@@ -1698,7 +1727,7 @@ struct spi_master *spi_alloc_master(struct device *dev, unsigned size)
 	master->bus_num = -1;
 	master->num_chipselect = 1;
 	master->dev.class = &spi_master_class;
-	master->dev.parent = get_device(dev);
+	master->dev.parent = dev;
 	spi_master_set_devdata(master, &master[1]);
 
 	return master;
@@ -1805,6 +1834,9 @@ int spi_register_master(struct spi_master *master)
 	spin_lock_init(&master->queue_lock);
 	spin_lock_init(&master->bus_lock_spinlock);
 	mutex_init(&master->bus_lock_mutex);
+#if defined CONFIG_HISI_SPI
+	mutex_init(&master->msg_mutex);
+#endif
 	master->bus_lock_flag = 0;
 	init_completion(&master->xfer_completion);
 	if (!master->max_dma_len)
@@ -2334,6 +2366,40 @@ static void spi_complete(void *arg)
 	complete(arg);
 }
 
+void show_dma_register(struct spi_master *master, int channel_id)
+{
+	if((channel_id < 1) || (channel_id > 15)){
+		dev_err(&master->dev, "channel_id error: %d\n", channel_id);
+		return;
+	}
+	dev_err(&master->dev, "show dma register.\n");
+	dev_err(&master->dev, "INT_STAT : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30000, 4096)));
+	dev_err(&master->dev, "INT_TC1 : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30004, 4096)));
+	dev_err(&master->dev, "INT_TC2 : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30008, 4096)));
+	dev_err(&master->dev, "INT_ERR1 : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf3000c, 4096)));
+	dev_err(&master->dev, "INT_ERR2 : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30010, 4096)));
+	dev_err(&master->dev, "INT_ERR3 : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30014, 4096)));
+	dev_err(&master->dev, "INT_TC1_RAW : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30600, 4096)));
+	dev_err(&master->dev, "INT_TC2_RAW : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30608, 4096)));
+	dev_err(&master->dev, "INT_ERR1_RAW : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30610, 4096)));
+	dev_err(&master->dev, "INT_ERR2_RAW : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30618, 4096)));
+	dev_err(&master->dev, "INT_ERR3_RAW : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30620, 4096)));
+	dev_err(&master->dev, "CH_STAT : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30690, 4096)));
+	dev_err(&master->dev, "SEC_CTRL : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30694, 4096)));
+	dev_err(&master->dev, "DMA_CTRL : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30698, 4096)));
+	dev_err(&master->dev, "CX_CURR_CNT0 : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30704 + 0x10*channel_id, 4096)));
+	dev_err(&master->dev, "CX_CURENT_SRC_ADDR: 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30708 + 0x10*channel_id, 4096)));
+	dev_err(&master->dev, "CX_CURENT_DST_ADDR : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf3070c + 0x10*channel_id, 4096)));
+	dev_err(&master->dev, "CX_LLI : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30800 + 0x40*channel_id, 4096)));
+	dev_err(&master->dev, "CX_CNT0 : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30810 + 0x40*channel_id, 4096)));
+	dev_err(&master->dev, "CX_SRC_ADDR : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30814 + 0x40*channel_id, 4096)));
+	dev_err(&master->dev, "CX_DST_ADDR : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30818 + 0x40*channel_id, 4096)));
+	dev_err(&master->dev, "CX_CONFIG : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf3081c + 0x40*channel_id, 4096)));
+	dev_err(&master->dev, "CX_AXI_CONFIG : 0x%x \n", readl(devm_ioremap(&master->dev, 0xfdf30820 + 0x40*channel_id, 4096)));
+
+	return;
+}
+
 static int __spi_sync(struct spi_device *spi, struct spi_message *message,
 		      int bus_locked)
 {
@@ -2349,6 +2415,9 @@ static int __spi_sync(struct spi_device *spi, struct spi_message *message,
 	message->complete = spi_complete;
 	message->context = &done;
 	message->spi = spi;
+	master->xfers = 0;
+	master->tx_xdmas = 0;
+	master->rx_xdmas = 0;
 
 	SPI_STATISTICS_INCREMENT_FIELD(&master->statistics, spi_sync);
 	SPI_STATISTICS_INCREMENT_FIELD(&spi->statistics, spi_sync);
@@ -2366,6 +2435,7 @@ static int __spi_sync(struct spi_device *spi, struct spi_message *message,
 
 		trace_spi_message_submit(message);
 
+		master->xfers |= 1<<0;
 		status = __spi_queued_transfer(spi, message, false);
 
 		spin_unlock_irqrestore(&master->bus_lock_spinlock, flags);
@@ -2385,10 +2455,20 @@ static int __spi_sync(struct spi_device *spi, struct spi_message *message,
 						       spi_sync_immediate);
 			SPI_STATISTICS_INCREMENT_FIELD(&spi->statistics,
 						       spi_sync_immediate);
+			master->xfers |= 1<<1;
 			__spi_pump_messages(master, false);
 		}
 
-		wait_for_completion(&done);
+		if (!wait_for_completion_timeout(&done, 100*HZ)) {
+			dev_err(&master->dev, "^^^^*** spi timeout xfers:%u, tx_xdmas:%u, rx_xdmas:%u\n", master->xfers, master->tx_xdmas, master->rx_xdmas);
+			if (master->tx_chan_no) {
+				show_dma_register(master, master->tx_chan_no);
+			}
+			if (master->rx_chan_no) {
+				show_dma_register(master, master->rx_chan_no);
+			}
+			BUG_ON(1);
+		}
 		status = message->status;
 	}
 	message->context = NULL;
@@ -2700,4 +2780,3 @@ err0:
  * include needing to have boardinfo data structures be much more public.
  */
 postcore_initcall(spi_init);
-

@@ -1,4 +1,5 @@
 #define GET_HARDWARE_TIMEOUT 100000
+#define SPI_4G_PHYS_ADDR 0xFFFFFFFF
 
 #define SSP_TXFIFOCR(r)	(r + 0x028)
 #define SSP_RXFIFOCR(r)	(r + 0x02C)
@@ -24,7 +25,7 @@
 	GEN_MASK_BITS(SSP_RX_16_OR_MORE_ELEM, SSP_RXFIFOCR_MASK_INT, 3) \
 )
 
-#define ENUM_SPI_HWSPIN_LOCK 12
+#define ENUM_SPI_HWSPIN_LOCK 27
 
 #if defined(CONFIG_SPI_HISI_CS_USE_PCTRL)
 static inline bool pctrl_cs_is_valid(int cs)
@@ -164,5 +165,64 @@ static int hisi_spi_get_pins_data(struct pl022 *pl022, struct device *dev)
 	if (IS_ERR(pl022->pins_sleep))
 		dev_dbg(dev, "could not get sleep pinstate\n");
 
+	pl022->pins.p = pl022->pinctrl;
+	pl022->pins.default_state = pl022->pins_default;
+#ifdef CONFIG_PM
+	pl022->pins.idle_state = pl022->pins_idle;
+	pl022->pins.sleep_state = pl022->pins_sleep;
+#endif
+	dev->pins = &pl022->pins;
+
 	return 0;
+}
+
+static void hisi_spi_txrx_buffer_check(struct pl022 *pl022,struct spi_transfer *transfer)
+{
+	if ((virt_to_phys(pl022->cur_transfer->tx_buf) > SPI_4G_PHYS_ADDR)) {
+		/* wrining! must be use dma buffer, and needs the flag "GFP_DMA" when alloc memery */
+		WARN_ON(1);
+		pl022->tx_buffer = kzalloc(pl022->cur_transfer->len, GFP_KERNEL | GFP_DMA);
+		if (NULL != pl022->tx_buffer) {
+			memcpy(pl022->tx_buffer, transfer->tx_buf, pl022->cur_transfer->len);
+			pl022->tx = (void*)pl022->tx_buffer;
+			dev_err(&pl022->adev->dev,"tx is not dma-buffer\n");
+		} else {
+			pl022->tx = (void *)transfer->tx_buf;
+			dev_err(&pl022->adev->dev,"can not alloc dma-buffer for tx\n");
+		}
+
+	} else {
+		pl022->tx = (void *)transfer->tx_buf;
+	}
+	pl022->tx_end = pl022->tx + pl022->cur_transfer->len;
+
+	if ((virt_to_phys(pl022->cur_transfer->rx_buf) > SPI_4G_PHYS_ADDR)) {
+		/* wrining! must be use dma buffer, and needs the flag "GFP_DMA" when alloc memery */
+		WARN_ON(1);
+		pl022->rx_buffer = kzalloc(pl022->cur_transfer->len, GFP_KERNEL | GFP_DMA);
+		if (NULL != pl022->rx_buffer) {
+			pl022->rx = (void *)pl022->rx_buffer;
+			dev_err(&pl022->adev->dev,"rx is not dma-buffer\n");
+		} else {
+			pl022->rx = (void *)transfer->rx_buf;
+			dev_err(&pl022->adev->dev,"can not alloc dma-buffer for rx\n");
+		}
+	} else {
+		pl022->rx = (void *)transfer->rx_buf;
+	}
+	pl022->rx_end = pl022->rx + pl022->cur_transfer->len;
+}
+
+static void hisi_spi_dma_buffer_free(struct pl022 *pl022)
+{
+	if (NULL != pl022->rx_buffer) {
+		memcpy(pl022->cur_transfer->rx_buf, pl022->rx, pl022->cur_transfer->len);
+		kfree(pl022->rx_buffer);
+		pl022->rx_buffer = NULL;
+	}
+
+	if (NULL != pl022->tx_buffer) {
+		kfree(pl022->tx_buffer);
+		pl022->tx_buffer = NULL;
+	}
 }

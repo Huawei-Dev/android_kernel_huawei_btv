@@ -531,6 +531,14 @@ struct spi_master {
 	/* dummy data for full duplex devices */
 	void			*dummy_rx;
 	void			*dummy_tx;
+#if defined CONFIG_HISI_SPI
+	struct mutex		msg_mutex;
+#endif
+	u32			xfers;
+	u32			tx_xdmas;
+	u32			rx_xdmas;
+	int			tx_chan_no;
+	int			rx_chan_no;
 };
 
 static inline void *spi_master_get_devdata(struct spi_master *master)
