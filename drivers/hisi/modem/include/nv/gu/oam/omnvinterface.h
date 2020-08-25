@@ -990,7 +990,15 @@ typedef struct
     /* 规避楚天龙某一批次卡存在CSIM初始化流程写完文件后，发送STATSU命令，卡不停返回60的问题 */
     VOS_UINT32                          ulCsimReselectFile      : 1;
 
-    VOS_UINT32                          ulRsv                   : 13;
+    /* Added by z00316370 for ISIM_CUSTOM 2016-8-17 begin 占位保留 */
+    VOS_UINT32                          ulImsAccessCustomFlgRsv    : 1;
+
+    VOS_UINT32                          ulDocomoReadOPFileFlgRsv   : 1;
+
+    /* 针对CGLA是否需&0x6F 定制项 */
+    VOS_UINT32                          ulCglaGetRspCustomFlg   : 1;
+
+    VOS_UINT32                          ulRsv                   : 10;
 }USIMM_FEATURE_CFG_BIT_STRU;
 
 /*****************************************************************************
@@ -2255,6 +2263,20 @@ typedef struct
     VOS_UINT8                           ucIsimEnableFlag;
     VOS_UINT8                           aucRsv[3];
 }NV_ISIM_ENABLE_STRU;
+
+/*****************************************************************************
+ 结构名    : USIMM_PROVIDE_COMMAND_CTRL_NV_STRU
+ 结构说明  : 控制主动命令频繁上报
+ 对应NV ID : 4046
+
+  1.日    期   : 2017年11月27日
+    作    者   : z00377832
+    修改内容   : 规避马来西亚UNIFI的卡频繁上报LOCAL INFORMATION新增
+*****************************************************************************/
+typedef struct
+{
+    VOS_UINT32                          ulFilterProvideCommandFlag;
+}USIMM_PROVIDE_COMMAND_CTRL_NV_STRU;
 
 /*****************************************************************************
   8 UNION定义

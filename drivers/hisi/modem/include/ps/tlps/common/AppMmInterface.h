@@ -46,9 +46,11 @@ extern "C" {
 #define APP_MAX_PLMN_NUM                37
 #define APP_MAX_UEID_BUF_SIZE           10
 #define APP_MS_NET_CAP_MAX_SIZE         9
+/*niezhouyu add begin*/
 #define APP_MM_MAX_EQU_PLMN_NUM         16  /* 协议规定EPlmn最大个数*/
 #define APP_MM_MAX_PLMN_NUM             64  /* PLMN列表最大个数 */
 #define APP_MM_MAX_TA_NUM               64  /* TA 列表最大个数 */
+/*niezhouyu add end*/
 
 #define APP_MM_CN_NAME_MAX_LEN         255          /* 网络名字的最大长度 */
 
@@ -852,6 +854,7 @@ typedef struct
     APP_PLMN_ID_STRU                    astPlmnId[APP_MM_MAX_PLMN_NUM];
 }APP_MM_PLMN_LIST_STRU;
 
+/*niezhouyu add begin*/
 typedef struct
 {
     VOS_UINT32                          ulPlmnNum;
@@ -923,6 +926,7 @@ typedef struct
     VOS_UINT8                           ucRsv;
 }APP_MM_CN_NETWORK_NAME_STRU;
 
+/*niezhouyu add end*/
 /*****************************************************************************
 结构名称    :APP_DRX_STRU
 使用说明    :

@@ -44,6 +44,7 @@ struct authinfo;
 struct pap {
   struct authinfo auth;    /* common structure of authentication */
   struct {
+      /*fanzhibin f49086 add it begin*/
       VOS_CHAR password[PASSWORDLEN+1];    /* just use it to store password for print */
       VOS_UINT8 aucReserved[1];            /* add for pclint */
 
@@ -51,6 +52,7 @@ struct pap {
       ，把接收到的pap req报文发给AT*/
       VOS_UINT16 LenOfRequest;
       VOS_UINT8  BufRequest[PASSWORDLEN + AUTHLEN];
+      /*fanzhibin f49086 add it end*/
   } RecordData;    /* encapsulated to structure RecordData by liukai */
 };
 

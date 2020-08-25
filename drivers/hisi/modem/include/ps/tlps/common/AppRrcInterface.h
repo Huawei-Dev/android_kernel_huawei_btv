@@ -78,8 +78,10 @@ extern "C" {
 /* 收到切换重配置消息到回复数传用户面时延协议时间 */
 #define PS_OM_HO_PTL_USER_PLANE_TIME                 (100)            /* 100ms T11-T4*/
 
+/* add for AT&T LRRC DAM begin */
 /* 受限列表中保存最大的条目数 */
 #define RRC_APP_MAX_LIMITED_ITEM_COUNT         (32)
+/* add for AT&T LRRC DAM end */
 /*f00295098新增测量消息中上报小区最大个数*/
 #define LRRC_LCSEL_INTRA_CELL_REPORT_NUM 4
 #define LRRC_LCSEL_INTER_CELL_REPORT_NUM 4
@@ -1376,6 +1378,7 @@ typedef struct
     VOS_UINT16                          usRev;  /* 保留 */
     LRRC_DAM_BAR_LIST_ITEM_STRU         astDamBarListItem[RRC_APP_MAX_LIMITED_ITEM_COUNT];
 }LRRC_APP_DAM_BAR_LIST_DBG_INFO_IND_STRU;
+/* add for AT&T LRRC DAM end */
 /*****************************************************************************
  结构名    : LRRC_APP_IDLE_SERVE_INFO_STRU
  协议表格  :
@@ -1698,6 +1701,7 @@ typedef struct
     LRRC_APP_GERAN_CELL_RSLT_STRU       astGeranCellRslt[LRRC_GERAN_CELL_MAX_NUM]; /* 异频小区上报结果 */
 } LRRC_APP_GERAN_MEAS_RSLT_STRU;
 
+/* add for Conn Meas Filter Optimize begin */
 /*****************************************************************************
  结构名    : LRRC_CONN_MEAS_FILTER_INFO_IND_TYPE_ENUM
  结构说明  : LRRC上报滤波结果的类型
@@ -1804,6 +1808,7 @@ typedef struct
         LRRC_CONN_MEAS_FILTER_UTRA_INFO_STRU        stUtraConnMeasFilterInfo;   /* _H2ASN_Skip */
     }u;  /* _H2ASN_Skip */
 }LRRC_CONN_MEAS_FILTER_INFO_IND_STRU;
+/* add for Conn Meas Filter Optimize end */
 
 /*****************************************************************************
  结构名    : APP_OM_MSG_REDF_STRU

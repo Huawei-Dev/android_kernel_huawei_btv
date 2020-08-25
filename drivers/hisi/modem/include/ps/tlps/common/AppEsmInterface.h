@@ -1,4 +1,18 @@
+/******************************************************************************
 
+  Copyright(C)2008,Hisilicon Co. LTD.
+
+ ******************************************************************************
+  File Name       : AppEsmInterface.h
+  Description     : AppEsmInterface.h header file
+  History         :
+      1.sunbing       2008-12-16   Draft Enact
+      2.yangqianhui   2008-12-22   Modify
+      3.sunbing       2009-01-06   Modify  BA8D00870
+      4.yangqianhui   2009-02-05   Modify  BA8D00933
+      5.yangqianhui   2009-03-06   Modify  BA8D01127
+
+******************************************************************************/
 
 #ifndef __APPESMINTERFACE_H__
 #define __APPESMINTERFACE_H__
@@ -111,9 +125,11 @@ enum APP_ESM_MSG_TYPE_ENUM
 
     ID_APP_ESM_SET_GW_AUTH_REQ          = 0x11+APP_ESM_MSG_ID_HEADER,/*_H2ASN_MsgChoice  APP_ESM_SET_GW_AUTH_REQ_STRU*/
     ID_APP_ESM_SET_GW_AUTH_CNF          = 0x11+ESM_APP_MSG_ID_HEADER,/*_H2ASN_MsgChoice  APP_ESM_SET_GW_AUTH_CNF_STRU*/
+    /* niuxiufan modify begin */
     ID_APP_ESM_IPV6_INFO_NOTIFY         = 0x12+APP_ESM_MSG_ID_HEADER,/*_H2ASN_MsgChoice  APP_ESM_IPV6_INFO_NOTIFY_STRU*/
 
     ID_APP_ESM_PROCEDURE_ABORT_NOTIFY   = 0x13+APP_ESM_MSG_ID_HEADER,/*_H2ASN_MsgChoice  APP_ESM_PROCEDURE_ABORT_NOTIFY_STRU*/
+    /* niuxiufan modify end */
 
     ID_APP_ESM_NDISCONN_REQ             = 0x14+APP_ESM_MSG_ID_HEADER,/*_H2ASN_MsgChoice  APP_ESM_NDISCONN_REQ_STRU*/
     ID_APP_ESM_NDISCONN_CNF             = 0x12+ESM_APP_MSG_ID_HEADER,/*_H2ASN_MsgChoice  APP_ESM_NDISCONN_CNF_STRU*/
@@ -319,6 +335,7 @@ enum APP_ESM_PDN_TYPE_ENUM
 };
 typedef VOS_UINT32 APP_ESM_PDN_TYPE_ENUM_UINT32;
 
+/*Modify by sunbing 49683 for CL multimode 2014-01-09 begin*/
 /*****************************************************************************
  枚举名    : APP_ESM_PDN_REQUEST_TYPE_ENUM
  枚举说明  : PDN请求类型取值 24008 10.5.6.17
@@ -330,6 +347,7 @@ enum APP_ESM_PDN_REQUEST_TYPE_ENUM
     APP_ESM_PDN_REQUEST_TYPE_BUTT
 };
 typedef VOS_UINT32 APP_ESM_PDN_REQUEST_TYPE_ENUM_UINT32;
+/*Modify by sunbing 49683 for CL multimode 2014-01-09 end*/
 
 
 /*****************************************************************************
@@ -1600,6 +1618,7 @@ typedef struct
     VOS_UINT8                           aucReserved[2];
     APP_ESM_IPV6_PREFIX_STRU            astIpv6PrefixArray[APP_ESM_MAX_IPV6_PREFIX_NUM];
 }APP_ESM_IPV6_INFO_NOTIFY_STRU;
+/*niuxiufan modify begin */
 /*****************************************************************************
  结构名    : APP_ESM_PROCEDURE_ABORT_NOTIFY_STRU
  结构说明  : APS-->ESM 流程终止消息结构
@@ -1612,6 +1631,7 @@ typedef struct
     VOS_UINT32                          ulOpId;
     VOS_UINT32                          ulCid;
 }APP_ESM_PROCEDURE_ABORT_NOTIFY_STRU;
+/*niuxiufan modify end */
 
 
 /*****************************************************************************

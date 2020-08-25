@@ -1,4 +1,50 @@
-
+/*
+ * Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+ * foss@huawei.com
+ *
+ * If distributed as part of the Linux kernel, the following license terms
+ * apply:
+ *
+ * * This program is free software; you can redistribute it and/or modify
+ * * it under the terms of the GNU General Public License version 2 and
+ * * only version 2 as published by the Free Software Foundation.
+ * *
+ * * This program is distributed in the hope that it will be useful,
+ * * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * * GNU General Public License for more details.
+ * *
+ * * You should have received a copy of the GNU General Public License
+ * * along with this program; if not, write to the Free Software
+ * * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+ *
+ * Otherwise, the following license terms apply:
+ *
+ * * Redistribution and use in source and binary forms, with or without
+ * * modification, are permitted provided that the following conditions
+ * * are met:
+ * * 1) Redistributions of source code must retain the above copyright
+ * *    notice, this list of conditions and the following disclaimer.
+ * * 2) Redistributions in binary form must reproduce the above copyright
+ * *    notice, this list of conditions and the following disclaimer in the
+ * *    documentation and/or other materials provided with the distribution.
+ * * 3) Neither the name of Huawei nor the names of its contributors may
+ * *    be used to endorse or promote products derived from this software
+ * *    without specific prior written permission.
+ *
+ * * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
 
 /******************************************************************************
    1 头文件包含
@@ -46,10 +92,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_BrPreRoutingHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_BRIDGE,
             .hooknum    = NF_BR_PRE_ROUTING,
             .priority   = NF_BR_PRI_FILTER_OTHER,       /* 网桥hook点的最低优先级 */
@@ -60,10 +108,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_BrPostRoutingHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_BRIDGE,
             .hooknum    = NF_BR_POST_ROUTING,
             .priority   = NF_BR_PRI_FILTER_OTHER,
@@ -74,10 +124,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_BrForwardHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_BRIDGE,
             .hooknum    = NF_BR_FORWARD,
             .priority   = NF_BR_PRI_FILTER_OTHER,
@@ -88,10 +140,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_BrLocalInHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_BRIDGE,
             .hooknum    = NF_BR_LOCAL_IN,
             .priority   = NF_BR_PRI_FILTER_OTHER,
@@ -102,10 +156,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_BrLocalOutHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_BRIDGE,
             .hooknum    = NF_BR_LOCAL_OUT,
             .priority   = NF_BR_PRI_FILTER_OTHER,
@@ -116,10 +172,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_ArpInHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_ARP,
             .hooknum    = NF_ARP_IN,
             .priority   = NF_IP_PRI_CONNTRACK,      /* ARP hook点的优先级 */
@@ -130,10 +188,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_ArpOutHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_ARP,
             .hooknum    = NF_ARP_OUT,
             .priority   = NF_IP_PRI_CONNTRACK,
@@ -144,10 +204,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip4PreRoutingHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_IPV4,
             .hooknum    = NF_INET_PRE_ROUTING,
             .priority   = NF_IP_PRI_MANGLE,         /* 高于DNAT hook点的优先级 */
@@ -158,10 +220,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip4PostRoutingHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_IPV4,
             .hooknum    = NF_INET_POST_ROUTING,
             .priority   = NF_IP_PRI_SELINUX_LAST,   /* 低于SNAT hook点的优先级 */
@@ -172,10 +236,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip4LocalInHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_IPV4,
             .hooknum    = NF_INET_LOCAL_IN,
             .priority   = NF_IP_PRI_SELINUX_LAST,
@@ -186,10 +252,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip4LocalOutHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_IPV4,
             .hooknum    = NF_INET_LOCAL_OUT,
             .priority   = NF_IP_PRI_SELINUX_LAST,
@@ -200,10 +268,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip4ForwardHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_IPV4,
             .hooknum    = NF_INET_FORWARD,
             .priority   = NF_IP_PRI_SELINUX_LAST,
@@ -214,10 +284,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip6PreRoutingHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_IPV6,
             .hooknum    = NF_INET_PRE_ROUTING,
             .priority   = NF_IP_PRI_MANGLE,
@@ -228,10 +300,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip6PostRoutingHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_IPV6,
             .hooknum    = NF_INET_POST_ROUTING,
             .priority   = NF_IP_PRI_SELINUX_LAST,
@@ -242,10 +316,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip6LocalInHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_IPV6,
             .hooknum    = NF_INET_LOCAL_IN,
             .priority   = NF_IP_PRI_SELINUX_LAST,
@@ -256,10 +332,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip6LocalOutHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_IPV6,
             .hooknum    = NF_INET_LOCAL_OUT,
             .priority   = NF_IP_PRI_SELINUX_LAST,
@@ -270,10 +348,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_Ip6ForwardHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_IPV6,
             .hooknum    = NF_INET_FORWARD,
             .priority   = NF_IP_PRI_SELINUX_LAST,
@@ -284,10 +364,12 @@ NF_EXT_MASK_OPS_STRU g_stNfExtMaskOps[]    =
         {0,0,0,0},
         {
             .hook       = NFExt_BrForwardFlowCtrlHook,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 1, 0))
             .owner      = THIS_MODULE,
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
             .priv       = NULL,
+#endif
             .pf         = NFPROTO_BRIDGE,
             .hooknum    = NF_BR_FORWARD,
             .priority   = NF_BR_PRI_FILTER_BRIDGED,             /* 与包过滤优先级相同,优先级在这里不能为0 */

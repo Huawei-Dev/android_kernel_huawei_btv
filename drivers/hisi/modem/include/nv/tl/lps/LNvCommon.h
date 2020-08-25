@@ -46,6 +46,7 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_IMS_CONTROL                            = 0xC546,/* IMS总开关 NV*/
     /*jiaguocai for IMS support flag,begin 2016-10-11*/
     EN_NV_ID_VISP_WAKEUP_COMPENS_TIMER_CTRL         = 0xC806,
+    EN_NV_ID_EMC_REG_NO_RSP_TO_ANONYMOUS_CTRL       = 0xC807,/* 紧急注册保护功能定制NV */
 
     EN_NV_ID_PS_BEGIN                               = 0xD200,/*Modem begin D000*/
     EN_NV_ID_LTEAPT_TOTAL_FLG                       = 0xD201,
@@ -54,12 +55,12 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_UE_NET_CAPABILITY                      = 0xD204,
     EN_NV_ID_UE_CENTER                              = 0xD205,
     EN_NV_ID_NAS_RELEASE                            = 0xD206,
-    EN_NV_ID_IMS_RAT_SUPPORT                        = 0xD207,
+    EN_NV_ID_IMS_RAT_SUPPORT                        = 0xD207,/*modified by sunbing 49683 2013-06-27 VoLTE*/
     EN_NV_ID_SEC_CONTEXT                            = 0xD208,
-    EN_NV_ID_IMSA_CONFIG                            = 0xD209,
+    EN_NV_ID_IMSA_CONFIG                            = 0xD209,/*modified by sunbing 49683 2013-06-27 VoLTE*/
     EN_NV_ID_EPS_LOC                                = 0xD20a,
-    EN_NV_ID_IMS_CAPABILITY                         = 0xD20b,
-    EN_NV_ID_SIP_PORT_CONFIG                        = 0xD20c,
+    EN_NV_ID_IMS_CAPABILITY                         = 0xD20b,/*modified by sunbing 49683 2013-06-27 VoLTE*/
+    EN_NV_ID_SIP_PORT_CONFIG                        = 0xD20c,/*modified by sunbing 49683 2013-06-27 VoLTE*/
     EN_NV_ID_IMSI                                   = 0xD20d,
     EN_NV_ID_UE_VOICE_DOMAIN                        = 0xD20e,
     EN_NV_ID_IMS_VOIP_CONFIG                        = 0xD20f,
@@ -73,7 +74,7 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_PS_RAT_RSSI_THRESHOLD                  = 0xD217,
     EN_NV_ID_LPP_PARA_CONFIG                        = 0xD218,
     EN_NV_ID_LNAS_SWITCH_PARA                       = 0xD219,
-    EN_NV_ID_CONFIG_NWCAUSE                         = 0xD21a,
+    EN_NV_ID_CONFIG_NWCAUSE                         = 0xD21a,/* modify by leili 2014-02-15 for self-adaption NW cause*/
     EN_NV_ID_DAM_CONFIG_PARA                        = 0xD21b,
     EN_NV_ID_LNAS_COMM_CONFIG_PARA                  = 0xD21c,
     EN_NV_ID_PCSCF_DISCOVERY_POLICY                 = 0xD21d,
@@ -86,9 +87,9 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_UE_CAP_V1060                           = 0xD224,
     EN_NV_ID_UE_CAP_RF_PARA_V1060                   = 0xD225,/* R10 NV修改 end */
     EN_NV_ID_IRAT_REDIR_SWITCH                      = 0xD226,
-    EN_NV_ID_LTE_SPAC_BAND_INFO                     = 0xD227,
-    EN_NV_ID_LTE_ABANDON_BAND_INFO                  = 0xD228,
-    EN_NV_ID_LTE_MTC_NOTCH_FEATURE_INFO             = 0xD229,
+    EN_NV_ID_LTE_SPAC_BAND_INFO                     = 0xD227,/* MTC add by k0228722 begin */
+    EN_NV_ID_LTE_ABANDON_BAND_INFO                  = 0xD228,/* MTC add by k0228722 end */
+    EN_NV_ID_LTE_MTC_NOTCH_FEATURE_INFO             = 0xD229,/* MTC NOTCH add by begin */
     EN_NV_ID_LTE_CUSTOM_MCC_INFO                    = 0xD22a,/*Delete FDD Band */
     EN_NV_ID_RRC_THRESHOLD                          = 0XD22b,/* adapt filter begin */
     EN_NV_ID_UE_CAPABILITY                          = 0xD22c,
@@ -127,7 +128,7 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_VOWIFI_PARA_CONFIG                     = 0xD252,
     EN_NV_ID_IMSA_COMM_PARA_CONFIG                  = 0xD253,
     EN_NV_ID_IMS_PARM_UE_CAPABILITY                 = 0xD254,
-    EN_NV_ID_OPLMN_SEL_FILE                         = 0xD255,
+    EN_NV_ID_LNAS_ATTACH_TAU_REJ_NOT_RELEASE        = 0xD255,
     EN_NV_ID_HPLMN_PERI_FILE                        = 0xD256,
     EN_NV_ID_SEC_CONTEXT_FILE                       = 0xD257,
     EN_NV_ID_CS_LOC_FILE                            = 0xD258,
@@ -296,7 +297,7 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_UE_CAP_V1020_RF_MEAS_PARA_BAND30       = 0xD32d,
     EN_NV_ID_UE_CAP_V1020_RF_MEAS_PARA_BAND31       = 0xD32e,
     EN_NV_ID_UE_CAP_V1020_RF_MEAS_PARA_BAND32       = 0xD32f,/* CA NV end,d310~d32f,d350~d37f,d390~d3bf */
-    EN_NV_ID_TDS_AREA_LOST_TIMER                    = 0xD330,
+    EN_NV_ID_TDS_AREA_LOST_TIMER                    = 0xD330,/* add for SGLTE Begin */
     EN_NV_ID_TDS_FEATHURE_PARA                      = 0xD331,
     EN_NV_ID_TDS_AREA_LOST_THSD                     = 0xD332,/* MTC AREA LOST Begin */
     EN_NV_ID_TDS_MTC_RESEL_PARA                     = 0xD333,/* MTC RESEL Begin */

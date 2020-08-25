@@ -84,6 +84,7 @@ static const struct fsmcodedesc {
   { FsmRecvResetAck,  0, 1, "ResetAck"     }
 };
 
+/*fanzhibin f49086 add it begin*/
 const char *
 command_ShowNegval(unsigned val)
 {
@@ -94,6 +95,7 @@ command_ShowNegval(unsigned val)
   }
   return "disabled & denied";
 }
+/*fanzhibin f49086 add it end*/
 
 
 
@@ -436,6 +438,7 @@ void FsmTimeout(void *v,VOS_UINT32 ipcp_or_lcp)
        break;
      }
 
+ /*fanzhibin f49086 add it begin*/
    if(fp->state < ST_OPENED
     &&fp->state > ST_STOPPED)
    {
@@ -446,6 +449,7 @@ void FsmTimeout(void *v,VOS_UINT32 ipcp_or_lcp)
                PPP_MNTN_LOG(PS_PID_APP_PPP, 0, PS_PRINT_NORMAL,"start reltimer error\r\n");
          }
    }
+ /*fanzhibin f49086 add it end*/
 
  /*    timer_Start(&fp->FsmTimer);*/
    } else {
@@ -494,8 +498,10 @@ void FsmRecvConfigReq(struct fsm *fp, struct fsmheader *lhp, struct ppp_mbuf *bp
   /* lcp标志或ipcp pdp激活成功的标志, 该标杆在lcp阶段或ipcp pdp激活成功之后置1 */
   VOS_UINT32 lcpOrIpcpAck = 1;
 
+/*fanzhibin f49086 add it begin*/
   PPP_REQ_CONFIG_INFO_STRU PppReqConfigInfo;
   VOS_UINT8 SendBuffer[200];
+/*fanzhibin f49086 add it end*/
 
   PPP_MNTN_LOG(PS_PID_APP_PPP, 0, PS_PRINT_NORMAL, "FsmRecvConfigReq");
   bp = ppp_m_pullup(bp);
@@ -518,6 +524,7 @@ void FsmRecvConfigReq(struct fsm *fp, struct fsmheader *lhp, struct ppp_mbuf *bp
   dec.rejend = dec.rej;
   cp = PPP_MBUF_CTOP(bp);
 
+/*fanzhibin f49086 add it begin*/
   if(fp->link->phase == PHASE_NETWORK)
   {
       /* ipcp阶段，该标志置0 */
@@ -599,6 +606,7 @@ void FsmRecvConfigReq(struct fsm *fp, struct fsmheader *lhp, struct ppp_mbuf *bp
 
 
   }
+/*fanzhibin f49086 add it end*/
 
   /* 如果PDP激活未成功,不去解帧,直接回NAK,NAK里面不带任何OPTION项 */
   if (1 == lcpOrIpcpAck)

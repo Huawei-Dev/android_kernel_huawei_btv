@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and 
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may 
+* *    be used to endorse or promote products derived from this software 
+* *    without specific prior written permission.
+* 
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 #ifndef __TAF_APP_SSA_H__
 #define __TAF_APP_SSA_H__
@@ -17,9 +63,11 @@ extern "C"{
 
 #pragma pack(4)
 
+/* Modified by l60609 for DSDA Phase III, 2013-3-4, Begin */
 /* USSD */
 #define AT_USSD_NON_TRAN_MODE               0    /* 非透传:单板支持编解码 */
 #define AT_USSD_TRAN_MODE                   1    /* 透传:  单板不编解码，只是透传，由后台来编解码 */
+/* Modified by l60609 for DSDA Phase III, 2013-3-4, End */
 
 /*************************Operation Code************************/
 typedef     TAF_UINT8                       TAF_SS_OPERATION;
@@ -90,7 +138,9 @@ typedef      TAF_UINT16         TAF_SS_ERROR;
 
 /*******************SS-Code的定义**************************/
 typedef     TAF_UINT8           TAF_SS_CODE;
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
 #define     TAF_SS_CODE_MASK                                (0xf0)              /* 用于识别补充业务类别，如呼叫闭锁业务高4bit为9， */
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
 #define     TAF_ALL_SS_CODE                                 0x00    /*所有的补充业务*/
 
@@ -296,7 +346,9 @@ typedef     TAF_UINT8           TAF_SS_FORWARDINGOPTIONS;
 #define     TAF_SS_MAX_MSISDN_LEN                                  20
 #define     TAF_SS_MAX_PASSWORD_LEN                                4
 #define     TAF_SS_MAX_UNPARSE_PARA_LEN                            255
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
 #define     TAF_SS_MAX_USSD_CHAR_HEX_FORMAT                        (TAF_SS_MAX_USS_CHAR * 2)
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
 
 /********************SS错误原因值*************************************/
@@ -320,7 +372,9 @@ typedef     TAF_UINT8           TAF_SS_FORWARDINGOPTIONS;
 #define TAF_ERR_SS_NUMBER_OF_PW_ATTEMPTS_VIOLATION  (TAF_ERR_SS_BASE + 43)  /*密码尝试次数超过上限*/
 #define TAF_ERR_SS_UNKNOWN_ALPHABET                 (TAF_ERR_SS_BASE + 71)  /*USSD字符编码不支持*/
 #define TAF_ERR_SS_USSD_BUSY                        (TAF_ERR_SS_BASE + 72)  /*当前无法进行USSD操作*/
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
 #define TAF_ERR_SS_NO_PASSWORD                      (TAF_ERR_SS_BASE + 73)      /* 无操作要求的密码 */
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
 #define TAF_ERR_IMSA_USSD_BUSY                      (TAF_ERR_SS_IMSA_BASE + 1)  /*当前无法进行USSD操作*/
 #define TAF_ERR_IMSA_SRVCCING_BUFF_MSG              (TAF_ERR_SS_IMSA_BASE + 2)  /*SRVCC过程中的USSD缓存,在SRVCC成功后通过此原因通知*/
@@ -347,12 +401,14 @@ typedef     TAF_UINT8       TAF_SS_NUMTYPE;
 typedef     TAF_UINT8       TAF_SS_SUBADDRTYPE;
 typedef     TAF_UINT8       TAF_SS_CAUSE;
 
+/* Modified by l60609 for DSDA Phase III, 2013-3-4, Begin */
 typedef struct
 {
     TAF_UINT8   ucStatus;        /* 1: NV有效标志位，0：无效 */
     TAF_UINT8   ucUssdTransMode;
     TAF_UINT8   aucRsv[2];
 }USSD_TRANS_MODE_STRU;
+/* Modified by l60609 for DSDA Phase III, 2013-3-4, End */
 
 typedef struct
 {
@@ -640,14 +696,20 @@ typedef  struct
 {
     TAF_UINT32                              OP_BsService:1;
     TAF_UINT32                              OP_LongFTN_Supported:1;
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
     TAF_UINT32                              OP_Password:1;
     TAF_UINT32                              OP_Spare:29;
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
     /**选择bearerService(SS_BEARER_SERVICE:0)还是teleService(SS_TELE_SERVICE1)**/
     TAF_SS_CODE                             SsCode;
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
     VOS_UINT8                               aucReserved1[3];
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
     TAF_SS_BASIC_SERVICE_STRU               BsService;
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
     TAF_UINT8                               aucPassword[TAF_SS_MAX_PASSWORD_LEN];                 /* 指示Clck密码 */
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
 }TAF_SS_ERASESS_REQ_STRU;
 
 
@@ -905,7 +967,9 @@ TAF_UINT32 TAF_RegisterPasswordReq(MN_CLIENT_ID_T                        ClientI
                                    MN_OPERATION_ID_T                               OpId,
                                    TAF_SS_REGPWD_REQ_STRU              *pPara);
 
+/* Delete by f62575 for SS FDN&Call Control, 2013-05-06, begin */
 /* 删除GetPassword操作函数TAF_GetPasswordRsp外部引用 */
+/* Delete by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
 
 /*ProcessUnstructuredSS-Request操作*/

@@ -120,6 +120,7 @@ extern "C" {
 
 #define NVIM_MAX_FDD_FREQ_BANDS_NUM                         (12)
 
+/* Add by z60575 for multi_ssid, 2012-9-5 end */
 /*+CGMI - 获取制造商名称*/
 
 #define NAS_NVIM_MAX_IMSI_FORBIDDEN_LIST_NUM         (16)
@@ -714,6 +715,7 @@ typedef struct
     VOS_UINT8                           ucReserve2;
 }NAS_MMC_NVIM_CPHS_SUPPORT_FLG_STRU;
 
+/* Added by l60609 for B060 Project, 2012-2-20, Begin   */
 /*****************************************************************************
  结构名    : NAS_PREVENT_TEST_IMSI_REG_STRU
  结构说明  : en_NV_Item_PREVENT_TEST_IMSI_REG结构
@@ -731,6 +733,7 @@ typedef struct
     VOS_UINT8                           ucReserve1;
     VOS_UINT8                           ucReserve2;
 }NAS_PREVENT_TEST_IMSI_REG_STRU;
+/* Added by l60609 for B060 Project, 2012-2-20, End   */
 /*****************************************************************************
 *                                                                            *
 *                           参数设置消息结构                                 *
@@ -2473,6 +2476,24 @@ typedef struct
 }NAS_MMC_NVIM_ENABLE_LTE_TIMER_LEN_STRU;
 
 
+/* Added by c00318887 for DCM DisableLte定制优化和SMC失败后强制鉴权优化, 2017-2-22, begin */
+/*****************************************************************************
+ 结构名    : NAS_MMC_NVIM_DCM_CUSTOMER_ENABLE_LTE_TIMER_LEN_STRU
+ 结构说明  : en_NV_Item_Dcm_Custom_Disable_Lte_Cfg(2444) NV项结构
+
+  1.日    期   : 2017年2月22日
+    作    者   : c00318887
+    修改内容   : DCM_CUSTOMER enable lte定时器时长
+*****************************************************************************/
+typedef struct
+{
+    VOS_UINT8                           ucActiveFlag;                           /* 0: nv项未激活；1:nv项激活 */
+    VOS_UINT8                           ucEnableLteTimerLen;                    /* EnableLte timer len, 单位:分钟， nv项激活时如果为0则不使能 */
+    VOS_UINT8                           ucReserved1;
+    VOS_UINT8                           ucReserved2;
+}NAS_MMC_NVIM_DCM_CUSTOM_DISABLE_LTE_CFG_STRU;
+
+/* Added by c00318887 for DCM DisableLte定制优化和SMC失败后强制鉴权优化, 2017-2-22, end */
 /* Added by c00318887 for 移植T3402 , 2015-6-17, begin */
 /*****************************************************************************
  结构名    : NAS_MMC_NVIM_DISABLE_LTE_START_T3402_ENABLE_LTE_CFG_STRU

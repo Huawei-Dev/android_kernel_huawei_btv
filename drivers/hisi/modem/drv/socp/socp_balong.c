@@ -1,4 +1,50 @@
-
+/*
+ * Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+ * foss@huawei.com
+ *
+ * If distributed as part of the Linux kernel, the following license terms
+ * apply:
+ *
+ * * This program is free software; you can redistribute it and/or modify
+ * * it under the terms of the GNU General Public License version 2 and
+ * * only version 2 as published by the Free Software Foundation.
+ * *
+ * * This program is distributed in the hope that it will be useful,
+ * * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * * GNU General Public License for more details.
+ * *
+ * * You should have received a copy of the GNU General Public License
+ * * along with this program; if not, write to the Free Software
+ * * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+ *
+ * Otherwise, the following license terms apply:
+ *
+ * * Redistribution and use in source and binary forms, with or without
+ * * modification, are permitted provided that the following conditions
+ * * are met:
+ * * 1) Redistributions of source code must retain the above copyright
+ * *    notice, this list of conditions and the following disclaimer.
+ * * 2) Redistributions in binary form must reproduce the above copyright
+ * *    notice, this list of conditions and the following disclaimer in the
+ * *    documentation and/or other materials provided with the distribution.
+ * * 3) Neither the name of Huawei nor the names of its contributors may
+ * *    be used to endorse or promote products derived from this software
+ * *    without specific prior written permission.
+ *
+ * * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
 
 #include <linux/version.h>
 #include <linux/gfp.h>
@@ -1425,7 +1471,7 @@ void socp_handler_decdst(void)
         SOCP_REG_READ(TfState, IntState);
         IntState = IntState & 0xffff;
         SOCP_REG_READ(TfMaskReg, mask);
-        SOCP_REG_WRITE(TfMaskReg, (IntState | mask));
+        SOCP_REG_WRITE(TfMaskReg, (IntState | mask));  //added by yangzhi 2011.7.27
         SOCP_REG_WRITE(SOCP_REG_DEC_RAWINT0, IntState);
 
         g_strSocpStat.u32IntDecDstTfr |= IntState;
@@ -1524,12 +1570,14 @@ s32 socp_init(void)
 
     spin_lock_init(&lock);
 
+    /*Add dts begin*/
     dev = of_find_compatible_node(NULL,NULL,"hisilicon,socp_balong_app");
     if(NULL == dev)
     {
         socp_printf("socp_init: Socp dev find failed\n");
         return BSP_ERROR;
     }
+    /*Add dts end*/
 
     g_strSocpStat.baseAddr = (unsigned long)of_iomap(dev,0);
     if(0 == g_strSocpStat.baseAddr)
@@ -3301,6 +3349,7 @@ s32 bsp_socp_read_data_done(u32 u32DestChanID, u32 u32ReadSize)
         SOCP_CHECK_CHAN_ID(u32ChanID, SOCP_MAX_DECDST_CHN);
         SOCP_CHECK_DECDST_ALLOC(u32ChanID);
 
+        //added by yangzhi 2011.7.25
         TfMaskReg = SOCP_REG_DEC_CORE0MASK0;
         pChan = &g_strSocpStat.sDecDstChan[u32ChanID];
         SOCP_REG_READ(SOCP_REG_DECDEST_BUFWPTR(u32ChanID), uPAddr);
@@ -3330,6 +3379,7 @@ s32 bsp_socp_read_data_done(u32 u32DestChanID, u32 u32ReadSize)
         /* Ð´ÈëÐ´Ö¸Õëµ½Ð´Ö¸Õë¼Ä´æÆ÷*/
         uPAddr = SOCP_VIRT_PHY(pChan->sDecDstBuf.u32Read); /* [false alarm]:ÆÁ±ÎFortify´íÎó */
         SOCP_REG_WRITE(SOCP_REG_DECDEST_BUFRPTR(u32ChanID), uPAddr);
+        //added by yangzhi 2011.7.25
         spin_lock_irqsave(&lock, lock_flag);
         SOCP_REG_SETBITS(SOCP_REG_DEC_RAWINT0, u32ChanID, 1, 1);
         SOCP_REG_SETBITS(TfMaskReg, u32ChanID, 1, 0);

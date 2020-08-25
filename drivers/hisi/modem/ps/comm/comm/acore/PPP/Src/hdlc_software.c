@@ -356,6 +356,7 @@ VOS_UINT32 Ppp_FrameDecap(PPP_ID PppId, PPP_ZC_STRU *pstMem)
     return VOS_OK;
 }
 
+/*fanzhibin f49086 add it end*/
 
 PPP_HDLC_RESULT_TYPE_ENUM_UINT32 PPP_HDLC_SOFT_ProcData
 (

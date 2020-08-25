@@ -1,4 +1,33 @@
-
+/*-
+ * Copyright (c) 1996 - 2001 Brian Somers <brian@Awfulhak.org>
+ *          based on work by Toshiharu OHNO <tony-o@iij.ad.jp>
+ *                           Internet Initiative Japan, Inc (IIJ)
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ * $FreeBSD: src/usr.sbin/ppp/pap.c,v 1.50 2002/06/17 01:12:38 brian Exp $
+ * 1. 2006-03-13 MODIFY BY F49086 FOR A32D02476
+ */
 
 
 #include "PPP/Inc/ppp_public.h"
@@ -76,6 +105,7 @@ void
 pap_Success(struct link *l)
 {
     SendPapCode(l, PAP_ACK, "Greetings!!");
+/*fanzhibin f49086 add it begin*/
   l->lcp.auth_ineed = 0;
   if(l->lcp.auth_iwait == 0)    /* auth_iwait: 0, authentication to peer is not complete or no need to authentication,
                                               !0, authentication to peer is complete */
@@ -89,6 +119,7 @@ pap_Success(struct link *l)
         }
     }
 
+/*fanzhibin f49086 add it end*/
 
 }
 
@@ -162,6 +193,7 @@ pap_Input(/*struct bundle *bundle,*/ struct link *l, PPP_ZC_STRU *pstMem)
     }
   authp->id = authp->in.hdr.id;        /* We respond with this id */
 
+  /*fanzhibin f49086 add it begin*/
   if (authp->in.hdr.code == PAP_REQUEST)
   {
     /*将config req报文头部拷贝到缓存中*/
@@ -172,6 +204,7 @@ pap_Input(/*struct bundle *bundle,*/ struct link *l, PPP_ZC_STRU *pstMem)
     l->pap.RecordData.LenOfRequest = VOS_NTOHS(authp->in.hdr.length);
 
   }
+  /*fanzhibin f49086 add it end*/
 
 
 
@@ -213,6 +246,7 @@ pap_Input(/*struct bundle *bundle,*/ struct link *l, PPP_ZC_STRU *pstMem)
       }
 
 
+/*fanzhibin f49086 add it begin*/
       if (klen > sizeof l->pap.RecordData.password- 1)
       {
         PPP_MNTN_LOG(PS_PID_APP_PPP, DIAG_MODE_COMM, LOG_LEVEL_WARNING, "auth: too long");
@@ -229,6 +263,7 @@ pap_Input(/*struct bundle *bundle,*/ struct link *l, PPP_ZC_STRU *pstMem)
       }
 
       pap_Success(l);
+/*fanzhibin f49086 add it end*/
 
       break;
 

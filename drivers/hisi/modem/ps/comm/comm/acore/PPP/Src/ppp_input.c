@@ -458,6 +458,7 @@ VOS_UINT32 PPP_PushPacketEvent(VOS_UINT8 ucRabId, PPP_ZC_STRU *pstImmZc, ADS_PKT
     g_PppDataQCtrl.stStat.ulDownlinkCnt++;
 
     /* 通过RabId，寻找到PPP ID和相应的实体 */
+    /*Add by y45445 for PS FUSION PC ST 20120117 begin*/
     if ( !PPP_RAB_TO_PPPID(&usPppId, ucRabId) )
     {
         g_PppDataQCtrl.stStat.ulDownlinkDropCnt++;
@@ -483,7 +484,10 @@ VOS_UINT32 PPP_PushPacketEvent(VOS_UINT8 ucRabId, PPP_ZC_STRU *pstImmZc, ADS_PKT
 
         return PS_FAIL;
     }
+    /*Add by y45445 for PS FUSION PC ST 20120117 end*/
 
+    /*Add by y45445 for PS FUSION PC ST 20120117 begin*/
+    /*Add by y45445 for PS FUSION PC ST 20120117 end*/
     /*填充pstData的usApp字段:高8位放usPppId,低8位放PPP报文类型*/
     PPP_ZC_SET_DATA_APP(pstImmZc, (VOS_UINT16)(usPppId << 8) | (VOS_UINT16)PPP_PUSH_PACKET_TYPE);
 

@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may
+* *    be used to endorse or promote products derived from this software
+* *    without specific prior written permission.
+*
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 #ifndef __ATPARSE_H__
 #define __ATPARSE_H__
@@ -22,10 +68,12 @@ extern "C" {
 /* Added by L60609 for AT Project，2011-10-09,  Begin*/
 #define AT_CMD_MAX_LEN                          5000
 
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
 #define AT_CMD_OUTPUT_MAX_LEN                   (1500)                          /* 所有支持AT命令的通道MODEM限制最小为1500BYTE
                                                                                    VCOM通道限制为4K，其他通道由DMS模块限制为5120字节，
                                                                                    此处按最小的MODEM限制
                                                                                 */
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
 #define AT_CMD_ECONF_DIAL_MAX_PARA_NUM          (11)
 #define AT_CMD_ECONF_DIAL_MIN_PARA_NUM          (7)
@@ -153,8 +201,10 @@ enum AT_RRETURN_CODE_ENUM
 
     AT_CME_SERVICE_NOT_PROVISIONED,
 
+    /* Added by L60609 for V7R1C50 AT&T&DCM, 2012-6-16, begin */
     AT_CME_PDP_ACT_LIMIT,
     AT_CME_NET_SEL_MENU_DISABLE,
+    /* Added by L60609 for V7R1C50 AT&T&DCM, 2012-6-16, end */
 
     AT_CME_CS_SERV_EXIST,
 
@@ -649,7 +699,9 @@ typedef VOS_UINT32 (*PFN_AT_FW_MSG_PROC)(VOS_UINT8 ucClientId, VOS_VOID *pMsgBlo
 #define CGANS_CMD_PARA_STRING           "(0,1),(\"NULL\"),(1-11)"
 #endif  /* FEATURE_ON == FEATURE_LTE */
 
+/* Added by l60609 for V3R3 PPP RPOJECT 2013-06-07, Begin */
 #define CGANS_EXT_CMD_PARA_STRING       "(0,1)"
+/* Added by l60609 for V3R3 PPP RPOJECT 2013-06-07, End */
 
 #if (FEATURE_ON == FEATURE_LTE)
 #define CGDATA_CMD_PARA_STRING          "(\"NULL\"),(1-31),(1-31),(1-31),(1-31),(1-31),(1-31),(1-31),(1-31),(1-31),(1-31),(1-31)"
@@ -674,6 +726,7 @@ typedef VOS_UINT32 (*PFN_AT_FW_MSG_PROC)(VOS_UINT8 ucClientId, VOS_VOID *pMsgBlo
 #else
 #define CGEQREQ_CMD_PARA_STRING         "(1-31),(0-4),(0-11480),(0-42000),(0-11480),(0-42000),(0-2),(0-1520),(\"0E0\",\"1E2\",\"7E3\",\"1E3\",\"1E4\",\"1E5\",\"1E6\",\"1E1\"),(\"0E0\",\"5E2\",\"1E2\",\"5E3\",\"4E3\",\"1E3\",\"1E4\",\"1E5\",\"1E6\",\"6E8\"),(0-3),(0-4100),(0-3),(0-1),(0-1)"
 #define CGEQMIN_CMD_PARA_STRING         "(1-31),(0-4),(0-11480),(0-42000),(0-11480),(0-42000),(0-2),(0-1520),(\"0E0\",\"1E2\",\"7E3\",\"1E3\",\"1E4\",\"1E5\",\"1E6\",\"1E1\"),(\"0E0\",\"5E2\",\"1E2\",\"5E3\",\"4E3\",\"1E3\",\"1E4\",\"1E5\",\"1E6\",\"6E8\"),(0-3),(0-4100),(0-3),(0-1),(0-1)"
+/* Modified  by f62575 for AT Project, 2011-11-24, end */
 #endif  /* PS_UE_REL_VER < PS_PTL_VER_R5 */
 
 #else
@@ -686,6 +739,7 @@ typedef VOS_UINT32 (*PFN_AT_FW_MSG_PROC)(VOS_UINT8 ucClientId, VOS_VOID *pMsgBlo
 #else
 #define CGEQREQ_CMD_PARA_STRING         "(1-11),(0-4),(0-11480),(0-42000),(0-11480),(0-42000),(0-2),(0-1520),(\"0E0\",\"1E2\",\"7E3\",\"1E3\",\"1E4\",\"1E5\",\"1E6\",\"1E1\"),(\"0E0\",\"5E2\",\"1E2\",\"5E3\",\"4E3\",\"1E3\",\"1E4\",\"1E5\",\"1E6\",\"6E8\"),(0-3),(0-4100),(0-3),(0-1),(0-1)"
 #define CGEQMIN_CMD_PARA_STRING         "(1-11),(0-4),(0-11480),(0-42000),(0-11480),(0-42000),(0-2),(0-1520),(\"0E0\",\"1E2\",\"7E3\",\"1E3\",\"1E4\",\"1E5\",\"1E6\",\"1E1\"),(\"0E0\",\"5E2\",\"1E2\",\"5E3\",\"4E3\",\"1E3\",\"1E4\",\"1E5\",\"1E6\",\"6E8\"),(0-3),(0-4100),(0-3),(0-1),(0-1)"
+/* Modified  by f62575 for AT Project, 2011-11-24, end */
 #endif  /* PS_UE_REL_VER < PS_PTL_VER_R5 */
 
 #endif  /* FEATURE_ON == FEATURE_LTE */
@@ -718,12 +772,14 @@ typedef VOS_UINT32 (*PFN_AT_FW_MSG_PROC)(VOS_UINT8 ucClientId, VOS_VOID *pMsgBlo
 #define NDISCONN_TEST_CMD_PARA_STRING    "(1-16),(0,1),(apn),(username),(passwd),(0-65535)"
 #endif
 
+/* Added by l47619 for C50 IPC Project, 2012-03-19, begin */
 #if (FEATURE_ON == FEATURE_LTE)
 #define DNSQUERY_TEST_CMD_PARA_STRING   "(1-31)"
 #else
 #define DNSQUERY_TEST_CMD_PARA_STRING   "(1-11)"
 #endif  /* FEATURE_ON == FEATURE_LTE */
 
+/* Modified by l60609 for V9R1 IPv6&TAF/SM Project, 2013-4-25, begin */
 #if (FEATURE_ON == FEATURE_LTE)
 #if (FEATURE_ON == FEATURE_MULTI_MODEM)
 #if (MULTI_MODEM_NUMBER == 3)
@@ -745,7 +801,9 @@ typedef VOS_UINT32 (*PFN_AT_FW_MSG_PROC)(VOS_UINT8 ucClientId, VOS_VOID *pMsgBlo
 #define CHDATA_TEST_CMD_PARA_STRING   "(1-11),(1-3)"
 #endif
 #endif  /* FEATURE_ON == FEATURE_LTE */
+/* Modified by l60609 for V9R1 IPv6&TAF/SM Project, 2013-4-25, end */
 
+/* Added by l47619 for C50 IPC Project, 2012-03-19, end */
 /*DTS2012041102190 : h00135900 start in 2011-04-11 AT代码融合*/
 #if (FEATURE_ON == FEATURE_LTE)
 #if (FEATURE_ON == FEATURE_IPV6)

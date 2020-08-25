@@ -1,4 +1,50 @@
-
+/*
+ * Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+ * foss@huawei.com
+ *
+ * If distributed as part of the Linux kernel, the following license terms
+ * apply:
+ *
+ * * This program is free software; you can redistribute it and/or modify
+ * * it under the terms of the GNU General Public License version 2 and 
+ * * only version 2 as published by the Free Software Foundation.
+ * *
+ * * This program is distributed in the hope that it will be useful,
+ * * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * * GNU General Public License for more details.
+ * *
+ * * You should have received a copy of the GNU General Public License
+ * * along with this program; if not, write to the Free Software
+ * * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+ *
+ * Otherwise, the following license terms apply:
+ *
+ * * Redistribution and use in source and binary forms, with or without
+ * * modification, are permitted provided that the following conditions
+ * * are met:
+ * * 1) Redistributions of source code must retain the above copyright
+ * *    notice, this list of conditions and the following disclaimer.
+ * * 2) Redistributions in binary form must reproduce the above copyright
+ * *    notice, this list of conditions and the following disclaimer in the
+ * *    documentation and/or other materials provided with the distribution.
+ * * 3) Neither the name of Huawei nor the names of its contributors may 
+ * *    be used to endorse or promote products derived from this software 
+ * *    without specific prior written permission.
+ * 
+ * * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
 
 
 #ifndef __DRV_MAILBOX_CFG_H__
@@ -139,6 +185,7 @@ enum MAILBOX_GAP_FOR_SI_PARSE {MAILBOX_GAP_FOR_SI_BUTT};
  实 体 名  : MAILBOX_CPUID_E
  功能描述  : 定义邮箱涉及CPU编号
 *****************************************************************************/
+/* Modified by c64416 for hifi mailbox, 2013/09/24, begin */
 enum MAILBOX_CPUID_ENUM
 {
     MAILBOX_CPUID_RESERVED  =   -1,
@@ -149,6 +196,7 @@ enum MAILBOX_CPUID_ENUM
     MAILBOX_CPUID_HIFI      =   IPC_CORE_HiFi,
     MAILBOX_CPUID_BUTT
 };
+/* Modified by c64416 for hifi mailbox, 2013/09/24, end */
 
 /*****************************************************************************
  实体名称  : MAILBOX_MAILCODE_ENUM
@@ -341,11 +389,13 @@ enum MAILBOX_MAILCODE_ENUM
 /* 邮件序列号的初始值 */
 #define MAILBOX_SEQNUM_START            (0)
 
+/* Modified by c64416 for hifi mailbox, 2013/09/24, begin */
 /* 邮箱占用memory基地址 */
 #define MAILBOX_MEM_BASEADDR            (DDR_HIFI_MBX_ADDR)
 
 /* 邮箱占用memory预留总长度, 包括邮箱控制头和邮箱队列缓存 */
 #define MAILBOX_MEM_LENGTH              (DDR_HIFI_MBX_SIZE)
+/* Modified by c64416 for hifi mailbox, 2013/09/24, end */
 
 /*****************************************************************************
  实 体 名  : struct mb_head
@@ -375,6 +425,7 @@ typedef struct mb_head
     MAILBOX_QUEUE_SIZE_##src##2##dst##_##channel
 enum MAILBOX_QUEUE_SIZE_ENUM
 {
+/* Modified by c64416 for hifi mailbox, 2013/09/24, begin */
     /* 以下各枚举项按规则生成, 形如: MAILBOX_QUEUE_SIZE_MCU2ACPU_DEFAULT */
     MAILBOX_QUEUE_SIZE(MCU,  ACPU, MSG) = 0x00000000,
     MAILBOX_QUEUE_SIZE(ACPU, MCU,  MSG) = 0x00000000,
@@ -399,6 +450,7 @@ enum MAILBOX_QUEUE_SIZE_ENUM
 
     MAILBOX_QUEUE_SIZE(BBE16, HIFI, MSG) = 0x00001800,
     MAILBOX_QUEUE_SIZE(HIFI, BBE16, MSG) = 0x00001800
+/* Modified by c64416 for hifi mailbox, 2013/09/24, end */
 };
 
 /* 各邮箱控制头地址分配 */
@@ -493,6 +545,7 @@ enum MAILBOX_QUEUE_ADDR_ENUM
     MAILBOX_IPC_INT_##src##2##dst##_##channel
 enum IPC_MAILBOX_INT_ENUM
 {
+/* Modified by c64416 for hifi mailbox, 2013/09/24, begin */
 #if 0
     /* 以下各枚举项按规则生成, 形如: MAILBOX_IPC_INT_CCPU2MCU_DEFAULT */
     MAILBOX_IPC_INT_NUM(CCPU, MCU, MSG)  = IPC_MCU_INT_SRC_CCPU_MSG,
@@ -532,6 +585,7 @@ enum IPC_MAILBOX_INT_ENUM
     MAILBOX_IPC_INT_NUM(ACPU, HIFI, MSG) = IPC_HIFI_INT_SRC_ACPU_MSG,
     MAILBOX_IPC_INT_NUM(HIFI, ACPU, MSG) = IPC_ACPU_INT_SRC_HIFI_MSG,
 #endif
+/* Modified by c64416 for hifi mailbox, 2013/09/24, end */
 };
 
 /* 各邮箱数据单个邮件最大长度定义 */

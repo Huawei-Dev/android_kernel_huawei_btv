@@ -107,6 +107,7 @@ struct ipcp {
 #endif
     } ns;
 
+/*fanzhibin f49086 add it begin*/
     /*为了与网络侧之间的交互，特定义该结构*/
     VOS_UINT32 stage;
 
@@ -129,6 +130,7 @@ struct ipcp {
 
     VOS_UINT16 ComressProtoLen;
     VOS_CHAR CompressProto[10];
+/*fanzhibin f49086 add it end*/
 
 
 
@@ -172,7 +174,9 @@ extern void ipcp_Destroy(struct ipcp *);
 extern void ipcp_Setup(struct ipcp *, VOS_UINT32);
 extern void ipcp_SetLink(struct ipcp *, struct link *);
 
+/*fanzhibin f49086 add it begin*/
 extern VOS_UINT32 DecodeAtIndication(struct ipcp* pIpcp,VOS_CHAR* pEchoBuffer,VOS_UINT16 BufferLen);
+/*fanzhibin f49086 add it end*/
 
 extern VOS_INT32  ipcp_Show(struct ipcp * /*struct cmdargs const **/);
 extern PPP_ZC_STRU *ipcp_Input(/*struct bundle *, */struct link *, PPP_ZC_STRU *);

@@ -177,8 +177,10 @@ enum SYS_NV_ID_ENUM
 
 /*  2021  */     en_NV_Item_CNAS_HRPD_Session_Ctrl_Cfg = 2021,
 
+/* Added by k902809 for Iteration 15, 2015-5-21, begin */
 /* 2022 */      en_NV_Item_EHRPD_Retry_Conn_Est_Config  = 2022,
 /* 2023 */      en_NV_Item_EHRPD_Retry_Pdn_Setup_Config = 2023,
+/* Added by k902809 for Iteration 15, 2015-5-21, end */
 
 /*  2024  */     en_NV_Item_1X_ADD_AVOID_LIST_CFG  = 2024,
 /*  2025 */     en_NV_Item_1X_NEG_PREF_SYS_CMP_CTRL  = 2025,
@@ -416,6 +418,10 @@ enum SYS_NV_ID_ENUM
 
 /* 2413 */      en_NV_Item_PDP_REDIAL_FOR_NO_CAUSE_CFG = 2413,                  /* PDP双栈激活，网侧无原因值重拨功能开关配置 */
 
+/* Added by c00318887 for DCM DisableLte定制优化和SMC失败优化, 2017-2-22, begin */
+/* 2444 */      en_NV_Item_Dcm_Custom_Disable_Lte_Cfg       = 2444,                 /* DCM disable Lte 定制配置 */
+/* Added by c00318887 for DCM DisableLte定制优化和SMC失败优化, 2017-2-22, end */
+
 /* 2470 */      en_NV_Item_Pdp_Redial_For_No_Pdp_Type_CAUSE_CFG     = 2470,     /* PDP双栈激活，网侧拒绝28号原因值重拨功能开关配置 */
 
 /*   3000*/      en_NV_Item_ErrLog_CsHo_Len = 3000,
@@ -423,7 +429,9 @@ enum SYS_NV_ID_ENUM
 
 /* 3002 */      en_NV_Item_GAS_UTRAN_TDD_DEFAULT_Q_RXLMIN = 3002,
 
+/* Added by yangsicong for L2G REDIR C1 CUSTUME, 2015-1-26, begin */
 /* 3003 */      en_NV_Item_GAS_C1_Calc_Opt_White_Plmn_List = 3003,
+/* Added by yangsicong for L2G REDIR C1 CUSTUME, 2015-1-26, end */
 
 /* 3004 */      en_NV_Item_ErrLog_Stay_Self_Rat_Timer_Threshold      = 3004,
 
@@ -511,6 +519,7 @@ enum SYS_NV_ID_ENUM
 /* 3055 */     en_NV_Item_WAS_OUT_SERVICE_RESEL_THRES                   = 3055,
 /* 3063 */     en_NV_Item_GAS_Revision_Level_Customization              = 3063,
 /* 3092*/      en_NV_Item_Was_SfnSfnOtd_Cfg                  = 3092,
+/* 3098 */     en_NV_Item_Was_Emergency_Camp_Cfg             = 3098,
 /* 3500 */     en_NV_Item_CAS_1X_RC_PREF                     = 3500,
 /* 3501 */     en_NV_Item_CAS_1X_NVIM_TERMINAL_INFO          = 3501,
 /* 3502 */     en_NV_Item_CAS_1X_NVIM_CELL_THRESHOLD         = 3502,
@@ -573,8 +582,10 @@ enum SYS_NV_ID_ENUM
 /* 4002 */       en_NV_Item_PESN   = 4002,
 /* 4003 */       en_NV_Item_MEID   = 4003,
 /* 4004 */       en_NV_Item_SLEEP_BBE16_CTRL    = 4004,
+/* Added by zhuli 2015-10-16 begin */
 /* 4005 */       en_NV_Item_Cdma_Test_Card_Cfg                          = 4005,
 /* 4006 */       en_NV_Item_STK_Support_Feature_Cfg                     = 4006,
+/* Added by zhuli 2015-10-16 begin */
 
 /* 4007 */       en_NV_Item_SC_PERS_Support_Platform_Cfg                = 4007,
 /* 4008 */       en_NV_Item_NV_SC_PERS_CTRL_CFG                         = 4008,
@@ -582,6 +593,8 @@ enum SYS_NV_ID_ENUM
 /* 4010 */       en_NV_Item_Isim_Enable_Cfg                             = 4010,
 
 /* 4011 */       en_NV_Item_Usim_Uicc_App_Priority_Cfg                  = 4011,
+
+/* 4046 */       en_NV_Item_Provide_Command_Ctrl                        = 4046,
 
 /* 4500 */       en_NV_Item_TTF_PPPC_CONFIG_OPTIONS                       = 4500,
 
@@ -609,8 +622,10 @@ enum SYS_NV_ID_ENUM
 
 /*  9046 */      en_NV_Item_Ho_Wait_Sysinfo_Timer_Config    = 9046,
 
+/* Added by f62575 for C50_IPC Project, 2012/02/23, begin */
 /*   9049 */     en_NV_Item_FDN_Info                 = 9049,
 /* 9050  */      en_NV_Item_CSFB_PPAC_Para           = 9050,                  /* WAS新增PPAC NV项 */
+/* Added by f62575 for C50_IPC Project, 2012/02/23, end   */
 /*   9051*/      en_NV_BREATH_TIME = 9051,
 /* 增加LTE国际漫游定制NV */
 /* 9052 */       en_NV_Item_Lte_Internation_Roam_Config     = 9052,
@@ -633,9 +648,11 @@ enum SYS_NV_ID_ENUM
 /*   9069*/      en_NV_Item_WAS_Customized_Para        = 9069,       /* WAS新增NV项，存储定制NV参数 */
 /* 9072 */       en_NV_Item_FC_ACPU_DRV_ASSEMBLE_PARA  = 9072, /* 动态调整驱动组包方案档位信息 */
 
+/* Added by L60609 for V7R1C50 AT&T&DCM, 2012-6-11, begin */
 /* 9080 */       en_NV_Item_Scan_Ctrl_Para             = 9080,
 /* 9081 */       en_NV_Item_Att_Ens_Ctrl_Para          = 9081,
 /* 9082 */       en_NV_Item_Pdp_Act_Limit_Para         = 9082,
+/* Added by L60609 for V7R1C50 AT&T&DCM, 2012-6-11, end */
 /* 9083 */       en_NV_Item_REPORT_ECC_NUM_SUPPORT_FLAG = 9083,
 /* 9084 */       en_NV_Item_CUSTOM_ECC_NUM_LIST         = 9084,
 /* 9085 */       en_NV_Item_ACTING_PLMN_SUPPORT_FLAG    = 9085,
@@ -644,7 +661,9 @@ enum SYS_NV_ID_ENUM
 /* 9088 */       en_NV_Item_CS_FAIL_NETWORK_FAILURE_PLMN_SEARCH_FLAG = 9088,
 /* 9089 */       en_NV_Item_REPORT_PLMN_SUPPORT_FLAG                 = 9089,
 
+                 /* Added by h59254 for V7R1C50 AT&T, 2012-6-29, begin */
 /* 9090 */       en_NV_Item_Usim_Support_Feature_Config              = 9090,
+                 /* Added by h59254 for V7R1C50 AT&T, 2012-6-29, begin */
 
 /* 9091 */       en_NV_Item_UTRAN_TDD_FREQ_BAND		   = 9091, /* 指示TDS Band信息 */
 
@@ -659,8 +678,10 @@ enum SYS_NV_ID_ENUM
 /* 9103 */       en_NV_Item_Utran_Mode_Auto_Switch     = 9103,                  /* 在当前的GUTL版本，支持配置出GUL版本,GTL版本，以及GUTL版本配置NVIM ID */
 /* 9104 */       en_NV_Item_Disabled_Rat_Plmn_Info     = 9104,                  /* 禁止带接入技术的PLMN信息 */
 
+/* Modify by z60575 for multi_ssid, 2012-9-25 begin */
 /* 9110 */       en_NV_Item_MULTI_WIFI_KEY             = 9110,       /* 支持多组SSID扩展新增WIKEY NV项 */
 /* 9111 */       en_NV_Item_MULTI_WIFI_STATUS_SSID     = 9111,       /* 支持多组SSID扩展新增SSID NV项 */
+/* Modify by z60575 for multi_ssid, 2012-9-25 end */
 
 /* 9112 */      en_NV_Item_UMTS_CODEC_TYPE              = 9112,
 
@@ -681,9 +702,13 @@ enum SYS_NV_ID_ENUM
 /* 9126 */       en_NV_Item_Usim_OpFile_Init_Cfg = 9126,
 /* 9127 */       en_NV_Item_Sim_OpFile_Init_Cfg = 9127,
 /* 9128 */       en_NV_Item_CIMI_PORT_CFG = 9128,
+/* Added by h59254 2013/01/04, begin */
 /* 9129 */       en_NV_Item_Test_Card_Cfg = 9129,
+/* Added by h59254 2013/01/04, end */
 
+/* Added by l60609 for V9R1 IPv6&TAF/SM Project, 2013-4-24, begin */
 /* 9130 */       en_NV_Item_IPV6_BACKPROC_EXT_CAUSE = 9130,
+/* Added by l60609 for V9R1 IPv6&TAF/SM Project, 2013-4-24, end */
 
                  en_NV_Item_SMS_TIMER_LENGTH = 9131,
                  en_NV_Item_SS_CUSTOMIZE_PARA = 9132,
@@ -694,7 +719,9 @@ enum SYS_NV_ID_ENUM
 /* 9200 */       en_NV_Item_WTTF_MACDL_WATERMARK_LEVEL_Config = 9200, /* BBP译码中断水线等级控制信息 */
 /* 9201 */       en_NV_Item_WTTF_MACDL_BBPMST_TB_HEAD_Config  = 9201, /* BBPMST头部TB块信息 */
 
+/* Added by l60609 for DSDA Phase II, 2012-12-13, Begin */
 /* 9202 */       en_NV_Item_AT_CLIENT_CONFIG    = 9202,                           /* 双卡双通控制AT通道归属哪个Modem信息 */
+/* Added by l60609 for DSDA Phase II, 2012-12-13, End */
 
 /* 9203 */       en_NV_Item_Platform_RAT_CAP        = 9203,
 /* 9205 */       en_NV_Item_BBP_DUMP_ENABLE             = 9205,  /* BBP 数采开关 */
@@ -721,7 +748,9 @@ enum SYS_NV_ID_ENUM
 /*9219*/         en_NV_Item_DEACT_USIM_WHEN_POWEROFF        = 9219, /* AT+CFUN=0命令软关机，去激活SIM卡功能控制NV */
                 en_NV_Item_Enable_Lte_Timer_Len = 9220,
 
+/* Added by f62575 for VSIM FEATURE, 2013-8-29, begin */
                 en_Item_NAS_VSIM_CTRL_FEATURE               = 9224,
+/* Added by f62575 for VSIM FEATURE, 2013-8-29, end */
 
 /*   9225  */   en_NV_Item_CSFB_RAU_FOLLOW_ON_FLAG = 9225,
 

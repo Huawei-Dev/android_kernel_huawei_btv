@@ -365,7 +365,7 @@ int mdrv_file_write(void *ptr, unsigned int size, unsigned int number, void *str
 {
     int cnt;
 
-    if((0 == ptr) || (0 == stream))
+    if((0 == ptr) || (0 == stream) || (0 == size))
     {
         g_err = 1;
         return -1;
@@ -381,7 +381,7 @@ int mdrv_file_write_sync(void *ptr, unsigned int size, unsigned int number, void
 {
     int cnt;
 
-    if((0 == ptr) || (0 == stream))
+    if((0 == ptr) || (0 == stream) || (0 == size))
     {
         g_err = 1;
         return -1;

@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may
+* *    be used to endorse or promote products derived from this software
+* *    without specific prior written permission.
+*
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 /*****************************************************************************
    1 头文件包含
@@ -112,6 +158,7 @@ const AT_PROC_MSG_FROM_DRV_AGENT_STRU g_astAtProcMsgFromDrvAgentTab[]=
     /* Added by l00171473 for 内存监控AT命令, 2011-11-29,  begin */
     {DRV_AGENT_MEMINFO_QRY_CNF,             AT_RcvDrvAgentMemInfoQryRsp},
     /* Added by l00171473 for 内存监控AT命令, 2011-11-29,  end */
+    /* Added by f62575 for AT Project, 2011-10-04,  Begin */
     {DRV_AGENT_DLOADINFO_QRY_CNF,           AT_RcvDrvAgentDloadInfoQryRsp},
     {DRV_AGENT_FLASHINFO_QRY_CNF,           AT_RcvDrvAgentFlashInfoQryRsp},
     {DRV_AGENT_AUTHORITYVER_QRY_CNF,        AT_RcvDrvAgentAuthorityVerQryRsp},
@@ -124,7 +171,9 @@ const AT_PROC_MSG_FROM_DRV_AGENT_STRU g_astAtProcMsgFromDrvAgentTab[]=
     {DRV_AGENT_SDLOAD_SET_CNF,              AT_RcvDrvAgentSdloadSetRsp},
     {DRV_AGENT_APPDMVER_QRY_CNF,            AT_RcvDrvAgentAppdmverQryRsp},
     {DRV_AGENT_DLOADVER_QRY_CNF,            AT_RcvDrvAgentDloadverQryRsp},
+    /* Added by f62575 for AT Project, 2011-10-04,  End */
 
+    /* Added by l60609 for AT Project, 2011-11-03,  Begin */
     {DRV_AGENT_IMSICHG_QRY_CNF,             AT_RcvDrvAgentImsiChgQryRsp},
     {DRV_AGENT_INFORBU_SET_CNF,             AT_RcvDrvAgentInfoRbuSetRsp},
     /*DTS2012041102190 : h00135900 start in 2011-04-11 AT代码融合*/
@@ -133,24 +182,31 @@ const AT_PROC_MSG_FROM_DRV_AGENT_STRU g_astAtProcMsgFromDrvAgentTab[]=
     {DRV_AGENT_CPNN_QRY_CNF,                AT_RcvDrvAgentCpnnQryRsp},
     {DRV_AGENT_CPNN_TEST_CNF,               AT_RcvDrvAgentCpnnTestRsp},
     {DRV_AGENT_NVBACKUP_SET_CNF,            AT_RcvDrvAgentNvBackupSetRsp},
+    /* Added by l60609 for AT Project, 2011-11-03,  Begin */
 
     {DRV_AGENT_NVRESTORE_SET_CNF,           AT_RcvDrvAgentSetNvRestoreCnf},
     {DRV_AGENT_NVRSTSTTS_QRY_CNF,           AT_RcvDrvAgentQryNvRestoreRstCnf},
     {DRV_AGENT_NVRESTORE_MANU_DEFAULT_CNF,  AT_RcvDrvAgentNvRestoreManuDefaultRsp},
 
     {DRV_AGENT_ADC_SET_CNF,                 AT_RcvDrvAgentSetAdcRsp},
+    /* Added by f62575 for SMALL IMAGE, 2012-1-3, Begin   */
     {DRV_AGENT_TSELRF_SET_CNF,              AT_RcvDrvAgentTseLrfSetRsp},
     {DRV_AGENT_HKADC_GET_CNF,               AT_RcvDrvAgentHkAdcGetRsp},
+    /* Added by f62575 for SMALL IMAGE, 2012-1-3, end   */
 
     {DRV_AGENT_TBAT_QRY_CNF,                AT_RcvDrvAgentQryTbatRsp},
+    /* Added by l60609 for B060 Project, 2012-2-21, Begin   */
     {DRV_AGENT_SPWORD_SET_CNF,              AT_RcvDrvAgentSetSpwordRsp},
+    /* Added by l60609 for B060 Project, 2012-2-21, End   */
 
     {DRV_AGENT_NVBACKUPSTAT_QRY_CNF,        AT_RcvDrvAgentNvBackupStatQryRsp},
     {DRV_AGENT_NANDBBC_QRY_CNF,             AT_RcvDrvAgentNandBadBlockQryRsp},
     {DRV_AGENT_NANDVER_QRY_CNF,             AT_RcvDrvAgentNandDevInfoQryRsp},
     {DRV_AGENT_CHIPTEMP_QRY_CNF,            AT_RcvDrvAgentChipTempQryRsp},
 
+    /* Added by h59254 for C50 SAR Project, 2012/03/10, begin */
     {DRV_AGENT_ANTSTATE_QRY_IND,            AT_RcvDrvAgentAntStateIndRsp},
+    /* Added by h59254 for C50 SAR Project, 2012/03/10, end */
 
     {DRV_AGENT_MAX_LOCK_TIMES_SET_CNF,      AT_RcvDrvAgentSetMaxLockTmsRsp},
 
@@ -172,7 +228,9 @@ const AT_PROC_MSG_FROM_DRV_AGENT_STRU g_astAtProcMsgFromDrvAgentTab[]=
 
     {DRV_AGENT_SWVER_SET_CNF,               AT_RcvDrvAgentSwverSetCnf},
 
+    /* Added by L47619 for V9R1 vSIM Project, 2013-8-27, begin */
     {DRV_AGENT_HVPDH_CNF,                   AT_RcvDrvAgentHvpdhSetCnf},
+    /* Added by L47619 for V9R1 vSIM Project, 2013-8-27, end */
 
     /* Added by d00212987 for BalongV9R1 NV备份数据丢失容错&恢复 项目 2013-10-24, begin */
     {DRV_AGENT_NVMANUFACTUREEXT_SET_CNF,    AT_RcvNvManufactureExtSetCnf},
@@ -301,8 +359,11 @@ const AT_PROC_MSG_FROM_MMA_STRU g_astAtProcMsgFromMmaTab[]=
     {ID_TAF_MMA_USIM_STATUS_IND,            AT_RcvAtMmaUsimStatusInd},
     {ID_TAF_MMA_CMM_SET_CNF,            AT_RcvMmaCmmSetCmdRsp},
     {ID_TAF_MMA_SIMLOCK_STAUS_QUERY_CNF, AT_RcvSimLockQryRsp},
+/* Modified by k902809 for Iteration 11, 2015-3-23, begin */
     {ID_TAF_MMA_AC_INFO_QRY_CNF,        AT_RcvMmaAcInfoQueryCnf},
     {ID_TAF_MMA_AC_INFO_CHANGE_IND,     AT_RcvMmaAcInfoChangeInd},
+/* Modified by k902809 for Iteration 11, Iteration 11 2015-3-23, end */
+    /* Added by k902809 for Iteration 11, 2015-3-25, begin */
     {ID_TAF_MMA_EOPLMN_SET_CNF,         AT_RcvMmaEOPlmnSetCnf},
     {ID_TAF_MMA_NET_SCAN_CNF,           AT_RcvMmaNetScanCnf},
     {ID_TAF_MMA_USER_SRV_STATE_QRY_CNF,   AT_RcvMmaUserSrvStateQryCnf},
@@ -311,8 +372,11 @@ const AT_PROC_MSG_FROM_MMA_STRU g_astAtProcMsgFromMmaTab[]=
     {ID_TAF_MMA_MMPLMNINFO_QRY_CNF,     AT_RcvMmaMMPlmnInfoQryCnf},
     {ID_TAF_MMA_LAST_CAMP_PLMN_QRY_CNF,           AT_RcvMmaPlmnQryCnf},
     {ID_TAF_MMA_EOPLMN_QRY_CNF,         AT_RcvMmaEOPlmnQryCnf},
+    /* Added by k902809 for Iteration 11, Iteration 11 2015-3-25, end */
     {ID_TAF_MMA_COPN_INFO_QRY_CNF,      AT_RcvMmaCopnInfoQueryCnf},
+    /* Modified by k902809 for Iteration 11, 2015-3-24, begin */
     {ID_TAF_MMA_SIM_INSERT_CNF,          AT_RcvMmaSimInsertRsp},
+    /* Modified by k902809 for Iteration 11, Iteration 11 2015-3-24, end */
     {ID_TAF_MMA_SYS_CFG_SET_CNF,        AT_RcvMmaSysCfgSetCnf},
     {ID_TAF_MMA_PHONE_MODE_SET_CNF,     AT_RcvMmaPhoneModeSetCnf},
     {ID_TAF_MMA_DETACH_CNF,             AT_RcvMmaDetachCnf},
@@ -1387,10 +1451,12 @@ VOS_UINT32 AT_RcvDrvAgentMsidQryCnf(VOS_VOID *pMsg)
     DRV_AGENT_MSID_QRY_CNF_STRU        *pstDrvAgentMsidQryCnf;
     VOS_UINT32                          ulResult;
     VOS_UINT8                           ucIndex;
+    /* Modified by l60609 for DSDA Phase III, 2013-3-4, Begin */
     MODEM_ID_ENUM_UINT16                enModemId;
     VOS_UINT32                          ulRet;
 
     enModemId = MODEM_ID_0;
+    /* Modified by l60609 for DSDA Phase III, 2013-3-4, End */
 
     /* 初始化 */
     pRcvMsg               = (DRV_AGENT_MSG_STRU *)pMsg;
@@ -1442,6 +1508,7 @@ VOS_UINT32 AT_RcvDrvAgentMsidQryCnf(VOS_VOID *pMsg)
         return VOS_ERR;
     }
 
+    /* Modified by l60609 for DSDA Phase III, 2013-3-4, Begin */
     ulRet = AT_GetModemIdFromClient(ucIndex, &enModemId);
 
     if (VOS_OK != ulRet)
@@ -1451,6 +1518,7 @@ VOS_UINT32 AT_RcvDrvAgentMsidQryCnf(VOS_VOID *pMsg)
     }
 
 
+    /* Modified by l60609 for DSDA Phase III, 2013-3-4, End */
     if (AT_ERROR == ulResult)
     {
         gstAtSendData.usBufLen = 0;
@@ -2162,6 +2230,7 @@ VOS_UINT32 AT_RcvMmaEonsUcs2Cnf(VOS_VOID *pMsg)
 *****************************************************************************/
 VOS_UINT32 AT_RcvAtMmaUsimStatusInd(VOS_VOID *pMsg)
 {
+    /* Modified by l60609 for DSDA Phase II, 2012-12-24, Begin */
     AT_MMA_USIM_STATUS_IND_STRU        *pstAtMmaUsimStatusIndMsg;
     MODEM_ID_ENUM_UINT16                enModemId;
     AT_USIM_INFO_CTX_STRU              *pstUsimInfoCtx = VOS_NULL_PTR;
@@ -2185,6 +2254,7 @@ VOS_UINT32 AT_RcvAtMmaUsimStatusInd(VOS_VOID *pMsg)
     pstUsimInfoCtx->enCardStatus = pstAtMmaUsimStatusIndMsg->enCardStatus;
     pstUsimInfoCtx->ucIMSILen    = pstAtMmaUsimStatusIndMsg->ucIMSILen;
     PS_MEM_CPY(pstUsimInfoCtx->aucIMSI, pstAtMmaUsimStatusIndMsg->aucIMSI, NAS_MAX_IMSI_LENGTH);
+    /* Modified by l60609 for DSDA Phase II, 2012-12-24, End */
 
     printk(KERN_ERR "\nAT_RcvAtMmaUsimStatusInd: CardType: %d , CardStatus: %d , ulSenderPid: %d\n",
            pstAtMmaUsimStatusIndMsg->enCardType, pstAtMmaUsimStatusIndMsg->enCardStatus, pstAtMmaUsimStatusIndMsg->ulSenderPid);
@@ -2852,11 +2922,13 @@ VOS_UINT32 AT_RcvDrvAgentSetRxdivCnf(VOS_VOID *pMsg)
     }
     else
     {
+        /* Added by f62575 for SMALL IMAGE, 2012-1-3, begin */
         gstAtSendData.usBufLen = 0;
 
         AT_STOP_TIMER_CMD_READY(ucIndex);
 
         At_FormatResultData(ucIndex, AT_ERROR);
+        /* Added by f62575 for SMALL IMAGE, 2012-1-3, end   */
     }
 
     return VOS_OK;
@@ -3119,7 +3191,9 @@ VOS_UINT32  AT_GetImeiValue(
 
     PS_MEM_SET(&stScPersCtrl, 0x00, sizeof(NV_SC_PERS_CTRL_STRU));
 
+    /* Modified by l60609 for DSDA Phase III, 2013-3-4, Begin */
     if (NV_OK != NV_ReadEx(enModemId, en_NV_Item_IMEI, aucBuf, ulDataLen))
+    /* Modified by l60609 for DSDA Phase III, 2013-3-4, End */
     {
         AT_WARN_LOG("TAF_GetImeiValue:Read IMEI Failed!");
         return VOS_ERR;
@@ -3395,6 +3469,7 @@ VOS_UINT32 AT_RcvDrvAgentSetDatalockRsp(VOS_VOID *pMsg)
     return VOS_OK;
  }
 
+/* Modified by f62575 for B050 Project, 2012-2-3, Begin   */
 /*****************************************************************************
  函 数 名  : AT_GetSimLockStatus
  功能描述  : AT^SIMLOCK使能状态查询命令,
@@ -3445,6 +3520,7 @@ VOS_UINT32 AT_GetSimLockStatus(VOS_UINT8 ucIndex)
 
     return VOS_OK;
 }
+/* Modified by f62575 for B050 Project, 2012-2-3, end   */
 
 /*****************************************************************************
  函 数 名  : AT_RcvDrvAgentQryTbatvoltRsp
@@ -3996,9 +4072,11 @@ VOS_UINT32 AT_RcvDrvAgentQryVersionRsp(VOS_VOID *pMsg)
     /* Modify by f62575 for V7代码同步, 2012-04-07, Begin   */
     VOS_UINT32                          ulRet;
     TAF_NVIM_CS_VER_STRU                stCsver;
+    /* Modified by l60609 for DSDA Phase III, 2013-3-4, Begin */
     MODEM_ID_ENUM_UINT16                enModemId;
 
     enModemId = MODEM_ID_0;
+    /* Modified by l60609 for DSDA Phase III, 2013-3-4, End */
 
     stCsver.usCsver = 0;
 
@@ -4036,6 +4114,7 @@ VOS_UINT32 AT_RcvDrvAgentQryVersionRsp(VOS_VOID *pMsg)
         return VOS_ERR;
     }
 
+    /* Modified by l60609 for DSDA Phase III, 2013-3-4, Begin */
     ulRet = AT_GetModemIdFromClient(ucIndex, &enModemId);
 
     if (VOS_OK != ulRet)
@@ -4074,6 +4153,7 @@ VOS_UINT32 AT_RcvDrvAgentQryVersionRsp(VOS_VOID *pMsg)
         At_FormatResultData(ucIndex, AT_ERROR);
         return VOS_OK;
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-3-4, End */
 
     usLength = 0;
 
@@ -6925,6 +7005,7 @@ VOS_VOID AT_RcvNdisMsg(MsgBlock* pMsg)
     return;
 }
 
+/* Added by h44270 for V7R1 phase III, 2011-10-18, begin */
 /*****************************************************************************
  函 数 名  : AT_ProcRabmSetFastDormParaCnf
  功能描述  : 处理消息ID_RABM_AT_SET_FASTDORM_PARA_CNF
@@ -7009,6 +7090,7 @@ VOS_UINT32    AT_ProcRabmQryFastDormParaCnf(
     /* 复位AT状态 */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
+    /* Added by l60609 for B070 Project, 2012/03/20, begin */
     if (VOS_TRUE == pstMsg->ucRslt)
     {
         /* 输出查询结果 */
@@ -7026,6 +7108,7 @@ VOS_UINT32    AT_ProcRabmQryFastDormParaCnf(
         ulResult = AT_OK;
         gstAtSendData.usBufLen = usLength;
     }
+    /* Added by l60609 for B070 Project, 2012/03/20, end */
 
     At_FormatResultData(ucIndex, ulResult);
 
@@ -7269,6 +7352,7 @@ TAF_VOID AT_RabmMsgProc(
     }
 }
 
+/* Added by h44270 for V7R1 phase III, 2011-10-18, end */
 
 /*****************************************************************************
  函 数 名  : At_MsgProc
@@ -7511,6 +7595,7 @@ TAF_VOID At_MsgProc(MsgBlock* pMsg)
     }
 }
 
+/* Added by f62575 for AT Project, 2011/10/22, begin */
 /*****************************************************************************
  函 数 名  : AT_EventReport
  功能描述  : 向OM上报AT事件
@@ -7604,6 +7689,7 @@ VOS_VOID AT_EventReport(
     return;
 }
 
+/* Added by f62575 for AT Project, 2011/10/22, end */
 
 /*****************************************************************************
  函 数 名  : AT_RcvDrvAgentSetAdcRsp
@@ -7805,6 +7891,7 @@ VOS_UINT32 AT_RcvSimLockQryRsp(VOS_VOID *pMsg)
 }
 /* Modified by w00167002 for L-C互操作项目, 2014-2-21, end */
 
+/* Added by f62575 for B050 Project, 2012-2-3, end   */
 
 
 /*****************************************************************************
@@ -10299,6 +10386,7 @@ VOS_UINT32 AT_RcvMtaCposrInd(VOS_VOID *pMsg)
     VOS_UINT8                           ucIndex;
     AT_MTA_MSG_STRU                    *pstCposrMsg;
     MTA_AT_CPOSR_IND_STRU              *pstEvent;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-20, Begin */
     AT_MODEM_AGPS_CTX_STRU             *pstAgpsCtx = VOS_NULL_PTR;
 
     /* 初始化消息变量 */
@@ -10329,6 +10417,7 @@ VOS_UINT32 AT_RcvMtaCposrInd(VOS_VOID *pMsg)
     {
         AT_WARN_LOG1("AT_RcvMtaCposrInd: +CPOSR: ", pstAgpsCtx->enCposrReport);
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-20, End */
 
     return VOS_OK;
 }
@@ -10358,6 +10447,7 @@ VOS_UINT32 AT_RcvMtaXcposrRptInd(VOS_VOID *pMsg)
     VOS_UINT8                           ucIndex;
     AT_MTA_MSG_STRU                    *pstXcposrRptMsg;
     MTA_AT_XCPOSRRPT_IND_STRU          *pstEvent;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-20, Begin */
 
     /* 初始化消息变量 */
     pstXcposrRptMsg = (AT_MTA_MSG_STRU*)pMsg;
@@ -11456,7 +11546,9 @@ VOS_UINT32 AT_RcvMtaWrrRrcVersionSetCnf(
     else
     {
         /* 设置成功后重新读写一下NV */
+        /* Modified by l60609 for DSDA Phase III, 2013-3-5, Begin */
         AT_ReadWasCapabilityNV();
+        /* Modified by l60609 for DSDA Phase III, 2013-3-5, End */
 
         ulResult = AT_OK;
     }
@@ -12996,6 +13088,7 @@ VOS_UINT32 AT_RcvMtaCgsnQryCnf(VOS_VOID *pstMsg)
 }
 
 
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
 /*****************************************************************************
  函 数 名  : AT_RcvMmaCopnInfoQueryCnf
  功能描述  : TAF_MMA_COPN_INFO_QUERY_CNF_STRU消息处理函数
@@ -13021,16 +13114,22 @@ VOS_UINT32 AT_RcvMtaCgsnQryCnf(VOS_VOID *pstMsg)
 *****************************************************************************/
 VOS_UINT32 AT_RcvMmaCopnInfoQueryCnf(VOS_VOID *pMsg)
 {
+    /* Modified by k902809 for Iteration 11, 2015-3-24, begin */
     TAF_MMA_COPN_INFO_QRY_CNF_STRU     *pstCopnInfo = VOS_NULL_PTR;
+    /* Modified by k902809 for Iteration 11, Iteration 11 2015-3-24, end */
     TAF_PH_OPERATOR_NAME_STRU          *pstPlmnName = VOS_NULL_PTR;
+    /* Modified by k902809 for Iteration 11, 2015-3-24, begin */
     VOS_UINT16                          usFromIndex;
+    /* Modified by k902809 for Iteration 11, Iteration 11 2015-3-24, end */
     VOS_UINT16                          usLength;
     VOS_UINT8                           ucIndex;
     VOS_UINT32                          ulLoop;
     VOS_UINT32                          ulRet;
 
     /* 初始化 */
+    /* Modified by k902809 for Iteration 11, 2015-3-24, begin */
     pstCopnInfo   = (TAF_MMA_COPN_INFO_QRY_CNF_STRU *)pMsg;
+    /* Modified by k902809 for Iteration 11, Iteration 11 2015-3-24, end */
     usLength      = 0;
 
     /* 通过clientid获取index */
@@ -13138,11 +13237,13 @@ VOS_UINT32 AT_RcvMmaCopnInfoQueryCnf(VOS_VOID *pMsg)
     {
         usFromIndex = pstCopnInfo->usFromIndex + pstCopnInfo->usPlmnNum;
 
+        /* Modified by k902809 for Iteration 11, 2015-3-24, begin */
         ulRet = TAF_MMA_QryCopnInfoReq(WUEPS_PID_AT,
                                        gastAtClientTab[ucIndex].usClientId,
                                        usFromIndex,
                                        0);
 
+        /* Modified by k902809 for Iteration 11, Iteration 11 2015-3-24, end */
         if (VOS_TRUE != ulRet)
         {
             /* 使用AT_STOP_TIMER_CMD_READY恢复AT命令实体状态为READY状态 */
@@ -13154,6 +13255,7 @@ VOS_UINT32 AT_RcvMmaCopnInfoQueryCnf(VOS_VOID *pMsg)
     return VOS_OK;
 }
 
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
 /*****************************************************************************
  函 数 名  : AT_RcvMtaSetNCellMonitorCnf
@@ -13377,7 +13479,9 @@ VOS_UINT32 AT_RcvMtaNCellMonitorInd(VOS_VOID *pstMsg)
 *****************************************************************************/
 VOS_UINT32 AT_RcvMmaSimInsertRsp(VOS_VOID *pMsg)
 {
+    /* Modified by k902809 for Iteration 11, 2015-3-24, begin */
     TAF_MMA_SIM_INSERT_CNF_STRU        *pstSimInsertRsp = VOS_NULL_PTR;
+    /* Modified by k902809 for Iteration 11, Iteration 11 2015-3-24, end */
     VOS_UINT8                           ucIndex;
     VOS_UINT32                          ulResult;
 
@@ -14443,6 +14547,7 @@ VOS_UINT32 AT_RcvMmaPhoneModeSetCnf(
 
     /* Deleted by wx270776 for OM融合, 2015-7-9, end */
 
+    /* Added by c64416 for ^PSTANDBY low power proc, 2013-9-13, Begin */
     /* V7R2 ^PSTANDBY命令复用关机处理流程 */
     if(AT_CMD_PSTANDBY_SET == (AT_LTE_CMD_CURRENT_OPT_ENUM)gastAtClientTab[ucIndex].CmdCurrentOpt)
     {
@@ -14450,6 +14555,7 @@ VOS_UINT32 AT_RcvMmaPhoneModeSetCnf(
 
         return VOS_OK;
     }
+    /* Added by c64416 for ^PSTANDBY low power proc, 2013-9-13, End */
 
     /* 如果GU处理结果正确，则发送到TL测并等待结果 */
     if (ulResult == AT_OK)
@@ -15895,8 +16001,10 @@ VOS_UINT32 AT_RcvMmaAcInfoChangeInd(
 {
     VOS_UINT16                          usLength;
     TAF_MMA_CELL_AC_INFO_STRU          *pstCellAcInfo = VOS_NULL_PTR;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     MODEM_ID_ENUM_UINT16                enModemId;
     VOS_UINT32                          ulRslt;
+    /* Modified by k902809 for Iteration 11, 2015-3-24, begin */
     TAF_MMA_AC_INFO_CHANGE_IND_STRU    *psAcInfoChangeInd = VOS_NULL_PTR;
     VOS_UINT8                           ucIndex;
 
@@ -15907,11 +16015,14 @@ VOS_UINT32 AT_RcvMmaAcInfoChangeInd(
         AT_WARN_LOG("AT_RcvMmaAcInfoChangeInd : AT INDEX NOT FOUND!");
         return VOS_ERR;
     }
+    /* Modified by k902809 for Iteration 11, Iteration 11 2015-3-24, end */
 
     enModemId = MODEM_ID_0;
 
     usLength = 0;
+    /* Modified by k902809 for Iteration 11, 2015-3-24, begin */
     pstCellAcInfo = (TAF_MMA_CELL_AC_INFO_STRU*)(&psAcInfoChangeInd->stCellAcInfo);
+    /* Modified by k902809 for Iteration 11, Iteration 11 2015-3-24, end */
 
     ulRslt = AT_GetModemIdFromClient(ucIndex, &enModemId);
 
@@ -15923,6 +16034,9 @@ VOS_UINT32 AT_RcvMmaAcInfoChangeInd(
 
     /* 通过AT^CURC控制紧急呼叫号码不上报 */
     /* Modified by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-2, end */
+    /* Deleted by k902809 for Iteration 11, 2015-4-1, begin */
+    /* Deleted by k902809 for Iteration 11, Iteration 11 2015-4-1, end */
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                        (VOS_CHAR *)pgucAtSndCodeAddr,
@@ -15943,7 +16057,20 @@ VOS_UINT32 AT_RcvMmaAcInfoChangeInd(
     return VOS_OK;
 }
 
+/* Added by k902809 for Iteration 11, 2015-3-24, begin */
+/*****************************************************************************
+Function Name     :   AT_RcvMmaEOPlmnSetCnf
+Description       :
 
+Input parameters  :   VOS_VOID                           *pstMsg
+Outout parameters :
+Return Value      :   None
+
+Modify History:
+    1)  Date      :   2015-03-24
+        Author    :   k902809
+        Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 AT_RcvMmaEOPlmnSetCnf(
     VOS_VOID                           *pstMsg
 )
@@ -16077,7 +16204,19 @@ VOS_UINT32 AT_RcvMmaEOPlmnQryCnf(
     return VOS_OK;
 }
 
+/*****************************************************************************
+Function Name     :   AT_RcvMmaNetScanCnf
+Description       :
 
+Input parameters  :   VOS_VOID                           *pstMsg
+Outout parameters :
+Return Value      :   None
+
+Modify History:
+    1)  Date      :   2015-03-24
+        Author    :   k902809
+        Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 AT_RcvMmaNetScanCnf(
     VOS_VOID                           *pstMsg
 )
@@ -16134,6 +16273,7 @@ VOS_UINT32 AT_RcvMmaUserSrvStateQryCnf(
     VOS_VOID                           *pstMsg
 )
 {
+    /* Modified by k902809 for Iteration 11, 2015-3-28, begin */
     TAF_MMA_USER_SRV_STATE_QRY_CNF_STRU                    *pstUserSrvStateCnf = VOS_NULL_PTR;
     VOS_UINT16                                              usLength;
     VOS_UINT8                                               ucIndex;
@@ -16162,6 +16302,7 @@ VOS_UINT32 AT_RcvMmaUserSrvStateQryCnf(
     /* 复位AT状态 */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
+    /* Modified by k902809 for Iteration 11, Iteration 11 2015-3-28, end */
     usLength  = 0;
 
     usLength += (TAF_UINT16)At_sprintf(AT_CMD_MAX_LEN,
@@ -16214,6 +16355,7 @@ VOS_UINT32  AT_RcvMmaPwrOnAndRegTimeQryCnf(
     VOS_UINT32                                              ulCostTime;
     VOS_UINT16                                              usLength;
     VOS_UINT32                                              ulResult;
+    /* Modified by k902809 for Iteration 11, 2015-3-28, begin */
     TAF_MMA_POWER_ON_AND_REG_TIME_QRY_CNF_STRU             *pstAppwronregCnf = VOS_NULL_PTR;
     VOS_UINT8                           ucIndex;
 
@@ -16242,6 +16384,7 @@ VOS_UINT32  AT_RcvMmaPwrOnAndRegTimeQryCnf(
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
     ulCostTime = pstAppwronregCnf->ulCostTime;
+    /* Modified by k902809 for Iteration 11, Iteration 11 2015-3-28, end */
 
     /* 初始化 */
     ulResult   = AT_OK;
@@ -16316,13 +16459,16 @@ VOS_UINT32  AT_RcvMmaSpnQryCnf(
     VOS_VOID                           *pstMsg
 )
 {
+    /* Added by k902809 for Iteration 11, 2015-3-30, begin */
     TAF_MMA_SPN_QRY_CNF_STRU           *pstSpnCnf;
+    /* Added by k902809 for Iteration 11, Iteration 11 2015-3-30, end */
     VOS_UINT32                          ulResult;
     TAF_PH_USIM_SPN_STRU                stAtSPNRslt;
     VOS_UINT16                          usLength;
     VOS_UINT16                          usDatalen;
     /* Modified by s62952 for BalongV300R002 Build优化项目 2012-02-28, begin */
     VOS_UINT8                          *pucSystemAppConfig;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, Begin */
     VOS_UINT8                           ucIndex;
     AT_MODEM_NET_CTX_STRU              *pstNetCtx = VOS_NULL_PTR;
 
@@ -16351,6 +16497,7 @@ VOS_UINT32  AT_RcvMmaSpnQryCnf(
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
     pstNetCtx = AT_GetModemNetCtxAddrFromClientId(ucIndex);
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, End */
 
     pucSystemAppConfig                  = AT_GetSystemAppConfigAddr();
     /* Modified by s62952 for BalongV300R002 Build优化项目 2012-02-28, end */
@@ -16361,7 +16508,9 @@ VOS_UINT32  AT_RcvMmaSpnQryCnf(
     usDatalen = 0;
 
     /* 0 表示SIM */
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, Begin */
     if (1 == pstNetCtx->ucSpnType)
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, End */
     {
         PS_MEM_CPY(&stAtSPNRslt, &(pstSpnCnf->stMnMmaSpnInfo.stUsimSpnInfo), sizeof(TAF_PH_USIM_SPN_STRU));
     }
@@ -16639,6 +16788,7 @@ VOS_UINT32  AT_RcvMmaPlmnQryCnf(
 
 }
 
+/* Added by k902809 for Iteration 11, Iteration 11 2015-3-24, end */
 
 
 /*****************************************************************************
@@ -18177,6 +18327,7 @@ VOS_UINT32 AT_RcvTafMmaSyscfgTestCnf(
         return VOS_ERR;
     }
 
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, Begin */
     pstNetCtx = AT_GetModemNetCtxAddrFromClientId(ucIndex);
 
     /* SYSCFG */
@@ -18228,6 +18379,7 @@ VOS_UINT32 AT_RcvTafMmaSyscfgTestCnf(
                                                             pstSysCfgTestCnf->stBandInfo.strSysCfgBandGroup);
         }
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, End */
 
     At_FormatResultData(ucIndex, AT_OK);
 
@@ -18703,6 +18855,7 @@ VOS_UINT32 AT_RcvMmaPlmnChangeInd(
 )
 {
     VOS_UINT16                          usLength;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     MODEM_ID_ENUM_UINT16                enModemId;
     VOS_UINT32                          ulRslt;
     VOS_UINT8                           ucIndex;
@@ -18728,6 +18881,7 @@ VOS_UINT32 AT_RcvMmaPlmnChangeInd(
 
     /* Deleted by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-2, begin */
     /* Deleted by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-2, end */
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     usLength += (TAF_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                      (VOS_CHAR *)pgucAtSndCodeAddr,

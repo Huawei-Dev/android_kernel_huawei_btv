@@ -62,6 +62,10 @@ extern "C" {
 
 #define LNAS_NV_GET_UICC_RESET_CLEAR_BIT                (0x00001000)
 
+#define LNAS_NV_ATTACH_REJ_NOT_REL_MAX_CAUSE_NUM  10
+#define LNAS_NV_TAU_REJ_NOT_REL_MAX_CAUSE_NUM     10
+
+
 /************************stNasFunFlag02 Begin***************************/
 
 /*****************************************************************************
@@ -209,6 +213,7 @@ typedef struct
     NAS_LMM_VOICE_DOMAIN_ENUM_UINT32    enVoicDomain;
 }LNAS_LMM_NV_VOICE_DOMAIN_STRU;
 
+/*R10 modify begin for leili*/
 typedef struct
 {
     VOS_UINT32                          bitOpReleaseName    :1;       /* 1: VALID; 0: INVALID*/
@@ -217,6 +222,7 @@ typedef struct
     VOS_UINT32                          ulReleaseName;
 
 }LNAS_LMM_NV_NAS_RELEASE_STRU;
+/*R10 modify end for leili*/
 
 typedef struct
 {
@@ -228,8 +234,10 @@ typedef struct
 }LNAS_LMM_NV_NAS_LOCALIP_CAP_STRU;
 
 
+/*self-adaption NW cause modify begin for leili*/
 typedef LNAS_LMM_CONFIG_NWCAUSE_STRU        LNAS_LMM_NV_CONFIG_NWCAUSE_STRU;
 
+/*self-adaption NW cause modify end for leili*/
 
 
 /*****************************************************************************
@@ -921,6 +929,19 @@ typedef struct
     VOS_UINT32                          ulRsv15;
 }LNAS_LCS_NV_COMMON_CONFIG_STRU;
 
+/*****************************************************************************
+结构名称    :LNAS_LMM_NV_ATTACHTAU_REJ1719_NOT_REL_STRU
+使用说明    :DOCOMO需求ATTACH/TAU被17/19拒绝后不释放链路
+*****************************************************************************/
+typedef struct
+{
+    VOS_UINT8                           ucSwitch;    /*特性开关,1: 打开,即不释放链路 0: 关闭*/
+    VOS_UINT8                           ucAttachCauseNum;
+    VOS_UINT8                           aucAttachCause[LNAS_NV_ATTACH_REJ_NOT_REL_MAX_CAUSE_NUM];
+    VOS_UINT8                           ucTauCauseNum;
+    VOS_UINT8                           aucTauCause[LNAS_NV_TAU_REJ_NOT_REL_MAX_CAUSE_NUM];
+    VOS_UINT8                           ucRsv;
+}LNAS_LMM_NV_ATTACHTAU_REJ_NOT_REL_STRU;
 
 
 /*****************************************************************************

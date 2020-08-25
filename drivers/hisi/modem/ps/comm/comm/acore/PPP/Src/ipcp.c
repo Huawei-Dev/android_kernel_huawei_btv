@@ -174,6 +174,7 @@ ipcp_Setup(struct ipcp *ipcp, VOS_UINT32 mask)
 
   ipcp->fsm.open_mode = 0;
 
+/*fanzhibin f49086 add it begin*/
   ipcp->stage = IPCP_NOT_RECEIVE_REQ;
   ipcp->IpAddr_neg = 0;
 
@@ -185,6 +186,7 @@ ipcp_Setup(struct ipcp *ipcp, VOS_UINT32 mask)
   ipcp->IpAddrs_neg = 0;
   ipcp->CompressProto_neg = 0;
 
+/*fanzhibin f49086 add it end*/
 
 
   ipcp->heis1172 = 0;
@@ -217,6 +219,7 @@ IpcpInitRestartCounter(struct fsm *fp, VOS_INT32 what)
       break;
   }
 
+/*fanzhibin f49086 add it begin*/
   /*========>A32D12744*/
   if( VOS_NULL_PTR !=(fp->timer) )
   {
@@ -231,6 +234,7 @@ IpcpInitRestartCounter(struct fsm *fp, VOS_INT32 what)
         PPP_MNTN_LOG(PS_PID_APP_PPP, 0, PS_PRINT_NORMAL,"start reltimer error\r\n");
   }
 
+/*fanzhibin f49086 add it end*/
 
 }
 
@@ -438,6 +442,7 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
       case MODE_REQ:
         ipcp->peer_req = 1; /* [false alarm]:移植开源代码 */
 
+/*fanzhibin f49086 add it begin*/
         if (!IsAccepted(ipcp->IpAddr_neg))
         {
           PPP_MNTN_LOG(PS_PID_APP_PPP, 0, PS_PRINT_NORMAL, "ipcp:ip address rej!\r\n");
@@ -456,6 +461,7 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
                 PPP_MNTN_LOG(PS_PID_APP_PPP, 0, PS_PRINT_NORMAL, "ipcp:ip address ack!\r\n");
             }
         }
+/*fanzhibin f49086 add it end*/
 
 
         break;
@@ -466,6 +472,7 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
       switch (mode_type) {
       case MODE_REQ:
 
+/*fanzhibin f49086 add it begin*/
         if (!IsAccepted(ipcp->CompressProto_neg)) /* [false alarm]:移植开源代码 */
         {
           if (fp->link->ipcp.stage == IPCP_SUCCESS_FROM_GGSN)
@@ -493,6 +500,7 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
                 PPP_MNTN_LOG(PS_PID_APP_PPP, 0, PS_PRINT_NORMAL, "ipcp:CompressPro ack!\r\n");
             }
         }
+/*fanzhibin f49086 add it end*/
 
 
         break;
@@ -515,6 +523,7 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
       }
       break;
 
+/*fanzhibin f49086 add it begin*/
     case TY_PRIMARY_NBNS:    /* M$ NetBIOS nameserver hack (rfc1877) */
 
       switch (mode_type) {
@@ -672,6 +681,7 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
         break;
       }
       break;
+/*fanzhibin f49086 add it end*/
 
 
 
@@ -705,6 +715,8 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
   }
 
 }
+/*fanzhibin f49086 add it begin for A32D05312*/
+/*fanzhibin f49086 add it end*/
 
 
 VOS_VOID Ppp_ProcConfigInfoInd(VOS_UINT16 usPppId)

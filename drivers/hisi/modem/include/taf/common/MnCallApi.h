@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may
+* *    be used to endorse or promote products derived from this software
+* *    without specific prior written permission.
+*
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 #ifndef  MN_CALL_API_H
 #define  MN_CALL_API_H
 
@@ -74,10 +120,12 @@ extern "C" {
 #endif
 /* Added by y00245242 for V3R3C60_eCall项目, 2014-4-1, end */
 
+/* Added by l60609 for CDMA 1X Iteration 2, 2014-9-3, begin */
 #define TAF_CALL_MAX_NUM_DIGIT_LEN                          (64)
 #define TAF_CALL_MAX_FLASH_DIGIT_LEN                        (32)
 #define TAF_CALL_MAX_BURST_DTMF_NUM                         (255)
 
+/* Added by l60609 for CDMA 1X Iteration 2, 2014-9-3, end */
 
 #define TAF_CALL_MAX_ECONF_CALLED_NUM        (5)
 #define TAF_IMSA_ALPHA_STRING_SZ            (129)
@@ -117,6 +165,7 @@ extern "C" {
 /*****************************************************************************
   3类型定义
 *****************************************************************************/
+/* Added by f62575 for AT Project, 2011-11-1, begin */
 
 
 /*****************************************************************************
@@ -197,6 +246,7 @@ enum NAS_CC_CALL_TYPE
 };
 typedef VOS_UINT8  NAS_CC_CALL_TYPE_ENUM_U8;
 
+/* Added by f62575 for AT Project, 2011-11-1, end */
 
 /* Added by w00176964 for VoLTE_PhaseII 项目, 2013-9-12, begin */
 /*****************************************************************************
@@ -933,6 +983,7 @@ enum MN_CALL_EVENT_ENUM
     MN_CALL_EVT_CALL_ANSWER_REMOTE_MODIFY_CNF   = 0x26,
     MN_CALL_EVT_CALL_MODIFY_STATUS_IND          = 0x27,
 
+    /* Added by l60609 for CDMA 1X Iteration 2, 2014-9-3, begin */
     TAF_CALL_EVT_SEND_FLASH_RSLT,                           /* _H2ASN_MsgChoice TAF_CALL_EVT_SEND_FLASH_RSLT_STRU */
     TAF_CALL_EVT_CALLED_NUM_INFO_IND,                       /* _H2ASN_MsgChoice TAF_CALL_EVT_CALLED_NUM_INFO_IND_STRU */
     TAF_CALL_EVT_CALLING_NUM_INFO_IND,                      /* _H2ASN_MsgChoice TAF_CALL_EVT_CALLING_NUM_INFO_IND_STRU */
@@ -943,13 +994,16 @@ enum MN_CALL_EVENT_ENUM
     TAF_CALL_EVT_SIGNAL_INFO_IND,                           /* _H2ASN_MsgChoice TAF_CALL_EVT_SIGNAL_INFO_IND_STRU */
     TAF_CALL_EVT_LINE_CTRL_INFO_IND,                        /* _H2ASN_MsgChoice TAF_CALL_EVT_LINE_CTRL_INFO_IND_STRU */
     TAF_CALL_EVT_CALL_WAITING_IND,                          /* _H2ASN_MsgChoice TAF_CALL_EVT_CALL_WAITING_IND_STRU */
+    /* Added by l60609 for CDMA 1X Iteration 2, 2014-9-3, end */
 
     TAF_CALL_EVT_ECONF_DIAL_CNF,
     TAF_CALL_EVT_ECONF_NOTIFY_IND,                               /* imsa通知SPM模块增强型多方通话参与者的状态发送变化  */
     TAF_CALL_EVT_CLCCECONF_INFO,
 
+    /* Added by f279542 for CDMA 1X Iteration 4, 2014-11-10, begin */
     TAF_CALL_EVT_SEND_BURST_DTMF_CNF,                            /* _H2ASN_MsgChoice TAF_CALL_EVT_SEND_BURST_DTMF_CNF_STRU */
     TAF_CALL_EVT_SEND_BURST_DTMF_RSLT,                           /* _H2ASN_MsgChoice TAF_CALL_EVT_SEND_BURST_DTMF_RSLT_STRU */
+    /* Added by f279542 for CDMA 1X Iteration 4, 2014-11-10, end */
 
     TAF_CALL_EVT_CCWAC_INFO_IND,                            /* _H2ASN_MsgChoice TAF_CALL_EVT_CCWAC_INFO_IND_STRU */
 
@@ -984,7 +1038,9 @@ typedef  VOS_UINT32  MN_CALL_EVENT_ENUM_U32;
 #define TAF_CS_CAUSE_IMS_BEGIN              (0x4800)
 #define TAF_CS_CAUSE_IMSA_BEGIN             (0x4C00)
 /* Modified by s00217060 for VoLTE_PhaseI  项目, 2013-07-08, end */
+/* Added by l60609 for CDMA 1X Iteration 2, 2014-9-3, begin */
 #define TAF_CS_CAUSE_XCALL_BEGIN            (0x9000)
+/* Added by l60609 for CDMA 1X Iteration 2, 2014-9-3, end */
 
 
 /*****************************************************************************
@@ -1475,6 +1531,7 @@ typedef enum                                                                    
 
 typedef VOS_UINT8   TAF_CALL_PRESENTATION_IND_ENUM_UINT8;
 
+/* Added by l60609 for CDMA 1X Iteration 2, 2014-9-3, begin */
 
 /* 移枚举定义到tafAppCall.h文件中 */
 /*****************************************************************************
@@ -1530,6 +1587,7 @@ enum TAF_CALL_NUMBER_TYPE_ENUM
     TAF_CALL_NUMBER_TYPE_BUTT                               = 0x08
 };
 typedef VOS_UINT8 TAF_CALL_NUMBER_TYPE_ENUM_UINT8;
+/* Added by l60609 for CDMA 1X Iteration 2, 2014-9-3, end */
 
 /*****************************************************************************
 枚举名    : MN_CALL_MODIFY_STATUS_ENUM
@@ -1583,6 +1641,7 @@ enum TAF_CALL_SEND_BURST_DTMF_CNF_RESULT_ENUM
     TAF_CALL_SEND_BURST_DTMF_CNF_RESULT_BUTT
 };
 typedef VOS_UINT8   TAF_CALL_SEND_BURST_DTMF_CNF_RESULT_ENUM_U8;
+/* Added by f62575 for STK&DCM Project, 2012/09/18, begin */
 /*****************************************************************************
 结构名      : MN_CALL_HOLD_TONE_ENUM
 结构说明    : 是否播放本地提示音枚举类型
@@ -1614,6 +1673,7 @@ typedef struct
     VOS_UINT8                           SubAddrInfo[MN_CALL_MAX_SUBADDR_INFO_LEN];
     VOS_UINT8                           ucReserved;
 }MN_CALL_SUBADDR_STRU;
+/* Added by f62575 for STK&DCM Project, 2012/09/18, end */
 
 #define MN_CALL_MAX_CALLED_BCD_NUM_LEN      (40)                                /* 3GPP TS 24.008 10.5.4.7 */
 #define MN_CALL_MAX_CALLED_ASCII_NUM_LEN    (MN_CALL_MAX_CALLED_BCD_NUM_LEN * 2)
@@ -1718,8 +1778,10 @@ typedef struct
 typedef struct
 {
     MN_CLIENT_ID_T                      clientId;                               /* Client ID */
+    /* Modified by f62575 for STK&DCM Project, 2012/09/18, begin */
     MN_OPERATION_ID_T                   opId;                                   /* op ID */
     MN_CALL_ID_T                        callId;                                 /* Call ID */
+    /* Modified by f62575 for STK&DCM Project, 2012/09/18, end */
     MN_CALL_STATE_ENUM_U8               enCallState;                            /* Call State */
     MN_CALL_MPTY_STATE_ENUM_U8          enMptyState;                            /* MPTY State */
     MN_CALL_TYPE_ENUM_U8                enCallType;                             /* Call Type */
@@ -1732,7 +1794,9 @@ typedef struct
 
     MN_CALL_CS_DATA_CFG_INFO_STRU       stDataCfgInfo;                          /* Data Configuration */
     MN_CALL_BCD_NUM_STRU                stCallNumber;                           /* Call Number */
+    /* Added by f62575 for STK&DCM Project, 2012/09/18, begin */
     MN_CALL_SUBADDR_STRU                stSubCallNumber;                        /* Call SubAddress */
+    /* Added by f62575 for STK&DCM Project, 2012/09/18, end */
     MN_CALL_CALLED_NUM_STRU             stCalledNumber;                         /* Called Number */
     MN_CALL_SUBADDR_STRU                stCalledSubAddr;                        /* Called SubAddress */
     MN_CALL_BCD_NUM_STRU                stRedirectNumber;                       /* Redirect Number */
@@ -2305,7 +2369,9 @@ enum MN_CALL_CODEC_TYPE_ENUM
     MN_CALL_CODEC_TYPE_FR,                  /* full rate */
     MN_CALL_CODEC_TYPE_HR,                  /* half rate */
     MN_CALL_CODEC_TYPE_AMR2,
+    /* Added by z40661 for AMR-WB , 2012-02-09, begin */
     MN_CALL_CODEC_TYPE_AMRWB,
+    /* Added by z40661 for AMR-WB , 2012-02-09, end */
     /* Added by s00217060 for VoLTE_PhaseI  项目, 2013-08-16, begin */
     MN_CALL_CODEC_TYPE_G711,
     /* Added by s00217060 for VoLTE_PhaseI  项目, 2013-08-16, end */
@@ -2769,6 +2835,7 @@ typedef struct
 } MN_CALL_RELEASE_STRU;
 #endif
 
+/* Added by l60609 for CDMA 1X Iteration 2, 2014-9-3, begin */
 /*****************************************************************************
 结构名      : TAF_CALL_FLASH_PARA_STRU
 结构说明    : FLASH请求参数
@@ -2817,6 +2884,7 @@ typedef struct
     VOS_UINT8                           ucResult;                               /* VOS_OK:成功; VOS_ERR:失败 */
 }TAF_CALL_EVT_SEND_FLASH_RSLT_STRU;
 
+/* Added by f279542 for CDMA 1X Iteration 4, 2014-11-10, begin */
 /*****************************************************************************
  结构名    : TAF_CALL_BURST_DTMF_PARA_STRU
  结构说明  : Send Burst DTMF消息信息字段结构
@@ -2851,6 +2919,7 @@ typedef struct
     VOS_UINT8                           aucReserved2[1];                           /*_H2ASN_Skip*/
     TAF_CALL_BURST_DTMF_PARA_STRU       stBurstDTMFPara;
 } TAF_CALL_BURST_DTMF_REQ_MSG_STRU;
+/* Added by f279542 for CDMA 1X Iteration 4, 2014-11-10, end */
 
 /*****************************************************************************
  结构名    : TAF_CALL_SND_CCLPR_REQ_MSG_STRU
@@ -3091,6 +3160,7 @@ typedef struct
     VOS_UINT8                           aucRsved[3];
 }TAF_CALL_EVT_CALL_WAITING_IND_STRU;
 
+/* Added by l60609 for CDMA 1X Iteration 2, 2014-9-3, end */
 
 /*****************************************************************************
 结构名      : TAF_CALL_EVT_CCWAC_INFO_IND_STRU
@@ -3438,6 +3508,7 @@ VOS_VOID MN_CALL_RcvAtClprGetReq(MN_CALL_APP_REQ_MSG_STRU            *pstCallMsg
 *****************************************************************************/
 VOS_UINT8 GMM_GetCurNetwork(VOS_VOID);
 
+/* Added by f279542 for CDMA 1X Iteration 4, 2014-11-12, begin */
 extern VOS_UINT32  TAF_XCALL_SendBurstDtmf(
     MN_CLIENT_ID_T                      clientId,
     MN_OPERATION_ID_T                   opId,
@@ -3449,6 +3520,7 @@ extern VOS_UINT32  TAF_XCALL_SendFlashReq(
     MN_OPERATION_ID_T                   opId,
     TAF_CALL_FLASH_PARA_STRU           *pstFlashPara
 );
+/* Added by f279542 for CDMA 1X Iteration 4, 2014-11-12, end */
 
 VOS_UINT32  TAF_XCALL_SendCustomDialReq(
     MN_CLIENT_ID_T                      clientId,

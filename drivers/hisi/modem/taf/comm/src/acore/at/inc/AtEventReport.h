@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may
+* *    be used to endorse or promote products derived from this software
+* *    without specific prior written permission.
+*
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 
 #ifndef __ATEVENTREPORT_H__
@@ -1053,10 +1099,12 @@ VOS_UINT32 AT_RcvTafPsEvtReportRaInfo(
 );
 #endif
 
+/* Added by l60609 for PS Project,2012-12-21,Begin */
 VOS_UINT32 AT_RcvTafPsEvtPdpDisconnectInd(
     VOS_UINT8                           ucIndex,
     VOS_VOID                           *pEvtInfo
 );
+/* Added by l60609 for PS Project,2012-12-21,End */
 
 VOS_VOID AT_QryParaRspCeregProc(
     VOS_UINT8                           ucIndex,
@@ -1100,16 +1148,20 @@ VOS_VOID AT_ConvertNasMccToBcdType(
 );
 
 
+/* Added by L60609 for V7R1C50 AT&T&DCM, 2012-6-19, begin */
 VOS_VOID AT_RcvMmaNsmStatusInd(
     TAF_UINT8                           ucIndex,
     TAF_PHONE_EVENT_INFO_STRU          *pEvent
 );
+/* Added by L60609 for V7R1C50 AT&T&DCM, 2012-6-19, end */
 
+/* Modified by l60609 for DSDA Phase III, 2013-3-5, Begin */
 VOS_UINT32 AT_CheckRptCmdStatus(
     VOS_UINT8                          *pucRptCfg,
     AT_CMD_RPT_CTRL_TYPE_ENUM_UINT8     enRptCtrlType,
     AT_RPT_CMD_INDEX_ENUM_UINT8         enRptCmdIndex
 );
+/* Modified by l60609 for DSDA Phase III, 2013-3-5, End */
 
 VOS_VOID AT_ReportCCallstateResult(
     VOS_UINT16                          usClientId,
@@ -1154,6 +1206,7 @@ VOS_VOID AT_RcvMmaRssiChangeInd(
 
 /* Added by w00176964 for V7R1C50_DCM接入禁止小区信息上报, 2012-12-11, begin */
 
+/* Added by k902809 for Iteration 11, 2015-3-26, begin */
 VOS_VOID AT_PhNetScanReportSuccess(
     VOS_UINT8                           ucIndex,
     TAF_MMA_NET_SCAN_CNF_STRU          *pstNetScanCnf
@@ -1171,7 +1224,9 @@ VOS_VOID AT_RcvMnCallChannelInfoInd(VOS_VOID *pEvtInfo);
 
 /* Added by l00171473 for DTS2013010800120 语音带宽信息上报, 2013-1-5, end */
 
+/* Deleted by k902809 for Iteration 11, 2015-3-30, begin */
 
+/* Deleted by k902809 for Iteration 11, Iteration 11 2015-3-30, end */
 
 /*****************************************************************************
  函 数 名  : At_RcvXlemaQryCnf
@@ -1198,7 +1253,9 @@ VOS_UINT32 AT_GetSsEventErrorCode(
     VOS_UINT8                           ucIndex,
     TAF_SS_CALL_INDEPENDENT_EVENT_STRU *pEvent);
 
+/* Deleted by k902809 for Iteration 11, 2015-3-27, begin */
 
+/* Deleted by k902809 for Iteration 11, Iteration 11 2015-3-27, end */
 
 VOS_UINT32 At_QryParaPlmnListProc(
     VOS_VOID                           *pMsg
@@ -1242,8 +1299,12 @@ VOS_VOID AT_RcvTafCallStopDtmfRslt(
 );
 /* Added by l00198894 for V9R1 STK升级, 2013/07/11, end */
 
+/* Added by x65241 for ACC&SPLMN, 2013-10-15 Begin */
 VOS_VOID AT_PhEOPlmnQueryCnfProc(TAF_UINT8 *pData);
+/* Deleted by k902809 for Iteration 11, 2015-3-24, begin */
 
+/* Deleted by k902809 for Iteration 11, Iteration 11 2015-3-24, end */
+/* Added by x65241 for ACC&SPLMN, 2013-10-15 End */
 
 extern VOS_VOID AtBase64Encode(const VOS_VOID* pdata,const VOS_UINT32 data_size,VOS_VOID* out_pcode);
 

@@ -103,7 +103,7 @@ void bsp_wdt_irq_disable(WDT_CORE_ID core_id)
 {
     if(g_wdt_int_no)
     {
-        disable_irq(g_wdt_int_no);
+        disable_irq_nosync(g_wdt_int_no);
     }
 }
 

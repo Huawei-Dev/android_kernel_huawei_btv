@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may
+* *    be used to endorse or promote products derived from this software
+* *    without specific prior written permission.
+*
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 /*****************************************************************************
    1 头文件包含
@@ -71,6 +117,7 @@ VOS_UINT32                              g_ulIpAddr = 0;
 *****************************************************************************/
 AT_FCID_MAP_STRU                        g_stFcIdMaptoFcPri[FC_ID_BUTT];
 
+/* Added by l60609 for DSDA Phase II, 2012-12-18, Begin */
 AT_PS_RMNET_ID_TAB                      g_astPsRmNetIdTab[] =
 {
     {MODEM_ID_0, FC_ID_NIC_1, AT_PS_USER_CID_1},
@@ -82,7 +129,9 @@ AT_PS_RMNET_ID_TAB                      g_astPsRmNetIdTab[] =
     {MODEM_ID_2, FC_ID_NIC_6, AT_PS_USER_CID_1},
     {MODEM_ID_2, FC_ID_NIC_7, AT_PS_USER_CID_2}
 };
+/* Added by l60609 for DSDA Phase II, 2012-12-18, End */
 
+/* Added by l60609 for V9R1 IPv6&TAF/SM Project, 2013-4-24, begin */
 /* ^DCONN上报函数表 */
 AT_PS_REPORT_CONN_RESULT_STRU           g_astAtRptConnectedResultTab[] =
 {
@@ -161,6 +210,7 @@ AT_CHDATA_RNIC_RMNET_ID_STRU            g_astAtChdataRnicRmNetIdTab[] =
     {AT_CH_DATA_CHANNEL_ID_7, RNIC_RMNET_ID_6, {0, 0, 0}}
 };
 
+/* Added by l60609 for V9R1 IPv6&TAF/SM Project, 2013-4-24, end */
 /*****************************************************************************
    3 函数、变量声明
 *****************************************************************************/
@@ -2350,6 +2400,7 @@ VOS_UINT32 AT_SendNdisRelReq(
     TAF_PS_CALL_PDP_DEACTIVATE_CNF_STRU        *pstEvent
 )
 {
+    /* Modified by l60609 for PS Project, 2011-12-21, Begin */
     AT_NDIS_PDNINFO_REL_REQ_STRU        stNdisRelReq;
     MODEM_ID_ENUM_UINT16                enModemId;
     VOS_UINT32                          ulRet;
@@ -2365,9 +2416,12 @@ VOS_UINT32 AT_SendNdisRelReq(
     }
 
     /* 构造消息 */
+    /* Modified by l60609 for DSDA Phase II, 2012-12-27, Begin */
     stNdisRelReq.enModemId = enModemId;
+    /* Modified by l60609 for DSDA Phase II, 2012-12-27, End */
     stNdisRelReq.ucRabId   = pstEvent->ucRabId;
 
+    /* Modified by l60609 for PS Project, 2011-12-21, End */
 
 
     /* 发送消息 */
@@ -4663,6 +4717,7 @@ VOS_UINT32 AT_RegNdisFCPoint(
     MODEM_ID_ENUM_UINT16                enModemId
 )
 {
+    /* Modified by l60609 for DSDA Phase II, 2012-12-17, Begin */
     FC_REG_POINT_STRU                   stRegFcPoint;
     VOS_UINT32                          ulRet;
     FC_PRI_ENUM_UINT8                   enFCPri;
@@ -4726,6 +4781,7 @@ VOS_UINT32 AT_RegNdisFCPoint(
         return VOS_ERR;
     }
 
+    /* Modified by l60609 for DSDA Phase II, 2012-12-17, End */
 
     /* 设置FCID与FC Pri的映射关系 */
     g_stFcIdMaptoFcPri[FC_ID_NIC_1].ulUsed      = VOS_TRUE;
@@ -6131,7 +6187,9 @@ VOS_UINT32 AT_SendRnicIpv4ActInd(VOS_UINT8 ucRmNetId)
 
     /* 填写消息体 */
     pstMsg->ucRabId         = g_stAtAppPdpEntity.stIpv4Dhcp.ucRabId;
+    /* Added by l60609 for DSDA Phase II, 2012-12-18, Begin */
     pstMsg->ucRmNetId       = ucRmNetId;
+    /* Added by l60609 for DSDA Phase II, 2012-12-18, End */
     pstMsg->ulIpv4Addr      = g_stAtAppPdpEntity.stIpv4Dhcp.ulIpv4Addr;
     pstMsg->ulNetMask       = g_stAtAppPdpEntity.stIpv4Dhcp.ulIpv4NetMask;
     pstMsg->ulGateWay       = g_stAtAppPdpEntity.stIpv4Dhcp.ulIpv4GateWay;
@@ -8959,6 +9017,7 @@ VOS_UINT32 AT_RegModemPsDataFCPoint(
     FC_REG_POINT_STRU                   stRegFcPoint;
     VOS_UINT32                          ulRet;
     FC_PRI_ENUM_UINT8                   enFcPri;
+    /* Modified by l60609 for DSDA Phase II, 2012-12-21, Begin */
     MODEM_ID_ENUM_UINT16                enModemId;
     AT_UART_CTX_STRU                   *pstUartCtx = VOS_NULL_PTR;
 
@@ -9005,6 +9064,7 @@ VOS_UINT32 AT_RegModemPsDataFCPoint(
 
     stRegFcPoint.ulParam1           = (VOS_UINT32)g_alAtUdiHandle[ucIndex];
     stRegFcPoint.enModemId          = enModemId;
+    /* Modified by l60609 for DSDA Phase II, 2012-12-21, End */
     stRegFcPoint.ulParam2           = enFcId;
     stRegFcPoint.pRstFunc           = AT_ResetFlowCtl;
 
@@ -9092,6 +9152,7 @@ VOS_UINT32 AT_DeRegModemPsDataFCPoint(
 )
 {
     VOS_UINT32                          ulRet;
+    /* Modified by l60609 for DSDA Phase II, 2012-12-28, Begin */
     MODEM_ID_ENUM_UINT16                enModemId;
     AT_UART_CTX_STRU                   *pstUartCtx = VOS_NULL_PTR;
 
@@ -9112,6 +9173,7 @@ VOS_UINT32 AT_DeRegModemPsDataFCPoint(
         AT_ERR_LOG("AT_DeRegModemPsDataFCPoint: Get modem id fail.");
         return VOS_ERR;
     }
+    /* Modified by l60609 for DSDA Phase II, 2012-12-21, Begin */
 
     ulRet = FC_DeRegPoint(FC_ID_MODEM, enModemId);
     if (VOS_OK != ulRet)
@@ -9119,6 +9181,7 @@ VOS_UINT32 AT_DeRegModemPsDataFCPoint(
         AT_ERR_LOG("AT_DeRegModemPsDataFCPoint: ERROR: FC DeRegPoint Failed.");
         return VOS_ERR;
     }
+    /* Modified by l60609 for DSDA Phase II, 2012-12-21, End */
 
     /* 清除FCID与FC Pri的映射关系 */
     g_stFcIdMaptoFcPri[FC_ID_MODEM].ulUsed      = VOS_FALSE;
@@ -9295,6 +9358,7 @@ VOS_UINT32 AT_RegHsicFCPoint(
     FC_PRI_ENUM_UINT8                   enFCPri;
     UDI_DEVICE_ID_E                     enDataChannelId;
     FC_ID_ENUM_UINT8                    enFcId;
+    /* Modified by l60609 for DSDA Phase II, 2012-12-21, Begin */
     MODEM_ID_ENUM_UINT16                enModemId;
     AT_MODEM_PS_CTX_STRU               *pstPsModemCtx = VOS_NULL_PTR;
 
@@ -9323,6 +9387,7 @@ VOS_UINT32 AT_RegHsicFCPoint(
         return VOS_ERR;
     }
 
+    /* Modified by L47619 for C52 HSIC ACM->NCM Project, 2012/09/06, begin */
     switch ( enDataChannelId )
     {
         case UDI_ACM_HSIC_ACM1_ID:
@@ -9341,6 +9406,7 @@ VOS_UINT32 AT_RegHsicFCPoint(
             AT_WARN_LOG("AT_RegHsicFCPoint: WARNING: data channel id is abnormal.");
             return VOS_ERR;
     }
+    /* Modified by L47619 for C52 HSIC ACM->NCM Project, 2012/09/06, end */
 
 
     stRegFcPoint.enFcId             = enFcId;
@@ -9362,6 +9428,7 @@ VOS_UINT32 AT_RegHsicFCPoint(
     stRegFcPoint.pSetFunc           = AT_EnableHsicFlowCtl;
     stRegFcPoint.ulParam1           = (VOS_UINT32)DIPC_GetDevHandleByRabId(pstEvent->ucRabId);
     stRegFcPoint.enModemId          = enModemId;
+    /* Modified by l60609 for DSDA Phase II, 2012-12-21, End */
     stRegFcPoint.ulParam2           = enFcId;
     stRegFcPoint.pRstFunc           = AT_ResetFlowCtl;
 
@@ -9438,6 +9505,7 @@ VOS_UINT32 AT_DeRegHsicFCPoint(
     FC_ID_ENUM_UINT8                    enFcId;
     VOS_UINT32                          ulRet;
     UDI_DEVICE_ID_E                     enDataChannelId;
+    /* Modified by l60609 for DSDA Phase II, 2012-12-21, Begin */
     MODEM_ID_ENUM_UINT16                enModemId;
     AT_MODEM_PS_CTX_STRU               *pstPsModemCtx = VOS_NULL_PTR;
 
@@ -9464,6 +9532,7 @@ VOS_UINT32 AT_DeRegHsicFCPoint(
         return VOS_ERR;
     }
 
+    /* Modified by L47619 for C52 HSIC ACM->NCM Project, 2012/09/06, begin */
     switch ( enDataChannelId )
     {
         case UDI_ACM_HSIC_ACM1_ID:
@@ -9482,6 +9551,7 @@ VOS_UINT32 AT_DeRegHsicFCPoint(
             AT_WARN_LOG("AT_DeRegHsicFCPoint: WARNING: data channel id is abnormal.");
             return VOS_ERR;
     }
+    /* Modified by L47619 for C52 HSIC ACM->NCM Project, 2012/09/06, end */
 
 
     ulRet = FC_DeRegPoint(enFcId, enModemId);
@@ -9490,6 +9560,7 @@ VOS_UINT32 AT_DeRegHsicFCPoint(
         AT_ERR_LOG("AT_DeRegHsicFCPoint: ERROR: de reg point Failed.");
         return VOS_ERR;
     }
+    /* Modified by l60609 for DSDA Phase II, 2012-12-21, End */
 
     /* 清除FCID与FC Pri的映射关系 */
     g_stFcIdMaptoFcPri[enFcId].ulUsed       = VOS_FALSE;
@@ -10103,6 +10174,7 @@ VOS_UINT32 AT_PS_GetIpAddrByRabId(
     return ulIpAddr;
 }
 
+/* Added by l60609 for DSDA Phase II, 2012-12-18, Begin */
 /*****************************************************************************
  函 数 名  : AT_PS_GetRmNetIdFromCid
  功能描述  : 根据Client Id和Cid获取对应的网卡Id
@@ -10164,6 +10236,7 @@ VOS_UINT32 AT_PS_GetRmNetIdByCid(
     return VOS_OK;
 }
 
+/* Added by l60609 for DSDA Phase II, 2012-12-18, End */
 
 /*****************************************************************************
  函 数 名  : AT_ResetFlowCtl
@@ -10221,6 +10294,7 @@ VOS_UINT32 AT_ResetFlowCtl(
     return VOS_OK;
 }
 
+/* Added by l60609 for V9R1 IPv6&TAF/SM Project, 2013-4-24, begin */
 
 /*****************************************************************************
  函 数 名  : AT_PS_GetRnicRmNetIdFromChDataValue
@@ -15611,6 +15685,7 @@ VOS_UINT32 AT_PS_ProcDialCmd(VOS_UINT8 ucIndex)
 
     return ulRslt;
 }
+/* Added by l60609 for V9R1 IPv6&TAF/SM Project, 2013-4-24, end */
 
 /*****************************************************************************
  函 数 名  : AT_PS_ProcSharePdpStateChange

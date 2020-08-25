@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may
+* *    be used to endorse or promote products derived from this software
+* *    without specific prior written permission.
+*
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 #ifndef __ATCMDMSGPROC_H__
 #define __ATCMDMSGPROC_H__
@@ -49,7 +95,9 @@ extern "C" {
 *****************************************************************************/
 
 
+/* Added by f62575 for AT Project, 2011/10/19, begin */
 extern VOS_INT8                         g_acATE5DissdPwd[AT_DISSD_PWD_LEN+1];
+/* Added by f62575 for AT Project, 2011/10/19, end */
 
 
 /*****************************************************************************
@@ -213,10 +261,12 @@ typedef struct
 /*****************************************************************************
   10 函数声明
 *****************************************************************************/
+/* Modified by l60609 for DSDA Phase III, 2013-3-5, Begin */
 VOS_UINT32 AT_FormatAtiCmdQryString(
     MODEM_ID_ENUM_UINT16                enModemId,
     DRV_AGENT_MSID_QRY_CNF_STRU         *pstDrvAgentMsidQryCnf
 );
+/* Modified by l60609 for DSDA Phase III, 2013-3-5, End */
 VOS_UINT32 AT_RcvDrvAgentMsidQryCnf(VOS_VOID *pMsg);
 VOS_UINT32 AT_RcvDrvAgentGasMntnCmdRsp(VOS_VOID *pMsg);
 VOS_UINT32 AT_RcvDrvAgentVertimeQryRsp(VOS_VOID *pMsg);
@@ -262,10 +312,12 @@ VOS_VOID AT_ConvertImsiDigit2String(
 );
 
 
+/* Modified by l60609 for DSDA Phase III, 2013-3-5, Begin */
 VOS_UINT32  AT_GetImeiValue(
     MODEM_ID_ENUM_UINT16                enModemId,
     VOS_UINT8 aucImei[TAF_PH_IMEI_LEN + 1]
 );
+/* Modified by l60609 for DSDA Phase III, 2013-3-5, End */
 VOS_BOOL AT_IsSimLockPlmnInfoValid(VOS_VOID);
 
 VOS_UINT32 AT_RcvDrvAgentSetGpioplRsp(VOS_VOID *pMsg);
@@ -297,22 +349,28 @@ extern VOS_VOID At_CovertMsInternalRxDivParaToUserSet(
 
 extern VOS_UINT32 AT_RcvDrvAgentSetAdcRsp(VOS_VOID *pMsg);
 
+/* Modified by f62575 for B050 Project, 2012-2-3, begin   */
 extern VOS_BOOL AT_E5CheckRight(
     VOS_UINT8                           ucIndex,
     VOS_UINT8                          *pucData,
     VOS_UINT16                          usLen
 );
+/* Modified by f62575 for B050 Project, 2012-2-3, end */
 
+/* Added by f62575 for SMALL IMAGE, 2012-1-3, Begin   */
 VOS_UINT32 AT_RcvDrvAgentTseLrfSetRsp(VOS_VOID *pMsg);
 
 VOS_UINT32 AT_RcvDrvAgentHkAdcGetRsp(VOS_VOID *pMsg);
 
+/* Added by f62575 for SMALL IMAGE, 2012-1-3, End     */
 VOS_UINT32 AT_RcvDrvAgentQryTbatRsp(VOS_VOID *pMsg);
 
 #if (FEATURE_ON == FEATURE_SECURITY_SHELL)
 VOS_UINT32 AT_RcvDrvAgentSetSpwordRsp(VOS_VOID *pMsg);
 #endif
+/* Added by f62575 for B050 Project, 2012-2-3, Begin   */
 VOS_UINT32 AT_RcvDrvAgentSetSecuBootRsp(VOS_VOID *pMsg);
+/* Added by f62575 for B050 Project, 2012-2-3, end   */
 
 extern VOS_UINT32 AT_RcvMmaCipherInfoQueryCnf(VOS_VOID *pMsg);
 extern VOS_UINT32 AT_RcvMmaLocInfoQueryCnf(VOS_VOID *pMsg);
@@ -326,7 +384,9 @@ VOS_UINT32 AT_RcvDrvAgentNandDevInfoQryRsp(VOS_VOID *pMsg);
 VOS_UINT32 AT_RcvDrvAgentChipTempQryRsp(VOS_VOID *pMsg);
 
 
+/* Added by h59254 for SAR Project, 2012/04/24, begin */
 VOS_UINT32 AT_RcvDrvAgentAntStateIndRsp(VOS_VOID *pMsg);
+/* Added by h59254 for SAR Project, 2012/04/24, end */
 
 
 VOS_VOID  AT_ReadSystemAppConfigNV(VOS_VOID);
@@ -384,7 +444,9 @@ VOS_UINT32 AT_RcvMmaAcInfoQueryCnf(VOS_VOID *pstMsg);
 
 /* Added by w00176964 for V7R1C50_DCM接入禁止小区信息上报, 2012-12-11, end */
 
+/* Modified by l60609 for DSDA Phase III, 2013-2-26, Begin */
 extern VOS_VOID AT_ReadWasCapabilityNV(VOS_VOID);
+/* Modified by l60609 for DSDA Phase III, 2013-2-26, End */
 
 VOS_UINT32 AT_RcvMtaBodySarSetCnf(VOS_VOID *pstMsg);
 
@@ -443,7 +505,9 @@ VOS_UINT32 AT_RcvMtaImeiVerifyQryCnf(VOS_VOID *pstMsg);
 VOS_UINT32 AT_RcvMtaCgsnQryCnf(VOS_VOID *pstMsg);
 
 
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
 VOS_UINT32 AT_RcvMmaCopnInfoQueryCnf(VOS_VOID *pMsg);
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
 VOS_UINT32 AT_RcvMtaSetNCellMonitorCnf(VOS_VOID *pstMsg);
 VOS_UINT32 AT_RcvMtaQryNCellMonitorCnf(VOS_VOID *pstMsg);
@@ -658,6 +722,7 @@ extern VOS_UINT32 AT_RcvMmaPhoneModeQryCnf(
     VOS_VOID                           *pMsg
 );
 
+/* Added by k902809 for Iteration 11, 2015-3-24, begin */
 VOS_UINT32 AT_RcvMmaAcInfoChangeInd(
     VOS_VOID                           *pstMsg
 );
@@ -692,6 +757,7 @@ VOS_UINT32  AT_RcvMmaPlmnQryCnf(
     VOS_VOID                           *pstMsg
 );
 
+/* Added by k902809 for Iteration 11, Iteration 11 2015-3-24, end */
 VOS_UINT32 AT_RcvTafMmaQuickStartSetCnf(
     VOS_VOID                           *pMsg
 );

@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may
+* *    be used to endorse or promote products derived from this software
+* *    without specific prior written permission.
+*
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 /*****************************************************************************
    1 头文件包含
@@ -132,8 +178,10 @@ const AT_RETURN_TAB_TYPE_STRU gastAtReturnCodeTab[]=
     {AT_CME_SERVICE_NOT_PROVISIONED,                       {(VOS_UINT8*)"171", (VOS_UINT8*)"Service not provisioned"       }  },
 
     /* 3GPP 27007 9.2.3 Also all other values below 256 are reserved */
+    /* Added by L60609 for V7R1C50 AT&T&DCM, 2012-6-16, begin */
     {AT_CME_PDP_ACT_LIMIT,                                 {(TAF_UINT8*)"300", (TAF_UINT8*)"PDP ACT LIMIT"                            }  },
     {AT_CME_NET_SEL_MENU_DISABLE,                          {(TAF_UINT8*)"301", (TAF_UINT8*)"NETWORK SELECTION MENU DISABLE"           }  },
+    /* Added by L60609 for V7R1C50 AT&T&DCM, 2012-6-16, end */
 
     {AT_CME_CS_SERV_EXIST,                                 {(TAF_UINT8*)"302", (TAF_UINT8*)"CS SERVICE EXIST"                         }  },
 
@@ -148,6 +196,7 @@ const AT_RETURN_TAB_TYPE_STRU gastAtReturnCodeTab[]=
     {AT_CME_IMS_VOICE_DOMAIN_PS_ONLY,                      {(VOS_UINT8*)"308", (VOS_UINT8*)"IMS Voice Domain PS Only"              }  },
     {AT_CME_IMS_STACK_TIMEOUT,                             {(VOS_UINT8*)"309", (VOS_UINT8*)"IMS Stack Time Out"              }  },
 
+    /* Added by c64416 for AT Project 2011-10-23  Begin */
     {AT_CME_APN_LEN_ILLEGAL,                               {(VOS_UINT8*)"700", (VOS_UINT8*)"APN length illegal"              }  },
     {AT_CME_APN_SYNTACTICAL_ERROR,                         {(VOS_UINT8*)"701", (VOS_UINT8*)"APN syntactical error"           }  },
     {AT_CME_SET_APN_BEFORE_SET_AUTH,                       {(VOS_UINT8*)"702", (VOS_UINT8*)"set APN before set auth"         }  },
@@ -164,6 +213,7 @@ const AT_RETURN_TAB_TYPE_STRU gastAtReturnCodeTab[]=
     {AT_CME_PDN_TYPE_ILLEGAL,                              {(VOS_UINT8*)"713", (VOS_UINT8*)"PDN type illegal"                }  },
     {AT_CME_IPV4_ADDR_ALLOC_TYPE_ILLEGAL,                  {(VOS_UINT8*)"714", (VOS_UINT8*)"IPV4 address alloc type illegal" }  },
     {AT_CME_LINK_CID_INVALID,                              {(VOS_UINT8*)"715", (VOS_UINT8*)"link cid invalid"                }  },
+    /* Added by c64416 for AT Project 2011-10-23  End*/
     {AT_CME_NO_SUCH_ELEMENT,                               {(VOS_UINT8*)"716", (VOS_UINT8*)"no such element"                 }  },
     {AT_CME_MISSING_RESOURCE,                              {(VOS_UINT8*)"717", (VOS_UINT8*)"missing resource"                }  },
     {AT_CME_OPERATION_NOT_ALLOWED_IN_CL_MODE,              {(VOS_UINT8*)"718", (VOS_UINT8*)"operation not allowed in CL mode"                }  },
@@ -202,6 +252,7 @@ const AT_RETURN_TAB_TYPE_STRU gastAtReturnCodeTab[]=
     {AT_SIMLOCK_PLMN_NUM_ERR,                              {(VOS_UINT8*)"2", (VOS_UINT8*)"Simlock Plmn num invalid"          }  },
     {AT_SIMLOCK_PLMN_MNC_LEN_ERR,                          {(VOS_UINT8*)"3", (VOS_UINT8*)"Simlock Plmn MNC len Err"          }  },
 
+    /* Added by c64416 for AT Project 2011-10-23  Begin */
     {AT_DEVICE_NOT_SUPPORT,                                {(VOS_UINT8*)"500", (VOS_UINT8*)"Undone",                            }},
     {AT_DEVICE_ERR_UNKNOWN,                                {(VOS_UINT8*)"501", (VOS_UINT8*)"Unknown error",                     }},
     {AT_DEVICE_INVALID_PARAMETERS,                         {(VOS_UINT8*)"502", (VOS_UINT8*)"Invalid parameters",                }},
@@ -248,6 +299,7 @@ const AT_RETURN_TAB_TYPE_STRU gastAtReturnCodeTab[]=
     {AT_DEVICE_CLOSE_UL_CHAN_FAILURE,                      {(VOS_UINT8*)"560", (VOS_UINT8*)"Close TX Transmitter Failure",      }},
     {AT_DEVICE_CLOSE_DL_CHAN_FAILURE,                      {(VOS_UINT8*)"561", (VOS_UINT8*)"Close RX Transmitter Failure",      }},
     {AT_DEVICE_NV_DATA_INVALID,                            {(VOS_UINT8*)"562", (VOS_UINT8*)"NV DATA INVALID",                   }},
+    /* Added by c64416 for AT Project 2011-10-23  End*/
 
     {AT_PERSONALIZATION_ERR_BEGIN,                          {VOS_NULL_PTR     , VOS_NULL_PTR                                     } },
     {AT_PERSONALIZATION_IDENTIFY_FAIL,                      {(VOS_UINT8*)"301", (VOS_UINT8*)"Identify failure",                  } },
@@ -491,6 +543,7 @@ TAF_UINT32 At_SendData(TAF_UINT8 ucIndex,TAF_UINT8 ucType,TAF_UINT8* pData,TAF_U
         return AT_FAILURE;
     }
 
+/* Added by S62952 for IPV6, 2011-07-19, begin */
 
     if (AT_DATA_STOP_STATE == gastAtClientTab[ucIndex].DataState)
     {
@@ -577,6 +630,7 @@ TAF_UINT32 At_SendData(TAF_UINT8 ucIndex,TAF_UINT8 ucType,TAF_UINT8* pData,TAF_U
         }
         return AT_FAILURE;
     }
+ /* Added by S62952 for IPV6, 2011-07-19, end */
 }
 
 
@@ -801,6 +855,7 @@ VOS_VOID AT_DisplaySelResultData(
     ulMuxUserFlg  = AT_CheckMuxUser(ucIndex);
     /* Added by L60609 for MUX，2012-08-06,  End */
 
+    /* Added by S62952 for IPV6, 2011-07-19, begin */
 
     if ( (AT_CMD_MODE == gastAtClientTab[ucIndex].Mode)
       || (AT_ONLINE_CMD_MODE == gastAtClientTab[ucIndex].Mode) )
@@ -883,6 +938,7 @@ VOS_VOID AT_DisplaySelResultData(
             ;
         }
     }
+    /* Added by S62952 for IPV6, 2011-07-19, end */
     return;
 }
 
@@ -925,7 +981,9 @@ VOS_VOID At_BufferorSendResultData(
     ulBufferLength = gstAtCombineSendData[ucIndex].usBufLen + usLength;
 
     /* 若缓冲区存储空间不够用则将当前已缓存信息输出 */
+    /* Modified by f62575 for SS FDN&Call Control, 2013-05-06, begin */
     if (ulBufferLength > AT_CMD_OUTPUT_MAX_LEN)
+    /* Modified by f62575 for SS FDN&Call Control, 2013-05-06, end */
     {
         At_SendResultData(ucIndex,
                           gstAtCombineSendData[ucIndex].aucBuffer,
@@ -993,7 +1051,9 @@ VOS_VOID AT_SendBroadCastResultData(
 
     for (ucCount = 0; ucCount < AT_MAX_CLIENT_NUM; ucCount++ )
     {
+        /* Modified by l60609 for DSDA Phase III, 2013-2-21, Begin */
         pstAtClientCtx = AT_GetClientCtxAddr(ucCount);
+        /* Modified by l60609 for DSDA Phase III, 2013-2-21, End */
 
         /* 该端口未使用 */
         if (AT_CLIENT_NULL == gastAtClientTab[ucCount].ucUsed)
@@ -1089,11 +1149,13 @@ VOS_VOID At_SendResultData(
         /* 通过ucIndex获取端口类型 */
     AT_MNTN_TraceCmdResult(ucIndex, pData, usLen);
 
+    /* Modified by l60609 for DSDA Phase II, 2012-12-17, Begin */
     if (AT_IS_BROADCAST_CLIENT_INDEX(ucIndex))
     {
         AT_SendBroadCastResultData(ucIndex, pData, usLen);
         AT_MNTN_TraceRPTPORT();
     }
+    /* Modified by l60609 for DSDA Phase II, 2012-12-17, End */
     else
     {
         if (AT_MAX_CLIENT_NUM <= ucIndex)
@@ -1868,7 +1930,9 @@ VOS_VOID At_FormatResultData(
                 gstAtCombineSendData[ucIndex].usBufLen += usLength;
             }
 
+            /* Added by c64416 for AT Project 2011-10-20  Begin */
             AT_ParseCmdOver(ucIndex);
+            /* Added by c64416 for AT Project 2011-10-20  End*/
         }
     }
     else
@@ -1937,7 +2001,9 @@ VOS_VOID At_FormatResultData(
                 }
             }
 
+            /* Added by c64416 for AT Project 2011-10-20  Begin */
             AT_ParseCmdOver(ucIndex);
+            /* Added by c64416 for AT Project 2011-10-20  End*/
         }
     }
 

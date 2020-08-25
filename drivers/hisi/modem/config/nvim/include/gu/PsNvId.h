@@ -390,7 +390,9 @@ enum PS_NV_ID_ENUM
 /* 9267 */      en_NV_Item_JAM_DETECT_CFG         = 9267,
 
 /* 9273 */      en_NV_Item_FREQ_LOCK_CFG         = 9273,
+/* Added by w0014666 for ERRLOG Phase II, 2014-07-04, begin */ 
                  en_NV_Item_GAS_MNTN_CONFIG        = 9277,
+/* Added by w0014666 for ERRLOG Phase II, 2014-07-04, end */
                  
 /* 2316 */      en_NV_Item_ENHANCED_OPERATOR_NAME_SRV_CFG = 2316,
 /* 2323 */      en_NV_Item_REFRESH_ALL_FILE_RESTART_CFG   = 2323,

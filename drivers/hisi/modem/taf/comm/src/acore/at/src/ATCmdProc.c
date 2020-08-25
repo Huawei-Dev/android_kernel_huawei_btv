@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may
+* *    be used to endorse or promote products derived from this software
+* *    without specific prior written permission.
+*
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 
 /*****************************************************************************
@@ -620,7 +666,9 @@ CPM_RCV_FUNC                            g_apAtPortDataRcvFuncTab[AT_PHY_PORT_MAX
 /* Deleted by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-2, begin */
 /* Deleted by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-2, end */
 
+/* Added by l60609 for B060 Project, 2012-2-21, Begin   */
 AT_SP_WORD_CTX_STRU                     g_stSpWordCtx = {0};
+/* Added by l60609 for B060 Project, 2012-2-21, End   */
 
 /*****************************************************************************
    3 函数、变量声明
@@ -695,6 +743,7 @@ TAF_UINT32 At_ClientIdToUserId (
 {
     TAF_UINT8                           i;
 
+    /* Modified by l60609 for DSDA Phase II, 2012-12-15, Begin */
     /* 判断是否为广播client id */
     /* MODEM 0的广播ClientId */
     if (AT_BROADCAST_CLIENT_ID_MODEM_0 == usClientId)
@@ -717,6 +766,7 @@ TAF_UINT32 At_ClientIdToUserId (
         return AT_SUCCESS;
     }
 
+    /* Modified by l60609 for DSDA Phase II, 2012-12-15, End */
 
     /* 查找用户管理表 */
     for ( i = 0; i < AT_MAX_CLIENT_NUM ; i++ )
@@ -1185,6 +1235,7 @@ TAF_UINT32  At_SendPduMsgOrCmd(
     MN_OPERATION_ID_T                   opId                = At_GetOpId();
     MN_MSG_TS_DATA_INFO_STRU            *pstTsDataInfo;
     MN_MSG_RAW_TS_DATA_STRU             *pstRawData;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, Begin */
     AT_MODEM_SMS_CTX_STRU               *pstSmsCtx = VOS_NULL_PTR;
 
     pstSmsCtx = AT_GetModemSmsCtxAddrFromClientId(ucIndex);
@@ -1236,6 +1287,7 @@ TAF_UINT32  At_SendPduMsgOrCmd(
                    &(pstSmsCtx->stCscaCsmpInfo.stParmInUsim.stScAddr),
                    sizeof(pstSendDirectParm->stMsgInfo.stScAddr));
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, End */
 
     pstSendDirectParm->stMsgInfo.stTsRawData.ulLen = gastAtClientTab[ucIndex].AtSmsData.ucPduLen;
     PS_MEM_CPY(pstSendDirectParm->stMsgInfo.stTsRawData.aucData,
@@ -1424,6 +1476,7 @@ VOS_UINT32  At_WritePduMsgToMem(
                                                                 MN_MSG_TPDU_MAX};
     TAF_UINT8                           ucFo;
     MN_MSG_RAW_TS_DATA_STRU             *pstRawData;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     AT_MODEM_SMS_CTX_STRU              *pstSmsCtx = VOS_NULL_PTR;
 
     pstSmsCtx = AT_GetModemSmsCtxAddrFromClientId(ucIndex);
@@ -1477,6 +1530,7 @@ VOS_UINT32  At_WritePduMsgToMem(
                        sizeof(pstWriteParm->stMsgInfo.stScAddr));
         }
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     pstWriteParm->stMsgInfo.stTsRawData.ulLen = gastAtClientTab[ucIndex].AtSmsData.ucPduLen;
     PS_MEM_CPY(pstWriteParm->stMsgInfo.stTsRawData.aucData,
@@ -1710,9 +1764,11 @@ TAF_UINT32 At_SmsPduProc ( TAF_UINT8 ucIndex, TAF_UINT8 *pData, TAF_UINT16 usLen
             ulRet = At_WritePduMsgToMem(ucIndex, pData, usTmpLen);
             break;
 
+        /*begin add by zhoujun40661 2006-10-24 for CNMA*/
         case AT_CMD_CNMA_PDU_SET:
             ulRet = At_SendPduMsgAck(ucIndex, pData, usTmpLen);
             break;
+        /*end add by zhoujun40661 2006-10-24 for CNMA*/
 
         default:
             ulRet = AT_ERROR;                                                   /*  返回错误*/
@@ -1770,6 +1826,7 @@ TAF_UINT32  At_SendTextMsgOrCmd(
     TAF_UINT32                          ulRet;
     MN_MSG_SEND_PARM_STRU               *pstSendDirectParm;
     MN_OPERATION_ID_T                   opId                = At_GetOpId();
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, Begin */
     AT_MODEM_SMS_CTX_STRU               *pstSmsCtx = VOS_NULL_PTR;
 
     if ((AT_CMD_CMGS_TEXT_SET != gastAtClientTab[ucIndex].CmdCurrentOpt)
@@ -1827,6 +1884,7 @@ TAF_UINT32  At_SendTextMsgOrCmd(
         PS_MEM_CPY(&pstTsDataInfo->u.stSubmit.stValidPeriod,
                    &(pstSmsCtx->stCscaCsmpInfo.stVp),
                    sizeof(pstTsDataInfo->u.stSubmit.stValidPeriod));
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, End */
 
         /*UDL UD*/
         if (gastAtClientTab[ucIndex].usSmsTxtLen > MN_MSG_MAX_LEN)
@@ -1953,6 +2011,7 @@ TAF_UINT32  At_WriteTextMsgToMem(
     TAF_UINT32                          ulRet;
     MN_MSG_WRITE_PARM_STRU              *pstWriteParm;
     MN_MSG_DCS_CODE_STRU                *pstDcs;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     AT_MODEM_SMS_CTX_STRU              *pstSmsCtx = VOS_NULL_PTR;
 
     pstSmsCtx = AT_GetModemSmsCtxAddrFromClientId(ucIndex);
@@ -2103,6 +2162,7 @@ TAF_UINT32  At_WriteTextMsgToMem(
         AT_WARN_LOG("At_WriteTextMsgToMem: Fail to encode sms message or command.");
         return AT_ERROR;
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     gastAtClientTab[ucIndex].opId = At_GetOpId();
     ulRet = MN_MSG_Write(gastAtClientTab[ucIndex].usClientId,
@@ -2265,6 +2325,7 @@ TAF_UINT32 At_SmsTextProc ( TAF_UINT8 ucIndex, TAF_UINT8 *pData, TAF_UINT16 usLe
 *****************************************************************************/
 TAF_UINT32 At_SmsProc ( TAF_UINT8 ucIndex, TAF_UINT8 *pData, TAF_UINT16 usLen)
 {
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, Begin */
     AT_MODEM_SMS_CTX_STRU              *pstSmsCtx = VOS_NULL_PTR;
 
     pstSmsCtx = AT_GetModemSmsCtxAddrFromClientId(ucIndex);
@@ -2279,6 +2340,7 @@ TAF_UINT32 At_SmsProc ( TAF_UINT8 ucIndex, TAF_UINT8 *pData, TAF_UINT16 usLen)
         /* 如果处理有问题，返回AT_ERROR */
         return At_SmsPduProc(ucIndex,pData,usLen);                              /* PDU */
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, End */
 }
 
 
@@ -2416,7 +2478,9 @@ VOS_UINT32 At_DispatchSimlockCmd(
     }
     else
     {
+        /* Added by f62575 for B050 Project, 2012-2-3, Begin   */
         AT_GetSimLockStatus(ucIndex);
+        /* Added by f62575 for B050 Project, 2012-2-3, end   */
     }
     return AT_SUCCESS;
 }
@@ -2547,6 +2611,7 @@ VOS_UINT32 At_ProcSimLockPara(
 
 }
 
+/* Added by L47619 for AP-Modem Personalisation Project, 2012/04/18, begin */
 /*****************************************************************************
  函 数 名  : AT_HandleFacAuthPubKeyCmd
  功能描述  : 处理AT^FACAUTHPUBKEY命令的特殊函数(因为该命令的第一个参数长度超过
@@ -2589,9 +2654,11 @@ VOS_UINT32 AT_HandleFacAuthPubKeyCmd(
     VOS_UINT16                          usFirstParaLen;
     VOS_UINT16                          usSecondParaLen;
     VOS_UINT32                          ulResult;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     AT_PARSE_CMD_NAME_TYPE_STRU         stAtCmdName;
 
     PS_MEM_SET(&stAtCmdName, 0, sizeof(stAtCmdName));
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     /* 局部变量初始化 */
     usPos               = 0;
@@ -2638,12 +2705,14 @@ VOS_UINT32 AT_HandleFacAuthPubKeyCmd(
 
     /* 获取命令(不包含命令前缀AT)名称及长度 */
     usPos = (VOS_UINT16)VOS_StrLen("AT");
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     stAtCmdName.usCmdNameLen = (VOS_UINT16)VOS_StrLen("^FACAUTHPUBKEY");
     PS_MEM_CPY(stAtCmdName.aucCmdName,
                (pucData + usPos),
                stAtCmdName.usCmdNameLen);
     stAtCmdName.aucCmdName[stAtCmdName.usCmdNameLen] = '\0';
     usPos += stAtCmdName.usCmdNameLen;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     usPos += (VOS_UINT16)VOS_StrLen("=");
 
@@ -2749,9 +2818,11 @@ VOS_UINT32 AT_HandleSimLockDataWriteCmd(
     VOS_UINT8                          *pucDataPara;
     AT_SIMLOCKDATAWRITE_SET_REQ_STRU   *pstSimlockDataWrite;
     VOS_UINT32                          ulResult;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     AT_PARSE_CMD_NAME_TYPE_STRU         stAtCmdName;
 
     PS_MEM_SET(&stAtCmdName, 0, sizeof(stAtCmdName));
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     /* 局部变量初始化 */
     pucDataPara         = VOS_NULL_PTR;
@@ -2791,12 +2862,14 @@ VOS_UINT32 AT_HandleSimLockDataWriteCmd(
 
     /* 获取命令(不包含命令前缀AT)名称及长度 */
     usPos = (VOS_UINT16)VOS_StrLen("AT");
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     stAtCmdName.usCmdNameLen = (VOS_UINT16)VOS_StrLen("^SIMLOCKDATAWRITE");
     PS_MEM_CPY(stAtCmdName.aucCmdName,
                (pucData + usPos),
                stAtCmdName.usCmdNameLen);
     stAtCmdName.aucCmdName[stAtCmdName.usCmdNameLen] = '\0';
     usPos += stAtCmdName.usCmdNameLen;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     usPos += (VOS_UINT16)VOS_StrLen("=");
 
@@ -3464,6 +3537,7 @@ VOS_UINT32 At_HandleApModemSpecialCmd(
 
     return AT_FAILURE;
 }
+/* Added by L47619 for AP-Modem Personalisation Project, 2012/04/18, end */
 
 /*****************************************************************************
  函 数 名  : At_CheckUsimStatus
@@ -3517,6 +3591,7 @@ TAF_UINT32 At_CheckUsimStatus (
 )
 {
     TAF_UINT32                          ulRst;
+    /* Modified by l60609 for DSDA Phase II, 2012-12-24, Begin */
     MODEM_ID_ENUM_UINT16                enModemId;
     VOS_UINT32                          ulGetModemIdRslt;
     AT_USIM_INFO_CTX_STRU              *pstUsimInfoCtx = VOS_NULL_PTR;
@@ -3535,13 +3610,17 @@ TAF_UINT32 At_CheckUsimStatus (
         return AT_ERROR;
     }
 
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, Begin */
     pstSmsCtx      = AT_GetModemSmsCtxAddrFromModemId(enModemId);
     pstUsimInfoCtx = AT_GetUsimInfoCtxFromModemId(enModemId);
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, End */
 
+    /* Modified by l60609 for DSDA Phase II, 2012-12-24, End */
 
 
 
     /* 快速开机模式，不检查 PIN 状态 */
+    /* Modified by l60609 for DSDA Phase III, 2013-3-4, Begin */
     if (NV_OK != NV_ReadEx(enModemId, en_NV_Item_FollowOn_OpenSpeed_Flag, (VOS_VOID*)(&stQuickStartFlg), sizeof(NAS_NVIM_FOLLOWON_OPENSPEED_FLAG_STRU)))
     {
        stQuickStartFlg.ulQuickStartSta = AT_QUICK_START_DISABLE;
@@ -3591,6 +3670,7 @@ TAF_UINT32 At_CheckUsimStatus (
             ulRst = AT_ERROR;
             break;
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-3-4, End */
 
     return ulRst;
 }
@@ -4148,10 +4228,12 @@ TAF_VOID At_TimeOutProc(
     {
         switch(pMsg->ulName & 0x000000ff)
         {
+            /* Modified by l60609 for DSDA Phase III, 2013-2-21, Begin */
             /* 自动应答放在AT处理，不会进行上报，语音状态下，相当于接听了，但是没有指示 */
             case AT_S0_TIMER:
                 AT_RcvTiS0Expired(pMsg);
                 break;
+            /* Modified by l60609 for DSDA Phase III, 2013-2-21, End */
 
             case AT_HOLD_CMD_TIMER:
                 ucIndex = (VOS_UINT8)((pMsg->ulName)>>12);
@@ -4629,7 +4711,9 @@ AT_CMD_CURRENT_OPT_ENUM At_GetMnOptType(MN_MMI_OPERATION_TYPE_ENUM_U8 enType)
         return AT_CMD_SS_INTERROGATE;
     case TAF_MMI_REGISTER_PASSWD:/* TAF_MMI_REGISTER_PASSWD */
         return AT_CMD_SS_REGISTER_PSWD;
+    /* Delete by f62575 for SS FDN&Call Control, 2013-05-06, begin */
 	/* Delete TAF_MMI_GET_PASSWD分支 */
+    /* Delete by f62575 for SS FDN&Call Control, 2013-05-06, end */
     case TAF_MMI_PROCESS_USSD_REQ:/* TAF_MMI_PROCESS_USSD_REQ */
         return AT_CMD_SS_USSD;
     case TAF_MMI_SUPPRESS_CLIP:/* TAF_MMI_SUPPRESS_CLIP */
@@ -4800,9 +4884,11 @@ VOS_UINT32 At_ProcXmlText ( TAF_UINT8 ucIndex, TAF_UINT8 *pData, TAF_UINT16 usLe
     AT_MTA_CPOS_REQ_STRU                   *pstCposSetReq;
     VOS_UINT32                              ulResult;
     MTA_AT_CPOS_OPERATE_TYPE_ENUM_UINT32    enCposOpType;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-20, Begin */
     AT_MODEM_AGPS_CTX_STRU                 *pstAgpsCtx = VOS_NULL_PTR;
 
     pstAgpsCtx = AT_GetModemAgpsCtxAddrFromClientId(ucIndex);
+    /* Modified by l60609 for DSDA Phase III, 2013-2-20, End */
 
     /* 局部变量初始化 */
     usTmpLen           = usLen;
@@ -4833,6 +4919,7 @@ VOS_UINT32 At_ProcXmlText ( TAF_UINT8 ucIndex, TAF_UINT8 *pData, TAF_UINT16 usLe
         return AT_ERROR;
     }
 
+    /* Modified by l60609 for DSDA Phase III, 2013-2-20, Begin */
     /* 把缓冲区的字符加到XML码流中 */
     if (MTA_AT_CPOS_CANCEL != enCposOpType)
     {
@@ -4895,6 +4982,7 @@ VOS_UINT32 At_ProcXmlText ( TAF_UINT8 ucIndex, TAF_UINT8 *pData, TAF_UINT16 usLe
 
         return AT_WAIT_ASYNC_RETURN;
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-20, End */
 
     return AT_WAIT_XML_INPUT;
 }

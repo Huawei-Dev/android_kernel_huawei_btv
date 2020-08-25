@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may
+* *    be used to endorse or promote products derived from this software
+* *    without specific prior written permission.
+*
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 
 /*****************************************************************************
@@ -974,7 +1020,9 @@ VOS_UINT32 TAF_SetAutoReselStub(
                                   I0_WUEPS_PID_MMA);
 }
 
+/* Deleted by k902809 for Iteration 11, 2015-3-25, begin */
 
+/* Deleted by k902809 for Iteration 11, Iteration 11 2015-3-25, end */
 
 /*****************************************************************************
  函 数 名  : TAF_QryUsimInfo
@@ -1051,7 +1099,9 @@ TAF_UINT32 TAF_QryCpnnInfo(
                              I0_WUEPS_PID_MMA);
 }
 
+/* Deleted by k902809 for Iteration 11, 2015-3-24, begin */
 
+/* Deleted by k902809 for Iteration 11, Iteration 11 2015-3-24, end */
 
 
 /* Added by s00246516 for L-C互操作项目, 2014-01-29, Begin */
@@ -3094,7 +3144,24 @@ VOS_UINT32 TAF_MMA_SetCmmReq(
     return VOS_TRUE;
 }
 
+/* Added by k902809 for Iteration 11, 2015-3-23, begin */
+/*****************************************************************************
+  Function Name     :   TAF_MMA_QryAcInfoReq
+  Description       :   Allocate the memory for message.
+                        Sends the message to MMA.
+                        Returns VOS_FALSE on failure of senfing message.
 
+  Input parameters  :   UINT32                              ulModuleId,
+                        MN_CLIENT_ID_T                      ClientId,
+                        MN_OPERATION_ID_T                   OpId
+  Outout parameters :
+  Return Value      :   VOS_FALSE or VOS_TRUE
+
+  Modify History:
+      1)  Date      :   2015-03-21
+          Author    :   k902809
+          Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 TAF_MMA_QryAcInfoReq(
     VOS_UINT32                          ulModuleId,
     MN_CLIENT_ID_T                      usClientId,
@@ -3131,7 +3198,24 @@ VOS_UINT32 TAF_MMA_QryAcInfoReq(
     return VOS_TRUE;
 }
 
+/*****************************************************************************
+  Function Name     :   TAF_MMA_QryCopnInfoReq
+  Description       :   Allocate the memory for message.
+                        Sends the message to MMA
+                        Returns AT_FAILURE on failure of senfing message.
 
+  Input parameters  :   UINT32                              ulModuleId,
+                        MN_CLIENT_ID_T                      ClientId,
+                        VOS_UINT16                          usFromIndex,
+                        MN_OPERATION_ID_T                   OpId
+  Outout parameters :
+  Return Value      :   VOS_FALSE or VOS_TRUE
+
+  Modify History:
+      1)  Date      :   2015-03-24
+          Author    :   k902809
+          Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 TAF_MMA_QryCopnInfoReq(
     VOS_UINT32                          ulModuleId,
     MN_CLIENT_ID_T                      usClientId,
@@ -3177,7 +3261,24 @@ VOS_UINT32 TAF_MMA_QryCopnInfoReq(
     return VOS_TRUE;
 }
 
+/*****************************************************************************
+  Function Name     :   TAF_MMA_SimInsertReq
+  Description       :   Allocate the memory for sim insert message.
+                        Sends the message to MMA
+                        Returns AT_FAILURE on failure of senfing message.
 
+  Input parameters  :   UINT32                              ulModuleId
+                        MN_CLIENT_ID_T                      ClientId
+                        MN_OPERATION_ID_T                   OpId
+                        TAF_SIM_INSERT_STATE_ENUM_UINT32    enSimInsertState
+  Outout parameters :
+  Return Value      :   VOS_FALSE or VOS_TRUE
+
+  Modify History:
+      1)  Date      :   2015-03-24
+          Author    :   k902809
+          Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 TAF_MMA_SimInsertReq(
     VOS_UINT32                          ulModuleId,
     MN_CLIENT_ID_T                      usClientId,
@@ -3217,7 +3318,24 @@ VOS_UINT32 TAF_MMA_SimInsertReq(
 }
 
 
+/*****************************************************************************
+  Function Name     :   TAF_MMA_SetEOPlmnReq
+  Description       :   Allocate the memory for EOPlmn.
+                        Sends the message to MMA
+                        Returns AT_FAILURE on failure of senfing message.
 
+  Input parameters  :   UINT32                              ulModuleId;
+                        MN_CLIENT_ID_T                      ClientId,
+                        MN_OPERATION_ID_T                   OpId
+                        TAF_MMA_SET_EOPLMN_LIST_STRU       *pstEOPlmnCfg
+  Outout parameters :
+  Return Value      :   VOS_FALSE or VOS_TRUE
+
+  Modify History:
+      1)  Date      :   2015-03-24
+          Author    :   k902809
+          Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 TAF_MMA_SetEOPlmnReq(
     VOS_UINT32                          ulModuleId,
     MN_CLIENT_ID_T                      usClientId,
@@ -3263,7 +3381,24 @@ VOS_UINT32 TAF_MMA_SetEOPlmnReq(
 }
 
 
+/*****************************************************************************
+  Function Name     :   TAF_MMA_EOPlmnQryReq
+  Description       :   Allocate the memory for EOPlmn.
+                        Sends the message to MMA
+                        Returns AT_FAILURE on failure of senfing message.
 
+  Input parameters  :   UINT32                              ulModuleId;
+                        MN_CLIENT_ID_T                      ClientId,
+                        MN_OPERATION_ID_T                   OpId
+                        TAF_MMA_SET_EOPLMN_LIST_STRU       *pstEOPlmnCfg
+  Outout parameters :
+  Return Value      :   VOS_FALSE or VOS_TRUE
+
+  Modify History:
+      1)  Date      :   2015-03-30
+          Author    :   k902809
+          Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 TAF_MMA_QryEOPlmnReq(
     VOS_UINT32                          ulModuleId,
     MN_CLIENT_ID_T                      usClientId,
@@ -3301,7 +3436,23 @@ VOS_UINT32 TAF_MMA_QryEOPlmnReq(
 }
 
 
+/*****************************************************************************
+  Function Name     :   TAF_MMA_QryCLocInfoReq
+  Description       :   Allocate the memory for message.
+                        Sends the message to MMA.
+                        Returns VOS_FALSE on failure of senfing message.
 
+  Input parameters  :   UINT32                              ulModuleId,
+                        MN_CLIENT_ID_T                      ClientId,
+                        MN_OPERATION_ID_T                   OpId
+  Outout parameters :
+  Return Value      :   VOS_FALSE or VOS_TRUE
+
+  Modify History:
+      1)  Date      :   2015-03-25
+          Author    :   k902809
+          Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 TAF_MMA_QryCLocInfoReq(
     VOS_UINT32                          ulModuleId,
     MN_CLIENT_ID_T                      usClientId,
@@ -3338,7 +3489,24 @@ VOS_UINT32 TAF_MMA_QryCLocInfoReq(
     return VOS_TRUE;
 }
 
+/*****************************************************************************
+  Function Name     :   TAF_MMA_NetScanReq
+  Description       :   Allocate the memory for message.
+                        Sends the message to MMA.
+                        Returns VOS_FALSE on failure of senfing message.
 
+  Input parameters  :   UINT32                              ulModuleId,
+                        MN_CLIENT_ID_T                      ClientId,
+                        MN_OPERATION_ID_T                   OpId,
+                        TAF_MMA_NET_SCAN_REQ_STRU          *pstRecvNetScanSetPara
+  Outout parameters :
+  Return Value      :   VOS_FALSE or VOS_TRUE
+
+  Modify History:
+      1)  Date      :   2015-03-21
+          Author    :   k902809
+          Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 TAF_MMA_NetScanReq(
     VOS_UINT32                          ulModuleId,
     MN_CLIENT_ID_T                      usClientId,
@@ -3385,7 +3553,23 @@ VOS_UINT32 TAF_MMA_NetScanReq(
     return VOS_TRUE;
 }
 
+/*****************************************************************************
+  Function Name     :   TAF_MMA_NetScanAbortReq
+  Description       :   Allocate the memory for message.
+                        Sends the message to MMA.
+                        Returns VOS_FALSE on failure of senfing message.
 
+  Input parameters  :   UINT32                              ulModuleId,
+                        MN_CLIENT_ID_T                      ClientId,
+                        MN_OPERATION_ID_T                   OpId
+  Outout parameters :
+  Return Value      :   VOS_FALSE or VOS_TRUE
+
+  Modify History:
+      1)  Date      :   2015-03-21
+          Author    :   k902809
+          Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 TAF_MMA_NetScanAbortReq(
     VOS_UINT32                          ulModuleId,
     MN_CLIENT_ID_T                      usClientId,
@@ -3423,7 +3607,23 @@ VOS_UINT32 TAF_MMA_NetScanAbortReq(
 }
 
 
+/*****************************************************************************
+  Function Name     :   TAF_MMA_QrySpnReq
+  Description       :   Allocate the memory for message.
+                        Sends the message to MMA.
+                        Returns VOS_FALSE on failure of senfing message.
 
+  Input parameters  :   UINT32                              ulModuleId,
+                        MN_CLIENT_ID_T                      ClientId,
+                        MN_OPERATION_ID_T                   OpId
+  Outout parameters :
+  Return Value      :   VOS_FALSE or VOS_TRUE
+
+  Modify History:
+      1)  Date      :   2015-03-30
+          Author    :   k902809
+          Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 TAF_MMA_QrySpnReq(
     VOS_UINT32                          ulModuleId,
     MN_CLIENT_ID_T                      usClientId,
@@ -3462,7 +3662,23 @@ VOS_UINT32 TAF_MMA_QrySpnReq(
 
 
 
+/*****************************************************************************
+  Function Name     :   TAF_MMA_QryMMPlmnInfoReq
+  Description       :   Allocate the memory for message.
+                        Sends the message to MMA.
+                        Returns VOS_FALSE on failure of senfing message.
 
+  Input parameters  :   UINT32                              ulModuleId,
+                        MN_CLIENT_ID_T                      ClientId,
+                        MN_OPERATION_ID_T                   OpId
+  Outout parameters :
+  Return Value      :   VOS_FALSE or VOS_TRUE
+
+  Modify History:
+      1)  Date      :   2015-03-30
+          Author    :   k902809
+          Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 TAF_MMA_QryMMPlmnInfoReq(
     VOS_UINT32                          ulModuleId,
     MN_CLIENT_ID_T                      usClientId,
@@ -3499,7 +3715,23 @@ VOS_UINT32 TAF_MMA_QryMMPlmnInfoReq(
     return VOS_TRUE;
 }
 
+/*****************************************************************************
+  Function Name     :   TAF_MMA_QryPlmnReq
+  Description       :   Allocate the memory for message.
+                        Sends the message to MMA.
+                        Returns VOS_FALSE on failure of senfing message.
 
+  Input parameters  :   UINT32                              ulModuleId,
+                        MN_CLIENT_ID_T                      ClientId,
+                        MN_OPERATION_ID_T                   OpId
+  Outout parameters :
+  Return Value      :   VOS_FALSE or VOS_TRUE
+
+  Modify History:
+      1)  Date      :   2015-03-30
+          Author    :   k902809
+          Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 TAF_MMA_QryPlmnReq(
     VOS_UINT32                          ulModuleId,
     MN_CLIENT_ID_T                      usClientId,
@@ -3536,7 +3768,23 @@ VOS_UINT32 TAF_MMA_QryPlmnReq(
     return VOS_TRUE;
 }
 
+/*****************************************************************************
+  Function Name     :   TAF_MMA_QryUserSrvStateReq
+  Description       :   Allocate the memory for message.
+                        Sends the message to MMA.
+                        Returns VOS_FALSE on failure of senfing message.
 
+  Input parameters  :   UINT32                              ulModuleId,
+                        MN_CLIENT_ID_T                      ClientId,
+                        MN_OPERATION_ID_T                   OpId
+  Outout parameters :
+  Return Value      :   VOS_FALSE or VOS_TRUE
+
+  Modify History:
+      1)  Date      :   2015-03-27
+          Author    :   k902809
+          Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 TAF_MMA_QryUserSrvStateReq(
     VOS_UINT32                          ulModuleId,
     MN_CLIENT_ID_T                      usClientId,
@@ -3574,7 +3822,23 @@ VOS_UINT32 TAF_MMA_QryUserSrvStateReq(
 }
 
 
+/*****************************************************************************
+  Function Name     :   TAF_MMA_QryApPwrOnAndRegTimeReq
+  Description       :   Allocate the memory for message.
+                        Sends the message to MMA.
+                        Returns VOS_FALSE on failure of senfing message.
 
+  Input parameters  :   UINT32                              ulModuleId,
+                        MN_CLIENT_ID_T                      ClientId,
+                        MN_OPERATION_ID_T                   OpId
+  Outout parameters :
+  Return Value      :   VOS_FALSE or VOS_TRUE
+
+  Modify History:
+      1)  Date      :   2015-03-27
+          Author    :   k902809
+          Modify content :    Create
+*****************************************************************************/
 VOS_UINT32 TAF_MMA_QryApPwrOnAndRegTimeReq(
     VOS_UINT32                          ulModuleId,
     MN_CLIENT_ID_T                      usClientId,
@@ -3611,6 +3875,7 @@ VOS_UINT32 TAF_MMA_QryApPwrOnAndRegTimeReq(
     return VOS_TRUE;
 }
 
+/* Added by k902809 for Iteration 11, Iteration 11 2015-3-23, end */
 
 /*****************************************************************************
  函 数 名  : TAF_MMA_SetAutoAttachReq

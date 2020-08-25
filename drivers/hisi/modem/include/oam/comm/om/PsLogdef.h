@@ -1,4 +1,50 @@
-
+/*
+ * Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+ * foss@huawei.com
+ *
+ * If distributed as part of the Linux kernel, the following license terms
+ * apply:
+ *
+ * * This program is free software; you can redistribute it and/or modify
+ * * it under the terms of the GNU General Public License version 2 and
+ * * only version 2 as published by the Free Software Foundation.
+ * *
+ * * This program is distributed in the hope that it will be useful,
+ * * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * * GNU General Public License for more details.
+ * *
+ * * You should have received a copy of the GNU General Public License
+ * * along with this program; if not, write to the Free Software
+ * * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+ *
+ * Otherwise, the following license terms apply:
+ *
+ * * Redistribution and use in source and binary forms, with or without
+ * * modification, are permitted provided that the following conditions
+ * * are met:
+ * * 1) Redistributions of source code must retain the above copyright
+ * *    notice, this list of conditions and the following disclaimer.
+ * * 2) Redistributions in binary form must reproduce the above copyright
+ * *    notice, this list of conditions and the following disclaimer in the
+ * *    documentation and/or other materials provided with the distribution.
+ * * 3) Neither the name of Huawei nor the names of its contributors may
+ * *    be used to endorse or promote products derived from this software
+ * *    without specific prior written permission.
+ *
+ * * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
 
 
 
@@ -448,18 +494,26 @@ typedef enum
                   PS_FILE_ID_L_LRRCLCSELBGFSM_C,
                   PS_FILE_ID_L_LRRCCSELBGGLOBAL_C,
                   PS_FILE_ID_L_LRRCLCSELBGSCAN_C,
+                  /* add by zhuochao for ECID begin */
                   PS_FILE_ID_L_LRRCMTAPROC_C,
+                  /* add by zhuochao for ECID end */
 
 /* 10355 */       PS_FILE_ID_L_RRCRRCADRX_C,
                   PS_FILE_ID_L_RRCPWRMAIN_C,
                   PS_FILE_ID_L_RRCCSELSSC_C,
+                  /* begin; 2014-02-20 CL MULT add */
                   PS_FILE_ID_L_RRCITFCMMCAFUNC_C,
+                  /* end; 2014-02-20 CL MULT add */
 
+                  /* begin; 2014-07-20 DSDS add */
 /* 10359 */       PS_FILE_ID_L_RRCDSDSCOMM_C,
                   PS_FILE_ID_L_RRCITFDSDSRRMFUNC_C,
+                  /* end; 2014-07-20 DSDS add */
 
+                  /* begin; 2014-03-05 CL MULT add */
 /* 10361 */       PS_FILE_ID_L_RRCITFCMMCATRANSMSG_C,
                   PS_FILE_ID_L_RRCCDMAMSGPROC_C,
+                  /* end; 2014-03-05 CL MULT add */
                   PS_FILE_ID_L_LRRCLRRCLPPCMD_C,
                   /* mod for Malloc Memory Size optimize begin */
                   PS_FILE_ID_L_ASN1UUDECODE_C,
@@ -685,6 +739,7 @@ typedef enum
     PS_FILE_ID_NASTCRABMMSGPROC_C,
 
     PS_FILE_ID_NASTCMTCMSGPROC_C,
+    /* Added by s49683 for VoLTE, 2013-07-19, Begin */
     PS_FILE_ID_IMSAMAIN_C,
     PS_FILE_ID_IMSACALLMANAGEMENT_C,
     PS_FILE_ID_IMSACONNMANAGEMENT_C,
@@ -705,6 +760,7 @@ typedef enum
     PS_FILE_ID_IMSAPROCATMSG_C,
     PS_FILE_ID_IMSAPROCIMSUSSDMSG_C,
     PS_FILE_ID_IMSAPROCUSSDMSG_C,
+    /* Added by s49683 for VoLTE, 2013-07-19, end */
     PS_FILE_ID_IMSAPROCRNICMSG_C,
 
     PS_FILE_ID_IMSAPROCOMMSG_C,
@@ -859,6 +915,7 @@ typedef enum
     PS_FILE_ID_L_PDCP_LOOPBACK_C,
     PS_FILE_ID_L_RLCMBMS_C,
 
+    /*added by z103912 2012-2-2 for ROHC*/
     PS_FILE_ID_L_ROHC_CONSTRUCT_PKT,
     PS_FILE_ID_L_ROHC_COMP_PROF0_C,
     PS_FILE_ID_L_ROHC_COMP_PROF1_C,
@@ -2491,7 +2548,9 @@ typedef enum
                   /* Added by s00164817 for PS Project£¬2011-12-13,  End */
 
 
+                  /*added by x59651 for balong V7R1 C50,20120221,begin*/
                   PS_FILE_ID_PSDIPC_C,
+                  /*added by x59651 for balong V7R1 C50,20120221,end*/
                   PS_FILE_ID_PSMUX_C,
                   PS_FILE_ID_SOCP_C,
 
@@ -2633,8 +2692,10 @@ typedef enum
                   PS_FILE_ID_CNAS_XSD_COM_FUNC_C,
                   PS_FILE_ID_CNAS_XSD_FSM_SYS_ACQ_C,
                   PS_FILE_ID_CNAS_XSD_FSM_SYS_ACQ_TBL_C,
+                  /* Added by k902809 for CDMA 1X Iteration 6, 2014-12-26, begin */
                   PS_FILE_ID_CNAS_XSD_FSM_REDIR_TBL_C,
                   PS_FILE_ID_CNAS_XSD_FSM_REDIR_C,
+                  /* Added by k902809 for CDMA 1X Iteration 6, 2014-12-26, end */
 
                   PS_FILE_ID_CNAS_XSD_SYS_ACQ_STRATEGY_C,
                   PS_FILE_ID_CNAS_XSD_MNTN_C,
@@ -2674,6 +2735,7 @@ typedef enum
                   PS_FILE_ID_CNAS_XCC_SND_APS_C,
                   PS_FILE_ID_CNAS_XCC_COM_FUNC_C,
                   PS_FILE_ID_CNAS_XCC_SND_MMA_C,
+                  /* Added by l60609 for CDMA 1X Phase0, 2014-7-3, end */
                   PS_FILE_ID_CNAS_XCC_SND_LMM_C,
 
                   PS_FILE_ID_CBT_FUNC_C,

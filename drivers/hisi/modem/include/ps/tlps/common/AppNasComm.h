@@ -1,4 +1,15 @@
+/******************************************************************************
 
+  Copyright(C)2008,Hisilicon Co. LTD.
+
+ ******************************************************************************
+  File Name       : AppNasComm.h
+  Description     : AppNasComm.h header file
+  History         :
+      1.sunbing       2008-12-17   Draft Enact
+      2.lihong        2009-09-22   Modify
+
+******************************************************************************/
 
 #ifndef __APPNASCOMM_H__
 #define __APPNASCOMM_H__
@@ -212,7 +223,9 @@ extern "C" {
 
 #define MAX_SUPPORTED_CODEC_NUM         10
 
+/*self-adaption NW cause modify begin for leili*/
 #define NAS_LMM_MAX_CAUSE_NUM            10
+/*self-adaption NW cause modify end for leili*/
 
 #define NAS_MM_MAX_PDP_REJ_CAUSE_NUM         16
 #define NAS_MM_DAM_MAX_PLMN_NUM              16
@@ -1128,6 +1141,7 @@ typedef struct
     VOS_UINT8                           aucOp[NAS_EMM_SOFT_USIM_OP_LEN];
 }NAS_EMM_SOFT_USIM_AUTH_PARAM_STRU;
 
+/*self-adaption NW cause modify begin for leili*/
 
 /*****************************************************************************
 ½á¹¹Ãû³Æ    :NAS_LMM_ADAPTION_CAUSE_STRU
@@ -1151,6 +1165,7 @@ typedef struct
     VOS_UINT8                           aucRsv[3];
     NAS_LMM_ADAPTION_CAUSE_STRU         astAdaptCause[NAS_LMM_MAX_CAUSE_NUM];
 }LNAS_LMM_CONFIG_NWCAUSE_STRU;
+/*self-adaption NW cause modify end for leili*/
 
 
 /*****************************************************************************

@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and 
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may 
+* *    be used to endorse or promote products derived from this software 
+* *    without specific prior written permission.
+* 
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 /*****************************************************************************
   1 头文件包含
@@ -57,9 +103,11 @@ VOS_UINT32  AT_FillAppReqMsgHeader(
     pAppMsgHeader->opId                 = ucOpId;
     pAppMsgHeader->usMsgName            = usMsgType;
     pAppMsgHeader->ulSenderPid          = WUEPS_PID_AT;
+    /* Added by l60609 for DSDA Phase II, 2012-12-17, Begin */
     pAppMsgHeader->ulReceiverPid        = AT_GetDestPid(usClientId, ulRcvPid);
     pAppMsgHeader->ulSenderCpuId        = VOS_LOCAL_CPUID;
     pAppMsgHeader->ulReceiverCpuId      = VOS_LOCAL_CPUID;
+    /* Added by l60609 for DSDA Phase II, 2012-12-17, End */
 
     return VOS_OK;
 }
@@ -175,9 +223,29 @@ VOS_UINT32  AT_FillAndSndAppReqMsg(
     VOS_UINT32                          ulRet;
     VOS_UINT32                          ulMsgLen;
     VOS_UINT8                          *pMsgPara;
+    MODEM_ID_ENUM_UINT16                enModemId;
 
     if ((VOS_NULL_PTR == pPara) && (0 < ulParaLen))
     {
+        return TAF_FAILURE;
+    }
+
+    /* austinc30不支持双LTE，IMS相关的AT命令，不是发给modem0的，直接返回失败 */
+    enModemId = MODEM_ID_0;
+
+    /* 获取client id对应的Modem Id */
+    ulRet = AT_GetModemIdFromClient(usClientId, &enModemId);
+
+    if (VOS_OK != ulRet)
+    {
+        AT_ERR_LOG("AT_FillAndSndAppReqMsg: AT_GetModemIdFromClient is error");
+        return TAF_FAILURE;
+    }
+
+    if ((PS_PID_IMSA == ulRcvPid)
+     && (enModemId != MODEM_ID_0))
+    {
+        AT_ERR_LOG("AT_FillAndSndAppReqMsg: enModemId is not support ims");
         return TAF_FAILURE;
     }
 
@@ -568,6 +636,25 @@ VOS_UINT32 AT_SndImsaImsCtrlMsg (
 {
     AT_IMSA_IMS_CTRL_MSG_STRU          *pstSndMsg = VOS_NULL_PTR;
     VOS_UINT32                          ulMsgLen;
+    VOS_UINT32                          ulRet;
+    MODEM_ID_ENUM_UINT16                enModemId;
+
+    enModemId = MODEM_ID_0;
+
+    /* 获取client id对应的Modem Id */
+    ulRet = AT_GetModemIdFromClient(usClientId, &enModemId);
+
+    if (VOS_ERR == ulRet)
+    {
+        AT_ERR_LOG("AT_SndImsaImsCtrlMsg:AT_GetModemIdFromClient is error");
+        return VOS_ERR;
+    }
+
+    if (enModemId != MODEM_ID_0)
+    {
+        AT_ERR_LOG("AT_SndImsaImsCtrlMsg: enModemId is not support ims");
+        return VOS_ERR;
+    }
 
     ulMsgLen = sizeof(AT_IMSA_IMS_CTRL_MSG_STRU) - 4 + pstAtImsaMsgPara->ulMsgLen;
 

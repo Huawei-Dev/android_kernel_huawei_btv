@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may
+* *    be used to endorse or promote products derived from this software
+* *    without specific prior written permission.
+*
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 /*lint -e767 修改人:罗建 107747;检视人:孙少华65952;原因:Log打印*/
 #define    THIS_FILE_ID        PS_FILE_ID_TAF_MMI_STRPARSE_C
 /*lint +e767 修改人:罗建 107747;检视人:sunshaohua*/
@@ -29,6 +75,7 @@
 
 #define MN_MMI_BS_MAX_ENTRY (sizeof(f_stMmiBSInfo)/sizeof(MN_MMI_BS_TABLE_STRU))
 
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
 /* 通用补充业务操作码映射表: 第一列补充业务操作码对应的MMI字符串，第二列补充业务操作码 */
 MN_MMI_SS_OP_Tbl_STRU                   g_astTafMmiOporationTypeTbl[] = {
                                                     {"**", TAF_MMI_REGISTER_SS,    {0, 0, 0, 0, 0, 0, 0}},
@@ -37,6 +84,7 @@ MN_MMI_SS_OP_Tbl_STRU                   g_astTafMmiOporationTypeTbl[] = {
                                                     {"*#", TAF_MMI_INTERROGATE_SS, {0, 0, 0, 0, 0, 0, 0}},
                                                     {"##", TAF_MMI_ERASE_SS,       {0, 0, 0, 0, 0, 0, 0}},
                                                   };
+/* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
 /*****************************************************************************
   4 类型定义
@@ -129,6 +177,7 @@ MN_CALL_CLIR_CFG_ENUM_U8  f_enClirOperate = MN_CALL_CLIR_AS_SUBS;
 /*****************************************************************************
   6 函数实现
 *****************************************************************************/
+/* Added by f62575 for SS FDN&Call Control, 2013-5-20, begin */
 /**********************************************************
  函 数 名  : MMI_GetOporationTypeTblSize
  功能描述  : 获取补充业务操作码映射表的容量
@@ -259,6 +308,7 @@ MN_MMI_SC_TABLE_STRU *MMI_GetSCTblAddr(VOS_VOID)
 {
     return f_stMmiScInfo;
 }
+/* Added by f62575 for SS FDN&Call Control, 2013-5-20, end */
 
 /*****************************************************************************
  函 数 名  : MMI_AtoI
@@ -1004,11 +1054,13 @@ VOS_UINT32 MMI_FillInRegisterSSPara(
         }
         else
         {
+            /* Modified by f62575 for SS FDN&Call Control, 2013-05-06, begin */
             /* Delete TAF_ALL_BARRING_SS_CODE密码相关操作 */
             if (0 == VOS_StrLen(pstScSiPara->acSib))
             {
                 return MN_ERR_NO_ERROR;
             }
+            /* Modified by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
         }
         if (VOS_OK != MMI_TransMmiBsCodeToNetBsCode(ucNetSsCode,
@@ -1088,11 +1140,13 @@ VOS_UINT32 MMI_FillInEraseSSPara(
         }
         else
         {
+            /* Modified by f62575 for SS FDN&Call Control, 2013-05-06, begin */
             /* Delete TAF_ALL_BARRING_SS_CODE密码相关操作 */
             if (0 == VOS_StrLen(pstScSiPara->acSib))
             {
                 return MN_ERR_NO_ERROR;
             }
+            /* Modified by f62575 for SS FDN&Call Control, 2013-05-06, end */
         }
         if (VOS_OK != MMI_TransMmiBsCodeToNetBsCode(ucNetSsCode,
                                                     pstScSiPara,
@@ -1140,6 +1194,7 @@ VOS_UINT32 MMI_FillInActivateSSPara(
     TAF_SS_ACTIVATESS_REQ_STRU          *pstActivateSsReq;
     VOS_UINT8                           ucNetBsCode;
     VOS_UINT8                           ucNetBsType;
+    /* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
     VOS_UINT32                          ulPasswordLen;
 
     /*
@@ -1155,6 +1210,7 @@ VOS_UINT32 MMI_FillInActivateSSPara(
         }
 
     }
+    /* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
     pstActivateSsReq = &pMmiOpParam->ActivateSsReq;
 
@@ -1182,6 +1238,7 @@ VOS_UINT32 MMI_FillInActivateSSPara(
         }
         else
         {
+            /* Modified by f62575 for SS FDN&Call Control, 2013-05-06, begin */
             /* 保存密码到激活消息参数结构 */
             ulPasswordLen = VOS_StrLen(pstScSiPara->acSia);
             if (TAF_SS_MAX_PASSWORD_LEN != ulPasswordLen)
@@ -1198,6 +1255,7 @@ VOS_UINT32 MMI_FillInActivateSSPara(
             {
                 return MN_ERR_NO_ERROR;
             }
+            /* Modified by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
         }
 
@@ -1292,7 +1350,9 @@ VOS_UINT32 MMI_FillInDeactivateSSPara(
     TAF_SS_DEACTIVATESS_REQ_STRU        *pstDeactivateSsReq;
     VOS_UINT8                           ucNetBsCode;
     VOS_UINT8                           ucNetBsType;
+    /* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
     VOS_UINT32                          ulPasswordLen;
+    /* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
     pstDeactivateSsReq = &pMmiOpParam->DeactivateSsReq;
 
@@ -1320,6 +1380,7 @@ VOS_UINT32 MMI_FillInDeactivateSSPara(
         }
         else
         {
+            /* Modified by f62575 for SS FDN&Call Control, 2013-05-06, begin */
             /* 保存密码到去激活消息参数结构 */
             ulPasswordLen = VOS_StrLen(pstScSiPara->acSia);
             if (TAF_SS_MAX_PASSWORD_LEN != ulPasswordLen)
@@ -1331,6 +1392,7 @@ VOS_UINT32 MMI_FillInDeactivateSSPara(
                        pstScSiPara->acSia,
                        TAF_SS_MAX_PASSWORD_LEN);
             pMmiOpParam->DeactivateSsReq.OP_Password = VOS_TRUE;
+           /* Modified by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
             if (0 == VOS_StrLen(pstScSiPara->acSib))
             {
@@ -1406,7 +1468,9 @@ VOS_UINT32 MMI_FillInInterrogateSSPara(
         }
         else
         {
+            /* Delete by f62575 for SS FDN&Call Control, 2013-05-06, begin */
             /* Delete TAF_MMI_GET_PASSWD密码相关操作 */
+            /* Delete by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
             if (0 == VOS_StrLen(pstScSiPara->acSib))
             {
@@ -1469,6 +1533,8 @@ VOS_UINT32 MMI_FillInProcessUssdReqPara(
 
     PS_MEM_SET(pstProcessUssdReq, 0, sizeof(TAF_SS_PROCESS_USS_REQ_STRU));
 
+    /* Deleted by z60575 for TQE, 2013-8-3 begin */
+    /* Deleted by z60575 for TQE, 2013-8-3 end */
 
     pstProcessUssdReq->DatacodingScheme = pstMmiOpParam->ProcessUssdReq.DatacodingScheme;
 
@@ -1767,8 +1833,10 @@ LOCAL VOS_UINT32 MMI_FillInCallOrigPara(
     MN_MMI_SC_SI_PARA_STRU              stScSiPara;
     VOS_UINT8                           ucNetSsCode = TAF_ALL_SS_CODE;
     VOS_UINT16                          i = 0;
+    /* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
     VOS_UINT32                          ulTableSize;
     MN_MMI_SS_OP_Tbl_STRU              *pstOperationType    = VOS_NULL_PTR;
+    /* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
     *pulErrCode = MN_ERR_NO_ERROR;
     PS_MEM_SET(acOpType, '\0', sizeof(acOpType));
@@ -1779,6 +1847,7 @@ LOCAL VOS_UINT32 MMI_FillInCallOrigPara(
         acOpType[i] = pInMmiStr[i];
     }
 
+    /* Modified by f62575 for SS FDN&Call Control, 2013-05-06, begin */
     ulTableSize         = MMI_GetOporationTypeTblSize();
     pstOperationType  = MMI_GetOporationTypeTblAddr();
     for (i = 0; i < ulTableSize; i++)
@@ -1794,6 +1863,7 @@ LOCAL VOS_UINT32 MMI_FillInCallOrigPara(
 
         pstOperationType++;
     }
+    /* Modified by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
     if (VOS_FALSE == bMatch)
     {
@@ -1981,6 +2051,7 @@ TAF_UINT32 MN_MmiStringParse(
     TAF_UINT32                          ulStrLen;
 
 
+    /* Modified by z60575 for TQE, 2013-8-3 begin */
     if (VOS_NULL_PTR == pInMmiStr)
     {
         MN_ERR_LOG("MN_MmiStringParse: Input Invalid Param");
@@ -1995,6 +2066,7 @@ TAF_UINT32 MN_MmiStringParse(
         MN_ERR_LOG("MN_MmiStringParse: Input Invalid Param");
         return MN_ERR_INVALIDPARM;
     }
+    /* Modified by z60575 for TQE, 2013-8-3 end */
 
     PS_MEM_SET(pMmiOpParam, 0, sizeof(MN_MMI_OPERATION_PARAM_STRU));
 
@@ -2011,7 +2083,9 @@ TAF_UINT32 MN_MmiStringParse(
                                            ppOutRestMmiStr,
                                            pMmiOpParam))
     {
+        /* Deleted by f62575 for SS FDN&Call Control, 2013-05-06, begin */
         /* 作为独立的解码函数，不应与AT模块的业务功能耦合，删除AT模块业务全局变量的赋值操作 */
+        /* Deleted by f62575 for SS FDN&Call Control, 2013-05-06, end */
         return MN_ERR_NO_ERROR;
     }
 

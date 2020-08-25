@@ -102,7 +102,9 @@ ERR_MSP_NVIM_NOT_SUPPORT_WRITE       2007           ÏµÍ³Ä£Ê½²»ÔÊÐíÐÞ¸Ä¸ÃÏî
 
 #define LPS_NV_DL_CTRL_PDU_NOTIFY_BIT          (0x00000002)
 
+/*added by lishangfeng 20130320 begin*/
 #define LPS_NV_SEARCHING_OPTIMIZE_FUN_BIT    (0x00000004)
+/*added by lishangfeng 20130320 end*/
 
 #define LPS_NV_GET_MSG4_OLDCR_BIT           ( 0x00000002 )
 
@@ -144,7 +146,9 @@ ERR_MSP_NVIM_NOT_SUPPORT_WRITE       2007           ÏµÍ³Ä£Ê½²»ÔÊÐíÐÞ¸Ä¸ÃÏî
 /* ÈíÒøBandwidthÐèÇó¿ª¹Ø */
 #define LPS_NV_GET_BANDWIDTH_SUPPORT_BIT         ( 0x00000400 )
 
+/* modify by lishangfeng freq all begin */
 #define LPS_NV_GET_FREQ_IN_ALL_BANDWITH_SUPPORT_BIT ( 0x00000800 )
+/* modify by lishangfeng freq all end */
 /* ÖØ½¨¿ª¹Ø */
 #define LPS_NV_GET_REST_STUB_SUPPORT_BIT         ( 0x00001000 )
 
@@ -201,7 +205,9 @@ ERR_MSP_NVIM_NOT_SUPPORT_WRITE       2007           ÏµÍ³Ä£Ê½²»ÔÊÐíÐÞ¸Ä¸ÃÏî
 /* gaojishan-fast-dorm-cfg */
 #define LPS_NV_JP_DCOM_FAST_DORM_BIT  ( 0x40000000 )
 
+/* add by lishangfeng for RRM 5.2.1 test begin */
 #define LPS_NV_RRM_LTE_521_BIT  ( 0x80000000 )
+/* add by lishangfeng for RRM 5.2.1 test end */
 
 /* gaojishan-CMAS-Begin */
 #define LPS_NV_CMAS_REPT_BEFORE_CAMP_SUCC_BIT    (0x00000008 )
@@ -212,11 +218,15 @@ ERR_MSP_NVIM_NOT_SUPPORT_WRITE       2007           ÏµÍ³Ä£Ê½²»ÔÊÐíÐÞ¸Ä¸ÃÏî
 #define LPS_NV_CA_SUPPORT_BIT  ( 0x00000001 )
 /* v7r2 ca end */
 
+/* add for LTE NetScan begin */
 /* stPsFunFlag02£¬Êý×éÖÐÎª1 */
 /* NetScanÌØÐÔÊÇ·ñ´ò¿ª£¬1Îª´ò¿ª£¬0Îª¹Ø±Õ */
 #define LPS_NV_NETSCAN_SUPPORT_BIT    (0x00000002)
+/* add for LTE NetScan end */
 
+/* add for MFBI begin */
 #define LPS_NV_LRRC_MFBI_CAMPON_WIDER_BAND_FLAG_BIT    (0x00000004)
+/* add for MFBI end */
 
 #define LPS_NV_LRRC_SUPPORT_EIA0_BIT (0x00000010)
 
@@ -226,7 +236,9 @@ ERR_MSP_NVIM_NOT_SUPPORT_WRITE       2007           ÏµÍ³Ä£Ê½²»ÔÊÐíÐÞ¸Ä¸ÃÏî
 /* Æô¶¯±³¾°ËÑ£¬µ«ÊÇÖ»ËÑË÷Lµ¥Ä££¬ËÑË÷Íê±Ïºó»Ø¸´LMMËÑË÷½á¹û£¬²»ÔÙËÑË÷ GU Ä£ */
 #define LPS_NV_GET_L_BGS_L_SUPPORT_BIT            (0x00000040)
 
+/* modify by lishangfeng 20131212 begin */
 #define LPS_NV_SND_ETWS_IMIDIEATELY_BIT           (0x00000080)                  /* 0x80±íÊ¾ÎªÁ¢¼´·¢ËÍ£»0x00±íÊ¾ÊÕÆëºóÔÙ·¢ËÍ */
+/* modify by lishangfeng 20131212 end */
 
 #define LPS_NV_L2_TLEVENT_REPORT_BIT           (0x00000100)                  /* TL L2ÊÂ¼þÉÏ±¨*/
 #define LPS_NV_L2_LTEPRINT_REPORT_BIT           (0x00000200)                  /* LTE L2 ´òÓ¡ÐÅÏ¢ÉÏ±¨*/
@@ -251,7 +263,9 @@ ERR_MSP_NVIM_NOT_SUPPORT_WRITE       2007           ÏµÍ³Ä£Ê½²»ÔÊÐíÐÞ¸Ä¸ÃÏî
 /*add by l00220658 µÍ¹¦ºÄÄ£¿éÔö¼Ó ADRX SSC NV¿ª¹Ø stPsFunFlag03 µÚ0Î» µÚ1Î»*/
 #define LPS_NV_GET_SSC_SUPPORT_BIT                (0x00000001)
 #define LPS_NV_GET_ADRX_SUPPORT_BIT               (0x00000002)
+/* niuxiufan rrc release modify begin */
 #define LPS_NV_GET_NOT_TRY_FAKE_CELL_FLAG_BIT     (0x00000004)
+/* niuxiufan rrc release modify end */
 #define LPS_NV_GET_DEL_MOBILE_SUPPORT_BIT         (0x00000008)
 
 #define LPS_NV_GET_PTMSI_TAU_ACTIVE_FLAG_SUPPORT_BIT (0x00000020)
@@ -373,7 +387,9 @@ ERR_MSP_NVIM_NOT_SUPPORT_WRITE       2007           ÏµÍ³Ä£Ê½²»ÔÊÐíÐÞ¸Ä¸ÃÏî
 #define LRRC_MTC_THRESHOLD_MIN_VALUE      (0)
 #define LRRC_MTC_THRESHOLD_MAX_VALUE      (31 * 2 * 8)
 /* LTE PS Transfer end */
+/* niuxiufan taiwan modify begin */
 #define LRRC_IRAT_REDIR_NOT_BANDSCAN_BIT (0x00000008)
+/* niuxiufan taiwan modify end */
 
 /* ²âÊÔÍø²à·¢ËÍPagingÇé¿ö,²»´¦Àí±¾UE Paging l00285345 begin*/
 #define LRRC_IDLE_DISCARD_PAGING_BIT     (0x00000001)
@@ -1253,6 +1269,7 @@ typedef struct
     RRC_NV_CSEL_FREQ_BAND_INFO_STRU      stLockedBand;                   /* Ëø¶¨BandÐÅÏ¢ */
 } LRRC_NV_LOCK_INFO_STRU;
 
+/* modify by lishangfeng begin */
 
 /*****************************************************************************
  ½á¹¹Ãû    : LRRC_NV_CSQ_RPT_INFO_STRU
@@ -1268,6 +1285,7 @@ typedef struct
     VOS_UINT16                       usDetaSINR;    /* ÐÅÔë±ÈÃÅÏÞ (0,50)db*/
 } LRRC_NV_CSQ_RPT_INFO_STRU;
 
+/* modify by lishangfeng end */
 
 /* wangrui 20120817 begin */
 /*****************************************************************************
@@ -1779,6 +1797,7 @@ typedef struct
 extern LTE_MTC_ABANDON_EUTRA_BAND_SCAN_STRU g_stAbandEutraBandInfo;
 extern LTE_MTC_SPAC_BAND_SCAN_CONFIG_STRU   g_stSpacBandInfo;
 
+/* MTC NOTCH add begin  */
 /*****************************************************************************
  ½á¹¹Ãû    : LTE_MTC_NOTCH_FEATURE_STRU
  Ð­Òé±í¸ñ  :
@@ -1791,6 +1810,7 @@ typedef struct
      VOS_UINT8                      aucRcve[2];                                     /* ±£ÁôÎ» */
 } LTE_MTC_NOTCH_FEATURE_STRU;
 
+/* MTC NOTCH add end  */
 /*****************************************************************************
  ½á¹¹Ãû    : LTE_RRC_THRESHOLD_STRU
  Ð­Òé±í¸ñ  :
@@ -2261,6 +2281,7 @@ typedef struct
     VOS_UINT32                          ulCellIdentity;
 } LRRC_NV_CELL_GLOBAL_ID_STRU;
 
+/*Begin: add by CSG */
 /*****************************************************************************
  ½á¹¹Ãû    : LRRC_NV_CSG_NEIGH_MACRO_CELL_INFO_STRU
  Ð­Òé±í¸ñ  :
@@ -2328,6 +2349,7 @@ typedef struct
     /* CSGÐ¡ÇøµÄÁÚ½üºêÐ¡Çø Ë÷ÒýÖµÔ½Ð¡±íÊ¾¸ÃÌõÄ¿Ô½ÐÂ */
     LRRC_NV_CSG_NEIGH_MACRO_CELL_INFO_STRU       astNeighborMacroCell[LRRC_CSG_HISTORY_CAMPED_CELL_NUM];
 }LRRC_NV_CSG_HISTORY_INFO_STRU;
+/*End: add by CSG */
 
 /*****************************************************************************
  ½á¹¹Ãû    : RRC_CSEL_MOBILITY_PARAM_STRU
@@ -2509,6 +2531,7 @@ typedef struct
     VOS_UINT16              ulRsv3;
 }LRRC_NV_INTER_OPT_FREQENTLY_CTRL;
 
+/*begin,add for CSFB B1 REPORT, l001953221*/
 /*****************************************************************************
  ½á¹¹Ãû    : TLRRC_NV_LOC_B1_SWITCH_AND_THRETH
  Ð­Òé±í¸ñ  :
@@ -2528,6 +2551,7 @@ typedef struct
     VOS_UINT16              usRsv3;
     VOS_UINT32              ulRsv0;
 }LRRC_NV_PRIVATE_B1_SWITCH_AND_THRETH_STRU;
+/*end,add for CSFB B1 REPORT, l001953221*/
 
 /*****************************************************************************
  ½á¹¹Ãû    : LRRC_NV_VOLTE_A2B2_SWITCH_AND_THRETH_STRU
@@ -2677,7 +2701,9 @@ typedef struct
 typedef struct
 {
     VOS_UINT8               ucSCellReselRsrqSwitch;    /* LTEÄ£ÄÚÖØÑ¡£¬¶Ô·þÎñÐ¡ÇøRSRQÏÞÖÆ¿ª¹Ø */
+    /* add for Conn Meas Filter Optimize begin */
     VOS_UINT8               ucConnMeasFilterOptimizeSwitch;
+    /* add for Conn Meas Filter Optimize begin */
     VOS_UINT8               ucCsfbT304ExpCcoRemain;    /* CSFBÁ÷³ÌÖÐ£¬T304³¬Ê±£¬²»Í£Ö¹CCO¿ª¹Ø */
     VOS_UINT8               ucVolteDelayB2MeasRptWhenMO;   /* VolteÖ÷½ÐÑÓ³Ù±¨B2²âÁ¿±¨¸æÒÔ±ÜÃâ·¢Éúbsrvcc */
     VOS_UINT8               ucVolteDelayB2MeasRptWhenMT;   /* Volte±»½ÐÑÓ³Ù±¨B2²âÁ¿±¨¸æÒÔ±ÜÃâ·¢Éúbsrvcc */
@@ -2894,6 +2920,7 @@ extern VOS_UINT32  g_ulPsPagingConnRelFlg;
 extern VOS_UINT32  g_ulPsUlDrbDiscardFlag;
 extern VOS_UINT32  g_ulMbmsSupportSwitch;
 extern VOS_UINT32  g_ulPsBandwidthSupportFlg;
+/* modify by lishangfeng freq all begin */
 extern VOS_UINT32  g_ulPsFreqInAllBandWidthFlg;
 
 extern VOS_UINT32  g_ulHoFailFlag;
@@ -2909,10 +2936,12 @@ extern VOS_UINT32      g_ulOtherOperateSupBandInJapan;/* ÆäËûÔËÓªÉÌÔÚÈÕ±¾¹úÄÚÖ§³
 extern VOS_UINT32      g_ulSupBandOutJapan;
 /* Begin: 2015/5/6 sbm */
 
+/*Begin: for sbm delete wcdma band9  */
 extern VOS_UINT8       gucJpUband1MncCnt;
 extern VOS_UINT8       gaucJpUband1Mnc[3];
 extern VOS_UINT8       gaucJpUband1Mcc[3];
 extern VOS_UINT8       gaucJpUband2Mcc[3];
+/*End: for sbm delete wcdma band9  */
 /* gaojishan-SYSCFG-SAVENV-End */
 extern VOS_UINT32  g_ulLReestIratCellSrchFlg;
 /* gaojishan-nccpermit */
@@ -2953,7 +2982,9 @@ extern VOS_UINT32                              gul_CmasRptBeforeAuthSwitch;
 /*add by l00220658 µÍ¹¦ºÄÄ£¿éÔö¼Ó ADRX SSC NV¿ª¹Ø stPsFunFlag03 µÚ0Î» µÚ1Î»*/
 extern VOS_UINT32 g_ulSscSupportFlag;
 extern VOS_UINT32 g_ulAdrxSupportFlag;
+/* niuxiufan taiwan modify begin */
 extern VOS_UINT32 g_ulRedirNotBandScanFlg;
+/* niuxiufan taiwan modify end */
 
 /* ²âÊÔÍø²à·¢ËÍPagingÇé¿ö,²»´¦Àí±¾UE Paging l00285345 begin*/
 extern PS_BOOL_ENUM_UINT8  g_enPsIdleDiscardPagingFlag;
@@ -2961,7 +2992,9 @@ extern PS_BOOL_ENUM_UINT8  g_enPsIdleDiscardPagingFlag;
 
 /* ESRÁ÷³Ì·¢ÉúÇÐ»»,Î´·¢ÆðTAU,ÖØ´«ESRÏûÏ¢¿ØÖÆ¿ª¹Ø:¹æ±ÜÐ¡ÇøÇÐ»»ºóÍø²à²»ÏÂ·¢RELÎÊÌâ */
 extern VOS_UINT32  g_ulNasEmmHoRetransEsrFlag;
+/* niuxiufan rrc release modify begin */
 extern VOS_UINT32 g_ulNotTryFakeCellFlg;
+/* niuxiufan rrc release modify end */
 /*****************************************************************************
   8 Fuction Extern
 *****************************************************************************/

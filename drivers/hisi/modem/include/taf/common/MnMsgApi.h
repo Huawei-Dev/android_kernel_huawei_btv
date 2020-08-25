@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and 
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may 
+* *    be used to endorse or promote products derived from this software 
+* *    without specific prior written permission.
+* 
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 #ifndef __MNMSGAPI_H__
 #define __MNMSGAPI_H__
 
@@ -24,6 +70,7 @@ extern "C" {
 /*****************************************************************************
   2 常量定义
 *****************************************************************************/
+/* Added by f62575 for AT Project, 2011-10-24, begin */
 /* Deleted by f62575 for V9R1 STK升级, 2013-6-26, begin */
 /* Deleted MN_MSG_7BIT_MASK */
 #define MN_MSG_RP_REPORT_CAUSE_VALUE_MASK                   (0xff)
@@ -47,6 +94,7 @@ extern "C" {
 #define MN_MSG_NVIM_ITEM_ACTIVE                             (1)                 /*NVIM项已激活*/
 #define MN_MSG_NVIM_ITEM_INACTIVE                           (0)                 /*NVIM项未激活*/
 
+/* Added by f62575 for AT Project, 2011-10-24, end */
 
 typedef  VOS_UINT8   MN_MSG_ADDR_NUM_TYPE_T;
 #define MN_MSG_MIN_BCD_NUM_LEN                              (2 - 1)
@@ -76,8 +124,10 @@ typedef VOS_UINT8    MN_MSG_OPER_TYPE_T;
 #define MN_MSG_ACTIVE_MESSAGE_MAX_URL_LEN                   (160)
 #define MN_MSG_ACTIVE_MESSAGE_PARA_LEN                      ((MN_MSG_ACTIVE_MESSAGE_MAX_URL_LEN) + 8)
 
+/* Added by f62575 for AT Project, 2011-10-04,  Begin */
 #define MN_GET_ADDRTYPE(ucAddrType, enNumType, enNumPlan)                           \
                         ((ucAddrType) = 0x80 | (VOS_UINT8)((enNumType) << 4) | enNumPlan)
+/* Added by f62575 for AT Project, 2011-10-04,  End */
 
 #if ((FEATURE_ON == FEATURE_GCBS) || (FEATURE_ON == FEATURE_WCBS))
 

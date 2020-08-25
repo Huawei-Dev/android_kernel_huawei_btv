@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and 
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may 
+* *    be used to endorse or promote products derived from this software 
+* *    without specific prior written permission.
+* 
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 #ifndef __ATMSGPRINT_H__
 #define __ATMSGPRINT_H__
@@ -190,6 +236,7 @@ extern VOS_UINT32 At_ParseCsmpFo(
     VOS_UINT8                           *pucFo
 );
 
+/* Modified by l60609 for DSDA Phase III, 2013-3-5, Begin */
 /*****************************************************************************
  函 数 名  : At_ParseCsmpVp
  功能描述  : AT命令CSMP中VP参数的解析
@@ -210,12 +257,15 @@ VOS_UINT32 At_ParseCsmpVp(
     VOS_UINT8                           ucIndex,
     MN_MSG_VALID_PERIOD_STRU           *pstVp
 );
+/* Modified by l60609 for DSDA Phase III, 2013-3-5, End */
 
+/* Added by f62575 for AT Project, 2011-10-04,  Begin */
 VOS_UINT32  AT_AsciiNumberToBcd(
     const VOS_CHAR                      *pcAsciiNumber,
     VOS_UINT8                           *pucBcdNumber,
     VOS_UINT8                           *pucBcdLen
 );
+/* Added by f62575 for AT Project, 2011-10-04,  End */
 
 VOS_UINT32  AT_BcdNumberToAscii(
     const VOS_UINT8                     *pucBcdNumber,

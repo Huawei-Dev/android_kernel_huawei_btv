@@ -36,6 +36,7 @@
 
 
 #pragma pack(4)
+/*fanzhibin f49086 add it begin*/
 #ifndef AUTHLEN
 #define AUTHLEN  (100)    /* Size of authname/authkey(porting from BSD, not alter) */
 #endif
@@ -48,6 +49,7 @@
 #ifndef MD5DIGESTSIZE
 #define MD5DIGESTSIZE (16)    /* MD5 (Message-Digest) hash size */
 #endif
+/*fanzhibin f49086 add it end*/
 
 struct authinfo;
 typedef void (*auth_func)(struct link *);

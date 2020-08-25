@@ -85,7 +85,7 @@ s32 act_msgProc(u32 channel_id , u32 len, void* context)
     spin_lock_irqsave(&(act_cdevp->list_lock), flags);
 
     //挂接到链表，spinlick_irq_restore释放锁
-    list_add(&(data->msg_list), &(act_cdevp->msg_list));
+    list_add_tail(&(data->msg_list), &(act_cdevp->msg_list));
 
     //释放信号量
     spin_unlock_irqrestore(&(act_cdevp->list_lock), flags);

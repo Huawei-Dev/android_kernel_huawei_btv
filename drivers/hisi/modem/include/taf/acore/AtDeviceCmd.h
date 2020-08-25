@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and 
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may 
+* *    be used to endorse or promote products derived from this software 
+* *    without specific prior written permission.
+* 
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 #ifndef _ATDEVICECMD_H_
 #define _ATDEVICECMD_H_
 
@@ -6,7 +52,9 @@
   1 其他头文件包含
 *****************************************************************************/
 #include "v_typdef.h"
+/* Added by f62575 for B050 Project, 2012-2-3, begin   */
 #include "ATCmdProc.h"
+/* Added by f62575 for B050 Project, 2012-2-3, end */
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -21,6 +69,7 @@ extern "C" {
   2 宏定义
 *****************************************************************************/
 /*生产使用的加密结构*/
+/* Added by f62575 for SMALL IMAGE, 2012-1-3, begin */
 
 /* WIFI KEY字符串长度，与NVIM模块Ipcom_parameters_handle.h文件的 NV_WLKEY_LEN 保持一致 */
 #define AT_NV_WLKEY_LEN                 (27)
@@ -40,8 +89,10 @@ extern "C" {
 /* 单板侧支持的WIFI KEY个数 */
 #define AT_WIWEP_CARD_WIFI_KEY_TOTAL    (4)
 
+/* Add by z60575 for multi_ssid, 2012-9-5 begin */
 /* 工位侧支持的WIFI KEY个数 */
 #define AT_WIWEP_TOOLS_WIFI_KEY_TOTAL   (16)
+/* Add by z60575 for multi_ssid, 2012-9-5 end */
 
 /* PHYNUM命令物理号类型MAC的物理号长度 */
 #define AT_PHYNUM_MAC_LEN               (12)
@@ -53,6 +104,7 @@ extern "C" {
 
 #define AT_WIFIGLOBAL_MAC_LEN_BETWEEN_COLONS   (2)                             /* MAC地址中冒号之间的字符个数*/
 
+/* Added by f62575 for SMALL IMAGE, 2012-1-3, end   */
 
 #if(FEATURE_ON == FEATURE_UE_MODE_TDS)
 #define AT_TDS_SCALIB_STR (VOS_UINT8 *)"(\"CACHE\",\"USE\",\"SAVE\",\"GET\",\"READ\",\"INI\",\"BEGIN\",\"END\",\"SET\",\"\"),(\"APCOFFSETFLAG\",\"APCOFFSET\",\"APC\",\"APCFREQ\",\"AGC\",\"AGCFREQ\",\"\"),(1,5,6),(@pram)"
@@ -189,6 +241,7 @@ enum AT_SET_STATE_ENUM
    故将 g_stATDislogPwd 中的密码废弃, 仅使用其中的 DIAG 口状态;
    重新定义NV项用来保存密码  */
 extern VOS_INT8                         g_acATOpwordPwd[AT_OPWORD_PWD_LEN+1];
+/* Added by f62575 for B050 Project, 2012-2-3, end   */
 
 
 /*****************************************************************************
@@ -279,6 +332,7 @@ VOS_UINT32 AT_QryTseLrfPara(VOS_UINT8 ucIndex);
 
 VOS_UINT32 AT_GetPhynumMac(VOS_UINT8 aucMac[]);
 
+/* Added by f62575 for B050 Project, 2012-2-3, Begin   */
 VOS_UINT32 AT_ExistSpecificPort(VOS_UINT8 ucPortType);
 
 VOS_UINT32 AT_OpenDiagPort(VOS_VOID);
@@ -287,6 +341,7 @@ VOS_UINT32 AT_CheckSetPortRight(
     VOS_UINT8                           aucOldRewindPortStyle[],
     VOS_UINT8                           aucNewRewindPortStyle[]
 );
+/* Added by f62575 for B050 Project, 2012-2-3, end   */
 
 VOS_UINT32 AT_TestHsicCmdPara(VOS_UINT8 ucIndex);
 

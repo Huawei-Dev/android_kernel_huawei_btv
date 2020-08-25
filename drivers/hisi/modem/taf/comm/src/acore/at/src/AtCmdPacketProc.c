@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may
+* *    be used to endorse or promote products derived from this software
+* *    without specific prior written permission.
+*
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 /*****************************************************************************
   1 头文件包含
@@ -25,6 +71,7 @@
   3 函数实现
 *****************************************************************************/
 
+/* Modified by l60609 for V9R1 IPv6&TAF/SM Project, 2013-4-27, begin */
 /*****************************************************************************
  函 数 名  : AT_AppConvertPdpStateToConnStatus
  功能描述  : 转换承载状态 -> 连接状态
@@ -183,6 +230,7 @@ VOS_UINT32 AT_SetChdataPara_HsicUser(VOS_UINT8 ucIndex)
 
     enDataChannelId = gastAtParaList[1].ulParaValue;
 
+    /* Modified by L47619 for C52 HSIC ACM->NCM Project, 2012/09/06, begin */
     /* 低软接口返回值修改，之前返回PS_TRUE的为SUPPORT */
     if (BSP_MODULE_SUPPORT == mdrv_misc_support_check(BSP_MODULE_TYPE_HSIC_NCM))
     {
@@ -214,6 +262,7 @@ VOS_UINT32 AT_SetChdataPara_HsicUser(VOS_UINT8 ucIndex)
             enUdiDevId = UDI_ACM_HSIC_ACM5_ID;
         }
     }
+    /* Modified by L47619 for C52 HSIC ACM->NCM Project, 2012/09/06, end */
 
     /* 查找是否有不同的<CID>配置了相同的<enUdiDevId> */
     for (ucLoop = 1; ucLoop <= TAF_MAX_CID; ucLoop++)
@@ -433,6 +482,7 @@ VOS_UINT32 AT_QryChdataPara_HsicUser(TAF_UINT8 ucIndex)
             usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,(VOS_CHAR*)pgucAtSndCodeAddr,(VOS_CHAR*)pgucAtSndCodeAddr + usLength,"%d", ucLoop);
 
             /* <datachannel> */
+            /* Modified by L47619 for C52 HSIC ACM->NCM Project, 2012/09/06, begin */
             switch ( pstPsModemCtx->astChannelCfg[ucLoop].ulRmNetId)
             {
                 case UDI_ACM_HSIC_ACM1_ID:
@@ -450,6 +500,7 @@ VOS_UINT32 AT_QryChdataPara_HsicUser(TAF_UINT8 ucIndex)
                 default:
                     return AT_ERROR;
             }
+            /* Modified by L47619 for C52 HSIC ACM->NCM Project, 2012/09/06, end */
             usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,(VOS_CHAR*)pgucAtSndCodeAddr,(VOS_CHAR*)pgucAtSndCodeAddr + usLength,",%d", enDataChannelId);
 
             ucNum++;
@@ -773,6 +824,7 @@ VOS_UINT32 At_QryDhcpPara_NdisUser(VOS_UINT8 ucIndex)
     VOS_UINT32                          ulPdpDeactingFlg;
     AT_DHCP_PARA_STRU                   stDhcpConfig;
 
+    /* Modified by S62952 for IPV6, 2011-04-19, begin */
     ulPdpActingFlg      = AT_NdisCheckIpv4PdpState(AT_PDP_STATE_ACTING);
     ulPdpDeactingFlg    = AT_NdisCheckIpv4PdpState(AT_PDP_STATE_DEACTING);
     usLength            = 0;
@@ -805,6 +857,7 @@ VOS_UINT32 At_QryDhcpPara_NdisUser(VOS_UINT8 ucIndex)
     usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN, (VOS_CHAR*)pgucAtSndCodeAddr, (VOS_CHAR*)pgucAtSndCodeAddr + usLength,"%X,",stDhcpConfig.stDhcpCfg.ulSndDNS);
     usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN, (VOS_CHAR*)pgucAtSndCodeAddr, (VOS_CHAR*)pgucAtSndCodeAddr + usLength,"%d,",ulSpeed);
     usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN, (VOS_CHAR*)pgucAtSndCodeAddr, (VOS_CHAR*)pgucAtSndCodeAddr + usLength,"%d",ulSpeed);
+    /* Modified by S62952 for IPV6, 2011-04-19, end */
 
     gstAtSendData.usBufLen = usLength;
 
@@ -2296,6 +2349,7 @@ VOS_UINT32 AT_TestApThroughputPara(VOS_UINT8 ucIndex)
 
     return AT_OK;
 }
+/* Modified by l60609 for V9R1 IPv6&TAF/SM Project, 2013-4-27, end */
 
 /*****************************************************************************
  函 数 名  : AT_SetApEndPppPara

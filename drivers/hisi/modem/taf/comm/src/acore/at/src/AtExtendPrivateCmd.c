@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may
+* *    be used to endorse or promote products derived from this software
+* *    without specific prior written permission.
+*
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 /*****************************************************************************
   1 头文件包含
@@ -17,9 +63,13 @@
 #include "siappstk.h"
 /* Added by Y00213812 for VoLTE_PhaseI 项目, 2013-07-08, end */
 
+/* Added by L47619 for V9R1 vSIM Project, 2013-8-27, begin */
 #include "AtCmdSimProc.h"
+/* Added by L47619 for V9R1 vSIM Project, 2013-8-27, end */
 
+/* ADD by c64416 for V9R1/V7R1 AT, 2013/09/18 begin */
 #include "at_lte_common.h"
+/* ADD by c64416 for V9R1/V7R1 AT, 2013/09/18 end */
 
 /* Added by j00174725 for V3R3C60_eCall项目, 2014-3-29, begin */
 #include "AtCmdCallProc.h"
@@ -58,6 +108,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     (VOS_UINT8*)"^CMDX", (VOS_UINT8*)"(@param1),(param2),(0-255)"},
 */
 
+/* Added by f62575 for AT Project,2011-10-17,  Begin*/
     {AT_CMD_AT2OM,
      At_SetAt2OmPara,AT_NOT_SET_TIME, TAF_NULL_PTR,  AT_NOT_SET_TIME,  VOS_NULL_PTR, AT_NOT_SET_TIME,
       VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -512,11 +563,13 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS,       CMD_TBL_PIN_IS_LOCKED | CMD_TBL_E5_IS_LOCKED,
     (VOS_UINT8*)"^FLASHINFO",   VOS_NULL_PTR},
 
+    /* Added by f62575 for SMALL IMAGE, 2012-1-3, Begin   */
     {AT_CMD_WIFIGLOBALMAC,
     AT_SetWifiGlobalMacPara,AT_NOT_SET_TIME,  AT_QryWifiGlobalMacPara,   AT_NOT_SET_TIME,   At_CmdTestProcOK, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS,       CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^WIFIGLOBALMAC", VOS_NULL_PTR},
+    /* Added by f62575 for SMALL IMAGE, 2012-1-3, End   */
 
     {AT_CMD_SDLOAD,
     AT_SetSdloadPara,       AT_SET_PARA_TIME,  VOS_NULL_PTR,              AT_NOT_SET_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
@@ -598,6 +651,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CMS_OPERATION_NOT_ALLOWED,       CMD_TBL_CLAC_IS_INVISIBLE,
     (VOS_UINT8*)"^CMSTUB",      (VOS_UINT8*)"(0-11),(0-6)"},
+/* Added by f62575 for AT Project,2011-10-17,  End*/
 
     /* 支持5中形态的语音类型 */
     {AT_CMD_VMSET,
@@ -757,11 +811,13 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     (VOS_UINT8*)"^CCC", (VOS_UINT8*)"(0,1),(1-7)"},
 
     /* Modified by z00234330 for 增加AT命令, 2013-7-20, begin */
+    /* Modified by s46746 for CS/PS mode 1, 2012-6-19, begin */
     {AT_CMD_CMM,
     At_SetCmmPara,          AT_SET_PARA_TIME, VOS_NULL_PTR,             AT_NOT_SET_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_CLAC_IS_INVISIBLE,
     (VOS_UINT8*)"^CMM", (VOS_UINT8*)"(0-12),(0-255)"},
+    /* Modified by s46746 for CS/PS mode 1, 2012-6-19, end */
     /* Modified by z00234330 for 增加AT命令, 2013-7-20, begin */
 
     {AT_CMD_MEANRPT,
@@ -982,6 +1038,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     (VOS_UINT8*)"^CPAM",        (VOS_UINT8*)"(0-3),(0-2)"},
 
     /* Modified by s62952 for BalongV300R002 Build优化项目 2012-02-28, begin */
+/* Added by c64416 for AT Project 2011-10-24  Begin */
     {AT_CMD_NDISSTATQRY,
     VOS_NULL_PTR, AT_NOT_SET_TIME, AT_QryNdisStatPara, AT_QRY_PARA_TIME, At_CmdTestProcOK, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -1033,6 +1090,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^NDISADD", (VOS_UINT8*)"(0,1),(ipAddr),(primaryDNS),(secondaryDNS),(primaryNBNS),(secondaryNBNS)"},
     /* Modified by s62952 for BalongV300R002 Build优化项目 2012-02-28, end */
+/* Added by c64416 for AT Project 2011-10-24  End*/
 
     {AT_CMD_CGDNS,
     AT_SetCgdnsPara,        AT_SET_PARA_TIME,   AT_QryCgdnsPara,        AT_QRY_PARA_TIME,   At_TestCgdnsPara,   AT_TEST_PARA_TIME,
@@ -1146,12 +1204,14 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^LOCINFO",    VOS_NULL_PTR},
+/* Added by l60609 for B070 Project, 2012/03/09, begin */
     {AT_CMD_QRYNVRESUME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,    AT_QryNvResumePara,  AT_NOT_SET_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^QRYNVRESUME",    (VOS_UINT8*)"(0,1)"},
 
+/* Added by l60609 for B070 Project, 2012/03/09, end */
 
     {AT_CMD_NVBACKUPSTAT,
     VOS_NULL_PTR,     AT_NOT_SET_TIME,   AT_QryNvBackupStatusPara,  AT_QRY_PARA_TIME,   At_CmdTestProcOK, AT_NOT_SET_TIME,
@@ -1273,6 +1333,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^XCPOSRRPT",    (VOS_UINT8 *)"(0,1)"},
 
+    /* Added by h59254 for V7R1C50 Log2.0 Begin */
     {AT_CMD_CGPSINFO,
     AT_SetGpsInfoPara, AT_SET_PARA_TIME, VOS_NULL_PTR, AT_NOT_SET_TIME, At_CmdTestProcOK,   AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -1296,6 +1357,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^LOGSAVE",    VOS_NULL_PTR},
+    /* Added by h59254 for V7R1C50 Log2.0 End */
 
     {AT_CMD_CCMGS,
     VOS_NULL_PTR, AT_SET_PARA_TIME, VOS_NULL_PTR, AT_NOT_SET_TIME, At_CmdTestProcOK,   AT_NOT_SET_TIME,
@@ -1337,11 +1399,13 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS,    CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^APSEC",    (VOS_UINT8 *)"(@SecPacket)"},
 
+    /* Added by h59254 for V7R1C50 ISDB Project,  2012-8-27 begin */
     {AT_CMD_CISA,
     VOS_NULL_PTR, AT_SET_PARA_TIME, VOS_NULL_PTR, AT_NOT_SET_TIME, VOS_NULL_PTR,   AT_NOT_SET_TIME,
     VOS_NULL_PTR, AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^CISA",    (TAF_UINT8*)"(1-520),(cmd)"},
+    /* Added by h59254 for V7R1C50 ISDB Project,  2012-8-27 end */
 
     {AT_CMD_APDS,
     AT_SetApdsPara,    AT_SET_PARA_TIME,   VOS_NULL_PTR,   AT_NOT_SET_TIME,    At_CmdTestProcOK,       AT_NOT_SET_TIME,
@@ -1615,6 +1679,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS,       CMD_TBL_PIN_IS_LOCKED | CMD_TBL_E5_IS_LOCKED,
     (VOS_UINT8*)"^RATCOMBINEPRIO",    (VOS_UINT8*)"(0,1)"},
 
+    /* Added by c64416 for VoLTE_PhaseIII, 2014-01-07, begin */
     {AT_CMD_VOLTEIMPU,
     AT_SetVolteimpuPara,     AT_SET_PARA_TIME,   At_CmdTestProcOK,       AT_NOT_SET_TIME,   At_CmdTestProcOK,   AT_NOT_SET_TIME,
     VOS_NULL_PTR,        AT_NOT_SET_TIME,
@@ -1668,6 +1733,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     VOS_NULL_PTR,       AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS,    CMD_TBL_NO_LIMITED,
     (VOS_UINT8 *)"^IMSDOMAINCFG",   (VOS_UINT8*)"(0-2)"},
+    /* Added by c64416 for VoLTE_PhaseIII, 2014-01-07, end */
 
     {AT_CMD_MIPICLK,
     VOS_NULL_PTR,     AT_NOT_SET_TIME,   AT_QryMipiClkValue,       AT_QRY_PARA_TIME,   At_CmdTestProcOK,   AT_NOT_SET_TIME,
@@ -1798,11 +1864,13 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_NO_LIMITED,
     (VOS_UINT8 *)"^CQOSPRI",    (VOS_UINT8 *)"(0,13,15)"},
 
+    /* Added by f279542 for CDMA 1X Iteration 4, 2014-11-10, begin */
     {AT_CMD_CBURSTDTMF,
     AT_SetCBurstDTMFPara,    AT_SET_PARA_TIME,    VOS_NULL_PTR,    AT_NOT_SET_TIME,    At_TestCBurstDTMFPara,    AT_NOT_SET_TIME,
     VOS_NULL_PTR,    AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^CBURSTDTMF", (VOS_UINT8*)"(1,2),(@key),(95,150,200,250,300,350),(60,100,150,200)"},
+    /* Added by f279542 for CDMA 1X Iteration 4, 2014-11-10, end */
 
     {AT_CMD_CCONTDTMF,
     AT_SetCContinuousDTMFPara,    AT_SET_PARA_TIME,    VOS_NULL_PTR,    AT_NOT_SET_TIME,    At_TestCContinuousDTMFPara,    AT_NOT_SET_TIME,
@@ -2043,11 +2111,13 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_NO_LIMITED,
     (VOS_UINT8*)"^SCREEN",    (VOS_UINT8 *)"(0-1)"},
 
+    /* add by lwx3331495 for listening path flag  2016-05-18 begin*/
     {AT_CMD_PORTCONCURRENT,
     AT_SetPcuiCtrlConcurrentFlagForTest,   AT_NOT_SET_TIME,   VOS_NULL_PTR,   AT_NOT_SET_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^PORTCONCURRENT", (VOS_UINT8*)"(0-1)"}
+    /* add by lwx3331495 for listening path flag  2016-05-18 end*/
 };
 /* Modified by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-25, end */
 
@@ -2056,6 +2126,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
   3 函数实现
 *****************************************************************************/
 
+/* Added by f62575 for AT Project, 2011-10-28, begin */
 /*****************************************************************************
  函 数 名  : AT_SetDissdCmd
  功能描述  : 处理 AT^DISSD 命令
@@ -2262,6 +2333,7 @@ VOS_UINT32 AT_TestStsfPara(VOS_UINT8 ucIndex)
 *****************************************************************************/
 VOS_UINT32 AT_TestCpnnPara(VOS_UINT8 ucIndex)
 {
+    /*Modified by l60609 for At Project, 2011-11-3, Begin */
     VOS_UINT32                          ulRst;
 
     ulRst = AT_FillAndSndAppReqMsg(gastAtClientTab[ucIndex].usClientId,
@@ -2280,6 +2352,7 @@ VOS_UINT32 AT_TestCpnnPara(VOS_UINT8 ucIndex)
     {
         return AT_ERROR;
     }
+    /*Modified by l60609 for At Project, 2011-11-3, End */
 }
 
 /*****************************************************************************
@@ -2594,6 +2667,7 @@ VOS_UINT32 AT_TestIpv6capPara(VOS_UINT8 ucIndex)
     return AT_OK;
 }
 
+/* Added by f62575 for AT Project, 2011-10-28, end */
 
 
 /*****************************************************************************
@@ -2617,6 +2691,7 @@ VOS_UINT32 AT_TestIpv6capPara(VOS_UINT8 ucIndex)
 *****************************************************************************/
 VOS_UINT32 AT_QryDloadVerPara( VOS_UINT8 ucIndex )
 {
+    /* Modified  by f62575 for AT Project, 2011-10-17, begin */
     VOS_UINT32                          ulRet;
 
     /* 发消息到C核获取鉴权标识 */
@@ -2635,6 +2710,7 @@ VOS_UINT32 AT_QryDloadVerPara( VOS_UINT8 ucIndex )
     /* 设置AT模块实体的状态为等待异步返回 */
     gastAtClientTab[ucIndex].CmdCurrentOpt = AT_CMD_DLOADVER_READ;
     return AT_WAIT_ASYNC_RETURN;
+    /* Modified  by f62575 for AT Project, 2011-10-17, end */
 
 }
 
@@ -2784,11 +2860,13 @@ VOS_UINT32 AT_TestApRptPortSelectPara(VOS_UINT8 ucIndex)
         return AT_ERROR;
     }
 
+    /* Modified by l60609 for Optimize RIL, 2013-7-11, Begin */
     gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                        (VOS_CHAR *)pgucAtSndCodeAddr,
                                        (VOS_CHAR *)pgucAtSndCodeAddr,
                                        "%s: (0-FFFFFFFF), (0-FFFFFFFF)",
                                        g_stParseContext[ucIndex].pstCmdElement->pszCmdName);
+    /* Modified by l60609 for Optimize RIL, 2013-7-11, End */
 
     return AT_OK;
 }

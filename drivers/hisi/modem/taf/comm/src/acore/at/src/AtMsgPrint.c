@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and 
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may 
+* *    be used to endorse or promote products derived from this software 
+* *    without specific prior written permission.
+* 
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 /*****************************************************************************
   1 头文件包含
@@ -129,6 +175,7 @@ TAF_VOID AT_StubClearSpecificAutoRelyMsg(
     TAF_UINT32                          ulBufferIndex
 )
 {
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     AT_MODEM_SMS_CTX_STRU              *pstSmsCtx = VOS_NULL_PTR;
 
     pstSmsCtx = AT_GetModemSmsCtxAddrFromClientId(ucClientIndex);
@@ -142,6 +189,7 @@ TAF_VOID AT_StubClearSpecificAutoRelyMsg(
     {
         PS_MEM_FREE(WUEPS_PID_AT, pstSmsCtx->astSmsMtBuffer[ulBufferIndex].pstTsDataInfo);
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     return;
 }
@@ -169,6 +217,7 @@ TAF_VOID AT_StubTriggerAutoReply(
 )
 {
     TAF_UINT8                           ucLoop;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     AT_MODEM_SMS_CTX_STRU              *pstSmsCtx = VOS_NULL_PTR;
 
     pstSmsCtx = AT_GetModemSmsCtxAddrFromClientId(ucIndex);
@@ -212,6 +261,7 @@ TAF_VOID AT_StubTriggerAutoReply(
         pstSmsCtx->astSmsMtBuffer[ucLoop].bUsed = TAF_FALSE;
         break;
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     return;
 
@@ -242,6 +292,7 @@ TAF_VOID AT_StubSaveAutoReplyData(
 )
 {
     TAF_UINT8                           ucLoop;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     AT_MODEM_SMS_CTX_STRU              *pstSmsCtx = VOS_NULL_PTR;
 
     pstSmsCtx = AT_GetModemSmsCtxAddrFromClientId(ucIndex);
@@ -296,6 +347,7 @@ TAF_VOID AT_StubSaveAutoReplyData(
 
         break;
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     return;
 }
@@ -561,6 +613,7 @@ VOS_UINT32  AT_SetAbsoluteValidPeriod(
 {
     TAF_UINT32                          ulRet;
     TAF_UINT8                           ucDateInvalidType;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     AT_MODEM_SMS_CTX_STRU              *pstSmsCtx = VOS_NULL_PTR;
 
     pstSmsCtx = AT_GetModemSmsCtxAddrFromClientId(ucIndex);
@@ -595,6 +648,7 @@ VOS_UINT32  AT_SetAbsoluteValidPeriod(
 
         return AT_SUCCESS;
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 }
 
 /*****************************************************************************
@@ -624,6 +678,7 @@ VOS_UINT32  AT_SetRelativeValidPeriod(
 {
     TAF_UINT32                          ulRet;
     TAF_UINT32                          ulRelativeValidPeriod;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     AT_MODEM_SMS_CTX_STRU              *pstSmsCtx = VOS_NULL_PTR;
 
     pstSmsCtx = AT_GetModemSmsCtxAddrFromClientId(ucIndex);
@@ -669,6 +724,7 @@ VOS_UINT32  AT_SetRelativeValidPeriod(
         pstValidPeriod->u.ucOtherTime = (TAF_UINT8)ulRelativeValidPeriod;
         return AT_SUCCESS;
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 }
 
 /*****************************************************************************
@@ -700,6 +756,7 @@ VOS_UINT32 At_ParseCsmpVp(
 )
 {
     TAF_UINT32                          ulRet;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     AT_MODEM_SMS_CTX_STRU              *pstSmsCtx = VOS_NULL_PTR;
 
     pstSmsCtx = AT_GetModemSmsCtxAddrFromClientId(ucIndex);
@@ -751,6 +808,7 @@ VOS_UINT32 At_ParseCsmpVp(
         return AT_CMS_OPERATION_NOT_ALLOWED;
     }
 
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 }
 
 /*****************************************************************************
@@ -893,6 +951,7 @@ VOS_VOID At_SendMsgFoAttr(
 )
 {
     TAF_UINT8                           ucFo = 0;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     AT_MODEM_SMS_CTX_STRU              *pstSmsCtx = VOS_NULL_PTR;
 
     pstSmsCtx = AT_GetModemSmsCtxAddrFromClientId(ucIndex);
@@ -928,6 +987,7 @@ VOS_VOID At_SendMsgFoAttr(
         }
 
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     switch (pstTsDataInfo->enTpduType)
     {
@@ -1235,6 +1295,7 @@ TAF_UINT16  At_PrintMsgFo(
     return usLength;
 }
 
+/* Added by f62575 for AT Project, 2011-10-04,  Begin */
 /*****************************************************************************
  函 数 名  : AT_ChkSmsNumType
  功能描述  : 同步函数,号码类型检查,参考协议23040 9.1.2.5
@@ -1556,6 +1617,7 @@ VOS_UINT32  AT_BcdNumberToAscii(
     return MN_ERR_NO_ERROR;
 }
 
+/* Added by f62575 for AT Project, 2011-10-04,  End */
 
 /*****************************************************************************
  函 数 名  : At_GetAsciiOrBcdAddr
@@ -1726,6 +1788,7 @@ TAF_UINT32  At_PrintListMsg(
 )
 {
     TAF_UINT16                          usLength = 0;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, Begin */
     AT_MODEM_SMS_CTX_STRU              *pstSmsCtx = VOS_NULL_PTR;
 
     pstSmsCtx = AT_GetModemSmsCtxAddrFromClientId(ucIndex);
@@ -1896,6 +1959,7 @@ TAF_UINT32  At_PrintListMsg(
         default:
             break;
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-22, End */
 
     return usLength;
 }
@@ -1924,6 +1988,7 @@ TAF_VOID At_GetCpmsMemStatus(
 )
 {
     MN_MSG_STORAGE_LIST_EVT_INFO_STRU   *pstStorageList;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     AT_MODEM_SMS_CTX_STRU              *pstSmsCtx = VOS_NULL_PTR;
 
     pstSmsCtx = AT_GetModemSmsCtxAddrFromClientId(ucIndex);
@@ -1942,6 +2007,7 @@ TAF_VOID At_GetCpmsMemStatus(
         *pulTotalRec = 0;
         return;
     }
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     *pulTotalRec = pstStorageList->ulTotalRec;
     *pulUsedRec = pstStorageList->ulUsedRec;
@@ -1971,6 +2037,7 @@ TAF_VOID At_PrintSetCpmsRsp(
     TAF_UINT16                          usLength            = 0;
     TAF_UINT32                          ulTotalRec;                             /*sms capacity of NVIM or USIM*/
     TAF_UINT32                          ulUsedRec;                              /*used records including all status*/
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     AT_MODEM_SMS_CTX_STRU              *pstSmsCtx = VOS_NULL_PTR;
 
     pstSmsCtx = AT_GetModemSmsCtxAddrFromClientId(ucIndex);
@@ -2005,6 +2072,7 @@ TAF_VOID At_PrintSetCpmsRsp(
                                        "%d,%d",
                                        ulUsedRec,
                                        ulTotalRec);
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     gstAtSendData.usBufLen = usLength;
     At_FormatResultData(ucIndex, AT_OK);
@@ -2075,6 +2143,7 @@ VOS_VOID At_PrintGetCpmsRsp(
     VOS_UINT32                          ulTotalRec;                             /*sms capacity of NVIM or USIM*/
     VOS_UINT32                          ulUsedRec;                              /*used records including all status*/
     VOS_UINT8                          *pucMemTypeStr       = VOS_NULL_PTR;
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, Begin */
     AT_MODEM_SMS_CTX_STRU              *pstSmsCtx           = VOS_NULL_PTR;
 
     ulTotalRec = 0;
@@ -2117,6 +2186,7 @@ VOS_VOID At_PrintGetCpmsRsp(
                                        pucMemTypeStr,
                                        ulUsedRec,
                                        ulTotalRec);
+    /* Modified by l60609 for DSDA Phase III, 2013-2-25, End */
 
     gstAtSendData.usBufLen = usLength;
     At_FormatResultData(ucIndex, AT_OK);

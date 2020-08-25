@@ -84,8 +84,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B19             = 0xD928,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B19             = 0xD929,
         EN_NV_ID_LTE_TX_MPR_B19                         = 0xD92a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B19                     = 0xD92b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B19                        = 0xD92c,
         EN_NV_ID_LTE_OTHER_COMP_B19         = 0xD92d,
@@ -93,12 +96,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B19                    = 0xD92e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B19                    = 0xD92f,
 
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_LTE_TX_ANT_SEL_B19                      = 0Xd930,
         //EN_NV_ID_TX_RF_BB_ATT_B19                       = 0xD930,
         //EN_NV_ID_TX_RF_BIAS_B19                         = 0xD931,
         EN_NV_ID_TX_PA_TEMP_COMP_B19                    = 0xD932,
         //EN_NV_ID_TX_ATTEN_TABLE_B19                     = 0xD933,
         //EN_NV_ID_POWERDET_VOLTAGE_B19                   = 0xD934,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B19                = 0xD935,
         EN_NV_ID_LTE_TX_PD_PARA_B19                      = 0xD936,
         EN_NV_ID_TX_ET_BAND_PARA_B19                      = 0xD937,
@@ -136,14 +141,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B21             = 0xD968,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B21             = 0xD969,
         EN_NV_ID_LTE_TX_MPR_B21                         = 0xD96a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B21                     = 0xD96b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B21                        = 0xD96c,
         EN_NV_ID_LTE_OTHER_COMP_B21         = 0xD96d,
 
         EN_NV_ID_LTE_TX_AMPR_NS05_B21                   = 0xD96e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B21                   = 0xD96f,
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B21                     = 0xD970,
         //EN_NV_ID_TX_RF_BB_ATT_B21                       = 0xD970,
@@ -151,6 +160,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B21                   = 0xD972,
         //EN_NV_ID_TX_ATTEN_TABLE_B21                        = 0xD973,
         //EN_NV_ID_POWERDET_VOLTAGE_B21                        = 0xD974,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B21               = 0xD975,
         EN_NV_ID_LTE_TX_PD_PARA_B21                     = 0xD976,
         EN_NV_ID_TX_ET_BAND_PARA_B21                    = 0xD977,
@@ -186,8 +196,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B2              = 0xD9a8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B2              = 0xD9a9,
         EN_NV_ID_LTE_TX_MPR_B2                          = 0xD9aa,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B2                      = 0xD9ab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B2                         = 0xD9ac,
         EN_NV_ID_LTE_OTHER_COMP_B2         = 0xD9ad,
@@ -195,6 +208,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B2                   = 0xD9ae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B2                   = 0xD9af,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B2                     = 0xD9b0,
         //EN_NV_ID_TX_RF_BB_ATT_B2                       = 0xD9b0,
@@ -202,6 +216,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B2                   = 0xD9b2,
         //EN_NV_ID_TX_ATTEN_TABLE_B2                        = 0xD9b3,
         //EN_NV_ID_POWERDET_VOLTAGE_B2                        = 0xD9b4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B2                = 0xD9b5,
         EN_NV_ID_LTE_TX_PD_PARA_B2                      = 0xD9b6,
         EN_NV_ID_TX_ET_BAND_PARA_B2                     = 0xD9b7,
@@ -238,8 +253,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B4              = 0xD9e8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B4              = 0xD9e9,
         EN_NV_ID_LTE_TX_MPR_B4                          = 0xD9ea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B4                      = 0xD9eb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B4                         = 0xD9ec,
         EN_NV_ID_LTE_OTHER_COMP_B4         = 0xD9ed,
@@ -247,6 +265,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B4                   = 0xD9ee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B4                   = 0xD9ef,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B4                     = 0xD9f0,
         //EN_NV_ID_TX_RF_BB_ATT_B4                      = 0xD9f0,
@@ -254,6 +273,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B4                   = 0xD9f2,
         //EN_NV_ID_TX_ATTEN_TABLE_B4                      = 0xD9f3,
         //EN_NV_ID_POWERDET_VOLTAGE_B4                  = 0xD9f4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B4                = 0xD9f5,
         EN_NV_ID_LTE_TX_PD_PARA_B4                      = 0xD9f6,
         EN_NV_ID_TX_ET_BAND_PARA_B4                     = 0xD9f7,
@@ -290,8 +310,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B6              = 0xDa28,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B6              = 0xDa29,
         EN_NV_ID_LTE_TX_MPR_B6                          = 0xDa2a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B6                      = 0xDa2b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B6                         = 0xDa2c,
         EN_NV_ID_LTE_OTHER_COMP_B6         = 0xDa2d,
@@ -299,6 +322,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B6                   = 0xDa2e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B6                   = 0xDa2f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B6                      = 0xDa30,
         //EN_NV_ID_TX_RF_BB_ATT_B6                      = 0xDa30,
@@ -306,6 +330,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B6                   = 0xDa32,
         //EN_NV_ID_TX_ATTEN_TABLE_B6                      = 0xDa33,
         //EN_NV_ID_POWERDET_VOLTAGE_B6                  = 0xDa34,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B6                = 0xDa35,
         EN_NV_ID_LTE_TX_PD_PARA_B6                      = 0xDa36,
         EN_NV_ID_TX_ET_BAND_PARA_B6                     = 0xDa37,
@@ -342,8 +367,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B9              = 0xDa68,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B9              = 0xDa69,
         EN_NV_ID_LTE_TX_MPR_B9                          = 0xDa6a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B9                      = 0xDa6b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B9                         = 0xDa6c,
         EN_NV_ID_LTE_OTHER_COMP_B9         = 0xDa6d,
@@ -351,6 +379,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B9                   = 0xDa6e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B9                   = 0xDa6f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B9                     = 0xDa70,
         //EN_NV_ID_TX_RF_BB_ATT_B9                      = 0xDa70,
@@ -358,6 +387,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B9                   = 0xDa72,
         //EN_NV_ID_TX_ATTEN_TABLE_B9                      = 0xDa73,
         //EN_NV_ID_POWERDET_VOLTAGE_B9                  = 0xDa74,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B9                = 0xDa75,
         EN_NV_ID_LTE_TX_PD_PARA_B9                      = 0xDa76,
         EN_NV_ID_TX_ET_BAND_PARA_B9                     = 0xDa77,
@@ -394,8 +424,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B10             = 0xDaa8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B10             = 0xDaa9,
         EN_NV_ID_LTE_TX_MPR_B10                         = 0xDaaa,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B10                     = 0xDaab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B10                        = 0xDaac,
         EN_NV_ID_LTE_OTHER_COMP_B10         = 0xDaad,
@@ -403,6 +436,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B10                   = 0xDaae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B10                   = 0xDaaf,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B10                    = 0xDab0,
         //EN_NV_ID_TX_RF_BB_ATT_B10                     = 0xDab0,
@@ -410,6 +444,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B10                   = 0xDab2,
         //EN_NV_ID_TX_ATTEN_TABLE_B10                     = 0xDab3,
         //EN_NV_ID_POWERDET_VOLTAGE_B10                 = 0xDab4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B10               = 0xDab5,
         EN_NV_ID_LTE_TX_PD_PARA_B10                     = 0xDab6,
         EN_NV_ID_TX_ET_BAND_PARA_B10                    = 0xDab7,
@@ -446,8 +481,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B11             = 0xDae8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B11             = 0xDae9,
         EN_NV_ID_LTE_TX_MPR_B11                         = 0xDaea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B11                     = 0xDaeb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B11                        = 0xDaec,
         EN_NV_ID_LTE_OTHER_COMP_B11         = 0xDaed,
@@ -455,6 +493,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B11                   = 0xDaee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B11                   = 0xDaef,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B11                    = 0xDaf0,
         //EN_NV_ID_TX_RF_BB_ATT_B11                     = 0xDaf0,
@@ -462,6 +501,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B11                   = 0xDaf2,
         //EN_NV_ID_TX_ATTEN_TABLE_B11                     = 0xDaf3,
         //EN_NV_ID_POWERDET_VOLTAGE_B11                 = 0xDaf4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B11               = 0xDaf5,
         EN_NV_ID_LTE_TX_PD_PARA_B11                     = 0xDaf6,
         EN_NV_ID_TX_ET_BAND_PARA_B11                    = 0xDaf7,
@@ -498,8 +538,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B12             = 0xDb28,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B12             = 0xDb29,
         EN_NV_ID_LTE_TX_MPR_B12                         = 0xDb2a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B12                     = 0xDb2b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B12                        = 0xDb2c,
         EN_NV_ID_LTE_OTHER_COMP_B12         = 0xDb2d,
@@ -507,6 +550,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B12                   = 0xDb2e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B12                   = 0xDb2f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B12                    = 0xDb30,
         //EN_NV_ID_TX_RF_BB_ATT_B12                     = 0xDb30,
@@ -514,6 +558,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B12                   = 0xDb32,
         //EN_NV_ID_TX_ATTEN_TABLE_B12                     = 0xDb33,
         //EN_NV_ID_POWERDET_VOLTAGE_B12                 = 0xDb34,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B12               = 0xDb35,
         EN_NV_ID_LTE_TX_PD_PARA_B12                     = 0xDb36,
         EN_NV_ID_TX_ET_BAND_PARA_B12                    = 0xDb37,
@@ -550,8 +595,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B13             = 0xDb68,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B13             = 0xDb69,
         EN_NV_ID_LTE_TX_MPR_B13                         = 0xDb6a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B13                     = 0xDb6b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B13                        = 0xDb6c,
         EN_NV_ID_LTE_OTHER_COMP_B13         = 0xDb6d,
@@ -559,6 +607,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B13                   = 0xDb6e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B13                   = 0xDb6f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B13                    = 0xDb70,
         //EN_NV_ID_TX_RF_BB_ATT_B13                     = 0xDb70,
@@ -566,6 +615,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B13                   = 0xDb72,
         //EN_NV_ID_TX_ATTEN_TABLE_B13                     = 0xDb73,
         //EN_NV_ID_POWERDET_VOLTAGE_B13                 = 0xDb74,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B13               = 0xDb75,
         EN_NV_ID_LTE_TX_PD_PARA_B13                     = 0xDb76,
         EN_NV_ID_TX_ET_BAND_PARA_B13                    = 0xDb77,
@@ -602,8 +652,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B14             = 0xDba8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B14             = 0xDba9,
         EN_NV_ID_LTE_TX_MPR_B14                         = 0xDbaa,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B14                     = 0xDbab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B14                        = 0xDbac,
         EN_NV_ID_LTE_OTHER_COMP_B14         = 0xDbad,
@@ -611,6 +664,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B14                   = 0xDbae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B14                   = 0xDbaf,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B14                    = 0xDbb0,
         //EN_NV_ID_TX_RF_BB_ATT_B14                     = 0xDbb0,
@@ -618,6 +672,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B14                   = 0xDbb2,
         //EN_NV_ID_TX_ATTEN_TABLE_B14                     = 0xDbb3,
         //EN_NV_ID_POWERDET_VOLTAGE_B14                 = 0xDbb4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B14               = 0xDbb5,
         EN_NV_ID_LTE_TX_PD_PARA_B14                     = 0xDbb6,
         EN_NV_ID_TX_ET_BAND_PARA_B14                    = 0xDbb7,
@@ -654,8 +709,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B17             = 0xDbe8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B17             = 0xDbe9,
         EN_NV_ID_LTE_TX_MPR_B17                         = 0xDbea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B17                     = 0xDbeb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B17                        = 0xDbec,
         EN_NV_ID_LTE_OTHER_COMP_B17         = 0xDbed,
@@ -663,6 +721,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B17                   = 0xDbee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B17                   = 0xDbef,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B17                    = 0xDbf0,
         //EN_NV_ID_TX_RF_BB_ATT_B17                     = 0xDbf0,
@@ -670,6 +729,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B17                   = 0xDbf2,
         //EN_NV_ID_TX_ATTEN_TABLE_B17                        = 0xDbf3,
         //EN_NV_ID_POWERDET_VOLTAGE_B17                 = 0xDbf4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B17               = 0xDbf5,
         EN_NV_ID_LTE_TX_PD_PARA_B17                     = 0xDbf6,
         EN_NV_ID_TX_ET_BAND_PARA_B17                    = 0xDbf7,
@@ -706,8 +766,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B18             = 0xDc28,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B18             = 0xDc29,
         EN_NV_ID_LTE_TX_MPR_B18                         = 0xDc2a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B18                     = 0xDc2b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B18                        = 0xDc2c,
         EN_NV_ID_LTE_OTHER_COMP_B18         = 0xDc2d,
@@ -715,6 +778,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B18                   = 0xDc2e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B18                   = 0xDc2f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B18                    = 0xDc30,
         //EN_NV_ID_TX_RF_BB_ATT_B18                     = 0xDc30,
@@ -722,6 +786,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B18                   = 0xDc32,
         //EN_NV_ID_TX_ATTEN_TABLE_B18                     = 0xDc33,
         //EN_NV_ID_POWERDET_VOLTAGE_B18                 = 0xDc34,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B18               = 0xDc35,
         EN_NV_ID_LTE_TX_PD_PARA_B18                     = 0xDc36,
         EN_NV_ID_TX_ET_BAND_PARA_B18                    = 0xDc37,
@@ -758,8 +823,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B22             = 0xDc68,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B22             = 0xDc69,
         EN_NV_ID_LTE_TX_MPR_B22                         = 0xDc6a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B22                     = 0xDc6b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B22                        = 0xDc6c,
         EN_NV_ID_LTE_OTHER_COMP_B22         = 0xDc6d,
@@ -767,6 +835,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B22                   = 0xDc6e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B22                   = 0xDc6f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B22                    = 0xDc70,
         //EN_NV_ID_TX_RF_BB_ATT_B22                       = 0xDc70,
@@ -774,6 +843,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B22                   = 0xDc72,
         //EN_NV_ID_TX_ATTEN_TABLE_B22                        = 0xDc73,
         //EN_NV_ID_POWERDET_VOLTAGE_B22                        = 0xDc74,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B22               = 0xDc75,
         EN_NV_ID_LTE_TX_PD_PARA_B22                     = 0xDC36,
         EN_NV_ID_TX_ET_BAND_PARA_B22                    = 0xDc77,
@@ -810,8 +880,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B23             = 0xDca8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B23             = 0xDca9,
         EN_NV_ID_LTE_TX_MPR_B23                         = 0xDcaa,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B23                     = 0xDcab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B23                        = 0xDcac,
         EN_NV_ID_LTE_OTHER_COMP_B23         = 0xDcad,
@@ -819,6 +892,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B23                   = 0xDcae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B23                   = 0xDcaf,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B23                    = 0xDcb0,
         //EN_NV_ID_TX_RF_BB_ATT_B23                       = 0xDcb0,
@@ -826,6 +900,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B23                   = 0xDcb2,
         //EN_NV_ID_TX_ATTEN_TABLE_B23                        = 0xDcb3,
         //EN_NV_ID_POWERDET_VOLTAGE_B23                        = 0xDcb4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B23               = 0xDcb5,
         EN_NV_ID_LTE_TX_PD_PARA_B23                     = 0xDcb6,
         EN_NV_ID_TX_ET_BAND_PARA_B23                    = 0xDcb7,
@@ -862,8 +937,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B24             = 0xDce8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B24             = 0xDce9,
         EN_NV_ID_LTE_TX_MPR_B24                         = 0xDcea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B24                     = 0xDceb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B24                        = 0xDcec,
         EN_NV_ID_LTE_OTHER_COMP_B24         = 0xDced,
@@ -871,6 +949,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B24                   = 0xDcee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B24                   = 0xDcef,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B24                    = 0xDcf0,
         //EN_NV_ID_TX_RF_BB_ATT_B24                       = 0xDcf0,
@@ -878,6 +957,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B24                   = 0xDcf2,
         //EN_NV_ID_TX_ATTEN_TABLE_B24                        = 0xDcf3,
         //EN_NV_ID_POWERDET_VOLTAGE_B24                        = 0xDcf4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B24               = 0xDcf5,
         EN_NV_ID_LTE_TX_PD_PARA_B24                     = 0xDcf6,
         EN_NV_ID_TX_ET_BAND_PARA_B24                    = 0xDcf7,
@@ -914,8 +994,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B25             = 0xDd28,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B25             = 0xDd29,
         EN_NV_ID_LTE_TX_MPR_B25                         = 0xDd2a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B25                     = 0xDd2b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B25                        = 0xDd2c,
         EN_NV_ID_LTE_OTHER_COMP_B25         = 0xDd2d,
@@ -923,6 +1006,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B25                   = 0xDd2e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B25                   = 0xDd2f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B25                    = 0xDd30,
         //EN_NV_ID_TX_RF_BB_ATT_B25                       = 0xDd30,
@@ -930,6 +1014,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B25                   = 0xDd32,
         //EN_NV_ID_TX_ATTEN_TABLE_B25                        = 0xDd33,
         //EN_NV_ID_POWERDET_VOLTAGE_B25                        = 0xDd34,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B25               = 0xDd35,
         EN_NV_ID_LTE_TX_PD_PARA_B25                     = 0xDd36,
         EN_NV_ID_TX_ET_BAND_PARA_B25                    = 0xDd37,
@@ -966,8 +1051,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B33             = 0xDd68,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B33             = 0xDd69,
         EN_NV_ID_LTE_TX_MPR_B33                         = 0xDd6a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B33                     = 0xDd6b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B33                        = 0xDd6c,
         EN_NV_ID_LTE_OTHER_COMP_B33         = 0xDd6d,
@@ -975,6 +1063,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B33                   = 0xDd6e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B33                   = 0xDd6f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B33                    = 0xDd70,
         //EN_NV_ID_TX_RF_BB_ATT_B33                       = 0xDd70,
@@ -982,6 +1071,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B33                   = 0xDd72,
         //EN_NV_ID_TX_ATTEN_TABLE_B33                        = 0xDd73,
         //EN_NV_ID_POWERDET_VOLTAGE_B33                        = 0xDd74,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B33               = 0xDd75,
         EN_NV_ID_LTE_TX_PD_PARA_B33                     = 0xDd76,
         EN_NV_ID_TX_ET_BAND_PARA_B33                    = 0xDd77,
@@ -1018,8 +1108,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B34             = 0xDda8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B34             = 0xDda9,
         EN_NV_ID_LTE_TX_MPR_B34                         = 0xDdaa,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B34                     = 0xDdab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B34                        = 0xDdac,
         EN_NV_ID_LTE_OTHER_COMP_B34         = 0xDdad,
@@ -1027,6 +1120,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B34                   = 0xDdae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B34                   = 0xDdaf,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B34                    = 0xDdb0,
         //EN_NV_ID_TX_RF_BB_ATT_B34                       = 0xDdb0,
@@ -1034,6 +1128,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B34                   = 0xDdb2,
         //EN_NV_ID_TX_ATTEN_TABLE_B34                        = 0xDdb3,
         //EN_NV_ID_POWERDET_VOLTAGE_B34                        = 0xDdb4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B34               = 0xDdb5,
         EN_NV_ID_LTE_TX_PD_PARA_B34                     = 0xDdb6,
         EN_NV_ID_TX_ET_BAND_PARA_B34                    = 0xDdb7,
@@ -1070,8 +1165,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B35             = 0xDde8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B35             = 0xDde9,
         EN_NV_ID_LTE_TX_MPR_B35                         = 0xDdea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B35                     = 0xDdeb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B35                        = 0xDdec,
         EN_NV_ID_LTE_OTHER_COMP_B35         = 0xDded,
@@ -1079,6 +1177,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B35                   = 0xDdee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B35                   = 0xDdef,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B35                    = 0xDdf0,
         //EN_NV_ID_TX_RF_BB_ATT_B35                       = 0xDdf0,
@@ -1086,6 +1185,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B35                   = 0xDdf2,
         //EN_NV_ID_TX_ATTEN_TABLE_B35                        = 0xDdf3,
         //EN_NV_ID_POWERDET_VOLTAGE_B35                        = 0xDdf4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B35               = 0xDdf5,
         EN_NV_ID_LTE_TX_PD_PARA_B35                     = 0xDdf6,
         EN_NV_ID_TX_ET_BAND_PARA_B35                    = 0xDdf7,
@@ -1122,8 +1222,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B36             = 0xDe28,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B36             = 0xDe29,
         EN_NV_ID_LTE_TX_MPR_B36                         = 0xDe2a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B36                     = 0xDe2b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B36                        = 0xDe2c,
         EN_NV_ID_LTE_OTHER_COMP_B36         = 0xDe2d,
@@ -1131,6 +1234,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B36                   = 0xDe2e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B36                   = 0xDe2f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B36                    = 0xDe30,
         //EN_NV_ID_TX_RF_BB_ATT_B36                       = 0xDe30,
@@ -1138,6 +1242,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B36                   = 0xDe32,
         //EN_NV_ID_TX_ATTEN_TABLE_B36                        = 0xDe33,
         //EN_NV_ID_POWERDET_VOLTAGE_B36                        = 0xDe34,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B36               = 0xDe35,
         EN_NV_ID_LTE_TX_PD_PARA_B36                     = 0xDe36,
         EN_NV_ID_TX_ET_BAND_PARA_B36                    = 0xDe37,
@@ -1174,8 +1279,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B37             = 0xDe68,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B37             = 0xDe69,
         EN_NV_ID_LTE_TX_MPR_B37                         = 0xDe6a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B37                     = 0xDe6b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B37                        = 0xDe6c,
         EN_NV_ID_LTE_OTHER_COMP_B37         = 0xDe6d,
@@ -1183,6 +1291,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B37                   = 0xDe6e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B37                   = 0xDe6f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B37                    = 0xDe70,
         //EN_NV_ID_TX_RF_BB_ATT_B37                       = 0xDe70,
@@ -1190,6 +1299,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B37                   = 0xDe72,
         //EN_NV_ID_TX_ATTEN_TABLE_B37                        = 0xDe73,
         //EN_NV_ID_POWERDET_VOLTAGE_B37                        = 0xDe74,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B37               = 0xDe75,
         EN_NV_ID_LTE_TX_PD_PARA_B37                     = 0xDe76,
         EN_NV_ID_TX_ET_BAND_PARA_B37                    = 0xDe77,
@@ -1226,8 +1336,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B42             = 0xDea8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B42             = 0xDea9,
         EN_NV_ID_LTE_TX_MPR_B42                         = 0xDeaa,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B42                     = 0xDeab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B42                        = 0xDeac,
         EN_NV_ID_LTE_OTHER_COMP_B42         = 0xDead,
@@ -1235,6 +1348,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B42                   = 0xDeae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B42                   = 0xDeaf,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B42                    = 0xDeb0,
         //EN_NV_ID_TX_RF_BB_ATT_B42                       = 0xDeb0,
@@ -1242,6 +1356,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B42                   = 0xDeb2,
         //EN_NV_ID_TX_ATTEN_TABLE_B42                        = 0xDeb3,
         //EN_NV_ID_POWERDET_VOLTAGE_B42                        = 0xDeb4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B42               = 0xDeb5,
         EN_NV_ID_LTE_TX_PD_PARA_B42                     =0xDeb6,
         EN_NV_ID_TX_ET_BAND_PARA_B42                    = 0xDeb7,
@@ -1278,8 +1393,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B43             = 0xDee8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B43             = 0xDee9,
         EN_NV_ID_LTE_TX_MPR_B43                         = 0xDeea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B43                     = 0xDeeb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B43                        = 0xDeec,
         EN_NV_ID_LTE_OTHER_COMP_B43         = 0xDeed,
@@ -1287,6 +1405,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B43                   = 0xDeee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B43                   = 0xDeef,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B43                    = 0xDef0,
         //EN_NV_ID_TX_RF_BB_ATT_B43                       = 0xDef0,
@@ -1294,6 +1413,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B43                   = 0xDef2,
         //EN_NV_ID_TX_ATTEN_TABLE_B43                        = 0xDef3,
         //EN_NV_ID_POWERDET_VOLTAGE_B43                        = 0xDef4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B43               = 0xDef5,
         EN_NV_ID_LTE_TX_PD_PARA_B43                     = 0xDef6,
         EN_NV_ID_TX_ET_BAND_PARA_B43                    = 0xDef7,
@@ -1330,8 +1450,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B39             = 0xDf28,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B39             = 0xDf29,
         EN_NV_ID_LTE_TX_MPR_B39                         = 0xDf2a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B39                     = 0xDf2b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B39                        = 0xDf2c,
 
@@ -1340,6 +1463,7 @@ extern "C" {
 
         EN_NV_ID_LTE_TX_AMPR_NS05_B39                   = 0xDf2e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B39                   = 0xDf2f,
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B39                    = 0xDf30,
         //EN_NV_ID_TX_RF_BB_ATT_B39                       = 0xDf30,
@@ -1347,6 +1471,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B39                   = 0xDf32,
         //EN_NV_ID_TX_ATTEN_TABLE_B39                        = 0xDf33,
         //EN_NV_ID_POWERDET_VOLTAGE_B39                        = 0xDf34,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B39               = 0xDf35,
         EN_NV_ID_LTE_TX_PD_PARA_B39                     = 0xDf36,
         EN_NV_ID_TX_ET_BAND_PARA_B39                    = 0xDf37,
@@ -1382,9 +1507,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B20             = 0xD628,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B20             = 0xD629,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B20                         = 0xD62a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B20                     = 0xD62b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B20                        = 0xD62c,
         EN_NV_ID_LTE_OTHER_COMP_B20         = 0xD62d,
@@ -1392,6 +1521,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B20                   = 0xD62e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B20                   = 0xD62f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B20                    = 0xD630,
         //EN_NV_ID_TX_RF_BB_ATT_B20                       = 0xD630,
@@ -1399,6 +1529,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B20                   = 0xD632,
         //EN_NV_ID_TX_ATTEN_TABLE_B20                        = 0xD633,
         //EN_NV_ID_POWERDET_VOLTAGE_B20                        = 0xD634,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B20               = 0xD635,
         EN_NV_ID_LTE_TX_PD_PARA_B20                     = 0xD636,
         EN_NV_ID_TX_ET_BAND_PARA_B20                    = 0xD637,
@@ -1433,9 +1564,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B40             = 0xD668,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B40             = 0xD669,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B40                         = 0xD66a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B40                     = 0xD66b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B40                        = 0xD66c,
         EN_NV_ID_LTE_OTHER_COMP_B40         = 0xD66d,
@@ -1443,6 +1578,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B40                   = 0xD66e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B40                   = 0xD66f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B40                    = 0xD670,
         //EN_NV_ID_TX_RF_BB_ATT_B40                       = 0xD670,
@@ -1450,6 +1586,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B40                   = 0xD672,
         //EN_NV_ID_TX_ATTEN_TABLE_B40                        = 0xD673,
         //EN_NV_ID_POWERDET_VOLTAGE_B40                        = 0xD674,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B40               = 0xD675,
         EN_NV_ID_LTE_TX_PD_PARA_B40                     = 0xD676,
         EN_NV_ID_TX_ET_BAND_PARA_B40                    = 0xD677,
@@ -1484,9 +1621,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B38             = 0xD6a8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B38             = 0xD6a9,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B38                         = 0xD6aa,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B38                     = 0xD6ab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B38                        = 0xD6ac,
         EN_NV_ID_LTE_OTHER_COMP_B38         = 0xD6ad,
@@ -1494,6 +1635,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B38                   = 0xD6ae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B38                   = 0xD6af,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B38                    = 0xD6b0,
         //EN_NV_ID_TX_RF_BB_ATT_B38                       = 0xD6b0,
@@ -1501,6 +1643,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B38                   = 0xD6b2,
         //EN_NV_ID_TX_ATTEN_TABLE_B38                        = 0xD6b3,
         //EN_NV_ID_POWERDET_VOLTAGE_B38                        = 0xD6b4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B38               = 0xD6b5,
         EN_NV_ID_LTE_TX_PD_PARA_B38                     = 0xD6b6,
         EN_NV_ID_TX_ET_BAND_PARA_B38                    = 0xD6b7,
@@ -1535,9 +1678,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B41             = 0xD6E8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B41             = 0xD6E9,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B41                         = 0xD6ea,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B41                     = 0xD6eb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B41                        = 0xD6ec,
         EN_NV_ID_LTE_OTHER_COMP_B41         = 0xD6ed,
@@ -1545,6 +1692,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B41                   = 0xD6ee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B41                   = 0xD6ef,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B41                    = 0xD6f0,
         //EN_NV_ID_TX_RF_BB_ATT_B41                       = 0xD6f0,
@@ -1552,6 +1700,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B41                   = 0xD6f2,
         //EN_NV_ID_TX_ATTEN_TABLE_B41                    = 0xD6f3,
         //EN_NV_ID_POWERDET_VOLTAGE_B41                   = 0xD6f4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B41               = 0xD6f5,
         EN_NV_ID_LTE_TX_PD_PARA_B41                     = 0xD6f6,
         EN_NV_ID_TX_ET_BAND_PARA_B41                    = 0xD6f7,
@@ -1586,9 +1735,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B7              = 0xD728,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B7              = 0xD729,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B7                          = 0xD72a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B7                      = 0xD72b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B7                         = 0xD72c,
         EN_NV_ID_LTE_OTHER_COMP_B7         = 0xD72d,
@@ -1596,6 +1749,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B7                   = 0xD72e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B7                   = 0xD72f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B7                     = 0xD730,
         //EN_NV_ID_TX_RF_BB_ATT_B7                      = 0xD730,
@@ -1603,6 +1757,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B7                   = 0xD732,
         //EN_NV_ID_TX_ATTEN_TABLE_B7                    = 0xD733,
         //EN_NV_ID_POWERDET_VOLTAGE_B7                  = 0xD734,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B7                = 0xD735,
         EN_NV_ID_LTE_TX_PD_PARA_B7                      = 0xD736,
         EN_NV_ID_TX_ET_BAND_PARA_B7                     = 0xD737,
@@ -1637,9 +1792,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B3              = 0xD828,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B3              = 0xD829,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B3                          = 0xD82a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B3                      = 0xD82b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B3                         = 0xD82c,
         EN_NV_ID_LTE_OTHER_COMP_B3         = 0xD82d,
@@ -1647,6 +1806,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B3                   = 0xD82e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B3                   = 0xD82f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B3                     = 0xD830,
         //EN_NV_ID_TX_RF_BB_ATT_B3                       = 0xD830,
@@ -1654,6 +1814,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B3                   = 0xD832,
         //EN_NV_ID_TX_ATTEN_TABLE_B3                        = 0xD833,
         //EN_NV_ID_POWERDET_VOLTAGE_B3                        = 0xD834,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B3                = 0xD835,
         EN_NV_ID_LTE_TX_PD_PARA_B3                      = 0xD836,
         EN_NV_ID_TX_ET_BAND_PARA_B3                     = 0xD837,
@@ -1688,9 +1849,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B1              = 0xD868,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B1              = 0xD869,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B1                          = 0xD86a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B1                      = 0xD86b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B1                         = 0xD86c,
         EN_NV_ID_LTE_OTHER_COMP_B1         = 0xD86d,
@@ -1698,6 +1863,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B1                   = 0xD86e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B1                   = 0xD86f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B1                    = 0xD870,
         //EN_NV_ID_TX_RF_BB_ATT_B1                       = 0xD870,
@@ -1705,6 +1871,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B1                   = 0xD872,
         //EN_NV_ID_TX_ATTEN_TABLE_B1                        = 0xD873,
         //EN_NV_ID_POWERDET_VOLTAGE_B1                        = 0xD874,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B1                = 0xD875,
         EN_NV_ID_LTE_TX_PD_PARA_B1                      = 0xD876,
         EN_NV_ID_TX_ET_BAND_PARA_B1                     = 0xD877,
@@ -1739,9 +1906,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B5              = 0xD8a8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B5              = 0xD8a9,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B5                          = 0xD8aa,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B5                      = 0xD8ab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B5                         = 0xD8ac,
         EN_NV_ID_LTE_OTHER_COMP_B5         = 0xD8ad,
@@ -1749,6 +1920,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B5                   = 0xD8ae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B5                   = 0xD8af,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B5                     = 0xD8b0,
         //EN_NV_ID_TX_RF_BB_ATT_B5                       = 0xD8b0,
@@ -1756,6 +1928,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B5                   = 0xD8b2,
         //EN_NV_ID_TX_ATTEN_TABLE_B5                        = 0xD8b3,
         //EN_NV_ID_POWERDET_VOLTAGE_B5                        = 0xD8b4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B5                = 0xD8b5,
         EN_NV_ID_LTE_TX_PD_PARA_B5                      = 0xD8b6,
         EN_NV_ID_TX_ET_BAND_PARA_B5                     = 0xD8b7,
@@ -1790,9 +1963,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B8              = 0xD8e8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B8              = 0xD8e9,
 
+        /* modify by wangrui mpr begin */
         EN_NV_ID_LTE_TX_MPR_B8                          = 0xD8ea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B8                      = 0xD8eb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B8                         = 0xD8ec,
         EN_NV_ID_LTE_OTHER_COMP_B8         = 0xD8ed,
@@ -1800,6 +1977,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B8                   = 0xD8ee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B8                   = 0xD8ef,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B8                    = 0xD8f0,
         //EN_NV_ID_TX_RF_BB_ATT_B8                       = 0xD8f0,
@@ -1807,6 +1985,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B8                   = 0xD8f2,
         //EN_NV_ID_TX_ATTEN_TABLE_B8                        = 0xD8f3,
         //EN_NV_ID_POWERDET_VOLTAGE_B8                        = 0xD8f4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B8                = 0xD8f5,
         EN_NV_ID_LTE_TX_PD_PARA_B8                      = 0xD8f6,
         EN_NV_ID_TX_ET_BAND_PARA_B8                     = 0xD8f7,
@@ -1843,9 +2022,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B28             = 0xDf68,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B28             = 0xDf69,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B28                          = 0xDf6a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B28                      = 0xDf6b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B28                         = 0xDf6c,
         EN_NV_ID_LTE_OTHER_COMP_B28         = 0xDf6d,
@@ -1853,6 +2036,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B28                   = 0xDf6e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B28                   = 0xDf6f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B28                    = 0xDf70,
         //EN_NV_ID_TX_RF_BB_ATT_B28                      = 0xDf70,
@@ -1860,6 +2044,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B28                   = 0xDf72,
         //EN_NV_ID_TX_ATTEN_TABLE_B28                        = 0xDf73,
         //EN_NV_ID_POWERDET_VOLTAGE_B28                        = 0xDf74,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B28               = 0xDf75,
         EN_NV_ID_LTE_TX_PD_PARA_B28                     = 0xDf76,
         EN_NV_ID_TX_ET_BAND_PARA_B28                    = 0xDf77,
@@ -1897,8 +2082,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B26             = 0xE3a8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B26             = 0xE3a9,
         EN_NV_ID_LTE_TX_MPR_B26                         = 0xE3aa,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B26                     = 0xE3ab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B26                        = 0xE3ac,
         EN_NV_ID_LTE_OTHER_COMP_B26         = 0xE3ad,
@@ -1906,6 +2094,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B26                   = 0xE3ae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B26                   = 0xE3af,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B26                    = 0xE3b0,
         //EN_NV_ID_TX_RF_BB_ATT_B26                       = 0xE3b0,
@@ -1913,6 +2102,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B26                   = 0xE3b2,
         //EN_NV_ID_TX_ATTEN_TABLE_B26                        = 0xE3b3,
         //EN_NV_ID_POWERDET_VOLTAGE_B26                        = 0xE3b4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B26               = 0xE3b5,
         EN_NV_ID_LTE_TX_PD_PARA_B26                     = 0xE3b6,
         EN_NV_ID_TX_ET_BAND_PARA_B26                    = 0xE3b7,
@@ -1956,12 +2146,14 @@ extern "C" {
       //  EN_NV_ID_LTE_TX_AMPR_NS05_BNon1                   = 0xDf6e,
       //  EN_NV_ID_LTE_TX_AMPR_NS09_BNon1                   = 0xDf6f,
 
+        /*add for V9R1_6361 Begin*/
 
        // EN_NV_ID_TX_RF_BB_ATT_BNon1                       = 0xDf70,
        // EN_NV_ID_TX_RF_BIAS_BNon1                         = 0xDf71,
        // EN_NV_ID_TX_PA_TEMP_COMP_BNon1                   = 0xDf72,
        // EN_NV_ID_TX_ATTEN_TABLE_BNon1                        = 0xDf73,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon1                        = 0xDf74,
+        /*add for V9R1_6361 End*/
        // EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon1               = 0xDf75,
     /*BEGIN DTS2014041603793 c00203521 modify for B28全频段特性*/
     /*Band128 相关NV项*/
@@ -1987,9 +2179,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B128              = 0xDfa8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B128              = 0xDfa9,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B128                           = 0xDfaa,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B128                          = 0xDfab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B128                         = 0xDfac,
         EN_NV_ID_LTE_OTHER_COMP_B128         = 0xDfad,
@@ -1997,6 +2193,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B128                    = 0xDfae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B128                    = 0xDfaf,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B128                    = 0xDfb0,
         //EN_NV_ID_TX_RF_BB_ATT_B128                         = 0xDfb0,
@@ -2004,6 +2201,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B128                      = 0xDfb2,
         //EN_NV_ID_TX_ATTEN_TABLE_B128                       = 0xDfb3,
         //EN_NV_ID_POWERDET_VOLTAGE_B128                     = 0xDfb4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B128                 = 0xDfb5,
         EN_NV_ID_LTE_TX_PD_PARA_B128                       = 0xDfb6,
         EN_NV_ID_TX_ET_BAND_PARA_B128                      = 0xDfb7,
@@ -2043,9 +2241,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B29              = 0xDfe8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B29              = 0xDfe9,
 
+        /* modify by wangrui mpr begin */
         EN_NV_ID_LTE_TX_MPR_B29                          = 0xDfea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B29                         = 0xDfeb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B29                         = 0xDfec,
         EN_NV_ID_LTE_OTHER_COMP_B29                      = 0xDfed,
@@ -2053,6 +2255,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B29                   = 0xDfee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B29                   = 0xDfef,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B29                    = 0xDff0,
         //EN_NV_ID_TX_RF_BB_ATT_B29                       = 0xDff0,
@@ -2060,6 +2263,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B29                     = 0xDff2,
         //EN_NV_ID_TX_ATTEN_TABLE_B29                        = 0xDff3,
         //EN_NV_ID_POWERDET_VOLTAGE_B29                        = 0xDff4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B29                = 0xDff5,
         EN_NV_ID_LTE_TX_PD_PARA_B29                      = 0xDff6,
         EN_NV_ID_TX_ET_BAND_PARA_B29                     = 0xDff7,
@@ -2097,9 +2301,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B32              = 0xe028,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B32              = 0xe029,
 
+        /* modify by wangrui mpr begin */
         EN_NV_ID_LTE_TX_MPR_B32                          = 0xe02a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B32                         = 0xe02b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B32                         = 0xe02c,
         EN_NV_ID_LTE_OTHER_COMP_B32                      = 0xe02d,
@@ -2107,6 +2315,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B32                   = 0xe02e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B32                   = 0xe02f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B32                    = 0xe030,
         //EN_NV_ID_TX_RF_BB_ATT_B32                       = 0xe030,
@@ -2114,6 +2323,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_B32                     = 0xe032,
         //EN_NV_ID_TX_ATTEN_TABLE_B32                        = 0xe033,
         //EN_NV_ID_POWERDET_VOLTAGE_B32                        = 0xe034,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B32                = 0xe035,
         EN_NV_ID_LTE_TX_PD_PARA_B32                      = 0xe036,
         EN_NV_ID_TX_ET_BAND_PARA_B32                     = 0xe037,
@@ -2149,9 +2359,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B30               = 0xe068,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B30               = 0xe069,
 
+        /* modify by wangrui mpr begin */
         EN_NV_ID_LTE_TX_MPR_B30                           = 0xe06a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B30                          = 0xe06b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B30                          = 0xe06c,
         EN_NV_ID_LTE_OTHER_COMP_B30                       = 0xe06d,
@@ -2159,6 +2373,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B30                     = 0xe06e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B30                     = 0xe06f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_B30                       = 0xe070,
         //EN_NV_ID_TX_RF_BIAS_B30                         = 0xe071,
@@ -2166,6 +2381,7 @@ extern "C" {
         //EN_NV_ID_TX_ATTEN_TABLE_B30                     = 0xe073,
         //EN_NV_ID_POWERDET_VOLTAGE_B30                   = 0xe074,
 
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B30                 = 0xe075,
         EN_NV_ID_LTE_TX_PD_PARA_B30                       = 0xe076,
         EN_NV_ID_TX_ET_BAND_PARA_B30                      = 0xe077,
@@ -2214,6 +2430,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon6                   = 0xe0ae,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon6                   = 0xe0af,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_BNon6                    = 0xe0b0,
         //EN_NV_ID_TX_RF_BB_ATT_BNon6                       = 0xe0b0,
@@ -2221,6 +2438,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_BNon6                   = 0xe0b2,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon6                        = 0xe0b3,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon6                        = 0xe0b4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon6               = 0xe0b5,
 
         EN_NV_ID_FTM_CAND_CELL_LIST_BNon7                 = 0xe0c0,
@@ -2254,6 +2472,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon7                   = 0xe0ee,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon7                   = 0xe0ef,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_BNon7                    = 0xe0f0,
         //EN_NV_ID_TX_RF_BB_ATT_BNon7                       = 0xe0f0,
@@ -2261,6 +2480,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_BNon7                   = 0xe0f2,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon7                        = 0xe0f3,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon7                        = 0xe0f4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon7               = 0xe0f5,
 
         EN_NV_ID_FTM_CAND_CELL_LIST_BNon8                 = 0xe100,
@@ -2295,6 +2515,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon8                   = 0xe12e,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon8                   = 0xe12f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_BNon8                    = 0xe130,
         //EN_NV_ID_TX_RF_BB_ATT_BNon8                       = 0xe130,
@@ -2302,6 +2523,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_BNon8                   = 0xe132,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon8                        = 0xe133,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon8                        = 0xe134,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon8               = 0xe135,
 
         /* 非标频段begin */
@@ -2336,6 +2558,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon9                   = 0xe16e,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon9                   = 0xe16f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_BNon9                    = 0xe170,
         //EN_NV_ID_TX_RF_BB_ATT_BNon9                       = 0xe170,
@@ -2343,6 +2566,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_BNon9                   = 0xe172,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon9                        = 0xe173,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon9                        = 0xe174,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon9               = 0xe175,
 
         EN_NV_ID_FTM_CAND_CELL_LIST_BNon10                 = 0xe180,
@@ -2376,6 +2600,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon10                   = 0xe1ae,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon10                   = 0xe1af,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_BNon10                    = 0xe1b0,
         //EN_NV_ID_TX_RF_BB_ATT_BNon10                       = 0xe1b0,
@@ -2383,6 +2608,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_BNon10                   = 0xe1b2,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon10                        = 0xe1b3,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon10                        = 0xe1b4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon10               = 0xe1b5,
 
         EN_NV_ID_FTM_CAND_CELL_LIST_BNon11                 = 0xe1c0,
@@ -2416,6 +2642,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon11                   = 0xe1ee,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon11                   = 0xe1ef,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_BNon11                    = 0xe1f0,
         //EN_NV_ID_TX_RF_BB_ATT_BNon11                       = 0xe1f0,
@@ -2423,6 +2650,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_BNon11                   = 0xe1f2,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon11                        = 0xe1f3,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon11                        = 0xe1f4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon11               = 0xe1f5,
         EN_NV_ID_FTM_CAND_CELL_LIST_BNon12                 = 0xe200,
         EN_NV_ID_LTE_RX_CALIBRATION_FREQ_BNon12            = 0xe201,
@@ -2463,6 +2691,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_BNon12                   = 0xe232,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon12                        = 0xe233,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon12                        = 0xe234,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon12               = 0xe235,
         /* 非标频段begin */
         EN_NV_ID_FTM_CAND_CELL_LIST_BNon13                 = 0xe240,
@@ -2496,6 +2725,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon13                   = 0xe26e,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon13                   = 0xe26f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_BNon13                    = 0xe270,
         //EN_NV_ID_TX_RF_BB_ATT_BNon13                       = 0xe270,
@@ -2503,6 +2733,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_BNon13                   = 0xe272,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon13                        = 0xe273,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon13                        = 0xe274,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon13               = 0xe275,
 
         EN_NV_ID_FTM_CAND_CELL_LIST_BNon14                 = 0xe280,
@@ -2536,6 +2767,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon14                   = 0xe2ae,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon14                   = 0xe2af,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_BNon14                    = 0xe2b0,
         //EN_NV_ID_TX_RF_BB_ATT_BNon14                       = 0xe2b0,
@@ -2543,6 +2775,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_BNon14                   = 0xe2b2,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon14                        = 0xe2b3,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon14                        = 0xe2b4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon14               = 0xe2b5,
 
         EN_NV_ID_FTM_CAND_CELL_LIST_BNon15                 = 0xe2c0,
@@ -2582,6 +2815,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_BNon15                   = 0xe2f2,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon15                        = 0xe2f3,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon15                        = 0xe2f4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon15               = 0xe2f5,
 	    /* BEGIN: Added by y00272211, 2015/5/14   问题单号:V7R5_AMPR*/
 	    EN_NV_ID_LTE_TX_AMPR_NS03_B15                      = 0xe2f6,
@@ -2619,6 +2853,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon16                   = 0xe32e,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon16                   = 0xe32f,
 
+        /*add for V9R1_6361 Begin*/
 
         EN_NV_ID_LTE_TX_ANT_SEL_BNon16                    = 0xe220,
         //EN_NV_ID_TX_RF_BB_ATT_BNon16                       = 0xe330,
@@ -2626,6 +2861,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_BNon16                   = 0xe332,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon16                        = 0xe333,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon16                        = 0xe334,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon16               = 0xe335,
 	    /* BEGIN: Added by y00272211, 2015/5/14   问题单号:V7R5_AMPR*/
 	    EN_NV_ID_LTE_TX_AMPR_NS03_B16                      = 0xe336,
@@ -2836,6 +3072,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B20        = 0xeb16,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B20         = 0xeb17,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B20         = 0xeb18,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B20                    = 0xeb19,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B20                  = 0xeb1a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B20                  = 0xeb1b,
@@ -2864,6 +3101,7 @@ extern "C" {
         EN_NV_ID_RF_CA_RCCODE_B20                        = 0xeb34,
 
 
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_B40                     = 0xeb40,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B40    =    0xeb41,
@@ -2886,6 +3124,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B40        = 0xeb56,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B40         = 0xeb57,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B40         = 0xeb58,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B40                    = 0xeb59,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B40                  = 0xeb5a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B40                  = 0xeb5b,
@@ -2893,6 +3132,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B40                       = 0xeb5d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B40               = 0xeb5e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B40              = 0xeb5f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B40               = 0xeb65,
         EN_NV_ID_LTE_TX_PD_PWR_TABLE_B40              = 0xeb66,
@@ -2932,6 +3172,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B38        = 0xeb96,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B38         = 0xeb97,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B38         = 0xeb98,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B38                    = 0xeb99,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B38                  = 0xeb9a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B38                  = 0xeb9b,
@@ -2955,6 +3196,7 @@ extern "C" {
         EN_NV_ID_DPD_FAC_LUT_01_B38                    = 0xebb2,
         EN_NV_ID_DPD_FAC_LUT_02_B38                           = 0xebb3,
         EN_NV_ID_RF_CA_RCCODE_B38                        = 0xebb4,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_B41                     = 0xebc0,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B41    =    0xebc1,
@@ -2977,6 +3219,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B41        = 0xebd6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B41         = 0xebd7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B41         = 0xebd8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B41                    = 0xebd9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B41                  = 0xebda,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B41                  = 0xebdb,
@@ -3000,6 +3243,7 @@ extern "C" {
         EN_NV_ID_DPD_FAC_LUT_01_B41                    = 0xebf2,
         EN_NV_ID_DPD_FAC_LUT_02_B41                           = 0xebf3,
         EN_NV_ID_RF_CA_RCCODE_B41                        = 0xebf4,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_B7                      = 0xec00,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B7    =    0xec01,
@@ -3022,6 +3266,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B7         = 0xec16,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B7          = 0xec17,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B7          = 0xec18,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B7                    = 0xec19,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B7                  = 0xec1a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B7                  = 0xec1b,
@@ -3045,6 +3290,7 @@ extern "C" {
         EN_NV_ID_DPD_FAC_LUT_01_B7                    = 0xec32,
         EN_NV_ID_DPD_FAC_LUT_02_B7                           = 0xec33,
         EN_NV_ID_RF_CA_RCCODE_B7                        = 0xec34,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_B3                      = 0xed00,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B3    =    0xed01,
@@ -3067,6 +3313,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B3         = 0xed16,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B3          = 0xed17,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B3          = 0xed18,
+         /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B3                    = 0xed19,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B3                  = 0xed1a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B3                  = 0xed1b,
@@ -3090,6 +3337,7 @@ extern "C" {
         EN_NV_ID_DPD_FAC_LUT_01_B3                     = 0xed32,
         EN_NV_ID_DPD_FAC_LUT_02_B3                           = 0xed33,
         EN_NV_ID_RF_CA_RCCODE_B3                        = 0xed34,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_B1                      = 0xed40,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B1    =    0xed41,
@@ -3112,6 +3360,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B1         = 0xed56,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B1          = 0xed57,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B1          = 0xed58,
+         /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B1                    = 0xed59,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B1                  = 0xed5a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B1                  = 0xed5b,
@@ -3135,6 +3384,7 @@ extern "C" {
         EN_NV_ID_DPD_FAC_LUT_01_B1                    = 0xed72,
         EN_NV_ID_DPD_FAC_LUT_02_B1                           = 0xed73,
         EN_NV_ID_RF_CA_RCCODE_B1                        = 0xed74,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_B5                      = 0xed80,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B5    =    0xed81,
@@ -3157,6 +3407,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B5         = 0xed96,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B5          = 0xed97,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B5          = 0xed98,
+         /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B5                    = 0xed99,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B5                  = 0xed9a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B5                  = 0xed9b,
@@ -3183,6 +3434,7 @@ extern "C" {
         EN_NV_ID_DPD_FAC_LUT_02_B5                           = 0xedb3,
         EN_NV_ID_RF_CA_RCCODE_B5                        = 0xedb4,
 
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_B8                      = 0xedc0,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B8    =    0xedc1,
@@ -3205,6 +3457,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B8         = 0xedd6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B8          = 0xedd7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B8          = 0xedd8,
+         /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B8                    = 0xedd9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B8                  = 0xedda,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B8                  = 0xeddb,
@@ -3228,6 +3481,7 @@ extern "C" {
         EN_NV_ID_DPD_FAC_LUT_01_B8                    = 0xedf2,
         EN_NV_ID_DPD_FAC_LUT_02_B8                           = 0xedf3,
         EN_NV_ID_RF_CA_RCCODE_B8                        = 0xedf4,
+        /*add for V9R1_6361 End*/
 
         /* modify by w00184272 for 所有band begin*/
         EN_NV_ID_ANT_MODEM_LOSS_B19                     = 0xEE00,
@@ -3252,6 +3506,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B19        = 0xEE16,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B19         = 0xEE17,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B19         = 0xEE18,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B19                     = 0xEE19,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B19                   = 0xEE1a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B19                   = 0xEE1b,
@@ -3276,6 +3531,7 @@ extern "C" {
         EN_NV_ID_DPD_FAC_LUT_02_B19                           = 0xee33,
         EN_NV_ID_RF_CA_RCCODE_B19                        = 0xee34,
 
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_B21                     = 0xEE40,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B21    =    0xEE41,
@@ -3299,6 +3555,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B21        = 0xEE56,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B21         = 0xEE57,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B21         = 0xEE58,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B21                     = 0xEE59,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B21                   = 0xEE5a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B21                   = 0xEE5b,
@@ -3322,6 +3579,7 @@ extern "C" {
         EN_NV_ID_DPD_FAC_LUT_01_B21                    = 0xee72,
         EN_NV_ID_DPD_FAC_LUT_02_B21                           = 0xee73,
         EN_NV_ID_RF_CA_RCCODE_B21                        = 0xee74,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_B2                      = 0xEE80,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B2    =    0xEE81,
@@ -3345,6 +3603,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B2         = 0xEE96,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B2          = 0xEE97,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B2          = 0xEE98,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B2                     = 0xEE99,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B2                   = 0xEE9a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B2                   = 0xEE9b,
@@ -3352,6 +3611,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B2                        = 0xEE9d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B2                = 0xEE9e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B2               = 0xEE9f,
+        /*add for V9R1_6361 End*/
 
 
 
@@ -3394,6 +3654,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B4         = 0xEEd6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B4          = 0xEEd7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B4          = 0xEEd8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B4                     = 0xEEd9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B4                   = 0xEEda,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B4                   = 0xEEdb,
@@ -3401,6 +3662,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B4                        = 0xEEdd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B4                = 0xEEde,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B4               = 0xEEdf,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B4                = 0xEEe5,
         EN_NV_ID_LTE_TX_PD_PWR_TABLE_B4               = 0xEEe6,
@@ -3441,6 +3703,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B6         = 0xEf16,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B6          = 0xEf17,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B6          = 0xEf18,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B6                     = 0xEf19,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B6                   = 0xEf1a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B6                   = 0xEf1b,
@@ -3448,6 +3711,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B6                        = 0xEf1d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B6                = 0xEf1e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B6               = 0xEf1f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B6                = 0xEf25,
@@ -3489,6 +3753,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B9         = 0xEf56,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B9          = 0xEf57,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B9          = 0xEf58,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B9                     = 0xEf59,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B9                   = 0xEf5a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B9                   = 0xEf5b,
@@ -3496,6 +3761,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B9                        = 0xEf5d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B9                = 0xEf5e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B9               = 0xEf5f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B9                = 0xEf65,
@@ -3537,6 +3803,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B10        = 0xEf96,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B10         = 0xEf97,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B10         = 0xEf98,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B10                    = 0xEf99,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B10                  = 0xEf9a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B10                  = 0xEf9b,
@@ -3544,6 +3811,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B10                       = 0xEf9d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B10               = 0xEf9e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B10              = 0xEf9f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B10                = 0xEfa5,
@@ -3589,6 +3857,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B11        = 0xEfd6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B11         = 0xEfd7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B11         = 0xEfd8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B11                    = 0xEfd9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B11                  = 0xEfda,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B11                  = 0xEfdb,
@@ -3596,6 +3865,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B11                       = 0xEfdd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B11               = 0xEfde,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B11              = 0xEfdf,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B11                = 0xEfe5,
@@ -3637,6 +3907,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B12        = 0xf016,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B12         = 0xf017,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B12         = 0xf018,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B12                    = 0xf019,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B12                  = 0xf01a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B12                  = 0xf01b,
@@ -3644,6 +3915,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B12                       = 0xf01d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B12               = 0xf01e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B12              = 0xf01f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B12                = 0xf025,
@@ -3685,6 +3957,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B13        = 0xf056,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B13         = 0xf057,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B13         = 0xf058,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B13                    = 0xf059,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B13                  = 0xf05a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B13                  = 0xf05b,
@@ -3692,6 +3965,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B13                       = 0xf05d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B13               = 0xf05e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B13              = 0xf05f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B13                = 0xf065,
@@ -3734,6 +4008,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B14        = 0xf096,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B14         = 0xf097,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B14         = 0xf098,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B14                    = 0xf099,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B14                  = 0xf09a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B14                  = 0xf09b,
@@ -3741,6 +4016,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B14                       = 0xf09d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B14               = 0xf09e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B14              = 0xf09f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B14                = 0xf0a5,
@@ -3787,6 +4063,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B17        = 0xf0d6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B17         = 0xf0d7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B17         = 0xf0d8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B17                    = 0xf0d9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B17                  = 0xf0da,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B17                  = 0xf0db,
@@ -3794,6 +4071,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B17                       = 0xf0dd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B17               = 0xf0de,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B17              = 0xf0df,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B17                = 0xf0e5,
@@ -3839,6 +4117,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B18        = 0xf116,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B18         = 0xf117,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B18         = 0xf118,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B18                    = 0xf119,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B18                  = 0xf11a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B18                  = 0xf11b,
@@ -3846,6 +4125,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B18                       = 0xf11d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B18               = 0xf11e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B18              = 0xf11f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B18                = 0xf125,
@@ -3891,6 +4171,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B22        = 0xf156,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B22         = 0xf157,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B22         = 0xf158,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B22                    = 0xf159,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B22                  = 0xf15a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B22                  = 0xf15b,
@@ -3898,6 +4179,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B22                       = 0xf15d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B22               = 0xf15e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B22              = 0xf15f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B22                = 0xf165,
@@ -3943,6 +4225,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B23        = 0xf196,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B23         = 0xf197,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B23         = 0xf198,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B23                    = 0xf199,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B23                  = 0xf19a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B23                  = 0xf19b,
@@ -3950,6 +4233,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B23                       = 0xf19d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B23               = 0xf19e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B23              = 0xf19f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B23                = 0xf1a5,
@@ -3991,6 +4275,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B24        = 0xf1d6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B24         = 0xf1d7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B24         = 0xf1d8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B24                    = 0xf1d9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B24                  = 0xf1da,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B24                  = 0xf1db,
@@ -3998,6 +4283,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B24                       = 0xf1dd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B24               = 0xf1de,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B24              = 0xf1df,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B24                = 0xf1e5,
@@ -4039,6 +4325,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B25        = 0xf216,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B25         = 0xf217,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B25         = 0xf218,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B25                    = 0xf219,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B25                  = 0xf21a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B25                  = 0xf21b,
@@ -4046,6 +4333,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B25                       = 0xf21d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B25               = 0xf21e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B25              = 0xf21f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B25                = 0xf225,
@@ -4087,6 +4375,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B33        = 0xf256,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B33         = 0xf257,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B33         = 0xf258,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B33                    = 0xf259,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B33                  = 0xf25a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B33                  = 0xf25b,
@@ -4094,6 +4383,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B33                       = 0xf25d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B33               = 0xf25e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B33              = 0xf25f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B33                = 0xf265,
@@ -4139,6 +4429,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B34        = 0xf296,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B34         = 0xf297,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B34         = 0xf298,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B34                    = 0xf299,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B34                  = 0xf29a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B34                  = 0xf29b,
@@ -4146,6 +4437,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B34                       = 0xf29d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B34               = 0xf29e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B34              = 0xf29f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B34                = 0xf2a5,
@@ -4187,6 +4479,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B35        = 0xf2d6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B35         = 0xf2d7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B35         = 0xf2d8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B35                    = 0xf2d9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B35                  = 0xf2da,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B35                  = 0xf2db,
@@ -4194,6 +4487,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B35                       = 0xf2dd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B35               = 0xf2de,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B35              = 0xf2df,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B35                = 0xf2e5,
@@ -4235,6 +4529,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B36        = 0xf316,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B36         = 0xf317,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B36         = 0xf318,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B36                    = 0xf319,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B36                  = 0xf31a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B36                  = 0xf31b,
@@ -4242,6 +4537,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B36                       = 0xf31d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B36               = 0xf31e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B36              = 0xf31f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B36                = 0xf325,
@@ -4283,6 +4579,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B37        = 0xf356,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B37         = 0xf357,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B37         = 0xf358,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B37                    = 0xf359,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B37                  = 0xf35a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B37                  = 0xf35b,
@@ -4290,6 +4587,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B37                       = 0xf35d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B37               = 0xf35e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B37              = 0xf35f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B37                = 0xf365,
@@ -4331,6 +4629,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B42        = 0xf396,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B42         = 0xf397,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B42         = 0xf398,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B42                    = 0xf399,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B42                  = 0xf39a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B42                  = 0xf39b,
@@ -4338,6 +4637,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B42                       = 0xf39d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B42               = 0xf39e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B42              = 0xf39f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B42                = 0xf3a5,
@@ -4379,6 +4679,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B43        = 0xf3d6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B43         = 0xf3d7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B43         = 0xf3d8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B43                    = 0xf3d9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B43                  = 0xf3da,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B43                  = 0xf3db,
@@ -4386,6 +4687,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B43                       = 0xf3dd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B43               = 0xf3de,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B43              = 0xf3df,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B43                = 0xf3e5,
@@ -4427,6 +4729,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B39        = 0xf416,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B39         = 0xf417,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B39         = 0xf418,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B39                    = 0xf419,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B39                  = 0xf41a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B39                  = 0xf41b,
@@ -4434,6 +4737,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B39                       = 0xf41d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B39               = 0xf41e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B39              = 0xf41f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B39                = 0xf425,
         EN_NV_ID_LTE_TX_PD_PWR_TABLE_B39               = 0xf426,
@@ -4474,6 +4778,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B28        = 0xf456,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B28         = 0xf457,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B28         = 0xf458,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B28                   = 0xf459,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B28                 = 0xf45a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B28                 = 0xf45b,
@@ -4522,6 +4827,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon1         = 0xf457,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon1         = 0xf458,
         */
+        /*add for V9R1_6361 Begin*/
     /*    EN_NV_ID_IIP2_CAL_TABLE_BNon1                    = 0xf459,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon1                 = 0xf45a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon1                  = 0xf45b,
@@ -4530,6 +4836,7 @@ extern "C" {
         EN_NV_ID_PA_POWER_DIFFERENCE_BNon1               = 0xf45e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon1              = 0xf45f,
         */
+        /*add for V9R1_6361 End*/
     /*BEGIN DTS2014041603793 c00203521 modify for B28全频段特性*/
        /*BAND128 生产NV*/
         EN_NV_ID_ANT_MODEM_LOSS_B128                        = 0xf480,
@@ -4553,6 +4860,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B128       = 0xf496,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B128        = 0xf497,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B128        = 0xf498,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B128                        = 0xf499,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B128                  = 0xf49a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B128                  = 0xf49b,
@@ -4601,6 +4909,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B29       = 0xf4d6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B29        = 0xf4d7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B29        = 0xf4d8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B29                        = 0xf4d9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B29                  = 0xf4da,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B29                  = 0xf4db,
@@ -4648,6 +4957,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B32       = 0xf516,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B32        = 0xf517,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B32        = 0xf518,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B32                        = 0xf519,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B32                  = 0xf51a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B32                  = 0xf51b,
@@ -4694,6 +5004,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B30        = 0xf556,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B30         = 0xf557,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B30         = 0xf558,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B30                     = 0xf559,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B30                   = 0xf55a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B30                   = 0xf55b,
@@ -4741,6 +5052,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon6        = 0xf596,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon6         = 0xf597,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon6         = 0xf598,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon6                    = 0xf599,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon6                 = 0xf59a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon6                  = 0xf59b,
@@ -4748,6 +5060,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon6                       = 0xf59d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon6               = 0xf59e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon6              = 0xf59f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon7                     = 0xf5c0,
@@ -4772,6 +5085,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon7        = 0xf5d6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon7         = 0xf5d7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon7         = 0xf5d8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon7                    = 0xf5d9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon7                 = 0xf5da,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon7                  = 0xf5db,
@@ -4779,6 +5093,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon7                       = 0xf5dd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon7               = 0xf5de,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon7              = 0xf5df,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon8                     = 0xf600,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_BNon8    =    0xf601,
@@ -4801,6 +5116,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon8        = 0xf616,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon8         = 0xf617,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon8         = 0xf618,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon8                    = 0xf619,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon8                 = 0xf61a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon8                  = 0xf61b,
@@ -4808,6 +5124,7 @@ extern "C" {
         EN_NV_ID_RF_TXIQ_CAL_BNon8                       = 0xf61d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon8               = 0xf61e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon8              = 0xf61f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon9                     = 0xf640,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_BNon9    =    0xf641,
@@ -4831,6 +5148,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon9        = 0xf656,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon9         = 0xf657,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon9         = 0xf658,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon9                    = 0xf659,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon9                 = 0xf65a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon9                  = 0xf65b,
@@ -4838,6 +5156,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon9                       = 0xf65d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon9               = 0xf65e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon9              = 0xf65f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon10                     = 0xf680,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_BNon10    =    0xf681,
@@ -4860,6 +5179,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon10        = 0xf696,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon10         = 0xf697,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon10         = 0xf698,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon10                   = 0xf699,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon10                = 0xf69a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon10                 = 0xf69b,
@@ -4867,6 +5187,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon10                      = 0xf69d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon10              = 0xf69e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon10             = 0xf69f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon11                     = 0xf6c0,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_BNon11    =    0xf6c1,
@@ -4889,6 +5210,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon11        = 0xf6d6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon11         = 0xf6d7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon11         = 0xf6d8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon11                   = 0xf6d9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon11                = 0xf6da,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon11                 = 0xf6db,
@@ -4896,6 +5218,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon11                      = 0xf6dd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon11              = 0xf6de,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon11             = 0xf6df,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon12                     = 0xf700,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_BNon12    =    0xf701,
@@ -4918,6 +5241,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon12        = 0xf716,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon12         = 0xf717,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon12         = 0xf718,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon12                   = 0xf719,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon12                = 0xf71a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon12                 = 0xf71b,
@@ -4925,6 +5249,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon12                      = 0xf71d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon12              = 0xf71e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon12             = 0xf71f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon13                     = 0xf740,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_BNon13    =    0xf741,
@@ -4947,6 +5272,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon13        = 0xf756,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon13         = 0xf757,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon13         = 0xf758,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon13                   = 0xf759,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon13                = 0xf75a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon13                 = 0xf75b,
@@ -4954,6 +5280,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon13                      = 0xf75d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon13              = 0xf75e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon13             = 0xf75f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon14                     = 0xf780,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_BNon14    =    0xf781,
@@ -4976,6 +5303,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon14        = 0xf796,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon14         = 0xf797,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon14         = 0xf798,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon14                   = 0xf799,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon14                = 0xf79a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon14                 = 0xf79b,
@@ -4983,6 +5311,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon14                      = 0xf79d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon14              = 0xf79e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon14             = 0xf79f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon15                     = 0xf7c0,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_BNon15    =    0xf7c1,
@@ -5005,6 +5334,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon15        = 0xf7d6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon15         = 0xf7d7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon15         = 0xf7d8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon15                   = 0xf7d9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon15                = 0xf7da,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon15                 = 0xf7db,
@@ -5012,6 +5342,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon15                      = 0xf7dd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon15              = 0xf7de,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon15             = 0xf7df,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon16                     = 0xf800,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_BNon16    =    0xf801,
@@ -5034,6 +5365,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon16        = 0xf816,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon16         = 0xf817,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon16         = 0xf818,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon16                   = 0xf819,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon16                = 0xf81a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon16                 = 0xf81b,
@@ -5041,6 +5373,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon16                      = 0xf81d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon16              = 0xf81e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon16             = 0xf81f,
+        /*add for V9R1_6361 End*/
         /* v7r5 band26 */
         EN_NV_ID_ANT_MODEM_LOSS_B26                     = 0xf820,
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B26    =    0xf821,
@@ -5063,6 +5396,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B26        = 0xf836,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B26         = 0xf837,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B26         = 0xf838,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B26                    = 0xf839,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B26                  = 0xf83a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B26                  = 0xf83b,
@@ -5070,6 +5404,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B26                     = 0xf83d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B26               = 0xf83e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B26              = 0xf83f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B26                = 0xf845,
@@ -5107,7 +5442,9 @@ extern "C" {
         EN_NV_ID_HI6360_UL_PARA                         = 0xD3CC,
         EN_NV_ID_EMU_PARA                               = 0xD3CE,
 
+        /* modify by lisahgnfeng begin */
         EN_NV_ID_PHY_FUNC_VERIFY_SWITCH_PARA            = 0xD3E0,
+        /* modify by lisahgnfeng end */
 
         /*tcx0*/
         EN_NV_ID_TCXO_DYNAMIC_CONFIG_PARA               = 0xD3E2,
@@ -5331,6 +5668,7 @@ extern "C" {
         EN_NV_APT_PDM_HOLD_NTX_STRU                    = 0xD531,
 
 
+        /*begin: add for feature k3v3+tas 2015/02/25*/
         EN_NV_ID_TAS_GPIO_PARA                           = 0xD5d0,
 
         EN_NV_ID_TAS_DPDT_PROTECT_PARA                   = 0xD5d1,
@@ -5339,8 +5677,11 @@ extern "C" {
         EN_NV_ID_TAS_CLG_MODE_GPIO_MAP                   = 0xD5d4,
         EN_NV_ID_TAS_HAPPY_THD_PARA                      = 0xD5d5,
         EN_NV_ID_MAS_THR_PARA                            = 0xD5d6,
+        /*end: add for feature tas 2015/02/25*/
 
+        /*begin: add for band29 and band32 RX  2015/12/25*/
         EN_NV_LPHY_SINGLE_RX_BAND_CAL_PARA               = 0xD5d7,
+        /*end: add for band29 and band32 RX  2015/12/25*/
         EN_NV_BT_DBB_REDUCE_STRU                        = 0xD5d8,
         EN_NV_ET_APT_MIPI_CMD_LAB_PARA                  = 0xD5D9,
         EN_NV_ET_SELECT_WORK_MODE_LAB_PARA              = 0xD5DA,
@@ -5503,6 +5844,7 @@ extern "C" {
             NV_BAND_FE_PARA_STRU_INDEX_031               = 0xD5AF,
     #endif
 
+        /*begin: add for feature k3v3+tas 2015/02/25*/
         EN_NV_ID_TAS_GPIO_PARA                           = 0xD5d0,
 
         EN_NV_ID_TAS_DPDT_PROTECT_PARA                   = 0xD5d1,
@@ -5510,6 +5852,7 @@ extern "C" {
         EN_NV_ID_TAS_BLIND_SW_THD_PARA                   = 0xD5d3,
         EN_NV_ID_TAS_CLG_MODE_GPIO_MAP                   = 0xD5d4,
         EN_NV_ID_TAS_HAPPY_THD_PARA                      = 0xD5d5,
+        /*end: add for feature tas 2015/02/25*/
 
         EN_NV_ID_MAS_THR_PARA                            = 0xD5d6,
         EN_NV_LPHY_SINGLE_RX_BAND_CAL_PARA               = 0xD5d7,
@@ -5560,8 +5903,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B19             = 0xD928,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B19             = 0xD929,
         EN_NV_ID_LTE_TX_MPR_B19                         = 0xD92a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B19                     = 0xD92b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B19                        = 0xD92c,
         EN_NV_ID_LTE_OTHER_COMP_B19         = 0xD92d,
@@ -5569,12 +5915,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B19                    = 0xD92e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B19                    = 0xD92f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B19                       = 0xD930,
         //EN_NV_ID_TX_RF_BIAS_B19                         = 0xD931,
         EN_NV_ID_TX_PA_TEMP_COMP_B19                    = 0xD932,
         //EN_NV_ID_TX_ATTEN_TABLE_B19                     = 0xD933,
         //EN_NV_ID_POWERDET_VOLTAGE_B19                   = 0xD934,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B19                = 0xD935,
         EN_NV_ID_LTE_TX_PD_PARA_B19                      = 0xD936,
         EN_NV_ID_TX_ET_BAND_PARA_B19                      = 0xD937,
@@ -5611,20 +5959,25 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B21             = 0xD968,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B21             = 0xD969,
         EN_NV_ID_LTE_TX_MPR_B21                         = 0xD96a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B21                     = 0xD96b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B21                        = 0xD96c,
         EN_NV_ID_LTE_OTHER_COMP_B21         = 0xD96d,
 
         EN_NV_ID_LTE_TX_AMPR_NS05_B21                   = 0xD96e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B21                   = 0xD96f,
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B21                       = 0xD970,
         //EN_NV_ID_TX_RF_BIAS_B21                         = 0xD971,
         EN_NV_ID_TX_PA_TEMP_COMP_B21                   = 0xD972,
         //EN_NV_ID_TX_ATTEN_TABLE_B21                        = 0xD973,
         //EN_NV_ID_POWERDET_VOLTAGE_B21                        = 0xD974,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B21               = 0xD975,
         EN_NV_ID_LTE_TX_PD_PARA_B21                     = 0xD976,
         EN_NV_ID_TX_ET_BAND_PARA_B21                     = 0xD977,
@@ -5660,8 +6013,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B2              = 0xD9a8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B2              = 0xD9a9,
         EN_NV_ID_LTE_TX_MPR_B2                          = 0xD9aa,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B2                      = 0xD9ab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B2                         = 0xD9ac,
         EN_NV_ID_LTE_OTHER_COMP_B2         = 0xD9ad,
@@ -5669,12 +6025,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B2                   = 0xD9ae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B2                   = 0xD9af,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B2                       = 0xD9b0,
         //EN_NV_ID_TX_RF_BIAS_B2                         = 0xD9b1,
         EN_NV_ID_TX_PA_TEMP_COMP_B2                   = 0xD9b2,
         //EN_NV_ID_TX_ATTEN_TABLE_B2                        = 0xD9b3,
         //EN_NV_ID_POWERDET_VOLTAGE_B2                        = 0xD9b4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B2                = 0xD9b5,
         EN_NV_ID_LTE_TX_PD_PARA_B2                      = 0xD9b6,
         EN_NV_ID_TX_ET_BAND_PARA_B2                     = 0xD9b7,
@@ -5710,8 +6068,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B4              = 0xD9e8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B4              = 0xD9e9,
         EN_NV_ID_LTE_TX_MPR_B4                          = 0xD9ea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B4                      = 0xD9eb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B4                         = 0xD9ec,
         EN_NV_ID_LTE_OTHER_COMP_B4         = 0xD9ed,
@@ -5719,12 +6080,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B4                   = 0xD9ee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B4                   = 0xD9ef,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B4                      = 0xD9f0,
         //EN_NV_ID_TX_RF_BIAS_B4                        = 0xD9f1,
         EN_NV_ID_TX_PA_TEMP_COMP_B4                   = 0xD9f2,
         //EN_NV_ID_TX_ATTEN_TABLE_B4                      = 0xD9f3,
         //EN_NV_ID_POWERDET_VOLTAGE_B4                  = 0xD9f4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B4                = 0xD9f5,
         EN_NV_ID_LTE_TX_PD_PARA_B4                      = 0xD9f6,
         EN_NV_ID_TX_ET_BAND_PARA_B4                     = 0xD9f7,
@@ -5760,8 +6123,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B6              = 0xDa28,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B6              = 0xDa29,
         EN_NV_ID_LTE_TX_MPR_B6                          = 0xDa2a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B6                      = 0xDa2b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B6                         = 0xDa2c,
         EN_NV_ID_LTE_OTHER_COMP_B6         = 0xDa2d,
@@ -5769,12 +6135,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B6                   = 0xDa2e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B6                   = 0xDa2f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B6                      = 0xDa30,
         //EN_NV_ID_TX_RF_BIAS_B6                        = 0xDa31,
         EN_NV_ID_TX_PA_TEMP_COMP_B6                   = 0xDa32,
         //EN_NV_ID_TX_ATTEN_TABLE_B6                      = 0xDa33,
         //EN_NV_ID_POWERDET_VOLTAGE_B6                  = 0xDa34,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B6                = 0xDa35,
         EN_NV_ID_LTE_TX_PD_PARA_B6                      = 0xDa36,
         EN_NV_ID_TX_ET_BAND_PARA_B6                     = 0xDa37,
@@ -5810,8 +6178,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B9              = 0xDa68,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B9              = 0xDa69,
         EN_NV_ID_LTE_TX_MPR_B9                          = 0xDa6a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B9                      = 0xDa6b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B9                         = 0xDa6c,
         EN_NV_ID_LTE_OTHER_COMP_B9         = 0xDa6d,
@@ -5819,12 +6190,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B9                   = 0xDa6e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B9                   = 0xDa6f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B9                      = 0xDa70,
         //EN_NV_ID_TX_RF_BIAS_B9                        = 0xDa71,
         EN_NV_ID_TX_PA_TEMP_COMP_B9                   = 0xDa72,
         //EN_NV_ID_TX_ATTEN_TABLE_B9                      = 0xDa73,
         //EN_NV_ID_POWERDET_VOLTAGE_B9                  = 0xDa74,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B9                = 0xDa75,
         EN_NV_ID_LTE_TX_PD_PARA_B9                      = 0xDa76,
         EN_NV_ID_TX_ET_BAND_PARA_B9                     = 0xDa77,
@@ -5860,8 +6233,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B10             = 0xDaa8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B10             = 0xDaa9,
         EN_NV_ID_LTE_TX_MPR_B10                         = 0xDaaa,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B10                     = 0xDaab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B10                        = 0xDaac,
         EN_NV_ID_LTE_OTHER_COMP_B10         = 0xDaad,
@@ -5869,12 +6245,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B10                   = 0xDaae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B10                   = 0xDaaf,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B10                     = 0xDab0,
         //EN_NV_ID_TX_RF_BIAS_B10                       = 0xDab1,
         EN_NV_ID_TX_PA_TEMP_COMP_B10                   = 0xDab2,
         //EN_NV_ID_TX_ATTEN_TABLE_B10                     = 0xDab3,
         //EN_NV_ID_POWERDET_VOLTAGE_B10                 = 0xDab4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B10               = 0xDab5,
         EN_NV_ID_LTE_TX_PD_PARA_B10                     = 0xDab6,
         EN_NV_ID_TX_ET_BAND_PARA_B10                    = 0xDab7,
@@ -5910,8 +6288,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B11             = 0xDae8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B11             = 0xDae9,
         EN_NV_ID_LTE_TX_MPR_B11                         = 0xDaea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B11                     = 0xDaeb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B11                        = 0xDaec,
         EN_NV_ID_LTE_OTHER_COMP_B11         = 0xDaed,
@@ -5919,12 +6300,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B11                   = 0xDaee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B11                   = 0xDaef,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B11                     = 0xDaf0,
         //EN_NV_ID_TX_RF_BIAS_B11                       = 0xDaf1,
         EN_NV_ID_TX_PA_TEMP_COMP_B11                   = 0xDaf2,
         //EN_NV_ID_TX_ATTEN_TABLE_B11                     = 0xDaf3,
         //EN_NV_ID_POWERDET_VOLTAGE_B11                 = 0xDaf4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B11               = 0xDaf5,
         EN_NV_ID_LTE_TX_PD_PARA_B11                     = 0xDaf6,
         EN_NV_ID_TX_ET_BAND_PARA_B11                    = 0xDaf7,
@@ -5960,8 +6343,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B12             = 0xDb28,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B12             = 0xDb29,
         EN_NV_ID_LTE_TX_MPR_B12                         = 0xDb2a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B12                     = 0xDb2b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B12                        = 0xDb2c,
         EN_NV_ID_LTE_OTHER_COMP_B12         = 0xDb2d,
@@ -5969,12 +6355,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B12                   = 0xDb2e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B12                   = 0xDb2f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B12                     = 0xDb30,
         //EN_NV_ID_TX_RF_BIAS_B12                       = 0xDb31,
         EN_NV_ID_TX_PA_TEMP_COMP_B12                   = 0xDb32,
         //EN_NV_ID_TX_ATTEN_TABLE_B12                     = 0xDb33,
         //EN_NV_ID_POWERDET_VOLTAGE_B12                 = 0xDb34,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B12               = 0xDb35,
         EN_NV_ID_LTE_TX_PD_PARA_B12                     = 0xDb36,
         EN_NV_ID_TX_ET_BAND_PARA_B12                    = 0xDb37,
@@ -6010,8 +6398,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B13             = 0xDb68,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B13             = 0xDb69,
         EN_NV_ID_LTE_TX_MPR_B13                         = 0xDb6a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B13                     = 0xDb6b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B13                        = 0xDb6c,
         EN_NV_ID_LTE_OTHER_COMP_B13         = 0xDb6d,
@@ -6019,12 +6410,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B13                   = 0xDb6e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B13                   = 0xDb6f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B13                     = 0xDb70,
         //EN_NV_ID_TX_RF_BIAS_B13                       = 0xDb71,
         EN_NV_ID_TX_PA_TEMP_COMP_B13                   = 0xDb72,
         //EN_NV_ID_TX_ATTEN_TABLE_B13                     = 0xDb73,
         //EN_NV_ID_POWERDET_VOLTAGE_B13                 = 0xDb74,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B13               = 0xDb75,
         EN_NV_ID_LTE_TX_PD_PARA_B13                     = 0xDb76,
         EN_NV_ID_TX_ET_BAND_PARA_B13                    = 0xDb77,
@@ -6060,8 +6453,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B14             = 0xDba8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B14             = 0xDba9,
         EN_NV_ID_LTE_TX_MPR_B14                         = 0xDbaa,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B14                     = 0xDbab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B14                        = 0xDbac,
         EN_NV_ID_LTE_OTHER_COMP_B14         = 0xDbad,
@@ -6069,12 +6465,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B14                   = 0xDbae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B14                   = 0xDbaf,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B14                     = 0xDbb0,
         //EN_NV_ID_TX_RF_BIAS_B14                       = 0xDbb1,
         EN_NV_ID_TX_PA_TEMP_COMP_B14                   = 0xDbb2,
         //EN_NV_ID_TX_ATTEN_TABLE_B14                     = 0xDbb3,
         //EN_NV_ID_POWERDET_VOLTAGE_B14                 = 0xDbb4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B14               = 0xDbb5,
         EN_NV_ID_LTE_TX_PD_PARA_B14                     = 0xDbb6,
         EN_NV_ID_TX_ET_BAND_PARA_B14                    = 0xDbb7,
@@ -6110,8 +6508,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B17             = 0xDbe8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B17             = 0xDbe9,
         EN_NV_ID_LTE_TX_MPR_B17                         = 0xDbea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B17                     = 0xDbeb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B17                        = 0xDbec,
         EN_NV_ID_LTE_OTHER_COMP_B17         = 0xDbed,
@@ -6119,12 +6520,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B17                   = 0xDbee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B17                   = 0xDbef,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B17                     = 0xDbf0,
         //EN_NV_ID_TX_RF_BIAS_B17                       = 0xDbf1,
         EN_NV_ID_TX_PA_TEMP_COMP_B17                   = 0xDbf2,
         //EN_NV_ID_TX_ATTEN_TABLE_B17                        = 0xDbf3,
         //EN_NV_ID_POWERDET_VOLTAGE_B17                 = 0xDbf4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B17               = 0xDbf5,
         EN_NV_ID_LTE_TX_PD_PARA_B17                     = 0xDbf6,
         EN_NV_ID_TX_ET_BAND_PARA_B17                    = 0xDbf7,
@@ -6158,9 +6561,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B18              = 0xDc28,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B18              = 0xDc29,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B18                          = 0xDc2a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B18                      = 0xDc2b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B18                         = 0xDc2c,
         EN_NV_ID_LTE_OTHER_COMP_B18         = 0xDc2d,
@@ -6168,12 +6575,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B18                   = 0xDc2e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B18                   = 0xDc2f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B18                      = 0xDc30,
         //EN_NV_ID_TX_RF_BIAS_B18                        = 0xDc31,
         EN_NV_ID_TX_PA_TEMP_COMP_B18                   = 0xDc32,
         //EN_NV_ID_TX_ATTEN_TABLE_B18                    = 0xDc33,
         //EN_NV_ID_POWERDET_VOLTAGE_B18                  = 0xDc34,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B18               = 0xDc35,
         EN_NV_ID_LTE_TX_PD_PARA_B18                      = 0xDc36,
         EN_NV_ID_TX_ET_BAND_PARA_B18                    = 0xDc37,
@@ -6212,8 +6621,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B22             = 0xDc68,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B22             = 0xDc69,
         EN_NV_ID_LTE_TX_MPR_B22                         = 0xDc6a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B22                     = 0xDc6b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B22                        = 0xDc6c,
         EN_NV_ID_LTE_OTHER_COMP_B22         = 0xDc6d,
@@ -6221,15 +6633,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B22                   = 0xDc6e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B22                   = 0xDc6f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B22                       = 0xDc70,
         //EN_NV_ID_TX_RF_BIAS_B22                         = 0xDc71,
         EN_NV_ID_TX_PA_TEMP_COMP_B22                   = 0xDc72,
         //EN_NV_ID_TX_ATTEN_TABLE_B22                        = 0xDc73,
         //EN_NV_ID_POWERDET_VOLTAGE_B22                        = 0xDc74,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B22               = 0xDc75,
         EN_NV_ID_LTE_TX_PD_PARA_B22                     = 0xDC36,
         EN_NV_ID_TX_ET_BAND_PARA_B22                    = 0xDc77,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B22             = 0xDc78,
         EN_NV_ID_LTE_DPD_LAB_STRU_B22                    = 0xDc79,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B22 = 0xDc7a,
@@ -6262,8 +6677,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B23             = 0xDca8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B23             = 0xDca9,
         EN_NV_ID_LTE_TX_MPR_B23                         = 0xDcaa,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B23                     = 0xDcab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B23                        = 0xDcac,
         EN_NV_ID_LTE_OTHER_COMP_B23         = 0xDcad,
@@ -6271,15 +6689,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B23                   = 0xDcae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B23                   = 0xDcaf,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B23                       = 0xDcb0,
         //EN_NV_ID_TX_RF_BIAS_B23                         = 0xDcb1,
         EN_NV_ID_TX_PA_TEMP_COMP_B23                   = 0xDcb2,
         //EN_NV_ID_TX_ATTEN_TABLE_B23                        = 0xDcb3,
         //EN_NV_ID_POWERDET_VOLTAGE_B23                        = 0xDcb4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B23               = 0xDcb5,
         EN_NV_ID_LTE_TX_PD_PARA_B23                     = 0xDcb6,
         EN_NV_ID_TX_ET_BAND_PARA_B23                    = 0xDcb7,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B23             = 0xDcb8,
         EN_NV_ID_LTE_DPD_LAB_STRU_B23                    = 0xDcb9,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B23 = 0xDcba,
@@ -6312,8 +6733,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B24             = 0xDce8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B24             = 0xDce9,
         EN_NV_ID_LTE_TX_MPR_B24                         = 0xDcea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B24                     = 0xDceb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B24                        = 0xDcec,
         EN_NV_ID_LTE_OTHER_COMP_B24         = 0xDced,
@@ -6321,15 +6745,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B24                   = 0xDcee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B24                   = 0xDcef,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B24                       = 0xDcf0,
         //EN_NV_ID_TX_RF_BIAS_B24                         = 0xDcf1,
         EN_NV_ID_TX_PA_TEMP_COMP_B24                   = 0xDcf2,
         //EN_NV_ID_TX_ATTEN_TABLE_B24                        = 0xDcf3,
         //EN_NV_ID_POWERDET_VOLTAGE_B24                        = 0xDcf4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B24               = 0xDcf5,
         EN_NV_ID_LTE_TX_PD_PARA_B24                     = 0xDcf6,
         EN_NV_ID_TX_ET_BAND_PARA_B24                    = 0xDcf7,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B24             = 0xDcf8,
         EN_NV_ID_LTE_DPD_LAB_STRU_B24                    = 0xDcf9,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B24 = 0xDcfa,
@@ -6360,9 +6787,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B25              = 0xDd28,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B25              = 0xDd29,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B25                          = 0xDd2a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B25                      = 0xDd2b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B25                         = 0xDd2c,
         EN_NV_ID_LTE_OTHER_COMP_B25         = 0xDd2d,
@@ -6370,12 +6801,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B25                   = 0xDd2e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B25                   = 0xDd2f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B25                      = 0xDd30,
         //EN_NV_ID_TX_RF_BIAS_B25                        = 0xDd31,
         EN_NV_ID_TX_PA_TEMP_COMP_B25                   = 0xDd32,
         //EN_NV_ID_TX_ATTEN_TABLE_B25                    = 0xDd33,
         //EN_NV_ID_POWERDET_VOLTAGE_B25                  = 0xDd34,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B25               = 0xDd35,
         EN_NV_ID_LTE_TX_PD_PARA_B25                      = 0xDd36,
         EN_NV_ID_TX_ET_BAND_PARA_B25                    = 0xDd37,
@@ -6412,9 +6845,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B26              = 0xe368,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B26              = 0xe369,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B26                          = 0xe36a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B26                      = 0xe36b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B26                         = 0xe36c,
         EN_NV_ID_LTE_OTHER_COMP_B26         = 0xe36d,
@@ -6422,12 +6859,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B26                   = 0xe36e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B26                   = 0xe36f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B26                      =0xe370,
         //EN_NV_ID_TX_RF_BIAS_B26                        = 0xe371,
         EN_NV_ID_TX_PA_TEMP_COMP_B26                   = 0xe372,
         //EN_NV_ID_TX_ATTEN_TABLE_B26                    = 0xe373,
         //EN_NV_ID_POWERDET_VOLTAGE_B26                  = 0xe374,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B26               = 0xe375,
         EN_NV_ID_LTE_TX_PD_PARA_B26                      = 0xe376,
         EN_NV_ID_TX_ET_BAND_PARA_B26                    = 0xe377,
@@ -6470,8 +6909,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B33             = 0xDd68,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B33             = 0xDd69,
         EN_NV_ID_LTE_TX_MPR_B33                         = 0xDd6a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B33                     = 0xDd6b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B33                        = 0xDd6c,
         EN_NV_ID_LTE_OTHER_COMP_B33         = 0xDd6d,
@@ -6479,15 +6921,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B33                   = 0xDd6e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B33                   = 0xDd6f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B33                       = 0xDd70,
         //EN_NV_ID_TX_RF_BIAS_B33                         = 0xDd71,
         EN_NV_ID_TX_PA_TEMP_COMP_B33                   = 0xDd72,
         //EN_NV_ID_TX_ATTEN_TABLE_B33                        = 0xDd73,
         //EN_NV_ID_POWERDET_VOLTAGE_B33                        = 0xDd74,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B33               = 0xDd75,
         EN_NV_ID_LTE_TX_PD_PARA_B33                     = 0xDd76,
         EN_NV_ID_TX_ET_BAND_PARA_B33                    = 0xDd77,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B33             = 0xDd78,
         EN_NV_ID_LTE_DPD_LAB_STRU_B33                    = 0xDd79,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B33 = 0xDd7a,
@@ -6520,8 +6965,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B34             = 0xDda8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B34             = 0xDda9,
         EN_NV_ID_LTE_TX_MPR_B34                         = 0xDdaa,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B34                     = 0xDdab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B34                        = 0xDdac,
         EN_NV_ID_LTE_OTHER_COMP_B34         = 0xDdad,
@@ -6529,15 +6977,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B34                   = 0xDdae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B34                   = 0xDdaf,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B34                       = 0xDdb0,
         //EN_NV_ID_TX_RF_BIAS_B34                         = 0xDdb1,
         EN_NV_ID_TX_PA_TEMP_COMP_B34                   = 0xDdb2,
         //EN_NV_ID_TX_ATTEN_TABLE_B34                        = 0xDdb3,
         //EN_NV_ID_POWERDET_VOLTAGE_B34                        = 0xDdb4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B34               = 0xDdb5,
         EN_NV_ID_LTE_TX_PD_PARA_B34                     = 0xDdb6,
         EN_NV_ID_TX_ET_BAND_PARA_B34                    = 0xDdb7,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B34             = 0xDdb8,
         EN_NV_ID_LTE_DPD_LAB_STRU_B34                    = 0xDdb9,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B34 = 0xDdba,
@@ -6570,8 +7021,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B35             = 0xDde8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B35             = 0xDde9,
         EN_NV_ID_LTE_TX_MPR_B35                         = 0xDdea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B35                     = 0xDdeb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B35                        = 0xDdec,
         EN_NV_ID_LTE_OTHER_COMP_B35         = 0xDded,
@@ -6579,15 +7033,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B35                   = 0xDdee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B35                   = 0xDdef,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B35                       = 0xDdf0,
         //EN_NV_ID_TX_RF_BIAS_B35                         = 0xDdf1,
         EN_NV_ID_TX_PA_TEMP_COMP_B35                   = 0xDdf2,
         //EN_NV_ID_TX_ATTEN_TABLE_B35                        = 0xDdf3,
         //EN_NV_ID_POWERDET_VOLTAGE_B35                        = 0xDdf4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B35               = 0xDdf5,
         EN_NV_ID_LTE_TX_PD_PARA_B35                     = 0xDdf6,
         EN_NV_ID_TX_ET_BAND_PARA_B35                    = 0xDdf7,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B35             = 0xDdf8,
         EN_NV_ID_LTE_DPD_LAB_STRU_B35                    = 0xDdf9,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B35 = 0xDdfa,
@@ -6620,8 +7077,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B36             = 0xDe28,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B36             = 0xDe29,
         EN_NV_ID_LTE_TX_MPR_B36                         = 0xDe2a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B36                     = 0xDe2b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B36                        = 0xDe2c,
         EN_NV_ID_LTE_OTHER_COMP_B36         = 0xDe2d,
@@ -6629,15 +7089,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B36                   = 0xDe2e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B36                   = 0xDe2f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B36                       = 0xDe30,
         //EN_NV_ID_TX_RF_BIAS_B36                         = 0xDe31,
         EN_NV_ID_TX_PA_TEMP_COMP_B36                   = 0xDe32,
         //EN_NV_ID_TX_ATTEN_TABLE_B36                        = 0xDe33,
         //EN_NV_ID_POWERDET_VOLTAGE_B36                        = 0xDe34,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B36               = 0xDe35,
         EN_NV_ID_LTE_TX_PD_PARA_B36                     = 0xDe36,
         EN_NV_ID_TX_ET_BAND_PARA_B36                    = 0xDe37,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B36             = 0xDe38,
         EN_NV_ID_LTE_DPD_LAB_STRU_B36                    = 0xDe39,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B36 = 0xDe3a,
@@ -6670,8 +7133,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B37             = 0xDe68,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B37             = 0xDe69,
         EN_NV_ID_LTE_TX_MPR_B37                         = 0xDe6a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B37                     = 0xDe6b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B37                        = 0xDe6c,
         EN_NV_ID_LTE_OTHER_COMP_B37         = 0xDe6d,
@@ -6679,15 +7145,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B37                   = 0xDe6e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B37                   = 0xDe6f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B37                       = 0xDe70,
         //EN_NV_ID_TX_RF_BIAS_B37                         = 0xDe71,
         EN_NV_ID_TX_PA_TEMP_COMP_B37                   = 0xDe72,
         //EN_NV_ID_TX_ATTEN_TABLE_B37                        = 0xDe73,
         //EN_NV_ID_POWERDET_VOLTAGE_B37                        = 0xDe74,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B37               = 0xDe75,
         EN_NV_ID_LTE_TX_PD_PARA_B37                     = 0xDe76,
         EN_NV_ID_TX_ET_BAND_PARA_B37                    = 0xDe77,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B37             = 0xDe78,
         EN_NV_ID_LTE_DPD_LAB_STRU_B37                    = 0xDe79,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B37 = 0xDe7a,
@@ -6720,8 +7189,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B42             = 0xDea8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B42             = 0xDea9,
         EN_NV_ID_LTE_TX_MPR_B42                         = 0xDeaa,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B42                     = 0xDeab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B42                        = 0xDeac,
         EN_NV_ID_LTE_OTHER_COMP_B42         = 0xDead,
@@ -6729,15 +7201,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B42                   = 0xDeae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B42                   = 0xDeaf,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B42                       = 0xDeb0,
         //EN_NV_ID_TX_RF_BIAS_B42                         = 0xDeb1,
         EN_NV_ID_TX_PA_TEMP_COMP_B42                   = 0xDeb2,
         //EN_NV_ID_TX_ATTEN_TABLE_B42                        = 0xDeb3,
         //EN_NV_ID_POWERDET_VOLTAGE_B42                        = 0xDeb4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B42               = 0xDeb5,
         EN_NV_ID_LTE_TX_PD_PARA_B42                     =0xDeb6,
         EN_NV_ID_TX_ET_BAND_PARA_B42                    = 0xDeb7,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B42             = 0xDeb8,
         EN_NV_ID_LTE_DPD_LAB_STRU_B42                    = 0xDeb9,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B42 = 0xDeba,
@@ -6770,8 +7245,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B43             = 0xDee8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B43             = 0xDee9,
         EN_NV_ID_LTE_TX_MPR_B43                         = 0xDeea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B43                     = 0xDeeb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B43                        = 0xDeec,
         EN_NV_ID_LTE_OTHER_COMP_B43         = 0xDeed,
@@ -6779,12 +7257,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B43                   = 0xDeee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B43                   = 0xDeef,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B43                       = 0xDef0,
         //EN_NV_ID_TX_RF_BIAS_B43                         = 0xDef1,
         EN_NV_ID_TX_PA_TEMP_COMP_B43                   = 0xDef2,
         //EN_NV_ID_TX_ATTEN_TABLE_B43                        = 0xDef3,
         //EN_NV_ID_POWERDET_VOLTAGE_B43                        = 0xDef4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B43               = 0xDef5,
         EN_NV_ID_LTE_TX_PD_PARA_B43                     = 0xDef6,
         EN_NV_ID_TX_ET_BAND_PARA_B43                     = 0xDef7,
@@ -6820,8 +7300,11 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B39             = 0xDf28,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B39             = 0xDf29,
         EN_NV_ID_LTE_TX_MPR_B39                         = 0xDf2a,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B39                     = 0xDf2b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B39                        = 0xDf2c,
 
@@ -6830,12 +7313,14 @@ extern "C" {
 
         EN_NV_ID_LTE_TX_AMPR_NS05_B39                   = 0xDf2e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B39                   = 0xDf2f,
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B39                       = 0xDf30,
         //EN_NV_ID_TX_RF_BIAS_B39                         = 0xDf31,
         EN_NV_ID_TX_PA_TEMP_COMP_B39                   = 0xDf32,
         //EN_NV_ID_TX_ATTEN_TABLE_B39                        = 0xDf33,
         //EN_NV_ID_POWERDET_VOLTAGE_B39                        = 0xDf34,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B39               = 0xDf35,
         EN_NV_ID_LTE_TX_PD_PARA_B39                     = 0xDf36,
         EN_NV_ID_TX_ET_BAND_PARA_B39                    = 0xDf37,
@@ -6871,9 +7356,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B20             = 0xD628,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B20             = 0xD629,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B20                         = 0xD62a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B20                     = 0xD62b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B20                        = 0xD62c,
         EN_NV_ID_LTE_OTHER_COMP_B20         = 0xD62d,
@@ -6881,12 +7370,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B20                   = 0xD62e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B20                   = 0xD62f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B20                       = 0xD630,
         //EN_NV_ID_TX_RF_BIAS_B20                         = 0xD631,
         EN_NV_ID_TX_PA_TEMP_COMP_B20                   = 0xD632,
         //EN_NV_ID_TX_ATTEN_TABLE_B20                        = 0xD633,
         //EN_NV_ID_POWERDET_VOLTAGE_B20                        = 0xD634,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B20               = 0xD635,
         EN_NV_ID_LTE_TX_PD_PARA_B20                     = 0xD636,
         EN_NV_ID_TX_ET_BAND_PARA_B20                    = 0xD637,
@@ -6920,9 +7411,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B40             = 0xD668,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B40             = 0xD669,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B40                         = 0xD66a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B40                     = 0xD66b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B40                        = 0xD66c,
         EN_NV_ID_LTE_OTHER_COMP_B40         = 0xD66d,
@@ -6930,15 +7425,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B40                   = 0xD66e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B40                   = 0xD66f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B40                       = 0xD670,
         //EN_NV_ID_TX_RF_BIAS_B40                         = 0xD671,
         EN_NV_ID_TX_PA_TEMP_COMP_B40                   = 0xD672,
         //EN_NV_ID_TX_ATTEN_TABLE_B40                        = 0xD673,
         //EN_NV_ID_POWERDET_VOLTAGE_B40                        = 0xD674,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B40               = 0xD675,
         EN_NV_ID_LTE_TX_PD_PARA_B40                     = 0xD676,
         EN_NV_ID_TX_ET_BAND_PARA_B40                    = 0xD677,
+        /*add for K3V5 START DUKUN 20141211*/
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B40             = 0xD678,
         EN_NV_ID_LTE_DPD_LAB_STRU_B40                    = 0xD679,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B40 = 0xD67a,
@@ -6969,9 +7467,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B38             = 0xD6a8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B38             = 0xD6a9,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B38                         = 0xD6aa,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B38                     = 0xD6ab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B38                        = 0xD6ac,
         EN_NV_ID_LTE_OTHER_COMP_B38         = 0xD6ad,
@@ -6979,16 +7481,19 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B38                   = 0xD6ae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B38                   = 0xD6af,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B38                       = 0xD6b0,
         //EN_NV_ID_TX_RF_BIAS_B38                         = 0xD6b1,
         EN_NV_ID_TX_PA_TEMP_COMP_B38                   = 0xD6b2,
         //EN_NV_ID_TX_ATTEN_TABLE_B38                        = 0xD6b3,
         //EN_NV_ID_POWERDET_VOLTAGE_B38                        = 0xD6b4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B38               = 0xD6b5,
         EN_NV_ID_LTE_TX_PD_PARA_B38                     = 0xD6b6,
         EN_NV_ID_TX_ET_BAND_PARA_B38                    = 0xD6b7,
 
+        /*add for K3V5 START DUKUN 20141211*/
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B38            = 0xD6b8,
         EN_NV_ID_LTE_DPD_LAB_STRU_B38                   = 0xD6b9,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B38 = 0xD6ba,
@@ -7019,9 +7524,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B41             = 0xD6E8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B41             = 0xD6E9,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B41                         = 0xD6ea,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B41                     = 0xD6eb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B41                        = 0xD6ec,
         EN_NV_ID_LTE_OTHER_COMP_B41         = 0xD6ed,
@@ -7029,15 +7538,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B41                   = 0xD6ee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B41                   = 0xD6ef,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B41                       = 0xD6f0,
         //EN_NV_ID_TX_RF_BIAS_B41                         = 0xD6f1,
         EN_NV_ID_TX_PA_TEMP_COMP_B41                   = 0xD6f2,
         //EN_NV_ID_TX_ATTEN_TABLE_B41                    = 0xD6f3,
         //EN_NV_ID_POWERDET_VOLTAGE_B41                   = 0xD6f4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B41               = 0xD6f5,
         EN_NV_ID_LTE_TX_PD_PARA_B41                     = 0xD6f6,
         EN_NV_ID_TX_ET_BAND_PARA_B41                    = 0xD6f7,
+        /* add for K3V5 START DUKUN20141211*/
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B41             = 0xD6f8,
         EN_NV_ID_LTE_DPD_LAB_STRU_B41                    = 0xD6f9,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B41 = 0xD6fa,
@@ -7068,9 +7580,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B7              = 0xD728,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B7              = 0xD729,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B7                          = 0xD72a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B7                      = 0xD72b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B7                         = 0xD72c,
         EN_NV_ID_LTE_OTHER_COMP_B7         = 0xD72d,
@@ -7079,12 +7595,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B7                   = 0xD72e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B7                   = 0xD72f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B7                      = 0xD730,
         //EN_NV_ID_TX_RF_BIAS_B7                        = 0xD731,
         EN_NV_ID_TX_PA_TEMP_COMP_B7                   = 0xD732,
         //EN_NV_ID_TX_ATTEN_TABLE_B7                    = 0xD733,
         //EN_NV_ID_POWERDET_VOLTAGE_B7                  = 0xD734,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B7               = 0xD735,
         EN_NV_ID_LTE_TX_PD_PARA_B7                      = 0xD736,
         EN_NV_ID_TX_ET_BAND_PARA_B7                    = 0xD737,
@@ -7123,9 +7641,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B3              = 0xD828,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B3              = 0xD829,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B3                          = 0xD82a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B3                      = 0xD82b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B3                         = 0xD82c,
         EN_NV_ID_LTE_OTHER_COMP_B3         = 0xD82d,
@@ -7133,15 +7655,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B3                   = 0xD82e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B3                   = 0xD82f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B3                       = 0xD830,
         //EN_NV_ID_TX_RF_BIAS_B3                         = 0xD831,
         EN_NV_ID_TX_PA_TEMP_COMP_B3                   = 0xD832,
         //EN_NV_ID_TX_ATTEN_TABLE_B3                        = 0xD833,
         //EN_NV_ID_POWERDET_VOLTAGE_B3                        = 0xD834,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B3               = 0xD835,
         EN_NV_ID_LTE_TX_PD_PARA_B3                      = 0xD836,
         EN_NV_ID_TX_ET_BAND_PARA_B3                     = 0xD837,
+        /*add for K3V5 START DUKUN20141211*/
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B3             = 0xD838,
         EN_NV_ID_LTE_DPD_LAB_STRU_B3                    = 0xD839,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B3 = 0xD83a,
@@ -7172,9 +7697,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B1              = 0xD868,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B1              = 0xD869,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B1                          = 0xD86a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B1                      = 0xD86b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B1                         = 0xD86c,
         EN_NV_ID_LTE_OTHER_COMP_B1         = 0xD86d,
@@ -7182,15 +7711,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B1                   = 0xD86e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B1                   = 0xD86f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B1                       = 0xD870,
         //EN_NV_ID_TX_RF_BIAS_B1                         = 0xD871,
         EN_NV_ID_TX_PA_TEMP_COMP_B1                   = 0xD872,
         //EN_NV_ID_TX_ATTEN_TABLE_B1                        = 0xD873,
         //EN_NV_ID_POWERDET_VOLTAGE_B1                        = 0xD874,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B1                = 0xD875,
         EN_NV_ID_LTE_TX_PD_PARA_B1                      = 0xD876,
         EN_NV_ID_TX_ET_BAND_PARA_B1                     = 0xD877,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B1             = 0xD878,
         EN_NV_ID_LTE_DPD_LAB_STRU_B1                    = 0xD879,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B1 = 0xD87a,
@@ -7221,9 +7753,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B5              = 0xD8a8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B5              = 0xD8a9,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B5                          = 0xD8aa,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B5                      = 0xD8ab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B5                         = 0xD8ac,
         EN_NV_ID_LTE_OTHER_COMP_B5         = 0xD8ad,
@@ -7231,15 +7767,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B5                   = 0xD8ae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B5                   = 0xD8af,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B5                       = 0xD8b0,
         //EN_NV_ID_TX_RF_BIAS_B5                         = 0xD8b1,
         EN_NV_ID_TX_PA_TEMP_COMP_B5                   = 0xD8b2,
         //EN_NV_ID_TX_ATTEN_TABLE_B5                        = 0xD8b3,
         //EN_NV_ID_POWERDET_VOLTAGE_B5                        = 0xD8b4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B5               = 0xD8b5,
         EN_NV_ID_LTE_TX_PD_PARA_B5                      = 0xD8b6,
         EN_NV_ID_TX_ET_BAND_PARA_B5                     = 0xD8b7,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B5             = 0xD8b8,
         EN_NV_ID_LTE_DPD_LAB_STRU_B5                    = 0xD8b9,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B5 = 0xD8ba,
@@ -7270,9 +7809,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B8              = 0xD8e8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B8              = 0xD8e9,
 
+        /* modify by wangrui mpr begin */
         EN_NV_ID_LTE_TX_MPR_B8                          = 0xD8ea,
+        /* modify by wangrui mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B8                      = 0xD8eb,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B8                         = 0xD8ec,
         EN_NV_ID_LTE_OTHER_COMP_B8         = 0xD8ed,
@@ -7280,15 +7823,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B8                   = 0xD8ee,
         EN_NV_ID_LTE_TX_AMPR_NS09_B8                   = 0xD8ef,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B8                       = 0xD8f0,
         //EN_NV_ID_TX_RF_BIAS_B8                         = 0xD8f1,
         EN_NV_ID_TX_PA_TEMP_COMP_B8                   = 0xD8f2,
         //EN_NV_ID_TX_ATTEN_TABLE_B8                        = 0xD8f3,
         //EN_NV_ID_POWERDET_VOLTAGE_B8                        = 0xD8f4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B8               = 0xD8f5,
         EN_NV_ID_LTE_TX_PD_PARA_B8                      = 0xD8f6,
         EN_NV_ID_TX_ET_BAND_PARA_B8                     = 0xD8f7,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B8             = 0xD8f8,
         EN_NV_ID_LTE_DPD_LAB_STRU_B8                    = 0xD8f9,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B8 = 0xD8fa,
@@ -7320,9 +7866,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B28             = 0xDf68,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B28             = 0xDf69,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B28                          = 0xDf6a,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B28                      = 0xDf6b,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B28                         = 0xDf6c,
         EN_NV_ID_LTE_OTHER_COMP_B28         = 0xDf6d,
@@ -7330,15 +7880,18 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B28                   = 0xDf6e,
         EN_NV_ID_LTE_TX_AMPR_NS09_B28                   = 0xDf6f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B28                      = 0xDf70,
         //EN_NV_ID_TX_RF_BIAS_B28                         = 0xDf71,
         EN_NV_ID_TX_PA_TEMP_COMP_B28                   = 0xDf72,
         //EN_NV_ID_TX_ATTEN_TABLE_B28                        = 0xDf73,
         //EN_NV_ID_POWERDET_VOLTAGE_B28                        = 0xDf74,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B28               = 0xDf75,
         EN_NV_ID_LTE_TX_PD_PARA_B28                     = 0xDf76,
         EN_NV_ID_TX_ET_BAND_PARA_B28                    = 0xDf77,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_LAB_STRU_B28             = 0xDf78,
         EN_NV_ID_LTE_DPD_LAB_STRU_B28                    = 0xDf79,
         EN_NV_ID_LTE_ETM_SEMI_STATIC_MIPI_CMD_LAB_STRU_B28 = 0xDf7a,
@@ -7378,12 +7931,14 @@ extern "C" {
       //  EN_NV_ID_LTE_TX_AMPR_NS05_BNon1                   = 0xDf6e,
       //  EN_NV_ID_LTE_TX_AMPR_NS09_BNon1                   = 0xDf6f,
 
+        /*add for V9R1_6361 Begin*/
 
        // EN_NV_ID_TX_RF_BB_ATT_BNon1                       = 0xDf70,
        // EN_NV_ID_TX_RF_BIAS_BNon1                         = 0xDf71,
        // EN_NV_ID_TX_PA_TEMP_COMP_BNon1                   = 0xDf72,
        // EN_NV_ID_TX_ATTEN_TABLE_BNon1                        = 0xDf73,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon1                        = 0xDf74,
+        /*add for V9R1_6361 End*/
        // EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon1               = 0xDf75,
     /*BEGIN DTS2014041603793 c00203521 modify for B28全频段特性*/
     /*Band128 相关NV项*/
@@ -7409,9 +7964,13 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_PDM_MID_TBL_B128              = 0xDfa8,
         EN_NV_ID_LTE_TX_APT_PDM_LOW_TBL_B128              = 0xDfa9,
 
+        /* modify by lishangfneg mpr begin */
         EN_NV_ID_LTE_TX_MPR_B128                           = 0xDfaa,
+        /* modify by lishangfneg mpr end */
 
+        /* add by wangrui tx begin */
         EN_NV_ID_LTE_ANT_SAR_B128                          = 0xDfab,
+        /* add by wangrui tx end */
 
         EN_NV_ID_LTE_TX_AMPR_B128                         = 0xDfac,
         EN_NV_ID_LTE_OTHER_COMP_B128         = 0xDfad,
@@ -7419,12 +7978,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_B128                    = 0xDfae,
         EN_NV_ID_LTE_TX_AMPR_NS09_B128                    = 0xDfaf,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_B128                         = 0xDfb0,
         //EN_NV_ID_TX_RF_BIAS_B128                           = 0xDfb1,
         EN_NV_ID_TX_PA_TEMP_COMP_B128                      = 0xDfb2,
         //EN_NV_ID_TX_ATTEN_TABLE_B128                       = 0xDfb3,
         //EN_NV_ID_POWERDET_VOLTAGE_B128                     = 0xDfb4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_B128                = 0xDfb5,
         EN_NV_ID_LTE_TX_PD_PARA_B128                       = 0xDfb6,
         EN_NV_ID_TX_ET_BAND_PARA_B128                      = 0xDfb7,
@@ -7692,12 +8253,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon8                   = 0xe12e,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon8                   = 0xe12f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_BNon8                       = 0xe130,
         //EN_NV_ID_TX_RF_BIAS_BNon8                         = 0xe131,
         EN_NV_ID_TX_PA_TEMP_COMP_BNon8                   = 0xe132,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon8                        = 0xe133,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon8                        = 0xe134,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon8               = 0xe135,
 
         /* 非标频段begin */
@@ -7732,12 +8295,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon9                   = 0xe16e,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon9                   = 0xe16f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_BNon9                       = 0xe170,
         //EN_NV_ID_TX_RF_BIAS_BNon9                         = 0xe171,
         EN_NV_ID_TX_PA_TEMP_COMP_BNon9                   = 0xe172,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon9                        = 0xe173,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon9                        = 0xe174,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon9               = 0xe175,
 
         EN_NV_ID_FTM_CAND_CELL_LIST_BNon10                 = 0xe180,
@@ -7771,12 +8336,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon10                   = 0xe1ae,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon10                   = 0xe1af,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_BNon10                       = 0xe1b0,
         //EN_NV_ID_TX_RF_BIAS_BNon10                         = 0xe1b1,
         EN_NV_ID_TX_PA_TEMP_COMP_BNon10                   = 0xe1b2,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon10                        = 0xe1b3,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon10                        = 0xe1b4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon10               = 0xe1b5,
 
         EN_NV_ID_FTM_CAND_CELL_LIST_BNon11                 = 0xe1c0,
@@ -7810,12 +8377,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon11                   = 0xe1ee,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon11                   = 0xe1ef,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_BNon11                       = 0xe1f0,
         //EN_NV_ID_TX_RF_BIAS_BNon11                         = 0xe1f1,
         EN_NV_ID_TX_PA_TEMP_COMP_BNon11                   = 0xe1f2,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon11                        = 0xe1f3,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon11                        = 0xe1f4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon11               = 0xe1f5,
         EN_NV_ID_FTM_CAND_CELL_LIST_BNon12                 = 0xe200,
         EN_NV_ID_LTE_RX_CALIBRATION_FREQ_BNon12            = 0xe201,
@@ -7855,6 +8424,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_BNon12                   = 0xe232,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon12                        = 0xe233,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon12                        = 0xe234,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon12               = 0xe235,
         /* 非标频段begin */
         EN_NV_ID_FTM_CAND_CELL_LIST_BNon13                 = 0xe240,
@@ -7888,12 +8458,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon13                   = 0xe26e,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon13                   = 0xe26f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_BNon13                       = 0xe270,
         //EN_NV_ID_TX_RF_BIAS_BNon13                         = 0xe271,
         EN_NV_ID_TX_PA_TEMP_COMP_BNon13                   = 0xe272,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon13                        = 0xe273,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon13                        = 0xe274,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon13               = 0xe275,
 
         EN_NV_ID_FTM_CAND_CELL_LIST_BNon14                 = 0xe280,
@@ -7927,12 +8499,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon14                   = 0xe2ae,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon14                   = 0xe2af,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_BNon14                       = 0xe2b0,
         //EN_NV_ID_TX_RF_BIAS_BNon14                         = 0xe2b1,
         EN_NV_ID_TX_PA_TEMP_COMP_BNon14                   = 0xe2b2,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon14                        = 0xe2b3,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon14                        = 0xe2b4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon14               = 0xe2b5,
 
 #if 0
@@ -7972,6 +8546,7 @@ extern "C" {
         EN_NV_ID_TX_PA_TEMP_COMP_BNon15                   = 0xe2f2,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon15                        = 0xe2f3,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon15                        = 0xe2f4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon15               = 0xe2f5,
 
         EN_NV_ID_FTM_CAND_CELL_LIST_BNon16                 = 0xe300,
@@ -8006,12 +8581,14 @@ extern "C" {
         EN_NV_ID_LTE_TX_AMPR_NS05_BNon16                   = 0xe32e,
         EN_NV_ID_LTE_TX_AMPR_NS09_BNon16                   = 0xe32f,
 
+        /*add for V9R1_6361 Begin*/
 
         //EN_NV_ID_TX_RF_BB_ATT_BNon16                       = 0xe330,
         //EN_NV_ID_TX_RF_BIAS_BNon16                         = 0xe331,
         EN_NV_ID_TX_PA_TEMP_COMP_BNon16                   = 0xe332,
         //EN_NV_ID_TX_ATTEN_TABLE_BNon16                        = 0xe333,
         //EN_NV_ID_POWERDET_VOLTAGE_BNon16                        = 0xe334,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_TX_UL_ONE_RB_MPR_BNon16               = 0xe335,
 #endif
         /* 非标频段end */
@@ -8270,6 +8847,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B20        = 0xeb16,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B20         = 0xeb17,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B20         = 0xeb18,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B20                    = 0xeb19,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B20                  = 0xeb1a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B20                  = 0xeb1b,
@@ -8301,6 +8879,7 @@ extern "C" {
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B20            = 0xeb37,
 
 
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_B40                     = 0xeb40,
         EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_B40         = 0xeb4D,
@@ -8315,6 +8894,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B40        = 0xeb56,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B40         = 0xeb57,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B40         = 0xeb58,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B40                    = 0xeb59,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B40                  = 0xeb5a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B40                  = 0xeb5b,
@@ -8322,6 +8902,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B40                       = 0xeb5d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B40               = 0xeb5e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B40              = 0xeb5f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B40               = 0xeb65,
         EN_NV_ID_LTE_TX_PD_PWR_TABLE_B40              = 0xeb66,
@@ -8356,6 +8937,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B38        = 0xeb96,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B38         = 0xeb97,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B38         = 0xeb98,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B38                    = 0xeb99,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B38                  = 0xeb9a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B38                  = 0xeb9b,
@@ -8379,6 +8961,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B38                    = 0xebb2,
         EN_NV_ID_ET_EVDELY_B38                           = 0xebb3,
         EN_NV_ID_RF_CA_RCCODE_B38                        = 0xebb4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B38            = 0xebb5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B38                   = 0xebb6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B38           = 0xebb7,
@@ -8396,6 +8979,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B41        = 0xebd6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B41         = 0xebd7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B41         = 0xebd8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B41                    = 0xebd9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B41                  = 0xebda,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B41                  = 0xebdb,
@@ -8419,6 +9003,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B41                    = 0xebf2,
         EN_NV_ID_ET_EVDELY_B41                           = 0xebf3,
         EN_NV_ID_RF_CA_RCCODE_B41                        = 0xebf4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B41             = 0xebf5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B41                    = 0xebf6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B41            = 0xebf7,
@@ -8436,6 +9021,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B7         = 0xec16,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B7          = 0xec17,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B7          = 0xec18,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B7                    = 0xec19,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B7                  = 0xec1a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B7                  = 0xec1b,
@@ -8462,6 +9048,7 @@ extern "C" {
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B7             = 0xec35,
         EN_NV_ID_LTE_DPD_FAC_STRU_B7                    = 0xec36,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B7            = 0xec37,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_B3                      = 0xed00,
         EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_B3          = 0xed0D,
@@ -8476,6 +9063,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B3         = 0xed16,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B3          = 0xed17,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B3          = 0xed18,
+         /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B3                    = 0xed19,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B3                  = 0xed1a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B3                  = 0xed1b,
@@ -8499,6 +9087,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B3                     = 0xed32,
         EN_NV_ID_ET_EVDELY_B3                           = 0xed33,
         EN_NV_ID_RF_CA_RCCODE_B3                        = 0xed34,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B3             = 0xed35,
         EN_NV_ID_LTE_DPD_FAC_STRU_B3                    = 0xed36,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B3            = 0xed37,
@@ -8516,6 +9105,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B1         = 0xed56,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B1          = 0xed57,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B1          = 0xed58,
+         /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B1                    = 0xed59,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B1                  = 0xed5a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B1                  = 0xed5b,
@@ -8539,6 +9129,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B1                    = 0xed72,
         EN_NV_ID_ET_EVDELY_B1                           = 0xed73,
         EN_NV_ID_RF_CA_RCCODE_B1                        = 0xed74,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B1             = 0xed75,
         EN_NV_ID_LTE_DPD_FAC_STRU_B1                    = 0xed76,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B1            = 0xed77,
@@ -8556,6 +9147,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B5         = 0xed96,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B5          = 0xed97,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B5          = 0xed98,
+         /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B5                    = 0xed99,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B5                  = 0xed9a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B5                  = 0xed9b,
@@ -8582,6 +9174,7 @@ extern "C" {
         EN_NV_ID_ET_EVDELY_B5                           = 0xedb3,
         EN_NV_ID_RF_CA_RCCODE_B5                        = 0xedb4,
 
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B5             = 0xedb5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B5                    = 0xedb6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B5            = 0xedb7,
@@ -8599,6 +9192,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B8         = 0xedd6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B8          = 0xedd7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B8          = 0xedd8,
+         /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B8                    = 0xedd9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B8                  = 0xedda,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B8                  = 0xeddb,
@@ -8622,6 +9216,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B8                    = 0xedf2,
         EN_NV_ID_ET_EVDELY_B8                           = 0xedf3,
         EN_NV_ID_RF_CA_RCCODE_B8                        = 0xedf4,
+        /*add for V9R1_6361 End*/
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B8             = 0xedf5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B8                    = 0xedf6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B8            = 0xedf7,
@@ -8641,6 +9236,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B19        = 0xEE16,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B19         = 0xEE17,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B19         = 0xEE18,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B19                     = 0xEE19,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B19                   = 0xEE1a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B19                   = 0xEE1b,
@@ -8665,6 +9261,7 @@ extern "C" {
         EN_NV_ID_ET_EVDELY_B19                           = 0xee33,
         EN_NV_ID_RF_CA_RCCODE_B19                        = 0xee34,
 
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B19             = 0xee35,
         EN_NV_ID_LTE_DPD_FAC_STRU_B19                    = 0xee36,
@@ -8683,6 +9280,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B21        = 0xEE56,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B21         = 0xEE57,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B21         = 0xEE58,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B21                     = 0xEE59,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B21                   = 0xEE5a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B21                   = 0xEE5b,
@@ -8706,7 +9304,9 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B21                    = 0xee72,
         EN_NV_ID_ET_EVDELY_B21                           = 0xee73,
         EN_NV_ID_RF_CA_RCCODE_B21                        = 0xee74,
+        /*add for V9R1_6361 End*/
 
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B21             = 0xee75,
         EN_NV_ID_LTE_DPD_FAC_STRU_B21                    = 0xee76,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B21            = 0xee77,
@@ -8725,6 +9325,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B2         = 0xEE96,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B2          = 0xEE97,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B2          = 0xEE98,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B2                     = 0xEE99,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B2                   = 0xEE9a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B2                   = 0xEE9b,
@@ -8732,6 +9333,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B2                        = 0xEE9d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B2                = 0xEE9e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B2               = 0xEE9f,
+        /*add for V9R1_6361 End*/
 
 
 
@@ -8751,6 +9353,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B2                    = 0xEEb2,
         EN_NV_ID_ET_EVDELY_B2                           = 0xEEb3,
         EN_NV_ID_RF_CA_RCCODE_B2                        = 0xEEb4,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B2             = 0xEEb5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B2                    = 0xEEb6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B2            = 0xEEb7,
@@ -8769,6 +9372,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B4         = 0xEEd6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B4          = 0xEEd7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B4          = 0xEEd8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B4                     = 0xEEd9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B4                   = 0xEEda,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B4                   = 0xEEdb,
@@ -8776,6 +9380,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B4                        = 0xEEdd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B4                = 0xEEde,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B4               = 0xEEdf,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B4                = 0xEEe5,
         EN_NV_ID_LTE_TX_PD_PWR_TABLE_B4               = 0xEEe6,
@@ -8793,6 +9398,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B4                    = 0xEEf2,
         EN_NV_ID_ET_EVDELY_B4                           = 0xEEf3,
         EN_NV_ID_RF_CA_RCCODE_B4                        = 0xEEf4,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B4             = 0xEEf5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B4                    = 0xEEf6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B4            = 0xEEf7,
@@ -8811,6 +9417,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B6         = 0xEf16,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B6          = 0xEf17,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B6          = 0xEf18,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B6                     = 0xEf19,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B6                   = 0xEf1a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B6                   = 0xEf1b,
@@ -8818,6 +9425,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B6                        = 0xEf1d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B6                = 0xEf1e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B6               = 0xEf1f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B6                = 0xEf25,
@@ -8836,6 +9444,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B6                    = 0xEf32,
         EN_NV_ID_ET_EVDELY_B6                           = 0xEf33,
         EN_NV_ID_RF_CA_RCCODE_B6                        = 0xEf34,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B6             = 0xEf35,
         EN_NV_ID_LTE_DPD_FAC_STRU_B6                    = 0xEf36,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B6            = 0xEf37,
@@ -8854,6 +9463,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B9         = 0xEf56,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B9          = 0xEf57,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B9          = 0xEf58,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B9                     = 0xEf59,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B9                   = 0xEf5a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B9                   = 0xEf5b,
@@ -8861,6 +9471,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B9                        = 0xEf5d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B9                = 0xEf5e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B9               = 0xEf5f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B9                = 0xEf65,
@@ -8879,6 +9490,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B9                    = 0xEf72,
         EN_NV_ID_ET_EVDELY_B9                           = 0xEf73,
         EN_NV_ID_RF_CA_RCCODE_B9                        = 0xEf74,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B9             = 0xEf75,
         EN_NV_ID_LTE_DPD_FAC_STRU_B9                    = 0xEf76,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B9            = 0xEf77,
@@ -8897,6 +9509,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B10        = 0xEf96,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B10         = 0xEf97,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B10         = 0xEf98,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B10                    = 0xEf99,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B10                  = 0xEf9a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B10                  = 0xEf9b,
@@ -8904,6 +9517,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B10                       = 0xEf9d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B10               = 0xEf9e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B10              = 0xEf9f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B10                = 0xEfa5,
@@ -8922,6 +9536,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B10                    = 0xEfb2,
         EN_NV_ID_ET_EVDELY_B10                           = 0xEfb3,
         EN_NV_ID_RF_CA_RCCODE_B10                        = 0xEfb4,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B10             = 0xEfb5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B10                    = 0xEfb6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B10            = 0xEfb7,
@@ -8944,6 +9559,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B11        = 0xEfd6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B11         = 0xEfd7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B11         = 0xEfd8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B11                    = 0xEfd9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B11                  = 0xEfda,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B11                  = 0xEfdb,
@@ -8951,6 +9567,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B11                       = 0xEfdd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B11               = 0xEfde,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B11              = 0xEfdf,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B11                = 0xEfe5,
@@ -8969,6 +9586,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B11                    = 0xEff2,
         EN_NV_ID_ET_EVDELY_B11                           = 0xEff3,
         EN_NV_ID_RF_CA_RCCODE_B11                        = 0xEff4,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B11             = 0xEff5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B11                    = 0xEff6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B11            = 0xEff7,
@@ -8987,6 +9605,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B12        = 0xf016,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B12         = 0xf017,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B12         = 0xf018,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B12                    = 0xf019,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B12                  = 0xf01a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B12                  = 0xf01b,
@@ -8994,6 +9613,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B12                       = 0xf01d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B12               = 0xf01e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B12              = 0xf01f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B12                = 0xf025,
@@ -9012,6 +9632,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B12                    = 0xf032,
         EN_NV_ID_ET_EVDELY_B12                           = 0xf033,
         EN_NV_ID_RF_CA_RCCODE_B12                        = 0xf034,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B12             = 0xf035,
         EN_NV_ID_LTE_DPD_FAC_STRU_B12                    = 0xf036,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B12            = 0xf037,
@@ -9030,6 +9651,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B13        = 0xf056,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B13         = 0xf057,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B13         = 0xf058,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B13                    = 0xf059,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B13                  = 0xf05a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B13                  = 0xf05b,
@@ -9037,6 +9659,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B13                       = 0xf05d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B13               = 0xf05e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B13              = 0xf05f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B13                = 0xf065,
@@ -9055,6 +9678,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B13                    = 0xf072,
         EN_NV_ID_ET_EVDELY_B13                           = 0xf073,
         EN_NV_ID_RF_CA_RCCODE_B13                        = 0xf074,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B13             = 0xf075,
         EN_NV_ID_LTE_DPD_FAC_STRU_B13                    = 0xf076,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B13            = 0xf077,
@@ -9074,6 +9698,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B14        = 0xf096,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B14         = 0xf097,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B14         = 0xf098,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B14                    = 0xf099,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B14                  = 0xf09a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B14                  = 0xf09b,
@@ -9081,6 +9706,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B14                       = 0xf09d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B14               = 0xf09e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B14              = 0xf09f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B14                = 0xf0a5,
@@ -9099,6 +9725,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B14                    = 0xf0b2,
         EN_NV_ID_ET_EVDELY_B14                           = 0xf0b3,
         EN_NV_ID_RF_CA_RCCODE_B14                        = 0xf0b4,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B14             = 0xf0b5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B14                    = 0xf0b6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B14            = 0xf0b7,
@@ -9122,6 +9749,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B17        = 0xf0d6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B17         = 0xf0d7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B17         = 0xf0d8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B17                    = 0xf0d9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B17                  = 0xf0da,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B17                  = 0xf0db,
@@ -9129,6 +9757,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B17                       = 0xf0dd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B17               = 0xf0de,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B17              = 0xf0df,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B17                = 0xf0e5,
@@ -9147,6 +9776,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B17                    = 0xf0f2,
         EN_NV_ID_ET_EVDELY_B17                           = 0xf0f3,
         EN_NV_ID_RF_CA_RCCODE_B17                        = 0xf0f4,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B17             = 0xf0f5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B17                    = 0xf0f6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B17            = 0xf0f7,
@@ -9165,6 +9795,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B18         = 0xf116,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B18          = 0xf117,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B18          = 0xf118,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B18                    = 0xf119,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B18                  = 0xf11a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B18                  = 0xf11b,
@@ -9191,6 +9822,7 @@ extern "C" {
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B18             = 0xf135,
         EN_NV_ID_LTE_DPD_FAC_STRU_B18                    = 0xf136,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B18            = 0xf137,
+        /*add for V9R1_6361 End*/
 
 
 
@@ -9210,6 +9842,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B22        = 0xf156,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B22         = 0xf157,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B22         = 0xf158,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B22                    = 0xf159,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B22                  = 0xf15a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B22                  = 0xf15b,
@@ -9217,6 +9850,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B22                       = 0xf15d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B22               = 0xf15e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B22              = 0xf15f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B22                = 0xf165,
@@ -9235,6 +9869,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B22                    = 0xf172,
         EN_NV_ID_ET_EVDELY_B22                           = 0xf173,
         EN_NV_ID_RF_CA_RCCODE_B22                        = 0xf174,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B22            = 0xf175,
         EN_NV_ID_LTE_DPD_FAC_STRU_B22                   = 0xf176,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B22           = 0xf177,
@@ -9257,6 +9892,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B23        = 0xf196,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B23         = 0xf197,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B23         = 0xf198,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B23                    = 0xf199,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B23                  = 0xf19a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B23                  = 0xf19b,
@@ -9264,6 +9900,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B23                       = 0xf19d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B23               = 0xf19e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B23              = 0xf19f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B23                = 0xf1a5,
@@ -9282,6 +9919,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B23                    = 0xf1b2,
         EN_NV_ID_ET_EVDELY_B23                           = 0xf1b3,
         EN_NV_ID_RF_CA_RCCODE_B23                        = 0xf1b4,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B23             = 0xf1b5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B23                    = 0xf1b6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B23            = 0xf1b7,
@@ -9300,6 +9938,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B24        = 0xf1d6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B24         = 0xf1d7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B24         = 0xf1d8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B24                    = 0xf1d9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B24                  = 0xf1da,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B24                  = 0xf1db,
@@ -9307,6 +9946,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B24                       = 0xf1dd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B24               = 0xf1de,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B24              = 0xf1df,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B24                = 0xf1e5,
@@ -9325,6 +9965,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B24                    = 0xf1f2,
         EN_NV_ID_ET_EVDELY_B24                           = 0xf1f3,
         EN_NV_ID_RF_CA_RCCODE_B24                        = 0xf1f4,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B24             = 0xf1f5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B24                    = 0xf1f6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B24            = 0xf1f7,
@@ -9342,6 +9983,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B25         = 0xf216,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B25          = 0xf217,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B25          = 0xf218,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B25                    = 0xf219,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B25                  = 0xf21a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B25                  = 0xf21b,
@@ -9382,6 +10024,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B26         = 0xf856,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B26          = 0xf857,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B26          = 0xf858,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B26                    = 0xf859,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B26                  = 0xf85a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B26                  = 0xf85b,
@@ -9425,6 +10068,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B33        = 0xf256,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B33         = 0xf257,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B33         = 0xf258,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B33                    = 0xf259,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B33                  = 0xf25a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B33                  = 0xf25b,
@@ -9432,6 +10076,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B33                       = 0xf25d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B33               = 0xf25e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B33              = 0xf25f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B33                = 0xf265,
@@ -9450,6 +10095,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B33                    = 0xf272,
         EN_NV_ID_ET_EVDELY_B33                           = 0xf273,
         EN_NV_ID_RF_CA_RCCODE_B33                        = 0xf274,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B33             = 0xf275,
         EN_NV_ID_LTE_DPD_FAC_STRU_B33                    = 0xf276,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B33            = 0xf277,
@@ -9472,6 +10118,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B34        = 0xf296,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B34         = 0xf297,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B34         = 0xf298,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B34                    = 0xf299,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B34                  = 0xf29a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B34                  = 0xf29b,
@@ -9479,6 +10126,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B34                       = 0xf29d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B34               = 0xf29e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B34              = 0xf29f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B34                = 0xf2a5,
@@ -9497,6 +10145,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B34                    = 0xf2b2,
         EN_NV_ID_ET_EVDELY_B34                           = 0xf2b3,
         EN_NV_ID_RF_CA_RCCODE_B34                        = 0xf2b4,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B34             = 0xf2b5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B34                    = 0xf2b6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B34            = 0xf2b7,
@@ -9515,6 +10164,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B35        = 0xf2d6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B35         = 0xf2d7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B35         = 0xf2d8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B35                    = 0xf2d9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B35                  = 0xf2da,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B35                  = 0xf2db,
@@ -9522,6 +10172,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B35                       = 0xf2dd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B35               = 0xf2de,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B35              = 0xf2df,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B35                = 0xf2e5,
@@ -9540,6 +10191,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B35                    = 0xf2f2,
         EN_NV_ID_ET_EVDELY_B35                           = 0xf2f3,
         EN_NV_ID_RF_CA_RCCODE_B35                        = 0xf2f4,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B35             = 0xf2f5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B35                    = 0xf2f6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B35            = 0xf2f7,
@@ -9558,6 +10210,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B36        = 0xf316,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B36         = 0xf317,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B36         = 0xf318,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B36                    = 0xf319,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B36                  = 0xf31a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B36                  = 0xf31b,
@@ -9565,6 +10218,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B36                       = 0xf31d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B36               = 0xf31e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B36              = 0xf31f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B36                = 0xf325,
@@ -9583,6 +10237,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B36                    = 0xf332,
         EN_NV_ID_ET_EVDELY_B36                           = 0xf333,
         EN_NV_ID_RF_CA_RCCODE_B36                        = 0xf334,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B36             = 0xf335,
         EN_NV_ID_LTE_DPD_FAC_STRU_B36                    = 0xf336,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B36            = 0xf337,
@@ -9601,6 +10256,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B37        = 0xf356,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B37         = 0xf357,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B37         = 0xf358,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B37                    = 0xf359,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B37                  = 0xf35a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B37                  = 0xf35b,
@@ -9608,6 +10264,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B37                       = 0xf35d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B37               = 0xf35e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B37              = 0xf35f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B37                = 0xf365,
@@ -9626,6 +10283,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B37                    = 0xf372,
         EN_NV_ID_ET_EVDELY_B37                           = 0xf373,
         EN_NV_ID_RF_CA_RCCODE_B37                        = 0xf374,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B37             = 0xf375,
         EN_NV_ID_LTE_DPD_FAC_STRU_B37                    = 0xf376,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B37            = 0xf377,
@@ -9644,6 +10302,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B42        = 0xf396,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B42         = 0xf397,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B42         = 0xf398,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B42                    = 0xf399,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B42                  = 0xf39a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B42                  = 0xf39b,
@@ -9651,6 +10310,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B42                       = 0xf39d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B42               = 0xf39e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B42              = 0xf39f,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B42                = 0xf3a5,
@@ -9669,6 +10329,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B42                    = 0xf3b2,
         EN_NV_ID_ET_EVDELY_B42                           = 0xf3b3,
         EN_NV_ID_RF_CA_RCCODE_B42                        = 0xf3b4,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B42             = 0xf3b5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B42                    = 0xf3b6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B42            = 0xf3b7,
@@ -9687,6 +10348,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B43        = 0xf3d6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B43         = 0xf3d7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B43         = 0xf3d8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B43                    = 0xf3d9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B43                  = 0xf3da,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B43                  = 0xf3db,
@@ -9694,6 +10356,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B43                       = 0xf3dd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B43               = 0xf3de,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B43              = 0xf3df,
+        /*add for V9R1_6361 End*/
 
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B43                = 0xf3e5,
@@ -9712,6 +10375,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B43                    = 0xf3f2,
         EN_NV_ID_ET_EVDELY_B43                           = 0xf3f3,
         EN_NV_ID_RF_CA_RCCODE_B43                        = 0xf3f4,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B43             = 0xf3f5,
         EN_NV_ID_LTE_DPD_FAC_STRU_B43                    = 0xf3f6,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B43            = 0xf3f7,
@@ -9730,6 +10394,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B39        = 0xf416,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B39         = 0xf417,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B39         = 0xf418,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B39                    = 0xf419,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B39                  = 0xf41a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B39                  = 0xf41b,
@@ -9737,6 +10402,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_B39                       = 0xf41d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_B39               = 0xf41e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_B39              = 0xf41f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_LTE_TX_PD_AUTO_CAL_B39                = 0xf425,
         EN_NV_ID_LTE_TX_PD_PWR_TABLE_B39               = 0xf426,
@@ -9754,6 +10420,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B39                    = 0xf432,
         EN_NV_ID_ET_EVDELY_B39                           = 0xf433,
         EN_NV_ID_RF_CA_RCCODE_B39                        = 0xf434,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B39             = 0xf435,
         EN_NV_ID_LTE_DPD_FAC_STRU_B39                    = 0xf436,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B39            = 0xf437,
@@ -9772,6 +10439,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B28        = 0xf456,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B28         = 0xf457,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B28         = 0xf458,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B28                   = 0xf459,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B28                 = 0xf45a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B28                 = 0xf45b,
@@ -9795,6 +10463,7 @@ extern "C" {
         EN_NV_ID_ET_VOFFSET_GAIN_B28                    = 0xf472,
         EN_NV_ID_ET_EVDELY_B28                           = 0xf473,
         EN_NV_ID_RF_CA_RCCODE_B28                        = 0xf474,
+        /*add for K3V5 START DUKUN 20141211 */
         EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B28             = 0xf475,
         EN_NV_ID_LTE_DPD_FAC_STRU_B28                    = 0xf476,
         EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B28            = 0xf477,
@@ -9816,6 +10485,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon1         = 0xf457,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon1         = 0xf458,
         */
+        /*add for V9R1_6361 Begin*/
     /*    EN_NV_ID_IIP2_CAL_TABLE_BNon1                    = 0xf459,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon1                 = 0xf45a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon1                  = 0xf45b,
@@ -9824,6 +10494,7 @@ extern "C" {
         EN_NV_ID_PA_POWER_DIFFERENCE_BNon1               = 0xf45e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon1              = 0xf45f,
         */
+        /*add for V9R1_6361 End*/
     /*BEGIN DTS2014041603793 c00203521 modify for B28全频段特性*/
        /*BAND128 生产NV*/
         EN_NV_ID_ANT_MODEM_LOSS_B128                        = 0xf480,
@@ -9839,6 +10510,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_B128       = 0xf496,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B128        = 0xf497,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B128        = 0xf498,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_B128                        = 0xf499,
         EN_NV_ID_RF_DCOC_CAL_ANT1_B128                  = 0xf49a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_B128                  = 0xf49b,
@@ -10081,6 +10753,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon8        = 0xf616,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon8         = 0xf617,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon8         = 0xf618,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon8                    = 0xf619,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon8                 = 0xf61a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon8                  = 0xf61b,
@@ -10088,6 +10761,7 @@ extern "C" {
         EN_NV_ID_RF_TXIQ_CAL_BNon8                       = 0xf61d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon8               = 0xf61e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon8              = 0xf61f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon9                     = 0xf640,
         EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_BNon9         = 0xf64d,
@@ -10103,6 +10777,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon9        = 0xf656,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon9         = 0xf657,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon9         = 0xf658,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon9                    = 0xf659,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon9                 = 0xf65a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon9                  = 0xf65b,
@@ -10110,6 +10785,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon9                       = 0xf65d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon9               = 0xf65e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon9              = 0xf65f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon10                     = 0xf680,
         EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_BNon10         = 0xf68d,
@@ -10124,6 +10800,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon10        = 0xf696,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon10         = 0xf697,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon10         = 0xf698,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon10                   = 0xf699,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon10                = 0xf69a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon10                 = 0xf69b,
@@ -10131,6 +10808,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon10                      = 0xf69d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon10              = 0xf69e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon10             = 0xf69f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon11                     = 0xf6c0,
         EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_BNon11         = 0xf6cd,
@@ -10145,6 +10823,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon11        = 0xf6d6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon11         = 0xf6d7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon11         = 0xf6d8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon11                   = 0xf6d9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon11                = 0xf6da,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon11                 = 0xf6db,
@@ -10152,6 +10831,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon11                      = 0xf6dd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon11              = 0xf6de,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon11             = 0xf6df,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon12                     = 0xf700,
         EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_BNon12         = 0xf70d,
@@ -10166,6 +10846,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon12        = 0xf716,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon12         = 0xf717,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon12         = 0xf718,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon12                   = 0xf719,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon12                = 0xf71a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon12                 = 0xf71b,
@@ -10173,6 +10854,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon12                      = 0xf71d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon12              = 0xf71e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon12             = 0xf71f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon13                     = 0xf740,
         EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_BNon13         = 0xf74d,
@@ -10187,6 +10869,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon13        = 0xf756,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon13         = 0xf757,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon13         = 0xf758,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon13                   = 0xf759,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon13                = 0xf75a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon13                 = 0xf75b,
@@ -10194,6 +10877,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon13                      = 0xf75d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon13              = 0xf75e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon13             = 0xf75f,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon14                     = 0xf780,
         EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_BNon14         = 0xf78d,
@@ -10208,6 +10892,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon14        = 0xf796,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon14         = 0xf797,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon14         = 0xf798,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon14                   = 0xf799,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon14                = 0xf79a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon14                 = 0xf79b,
@@ -10215,6 +10900,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon14                      = 0xf79d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon14              = 0xf79e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon14             = 0xf79f,
+        /*add for V9R1_6361 End*/
 #if 0
         EN_NV_ID_ANT_MODEM_LOSS_BNon15                     = 0xf7c0,
         EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_BNon15         = 0xf7cd,
@@ -10229,6 +10915,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon15        = 0xf7d6,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon15         = 0xf7d7,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon15         = 0xf7d8,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon15                   = 0xf7d9,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon15                = 0xf7da,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon15                 = 0xf7db,
@@ -10236,6 +10923,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon15                      = 0xf7dd,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon15              = 0xf7de,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon15             = 0xf7df,
+        /*add for V9R1_6361 End*/
 
         EN_NV_ID_ANT_MODEM_LOSS_BNon16                     = 0xf800,
         EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_BNon16         = 0xf80d,
@@ -10250,6 +10938,7 @@ extern "C" {
         EN_NV_ID_LTE_TX_APT_COMP_MC_HIGH_TBL_BNon16        = 0xf816,
         EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_BNon16         = 0xf817,
         EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_BNon16         = 0xf818,
+        /*add for V9R1_6361 Begin*/
         EN_NV_ID_IIP2_CAL_TABLE_BNon16                   = 0xf819,
         EN_NV_ID_RF_DCOC_CAL_ANT1_BNon16                = 0xf81a,
         EN_NV_ID_RF_DCOC_CAL_ANT2_BNon16                 = 0xf81b,
@@ -10257,6 +10946,7 @@ extern "C" {
         EN_NV_ID_LTE_RF_TXIQ_CAL_STRU_BNon16                      = 0xf81d,
         EN_NV_ID_LTE_DEFAULT_POW_TABLE_STRU_BNon16              = 0xf81e,
         EN_NV_ID_TX_RF_FREQ_COMP_STRU_BNon16             = 0xf81f,
+        /*add for V9R1_6361 End*/
 #endif
 
         /* modify by w00184272 for 所有band end*/
@@ -10275,7 +10965,9 @@ extern "C" {
         EN_NV_ID_AD9361_UL_PARA                         = 0xD3CB,
         EN_NV_ID_HI6360_UL_PARA                         = 0xD3CC,
 
+        /* modify by lisahgnfeng begin */
         EN_NV_ID_PHY_FUNC_VERIFY_SWITCH_PARA            = 0xD3E0,
+        /* modify by lisahgnfeng end */
 
         /*tcx0*/
         EN_NV_ID_TCXO_DYNAMIC_CONFIG_PARA               = 0xD3E2,

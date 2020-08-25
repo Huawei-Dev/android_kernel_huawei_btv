@@ -175,6 +175,7 @@ extern "C" {
 
 
 
+/*Modified by dongying for UT,2010-2-1,begin*/
 #elif defined(PS_UT_SWITCH)|| defined(_GAS_UT_SWITCH_)
 #include "stdlib.h"
 
@@ -182,9 +183,11 @@ extern "C" {
 #define PS_MEM_SET(pBuffer,ucData,Count)                    (VOS_VOID)memset(pBuffer, ucData, Count)
 /*lint -emacro({586}, PS_ALLOC_MSG)*/
 #define PS_ALLOC_MSG(ulPid , ulLen)                         malloc((ulLen) + VOS_MSG_HEAD_LENGTH)
+/* pengzhipeng add for clear define start*/
 /*lint -emacro({586}, PS_ALLOC_MSG_WITH_HEADER_LEN)*/
 #define PS_ALLOC_MSG_WITH_HEADER_LEN(ulPid , ulLen)         malloc(ulLen)
 #define PS_POST_MSG(ulPid, pMsg)                            VOS_PostMsg(ulPid,pMsg)
+/* pengzhipeng add for clear define end*/
 /*lint -emacro({586}, PS_SEND_MSG)*/
 #define PS_SEND_MSG(ulPid, pMsg)                            free(pMsg)
 /*lint -emacro({586}, PS_MEM_FREE)*/
@@ -199,6 +202,7 @@ extern "C" {
 #define PS_MEM_MOVE(pDestBuffer,pSrcBuffer,ulBuffLen)       memmove(pDestBuffer,pSrcBuffer,ulBuffLen)
 
 #else
+/*Modified by dongying for UT,2010-2-1,end*/
 /*ÄÚ´æ¿½±´ºê¶¨Òå*/
 
 #define PS_MEM_CPY(pucDestBuffer, pucSrcBuffer, ulBufferLen) \

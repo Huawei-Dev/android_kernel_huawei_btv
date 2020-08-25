@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may
+* *    be used to endorse or promote products derived from this software
+* *    without specific prior written permission.
+*
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 /*****************************************************************************
   1 头文件包含
@@ -44,6 +90,7 @@ typedef struct
   5 函数实现
 *****************************************************************************/
 /*lint -e958*/
+/* Added by f62575 for AT Project, 2011-10-24, begin */
 
 
 /* Deleted by s00217060 for VoLTE_PhaseIII  项目, 2013-12-16, begin */
@@ -2121,7 +2168,7 @@ LOCAL VOS_UINT32  MSG_DecodeUdh(
 }
 
 /*****************************************************************************
- 函 数 名  : MN_MSG_UnpackSmWithOutUhh
+ 函 数 名  : MN_MSG_UnpackSmWithOutUdh
  功能描述  : TP-UDHI指示无消息头部的TPDU包中解析TP-UP
  输入参数  : const MN_MSG_DCS_CODE_STRU          *pstDcsInfo
              VOS_UINT8                           *pucUserData
@@ -2141,8 +2188,11 @@ LOCAL VOS_UINT32  MSG_DecodeUdh(
   3.日    期   : 2013年6月26日
     作    者   : f62575
     修改内容   : V9R1 STK升级
+  4.日    期   : 2017年1月23日
+    作    者   : q00380176
+    修改内容   : 修改函数名称，MN_MSG_UnpackSmWithOutUhh -> MN_MSG_UnpackSmWithOutUdh,DTS2017011304834
 *****************************************************************************/
-LOCAL VOS_UINT32 MN_MSG_UnpackSmWithOutUhh(
+LOCAL VOS_UINT32 MN_MSG_UnpackSmWithOutUdh(
     const MN_MSG_DCS_CODE_STRU          *pstDcsInfo,
     VOS_UINT8                           *pucUserData,
     VOS_UINT8                           *pucUnpackedSm
@@ -2266,7 +2316,7 @@ LOCAL VOS_UINT32 MN_MSG_UpackSmWithUdh(
      && (VOS_TRUE != pstDcsInfo->bCompressed))
     {
         ucFillBit = (7 - (((ucUdhl + 1) * 8) % 7)) % 7;
-        if ((((ucUdl * 7) + 7) / 8) < (ucUdhl + 1))
+        if (ucUdl < ((((ucUdhl + 1) * 8) + 6)/7))
         {
             MN_WARN_LOG("MN_MSG_UpackSmWithUdh: udhl is invalid.");
             return MN_ERR_CLASS_SMS_MSGLEN_OVERFLOW;
@@ -2274,7 +2324,7 @@ LOCAL VOS_UINT32 MN_MSG_UpackSmWithUdh(
         *pulLen = ucUdl - ((((ucUdhl + 1) * 8) + 6)/7);
         /* Modified by f62575 for V9R1 STK升级, 2013-6-26, begin */
         ulRet = TAF_STD_UnPack7Bit(&(pucUserData[ulPos]),
-                                   ucUdl,
+                                   *pulLen,
                                    ucFillBit,
                                    pucUnpackedSm);
         if (VOS_OK != ulRet)
@@ -2289,11 +2339,14 @@ LOCAL VOS_UINT32 MN_MSG_UpackSmWithUdh(
     }
     else
     {
-        *pulLen = ucUdl - (ucUdhl + 1);
-        if (*pulLen > MN_MSG_MAX_LEN)
+
+        if ((ucUdhl + 1) > ucUdl)
         {
-            *pulLen = MN_MSG_MAX_LEN;
+            return MN_ERR_CLASS_SMS_MSGLEN_OVERFLOW;
         }
+
+        *pulLen = ucUdl - (ucUdhl + 1);
+
         PS_MEM_CPY(pucUnpackedSm,
                    &(pucUserData[ulPos]),
                    *pulLen);
@@ -2367,9 +2420,11 @@ LOCAL VOS_UINT32 MSG_DecodeUserData_ForUsimMsg(
     {
         /*decode SM, Refer to 23040 9.2.3.16*/
         pstUserData->ulLen = ucUdl;
-        ulRet = MN_MSG_UnpackSmWithOutUhh(pstDcsInfo,
+
+        ulRet = MN_MSG_UnpackSmWithOutUdh(pstDcsInfo,
                                           &(pucUserData[ulPos]),
                                           pstUserData->pucOrgData);
+
     }
 
     return ulRet;
@@ -2572,9 +2627,11 @@ LOCAL VOS_UINT32 MSG_DecodeUserData(
 
     /*decode SM, Refer to 23040 9.2.3.16*/
     pstUserData->ulLen = ucUdl;
-    ulRet = MN_MSG_UnpackSmWithOutUhh(pstDcsInfo,
+
+    ulRet = MN_MSG_UnpackSmWithOutUdh(pstDcsInfo,
                                       &(pucUserData[ulPos]),
                                       pstUserData->aucOrgData);
+
 
     return ulRet;
 }

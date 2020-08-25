@@ -48,6 +48,7 @@ extern "C" {
 #define AT_WIFI_SSID_LEN_MAX            (33)
 #define AT_WIFI_KEY_LEN_MAX             (27)
 
+/* Add by z60575 for multi_ssid, 2012-9-5 begin */
 /* 鉴权模式字符串长度 */
 #define AT_WIFI_WLAUTHMODE_LEN          (16)
 
@@ -69,6 +70,7 @@ extern "C" {
 #define TAF_NV_IPV6_FALLBACK_EXT_CAUSE_MAX_NUM      (20)
 
 #define AT_AP_NVIM_XML_RPT_SRV_URL_LEN              (127)
+/* Added by l60609 for XML, 2011-08-11 Begin */
 #define AT_AP_XML_RPT_SRV_URL_LEN                   (127)
 #define AT_AP_XML_RPT_SRV_URL_STR_LEN               (AT_AP_XML_RPT_SRV_URL_LEN + 1)
 #define AT_AP_XML_RPT_INFO_TYPE_LEN                 (127)
@@ -1056,6 +1058,7 @@ typedef struct
     VOS_UINT8   ucReserve[3];
 }TAF_AT_NVIM_AP_XML_RPT_FLG_STRU;
 
+/* Added by l60609 for XML, 2011-08-11 End */
 
 /*****************************************************************************
  结构名    : AT_CLIENT_BASIC_INFO_STRU
@@ -1757,6 +1760,7 @@ typedef struct
     VOS_UINT8                           aucReserved[3];
 }MN_MSG_REPLACE_DELIVER_MSG_STRU;
 
+/* Added by z40661 for AMR-WB , 2012-02-09 , end */
 /*****************************************************************************
  结构名    : TAF_APS_DSFLOW_STATS_CTRL_NV_STRU
  结构说明  : 流量统计控制NV项结构定义
@@ -1991,6 +1995,7 @@ typedef struct
 }MN_MSG_SMS_STATUS_IN_EFSMS_SUPPORT_FLG_STRU;
 
 
+/* Added by z40661 for AMR-WB , 2012-02-09 , begin */
 
 /*****************************************************************************
  结构名    : MN_CALL_NIMV_ITEM_CODEC_TYPE_STRU
@@ -2007,7 +2012,9 @@ typedef struct
     VOS_UINT8                           ucReserve;
 }MN_CALL_NIMV_ITEM_CODEC_TYPE_STRU;
 
+/* Added by z40661 for AMR-WB , 2012-02-09 , end */
 
+	/* Added by f62575 for C50_IPC Project, 2012/02/23, begin */
 /*****************************************************************************
  结构名    : TAF_FDN_CONFIG_STRU
  结构说明  : FDN业务特性参数结构
@@ -2020,6 +2027,7 @@ typedef struct
 {
     VOS_UINT32       ulMeStatus;
 }TAF_FDN_NVIM_CONFIG_STRU;
+/* Added by f62575 for C50_IPC Project, 2012/02/23, end   */
 
 /*****************************************************************************
 结构名    : TAF_CALL_NVIM_CALL_NOT_SUPPORTED_CAUSE_STRU
@@ -2246,6 +2254,7 @@ typedef struct
     VOS_UINT8                           ucStatus;                               /* 1: NV有效标志位，0：无效 */
     VOS_UINT8                           ucVpCfgState;                           /* 当前NV配置值 */
 }MN_CALL_NV_ITEM_VIDEO_CALL_STRU;
+/* Added by f62575 for AT Project, 2011-10-27, begin */
 
 /*****************************************************************************
  结构名    : MN_MSG_NVIM_CLASS0_TAILOR_STRU
@@ -2259,6 +2268,7 @@ typedef struct
     VOS_UINT8                           ucActFlg;                               /* NVIM中该项是否激活 */
     VOS_UINT8                           enClass0Tailor;
 }MN_MSG_NVIM_CLASS0_TAILOR_STRU;
+/* Added by f62575 for AT Project, 2011-10-27, end */
 /* 终端可配置需求: 2G拨号请求禁止Spare_bit3等参数 */
 typedef struct
 {
@@ -2914,6 +2924,7 @@ typedef struct
     VOS_UINT8   aucReserved[22];         /* 保留 */
 }AT_DYNAMIC_PID_TYPE_STRU;
 
+/* Added by L47619 for V3R3 Share-PDP Project, 2013-6-3, begin */
 /*****************************************************************************
  结构名    : TAF_NVIM_SHARE_PDP_INFO_STRU
  结构说明  : Share-PDP特性控制NV
@@ -2941,6 +2952,7 @@ typedef struct
     VOS_UINT8                           ucEnableFlag;  /* AT+CFUN=0软关机，去激活(U)SIM卡功能使能标识, 0 - 禁止, 1 - 使能*/
     VOS_UINT8                           aucReserved[3];
 } TAF_NVIM_DEACT_SIM_WHEN_POWEROFF_STRU;
+/* Added by L47619 for V3R3 Share-PDP Project, 2013-6-3, end */
 
 /* 下移到MSCC module */
 
@@ -3001,6 +3013,7 @@ typedef struct
 } MTC_NV_RF_INTRUSION_CFG_STRU;
 /* Added by j00174725 for V9R1 干扰控制, 2013/08/12, end */
 
+/* Added by f62575 for VSIM FEATURE, 2013-8-29, begin */
 /**************************************************************
  结构名    : TAF_NVIM_VSIM_CFG_STRU
  结构说明  : ME的虚拟卡控制参数
@@ -3025,6 +3038,7 @@ typedef struct
     VOS_UINT8                           aucReserved3;
 } TAF_NVIM_VSIM_CFG_STRU;
 
+/* Added by f62575 for VSIM FEATURE, 2013-8-29, end */
 /*****************************************************************************
  结构名    : TAF_SSA_NVIM_RETRY_CFG_STRU
  结构说明  : 记录ss重发配置信息

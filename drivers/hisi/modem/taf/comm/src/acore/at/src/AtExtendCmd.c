@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may
+* *    be used to endorse or promote products derived from this software
+* *    without specific prior written permission.
+*
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
 /*****************************************************************************
   1 头文件包含
@@ -93,6 +139,7 @@ const TAF_UINT16 gusAtSmsCmdNum = sizeof(gastAtSmsCmdTab)/sizeof(AT_SMS_CMD_TAB_
 
 AT_PAR_CMD_ELEMENT_STRU g_astAtExtendCmdTbl[] =
 {
+    /* Added by f62575 for AT Project, 2011-10-24, begin */
     /* PHONEBOOK */
     {AT_CMD_CPBS,
     At_SetCpbsPara,     AT_SET_PARA_TIME,   At_QryCpbsPara,  AT_QRY_PARA_TIME,  AT_TestCpbsPara, AT_SET_PARA_TIME,
@@ -249,6 +296,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtExtendCmdTbl[] =
     VOS_NULL_PTR,        AT_NOT_SET_TIME,
     AT_CMS_OPERATION_NOT_ALLOWED, CMD_TBL_LIMITED_NULL,
     (TAF_UINT8*)"+CSCB",    (VOS_UINT8*)"(0,1),(MIDS),(DCSS)"},
+    /* Added by f62575 for AT Project, 2011-10-24, end */
 
     /* 语音新增AT命令 */
     {AT_CMD_CLVL,
@@ -405,11 +453,13 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtExtendCmdTbl[] =
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"+CGATT",      (VOS_UINT8*)"(0,1)"},
 
+    /* Modified by s46746 for V7R1 phase II , 2011-10-18, begin */
     {AT_CMD_COPS,
     At_SetCopsPara,     AT_COPS_SPEC_SRCH_TIME, At_QryCopsPara,   AT_QRY_PARA_TIME,   At_TestCopsPara, AT_COPS_LIST_SRCH_TIME,
     At_AbortCopsPara,   AT_COPS_LIST_ABORT_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"+COPS",       (VOS_UINT8*)"(0,1,3),(0-2),(@oper),(0,2,7)"},
+    /* Modified by s46746 for V7R1 phase II , 2011-10-18, end */
 
     {AT_CMD_CSGIDSEARCH,
     AT_SetCsgIdSearchPara,     AT_CSG_SPEC_SRCH_TIME, At_QryCampCsgIdInfo,   AT_QRY_PARA_TIME,   AT_TestCsgIdSearchPara, AT_CSG_LIST_SRCH_TIME,
@@ -506,6 +556,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtExtendCmdTbl[] =
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"+CPOL",       (VOS_UINT8*)"(1-100),(0-2),(oper),(0,1),(0,1),(0,1),(0,1)"},
 
+    /* Modified by s46746 for SS FDN&Call Control, 2013-05-31, begin */
     {AT_CMD_CREG,
     At_SetCregPara,     AT_SET_PARA_TIME,  At_QryCregPara,   AT_QRY_PARA_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,        AT_NOT_SET_TIME,
@@ -523,6 +574,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtExtendCmdTbl[] =
     VOS_NULL_PTR,        AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_NO_LIMITED,
     (VOS_UINT8*)"+CEREG",   (VOS_UINT8*)"(0-2)"},
+    /* Modified by s46746 for SS FDN&Call Control, 2013-05-31, end */
 
     {AT_CMD_CGDCONT,
     AT_SetCgdcontPara, AT_SET_PARA_TIME, AT_QryCgdcontPara, AT_QRY_PARA_TIME, At_TestCgdcont, AT_NOT_SET_TIME,
@@ -689,11 +741,13 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtExtendCmdTbl[] =
     VOS_NULL_PTR,        AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS,    CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8 *)"+CMUT",   (VOS_UINT8 *)"(0,1)"},
+    /* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
     {AT_CMD_COPN,
     AT_SetCopnPara,     AT_SET_PARA_TIME,   VOS_NULL_PTR,       AT_NOT_SET_TIME,   At_CmdTestProcOK,   AT_NOT_SET_TIME,
     VOS_NULL_PTR,        AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS,    CMD_TBL_LIMITED_NULL,
     (VOS_UINT8 *)"+COPN",   VOS_NULL_PTR},
+    /* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
     {AT_CMD_RELEASERRC,
     At_SetReleaseRrc,          AT_SET_PARA_TIME, VOS_NULL_PTR,  AT_NOT_SET_TIME,  VOS_NULL_PTR,        AT_NOT_SET_TIME,

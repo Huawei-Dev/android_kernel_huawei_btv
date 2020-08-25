@@ -13,6 +13,8 @@
 #ifndef HISI_AP_DRV_H
 #define HISI_AP_DRV_H
 #include <linux/module.h>
+#include <linux/version.h>
+
 /*************************************************************************
 *
 *   启动/加载/复位/校验
@@ -185,6 +187,7 @@ int bsp_reset_core_notify(BSP_CORE_TYPE_E ecoretype, unsigned int cmdtype, unsig
 #define STR_EXCEPTIONDESC_MAXLEN	48
 
 /*与AP 约定定义成如下格式，如果变更，有AP变更*/
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0))
 typedef enum
 {
     CP_S_MODEMDMSS = 0x2c,
@@ -196,7 +199,30 @@ typedef enum
     CP_S_RILD_EXCEPTION = 0x3b,
     CP_S_3RD_EXCEPTION = 0x3c,
 } EXCH_SOURCE;
+#else
+typedef enum
+{
+    CP_S_MODEMDMSS     = 0x50,
+    CP_S_MODEMNOC      = 0x51,
+    CP_S_MODEMAP       = 0x52,
+    CP_S_EXCEPTION     = 0x53,
+    CP_S_RESETFAIL     = 0x54,
+    CP_S_NORMALRESET   = 0x55,
+    CP_S_RILD_EXCEPTION= 0x56,
+    CP_S_3RD_EXCEPTION = 0x57,
+    CP_S_DRV_EXC       = 0x58,
+    CP_S_PAM_EXC       = 0x59,
+    CP_S_GUAS_EXC      = 0x5a,
+    CP_S_CTTF_EXC      = 0x5b,
+    CP_S_CAS_CPROC_EXC = 0x5c,
+    CP_S_GUDSP_EXC     = 0x5d,
+    CP_S_TLPS_EXC      = 0x5e,
+    CP_S_TLDSP_EXC     = 0x5f,
+    CP_S_CPHY_EXC      = 0x60,
+    CP_S_GUCNAS_EXC    = 0x61,
 
+} EXCH_SOURCE;
+#endif
 
 struct list_head_rdr {
 	struct list_head_rdr *next, *prev;

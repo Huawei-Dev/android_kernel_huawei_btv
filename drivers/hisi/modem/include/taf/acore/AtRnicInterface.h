@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and 
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may 
+* *    be used to endorse or promote products derived from this software 
+* *    without specific prior written permission.
+* 
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 #ifndef __AT_RNIC_INTERFACE_H__
 #define __AT_RNIC_INTERFACE_H__
 
@@ -86,8 +132,10 @@ enum AT_RNIC_MSG_ID_ENUM
     ID_AT_RNIC_PDP_DEACT_IND            = 0x0006,   /* PDP去激活指示 */         /* _H2ASN_MsgChoice AT_RNIC_PDP_DEACT_IND_STRU */
     ID_AT_RNIC_DSFLOW_IND               = 0x0007,   /* 流量上报指示 */          /* _H2ASN_MsgChoice AT_RNIC_DSFLOW_IND_STRU */
     ID_AT_RNIC_MTU_CHANGE_IND           = 0x0008,   /* MTU更改指示 */           /* _H2ASN_MsgChoice AT_RNIC_MTU_CHANGE_IND_STRU */
+    /* Added by L47619 for V3R3 Share-PDP Project, 2013-6-3, begin */
     ID_AT_RNIC_PDN_INFO_CFG_IND         = 0x0009,   /* Share-PDP配置指示 */      /* _H2ASN_MsgChoice AT_RNIC_PDN_INFO_CFG_IND_STRU */
     ID_AT_RNIC_PDN_INFO_REL_IND         = 0x000A,   /* Share-PDP释放指示 */      /* _H2ASN_MsgChoice AT_RNIC_PDN_INFO_REL_IND_STRU */
+    /* Added by L47619 for V3R3 Share-PDP Project, 2013-6-3, end */
 
     /* RNIC发给AT的消息枚举 */
     ID_RNIC_AT_PDP_OPERATE_IND          = 0x1001,   /* PDP激活或者去激活指示 */ /* _H2ASN_MsgChoice RNIC_AT_PDP_OPERATE_IND_STRU */
@@ -147,8 +195,10 @@ typedef struct
     VOS_MSG_HEADER                                                                  /* _H2ASN_Skip */
     AT_RNIC_MSG_ID_ENUM_UINT32          enMsgId;                    /* 消息ID */    /* _H2ASN_Skip */
     MN_CLIENT_ID_T                      clientId;                   /* Client ID */
+    /* Modified by l60609 for V9R1 IPv6&TAF/SM Project, 2013-4-27, begin */
     RNIC_RMNET_ID_ENUM_UINT8            enRnicRmNetId;              /* RNIC网卡ID */
     VOS_UINT8                           aucRsv[1];                  /* 保留 */
+    /* Modified by l60609 for V9R1 IPv6&TAF/SM Project, 2013-4-27, end */
 }AT_RNIC_DSFLOW_IND_STRU;
 
 /*****************************************************************************
@@ -311,6 +361,7 @@ typedef struct
 }AT_RNIC_MTU_CHANGE_IND_STRU;
 
 
+/* Added by L47619 for V3R3 Share-PDP Project, 2013-6-3, begin */
 /*****************************************************************************
  结构名  : AT_RNIC_IPV4_PDN_INFO_STRU
  结构说明: IPv4配置信息结构, 地址全0为无效
@@ -391,6 +442,7 @@ typedef struct
     VOS_UINT8                           aucRsv[2];
 
 } AT_RNIC_PDN_INFO_REL_IND_STRU;
+/* Added by L47619 for V3R3 Share-PDP Project, 2013-6-3, end */
 
 /*****************************************************************************
   8 UNION定义

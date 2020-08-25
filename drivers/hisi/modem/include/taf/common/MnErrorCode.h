@@ -1,4 +1,50 @@
-
+/*
+* Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+* foss@huawei.com
+*
+* If distributed as part of the Linux kernel, the following license terms
+* apply:
+*
+* * This program is free software; you can redistribute it and/or modify
+* * it under the terms of the GNU General Public License version 2 and 
+* * only version 2 as published by the Free Software Foundation.
+* *
+* * This program is distributed in the hope that it will be useful,
+* * but WITHOUT ANY WARRANTY; without even the implied warranty of
+* * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* * GNU General Public License for more details.
+* *
+* * You should have received a copy of the GNU General Public License
+* * along with this program; if not, write to the Free Software
+* * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+*
+* Otherwise, the following license terms apply:
+*
+* * Redistribution and use in source and binary forms, with or without
+* * modification, are permitted provided that the following conditions
+* * are met:
+* * 1) Redistributions of source code must retain the above copyright
+* *    notice, this list of conditions and the following disclaimer.
+* * 2) Redistributions in binary form must reproduce the above copyright
+* *    notice, this list of conditions and the following disclaimer in the
+* *    documentation and/or other materials provided with the distribution.
+* * 3) Neither the name of Huawei nor the names of its contributors may 
+* *    be used to endorse or promote products derived from this software 
+* *    without specific prior written permission.
+* 
+* * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 #ifndef  MN_ERROR_CODE_H
 #define  MN_ERROR_CODE_H
 
@@ -95,13 +141,19 @@ extern "C" {
 #define    MN_ERR_CLASS_SMS_FLASH_MEM_NOTEXIST_FILE         (MN_ERR_CLASS_MSG + 47)
 #define    MN_ERR_CLASS_SMS_MO_CTRL_USIM_PARA_ERROR         (MN_ERR_CLASS_MSG + 48)
 #define    MN_ERR_CLASS_SMS_MO_CTRL_ACTION_NOT_ALLOWED      (MN_ERR_CLASS_MSG + 49)
+/* Added by f62575 for 2012082906141, 2012/10/10, begin */
 #define    MN_ERR_CLASS_SMS_MOSTATE                         (MN_ERR_CLASS_MSG + 50)
+/* Added by f62575 for 2012082906141, 2012/10/10, end */
 
 #define    MN_ERR_CLASS_CBS_CROSS_MID_ERROR                 (MN_ERR_CLASS_MSG + 101)
 #define    MN_ERR_CLASS_CBS_NOW_INITING                     (MN_ERR_CLASS_MSG + 102)
 #define    MN_ERR_CLASS_CBS_TOO_CBMIDS                      (MN_ERR_CLASS_MSG + 103)
+/* Modified by s46746 for SS FDN&Call Control, 2013-05-17, begin */
+/* Added by f62575 for C50_IPC Project, 2012/02/23, begin */
 #define    MN_ERR_CLASS_FDN_CHECK_DN_FAILURE                (MN_ERR_CLASS_MSG + 104)
 #define    MN_ERR_CLASS_FDN_CHECK_SC_FAILURE                (MN_ERR_CLASS_MSG + 105)
+/* Added by f62575 for C50_IPC Project, 2012/02/23, end   */
+/* Modified by s46746 for SS FDN&Call Control, 2013-05-17, end */
 /* Added by f62575 for V9R1 STKÉý¼¶, 2013-6-26, begin */
 #define    MN_ERR_CLASS_INVALID_TP_ADDRESS                  (MN_ERR_CLASS_MSG + 106)
 #define    MN_ERR_CLASS_INVALID_TP_UD                       (MN_ERR_CLASS_MSG + 107)

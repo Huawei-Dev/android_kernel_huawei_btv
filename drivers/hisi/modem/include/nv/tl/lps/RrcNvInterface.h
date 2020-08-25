@@ -72,16 +72,22 @@ extern "C" {
 #define RRC_MAX_NUM_OF_BANDS                    (64)
 #define RRC_MAX_NUM_OF_CDMA_BAND_CLASS          (32)
 #define RRC_MAX_NUM_OF_FEATURE_GROUP            (32)
+/* add for MFBI begin */
 #define RRC_FGI_MULTIBAND_SUPPORT_IN_ARRAY      (30)
+/* add for MFBI end */
 
+/* add for ANR begin */
 #define RRC_FGI_ANR_INTRA_SUPPORT_IN_ARRAY      (16)
 #define RRC_FGI_ANR_INTER_SUPPORT_IN_ARRAY      (17)
 #define RRC_FGI_ANR_IRAT_SUPPORT_IN_ARRAY       (18)
+/* add for ANR end */
 
+/*begin: add for feature v700r500*/
 #define RRC_MAX_NUM_OF_INTER_BAND_TDD_CA_DIFF_CFG_R11  (2)
 #define RRC_MAX_BYTE_LEN_OF_LATE_NON_CRITIC_EXT        (256)
 #define RRC_MAX_REQ_BANDS_R11                          (64)
 #define RRC_MAX_NUM_OF_SUPPORT_BAND_WIDTH_COMB_SET_R10 (4)
+/*end: add for feature v700r500*/
 
 #define RRC_MAX_SUPP_NAICS_2CRS_AP_R12                  (1)
 #define RRC_MAX_BIT_LEN_OF_COMM_SUPPBANDS_PERBC_R12     (8)
@@ -93,8 +99,10 @@ extern "C" {
 #define RRC_MAX_SUPP_BANDINFO_LIST_R12                  (64)
 
 /* v7r2 LLD begin */
+/*begin: modify for feature v700r500*/
 #define RRC_MAX_NUM_OF_BAND_COMB_R10            (64)  /*协议值为128，数组过大，拆分为2个64*/
 #define RRC_MAX_NUM_OF_BAND_COMB_R11            (64)  /*协议值为256，数组过大，拆分为4个64*/
+/*end: modify for feature v700r500*/
 
 #define RRC_MAX_NUM_OF_SIMULTANEOUS_BANDS_R10   (4)
 #define RRC_MAX_NUM_OF_BANDWIDTH_CLASS_R10      (2)
@@ -108,8 +116,10 @@ extern "C" {
 /* v7r2 code begin */
 #define RRC_REL10_ACCESS_STRATUM_REL            0x04
 /* v7r2 code end */
+/*begin: add for feature v700r500*/
 #define RRC_REL11_ACCESS_STRATUM_REL            0x08
 #define RRC_REL12_ACCESS_STRATUM_REL            0x10
+/*end: add for feature v700r500*/
 
 #define RRC_NUM_OF_MCC_CA_NV                    (7)     /* mcc NV个数 */
 #define RRC_MAX_NUM_OF_MCC                      (15)    /* 规格值100，NV超出大小，拆成7个NV */
@@ -1842,6 +1852,7 @@ typedef struct
     RRC_NEIGH_CELL_SI_ACQ_PARAM_R9_STRU         stNeighCellSiAcqParamR9;        /* optional */
 }RRC_UE_EUTRA_CAP_ADD_XDD_MODE_R9_STRU;
 
+/*begin: add for feature v700r500*/
 typedef VOS_UINT16           RRC_FREQ_BAND_IND_V9E0_UINT16;
 
 /*****************************************************************************
@@ -2181,7 +2192,9 @@ typedef struct
     /*R11 NV end*/
 }RRC_UE_EUTRA_CAP_V9C0_IES_STRU;
 
+/*end: add for feature v700r500*/
 
+/*begin: modify for feature v700r500*/
 /*****************************************************************************
  结构名    : RRC_UE_EUTRA_CAP_V9A0_IES_STRU
  协议表格  :
@@ -2200,6 +2213,7 @@ typedef struct
     RRC_UE_EUTRA_CAP_ADD_XDD_MODE_R9_STRU       stFddAddUeEutraCapabilitiesR9;  /* optional */
     RRC_UE_EUTRA_CAP_ADD_XDD_MODE_R9_STRU       stTddAddUeEutraCapabilitiesR9;  /* optional */
 }RRC_UE_EUTRA_CAP_V9A0_IES_STRU;
+/*end: modify for feature v700r500*/
 
 /*****************************************************************************
  结构名    : RRC_NON_CONTI_UL_RA_WITHIN_CC_R10_STRU
@@ -3362,6 +3376,7 @@ typedef struct
     RRC_UE_RX_TX_TIME_DIFF_MEAS_R11_ENUM_UINT8    enUeRxTxTimeDiffMeasR11;    /* optional */
 }RRC_OTHER_PARAM_R11_STRU;
 
+/*begin: add for feature v700r500*/
 /*****************************************************************************
  结构名    : RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1130_STRU
  协议表格  :
@@ -3379,7 +3394,9 @@ typedef struct
     RRC_MEAS_PARAM_V1130_STRU                   stMeasParamV1130;           /* optional */
     RRC_OTHER_PARAM_R11_STRU                    stOtherParamR11;            /* optional */
 }RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1130_STRU;
+/*end: add for feature v700r500*/
 
+/*begin: modify for feature v700r500*/
 /*****************************************************************************
  结构名    : RRC_UE_EUTRA_CAP_V1130_IES_STRU
  协议表格  :
@@ -3406,6 +3423,7 @@ typedef struct
     //RRC_UE_EUTRA_CAP_V1170_IES_STRU           stUeEutraCapV1170;                   /* optional */
     /*R11 NV end*/
 }RRC_UE_EUTRA_CAP_V1130_IES_STRU;
+/*end: modify for feature v700r500*/
 
 /*********************************************************************
 结构名    : RRC_BAND_PARAM_V1090_STRU
@@ -3581,6 +3599,7 @@ typedef struct
     /* v7r2 LLD end */
 }RRC_UE_EUTRA_CAP_V920_IES_STRU;
 
+/* add by lishangfeng for NorStandard begin */
 /*****************************************************************************
  结构名    : LTE_NON_STANDARD_BAND_STRU
  协议表格  :
@@ -3646,6 +3665,7 @@ typedef struct
     VOS_UINT32                                  aulReservered[16];
 }LTE_COMM_NON_STANDARD_BAND_COMM_STRU;
 
+/* add by lishangfeng for NorStandard end */
 
 /*****************************************************************************
  结构名    : RRC_UE_CAP_MCC_STRU

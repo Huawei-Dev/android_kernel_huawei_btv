@@ -49,7 +49,9 @@ extern "C" {
 #define NVIM_EUTRA_CAPA_COMM_INFO_SIZE                      (260)
 #define NVIM_CBS_MID_LIST_LEN                               (2004)
 #define NVIM_CBS_MID_RANGE_LIST_LEN                         (2004)
+/* Added by yangsicong for L2G REDIR C1 CUSTUME, 2015-1-26, begin */
 #define NVIM_GAS_C1_CALC_OPT_PLMN_WHITE_LIST_CNT_MAX        (20)
+/* Added by yangsicong for L2G REDIR C1 CUSTUME, 2015-1-26, end */
 
 #define NVIM_GAS_GSM_BAND_CUSTOMIZE_LIST_MAX_CNT            (80)
 
@@ -714,6 +716,7 @@ typedef struct
     VOS_INT16                            sEcn0Threshold;                        /* 启动非邻区测量的 ECN0 门限 */
     VOS_INT16                            sRssiThreshold;                        /* 启动非邻区测量的 RSSI 门限 */
 }NVIM_GAS_W_NON_NCELL_MEAS_CTRL_STRU;
+/* Added by l67237 for Gas Dsds Feature, 2014-3-4, begin */
 /*****************************************************************************
  结构名    : NV_GSM_RF_UNAVAILABLE_CFG_STRU
  结构说明  : en_NV_Item_GSM_RF_UNAVAILABLE_CFG 结构
@@ -725,6 +728,7 @@ typedef struct
     VOS_UINT8                           ucEnableScellSbFbFlag;                  /* 是否生效服务小区同步，1:是；0:否 */
     VOS_UINT8                           ucRsv;
 }NV_GSM_RF_UNAVAILABLE_CFG_STRU;
+/* Added by l67237 for Gas Dsds Feature, 2014-3-4, end */
 
 /*****************************************************************************
  结构名    : NVIM_GSM_CELL_INFO_RPT_CFG_STRU
@@ -814,6 +818,7 @@ typedef struct
    VOS_UINT8                            aucRsv[3];                      /* 保留位 */
 }NVIM_GAS_UTRAN_TDD_DEFAULT_Q_RXLMIN;
 
+/* Added by yangsicong for L2G REDIR C1 CUSTUME, 2015-1-26, begin */
 /*****************************************************************************
  结构名    : NVIM_GAS_C1_CALC_OPT_PLMN_WHITE_LIST_STRU
  结构说明  : C1计算优化网络白名单(目前仅在L CSFB G流程中使用)
@@ -836,6 +841,7 @@ typedef struct
 
    NVIM_GAS_PLMN_ID_STRU                astPlmn[NVIM_GAS_C1_CALC_OPT_PLMN_WHITE_LIST_CNT_MAX];       /* 预留位，为以后KWKC预留 */
 }NVIM_GAS_C1_CALC_OPT_PLMN_WHITE_LIST_STRU;
+/* Added by yangsicong for L2G REDIR C1 CUSTUME, 2015-1-26, end */
 
 /*****************************************************************************
  结构名    : NVIM_GSM_RAPID_HO_CUSTOMIZE_CFG_STRU

@@ -192,8 +192,8 @@ typedef struct
 *                                                                                                                               *
 ******************************************************************************/
 
-#ifndef isdigitt
-#define isdigitt(c)      (((c) >= '0') && ((c) <= '9'))
+#ifndef isdigit
+#define isdigit(c)      (((c) >= '0') && ((c) <= '9'))
 #endif
 
 #define CHIP_TYPE_MASK 0xffff0000

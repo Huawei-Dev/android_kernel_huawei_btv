@@ -1,4 +1,50 @@
-
+/*
+ * Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+ * foss@huawei.com
+ *
+ * If distributed as part of the Linux kernel, the following license terms
+ * apply:
+ *
+ * * This program is free software; you can redistribute it and/or modify
+ * * it under the terms of the GNU General Public License version 2 and
+ * * only version 2 as published by the Free Software Foundation.
+ * *
+ * * This program is distributed in the hope that it will be useful,
+ * * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * * GNU General Public License for more details.
+ * *
+ * * You should have received a copy of the GNU General Public License
+ * * along with this program; if not, write to the Free Software
+ * * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+ *
+ * Otherwise, the following license terms apply:
+ *
+ * * Redistribution and use in source and binary forms, with or without
+ * * modification, are permitted provided that the following conditions
+ * * are met:
+ * * 1) Redistributions of source code must retain the above copyright
+ * *    notice, this list of conditions and the following disclaimer.
+ * * 2) Redistributions in binary form must reproduce the above copyright
+ * *    notice, this list of conditions and the following disclaimer in the
+ * *    documentation and/or other materials provided with the distribution.
+ * * 3) Neither the name of Huawei nor the names of its contributors may
+ * *    be used to endorse or promote products derived from this software
+ * *    without specific prior written permission.
+ *
+ * * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
 
 
 #include "NVIM_ResumeId.h"
@@ -719,6 +765,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B20        /*0xeb17*/,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B20        /*0xeb18*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B20            ,
+        /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B20,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B20,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B20 ,
@@ -749,6 +796,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
 	EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B40        /**/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B40            ,
 
+        /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B40                     /*0xeb59*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B40                   /*0xeb5a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B40                   /*0xeb5b*/,
@@ -781,6 +829,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B38         ,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B38   ,
 
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B38                    ,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B38                  ,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B38                  ,
@@ -809,6 +858,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B41         ,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B41         ,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B41             ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B41                    ,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B41                  ,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B41                  ,
@@ -837,6 +887,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B7          ,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B7          ,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B7             ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B7                    ,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B7                  ,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B7                  ,
@@ -891,6 +942,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B3          ,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B3          ,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B3             ,
+     /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B3                    ,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B3                  ,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B3                  ,
@@ -920,6 +972,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B1          ,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B1          ,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B1            ,
+     /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B1                    ,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B1                  ,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B1                  ,
@@ -950,6 +1003,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B5          /*0xed98*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B5             ,
 
+         /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B5                    	/* 0xed99*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B5                 	/* 0xed9a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B5                 	/* 0xed9b*/,
@@ -980,6 +1034,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B8          /*0xedd8*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B8            ,
 
+         /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B8                    /*0xedd9*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B8                  /*0xedda*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B8                  /*0xeddb*/,
@@ -1010,6 +1065,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B19         ,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B19         ,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B19              ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B19                     ,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B19                   ,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B19                   ,
@@ -1039,6 +1095,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B21         ,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B21         ,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B21             ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B21                     ,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B21                   ,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B21                   ,
@@ -1069,6 +1126,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B2          /*0xEE98*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B2             ,
 
+        /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B2                     /*0xEE99*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B2                   /*0xEE9a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B2                   /*0xEE9b*/,
@@ -1100,6 +1158,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B4          /*0xEEd8*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B4             ,
 
+     /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B4                      /*0xEEd9*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B4                    /*0xEEda*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B4                    /*0xEEdb*/,
@@ -1131,6 +1190,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B6          /*0xEf18*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B6             ,
 
+     /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B6                     /*0xEf19*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B6                   /*0xEf1a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B6                   /*0xEf1b*/,
@@ -1162,6 +1222,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B9          /*0xEf58*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B9             ,
 
+     /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B9                     /* 0xEf59*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B9                   /* 0xEf5a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B9                   /* 0xEf5b*/,
@@ -1191,6 +1252,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B10         /*0xEf98*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B10              ,
 
+     /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B10                    /* 0xEf99*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B10                  /* 0xEf9a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B10                  /* 0xEf9b*/,
@@ -1221,6 +1283,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B11        /*0xEfd8*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B11              ,
 
+      /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B11                    /*0xEfd9*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B11                  /*0xEfda*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B11                  /*0xEfdb*/,
@@ -1250,6 +1313,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B12        /*0xf018*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B12                      ,
 
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B12                    /* 0xf019*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B12                  /* 0xf01a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B12                  /* 0xf01b*/,
@@ -1279,6 +1343,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B13        /*0xf058*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B13                     ,
 
+     /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B13                    /* 0xf059*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B13                  /* 0xf05a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B13                  /* 0xf05b*/,
@@ -1308,6 +1373,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B14        /*0xf098*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B14                     ,
 
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B14                    /* 0xf099*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B14                  /* 0xf09a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B14                  /* 0xf09b*/,
@@ -1338,6 +1404,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B17         /*0xf0d8*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B17                   ,
 
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B17                    /* 0xf0d9*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B17                  /* 0xf0da*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B17                  /* 0xf0db*/,
@@ -1366,6 +1433,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B18         /* 0xf117*/,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B18         /* 0xf118*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B18                     ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B18                     /* 0xf119*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B18                   /* 0xf11a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B18                   /* 0xf11b*/,
@@ -1395,6 +1463,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B22         /* 0xf157*/,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B22         /* 0xf158*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B22             ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B22                    /* 0xf159*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B22                  /* 0xf15a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B22                  /* 0xf15b*/,
@@ -1423,6 +1492,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B23         /* 0xf197*/,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B23         /* 0xf198*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B23             ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B23                     /* 0xf199*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B23                   /* 0xf19a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B23                   /* 0xf19b*/,
@@ -1453,6 +1523,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B24         /* 0xf1d7*/,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B24         /* 0xf1d8*/,
 		EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B24             ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B24                    /* 0xf1d9*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B24                  /* 0xf1da*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B24                  /* 0xf1db*/,
@@ -1484,6 +1555,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B25         /* 0xf217*/,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B25         /* 0xf218*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B25             ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B25                    /* 0xf219*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B25                  /* 0xf21a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B25                  /* 0xf21b*/,
@@ -1515,6 +1587,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B33         /* 0xf257*/,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B33         /* 0xf258*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B33             ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B33                    /* 0xf259*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B33                  /* 0xf25a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B33                  /* 0xf25b*/,
@@ -1546,6 +1619,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B34         /* 0xf297*/,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B34         /* 0xf298*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B34             ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B34                    /* 0xf299*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B34                  /* 0xf29a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B34                  /* 0xf29b*/,
@@ -1577,6 +1651,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B35         /* 0xf2d7*/,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B35         /* 0xf2d8*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B35             ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B35                    /* 0xf2d9*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B35                  /* 0xf2da*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B35                  /* 0xf2db*/,
@@ -1609,6 +1684,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B36         /* 0xf317*/,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B36         /* 0xf318*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B36             ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B36                    /* 0xf319*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B36                  /* 0xf31a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B36                  /* 0xf31b*/,
@@ -1641,6 +1717,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B37         /* 0xf357*/,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B37         /* 0xf358*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B37             ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B37                    /* 0xf359*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B37                  /* 0xf35a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B37                  /* 0xf35b*/,
@@ -1674,6 +1751,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B42         /* 0xf397*/,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B42         /* 0xf398*/,
 		EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B42             ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B42                    /* 0xf399*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B42                  /* 0xf39a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B42                  /* 0xf39b*/,
@@ -1705,6 +1783,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B43         /* 0xf3d7*/,
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B43         /* 0xf3d8*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B43             ,
+    /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B43                    /* 0xf3d9*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B43                  /* 0xf3da*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B43                  /* 0xf3db*/,
@@ -1742,6 +1821,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B39         /*0xf418*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B39            ,
 
+     /*add for V9R1_6361 Begin*/
     EN_NV_ID_IIP2_CAL_TABLE_B39                    /* 0xf419*/,
     EN_NV_ID_RF_DCOC_CAL_ANT1_B39                  /* 0xf41a*/,
     EN_NV_ID_RF_DCOC_CAL_ANT2_B39                  /* 0xf41b*/,
@@ -1770,6 +1850,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
      EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B128          ,
      EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B128          ,
      EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B128        ,
+      /*add for V9R1_6361 Begin*/
      EN_NV_ID_IIP2_CAL_TABLE_B128                    ,
      EN_NV_ID_RF_DCOC_CAL_ANT1_B128                  ,
      EN_NV_ID_RF_DCOC_CAL_ANT2_B128                  ,
@@ -1936,6 +2017,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
 	EN_NV_ID_LTE_TX_APT_COMP_MC_MID_TBL_B28			/* 0xf457*/,
 	EN_NV_ID_LTE_TX_APT_COMP_MC_LOW_TBL_B28			/* 0xf458*/,
 	EN_NV_ID_LTE_TX_CAL_RESULT_TABLE_STRU_B28            ,
+	/*add for V9R1_6361 Begin*/
 	EN_NV_ID_IIP2_CAL_TABLE_B28				  /* 0xf459*/,
 	EN_NV_ID_RF_DCOC_CAL_ANT1_B28				  /* 0xf45a*/,
 	EN_NV_ID_RF_DCOC_CAL_ANT2_B28				  /* 0xf45b*/,

@@ -34,6 +34,7 @@
 #include "PPP/Inc/ppp_mbuf.h"
 
 #pragma pack(4)
+/*fanzhibin f49086 add it begin*/
 #define MIN_LQRPERIOD 1        /* Minimum LQR frequency */
 #define DEF_LQRPERIOD 30    /* Default LQR frequency */
 #define MIN_FSMRETRY 1        /* Minimum FSM retry frequency */
@@ -41,6 +42,7 @@
 #define DEF_FSMTRIES 5        /* Default max retries */
 #define DEF_FSMAUTHTRIES 3    /* Default max auth retries */
 #define PPP_FSM_TIME_INTERVAL   6000
+/*fanzhibin f49086 add it end*/
 
 /*
  *  State of machine
@@ -208,7 +210,9 @@ struct fsm_opt {
 extern const char *command_ShowNegval(unsigned val);
 /*fanzhibin f49086 change it begin*/
 
+/*fanzhibin f49086 add it begin*/
 extern void FsmTimeout(void *,VOS_UINT32);
+/*fanzhibin f49086 add it end*/
 
 
 extern void fsm_Init(struct fsm *, const VOS_CHAR *, VOS_UINT16, VOS_INT32, VOS_INT32, VOS_INT32,

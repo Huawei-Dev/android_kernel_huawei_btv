@@ -157,12 +157,14 @@ typedef struct
 	VOS_UINT8                           aucRsv[2];
 }LHPA_MSG_HEADER_STRU;
 
+/* add for Balong CL begin */
 typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usMsgName;
     VOS_UINT8                           aucRsv[2];
 }CAS_MSG_HEADER_STRU;
+/* add for Balong CL end */
 /*****************************************************************************
   6 UNION
 *****************************************************************************/

@@ -1,4 +1,33 @@
-
+/*-
+ * Copyright (c) 1996 - 2001 Brian Somers <brian@Awfulhak.org>
+ *          based on work by Toshiharu OHNO <tony-o@iij.ad.jp>
+ *                           Internet Initiative Japan, Inc (IIJ)
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ * $FreeBSD: src/usr.sbin/ppp/lcp.c,v 1.105 2002/08/27 20:11:57 brian Exp $
+ *  1. 2006-03-13 MODIFY BY F49086 FOR A32D02477
+ */
 
 
 #include "PPP/Inc/ppp_public.h"
@@ -239,6 +268,7 @@ LcpInitRestartCounter(struct fsm *fp, VOS_INT32 what)
       break;
   }
 
+/*fanzhibin f49086 add it begin*/
 
   /*========>A32D12744*/
   if( VOS_NULL_PTR !=(fp->timer) )
@@ -260,6 +290,7 @@ LcpInitRestartCounter(struct fsm *fp, VOS_INT32 what)
   }
 
 
+/*fanzhibin f49086 add it end*/
 
 }
 
@@ -461,6 +492,7 @@ LcpLayerFinish(struct fsm *fp)
   /* We're now down */
   PPP_MNTN_LOG(PS_PID_APP_PPP, DIAG_MODE_COMM, PS_PRINT_NORMAL, "LcpLayerFinish\r\n");
 
+/*fanzhibin f49086 add it begin*/
 
 
   /*通知AT进行PDP去激活*/
@@ -484,6 +516,7 @@ LcpLayerFinish(struct fsm *fp)
   PppFreeId(usPppId);
 
   return;
+/*fanzhibin f49086 add it end*/
 
 }
 
@@ -496,6 +529,7 @@ LcpLayerUp(struct fsm *fp)
   fp->more.reqs = fp->more.naks = fp->more.rejs = fp->link->lcp.cfg.fsm.maxreq * 3;
 
   lcp_SendIdentification(&(fp->link->lcp));
+/*fanzhibin f49086 add it begin*/
   if(fp->link->lcp.want_auth != 0)
   {
       ipcp_Init(&(fp->link->ipcp), fp->link, &parent);
@@ -515,6 +549,7 @@ LcpLayerUp(struct fsm *fp)
       fsm_Open(&(fp->link->ipcp.fsm));
   }
 
+/*fanzhibin f49086 add it end*/
 
   return 1;
 }
@@ -757,7 +792,7 @@ LcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_type
       case MODE_REJ:
         lcp->his_reject |= (1 << opt->hdr.id); /* [false alarm]:移植开源代码 */
         PPP_MNTN_LOG(PS_PID_APP_PPP, DIAG_MODE_COMM, PS_PRINT_NORMAL, "Peer will not auth by our way\r\n");
-        lcp->want_auth = 0;
+        lcp->want_auth = 0;    /* added by liukai, 2008-11-24 */
         break;
       }
       break;
@@ -897,6 +932,8 @@ LcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_type
 
   if (mode_type != MODE_NOP) {
 
+/*fanzhibin f49086 add it begin*/
+/*fanzhibin f49086 add it end*/
 
     if (mode_type == MODE_REQ && !lcp->mru_req) { /* [false alarm]:移植开源代码 */
       mru = DEF_MRU;

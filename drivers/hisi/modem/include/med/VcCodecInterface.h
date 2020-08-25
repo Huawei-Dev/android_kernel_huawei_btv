@@ -1,4 +1,50 @@
-
+/*
+ * Copyright (C) Huawei Technologies Co., Ltd. 2012-2015. All rights reserved.
+ * foss@huawei.com
+ *
+ * If distributed as part of the Linux kernel, the following license terms
+ * apply:
+ *
+ * * This program is free software; you can redistribute it and/or modify
+ * * it under the terms of the GNU General Public License version 2 and 
+ * * only version 2 as published by the Free Software Foundation.
+ * *
+ * * This program is distributed in the hope that it will be useful,
+ * * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * * GNU General Public License for more details.
+ * *
+ * * You should have received a copy of the GNU General Public License
+ * * along with this program; if not, write to the Free Software
+ * * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+ *
+ * Otherwise, the following license terms apply:
+ *
+ * * Redistribution and use in source and binary forms, with or without
+ * * modification, are permitted provided that the following conditions
+ * * are met:
+ * * 1) Redistributions of source code must retain the above copyright
+ * *    notice, this list of conditions and the following disclaimer.
+ * * 2) Redistributions in binary form must reproduce the above copyright
+ * *    notice, this list of conditions and the following disclaimer in the
+ * *    documentation and/or other materials provided with the distribution.
+ * * 3) Neither the name of Huawei nor the names of its contributors may 
+ * *    be used to endorse or promote products derived from this software 
+ * *    without specific prior written permission.
+ * 
+ * * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
 
 
 #ifndef __VCCODECINTERFACE_H__
@@ -40,7 +86,9 @@ enum VC_VOICE_MSG_ID_ENUM
     ID_VC_VOICE_FOREGROUND_REQ  = 0x940A,       /*设置为前台通路*/              /* _H2ASN_MsgChoice VCVOICE_FOREGROUND_REQ_STRU */
     ID_VC_VOICE_BACKGROUND_REQ  = 0x940B,       /*设置为后台通路*/              /* _H2ASN_MsgChoice VCVOICE_BACKGROUND_REQ_STRU */
     ID_VC_VOICE_GROUND_QRY      = 0x940C,       /*查询通路状态 */               /* _H2ASN_MsgChoice VCVOICE_GROUND_QRY_STRU */
+    /* Added by z60575 for VOICE_LOOP, 2013-7-2 begin */
     ID_VC_VOICE_LOOP_REQ        = 0x940D,       /* 设置环回 */                  /* _H2ASN_MsgChoice VCVOICE_LOOP_REQ_STRU */
+    /* Added by z60575 for VOICE_LOOP, 2013-7-2 end */
     ID_VC_VOICE_SET_MSD_REQ             = 0x940E,       /*ECAL数据参数设置*/            /* _H2ASN_MsgChoice VCVOICE_SET_MSD_REQ_STRU */
     ID_VC_VOICE_SET_ECALLCFG_REQ        = 0x940F,       /*ECAL配置参数设置*/            /* _H2ASN_MsgChoice VCVOICE_SET_ECALLCFG_REQ_STRU */
     ID_VC_VOICE_SO_CTRL_ORDER_IND   = 0x9415,       /*CDMA下控制SO的状态和速率*/    /* _H2ASN_MsgChoice VCVOICE_SO_CTRL_ORDER_IND_STRU */
@@ -58,7 +106,9 @@ enum VC_VOICE_MSG_ID_ENUM
     ID_VOICE_VC_FOREGROUND_CNF  = 0x490A,       /*响应VC_VOICE_FOREGROUND_REQ*/ /* _H2ASN_MsgChoice VCVOICE_OP_RSLT_STRU */
     ID_VOICE_VC_BACKGROUND_CNF  = 0x490B,       /*响应VC_VOICE_BACKGROUND_REQ*/ /* _H2ASN_MsgChoice VCVOICE_OP_RSLT_STRU */
     ID_VOICE_VC_GROUND_RSP      = 0x490C,       /*响应VC_VOICE_GROUND_QRY*/     /* _H2ASN_MsgChoice VCVOICE_GROUND_RSP_STRU */
+    /* Added by z60575 for VOICE_LOOP, 2013-7-2 begin */
     ID_VOICE_VC_LOOP_CNF        = 0x490D,       /* 设置环回响应 */              /* _H2ASN_MsgChoice VCVOICE_OP_RSLT_STRU */
+    /* Added by z60575 for VOICE_LOOP, 2013-7-2 end */
     ID_VOICE_VC_SET_ECALLCFG_CNF        = 0x490F,      /*响应ID_VC_VOICE_SET_ECALLCFG_REQ*/ /* _H2ASN_MsgChoice VCVOICE_OP_RSLT_STRU */
     ID_VOICE_VC_ECALL_TRANS_STATUS_NTF  = 0x4910,      /*回复ECALL传送状态*/           /* _H2ASN_MsgChoice VCVOICE_ECALL_TRANS_STATUS_NTF_STRU */
     ID_VOICE_VC_START_SEND_MSD_IND      = 0x4930,      /*要求NAS重新发送MSD数据*/           /* _H2ASN_MsgChoice VCVOICE_OP_RSLT_STRU */
@@ -178,6 +228,7 @@ enum VCVOICE_GROUND_ENUM
 };
 typedef VOS_UINT16  VCVOICE_GROUND_ENUM_UINT16;
 
+/* Added by z60575 for VOICE_LOOP, 2013-7-2 begin */
 /* 环回状态 */
 enum VCVOICE_LOOP_ENUM
 {
@@ -186,6 +237,7 @@ enum VCVOICE_LOOP_ENUM
     VCVOICE_LOOP_BUTT
 };
 typedef VOS_UINT16  VCVOICE_LOOP_ENUM_UINT16;
+/* Added by z60575 for VOICE_LOOP, 2013-7-2 end */
 
 enum VCVOICE_ECALL_TRANS_STATUS_ENUM
 {
@@ -443,6 +495,7 @@ typedef struct
     VOS_UINT16                          usReserve2;
 }VCVOICE_OP_RSLT_STRU;
 
+/* Added by z60575 for VOICE_LOOP, 2013-7-2 begin */
 /*****************************************************************************
  结构名    : VCVOICE_LOOP_REQ_STRU
  协议表格  :
@@ -457,6 +510,7 @@ typedef struct
     VCVOICE_LOOP_ENUM_UINT16            enMode;                                 /* 当前状态 */
     VOS_UINT16                          usReserve2;
 }VCVOICE_LOOP_REQ_STRU;
+/* Added by z60575 for VOICE_LOOP, 2013-7-2 end */
 
 /*****************************************************************************
  结构名    : VOICEVC_DTMF_IND_STRU
