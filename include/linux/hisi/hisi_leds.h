@@ -109,4 +109,3 @@ struct hisi_led_platform_data {
 };
 
 #endif /* __LINUX_LEDS_HISI_H */
-

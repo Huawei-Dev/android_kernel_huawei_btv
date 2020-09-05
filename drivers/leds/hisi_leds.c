@@ -135,6 +135,7 @@ static void hisi_led_set_enable(u8 brightness_set, u8 id)
     brightness_config.hisi_led_dr_out_ctl = hisi_led_dr_out_ctl & LED_OUT_CTRL_VAL(id);
 
     printk(KERN_INFO "hisi_led_set_select_led, Led_id=[%d], brightness_set=%d,\n", id, brightness_set);
+
     hisi_led_set_reg_write(&brightness_config);
 }
 
@@ -146,12 +147,6 @@ static int hisi_led_set(struct hisi_led_data *led, u8 brightness)
 	u8 iset;
 	struct hisi_led_drv_data *data = hisi_led_pdata;
 
-	if (brightness != LED_OFF && brightness != LED_HALF && brightness != LED_FULL) {
-		pr_err("hisi_led_set brightness:%d is error\n", brightness);
-		ret = -EINVAL;
-		return ret;
-	}
-
 	mutex_lock(&data->lock);
 
 	switch (id) {
@@ -159,20 +154,21 @@ static int hisi_led_set(struct hisi_led_data *led, u8 brightness)
 	case HISI_LED0:
 	case HISI_LED1:
 	case HISI_LED2:
-        if (brightness == LED_OFF) {
-            /* set led off */
-            hisi_led_set_disable(id);
-            printk(KERN_INFO "[%s] off id is %d\n", __FUNCTION__, id);
-        } else if (brightness == LED_HALF) {
-            /* set led half brightness */
-            hisi_led_set_enable(DR_BRIGHTNESS_HALF, id);
-            printk(KERN_INFO "[%s] half id is %d\n", __FUNCTION__, id);
-        } else {
-            /* set led brightness */
-            iset = hisi_leds.leds[id].each_maxdr_iset;
-            hisi_led_set_enable(iset, id);
-            printk(KERN_INFO "[%s] full id is %d, iset:%d\n", __FUNCTION__, id, iset);
-        }
+	if (brightness == LED_OFF) {
+			/* set led off */
+			hisi_led_set_disable(id);
+			printk(KERN_INFO "[%s] off id is %d\n", __FUNCTION__, id);
+	} else if (brightness == LED_FULL) {
+			/* set led brightness */
+			iset = hisi_leds.leds[id].each_maxdr_iset;
+			hisi_led_set_enable(iset, id);
+			printk(KERN_INFO "[%s] full id is %d, iset:%d\n", __FUNCTION__, id, iset);
+	} else {
+			printk(KERN_INFO "[%s] half id is %d\n", __FUNCTION__, id);
+			/* set led half brightness */
+			hisi_led_set_enable(DR_BRIGHTNESS_HALF, id);
+			printk(KERN_INFO "[%s] half id is %d\n", __FUNCTION__, id);
+	}
         break;
 	default:
 		pr_err("hisi_led_set id:%d is error\n", id);
@@ -232,6 +228,7 @@ static int hisi_led_set_blink(struct led_classdev *led_ldev,
 	int ret = 0;
 	u8 set_time_on = 0;
 	u8 set_time_off = 0;
+
 	if (!led_dat) {
 		pr_err("led set blink error\n");
 		return -EINVAL;
@@ -268,6 +265,7 @@ static void hisi_led_set_brightness(struct led_classdev *led_ldev,
 		container_of(led_ldev, struct hisi_led_data, ldev);
 	if (!led) {
 		pr_err("led set btrightnss error!\n");
+		return;
 	}
 	led->status.brightness = brightness;
 	hisi_led_set(led, led->status.brightness);
