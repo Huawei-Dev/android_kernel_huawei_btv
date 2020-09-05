@@ -310,9 +310,6 @@ struct tcp_sock {
 		u32	rtt;
 		u32	seq;
 		u32	time;
-#ifdef CONFIG_TCP_AUTOTUNING
-		u32	min_rtt;
-#endif
 	} rcv_rtt_est;
 
 /* Receiver queue space */
@@ -320,20 +317,8 @@ struct tcp_sock {
 		int	space;
 		u32	seq;
 		u32	time;
-#ifdef CONFIG_TCP_AUTOTUNING
-		u32	segs;
-#endif
 	} rcvq_space;
 	
-#ifdef CONFIG_TCP_AUTOTUNING
-	struct {
-		u32	loss;
-		u32	bw;
-		u32	rtt_cnt;
-		u32	rcv_wnd;
-	} rcv_rate;
-#endif
-
 /* TCP-specific MTU probe information. */
 	struct {
 		u32		  probe_seq_start;

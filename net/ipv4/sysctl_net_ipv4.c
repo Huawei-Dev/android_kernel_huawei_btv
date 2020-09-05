@@ -782,17 +782,6 @@ static struct ctl_table ipv4_table[] = {
 		.mode           = 0644,
 		.proc_handler   = proc_tcp_default_init_rwnd
 	},
-#ifdef CONFIG_TCP_AUTOTUNING
-	{
-		.procname	= "tcp_autotuning",
-		.data		= &sysctl_tcp_autotuning,
-		.maxlen		= sizeof(int),
-		.mode		= 0644,
-		.proc_handler	= proc_dointvec_minmax,
-		.extra1		= &zero,
-		.extra2		= &one,
-	},
-#endif
 	{
 		.procname	= "icmp_msgs_per_sec",
 		.data		= &sysctl_icmp_msgs_per_sec,
