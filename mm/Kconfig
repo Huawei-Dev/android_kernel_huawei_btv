@@ -699,31 +699,3 @@ config ZONE_DEVICE
 	  
 config FRAME_VECTOR
 	bool
-	
-config HUAWEI_UNMOVABLE_ISOLATE
-	bool "Isolate the unmovable memory."
-	depends on ARM64
-	default n
-	  help
-	  Isolate the unmovable memory from others migrate types.
-	  So that we can improve the success rate of compact.
-
-	  If unsure, say "n".
-
-config HUAWEI_UNMOVABLE_ISOLATE1_SIZE_MBYTES
-	int "Size in Mega Bytes For UNMOVABLE_ISOLATE1"
-	depends on HUAWEI_UNMOVABLE_ISOLATE
-	default 64
-	help
-	  Defines the size (in MiB) of the default memory area for
-	  MIGRATE_UNMOVABLE_ISOLATE1 Memory Allocator. However,
-	  we should parse the size from /proc/cmdline firstly.
-
-config HUAWEI_UNMOVABLE_ISOLATE2_SIZE_MBYTES
-	int "Size in Mega Bytes For UNMOVABLE_ISOLATE2"
-	depends on HUAWEI_UNMOVABLE_ISOLATE
-	default 64
-	help
-	  Defines the size (in MiB) of the default memory area for
-	  MIGRATE_UNMOVABLE_ISOLATE2 Memory Allocator. However,
-	  we should parse the size from /proc/cmdline firstly.

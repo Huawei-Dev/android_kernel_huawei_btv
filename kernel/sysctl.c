@@ -94,10 +94,6 @@
 #include <linux/nmi.h>
 #endif
 
-#ifdef CONFIG_HUAWEI_UNMOVABLE_ISOLATE
-#include <linux/unmovable_isolate.h>
-#endif
-
 #if defined(CONFIG_SYSCTL)
 
 /* External variables not in a header file. */
@@ -1650,17 +1646,6 @@ static struct ctl_table vm_table[] = {
 		.proc_handler	= proc_dointvec_minmax,
 		.extra1		= (void *)&mmap_rnd_compat_bits_min,
 		.extra2		= (void *)&mmap_rnd_compat_bits_max,
-	},
-#endif
-#ifdef CONFIG_HUAWEI_UNMOVABLE_ISOLATE
-	{
-		.procname	= "unmovable_isolate_disabled",
-		.data		= &unmovable_isolate_disabled,
-		.maxlen		= sizeof(unmovable_isolate_disabled),
-		.mode		= 0644,
-		.proc_handler	= unmovable_isolate_disabled_sysctl_handler,
-		.extra1		= &one,
-		.extra2		= &one,
 	},
 #endif
 	{ }

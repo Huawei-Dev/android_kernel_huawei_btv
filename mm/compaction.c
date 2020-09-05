@@ -23,10 +23,6 @@
 #include <linux/freezer.h>
 #include "internal.h"
 
-#ifdef CONFIG_HUAWEI_UNMOVABLE_ISOLATE
-#include <linux/unmovable_isolate.h>
-#endif
-
 #ifdef CONFIG_COMPACTION
 static inline void count_compact_event(enum vm_event_item item)
 {
@@ -1159,16 +1155,9 @@ static isolate_migrate_t isolate_migratepages(struct zone *zone,
 		 * Async compaction is optimistic to see if the minimum amount
 		 * of work satisfies the allocation.
 		 */
-#ifdef CONFIG_HUAWEI_UNMOVABLE_ISOLATE
-		if ((cc->mode == MIGRATE_ASYNC &&
-		    !migrate_async_suitable(get_pageblock_migratetype(page))) ||
-		    unmovable_isolate_pageblock(zone, page))
-			continue;
-#else
 		if (cc->mode == MIGRATE_ASYNC &&
 		    !migrate_async_suitable(get_pageblock_migratetype(page)))
 			continue;
-#endif
 
 		/* Perform the isolation */
 		isolate_start_pfn = low_pfn;

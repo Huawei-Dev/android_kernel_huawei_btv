@@ -138,13 +138,6 @@ static ssize_t node_read_meminfo(struct device *dev,
 #else
 		       nid, K(node_page_state(nid, NR_SLAB_UNRECLAIMABLE)));
 #endif
-#ifdef CONFIG_HUAWEI_UNMOVABLE_ISOLATE
-	n += sprintf(buf + n,
-		       "Node %d Isolate1Free:   %8lu kB\n"
-		       "Node %d Isolate2Free:   %8lu kB\n",
-		       nid, K(node_page_state(nid, NR_FREE_UNMOVABLE_ISOLATE1_PAGES)),
-		       nid, K(node_page_state(nid, NR_FREE_UNMOVABLE_ISOLATE2_PAGES));
-#endif
 	n += hugetlb_report_node_meminfo(nid, buf + n);
 	return n;
 }

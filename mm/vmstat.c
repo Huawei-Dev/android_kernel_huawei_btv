@@ -761,10 +761,6 @@ const char * const vmstat_text[] = {
 	"workingset_nodereclaim",
 	"nr_anon_transparent_hugepages",
 	"nr_free_cma",
-#ifdef CONFIG_HUAWEI_UNMOVABLE_ISOLATE
-	"nr_free_unmovable_isolate1",
-	"nr_free_unmovable_isolate2",
-#endif
 	"nr_ioncache_pages",
 	"nr_mali_pages",
 
@@ -933,10 +929,6 @@ static char * const migratetype_names[MIGRATE_TYPES] = {
 	"HighAtomic",
 #ifdef CONFIG_CMA
 	"CMA",
-#endif
-#ifdef CONFIG_HUAWEI_UNMOVABLE_ISOLATE
-	"Unmovable_isolate1",
-	"Unmovable_isolate2",
 #endif
 #ifdef CONFIG_MEMORY_ISOLATION
 	"Isolate",

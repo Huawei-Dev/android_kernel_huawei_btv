@@ -53,9 +53,6 @@
 #define ALLOC_CPUSET		0x40 /* check for correct cpuset */
 #define ALLOC_CMA		0x80 /* allow allocations from CMA areas */
 #define ALLOC_FAIR		0x100 /* fair zone allocation */
-#ifdef CONFIG_HUAWEI_UNMOVABLE_ISOLATE
-#define ALLOC_UNMOVABLE		0x800 /* migratetype is MIGRATE_UNMOVABLE */
-#endif
 
 #define SCENE_POOL_MIN(x, y) (((x) < (y)) ? (x) : (y))
 
@@ -344,10 +341,6 @@ static struct page *ion_scene_pool_alloc_page(
 	struct zone *zone = NULL;
 	bool have_zone_ok = false;
 
-#ifdef CONFIG_HUAWEI_UNMOVABLE_ISOLATE
-	if (ac->migratetype == MIGRATE_UNMOVABLE)
-		alloc_flags |= ALLOC_UNMOVABLE;
-#endif
 	__for_each_zone_zonelist_nodemask(zone, z, zonelist,
 					  ac->high_zoneidx,
 					  ac->nodemask) {
