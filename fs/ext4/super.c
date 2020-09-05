@@ -42,9 +42,6 @@
 
 #include <linux/kthread.h>
 #include <linux/freezer.h>
-#ifdef CONFIG_HUAWEI_EXT4_FS_DUMP_INFO
-#include "ext4_dump_info.h"
-#endif
 
 #include "ext4.h"
 #include "ext4_extents.h"	/* Needed for trace points definition */
@@ -55,10 +52,6 @@
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/ext4.h>
-
-#ifdef CONFIG_FEATURE_HUAWEI_EMERGENCY_DATA
-#include "remount_fail.h"
-#endif
 
 static struct ext4_lazy_init *ext4_li_info;
 static struct mutex ext4_li_mtx;
@@ -396,10 +389,6 @@ static void ext4_handle_error(struct super_block *sb)
 		sb->s_flags |= MS_RDONLY;
 	}
 
-#ifdef CONFIG_HUAWEI_EXT4_FS_DUMP_INFO
-	dump_ext4_sb_info(sb);
-#endif
-
 	if (test_opt(sb, ERRORS_PANIC)) {
 		if (EXT4_SB(sb)->s_journal &&
 		  !(EXT4_SB(sb)->s_journal->j_flags & JBD2_REC_ERR))
@@ -407,10 +396,6 @@ static void ext4_handle_error(struct super_block *sb)
 		panic("EXT4-fs (device %s): panic forced after error\n",
 			sb->s_id);
 	}
-
-#ifdef CONFIG_FEATURE_HUAWEI_EMERGENCY_DATA
-	trigger_double_data(sb);
-#endif
 }
 
 #define ext4_error_ratelimit(sb)					\
@@ -606,20 +591,12 @@ void __ext4_abort(struct super_block *sb, const char *function,
 		save_error_info(sb, function, line);
 	}
 
-#ifdef CONFIG_HUAWEI_EXT4_FS_DUMP_INFO
-	dump_ext4_sb_info(sb);
-#endif
-
 	if (test_opt(sb, ERRORS_PANIC)) {
 		if (EXT4_SB(sb)->s_journal &&
 		  !(EXT4_SB(sb)->s_journal->j_flags & JBD2_REC_ERR))
 			return;
 		panic("EXT4-fs panic from previous error\n");
 	}
-
-#ifdef CONFIG_FEATURE_HUAWEI_EMERGENCY_DATA
-	trigger_double_data(sb);
-#endif
 }
 
 void __ext4_msg(struct super_block *sb,
@@ -3981,11 +3958,6 @@ no_journal:
 	ratelimit_state_init(&sbi->s_err_ratelimit_state, 5 * HZ, 10);
 	ratelimit_state_init(&sbi->s_warning_ratelimit_state, 5 * HZ, 10);
 	ratelimit_state_init(&sbi->s_msg_ratelimit_state, 5 * HZ, 10);
-
-#ifdef CONFIG_HUAWEI_EXT4_FS_DUMP_INFO
-	if (is_ext4_fs_dirty(sb))
-		dump_ext4_sb_info(sb);
-#endif
 
 	kfree(orig_data);
 	return 0;
