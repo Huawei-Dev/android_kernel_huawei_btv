@@ -15,16 +15,9 @@
 
 #include "zcomp_lzo.h"
 
-static void *lzo_create(gfp_t flags)
+static void *lzo_create(void)
 {
-	void *ret;
-
-	ret = kmalloc(LZO1X_MEM_COMPRESS, flags);
-	if (!ret)
-		ret = __vmalloc(LZO1X_MEM_COMPRESS,
-				flags | __GFP_HIGHMEM,
-				PAGE_KERNEL);
-	return ret;
+	return kzalloc(LZO1X_MEM_COMPRESS, GFP_KERNEL);
 }
 
 static void lzo_destroy(void *private)
