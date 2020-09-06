@@ -150,7 +150,6 @@ static struct target_type linear_target = {
 	.map    = linear_map,
 	.status = linear_status,
 	.prepare_ioctl = linear_prepare_ioctl,
-	.ioctl  = linear_ioctl,
 	.iterate_devices = linear_iterate_devices,
 };
 
