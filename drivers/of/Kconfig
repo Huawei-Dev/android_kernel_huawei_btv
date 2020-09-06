@@ -113,7 +113,7 @@ config OF_OVERLAY
 	  enable it manually to improve device tree unit test coverage.
 
 config OF_BATTERYDATA
-	def_bool y
+	def_bool n
 	help
 	  OpenFirmware BatteryData accessors
 
