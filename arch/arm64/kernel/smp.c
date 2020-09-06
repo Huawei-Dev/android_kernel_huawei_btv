@@ -708,7 +708,6 @@ unsigned int g_cpu_in_ipi_stop;
 static void ipi_cpu_stop(unsigned int cpu, struct pt_regs *regs)
 {
 #ifdef CONFIG_HISI_BB
-	struct pt_regs regs;
 	unsigned int mask;
 #endif
 
@@ -720,9 +719,9 @@ static void ipi_cpu_stop(unsigned int cpu, struct pt_regs *regs)
 #ifdef CONFIG_HISI_BB
 		mask = 0x1 << get_cpu();
 		g_cpu_in_ipi_stop |= mask;
-		memset(&regs, 0x0, sizeof(regs));
-		get_pt_regs(&regs);
-		show_regs(&regs);
+		memset(regs, 0x0, sizeof(regs));
+		get_pt_regs(regs);
+		show_regs(regs);
 		put_cpu();
 #endif
 		show_regs(regs);

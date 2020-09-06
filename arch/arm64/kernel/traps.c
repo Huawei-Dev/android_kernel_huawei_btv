@@ -259,9 +259,6 @@ static unsigned long oops_begin(void)
 	die_owner = cpu;
 	console_verbose();
 	bust_spinlocks(1);
-#ifdef CONFIG_HISI_BB
-	set_exception_info(instruction_pointer(regs));
-#endif
 	return flags;
 }
 
@@ -305,7 +302,9 @@ void die(const char *str, struct pt_regs *regs, int err)
 		bug_type = report_bug(regs->pc, regs);
 	if (bug_type != BUG_TRAP_TYPE_NONE)
 		str = "Oops - BUG";
-
+#ifdef CONFIG_HISI_BB
+	set_exception_info(instruction_pointer(regs));
+#endif
 	ret = __die(str, err, thread, regs);
 
 	oops_end(flags, regs, ret);
