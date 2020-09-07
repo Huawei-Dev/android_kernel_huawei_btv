@@ -22,6 +22,10 @@
 #include <asm/memory.h>
 #include <asm/pgtable-hwdef.h>
 
+#ifndef SECTION_ALIGN_DOWN
+#define SECTION_ALIGN_DOWN(pfn)	((pfn) & (~((1UL << 8) -1)))
+#endif
+
 /*
  * Software defined PTE bits definition.
  */
