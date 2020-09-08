@@ -1835,9 +1835,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
 	}
 
 get_rq:
-	/*lint -save -e712 -e747*/
-	wb_acct = wbt_wait(q->rq_wb, bio, q->queue_lock);
-	/*lint -restore*/
+	wb_acct = wbt_wait(q->rq_wb, bio->bi_rw, q->queue_lock);
 
 	/*
 	 * This sync check and mask will be re-done in init_request_from_bio(),
