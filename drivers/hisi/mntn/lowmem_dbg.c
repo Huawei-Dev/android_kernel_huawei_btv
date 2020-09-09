@@ -43,7 +43,7 @@ static int task_state_char(unsigned long state)
 	return bit < sizeof(state_to_char) - 1 ? state_to_char[bit] : '?';
 }
 
-static void dump_tasks(bool verbose)
+static void dump_tasks_hisi(bool verbose)
 {
 	struct task_struct *p;
 	struct task_struct *task;
@@ -96,7 +96,7 @@ static void lowmem_dump(struct work_struct *work)
 
 	mutex_lock(&lowmem_dump_mutex);
 	show_mem(SHOW_MEM_FILTER_NODES);
-	dump_tasks(verbose);
+	dump_tasks_hisi(verbose);
 	ksm_show_stats();
 	hisi_ion_memory_info(verbose);
 	if (verbose)
