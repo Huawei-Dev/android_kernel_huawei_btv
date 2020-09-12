@@ -1614,8 +1614,6 @@ void vfree(const void *addr)
 			schedule_work(&p->wq);
 	} else
 		__vunmap(addr, 1);
-
-	vmalloc_trace_hook((unsigned char)MEM_FREE, _RET_IP_, (unsigned long)addr, 0, (unsigned long long)0);/*lint !e571*/
 }
 EXPORT_SYMBOL(vfree);
 
@@ -1789,9 +1787,6 @@ void *__vmalloc_node_range(unsigned long size, unsigned long align,
 	 * the vmalloc'ed block.
 	 */
 	kmemleak_alloc(addr, real_size, 2, gfp_mask);
-
-	vmalloc_trace_hook((unsigned char)MEM_ALLOC, (unsigned long)caller, (unsigned long)addr,
-						(struct page *)area->pages[0], size);
 
 	return addr;
 

@@ -2631,8 +2631,6 @@ void *kmem_cache_alloc_trace(struct kmem_cache *s, gfp_t gfpflags, size_t size)
 {
 	void *ret = slab_alloc(s, gfpflags, _RET_IP_);
 	trace_kmalloc(_RET_IP_, ret, size, s->size, gfpflags);
-	kmalloc_trace_hook((unsigned char)MEM_ALLOC, _RET_IP_, (unsigned long long)ret,/*lint !e571*/
-                virt_to_phys(ret), (unsigned int)size);
 	kasan_kmalloc(s, ret, size);
 	return ret;
 }
@@ -3571,8 +3569,6 @@ void *__kmalloc(size_t size, gfp_t flags)
 	ret = slab_alloc(s, flags, _RET_IP_);
 
 	trace_kmalloc(_RET_IP_, ret, size, s->size, flags);
-	kmalloc_trace_hook((unsigned char)MEM_ALLOC, _RET_IP_, (unsigned long long)ret,
-                (unsigned long long)virt_to_phys(ret), (unsigned int)size);
 
 	kasan_kmalloc(s, ret, size);
 
@@ -3671,8 +3667,6 @@ void kfree(const void *x)
 		__free_kmem_pages(page, compound_order(page));
 		return;
 	}
-	kmalloc_trace_hook((unsigned char)MEM_FREE, _RET_IP_, (unsigned long long)x,
-            (unsigned long long)virt_to_phys(x), (unsigned int)page->slab_cache->object_size);
 	slab_free(page->slab_cache, page, object, NULL, 1, _RET_IP_);
 }
 EXPORT_SYMBOL(kfree);
@@ -4085,8 +4079,6 @@ void *__kmalloc_track_caller(size_t size, gfp_t gfpflags, unsigned long caller)
 
 	/* Honor the call site pointer we received. */
 	trace_kmalloc(caller, ret, size, s->size, gfpflags);
-	kmalloc_trace_hook((unsigned char)MEM_ALLOC, caller, (unsigned long long)ret,
-                (unsigned long long)virt_to_phys(ret), (unsigned int)size);
 
 	return ret;
 }

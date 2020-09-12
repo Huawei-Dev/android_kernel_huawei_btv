@@ -1017,8 +1017,6 @@ void *kmalloc_order_trace(size_t size, gfp_t flags, unsigned int order)
 {
 	void *ret = kmalloc_order(size, flags, order);
 	trace_kmalloc(_RET_IP_, ret, size, PAGE_SIZE << order, flags);
-	kmalloc_trace_hook((unsigned char)MEM_ALLOC, _RET_IP_, (unsigned long long)ret,/*lint !e571*/
-                (unsigned long long)virt_to_phys(ret), (unsigned int)size);
 	return ret;
 }
 EXPORT_SYMBOL(kmalloc_order_trace);

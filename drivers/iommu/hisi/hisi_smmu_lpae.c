@@ -330,7 +330,6 @@ int hisi_smmu_handle_mapping_lpae(struct iommu_domain *domain,
 	} while (pgd++, iova < end);
 out_unlock:
 	spin_unlock_irqrestore(&hisi_smmu_dev->lock, flags);
-	smmu_trace_hook(MEM_ALLOC, iova, paddr, (unsigned int)size);
 	return ret;
 }
 
@@ -424,7 +423,6 @@ unsigned int hisi_smmu_handle_unmapping_lpae(struct iommu_domain *domain,
 	} while (pgdp++, iova < end);
 
 	spin_unlock_irqrestore(&hisi_smmu_dev->lock, flags);
-	smmu_trace_hook(MEM_FREE, iova, (unsigned long long)0, unmap_size);
 	return unmap_size;
 }
 

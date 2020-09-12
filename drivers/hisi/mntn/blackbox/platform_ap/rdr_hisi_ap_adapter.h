@@ -29,13 +29,9 @@
 #define AP_TRACE_HUNG_TASK_SIZE		0x1000	/*4k */
 #define AP_TRACE_TASKLET_SIZE		0x2000	/*8k */
 #define AP_TRACE_WORKER_SIZE		0x4000	/*16k */
-#ifdef CONFIG_HISI_MEM_TRACE
-#define AP_TRACE_MEM_ALLOC_SIZE		0x80000	/*512k */
-#define AP_TRACE_ION_ALLOC_SIZE		0x80000	/*512k */
-#else
+
 #define AP_TRACE_MEM_ALLOC_SIZE		0x2000	/*dummy 8k space*/
 #define AP_TRACE_ION_ALLOC_SIZE		0x2000	/*dummy 8k space*/
-#endif
 
 /* 任务记录区 */
 #define AP_LAST_TASK_STRUCT_SIZE    (NR_CPUS*0xAC0+0x200)	/*0x5800 //22k== 8 * 0xAC0 + 0.5k */

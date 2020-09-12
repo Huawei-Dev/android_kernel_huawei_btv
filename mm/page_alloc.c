@@ -3304,10 +3304,9 @@ out:
 	if (unlikely(!page && read_mems_allowed_retry(cpuset_mems_cookie)))
 		goto retry_cpuset;
 
-	if (page) {
+	if (page)
 		page_tracker_set_trace(page, _RET_IP_, order);
-		page_trace_hook(gfp_mask, (unsigned char)MEM_ALLOC, _RET_IP_, page, order);/*lint !e571*/
-	}
+
 	return page;
 }
 EXPORT_SYMBOL(__alloc_pages_nodemask);
@@ -3344,7 +3343,6 @@ EXPORT_SYMBOL(get_zeroed_page);
 void __free_pages(struct page *page, unsigned int order)
 {
 	if (put_page_testzero(page)) {
-		page_trace_hook(__GFP_HIGHMEM, (unsigned char)MEM_FREE, _RET_IP_, page, order);/*lint !e571*/
 		if (order == 0)
 			free_hot_cold_page(page, false);
 		else

@@ -702,7 +702,6 @@ static struct ion_handle *__ion_alloc(struct ion_client *client, size_t len,
 		ion_handle_put(handle);
 		handle = ERR_PTR(ret);
 	}
-	ion_trace_hook(MEM_ALLOC, client, handle);
 	return handle;
 }
 
@@ -727,7 +726,6 @@ static void ion_free_nolock(struct ion_client *client, struct ion_handle *handle
 		return;
 	}
 
-	ion_trace_hook(MEM_FREE, client, handle);
 	ion_handle_put_nolock(handle);
 }
 
