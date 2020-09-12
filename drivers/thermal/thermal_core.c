@@ -1124,37 +1124,6 @@ trip_point_type_show(struct device *dev, struct device_attribute *attr,
 	}
 }
 
-#ifdef CONFIG_HISI_THERMAL_TSENSOR
-static ssize_t
-trip_point_type_activate(struct device *dev, struct device_attribute *attr,
-		const char *buf, size_t count)
-{
-	struct thermal_zone_device *tz = to_thermal_zone(dev);
-	int trip = 0, result = 0;
-
-	if (!tz->ops->activate_trip_type)
-		return -EPERM;
-
-	if (!sscanf(attr->attr.name, "trip_point_%d_type", &trip))
-		return -EINVAL;
-
-	if (!strncmp(buf, "enabled", strlen("enabled"))) {
-		result = tz->ops->activate_trip_type(tz, trip,
-					THERMAL_TRIP_ACTIVATION_ENABLED);
-		}
-	else if (!strncmp(buf, "disabled", strlen("disabled"))) {
-		result = tz->ops->activate_trip_type(tz, trip,
-					THERMAL_TRIP_ACTIVATION_DISABLED);
-		}
-	else{
-		result = -EINVAL;
-		}
-	if (result)
-		return result;
-	return count;
-}
-#endif
-
 static ssize_t
 trip_point_type_activate(struct device *dev, struct device_attribute *attr,
 		const char *buf, size_t count)
@@ -2264,7 +2233,6 @@ static int create_trip_attrs(struct thermal_zone_device *tz, int mask)
 						tz->trip_type_attrs[indx].name;
 		tz->trip_type_attrs[indx].attr.attr.mode = S_IRUGO;
 		tz->trip_type_attrs[indx].attr.show = trip_point_type_show;
-#ifdef CONFIG_HISI_THERMAL_TSENSOR
 		if (IS_ENABLED(CONFIG_THERMAL_WRITABLE_TRIPS) &&
 			mask & (1 << indx)) {
 			if (tz->ops->activate_trip_type) {
@@ -2273,7 +2241,6 @@ static int create_trip_attrs(struct thermal_zone_device *tz, int mask)
 								trip_point_type_activate;
 			}
 		}
-#endif
 
 		device_create_file(&tz->device,
 				   &tz->trip_type_attrs[indx].attr);
