@@ -9972,6 +9972,7 @@ out:
 	if (pulled_task) {
 		idle_exit_fair(this_rq);
 		this_rq->idle_stamp = 0;
+	}
 
 	return pulled_task;
 }

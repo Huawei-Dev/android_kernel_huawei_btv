@@ -668,6 +668,7 @@ static struct ctl_table kern_table[] = {
 		.mode		= 0644,
 		.proc_handler	= sched_max_latency_sysctl,
 	},
+#endif
 #ifdef CONFIG_SCHED_TUNE
 	{
 		.procname	= "sched_cfs_boost",
