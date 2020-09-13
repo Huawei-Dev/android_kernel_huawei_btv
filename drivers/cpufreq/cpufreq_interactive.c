@@ -34,16 +34,6 @@
 #define CREATE_TRACE_POINTS
 #include <trace/events/cpufreq_interactive.h>
 
-#ifdef CONFIG_HISI_HMPTH_INTERACTIVE
-#define	DEFAULT_HMP_UP_THRESHOLD	(768)
-#define	DEFAULT_HMP_DOWN_THRESHOLD	(448)
-#define	HMP_OFF			(0)
-#define	HMP_ON			(1)
-#define HMP_PRIO		(1)
-#define HMP_NAME		"boostpulse"
-extern int set_hmp_policy(const char *pname, int prio, int state, int up_thresholds, int down_thresholds);
-#endif
-
 #ifdef CONFIG_ARCH_HISI
 static int cpufreq_interactive_initialized;
 #endif
@@ -133,16 +123,6 @@ struct cpufreq_interactive_tunables {
 #define DEFAULT_TIMER_SLACK (4 * DEFAULT_TIMER_RATE)
 	int timer_slack_val;
 	bool io_is_busy;
-
-#ifdef CONFIG_HISI_HMPTH_INTERACTIVE
-	/* Non-zero mean hmp boost active */
-	int boost_hmp_val;
-	bool hmp_boosted;
-	/* boost hmp upthreshold, default 768 */
-	int boost_hmp_upthreshold;
-	/* boost hmp downthreshold, default 448 */
-	int boost_hmp_downthreshold;
-#endif
 };
 
 /* For cases where we have single governor instance for system */
@@ -398,14 +378,6 @@ static void cpufreq_interactive_timer(unsigned long data)
 	loadadjfreq = (unsigned int)cputime_speedadj * 100;
 	cpu_load = loadadjfreq / pcpu->policy->cur;
 	tunables->boosted = tunables->boost_val || now < tunables->boostpulse_endtime;
-
-#ifdef CONFIG_HISI_HMPTH_INTERACTIVE
-	if (tunables->hmp_boosted && !tunables->boosted) {
-		set_hmp_policy(HMP_NAME, HMP_PRIO, HMP_OFF, tunables->boost_hmp_upthreshold,
-				tunables->boost_hmp_downthreshold);
-		tunables->hmp_boosted = false;
-	}
-#endif
 
 	if (cpu_load >= tunables->go_hispeed_load || tunables->boosted) {
 		if (pcpu->policy->cur < tunables->hispeed_freq) {
@@ -1040,13 +1012,7 @@ static ssize_t store_boostpulse(struct cpufreq_interactive_tunables *tunables,
 	tunables->boostpulse_endtime = ktime_to_us(ktime_get()) +
 		tunables->boostpulse_duration_val;
 	trace_cpufreq_interactive_boost("pulse");
-#ifdef CONFIG_HISI_HMPTH_INTERACTIVE
-	if (tunables->boost_hmp_val && !tunables->hmp_boosted) {
-		tunables->hmp_boosted = true;
-		set_hmp_policy(HMP_NAME, HMP_PRIO, HMP_ON, tunables->boost_hmp_upthreshold,
-				tunables->boost_hmp_downthreshold);
-	}
-#endif
+
 	if (!tunables->boosted)
 		cpufreq_interactive_boost(tunables);
 	return count;
@@ -1112,65 +1078,6 @@ static ssize_t store_io_is_busy(struct cpufreq_interactive_tunables *tunables,
 	return count;
 }
 
-#ifdef CONFIG_HISI_HMPTH_INTERACTIVE
-static ssize_t show_boost_hmp(struct cpufreq_interactive_tunables *tunables,
-		char *buf)
-{
-	return sprintf(buf, "%u\n", tunables->boost_hmp_val);
-}
-
-static ssize_t store_boost_hmp(struct cpufreq_interactive_tunables *tunables,
-		const char *buf, size_t count)
-{
-	int ret;
-	unsigned long val;
-
-	ret = kstrtoul(buf, 0, &val);
-	if (ret < 0)
-		return ret;
-	tunables->boost_hmp_val = val;
-	return count;
-}
-
-static ssize_t show_boost_hmp_upthreshold(struct cpufreq_interactive_tunables
-		*tunables, char *buf)
-{
-	return sprintf(buf, "%u\n", tunables->boost_hmp_upthreshold);
-}
-
-static ssize_t store_boost_hmp_upthreshold(struct cpufreq_interactive_tunables
-		*tunables, const char *buf, size_t count)
-{
-	int ret;
-	unsigned long val;
-
-	ret = kstrtoul(buf, 0, &val);
-	if (ret < 0)
-		return ret;
-	tunables->boost_hmp_upthreshold = val;
-	return count;
-}
-
-static ssize_t show_boost_hmp_downthreshold(struct cpufreq_interactive_tunables
-		*tunables, char *buf)
-{
-	return sprintf(buf, "%u\n", tunables->boost_hmp_downthreshold);
-}
-
-static ssize_t store_boost_hmp_downthreshold(struct cpufreq_interactive_tunables
-		*tunables, const char *buf, size_t count)
-{
-	int ret;
-	unsigned long val;
-
-	ret = kstrtoul(buf, 0, &val);
-	if (ret < 0)
-		return ret;
-	tunables->boost_hmp_downthreshold = val;
-	return count;
-}
-#endif
-
 /*
  * Create show/store routines
  * - sys: One governor instance for complete SYSTEM
@@ -1221,12 +1128,6 @@ show_store_gov_pol_sys(boostpulse_duration);
 show_store_gov_pol_sys(boostpulse_min_interval);
 #endif
 show_store_gov_pol_sys(io_is_busy);
-#ifdef CONFIG_HISI_HMPTH_INTERACTIVE
-show_store_gov_pol_sys(boost_hmp);
-show_store_gov_pol_sys(boost_hmp_upthreshold);
-show_store_gov_pol_sys(boost_hmp_downthreshold);
-#endif
-
 
 #define gov_sys_attr_rw(_name)						\
 static struct global_attr _name##_gov_sys =				\
@@ -1253,12 +1154,6 @@ gov_sys_pol_attr_rw(boostpulse_duration);
 gov_sys_pol_attr_rw(boostpulse_min_interval);
 #endif
 gov_sys_pol_attr_rw(io_is_busy);
-#ifdef CONFIG_HISI_HMPTH_INTERACTIVE
-gov_sys_pol_attr_rw(boost_hmp);
-gov_sys_pol_attr_rw(boost_hmp_upthreshold);
-gov_sys_pol_attr_rw(boost_hmp_downthreshold);
-#endif
-
 
 static struct global_attr boostpulse_gov_sys =
 	__ATTR(boostpulse, 0200, NULL, store_boostpulse_gov_sys);
@@ -1282,11 +1177,6 @@ static struct attribute *interactive_attributes_gov_sys[] = {
 	&boostpulse_min_interval_gov_sys.attr,
 #endif
 	&io_is_busy_gov_sys.attr,
-#ifdef CONFIG_HISI_HMPTH_INTERACTIVE
-	&boost_hmp_gov_sys.attr,
-	&boost_hmp_upthreshold_gov_sys.attr,
-	&boost_hmp_downthreshold_gov_sys.attr,
-#endif
 	NULL,
 };
 
@@ -1311,11 +1201,6 @@ static struct attribute *interactive_attributes_gov_pol[] = {
 	&boostpulse_min_interval_gov_pol.attr,
 #endif
 	&io_is_busy_gov_pol.attr,
-#ifdef CONFIG_HISI_HMPTH_INTERACTIVE
-	&boost_hmp_gov_pol.attr,
-	&boost_hmp_upthreshold_gov_pol.attr,
-	&boost_hmp_downthreshold_gov_pol.attr,
-#endif
 	NULL,
 };
 
@@ -1370,11 +1255,6 @@ static struct cpufreq_interactive_tunables *alloc_tunable(
 
 #ifdef CONFIG_ARCH_HISI
 		tunables->boostpulse_min_interval = DEFAULT_MIN_BOOSTPULSE_INTERVAL;
-#endif
-
-#ifdef CONFIG_HISI_HMPTH_INTERACTIVE
-		tunables->boost_hmp_upthreshold = DEFAULT_HMP_UP_THRESHOLD;
-		tunables->boost_hmp_downthreshold = DEFAULT_HMP_DOWN_THRESHOLD;
 #endif
 
 	spin_lock_init(&tunables->target_loads_lock);
