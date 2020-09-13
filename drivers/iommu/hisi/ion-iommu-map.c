@@ -32,14 +32,8 @@
 #include <linux/hisi/hisi-iommu.h>
 #include <linux/hisi/ion-iommu.h>
 
-#ifdef IOMMU_DEBUG
-#define dbg(format, arg...)    \
-		pr_info("[hisi_iommu_domain]"format, ##arg)
-#else
-#define dbg(format, arg...)
-#endif
-
-struct iommu_domain_data *domain_info;
+#define MAX_IOVA_SIZE_2G 0x80000000UL
+#define MAX_IOVA_START_ADDR_4G 0x100000000UL
 
 struct map_result {
 	unsigned long iova_start;
@@ -49,7 +43,8 @@ struct map_result {
 	unsigned long is_tile;
 };
 
-static struct hisi_iommu_domain *m_hisi_domain;
+static struct iommu_domain_data *ion_domain_info;
+static struct ion_iommu_domain *ion_iommu_domain;
 DEFINE_MUTEX(iova_pool_mutex);
 
 static unsigned long hisi_alloc_iova(struct gen_pool *pool,
@@ -84,23 +79,23 @@ static void hisi_free_iova(struct gen_pool *pool,
 
 unsigned long hisi_iommu_alloc_iova(size_t size, unsigned long align)
 {
-	struct hisi_iommu_domain *hisi_domain = m_hisi_domain;
+	struct ion_iommu_domain *ion_domain = ion_iommu_domain;
 
-	return hisi_alloc_iova(hisi_domain->iova_pool, size, align);
+	return hisi_alloc_iova(ion_domain->iova_pool, size, align);
 }
 EXPORT_SYMBOL_GPL(hisi_iommu_alloc_iova);
 
 void hisi_iommu_free_iova(unsigned long iova, size_t size)
 {
 	int ret;
-	struct hisi_iommu_domain *hisi_domain = m_hisi_domain;
+	struct ion_iommu_domain *ion_domain = ion_iommu_domain;
 
-	ret = addr_in_gen_pool(hisi_domain->iova_pool, iova, size);
+	ret = addr_in_gen_pool(ion_domain->iova_pool, iova, size);
 	if(!ret) {
 		pr_err("%s:illegal para!!iova = %lx, size = %lx\n",
 				__func__, iova, size);
 	}
-	hisi_free_iova(hisi_domain->iova_pool, iova, size);
+	hisi_free_iova(ion_domain->iova_pool, iova, size);
 }
 EXPORT_SYMBOL_GPL(hisi_iommu_free_iova);
 
@@ -136,7 +131,41 @@ static void iova_pool_destroy(struct gen_pool *pool)
 	gen_pool_destroy(pool);
 }
 
-static int do_iommu_domain_map(struct hisi_iommu_domain *hisi_domain,
+static int iommu_check_tile_format(struct iommu_map_format *format,
+				   unsigned long phys_len)
+{
+	unsigned long header_size = format->header_size;
+	unsigned long phys_page_line = format->phys_page_line;
+	unsigned long virt_page_line = format->virt_page_line;
+
+	/* check invalid args */
+	if ((phys_len <= header_size) || !phys_page_line || !virt_page_line) {
+		pr_err("[%s]wrong arg:phys_len 0x%lx, header_size 0x%lx\n",
+			 __func__, phys_len, header_size);
+		pr_err("[%s]wrong arg:phys line 0x%lx, virt line 0x%lx\n",
+			 __func__, phys_page_line, virt_page_line);
+		return -EINVAL;
+	}
+
+	/* virt_page_line <= 128 and
+	 * virt_page_line / phys_page_line = 1 in normal process */
+	if ((virt_page_line * PAGE_SIZE > SZ_512K) ||
+	    (virt_page_line / phys_page_line != 1)) {
+		pr_err("%s:virt line/phys line out of standard\n", __func__);
+		return -EINVAL;
+	}
+
+	/* check overflow */
+	if ((virt_page_line * PAGE_SIZE <= virt_page_line) ||
+	    (phys_page_line * PAGE_SIZE <= phys_page_line)) {
+		pr_err("%s:virt_line/phys_line too large!!!\n", __func__);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
+static int do_iommu_domain_map(struct ion_iommu_domain *ion_domain,
 		struct scatterlist *sgl, struct iommu_map_format *format,
 		struct map_result *result)
 {
@@ -148,6 +177,12 @@ static int do_iommu_domain_map(struct hisi_iommu_domain *hisi_domain,
 	struct iommu_domain *domain;
 	struct scatterlist *sg;
 	struct tile_format fmt;
+
+	if (format->prot & IOMMU_SEC) {
+		pr_err("prot 0x%lx\n", format->prot);
+		return -EINVAL;
+	}
+
 	/* calculate whole phys mem length */
 	for (phys_len = 0, sg = sgl; sg; sg = sg_next(sg))
 		phys_len += (unsigned long)ALIGN(sg->length, PAGE_SIZE);
@@ -157,6 +192,10 @@ static int do_iommu_domain_map(struct hisi_iommu_domain *hisi_domain,
 		unsigned long lines;
 		unsigned long body_size;
 
+		if (iommu_check_tile_format(format, phys_len)) {
+			pr_err("%s:check foramt fail\n", __func__);
+			return -EINVAL;
+		}
 		body_size = phys_len - format->header_size;
 		lines = body_size / (format->phys_page_line * PAGE_SIZE);
 
@@ -175,17 +214,24 @@ static int do_iommu_domain_map(struct hisi_iommu_domain *hisi_domain,
 		iova_size = phys_len;
 	}
 
-	/* alloc iova */
-	pool = hisi_domain->iova_pool;
-	domain = hisi_domain->domain;
-	iova_start = hisi_alloc_iova(pool, iova_size, hisi_domain->range.align);
-	if (!iova_start) {
-		pr_err("[%s]hisi_alloc_iova alloc 0x%lx failed!\n",
-				__func__, iova_size);
+	/* Limit not exceeding 2G */
+	if (MAX_IOVA_SIZE_2G < iova_size) {
+		pr_err("[%s]hisi_alloc_iova alloc size more than 2G(0x%lx).\n",__func__, iova_size);
 		return -EINVAL;
 	}
 
-	if (0x100000000 < (iova_start + iova_size)) {
+	/* alloc iova */
+	pool = ion_domain->iova_pool;
+	domain = ion_domain->domain;
+	iova_start = hisi_alloc_iova(pool, iova_size, ion_domain->range.align);
+	if (!iova_start) {
+		pr_err("[%s]hisi_alloc_iova alloc size 0x%lx failed!"
+		        "hisi ion pool avail 0x%lx\n",
+			__func__, iova_size, gen_pool_avail(pool));
+		return -EINVAL;
+	}
+
+	if (MAX_IOVA_START_ADDR_4G < (iova_start + iova_size)) {
 		pr_err("hisi iommu can not deal with iova 0x%lx size 0x%lx\n",
 			iova_start, iova_size);
 	}
@@ -222,15 +268,15 @@ int hisi_iommu_map_domain(struct scatterlist *sgl,
 {
 	int ret = 0;
 	struct map_result result;
-	struct hisi_iommu_domain *hisi_domain;
+	struct ion_iommu_domain *ion_domain;
 
-	hisi_domain = m_hisi_domain;
+	ion_domain = ion_iommu_domain;
 
-	memset(&result, 0, sizeof(result));
+	memset(&result, 0, sizeof(result)); /* unsafe_function_ignore: memset  */
 
-	ret = do_iommu_domain_map(hisi_domain, sgl, format, &result);
+	ret = do_iommu_domain_map(ion_domain, sgl, format, &result);
 	if (ret) {
-		dbg("alloc iova fail\n");
+		pr_err("alloc iova fail\n");
 		return ret;
 	}
 	format->iova_start = result.iova_start;
@@ -245,8 +291,8 @@ static int do_iommu_domain_unmap(struct map_result *result)
 {
 	int ret;
 	unsigned long unmaped_size;
-	struct hisi_iommu_domain *hisi_domain = m_hisi_domain;
-	struct gen_pool *pool = hisi_domain->iova_pool;
+	struct ion_iommu_domain *ion_domain = ion_iommu_domain;
+	struct gen_pool *pool = ion_domain->iova_pool;
 
 	/* never unmap a zero length address space */
 	if (!result->iova_size) {
@@ -257,15 +303,15 @@ static int do_iommu_domain_unmap(struct map_result *result)
 
 	/* unmap tile equals to unmpa range */
 	if (result->is_tile) {
-		unmaped_size = iommu_unmap_tile(hisi_domain->domain,
+		unmaped_size = iommu_unmap_tile(ion_domain->domain,
 		result->iova_start, result->iova_size);
 	} else {
-		unmaped_size = iommu_unmap(hisi_domain->domain,
+		unmaped_size = iommu_unmap(ion_domain->domain,
 				result->iova_start, result->iova_size);
 	}
 
 	if (unmaped_size != result->iova_size) {
-		dbg("[%s]unmap failed!\n", __func__);
+		pr_err("[%s]unmap failed!\n", __func__);
 		return -EINVAL;
 	}
 	/* free iova */
@@ -301,75 +347,70 @@ int hisi_iommu_unmap_domain(struct iommu_map_format *format)
 EXPORT_SYMBOL_GPL(hisi_iommu_unmap_domain);
 
 /*only used to test*/
-phys_addr_t hisi_iommu_domain_iova_to_phys(unsigned long iova)
+phys_addr_t ion_iommu_domain_iova_to_phys(unsigned long iova)
 {
 	struct iommu_domain *domain;
-
-	domain = m_hisi_domain->domain;
+	domain = ion_iommu_domain->domain;
 	return iommu_iova_to_phys(domain, iova);
 }
-EXPORT_SYMBOL_GPL(hisi_iommu_domain_iova_to_phys);
+EXPORT_SYMBOL_GPL(ion_iommu_domain_iova_to_phys);
 
 struct iommu_domain *hisi_ion_enable_iommu(struct platform_device *pdev)
 {
-	int ret;
 	struct device *dev = &pdev->dev;
-	struct hisi_iommu_domain *hisi_domain;
-	
-	pr_info("in %s start\n", __func__);
-	if (m_hisi_domain) {
-		pr_err("ion domain already init return domain\n");
-		return m_hisi_domain->domain;
-	}
+	struct ion_iommu_domain *ion_domain;
 
 	pr_info("in %s start\n", __func__);
-	hisi_domain = kzalloc(sizeof(*hisi_domain), GFP_KERNEL);
-	if (!hisi_domain) {
-		dbg("alloc hisi_domain object fail\n");
+	if (ion_iommu_domain) {
+		pr_err("ion domain already init return domain\n");
+		return ion_iommu_domain->domain;
+	}
+
+	ion_domain = kzalloc(sizeof(*ion_domain), GFP_KERNEL);
+	if (!ion_domain) {
+		pr_err("alloc ion_domain object fail\n");
 		return NULL;
 	}
 
 	if (!iommu_present(dev->bus)) {
-		dbg("iommu not found\n");
-		kfree(hisi_domain);
+		pr_err("iommu not found\n");
+		kfree(ion_domain);
 		return NULL;
 	}
 
 	/* create iommu domain */
-	hisi_domain->domain = iommu_domain_alloc(dev->bus);
-	if (!hisi_domain->domain) {
-		ret = -EINVAL;
+	ion_domain->domain = iommu_domain_alloc(dev->bus);
+	if (!ion_domain->domain)
 		goto error;
-	}
-	iommu_attach_device(hisi_domain->domain, dev);
-	domain_info = (struct iommu_domain_data *)hisi_domain->domain->priv;
+
+	iommu_attach_device(ion_domain->domain, dev);
+	ion_domain_info = (struct iommu_domain_data *)ion_domain->domain->priv;
 
 	/**
 	 * Current align is 256K
 	 */
-	hisi_domain->iova_pool = iova_pool_setup(domain_info->iova_start,
-			domain_info->iova_size, SZ_256K);
-	if (!hisi_domain->iova_pool) {
-		ret = -EINVAL;
+	ion_domain->iova_pool = iova_pool_setup(ion_domain_info->iova_start,
+			ion_domain_info->iova_size, ion_domain_info->iova_align);
+	if (!ion_domain->iova_pool)
 		goto error;
-	}
 
 	/* this is a global pointer */
-	m_hisi_domain = hisi_domain;
+	ion_iommu_domain = ion_domain;
 
-	dbg("in %s end\n", __func__);
-	return m_hisi_domain->domain;
+	pr_info("in %s end\n", __func__);
+	return ion_iommu_domain->domain;
 
 error:
-	WARN(1, "hisi_iommu_domain_init failed!\n");
-	if (hisi_domain->iova_pool)
-		iova_pool_destroy(hisi_domain->iova_pool);
-	if (hisi_domain->domain)
-		iommu_domain_free(hisi_domain->domain);
-	kfree(hisi_domain);
-	
-	m_hisi_domain = NULL;
+	WARN(1, "ion_iommu_domain_init failed!\n");
+	if (ion_domain->iova_pool)
+		iova_pool_destroy(ion_domain->iova_pool);
 
+	if (ion_domain->domain)
+		iommu_domain_free(ion_domain->domain);
+
+	kfree(ion_domain);
+
+	ion_iommu_domain = NULL;
 	return NULL;
 }
 EXPORT_SYMBOL(hisi_ion_enable_iommu);

@@ -13,7 +13,7 @@ struct section_info {
 	unsigned int page_size;
 	unsigned int align;
 };
-struct hisi_iommu_domain {
+struct ion_iommu_domain {
 	struct iommu_domain *domain;
 	struct gen_pool *iova_pool;
 	struct section_info range;
@@ -26,7 +26,6 @@ struct hisi_iommu_domain * hisi_get_domain(void);
 size_t hisi_iommu_iova_size(void);
 size_t hisi_iommu_iova_available(void);
 void hisi_iommu_free_iova(unsigned long iova, size_t size);
-unsigned long hisi_iommu_alloc_iova(size_t size, unsigned long align);
 int hisi_iommu_map_range(struct iommu_domain *domain,unsigned long iova_start, struct scatterlist *sgl,
 			unsigned long iova_size,unsigned int prot);
 int hisi_iommu_unmap_range(struct iommu_domain *domain,unsigned long iova_start,unsigned long iova_size);

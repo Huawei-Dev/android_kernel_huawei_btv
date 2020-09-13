@@ -192,33 +192,44 @@ int iommu_unmap_tile(struct iommu_domain *domain, unsigned long iova,
 }
 EXPORT_SYMBOL_GPL(iommu_unmap_tile);
 
-static int get_domain_data(struct device_node *np,
-			   struct iommu_domain_data *data)
+int of_get_iova_info(struct device_node *np, unsigned long *iova_start,
+		     unsigned long *iova_size, unsigned long *iova_align)
 {
 	struct device_node *node = NULL;
+	unsigned long long align = SZ_256K;
 	int ret = 0;
 
-	data->phy_pgd_base = hisi_smmu->smmu_phy_pgtable_addr;
-	if (np) {
-		node = of_find_node_by_name(np, "iommu_info");
-		if (!node) {
-			dbg("find iommu_info node error\n");
-			return -ENODEV;
-		}
-		ret = of_property_read_u32(node, "start-addr",
-					   &data->iova_start);
-		if (ret) {
-			dbg("read iova start address error\n");
-			goto read_error;
-		}
-		ret = of_property_read_u32(node, "size", &data->iova_size);
-		if (ret) {
-			dbg("read iova size error\n");
-			goto read_error;
-		}
-		dbg("%s:start_addr 0x%x, size 0x%x\n",
-		    __func__, data->iova_start, data->iova_size);
+	if (!np)
+		return -ENODEV;
+
+	node = of_find_node_by_name(np, "iommu_info"); /*lint !e838*/
+	if (!node) {
+		dbg("find iommu_info node error\n");
+		return -ENODEV;
 	}
+	ret = of_property_read_u32(node, "start-addr",
+				   (u32 *)iova_start); /*lint !e838*/
+	if (ret) {
+		dbg("read iova start address error\n");
+		ret = -EINVAL;
+		goto read_error;
+	}
+	ret = of_property_read_u32(node, "size", (u32 *)iova_size);
+	if (ret) {
+		dbg("read iova size error\n");
+		ret = -EINVAL;
+		goto read_error;
+	}
+	ret = of_property_read_u64(node, "iova-align", (u64 *)iova_align);
+	if (ret)
+		memcpy(iova_align, &align, sizeof(*iova_align));
+
+	pr_err("%s:start_addr 0x%lx, size 0x%lx align 0x%lx\n",
+			__func__, *iova_start, *iova_size,
+			*iova_align);
+
+	return 0;
+
 read_error:
 	return ret;
 }
@@ -255,7 +266,7 @@ static void hisi_smmu_free_pgtables(unsigned long *page_table_addr)
 		hisi_smmu_free_ptes(*pgd);
 		pgd++;
 	}
-	memset((void *)page_table_addr, 0, SZ_16K);
+	memset((void *)page_table_addr, 0, SZ_16K); /* unsafe_function_ignore: memset  */
 	spin_unlock_irqrestore(&hisi_smmu->lock, flags);
 }
 
@@ -318,7 +329,6 @@ static int hisi_smmu_alloc_init_pte(struct smmu_pgd_t *ppgd,
 
 	if (smmu_pgd_none(*ppgd)) {
 		hisi_smmu_flush_pgtable(page_address(table), SMMU_PAGE_SIZE);
-		pgtable_page_ctor(table);
 		if (prot & IOMMU_SEC)
 			smmu_pgd_populate(ppgd, table,
 					  SMMU_PGD_TYPE_TABLE |
@@ -424,30 +434,11 @@ out_unlock:
 static int hisi_smmu_map(struct iommu_domain *domain, unsigned long iova,
 			 phys_addr_t paddr, size_t size, int prot)
 {
-	unsigned long max_iova;
-	struct iommu_domain_data *data;
-
 	if (!domain) {
 		dbg("domain is null\n");
 		return -ENODEV;
 	}
-	data = domain->priv;
-	max_iova = data->iova_start + data->iova_size;
-	if (iova < data->iova_start) {
-		pr_info("iova failed: iova = 0x%lx, start = 0x%8x\n",
-			iova, data->iova_start);
-		goto error;
-	}
-
-	if ((iova + size) > max_iova) {
-		dbg("iova is out of range, iova+size = 0x%lx, end = 0x%lx\n",
-		    iova + size, max_iova);
-		goto error;
-	}
 	return hisi_smmu_handle_mapping(domain, iova, paddr, size, prot);
-error:
-	dbg("iova is not in this range\n");
-	return -EINVAL;
 }
 
 static unsigned int hisi_smmu_clear_pte(struct smmu_pgd_t *pgdp,
@@ -497,36 +488,19 @@ static unsigned int hisi_smmu_handle_unmapping(struct iommu_domain *domain,
 static size_t hisi_smmu_unmap(struct iommu_domain *domain, unsigned long iova,
 			      size_t size)
 {
-	unsigned long max_iova;
 	unsigned int ret;
-	struct iommu_domain_data *data;
 
 	if (!domain) {
 		dbg("domain is null\n");
 		return -ENODEV;
-	}
-	data = domain->priv;
-	/*caculate the max io virtual address */
-	max_iova = data->iova_start + data->iova_size;
-	/*check the iova */
-	if (iova < data->iova_start)
-		goto error;
-	if ((iova + size) > max_iova) {
-		dbg("iova is out of range, iova+size = 0x%lx, end = 0x%lx\n",
-		    iova + size, max_iova);
-		goto error;
 	}
 	/*unmapping the range of iova */
 	ret = hisi_smmu_handle_unmapping(domain, iova, size);
 	if (ret == size) {
 		dbg("%s:unmap size:0x%x\n", __func__, (unsigned int)size);
 		return size;
-	} else {
+	} else
 		return 0;
-	}
-error:
-	dbg("%s:the range of io address is wrong\n", __func__);
-	return -EINVAL;
 }
 
 static phys_addr_t hisi_smmu_iova_to_phys(struct iommu_domain *domain,
@@ -555,8 +529,11 @@ static int hisi_attach_dev(struct iommu_domain *domain, struct device *dev)
 {
 	struct device_node *np = dev->of_node;
 	int ret = 0;
+	struct iommu_domain_data *data = (struct iommu_domain_data *)domain->priv;
 
-	ret = get_domain_data(np, domain->priv);
+	data->phy_pgd_base = hisi_smmu->smmu_phy_pgtable_addr;
+	ret = of_get_iova_info(np, &data->iova_start, &data->iova_size,
+			       &data->iova_align);
 	return ret;
 }
 
@@ -846,7 +823,7 @@ static ssize_t dbg_smmu_read(struct file *file, char __user *buf, size_t count,
 	iova_end = dbg_iova_start + dbg_iova_size;
 	dbg("iova_end = 0x%x\n", iova_end);
 	if ((dbg_iova_start == INVALID_IO_ADDR) || (iova_end > MAX_IO_ADDR)) {
-		dbg("parameter error :dbg_iova_start=0x%x,
+		dbg("parameter error :dbg_iova_start=0x%x, \
 				dbg_iova_size=0x%x, iova_end=0x%x\n",
 				dbg_iova_start, dbg_iova_size, iova_end);
 		kfree(msg);
@@ -895,7 +872,8 @@ static ssize_t dbg_smmu_write(struct file *file, const char __user *buffer,
 		kfree(msg);
 		return -EFAULT;
 	}
-	num = sscanf(msg, "start=0x%8x size=0x%8x",
+	/* cppcheck-suppress * */
+	num = sscanf(msg, "start=0x%8x size=0x%8x", /* unsafe_function_ignore: sscanf  */
 		     &dbg_iova_start, &dbg_iova_size);
 	dbg("num=%d,dbg_iova_start=0x%x,dbg_iova_size=0x%x\n", num,
 	    dbg_iova_start, dbg_iova_size);
@@ -940,7 +918,7 @@ static int hisi_smmu_probe(struct platform_device *pdev)
 		hisi_smmu->va_pgtable_addr = (unsigned long)
 		    phys_to_virt(hisi_smmu->smmu_phy_pgtable_addr);
 		dbg("smmu page table : 0x%lx\n", hisi_smmu->va_pgtable_addr);
-		memset((unsigned long *)hisi_smmu->va_pgtable_addr, 0, SZ_16K);
+		memset((unsigned long *)hisi_smmu->va_pgtable_addr, 0, SZ_16K); /* unsafe_function_ignore: memset  */
 	}
 
 	bus_set_iommu(&platform_bus_type, &hisi_smmu_ops);
