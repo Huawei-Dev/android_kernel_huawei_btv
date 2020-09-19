@@ -78,7 +78,6 @@ struct dm_verity_io {
 
 	/* original value of bio->bi_end_io */
 	bio_end_io_t *orig_bi_end_io;
-	void *orig_bi_private;
 
 	sector_t block;
 	unsigned n_blocks;
