@@ -25,7 +25,6 @@
 #include <linux/vmalloc.h>
 #include <linux/sizes.h>
 #include <linux/hisi/ion-iommu.h>
-#include <linux/hisi/page_tracker.h>
 
 #include "ion.h"
 #include "ion_priv.h"
@@ -217,7 +216,6 @@ static int ion_system_heap_allocate(struct ion_heap *heap,
 			size_remaining -= PAGE_SIZE << compound_order(page);
 			max_order = compound_order(page);
 			i++;
-			page_tracker_set_type(page, TRACK_ION, max_order);
 		}
 
 		max_order = orders[0];
@@ -247,7 +245,6 @@ static int ion_system_heap_allocate(struct ion_heap *heap,
 		size_remaining -= PAGE_SIZE << compound_order(page);
 		max_order = compound_order(page);
 		i++;
-		page_tracker_set_type(page, TRACK_ION, max_order);
 	}
 	table = kmalloc(sizeof(struct sg_table), GFP_KERNEL);
 	if (!table)

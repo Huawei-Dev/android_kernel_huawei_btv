@@ -380,7 +380,6 @@ static int ion_scene_pool_fill(struct ion_page_pool *pool,
 
 	WARN_ON(pool->order != compound_order(page));
 	ion_page_scene_pool_add(pool, page);
-	page_tracker_set_type(page, TRACK_ION, pool->order);
 	return 0;
 }
 

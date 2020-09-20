@@ -10,8 +10,6 @@
 #include <linux/kmemleak.h>
 #include <linux/page_owner.h>
 #include <linux/page_idle.h>
-#include <linux/hisi/page_ext.h>
-#include <linux/hisi/page_tracker.h>
 
 /*
  * struct page extension
@@ -67,9 +65,6 @@ static struct page_ext_operations *page_ext_ops[] = {
 #endif
 #if defined(CONFIG_IDLE_PAGE_TRACKING) && !defined(CONFIG_64BIT)
 	&page_idle_ops,
-#endif
-#ifdef CONFIG_HISI_PAGE_TRACKER
-	&page_tracker_ops,
 #endif
 };
 
@@ -181,13 +176,7 @@ void __init page_ext_init_flatmem(void)
 	}
 
 	pr_info("allocated %ld bytes of page_ext before free\n", total_usage);
-
-	total_usage -= _free_unused_page_ext();
-
-	pr_info("allocated %ld bytes of page_ext after free\n", total_usage);
-
 	invoke_init_callbacks();
-
 	return;
 
 fail:

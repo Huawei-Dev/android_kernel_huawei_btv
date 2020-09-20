@@ -36,8 +36,6 @@ source "drivers/hisi/pm/Kconfig"
 source "drivers/hisi/ocbc/Kconfig"
 source "drivers/hisi/modem/Kconfig"
 source "drivers/hisi/axi/Kconfig"
-source "drivers/hisi/hisi_page_tracker/Kconfig"
-source "drivers/hisi/hisi_page_ext/Kconfig"
 source "drivers/hisi/hilog/Kconfig"
 source "drivers/hisi/timekeeper/Kconfig"
 

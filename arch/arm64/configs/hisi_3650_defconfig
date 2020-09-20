@@ -3700,8 +3700,6 @@ CONFIG_IVP_SMMU=y
 # Hisilicon IVP vp5
 #
 # CONFIG_IVP_VP5 is not set
-# CONFIG_HISI_PAGE_TRACKER is not set
-# CONFIG_HISI_PAGE_EXT is not set
 
 #
 # Hisi lpm3_debug options

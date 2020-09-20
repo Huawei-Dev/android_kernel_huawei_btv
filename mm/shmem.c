@@ -68,7 +68,6 @@ static struct vfsmount *shm_mnt;
 #include <linux/magic.h>
 #include <linux/syscalls.h>
 #include <linux/fcntl.h>
-#include <linux/hisi/page_tracker.h>
 #include <uapi/linux/memfd.h>
 
 #include <asm/uaccess.h>
@@ -315,8 +314,6 @@ static int shmem_add_to_page_cache(struct page *page,
 		mapping->nrpages++;
 		__inc_zone_page_state(page, NR_FILE_PAGES);
 		__inc_zone_page_state(page, NR_SHMEM);
-		page_tracker_set_type(page, TRACK_FILE, 0);
-
 		spin_unlock_irq(&mapping->tree_lock);
 	} else {
 		page->mapping = NULL;

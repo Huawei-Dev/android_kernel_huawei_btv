@@ -3,7 +3,6 @@
 
 #include <linux/types.h>
 #include <linux/stacktrace.h>
-#include <linux/hisi/page_tracker.h>
 
 struct pglist_data;
 struct page_ext_operations {
@@ -48,9 +47,6 @@ struct page_ext {
 	gfp_t gfp_mask;
 	unsigned int nr_entries;
 	unsigned long trace_entries[8];
-#endif
-#ifdef CONFIG_HISI_PAGE_TRACKER
-	struct page_tracker page_tracker;
 #endif
 };
 

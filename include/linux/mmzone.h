@@ -657,10 +657,6 @@ typedef struct pglist_data {
 	struct page_ext *node_page_ext;
 #endif
 #endif
-#ifdef CONFIG_HISI_PAGE_TRACKER
-	wait_queue_head_t ktracker_wait;
-	struct task_struct *page_ktrackerd;
-#endif
 #ifndef CONFIG_NO_BOOTMEM
 	struct bootmem_data *bdata;
 #endif

@@ -18,7 +18,6 @@
 #include <linux/ion.h>
 #include <linux/hisi/hisi_ion.h>
 #include <linux/version.h>
-#include <linux/hisi/page_tracker.h>
 
 #define LMK_PRT_TSK_RSS 10000
 #define LMK_INTERVAL 3
@@ -99,8 +98,6 @@ static void lowmem_dump(struct work_struct *work)
 	dump_tasks_hisi(verbose);
 	ksm_show_stats();
 	hisi_ion_memory_info(verbose);
-	if (verbose)
-		page_tracker_wake_up();
 	mutex_unlock(&lowmem_dump_mutex);
 }
 

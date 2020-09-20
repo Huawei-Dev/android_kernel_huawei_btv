@@ -38,7 +38,6 @@
 #include <linux/balloon_compaction.h>
 #include <linux/mmu_notifier.h>
 #include <linux/page_idle.h>
-#include <linux/hisi/page_tracker.h>
 #include <linux/backing-dev.h>
 
 #include <asm/tlbflush.h>
@@ -606,7 +605,6 @@ int migrate_page(struct address_space *mapping,
 		return rc;
 
 	migrate_page_copy(newpage, page);
-	page_tracker_change_tracker(newpage, page);
 	return MIGRATEPAGE_SUCCESS;
 }
 EXPORT_SYMBOL(migrate_page);

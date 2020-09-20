@@ -62,12 +62,11 @@
 #include <linux/sched/rt.h>
 #include <linux/page_owner.h>
 #include <linux/kthread.h>
-#include <linux/hisi/page_tracker.h>
 #include <linux/hisi/rdr_hisi_ap_hook.h>
 #include <linux/hisi/hisi_ion.h>
 #include <asm/sections.h>
 #include <asm/tlbflush.h>
-#include <asm/div64.h> /*lint !e451 */
+#include <asm/div64.h>
 #include "internal.h"
 
 #ifdef CONFIG_HISI_SLOW_PATH_COUNT
@@ -1007,7 +1006,6 @@ static bool free_pages_prepare(struct page *page, unsigned int order)
 		return false;
 
 	reset_page_owner(page, order);
-	page_tracker_reset_tracker(page, order);
 
 	if (!PageHighMem(page)) {
 		debug_check_no_locks_freed(page_address(page),
@@ -1430,7 +1428,6 @@ static int prep_new_page(struct page *page, unsigned int order, gfp_t gfp_flags,
 		prep_compound_page(page, order);
 
 	set_page_owner(page, order, gfp_flags);
-	page_tracker_set_tracker(page, order);
 
 	/*
 	 * page is set pfmemalloc when ALLOC_NO_WATERMARKS was necessary to
@@ -2158,11 +2155,9 @@ void split_page(struct page *page, unsigned int order)
 
 	gfp_mask = get_page_owner_gfp(page);
 	set_page_owner(page, 0, gfp_mask);
-	page_tracker_set_tracker(page, 0);
 	for (i = 1; i < (1 << order); i++) {
 		set_page_refcounted(page + i);
 		set_page_owner(page + i, 0, gfp_mask);
-		page_tracker_set_tracker(page + i, 0);
 	}
 }
 EXPORT_SYMBOL_GPL(split_page);
@@ -2194,7 +2189,6 @@ int __isolate_free_page(struct page *page, unsigned int order)
 	rmv_page_order(page);
 
 	set_page_owner(page, order, __GFP_MOVABLE);
-	page_tracker_set_tracker(page, order);
 
 	/* Set the pageblock if the isolated page is at least a pageblock */
 	if (order >= pageblock_order - 1) {
@@ -3309,9 +3303,6 @@ out:
 	if (unlikely(!page && read_mems_allowed_retry(cpuset_mems_cookie)))
 		goto retry_cpuset;
 
-	if (page)
-		page_tracker_set_trace(page, _RET_IP_, order);
-
 	return page;
 }
 EXPORT_SYMBOL(__alloc_pages_nodemask);
@@ -3332,9 +3323,6 @@ unsigned long __get_free_pages(gfp_t gfp_mask, unsigned int order)
 	page = alloc_pages(gfp_mask, order);
 	if (!page)
 		return 0;
-
-	page_tracker_set_trace(page, _RET_IP_, order);
-
 	return (unsigned long) page_address(page);
 }
 EXPORT_SYMBOL(__get_free_pages);
