@@ -71,6 +71,10 @@ struct mmc_queue {
 	atomic_long_t cache_used;
 	unsigned long cache_jiffies;
 #endif
+	struct mmc_queue_req    *mqrq_cmdq;
+	struct workqueue_struct* workqueue_cmdq;
+	struct work_struct	work_cmdq;
+	int tmp_get_card_flag;
 };
 
 extern int mmc_init_queue(struct mmc_queue *, struct mmc_card *, spinlock_t *,
