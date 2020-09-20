@@ -1500,7 +1500,7 @@ int *get_migratetype_fallbacks(int mtype)
 static struct page *__rmqueue_cma_fallback(struct zone *zone,
 					unsigned int order)
 {
-	return __rmqueue_smallest(zone, order, MIGRATE_CMA);
+	return __rmqueue_smallest(zone, order, MIGRATE_MOVABLE);
 }
 #else
 static inline struct page *__rmqueue_cma_fallback(struct zone *zone,
@@ -1839,7 +1839,7 @@ static struct page *__rmqueue(struct zone *zone, unsigned int order,
 
 	page = __rmqueue_smallest(zone, order, migratetype);
 	if (unlikely(!page)) {
-		if (migratetype == MIGRATE_MOVABLE)
+		if (migratetype == MIGRATE_CMA)
 			page = __rmqueue_cma_fallback(zone, order);
 
 		if (!page)
