@@ -34,7 +34,6 @@ obj-$(CONFIG_HISI_BALONG_MODEM) += modem/
 endif
 obj-$(CONFIG_HISI_AXI) += axi/
 obj-$(CONFIG_HISI_FLP)   += flp/
-obj-$(CONFIG_HISI_HMPTH_SET) += hmpthresholds/
 obj-$(CONFIG_HISI_PERFHUB) += perfhub/
 obj-$(CONFIG_HISI_HILOG) += hilog/
 obj-$(CONFIG_HISI_TIMEKEEPER) += timekeeper/
