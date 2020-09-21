@@ -4340,8 +4340,7 @@ unsigned int cpu_temp(int cpu)
 struct cpu_select_env;
 struct sched_cluster;
 
-static inline int task_will_fit(struct task_struct *p, int cpu,
-				enum sched_boost_type boost_type)
+static inline int task_will_fit(struct task_struct *p, int cpu)
 {
 	return 1;
 }
