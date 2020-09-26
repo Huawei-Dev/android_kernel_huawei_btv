@@ -68,6 +68,15 @@ DEFINE_EVENT(loadeval, cpufreq_interactive_target,
 	    TP_ARGS(cpu_id, load, curtarg, curactual, newtarg)
 );
 
+#ifdef CONFIG_HISI_CPUFREQ
+DEFINE_EVENT(loadeval, cpufreq_interactive_fast_ramp,
+	    TP_PROTO(unsigned long cpu_id, unsigned long load,
+		     unsigned long curtarg, unsigned long curactual,
+		     unsigned long newtarg),
+	    TP_ARGS(cpu_id, load, curtarg, curactual, newtarg)
+);
+#endif
+
 DEFINE_EVENT(loadeval, cpufreq_interactive_already,
 	    TP_PROTO(unsigned long cpu_id, unsigned long load,
 		     unsigned long curtarg, unsigned long curactual,
