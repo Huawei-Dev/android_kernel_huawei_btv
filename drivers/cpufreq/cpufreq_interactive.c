@@ -442,8 +442,7 @@ static void cpufreq_interactive_timer(unsigned long data)
 		 * early is perfectly OK.
 		 */
 		spin_unlock_irqrestore(&pcpu->load_lock, flags);
-		cputime_speedadj = (u64)sched_get_busy(data) *
-				pcpu->policy->cpuinfo.max_freq;
+		cputime_speedadj = pcpu->policy->cpuinfo.max_freq;
 		do_div(cputime_speedadj, tunables->timer_rate);
 	} else {
 		delta_time = (unsigned int)
