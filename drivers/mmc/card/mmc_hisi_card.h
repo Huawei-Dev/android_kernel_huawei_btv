@@ -39,6 +39,7 @@ struct mmc_blk_data {
 	struct device_attribute force_ro;
 	struct device_attribute power_ro_lock;
 	struct device_attribute num_wr_reqs_to_start_packing;
+	struct device_attribute no_pack_for_random;
 	int	area_type;
 };
 
