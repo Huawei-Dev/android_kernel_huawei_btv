@@ -803,7 +803,7 @@ static ssize_t store_polling(struct device *dev,
 	return count;
 }
 
-DEVICE_ATTR(enable, S_IRUGO | S_IWUSR,
+DEVICE_ATTR(enable_clk, S_IRUGO | S_IWUSR,
 		show_enable, store_enable);
 DEVICE_ATTR(polling_interval, S_IRUGO | S_IWUSR,
 		show_polling, store_polling);
@@ -813,7 +813,7 @@ DEVICE_ATTR(down_threshold, S_IRUGO | S_IWUSR,
 		show_down_threshold, store_down_threshold);
 
 static struct attribute *clk_scaling_attrs[] = {
-	&dev_attr_enable.attr,
+	&dev_attr_enable_clk.attr,
 	&dev_attr_up_threshold.attr,
 	&dev_attr_down_threshold.attr,
 	&dev_attr_polling_interval.attr,
