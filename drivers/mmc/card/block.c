@@ -701,14 +701,14 @@ static int __mmc_blk_ioctl_cmd(struct mmc_card *card, struct mmc_blk_data *md,
 	return err;
 }
 
-struct mmc_blk_ioc_rpmb_data {
+struct mmc_blk_ioc_rpmb_datax {
 	struct mmc_blk_ioc_data *data[MMC_IOC_MAX_RPMB_CMD];
 };
 
-static struct mmc_blk_ioc_rpmb_data *mmc_blk_ioctl_rpmb_copy_from_user(
+static struct mmc_blk_ioc_rpmb_datax *mmc_blk_ioctl_rpmb_copy_from_user(
 	struct mmc_ioc_rpmb __user *user)
 {
-	struct mmc_blk_ioc_rpmb_data *idata;
+	struct mmc_blk_ioc_rpmb_datax *idata;
 	int err, i;
 
 	idata = kzalloc(sizeof(*idata), GFP_KERNEL);
@@ -740,7 +740,7 @@ out:
 static int mmc_blk_ioctl_rpmb_cmd(struct block_device *bdev,
 	struct mmc_ioc_rpmb __user *ic_ptr)
 {
-	struct mmc_blk_ioc_rpmb_data *idata;
+	struct mmc_blk_ioc_rpmb_datax *idata;
 	struct mmc_blk_data *md;
 	struct mmc_card *card;
 	struct mmc_command cmd = {0};
