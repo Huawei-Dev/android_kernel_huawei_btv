@@ -157,8 +157,6 @@
 					 ((r) & 0xFFF) << 16 | \
 					 ((t) & 0xFFF))
 
-#define SDMMC_SET_RD_THLD(v, x)         (((v) & 0x1FFF) << 16 | (x))
-
 /* HCON register defines */
 #define DMA_INTERFACE_IDMA		(0x0)
 #define DMA_INTERFACE_DWDMA		(0x1)
