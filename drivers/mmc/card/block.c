@@ -59,11 +59,7 @@
 #ifdef CONFIG_HISI_MMC
 #include "mmc_hisi_card.h"
 #endif
-#ifdef CONFIG_HISI_MMC_SECURE_RPMB
 #include <linux/mmc/rpmb.h>
-#endif
-
-
 #include "hisi_partition.h"
 
 MODULE_ALIAS("mmc:block");
@@ -185,11 +181,8 @@ static inline void mmc_blk_clear_packed(struct mmc_queue_req *mqrq)
 	packed->retries = 0;
 	packed->blocks = 0;
 }
-#if CONFIG_HISI_MMC_SECURE_RPMB
+
 struct mmc_blk_data *mmc_blk_get(struct gendisk *disk)
-#else
-static struct mmc_blk_data *mmc_blk_get(struct gendisk *disk)
-#endif
 {
 	struct mmc_blk_data *md;
 
@@ -209,11 +202,8 @@ static inline int mmc_get_devidx(struct gendisk *disk)
 	int devidx = disk->first_minor / perdev_minors;
 	return devidx;
 }
-#ifdef CONFIG_HISI_MMC_SECURE_RPMB
+
 void mmc_blk_put(struct mmc_blk_data *md)
-#else
-static void mmc_blk_put(struct mmc_blk_data *md)
-#endif
 {
 	mutex_lock(&open_lock);
 	md->usage--;
@@ -467,14 +457,6 @@ mmc_blk_getgeo(struct block_device *bdev, struct hd_geometry *geo)
 	return 0;
 }
 
-#ifndef CONFIG_HISI_MMC_SECURE_RPMB
-struct mmc_blk_ioc_data {
-	struct mmc_ioc_cmd ic;
-	unsigned char *buf;
-	u64 buf_bytes;
-};
-#endif
-
 static struct mmc_blk_ioc_data *mmc_blk_ioctl_copy_from_user(
 	struct mmc_ioc_cmd __user *user)
 {
@@ -611,22 +593,14 @@ static int __mmc_blk_ioctl_cmd(struct mmc_card *card, struct mmc_blk_data *md,
 	struct mmc_request mrq = {NULL};
 	struct scatterlist sg;
 	int err;
-#ifndef CONFIG_HISI_MMC_SECURE_RPMB
 	int is_rpmb = false;
 	u32 status = 0;
-#endif
 
 	if (!card || !md || !idata)
 		return -EINVAL;
 
-	if (md->area_type & MMC_BLK_DATA_AREA_RPMB) {
-#if CONFIG_HISI_MMC_SECURE_RPMB
-		/* enable secure rpmb will block access rpmb from ioctl */
-		return -EINVAL;
-#else
+	if (md->area_type & MMC_BLK_DATA_AREA_RPMB)
 		is_rpmb = true;
-#endif
-	}
 
 	cmd.opcode = idata->ic.opcode;
 	cmd.arg = idata->ic.arg;
@@ -695,14 +669,14 @@ static int __mmc_blk_ioctl_cmd(struct mmc_card *card, struct mmc_blk_data *md,
 		if (err)
 			return err;
 	}
-#ifndef CONFIG_HISI_MMC_SECURE_RPMB
+
 	if (is_rpmb) {
 		err = mmc_set_blockcount(card, data.blocks,
 			idata->ic.write_flag & (1 << 31));
 		if (err)
 			return err;
 	}
-#endif
+
 	if ((MMC_EXTRACT_INDEX_FROM_ARG(cmd.arg) == EXT_CSD_SANITIZE_START) &&
 	    (cmd.opcode == MMC_SWITCH)) {
 		err = ioctl_do_sanitize(card);
@@ -736,7 +710,6 @@ static int __mmc_blk_ioctl_cmd(struct mmc_card *card, struct mmc_blk_data *md,
 
 	memcpy(&(idata->ic.response), cmd.resp, sizeof(cmd.resp));
 
-#ifndef CONFIG_HISI_MMC_SECURE_RPMB
 	if (is_rpmb) {
 		/*
 		 * Ensure RPMB command has completed by polling CMD13
@@ -748,7 +721,7 @@ static int __mmc_blk_ioctl_cmd(struct mmc_card *card, struct mmc_blk_data *md,
 					"%s: Card Status=0x%08X, error %d\n",
 					__func__, status, err);
 	}
-#endif
+
 	return err;
 }
 
