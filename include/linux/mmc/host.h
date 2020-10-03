@@ -281,7 +281,6 @@ enum dev_state {
 	DEV_SUSPENDING = 1,
 	DEV_SUSPENDED,
 	DEV_RESUMED,
-	DEV_UNKNOWN,	/* Device is in an unknown state */
 };
 
 struct mmc_host {
