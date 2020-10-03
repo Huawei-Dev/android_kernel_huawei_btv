@@ -4568,7 +4568,8 @@ static int process_backlog(struct napi_struct *napi, int quota)
 			local_irq_disable();
 			input_queue_head_incr(sd);
 			if (++work >= quota) {
-				goto state_changed;
+				local_irq_enable();
+				return work;
 			}
 		}
 
@@ -4585,17 +4586,14 @@ static int process_backlog(struct napi_struct *napi, int quota)
 			napi->state = 0;
 			rps_unlock(sd);
 
-			goto state_changed;
+			break;
 		}
 
 		skb_queue_splice_tail_init(&sd->input_pkt_queue,
 					   &sd->process_queue);
 		rps_unlock(sd);
 	}
-state_changed:
 	local_irq_enable();
-	napi_gro_flush(napi, false);
-	sd->current_napi = NULL;
 
 	return work;
 }
@@ -4631,13 +4629,10 @@ EXPORT_SYMBOL(__napi_schedule_irqoff);
 
 void __napi_complete(struct napi_struct *n)
 {
-	struct softnet_data *sd = this_cpu_ptr(&softnet_data);
-
 	BUG_ON(!test_bit(NAPI_STATE_SCHED, &n->state));
 
 	list_del_init(&n->poll_list);
 	smp_mb__before_atomic();
-	sd->current_napi = NULL;
 	clear_bit(NAPI_STATE_SCHED, &n->state);
 }
 EXPORT_SYMBOL(__napi_complete);
@@ -4790,15 +4785,6 @@ void netif_napi_del(struct napi_struct *napi)
 }
 EXPORT_SYMBOL(netif_napi_del);
 
-
-struct napi_struct *get_current_napi_context(void)
-{
-	struct softnet_data *sd = this_cpu_ptr(&softnet_data);
-
-	return sd->current_napi;
-}
-EXPORT_SYMBOL(get_current_napi_context);
-
 static int napi_poll(struct napi_struct *n, struct list_head *repoll)
 {
 	void *have;
@@ -4818,9 +4804,6 @@ static int napi_poll(struct napi_struct *n, struct list_head *repoll)
 	 */
 	work = 0;
 	if (test_bit(NAPI_STATE_SCHED, &n->state)) {
-		struct softnet_data *sd = this_cpu_ptr(&softnet_data);
-
-		sd->current_napi = n;
 		work = n->poll(n, weight);
 		trace_napi_poll(n);
 	}
