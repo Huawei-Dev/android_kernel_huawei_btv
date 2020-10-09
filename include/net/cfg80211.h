@@ -2592,8 +2592,6 @@ struct cfg80211_ops {
 			struct cfg80211_scan_request *request);
 	void	(*abort_scan)(struct wiphy *wiphy, struct wireless_dev *wdev);
 
-	void	(*abort_scan)(struct wiphy *wiphy, struct wireless_dev *wdev);
-
 	int	(*auth)(struct wiphy *wiphy, struct net_device *dev,
 			struct cfg80211_auth_request *req);
 	int	(*assoc)(struct wiphy *wiphy, struct net_device *dev,
