@@ -415,7 +415,7 @@ void create_mapping_late(phys_addr_t phys, unsigned long virt,
 static void __init __map_memblock(pgd_t *pgd, phys_addr_t start, phys_addr_t end)
 {
 	unsigned long kernel_start = __pa(_text);
-	unsigned long kernel_end = __pa(__init_begin);
+	unsigned long kernel_end = __pa(_end);
 
 	/*
 	 * The kernel itself is mapped at page granularity. Map all other
