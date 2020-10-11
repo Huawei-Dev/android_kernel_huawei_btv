@@ -34,6 +34,7 @@
 #include "sd_ops.h"
 #ifdef CONFIG_HISI_BOOTDEVICE
 #include <linux/bootdevice.h>
+#include "emmc-rpmb.h"
 #endif
 #ifdef CONFIG_HISI_AB_PARTITION
 #include "mmc-kirin-lib.h"
@@ -686,6 +687,8 @@ static int mmc_decode_ext_csd(struct mmc_card *card, u8 *ext_csd)
 		set_bootdevice_pre_eol_info(card->ext_csd.pre_eol_info);
 		set_bootdevice_life_time_est_typ_a(card->ext_csd.device_life_time_est_typ_a);
 		set_bootdevice_life_time_est_typ_b(card->ext_csd.device_life_time_est_typ_b);
+		/* get rpmb configure info */
+		emmc_get_rpmb_info(card, ext_csd);
 	}
 #endif
 
@@ -2270,6 +2273,7 @@ int mmc_can_reset(struct mmc_card *card)
 	return 1;
 }
 EXPORT_SYMBOL(mmc_can_reset);
+
 #ifdef CONFIG_HISI_MMC
 extern int hisi_mmc_reset(struct mmc_host *host);
 #else

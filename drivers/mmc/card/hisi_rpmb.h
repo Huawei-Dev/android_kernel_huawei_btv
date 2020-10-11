@@ -24,6 +24,8 @@
 
 #define RPMB_DRIVER_IS_NOT_READY 0
 #define RPMB_DRIVER_IS_READY 1
+#define WAIT_INIT_TIMES 3000
+#define WAIT_CONFIG_TIME 5000
 
 #define RPMB_DEVICE_IS_NOT_READY 0
 #define RPMB_DEVICE_IS_READY 1
@@ -65,6 +67,8 @@
 #define RPMB_SVC_WRITE_CAPABILITY	 0xc600FFF6
 #define RPMB_SVC_READ_CAPABILITY 0xc600FFF7
 #define RPMB_SVC_PARTITION 0xc600FFF8
+#define RPMB_SVC_MULTI_KEY 0xc600FFF9
+#define RPMB_SVC_CONFIG_VIEW 0xc600FFFA
 
 /* Request codes */
 #define RPMB_REQ_KEY 1
@@ -154,15 +158,12 @@ struct request_info {
 	unsigned int rqst_type;
 	unsigned int base;
 	unsigned int blks;
-	unsigned char *src_buf;
-	unsigned char *des_buf;
 	unsigned int counter;
 	enum rpmb_state state;
 	struct _current_rqst {
 		unsigned int offset; /* offset upon to request_info.base */
 		unsigned int blks;   /* current request size */
 	} current_rqst;
-	void (*issue_fn)(uint64_t result);
 };
 
 #define RPMB_BLK_SZ (512)
@@ -171,22 +172,32 @@ struct request_info {
 #define MAX_RPMB_FRAME (32)
 #define MAX_HAMC_BUF_SZ (10 * 1024)
 
+#define RPMB_TIMEOUT_TIME_IN_KERNEL 800000000 /*may be in kernel we think 800ms is abnormal*/
+#define RPMB_MARK_EXIST_STATUS 0x5A5A
+
 struct rpmb_request {
 	struct rpmb_frame frame[MAX_RPMB_FRAME];
 	struct rpmb_frame status_frame;
 	unsigned char hmac_buf[MAX_HAMC_BUF_SZ];
 	struct request_info info;
 	uint16_t key_frame_status;
+	uint16_t rpmb_request_status;
+	uint16_t rpmb_exception_status;
 	struct _rpmb_debug {
+		uint64_t partition_size;
+		uint64_t result;
+		uint64_t test_time;
+		uint64_t test_hisee_atf_read_time;
+		uint64_t test_hisee_atf_write_time;
+		uint64_t test_hisee_atf_counter_time;
 		uint32_t key_id;
 		uint32_t func_id;
 		uint16_t start;
 		uint16_t block_count;
 		uint16_t write_value;
 		uint16_t read_check;
-		uint8_t result;
-		uint32_t test_time;
-		uint32_t partition_size;
+		uint8_t capability_times;
+		uint8_t multi_region_num;
 	} rpmb_debug;
 };
 

@@ -15,3 +15,4 @@ mmc_core-$(CONFIG_DEBUG_FS)	+= debugfs.o
 obj-$(CONFIG_MMC_CQ_HCI) += hisi_cmdq_core.o
 obj-$(CONFIG_HISI_MMC) += hisi_core_mmc.o
 obj-$(CONFIG_HISI_AB_PARTITION) += mmc-kirin-lib.o
+obj-$(CONFIG_HISI_BOOTDEVICE) += emmc-rpmb.o

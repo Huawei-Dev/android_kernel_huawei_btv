@@ -24,12 +24,9 @@ struct __bootdevice {
 	unsigned int manfid;
 	enum AB_PARTITION_TYPE ab_partition_support;
 	u8 ptn_index;
-
-	/* UFS only */
-	volatile uint64_t rpmb_blk_count;
-	/* we use 0x rpmb to indicate a valid value */
-#define RPMB_DONE 0x72706D62 /* 'r', 'p', 'm', 'b' */
-	volatile uint32_t rpmb_done;
+	/* UFS and EMMC all */
+	struct rpmb_config_info rpmb_config;
+	volatile int32_t rpmb_done;
 };
 
 #define MAX_PARTITION_NAME_LENGTH       36
@@ -43,29 +40,96 @@ static struct semaphore flash_find_index_sem;
 
 static struct __bootdevice bootdevice;
 
-void set_rpmb_blk_count(uint64_t blk_count)
-{
-	bootdevice.rpmb_blk_count = blk_count;
+void set_rpmb_total_blks(u64 total_blks){
+	bootdevice.rpmb_config.rpmb_total_blks = total_blks;
+}
+
+void set_rpmb_blk_size(u8 blk_size){
+	bootdevice.rpmb_config.rpmb_blk_size = blk_size;
+}
+
+void set_rpmb_read_frame_support(u64 read_frame_support){
+	bootdevice.rpmb_config.rpmb_read_frame_support = read_frame_support;
+}
+void set_rpmb_write_frame_support(u64 write_frame_support){
+	bootdevice.rpmb_config.rpmb_write_frame_support = write_frame_support;
+}
+
+
+void set_rpmb_read_align(u8 read_align){
+	bootdevice.rpmb_config.rpmb_read_align = read_align;
+}
+
+void set_rpmb_write_align(u8 write_align){
+	bootdevice.rpmb_config.rpmb_write_align = write_align;
+}
+
+void set_rpmb_region_enable(u8 region_enable){
+	bootdevice.rpmb_config.rpmb_region_enable = region_enable;
+}
+
+void set_rpmb_unit_size(u64 unit_size){
+	bootdevice.rpmb_config.rpmb_unit_size = unit_size;
+}
+
+void set_rpmb_region_size(int region_num, u8 region_size){
+	if(region_num >= 0 && region_num < MAX_RPMB_REGION_NUM)
+		bootdevice.rpmb_config.rpmb_region_size[region_num] = region_size;
+}
+
+void set_rpmb_config_ready_status(void){
 	bootdevice.rpmb_done = RPMB_DONE;
 }
 
-/*lint -save -e516 -e778 -e774*/
-int get_rpmb_blk_count(uint64_t *blk_count, int delay_ms)
-{
-	int i;
-
-	for (i = 0; i < delay_ms; i++) {
-		if (bootdevice.rpmb_done == RPMB_DONE) {
-			*blk_count = bootdevice.rpmb_blk_count;
-			return 0;
-		}
-		udelay((u64)1000);
-	}
-
-	return -ETIMEDOUT;
+u64 get_rpmb_total_blks(void){
+	return bootdevice.rpmb_config.rpmb_total_blks;
 }
-/*lint -restore*/
 
+u8 get_rpmb_blk_size(void){
+	return bootdevice.rpmb_config.rpmb_blk_size;
+}
+
+u64 get_rpmb_read_frame_support(void){
+	return bootdevice.rpmb_config.rpmb_read_frame_support;
+}
+
+u64 get_rpmb_write_frame_support(void){
+	return bootdevice.rpmb_config.rpmb_write_frame_support;
+}
+
+u8 get_rpmb_read_align(void){
+	return bootdevice.rpmb_config.rpmb_read_align;
+}
+
+u8 get_rpmb_write_align(void){
+	return bootdevice.rpmb_config.rpmb_write_align;
+}
+
+u8 get_rpmb_region_enable(void)
+{
+	return bootdevice.rpmb_config.rpmb_region_enable;
+}
+
+u64 get_rpmb_unit_size(void){
+	return bootdevice.rpmb_config.rpmb_unit_size;
+}
+
+u8 get_rpmb_region_size(int region_num)
+{
+	if(region_num >= 0 && region_num < MAX_RPMB_REGION_NUM)
+		return bootdevice.rpmb_config.rpmb_region_size[region_num];
+	else
+		return 0;
+}
+
+
+int get_rpmb_config_ready_status(void){
+	return bootdevice.rpmb_done;
+}
+
+struct rpmb_config_info get_rpmb_config(void){
+	return bootdevice.rpmb_config;
+}
 void set_bootdevice_type(enum bootdevice_type type)
 {
 	bootdevice.type = type;
@@ -185,6 +249,21 @@ void set_bootdevice_product_name(char *product_name, u32 len)
 
 	strlcpy(bootdevice.product_name, product_name, min_len);
 	bootdevice.product_name[min_len] = '\0';
+}
+
+void get_bootdevice_product_name(char* product_name, u32 len)
+{
+	u32 min_len = min_t(uint8_t, len, MAX_NAME_LEN);
+
+	if(min_len == 0)
+	{
+		product_name[0] = '\0';
+		return;
+	}
+
+	strlcpy(product_name, bootdevice.product_name, min_len);
+	product_name[min_len-1] = '\0';
+	return;
 }
 
 static int product_name_proc_show(struct seq_file *m, void *v)
@@ -307,7 +386,6 @@ static const struct file_operations manfid_proc_fops = {
 	.release	= single_release,
 };
 
-/*lint -save -e715 -e818*/
 static int ab_partition_support_proc_show(struct seq_file *m, void *v)
 {
 	bootdevice.ab_partition_support = get_device_boot_partition_type();
@@ -358,15 +436,13 @@ static ssize_t ab_partition_support_proc_write(struct file *p_file, const char _
 	return (ssize_t)count;
 }
 
-/*lint -save -e785*/
 static const struct file_operations ab_partition_support_proc_fops = {
 	.open		= ab_partition_support_proc_open,
 	.read		= seq_read,
 	.write          = ab_partition_support_proc_write,
-	.llseek		= seq_lseek,/*lint !e64 !e65*/ 
+	.llseek		= seq_lseek,
 	.release	= single_release,
 };
-/*lint -restore*/
 
 static int flash_find_index_proc_show(struct seq_file *m, void *v)
 {
@@ -418,7 +494,6 @@ static long flash_find_index_proc_ioctl(struct file *p_file, unsigned int cmd, u
 	return 0;
 }
 
-/*lint -save -e785*/
 static const struct file_operations flash_find_index_proc_fops = {
 	.open		= flash_find_index_proc_open,
 	.read		= seq_read,
@@ -427,8 +502,6 @@ static const struct file_operations flash_find_index_proc_fops = {
 	.llseek		= seq_lseek,/*lint !e64 !e65*/
 	.release	= single_release,
 };
-/*lint -restore*/
-/*lint -restore*/
 
 static int __init proc_bootdevice_init(void)
 {

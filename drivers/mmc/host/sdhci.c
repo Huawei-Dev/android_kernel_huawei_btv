@@ -1,4 +1,17 @@
-
+/*
+ *  linux/drivers/mmc/host/sdhci.c - Secure Digital Host Controller Interface driver
+ *
+ *  Copyright (C) 2005-2008 Pierre Ossman, All Rights Reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.
+ *
+ * Thanks to the following companies for their support:
+ *
+ *     - JMicron (hardware and technical support)
+ */
 
 #include <linux/delay.h>
 #include <linux/highmem.h>

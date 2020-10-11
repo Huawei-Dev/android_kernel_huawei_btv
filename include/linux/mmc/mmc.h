@@ -234,6 +234,7 @@ struct _mmc_csd {
 #define EXT_CSD_EXP_EVENTS_STATUS	54	/* RO, 2 bytes */
 #define EXT_CSD_EXP_EVENTS_CTRL		56	/* R/W, 2 bytes */
 #define EXT_CSD_DATA_SECTOR_SIZE	61	/* R */
+#define EXT_CSD_VENDOR_FEATURE_SUPPORT	124	/* Reserved R */
 #define EXT_CSD_GP_SIZE_MULT		143	/* R/W */
 #define EXT_CSD_PARTITION_SETTING_COMPLETED 155	/* R/W */
 #define EXT_CSD_PARTITION_ATTRIBUTE	156	/* R/W */
@@ -250,11 +251,15 @@ struct _mmc_csd {
 #define EXT_CSD_BOOT_WP			173	/* R/W */
 #define EXT_CSD_ERASE_GROUP_DEF		175	/* R/W */
 #define EXT_CSD_PART_CONFIG		179	/* R/W */
+#define EXT_CSD_RPMB_REGION1_SIZE_MULT	180	/* Reserved R/W */
 #define EXT_CSD_ERASED_MEM_CONT		181	/* RO */
+#define EXT_CSD_RPMB_REGION2_SIZE_MULT	182	/* Reserved R/W */
 #define EXT_CSD_BUS_WIDTH		183	/* R/W */
 #define EXT_CSD_STROBE_SUPPORT		184	/* RO */
 #define EXT_CSD_HS_TIMING		185	/* R/W */
+#define EXT_CSD_RPMB_REGION3_SIZE_MULT	186	/* Reserved R/W */
 #define EXT_CSD_POWER_CLASS		187	/* R/W */
+#define EXT_CSD_RPMB_REGION4_SIZE_MULT	188	/* Reserved R/W */
 #define EXT_CSD_REV			192	/* RO */
 #define EXT_CSD_STRUCTURE		194	/* RO */
 #define EXT_CSD_CARD_TYPE		196	/* RO */

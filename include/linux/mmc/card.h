@@ -100,9 +100,15 @@ struct mmc_ext_csd {
 #define MMC_FIRMWARE_LEN 8
 	u8			fwrev[MMC_FIRMWARE_LEN];  /* FW version */
 	u8			raw_exception_status;	/* 54 */
+	u8			raw_vendor_feature_support;	/* 124 */
 	u8			raw_partition_support;	/* 160 */
+	u8			raw_wr_rel_param;/* 166 */
 	u8			raw_rpmb_size_mult;	/* 168 */
+	u8			raw_rpmb_region1_size_mult;	/* 180 */
 	u8			raw_erased_mem_count;	/* 181 */
+	u8			raw_rpmb_region2_size_mult;	/* 182 */
+	u8			raw_rpmb_region3_size_mult;	/* 186 */
+	u8			raw_rpmb_region4_size_mult;	/* 188 */
 	u8			raw_ext_csd_structure;	/* 194 */
 	u8			raw_card_type;		/* 196 */
 	u8			raw_driver_strength;	/* 197 */

@@ -347,7 +347,7 @@ struct sdhci_adma2_64_desc {
  * Maximum segments assuming a 512KiB maximum requisition size and a minimum
  * 4KiB page size.
  */
-#define SDHCI_MAX_SEGS		128
+#define SDHCI_MAX_SEGS		256
 
 enum sdhci_cookie {
 	COOKIE_UNMAPPED,
