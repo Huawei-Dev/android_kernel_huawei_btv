@@ -3685,18 +3685,6 @@ CONFIG_HISI_SIM_HOTPLUG=y
 CONFIG_HISI_AXI=y
 
 #
-# Hisilicon IVP
-#
-CONFIG_HISI_IVP=y
-CONFIG_IVP_SMMU=y
-# CONFIG_IVP_SMMU_TEST is not set
-
-#
-# Hisilicon IVP vp5
-#
-# CONFIG_IVP_VP5 is not set
-
-#
 # Hisi lpm3_debug options
 #
 # CONFIG_HISI_LPM3_DEBUG is not set
