@@ -42,7 +42,9 @@ void hw_usb_get_device(struct device *dev)
 {
     hw_usb_device = dev;
 }
+
 EXPORT_SYMBOL(hw_usb_get_device);
+
 static int usb_port_switch(int usb_switch)
 {
 	int ret = 0;
@@ -101,6 +103,7 @@ int hw_usb_port_switch_request(int usb_switch_index)
 	return 0;
 }
 EXPORT_SYMBOL(hw_usb_port_switch_request);
+
 
 static ssize_t switch_request_show(struct device *pdev, struct device_attribute *attr,
 			   char *buf)
@@ -168,6 +171,7 @@ static ssize_t switch_index_show(struct device *pdev, struct device_attribute *a
 {
     return snprintf(buf, PAGE_SIZE, "%d\n", switch_request);
 }
+
 DEVICE_ATTR(switch_request, S_IRUGO | S_IWUSR, switch_request_show, switch_request_store);
 DEVICE_ATTR(switch_index, S_IRUGO, switch_index_show, NULL);
 DEVICE_ATTR(port_mode, 0660, port_mode_show, port_mode_store);
@@ -207,4 +211,3 @@ int hw_rwswitch_create_device(struct device *dev,struct class * usb_class)
     return 0;
 }
 EXPORT_SYMBOL(hw_rwswitch_create_device);
-

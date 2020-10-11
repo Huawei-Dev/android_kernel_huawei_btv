@@ -32,7 +32,6 @@
 
 #ifdef HW_USB_TIME_SYNC_PC
     #define AFTER_BOOT_TO_1970YEAR ((1971-1970)*365*24*60*60)
-    #define BEIJING_TIME_ZONE 8
 struct _time {
     int            time_bias;
     unsigned short year;
@@ -53,6 +52,7 @@ static struct hw_flush_pc_time flush_pc_data;
 
 static void hw_usb_flush_pc_time_work(struct work_struct *work)
 {
+#if defined (CONFIG_RTC_HCTOSYS_DEVICE)
     struct hw_flush_pc_time *pc_data = container_of(work,
             struct hw_flush_pc_time, pc_data_work.work);
     struct rtc_device *rtc;
@@ -81,6 +81,9 @@ static void hw_usb_flush_pc_time_work(struct work_struct *work)
     //	alarm_pending |= ANDROID_ALARM_TIME_CHANGE_MASK;
     //	wake_up(&alarm_wait_queue);
     //	spin_unlock_irqrestore(&alarm_slock, flags);
+#else
+    return;
+#endif
 }
 
 /*========================================================================
@@ -115,7 +118,7 @@ void hw_usb_handle_host_time(struct usb_ep *ep, struct usb_request *req)
     flush_pc_data.tv.tv_sec = (unsigned long) mktime (host_time->year,
                     host_time->month,
                     host_time->day,
-                    (host_time->hour+BEIJING_TIME_ZONE),
+                    host_time->hour,
                     host_time->minute,
                     host_time->second);
     schedule_delayed_work(&(flush_pc_data.pc_data_work), 0);
@@ -123,6 +126,7 @@ void hw_usb_handle_host_time(struct usb_ep *ep, struct usb_request *req)
     return;
 }
 EXPORT_SYMBOL(hw_usb_handle_host_time);
+
 /*========================================================================
 FUNCTION       hw_usb_sync_host_time_init
 
@@ -140,4 +144,5 @@ void hw_usb_sync_host_time_init(void)
     INIT_DELAYED_WORK(&(flush_pc_data.pc_data_work), hw_usb_flush_pc_time_work);
 }
 EXPORT_SYMBOL(hw_usb_sync_host_time_init);
+
 #endif
