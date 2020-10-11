@@ -1,6 +1,3 @@
-
-/*lint -e715 -esym(715,*) */
-/*lint -e818 -esym(818,*) */
 #include <asm/compiler.h>
 #include <linux/dma-mapping.h>
 #include <linux/kernel.h>
@@ -42,7 +39,7 @@ noinline int atfd_hisi_service_access_register_smc(u64 main_fun_id, u64 buff_add
 static ATFD_DATA g_atfd_config;
 void configure_master_security(unsigned int is_security, int master_id)
 {
-	if (master_id >= MASTER_ID_MAX || master_id == MASTER_DSS_ID) {
+	if (master_id >= MASTER_ID_MAX || master_id == MASTER_DSS_ID || master_id < 0) {
 		printk(KERN_ERR "%s %d, invalid master_id=%d.\n", __func__, __LINE__, (int)master_id);
 		return;
 	}
@@ -51,7 +48,9 @@ void configure_master_security(unsigned int is_security, int master_id)
 		return;
 	}
 	is_security |= 0xabcde0;
-	(void)atfd_hisi_service_access_register_smc(ACCESS_REGISTER_FN_MAIN_ID, (u64)is_security, (u64)master_id, ACCESS_REGISTER_FN_SUB_ID_MASTER_SECURITY_CONFIG);
+	(void)atfd_hisi_service_access_register_smc(ACCESS_REGISTER_FN_MAIN_ID,
+			(u64)is_security, (u64)master_id,/*lint !e571*/
+			(u64)ACCESS_REGISTER_FN_SUB_ID_MASTER_SECURITY_CONFIG);
 	return;
 }
 EXPORT_SYMBOL_GPL(configure_master_security);
@@ -70,6 +69,10 @@ void configure_dss_register_security(uint32_t addr, uint32_t val, uint8_t bw, ui
 	dss_data.bs = bs;
 	if (!g_atfd_config.buf_virt_addr) {
 		printk(KERN_ERR "%s %d, no available mem\n", __func__, __LINE__);
+		return;
+	}
+	if (DRMDRIVER_MODULE_INIT_SUCCESS_FLG != g_atfd_config.module_init_success_flg) {
+		printk(KERN_ERR "%s %d, module is not ready now\n", __func__, __LINE__);
 		return;
 	}
 	BUG_ON(in_interrupt());
@@ -94,7 +97,7 @@ int configure_dss_service_security(unsigned int master_op_type, unsigned int cha
 	}
 	value = (((u64)mode << 48) | ((u64)channel << 32) | master_op_type | 0xabcde0);
 	return atfd_hisi_service_access_register_smc(ACCESS_REGISTER_FN_MAIN_ID,
-			value, (u64)MASTER_DSS_ID, (u64)ACCESS_REGISTER_FN_SUB_ID_MASTER_SECURITY_CONFIG);
+		value, (u64)MASTER_DSS_ID, (u64)ACCESS_REGISTER_FN_SUB_ID_MASTER_SECURITY_CONFIG);
 }
 EXPORT_SYMBOL_GPL(configure_dss_service_security);
 
@@ -104,6 +107,7 @@ static int __init hisi_drm_driver_init(void)
 	struct device_node *np = NULL;
 	uint32_t data[2] = {0};
 	phys_addr_t bl31_smem_base = HISI_SUB_RESERVED_BL31_SHARE_MEM_PHYMEM_BASE;
+
 	memset((void *)&g_atfd_config, 0, sizeof(g_atfd_config));
 	np = of_find_compatible_node(NULL, NULL, ATFD_MEM_START_ADDRESS);
     if (!np) {
@@ -125,6 +129,7 @@ static int __init hisi_drm_driver_init(void)
 		return ret;
     }
 	mutex_init(&(g_atfd_config.atfd_mutex));
+	g_atfd_config.module_init_success_flg = DRMDRIVER_MODULE_INIT_SUCCESS_FLG;
 	return ret;
 }
 
@@ -132,6 +137,3 @@ arch_initcall(hisi_drm_driver_init);
 MODULE_DESCRIPTION("Hisilicon drm driver module");
 MODULE_AUTHOR("lvtaolong@huawei.com.sh");
 MODULE_LICENSE("GPL");
-
-/*lint +e715 +esym(715,*) */
-/*lint +e818 +esym(818,*) */
