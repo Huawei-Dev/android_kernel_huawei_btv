@@ -3,6 +3,7 @@
 #include <linux/irqchip.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
+#include "securec.h"
 
 /* Format of hex string: 0x12345678 */
 #define RUNMODE_FLAG_NORMAL  0
@@ -174,6 +175,37 @@ static int __init early_parse_lowpower_cmdline(char *p)
 
 early_param("low_volt_flag", early_parse_lowpower_cmdline);
 
+static int need_dsm_notify = 1;
+int get_dsm_notify_flag(void)
+{
+	return need_dsm_notify;
+}
+EXPORT_SYMBOL(get_dsm_notify_flag);
+
+static int __init early_parse_dsm_notify_cmdline(char *p)
+{
+	int ret = 0;
+	char clow[HEX_STRING_MAX + 1] = {'\0'};
+
+	if (p == NULL) {
+		need_dsm_notify = 1;       /* error parameter, dsm notify */
+		pr_err("%s input is NULL\n", __func__);
+		return 0;
+	}
+
+	memset(clow, 0, HEX_STRING_MAX + 1);
+	memcpy_s(clow, HEX_STRING_MAX, p, HEX_STRING_MAX);
+
+	ret = kstrtoint(clow, TRANSFER_BASE, &need_dsm_notify);
+	if (ret)
+		return ret;
+
+	pr_info("%s %d\n", __func__, need_dsm_notify);
+	return 0;
+}
+
+early_param("dsm_notify", early_parse_dsm_notify_cmdline);
+
 /**
  * parse powerdown charge cmdline which is passed from fastoot. *
  * Format : pd_charge=0 or 1             *
@@ -201,6 +233,30 @@ unsigned int get_pd_charge_flag(void)
 	return pd_charge_flag;
 }
 EXPORT_SYMBOL(get_pd_charge_flag);
+
+static unsigned int userlock = 0;
+static int __init early_parse_userlock_cmdline(char *p)
+{
+	if (p) {
+		if (!strncmp(p, "locked", strlen("locked")))
+			userlock = 1;
+		else
+			userlock = 0;
+
+		pr_info("userlock p:%s, userlock :%u\n", p,
+			   userlock);
+	}
+
+	return 0;
+}
+
+early_param("userlock", early_parse_userlock_cmdline);
+
+unsigned int get_userlock(void)
+{
+	return userlock;
+}
+EXPORT_SYMBOL(get_userlock);
 
 unsigned int bsp_need_loadmodem(void)
 {
