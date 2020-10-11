@@ -36,10 +36,9 @@
 
 #define	ID_MASK				0x0f
 
-/*lint -e750 -esym(750,*)*/
 #define	UNLOCK_OFFSET			0x04
 #define	LOCK_ST_OFFSET			0x08
-/*lint -e750 +esym(750,*)*/
+
 struct hisi_hwspinlock {
 	int id_in_group;
 	void __iomem *address;
@@ -88,7 +87,10 @@ static const struct hwspinlock_ops hisi_hwspinlock_ops = {
 	.relax		= hisi_hwspinlock_relax,
 };
 
-static struct of_device_id hisi_hwlock_of_match[];
+static struct of_device_id hisi_hwlock_of_match[] = {
+	{ .compatible = "hisilicon,hwspinlock" },
+	{ },
+};
 
 static int hisi_hwspinlock_probe(struct platform_device *pdev)
 {
@@ -115,22 +117,22 @@ static int hisi_hwspinlock_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 
-	ret = of_property_read_u32(np, "hwlock,register-width", &register_width);
+	ret = of_property_read_u32(np, "hwlock,register-width", (u32 *)&register_width);
 	if (ret) {
 		dev_err(dev, "no find 'hwlock,register-width' property!\n");
-		goto iounmap_base;
+		goto bank_err;
 	}
 
-	ret = of_property_read_u32(np, "hwlock,bits-per-single", &lock_bits_g);
+	ret = of_property_read_u32(np, "hwlock,bits-per-single", (u32 *)&lock_bits_g);
 	if (ret) {
 		dev_err(dev, "no find 'hwlock,bits-per-single' property!\n");
-		goto iounmap_base;
+		goto bank_err;
 	}
 
-	ret = of_property_read_u32(np, "hwlock,groups", &lock_groups);
+	ret = of_property_read_u32(np, "hwlock,groups", (u32 *)&lock_groups);
 	if (ret) {
 		dev_err(dev, "no find 'hwlock,groups' property!\n");
-		goto iounmap_base;
+		goto bank_err;
 	}
 
 	locks_per_register = register_width / lock_bits_g;
@@ -139,19 +141,19 @@ static int hisi_hwspinlock_probe(struct platform_device *pdev)
 	bank = devm_kzalloc(dev, sizeof(*bank) + num_lock * sizeof(*hwlock), GFP_KERNEL);
 	if (!bank) {
 		ret = -ENOMEM;
-		goto iounmap_base;
+		goto bank_err;
 	}
 
 	addr = devm_kzalloc(dev, lock_groups * sizeof(unsigned int), GFP_KERNEL);
 	if (!addr) {
 		ret = -ENOMEM;
-		goto iounmap_base;
+		goto addr_err;
 	}
 
 	hwspinlock_info = devm_kzalloc(dev, num_lock * sizeof(*hwspinlock_info), GFP_KERNEL);
 	if (!hwspinlock_info) {
 		ret = -ENOMEM;
-		goto iounmap_base;
+		goto hwspinlock_info_err;
 	}
 
 	ret = of_property_read_u32_array(np, "hwlock,offset", addr, lock_groups);
@@ -185,6 +187,12 @@ static int hisi_hwspinlock_probe(struct platform_device *pdev)
 reg_fail:
 	pm_runtime_disable(dev);
 iounmap_base:
+	devm_kfree(dev, hwspinlock_info);
+hwspinlock_info_err:
+	devm_kfree(dev, addr);
+addr_err:
+	devm_kfree(dev, bank);
+bank_err:
 	iounmap(hwspinlock_base);
 	of_node_put(np_pctrl);
 	return ret;
@@ -216,10 +224,6 @@ static int hisi_hwspinlock_remove(struct platform_device *pdev)
 	return 0;
 }
 
-static struct of_device_id hisi_hwlock_of_match[] = {
-	{ .compatible = "hisilicon,hwspinlock" },
-	{ },
-};
 MODULE_DEVICE_TABLE(of, hisi_hwlock_of_match);
 
 static struct platform_driver hisi_hwspinlock_driver = {

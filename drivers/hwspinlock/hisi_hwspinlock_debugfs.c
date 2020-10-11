@@ -39,9 +39,8 @@ static struct dentry *hwspinlock_debug_dir;
 static struct dentry *hwspinlock_fn;
 static struct hwspinlock *hwlock;
 static int locked;
-/*lint -e750 -esym(750,*)*/
+
 #define RESOURCE_LOCK_STAT_OFFSET			0x8
-/*lint -e750 +esym(750,*)*/
 
 static struct hwspinlock *debugfs_hwspinlock_request_specific(int id,
 						int *b_id, int *n_locks)
@@ -58,7 +57,7 @@ static struct hwspinlock *debugfs_hwspinlock_request_specific(int id,
 	*b_id = _hwlock->bank->base_id;
 	*n_locks = _hwlock->bank->num_locks;
 	hwlockinfo = (struct hwspinlock_hisi *)(_hwlock->priv);
-	pr_info("[Debug] Cat Sucess! RESOURCE_LOCK ID_IN_Group=%d  ADDR=%p\n",
+	pr_info("[Debug] Cat Sucess! RESOURCE_LOCK ID_IN_Group=%d  ADDR=%pK\n",
 				hwlockinfo->id_in_group, hwlockinfo->address);
 	return _hwlock;
 }
