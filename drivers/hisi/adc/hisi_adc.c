@@ -125,11 +125,11 @@ static int adc_send_ipc_to_lpm3(int channel)
 		goto err_adc_dev;
 	}
 
-	if (hisi_adc_dev->tx_msg[ADC_IPC_CMD_TYPE] != ADC_IPC_DATA)
-		hisi_adc_dev->tx_msg[ADC_IPC_CMD_TYPE] = ADC_IPC_DATA;
+	if (hisi_adc_dev->tx_msg[ADC_IPC_CMD_TYPE] != (mbox_msg_t)ADC_IPC_DATA)
+		hisi_adc_dev->tx_msg[ADC_IPC_CMD_TYPE] = (mbox_msg_t)ADC_IPC_DATA;
 
 	hisi_adc_dev->info.channel = channel;
-	hisi_adc_dev->tx_msg[ADC_IPC_CMD_CHANNEL] = channel;
+	hisi_adc_dev->tx_msg[ADC_IPC_CMD_CHANNEL] = (mbox_msg_t)channel;
 
 	do {
 		ret = RPROC_ASYNC_SEND(ADC_RPROC_SEND_ID, (mbox_msg_t *)hisi_adc_dev->tx_msg, ADC_IPC_CMD_LEN);
@@ -264,8 +264,8 @@ static int __init hisi_adc_driver_init(void)
 		goto err_get_mbox;
 	}
 
-	hisi_adc_dev->tx_msg[ADC_IPC_CMD_TYPE] = ADC_IPC_DATA;
-	hisi_adc_dev->tx_msg[ADC_IPC_CMD_CHANNEL] = ADC_RESULT_ERR;
+	hisi_adc_dev->tx_msg[ADC_IPC_CMD_TYPE] = (mbox_msg_t)ADC_IPC_DATA;
+	hisi_adc_dev->tx_msg[ADC_IPC_CMD_CHANNEL] = (mbox_msg_t)ADC_RESULT_ERR;
 
 	mutex_init(&hisi_adc_dev->mutex);
 	init_completion(&hisi_adc_dev->completion);

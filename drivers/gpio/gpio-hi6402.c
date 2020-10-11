@@ -513,7 +513,7 @@ static int hi6402_gpio_irq_setup(struct hi6402_gpio *chip, struct platform_devic
 {
 	struct gpio_chip *gc = &chip->gc;
 	const __be32 *mux;
-	int gpio_sel_array[HI6402_AWAKE_GPIO_CNT];
+	int gpio_sel_array[HI6402_AWAKE_GPIO_CNT] = {0};
 	int ret, i, size, j = 0;
 
 	mutex_init(&chip->irq_lock);
@@ -528,6 +528,12 @@ static int hi6402_gpio_irq_setup(struct hi6402_gpio *chip, struct platform_devic
 
 	chip->domain = irq_domain_add_linear(gc->of_node, HI6402_GPIO_NR,
 					     &hi6402_gpio_irq_domain_ops, chip);
+
+	if (NULL == chip->domain) {
+		dev_err(gc->dev, "irq_domain_add_linear error!\n");
+		mutex_destroy(&chip->irq_lock);
+		return -ENODEV;
+	}
 
 	gc->to_irq = hi6402_gpio_to_irq;
 
@@ -573,6 +579,7 @@ get_awake_irq_num:
 
 error:
 	irq_domain_remove(chip->domain);
+	mutex_destroy(&chip->irq_lock);
 	return ret;
 }
 
@@ -618,10 +625,9 @@ static int hi6402_gpio_probe(struct platform_device *pdev)
 			ret = -ENODEV;
 			goto error;
 		}
-	} else {
+	} else
 		chip->gc.base = hi6402_parse_gpio_base(dev);
-		irq_base = 0;
-	}
+
 	ret = of_property_read_u32(np, "irq_hi6402_gpio", &chip->p_irq);
 	if (ret) {
 		dev_err(dev, "could not find irq base\n");
@@ -677,6 +683,9 @@ static int hi6402_gpio_probe(struct platform_device *pdev)
 error:
 	if (chip->audio_clk)
 		clk_disable_unprepare(chip->audio_clk);
+
+	mutex_destroy(&chip->lock);
+
 	pr_err("%s: error\n", __FUNCTION__);
 	return ret;
 }
