@@ -17,6 +17,9 @@ struct antenna_device_info {
 
 enum antenna_type {
     ANTENNA_BOARDID_GPIO_DETECT,
+    ANTENNA_BOARDID_GPIO_STATUS,
 };
 
+#define ANATENNA_DETECT_SUCCEED 1
+#define ANATENNA_DETECT_FAIL    0
 #endif

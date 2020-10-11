@@ -41,9 +41,11 @@ struct antenna_detect_info {
 #define CODEC_GPIO_BASE 224
 static int g_gpio_count = 0;
 static int g_gpio[MAX_GPIO_NUM] = {0};
+static int g_gpio_expect = -1;
 
 static struct antenna_detect_info antenna_detect_tb[] = {
-    ANTENNA_DETECT_RO(antenna_boardid_detect,    BOARDID_GPIO_DETECT),
+    ANTENNA_DETECT_RO(antenna_board_match,    BOARDID_GPIO_DETECT),
+    ANTENNA_DETECT_RO(antenna_boardid_status,    BOARDID_GPIO_STATUS),
 };
 
 static struct attribute *antenna_sysfs_attrs[ARRAY_SIZE(antenna_detect_tb) + 1];
@@ -91,6 +93,7 @@ static ssize_t antenna_detect_show(struct device *dev,
          struct device_attribute *attr, char *buf)
 {
     int gpio_value = 0;
+    int match = 0;
     int temp_value = 0;
     int array_len = 0;
     int i = 0;
@@ -103,8 +106,36 @@ static ssize_t antenna_detect_show(struct device *dev,
     if (ret)
         dev_err(dev,"could not set pins to default state\n");
 
+    if(MAX_GPIO_NUM < g_gpio_count)
+    {
+        hwlog_err("%s : The detect GPIO number over MAX!\n",__func__);
+        return 0;
+    }
+
     switch(info->name){
     case ANTENNA_BOARDID_GPIO_DETECT:
+        for (i = 0; i < g_gpio_count; i++)
+        {
+            /* codec gpio which start from 224 should use gpio_get_value_cansleep*/
+            if( g_gpio[i] >= CODEC_GPIO_BASE ){
+                temp_value = gpio_get_value_cansleep(g_gpio[i]);
+            } else {
+                temp_value = gpio_get_value(g_gpio[i]);
+            }
+            gpio_value += (temp_value << i);
+        }
+        if ( g_gpio_expect == gpio_value)
+        {
+            match = ANATENNA_DETECT_SUCCEED;
+        }
+        else
+        {
+            match = ANATENNA_DETECT_FAIL;
+        }
+
+        hwlog_info("%s antenna gpio read_value= %d, expect_value = %d.\n", __func__, gpio_value, g_gpio_expect);
+        return snprintf(buf, PAGE_SIZE, "%d\n", match);
+    case ANTENNA_BOARDID_GPIO_STATUS:
         for (i = 0; i < g_gpio_count; i++)
         {
             /* codec gpio which start from 224 should use gpio_get_value_cansleep*/
@@ -134,7 +165,7 @@ struct class *hw_antenna_detect_get_class(void)
 {
     if (NULL == hw_antenna_detect_class)
     {
-        hw_antenna_detect_class = class_create(THIS_MODULE, "hw_antenna_boardid_detect");
+        hw_antenna_detect_class = class_create(THIS_MODULE, "hw_antenna");
         if (NULL == hw_antenna_detect_class)
         {
             hwlog_err("hw_antenna_detect_class create fail");
@@ -184,6 +215,12 @@ static int antenna_boardid_detect_probe(struct platform_device *pdev)
         goto free_di;
     }
 
+    if (of_property_read_u32(antenna_node, "expect_value", &g_gpio_expect))
+    {
+        /* default g_board_version is -1 */
+        g_gpio_expect = -1;
+    }
+
     for(i = 0; i < array_len; i++)
     {
         ret = of_property_read_string_index(antenna_node, "temp_gpio", i, &gpio_data_string);
@@ -226,8 +263,8 @@ static int antenna_boardid_detect_probe(struct platform_device *pdev)
     if(antenna_detect_class)
     {
         if(antenna_dev == NULL)
-            antenna_dev = device_create(antenna_detect_class, NULL, 0, NULL,"boardid");
-        ret = sysfs_create_link(&antenna_dev->kobj, &di->dev->kobj, "boardid_detect");
+            antenna_dev = device_create(antenna_detect_class, NULL, 0, NULL,"antenna_board");
+        ret = sysfs_create_link(&antenna_dev->kobj, &di->dev->kobj, "antenna_board_data");
         if(ret)
         {
             hwlog_err("create link to boardid_detect fail.\n");
