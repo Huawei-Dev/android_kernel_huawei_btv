@@ -1,7 +1,6 @@
 obj-$(CONFIG_HISI_HKADC) += adc/
 obj-$(CONFIG_HISI_CCI_EXTRA)		+= cci_extra/
 obj-$(CONFIG_HISI_CMDLINE_PARSE)	+= cmdline/
-obj-$(CONFIG_HISI_IRQ_AFFINITY)	+= irq_affinity/
 obj-$(CONFIG_HISILICON_PLATFORM_MAILBOX)	+= mailbox/
 obj-$(CONFIG_HI6402_CODEC)			+= hi64xx/
 obj-$(CONFIG_HI6403_CODEC)			+= hi64xx/
@@ -28,7 +27,6 @@ obj-$(CONFIG_HI3XXX_EFUSE)                      += efuse/
 obj-$(CONFIG_TZDRIVER)                          += tzdriver/
 obj-$(CONFIG_LOAD_IMAGE) += load_image/
 obj-$(CONFIG_HISI_SR)                      += pm/
-obj-$(CONFIG_HISI_OCBC)                    += ocbc/
 ifneq ($(link_kernel),false)
 obj-$(CONFIG_HISI_BALONG_MODEM) += modem/
 endif

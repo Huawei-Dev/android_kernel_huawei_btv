@@ -23,7 +23,6 @@
 #include <linux/init.h>
 #include <linux/interrupt.h>
 #include <linux/hisi/hisi_mailbox.h>
-#include <linux/hisi/hisi_irq_affinity.h>
 #include <linux/kern_levels.h>
 
 #define IPCBITMASK(n)				(1 << (n))
@@ -207,6 +206,8 @@ enum IPC_STATE_MACHINE {
 };
 
 extern int hisi_rproc_init(void);
+
+static inline int hisi_irqaffinity_register(unsigned int irq, int cpu) { return -ENOSYS; }
 
 char *rproc_analysis(const char *mdev_name, unsigned int pro_code)
 {

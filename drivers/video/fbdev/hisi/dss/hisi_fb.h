@@ -66,8 +66,6 @@
 #include <linux/dma-buf.h>
 #include <linux/genalloc.h>
 #include <linux/hisi/hisi-iommu.h>
-/*lint +e551 +e551*/
-//#include <linux/huawei/hisi_irq_affinity.h>
 
 #include "hisi_fb_def.h"
 #include "hisi_fb_panel.h"

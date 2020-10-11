@@ -2648,8 +2648,6 @@ static int dpe_regulator_clk_irq_setup(struct platform_device *pdev)
 		}
 	}
 
-	//hisi_irqaffinity_register(hisifd->dpe_irq, 1);
-
 	return 0;
 }
 

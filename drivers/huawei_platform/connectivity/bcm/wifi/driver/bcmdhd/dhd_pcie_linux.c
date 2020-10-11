@@ -71,9 +71,6 @@
 #endif /* CONFIG_PCI_MSM */
 #endif /* CONFIG_ARCH_MSM */
 #endif
-#ifdef DHD_TPUT_MONITOR
-#include <linux/hisi/hisi_irq_affinity.h>
-#endif
 #include "hw_wifi.h"
 #define PCI_CFG_RETRY 		10
 #define OS_HANDLE_MAGIC		0x1234abcd	/* Magic # to recognize osh */
@@ -1595,7 +1592,6 @@ void dhdpcie_interrupt_set_cpucore(dhd_pub_t *dhdp, bool set)
 		cpu = DPC_CPUCORE;
 	}
 	ret = irq_set_affinity_hint(pdev->irq, cpumask_of(cpu));
-	// ret = hisi_irqaffinity_register(pdev->irq, cpu);
 	DHD_ERROR(("%s: set cpu%d, ret=%d\n", __FUNCTION__, cpu, ret));
 }
 #else
