@@ -343,9 +343,6 @@ struct fcp_adapter_device_ops {
 	int (*fcp_read_switch_status)(void);
 	void (*reg_dump)(char*);
 };
-#ifdef CONFIG_TCPC_CLASS
-struct tcpc_device;
-#endif
 struct charge_device_info {
 	struct device *dev;
 	struct notifier_block usb_nb;
@@ -363,13 +360,6 @@ struct charge_device_info {
 	struct charge_core_data *core_data;
 	struct charge_sysfs_data sysfs_data;
 	struct hrtimer timer;
-#ifdef CONFIG_TCPC_CLASS
-	struct notifier_block tcpc_nb;
-	struct tcpc_device *tcpc;
-	unsigned int tcpc_otg;
-	struct mutex tcpc_otg_lock;
-	struct pd_dpm_vbus_state *vbus_state;
-#endif
 	unsigned int pd_input_current;
 	unsigned int pd_charge_current;
 	enum usb_charger_type charger_type;

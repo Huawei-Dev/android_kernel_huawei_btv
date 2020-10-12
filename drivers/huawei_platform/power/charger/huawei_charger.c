@@ -33,10 +33,6 @@
 #include <huawei_platform/usb/switch/switch_usb_class.h>
 #include <linux/delay.h>
 
-#ifdef CONFIG_TCPC_CLASS
-#include <huawei_platform/usb/pd/richtek/tcpm.h>
-#endif
-
 #ifdef CONFIG_HUAWEI_HW_DEV_DCT
 #include <huawei_platform/devdetect/hw_dev_dec.h>
 #endif
@@ -1396,10 +1392,6 @@ static void charge_stop_charging(struct charge_device_info *di)
 	di->sysfs_data.charge_enable = FALSE;
 	di->sysfs_data.adc_conv_rate = 0;
 	di->sysfs_data.water_intrused = 0;
-#ifdef CONFIG_TCPC_CLASS
-	di->pd_input_current = 0;
-	di->pd_charge_current = 0;
-#endif
 	output_num = 0;
 	detect_num = 0;
 	vbus_flag = 0;
@@ -1824,10 +1816,6 @@ static void charge_usb_work(struct work_struct *work)
 	struct charge_device_info *di =
 	    container_of(work, struct charge_device_info, usb_work);
 
-#ifdef CONFIG_TCPC_CLASS
-	if(charger_pd_support)
-		mutex_lock(&di->tcpc_otg_lock);
-#endif
 	water_check(di);
 
 	switch (di->charger_type) {
@@ -1861,10 +1849,6 @@ static void charge_usb_work(struct work_struct *work)
 	default:
 		break;
 	}
-#ifdef CONFIG_TCPC_CLASS
-	if(charger_pd_support)
-		mutex_unlock(&di->tcpc_otg_lock);
-#endif
 }
 
 /**********************************************************
@@ -2061,88 +2045,6 @@ static int charge_fault_notifier_call(struct notifier_block *fault_nb,
 	schedule_work(&di->fault_work);
 	return NOTIFY_OK;
 }
-
-
-#ifdef CONFIG_TCPC_CLASS
-
-static void charge_rename_pd_charger_type(enum hisi_charger_type type,
-				       struct charge_device_info *di,
-					bool ext_power)
-{
-	switch (type) {
-	case PD_DPM_VBUS_TYPE_PD:
-		di->charger_type = CHARGER_TYPE_PD;
-		hwlog_info("%s is ext_power %d", __func__, ext_power);
-		if(ext_power)
-			di->charger_source = POWER_SUPPLY_TYPE_MAINS;
-		else
-			di->charger_source = POWER_SUPPLY_TYPE_USB;
-		break;
-	case PD_DPM_VBUS_TYPE_TYPEC:
-		di->charger_type = CHARGER_TYPE_TYPEC;
-		di->charger_source = POWER_SUPPLY_TYPE_MAINS;
-		break;
-	default:
-		di->charger_type = CHARGER_REMOVED;
-		di->charger_source = POWER_SUPPLY_TYPE_BATTERY;
-		hwlog_info("%s default type %u", __func__, type);
-		break;
-	}
-}
-
-
-/**********************************************************
-*  Function:       tcpc_notifier_call
-*  Description:    respond the Type C port event from TCPC
-*  Parameters:   tcpc_nb: tcpc notifier_block
-*                      event:				PD_DPM_VBUS_TYPE_PD,
-*								PD_DPM_VBUS_TYPE_TYPEC,
-*								hisi_charger_type,
-*                      data: pointer of struct tcp_notify
-*  return value:  NOTIFY_OK-success or others
-**********************************************************/
-static int pd_dpm_notifier_call(struct notifier_block *tcpc_nb, unsigned long event, void *data)
-{
-	struct pd_dpm_vbus_state *vbus_state;
-	struct charge_device_info *di = container_of(tcpc_nb, struct charge_device_info, tcpc_nb);
-
-	if(PD_DPM_VBUS_TYPE_TYPEC == event)
-		return NOTIFY_OK;
-
-	charge_wake_lock();
-
-	if(PD_DPM_VBUS_TYPE_PD == event)
-	{
-		vbus_state = (struct pd_dpm_vbus_state *) data;
-		di->pd_input_current = vbus_state->ma;
-		di->pd_charge_current = (vbus_state->mv * vbus_state->ma * charger_pd_cur_trans_ratio) / (100 * di->core_data->vterm);
-		charge_rename_pd_charger_type(event, di, vbus_state->ext_power);
-	}
-	else
-	{
-		charge_rename_charger_type(event, di,FALSE);
-	}
-
-	charge_uevent_process(di, event);
-
-	mutex_lock(&di->tcpc_otg_lock);
-	if (event == PLEASE_PROVIDE_POWER) {
-		hwlog_info("case = USB_EVENT_OTG_ID-> (IM)\n");
-		charge_start_usb_otg(di);
-		mutex_unlock(&di->tcpc_otg_lock);
-	} else if (di->charger_type == CHARGER_REMOVED && otg_flag) {
-		hwlog_info("case = USB_EVENT_NONE-> (IM)\n");
-		charge_stop_charging(di);
-		mutex_unlock(&di->tcpc_otg_lock);
-	} else {
-		mutex_unlock(&di->tcpc_otg_lock);
-		schedule_work(&di->usb_work);
-	}
-
-	return NOTIFY_OK;
-}
-#endif
-
 
 
 /**********************************************************
@@ -2965,48 +2867,6 @@ static int charge_probe(struct platform_device *pdev)
 	INIT_DELAYED_WORK(&di->plugout_uscp_work, uscp_plugout_send_uevent);
 #endif
 
-#ifdef CONFIG_TCPC_CLASS
-
-	hw_charger_node =
-	    of_find_compatible_node(NULL, NULL, "huawei,charger");
-	if (hw_charger_node) {
-		if(of_property_read_u32(hw_charger_node, "pd_support", &charger_pd_support))
-		{
-			hwlog_err("get pd_support fail!\n");
-		}
-
-		hwlog_info("charger_pd_support = %d \n",charger_pd_support);
-	} else {
-		hwlog_err("get huawei,charger fail!\n");
-	}
-
-	if(charger_pd_support)
-	{
-		mutex_init(&di->tcpc_otg_lock);
-		hwlog_info("Register pd_dpm notifier\n");
-
-		di->tcpc_nb.notifier_call = pd_dpm_notifier_call;
-		ret = register_pd_dpm_notifier(&di->tcpc_nb);
-		if (ret < 0)
-		{
-			hwlog_err("register_pd_dpm_notifier failed\n");
-		}
-		else
-		{
-			hwlog_info("register_pd_dpm_notifier OK\n");
-		}
-	}
-	else
-	{
-		di->usb_nb.notifier_call = charge_usb_notifier_call;
-		ret = hisi_charger_type_notifier_register(&di->usb_nb);
-		if (ret < 0) {
-			hwlog_err("hisi_charger_type_notifier_register failed\n");
-			goto charge_fail_2;
-		}
-	}
-
-#else
 	hwlog_info("Register usb notifier\n");
 	di->usb_nb.notifier_call = charge_usb_notifier_call;
 	ret = hisi_charger_type_notifier_register(&di->usb_nb);
@@ -3014,7 +2874,6 @@ static int charge_probe(struct platform_device *pdev)
 		hwlog_err("hisi_charger_type_notifier_register failed\n");
 		goto charge_fail_2;
 	}
-#endif
 
 	di->fault_nb.notifier_call = charge_fault_notifier_call;
 	ret =
@@ -3053,24 +2912,9 @@ static int charge_probe(struct platform_device *pdev)
 	di->check_full_count = 0;
 	charge_parse_dts(di);
 	charge_wake_lock();
-#ifdef CONFIG_TCPC_CLASS
-
-	if(charger_pd_support)
-	{
-		pd_dpm_get_charge_event(&local_event, &local_state);
-		pd_dpm_notifier_call(&(di->tcpc_nb), local_event, &local_state);
-	}
-	else
-	{
-		charge_rename_charger_type(type, di,FALSE);
-		charge_send_uevent(di);
-		schedule_work(&di->usb_work);
-	}
-#else
-	charge_rename_charger_type(type, di,FALSE);
+	charge_rename_charger_type(type, di, FALSE);
 	charge_send_uevent(di);
 	schedule_work(&di->usb_work);
-#endif
 
 #ifdef CONFIG_HUAWEI_HW_DEV_DCT
 	/* detect current device successful, set the flag as present */

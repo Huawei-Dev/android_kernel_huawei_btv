@@ -292,12 +292,7 @@ static int uscp_notifier_call(struct notifier_block *usb_nb, unsigned long event
     charge_type_handler(di, type);
     return NOTIFY_OK;
 }
-#ifdef CONFIG_TCPC_CLASS
-static int pd_notifier_call(struct notifier_block *usb_nb, unsigned long event, void *data)
-{
-    return uscp_notifier_call(usb_nb, event, data);
-}
-#endif
+
 static int usb_notifier_call(struct notifier_block *usb_nb, unsigned long event, void *data)
 {
     return uscp_notifier_call(usb_nb, event, data);
@@ -696,17 +691,9 @@ static int uscp_probe(struct platform_device *pdev)
     hrtimer_init(&di->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
     di->timer.function = uscp_timer_func;
 
-#ifdef CONFIG_TCPC_CLASS
-    if(is_pd_supported()) {
-        di->tcpc_nb.notifier_call = pd_notifier_call;
-        ret = register_pd_dpm_notifier(&di->tcpc_nb);
-    } else {
-#endif
-        di->usb_nb.notifier_call = usb_notifier_call;
-        ret = hisi_charger_type_notifier_register(&di->usb_nb);
-#ifdef CONFIG_TCPC_CLASS
-    }
-#endif
+    di->usb_nb.notifier_call = usb_notifier_call;
+    ret = hisi_charger_type_notifier_register(&di->usb_nb);
+
     if (ret < 0)
     {
         hwlog_err("charger_type_notifier_register failed\n");

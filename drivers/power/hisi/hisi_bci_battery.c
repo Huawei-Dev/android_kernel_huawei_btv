@@ -48,9 +48,6 @@
 #ifdef CONFIG_DIRECT_CHARGER
 #include <huawei_platform/power/direct_charger.h>
 #endif
-#ifdef CONFIG_TCPC_CLASS
-#include <huawei_platform/usb/hw_pd_dev.h>
-#endif
 
 #ifdef CONFIG_HUAWEI_DSM
 #include <dsm/dsm_pub.h>
@@ -499,19 +496,13 @@ static int hisi_charger_event(struct notifier_block *nb, unsigned long event,
 	if (0 == get_direct_charge_flag()) {
 #endif
 
-#ifdef CONFIG_TCPC_CLASS
-		if (!pd_dpm_get_pd_finish_flag()) {
-#endif
-			if (hisi_get_charger_type() == CHARGER_TYPE_NONE) {
-				di->usb_online = 0;
-				di->ac_online = 0;
-				di->charge_status = POWER_SUPPLY_STATUS_DISCHARGING;
-				di->power_supply_status = POWER_SUPPLY_HEALTH_UNKNOWN;
-				di->charge_full_count = 0;
-			}
-#ifdef CONFIG_TCPC_CLASS
-		}
-#endif
+	if (hisi_get_charger_type() == CHARGER_TYPE_NONE) {
+		di->usb_online = 0;
+		di->ac_online = 0;
+		di->charge_status = POWER_SUPPLY_STATUS_DISCHARGING;
+		di->power_supply_status = POWER_SUPPLY_HEALTH_UNKNOWN;
+		di->charge_full_count = 0;
+	}
 
 #ifdef CONFIG_DIRECT_CHARGER
 	}
@@ -1089,13 +1080,6 @@ static int hisi_bci_battery_get_property(struct power_supply *psy,
 #ifdef CONFIG_DIRECT_CHARGER
 		else if (get_quick_charge_flag() && di->ac_online)
 			val->intval = 1;
-#endif
-#ifdef CONFIG_TCPC_CLASS
-		else if (true == pd_dpm_get_high_power_charging_status() && di->ac_online)
-		{
-			val->intval = 1;
-			hwlog_info("pd_dpm_get_high_power_charging_status intval 1 [%s]\n", __func__);
-		}
 #endif
 		else
 		{
