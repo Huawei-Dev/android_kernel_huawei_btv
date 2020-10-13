@@ -1086,7 +1086,6 @@ static int hisi_bci_battery_get_property(struct power_supply *psy,
 			hwlog_info("intval 0 [%s]\n", __func__);
 		}
 		break;
-		#endif
 	case POWER_SUPPLY_PROP_SCP_STATUS:
 		val->intval = 0;
 #ifdef CONFIG_DIRECT_CHARGER
