@@ -89,12 +89,6 @@ struct hisi_charger_bootloader_info {
 extern char *get_charger_info_p(void);
 static struct hisi_charger_bootloader_info hisi_charger_info = { 0 };
 
-#ifdef CONFIG_HISI_CHARGER_SYS_WDG
-extern void charge_enable_sys_wdt(void);
-extern void charge_stop_sys_wdt(void);
-extern void charge_feed_sys_wdt(unsigned int timeout);
-#endif
-
 #define CHARGER_BASE_ADDR 512
 #define VBUS_REPORT_NUM 4
 #define WORK_DELAY_5000MS 5000
@@ -1324,9 +1318,6 @@ static void charge_kick_watchdog(struct charge_device_info *di)
 	ret = di->ops->reset_watchdog_timer();
 	if (ret)
 		hwlog_err("charge kick watchdog timer fail!!\n");
-#ifdef CONFIG_HISI_CHARGER_SYS_WDG
-	charge_feed_sys_wdt(60);
-#endif
 }
 
 /**********************************************************
@@ -1343,9 +1334,6 @@ static void charge_disable_watchdog(struct charge_device_info *di)
 		hwlog_err("charge disable watchdog timer fail!!\n");
 	else
 		hwlog_info("charge disable watchdog timer");
-#ifdef CONFIG_HISI_CHARGER_SYS_WDG
-	charge_stop_sys_wdt();
-#endif
 }
 
 /**********************************************************
@@ -1367,9 +1355,7 @@ static void charge_start_charging(struct charge_device_info *di)
 	ret = di->ops->chip_init();
 	if (ret)
 		hwlog_err("chip init fail!!\n");
-#ifdef CONFIG_HISI_CHARGER_SYS_WDG
-	charge_enable_sys_wdt();
-#endif
+
 	mod_delayed_work(system_wq, &g_di->charge_work, msecs_to_jiffies(0));
 }
 
@@ -1440,9 +1426,6 @@ static void charge_stop_charging(struct charge_device_info *di)
 	charge_lock_flag = CHARGE_NO_NEED_WAKELOCK;
 	charge_wake_unlock();
 	mutex_unlock(&charge_wakelock_flag_lock);
-#ifdef CONFIG_HISI_CHARGER_SYS_WDG
-	charge_stop_sys_wdt();
-#endif
 }
 extern void hisi_usb_otg_bc_again(void);
 
@@ -3085,12 +3068,8 @@ static int charge_resume(struct platform_device *pdev)
 	hwlog_info("%s ++\n", __func__);
 	schedule_work(&resume_wakelock_work);
 
-	if (di->charger_source == POWER_SUPPLY_TYPE_MAINS) {
-#ifdef CONFIG_HISI_CHARGER_SYS_WDG
-		charge_enable_sys_wdt();
-#endif
+	if (di->charger_source == POWER_SUPPLY_TYPE_MAINS)
 		schedule_delayed_work(&di->charge_work, msecs_to_jiffies(0));
-	}
 
 	hwlog_info("%s --\n", __func__);
 

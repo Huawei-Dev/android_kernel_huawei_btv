@@ -2681,7 +2681,7 @@ out:
     soc_new = bound_soc(soc_new);
     return soc_new;
 }
-/* 电量平滑修正*/
+
 /*******************************************************
   Function:        limit_soc
   Description:     limt soc
@@ -2955,7 +2955,6 @@ static int calculate_state_of_charge(struct smartstar_coul_device *di)
     /* calculate remaining usable charge */
     //eco_leak_uah = calculate_eco_leak_uah();
 
-	/* 退出ECO模式后 */
     //remaining_charge_uah = remaining_charge_uah - eco_leak_uah;
 
     remaining_usable_charge_uah = remaining_charge_uah
@@ -3034,19 +3033,16 @@ static void coul_get_rm(struct smartstar_coul_device *di, int *rm)
 
 static void calc_initial_ocv(struct smartstar_coul_device *di)
 {
-#if (defined(CONFIG_HISI_CHARGER_ARCH) || defined(CONFIG_HUAWEI_CHARGER))
     int old_charge_state;
+
     old_charge_state = charge_set_charge_state(0);
-#endif
     di->coul_dev_ops->cali_adc();
     mdelay(2500); // 2.2s for calibration, 0.11s for sampling, and 0.19s for pad
     di->batt_ocv_temp = di->batt_temp;
     di->coul_dev_ops->save_ocv_temp((short)di->batt_ocv_temp);
     di->batt_ocv = coul_get_battery_voltage_mv()*1000;
     di->coul_dev_ops->save_ocv(di->batt_ocv, NOT_UPDATE_FCC);
-#if (defined(CONFIG_HISI_CHARGER_ARCH) || defined(CONFIG_HUAWEI_CHARGER))
     charge_set_charge_state(old_charge_state);
-#endif
     coul_clear_cc_register();
     coul_clear_coul_time();
 

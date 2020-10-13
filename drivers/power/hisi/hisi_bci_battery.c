@@ -1074,7 +1074,6 @@ static int hisi_bci_battery_get_property(struct power_supply *psy,
 		val->intval = hisi_battery_cycle_count();
 		break;
 	case POWER_SUPPLY_PROP_FCP_STATUS:
-		#if (defined (CONFIG_HUAWEI_CHARGER) || defined (CONFIG_HISI_CHARGER_ARCH))
 		if (FCP_STAGE_SUCESS <= fcp_get_stage_status() && di->ac_online)
 			val->intval = 1;
 #ifdef CONFIG_DIRECT_CHARGER
