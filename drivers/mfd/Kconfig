@@ -1482,12 +1482,6 @@ config HISI_FREQ_AUTODOWN
 	  Bus automatic frequency reduction is a method for reducing power consumption
 	  of the chip is proposed, through the bus load automatically reduced frequency.
 
-config HISI_CHARGER_POWER
-	tristate "Hisi Charger Power"
-	depends on OF
-	help
-	  This driver including charger power.
-
 config HISI_PMIC
 	tristate "HiSilicon PMU/Codec IC"
 	depends on OF
