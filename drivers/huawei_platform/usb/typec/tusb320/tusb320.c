@@ -51,20 +51,16 @@
 #include <huawei_platform/usb/hw_typec_dev.h>
 #include <huawei_platform/usb/hw_typec_platform.h>
 
-#ifdef CONFIG_LLT_TEST
-#include "tusb320_static_llt.h"
-#endif
-
 #define HWLOG_TAG tusb320_typec
 HWLOG_REGIST();
 
-static struct i2c_driver tusb320_i2c_driver;
 struct typec_device_info *g_tusb320_dev = NULL;
-u8 reg_status_val = 0;
+static int input_current = -1;
+static u8 attach_status = 0;
 
 /* read i2c start */
 static int tusb320_i2c_read(struct typec_device_info *di,
-        char *rxData, int length)
+        unsigned char *rxData, int length)
 {
     int ret = 0;
 
@@ -85,7 +81,7 @@ static int tusb320_i2c_read(struct typec_device_info *di,
 }
 
 static int tusb320_i2c_write(struct typec_device_info *di,
-        char *txData, int length)
+        unsigned char *txData, int length)
 {
     int ret = 0;
 
@@ -251,6 +247,9 @@ static void tusb320_soft_reset(void)
     if (ret < 0) {
         hwlog_err("%s: write REG_MODE_SET error\n", __func__);
     }
+
+    attach_status = 0;
+    input_current = -1;
 }
 
 static int tusb320_host_port_mode(u8 val)
@@ -320,12 +319,12 @@ static int tusb320_ctrl_port_mode(int value)
             break;
         case TYPEC_HOST_PORT_MODE_UFP:
             hwlog_info("%s: set to UFP mode\n", __func__);
-            tusb320_host_port_mode(TUSB320_REG_SET_UFP);
-            tusb320_rd_rp_disable(DISABLE_SET);
-            tusb320_soft_reset();
+            tusb320_write_reg(TUSB320_REG_MODE_SET, 
+                TUSB320_REG_SET_UFP|TUSB320_REG_SET_SOFT_RESET|TUSB320_REG_SET_DISABLE_TERM);
             mdelay(TUSB320_UFP_RESET_DURATION_MS);
-            tusb320_host_port_mode(TUSB320_REG_SET_UFP);
-            tusb320_rd_rp_disable(DISABLE_CLEAR);
+            tusb320_write_reg(TUSB320_REG_MODE_SET, TUSB320_REG_SET_UFP);
+	    attach_status = 0;
+            input_current = -1;
             break;
         case TYPEC_HOST_PORT_MODE_DRP:
             hwlog_info("%s: set to DRP mode\n", __func__);
@@ -346,32 +345,62 @@ static int tusb320_ctrl_port_mode(int value)
 
 static int tusb320_read_attachment_reg(void)
 {
-    u8 reg_val;
+    u8 reg_val = 0;
 
     tusb320_read_reg(TUSB320_REG_ATTACH_STATUS, &reg_val);
-    reg_status_val = reg_val;
 
-    hwlog_info("%s: register value of 09H is 0x%x\n", __func__, reg_status_val);
+    hwlog_info("%s: register value of 09H is 0x%x\n", __func__, reg_val);
 
     tusb320_clean_mask();
 
     return reg_val;
 }
-
+static int tusb320_detect_port_mode(void);
+static int tusb320_detect_input_current(void);
 static int tusb320_detect_attachment_status(void)
 {
-    u8 reg_val, mode_val, int_val;
+    u8 reg_val, mode_val;
+    int reg_current, port_mode = -1;
     struct typec_device_info *di = g_tusb320_dev;
 
     reg_val = tusb320_read_attachment_reg();
     mode_val = reg_val & TUSB320_REG_STATUS_MODE;
+    reg_current = tusb320_detect_input_current();
 
     if (mode_val) {
-        hwlog_info("%s: tusb320 ATTACH", __func__);
-        di->dev_st.attach_status = TYPEC_ATTACH;
+        hwlog_info("%s: tusb320 ATTACH,reg_val %d,reg_cur %d", __func__, reg_val, reg_current);
+        port_mode = tusb320_detect_port_mode();
+        if (port_mode == TYPEC_DEV_PORT_MODE_UFP) {
+            if (reg_val != attach_status) {
+                attach_status = reg_val;
+                input_current = reg_current;
+                di->dev_st.attach_status = TYPEC_ATTACH;
+                hwlog_info("%s: tusb320 TYPEC_ATTACH with different attach_status", __func__);
+            } else {
+                if ((reg_current != input_current) && reg_current >= 0) {
+                    input_current = reg_current;
+                    di->dev_st.attach_status = TYPEC_CUR_CHANGE_FOR_FSC;
+                    hwlog_info("%s: tusb320 TYPEC_CUR_CHANGE_FOR_FSC", __func__);
+                } else {
+                    di->dev_st.attach_status = TYPEC_STATUS_NOT_READY;
+                    hwlog_err("%s: wrong interrupt as UFP!\n", __func__);
+                }
+            }
+        } else {
+            if(reg_val != attach_status) {
+               attach_status = reg_val;
+               di->dev_st.attach_status = TYPEC_ATTACH;
+	       hwlog_info("%s: tusb320 attach as  DFP\n", __func__);
+            } else{
+               di->dev_st.attach_status = TYPEC_STATUS_NOT_READY;
+	       hwlog_err("%s: wrong interrupt as DFP!\n", __func__);
+            }
+        }
     } else {
         hwlog_info("%s: tusb320 DETACH", __func__);
         di->dev_st.attach_status = TYPEC_DETACH;
+        input_current = -1;
+        attach_status = 0;
     }
 
     return di->dev_st.attach_status;
@@ -379,10 +408,10 @@ static int tusb320_detect_attachment_status(void)
 
 static int tusb320_detect_cc_orientation(void)
 {
-    u8 reg_val, cc_val, mode_val;
+    u8 reg_val = 0, cc_val, mode_val;
     struct typec_device_info *di = g_tusb320_dev;
 
-    reg_val = reg_status_val;
+    tusb320_read_reg(TUSB320_REG_ATTACH_STATUS, &reg_val);
     cc_val = reg_val & TUSB320_REG_STATUS_CC;
     mode_val = reg_val & TUSB320_REG_STATUS_MODE;
 
@@ -404,10 +433,10 @@ static int tusb320_detect_cc_orientation(void)
 
 static int tusb320_detect_port_mode(void)
 {
-    u8 reg_val, mode_val;
+    u8 reg_val = 0, mode_val;
     struct typec_device_info *di = g_tusb320_dev;
 
-    reg_val = reg_status_val;
+    tusb320_read_reg(TUSB320_REG_ATTACH_STATUS, &reg_val);
     mode_val = reg_val & TUSB320_REG_STATUS_MODE;
 
     if (TUSB320_REG_STATUS_DFP == mode_val) {
@@ -475,6 +504,7 @@ static ssize_t dump_regs_show(struct device *dev, struct device_attribute *attr,
     return scnprintf(buf, PAGE_SIZE,
             "0x%02X,0x%02X,0x%02X\n", reg[8], reg[9], reg[10]);
 }
+
 static DEVICE_ATTR(dump_regs, S_IRUGO, dump_regs_show, NULL);
 
 static struct attribute *tusb320_attributes[] = {
@@ -557,12 +587,12 @@ static int tusb320_probe(
         struct i2c_client *client, const struct i2c_device_id *id)
 {
     int ret = 0;
-    int gpio_enb_val = 1;
+    unsigned int gpio_enb_val = 1;
     struct typec_device_info *di = NULL;
     struct typec_device_info *pdi = NULL;
     struct device_node *node;
-    int typec_trigger_otg = 0;
-    int mdelay = 0;
+    unsigned int typec_trigger_otg = 0;
+    unsigned int mdelay = 0;
 
     di = devm_kzalloc(&client->dev, sizeof(*di), GFP_KERNEL);
     if (!di) {
@@ -627,16 +657,16 @@ static int tusb320_probe(
     di->typec_trigger_otg = !!typec_trigger_otg;
     hwlog_info("%s: typec_trigger_otg = %d\n", __func__, typec_trigger_otg);
 
-    pdi = typec_chip_register(di, &tusb320_ops, THIS_MODULE);
-    if (NULL == pdi) {
-        hwlog_err("%s: typec register chip error!\n", __func__);
+    di->gpio_intb = of_get_named_gpio(node, "tusb320_typec,gpio_intb", 0);
+    if (!gpio_is_valid(di->gpio_intb)) {
+        hwlog_err("%s: of_get_named_gpio-intb error!!! ret=%d, gpio_intb=%d.\n", __func__, ret, di->gpio_intb);
         ret = -EINVAL;
         goto err_gpio_enb_request_1;
     }
 
-    di->gpio_intb = of_get_named_gpio(node, "tusb320_typec,gpio_intb", 0);
-    if (!gpio_is_valid(di->gpio_intb)) {
-        hwlog_err("%s: of_get_named_gpio-intb error!!! ret=%d, gpio_intb=%d.\n", __func__, ret, di->gpio_intb);
+    pdi = typec_chip_register(di, &tusb320_ops, THIS_MODULE);
+    if (NULL == pdi) {
+        hwlog_err("%s: typec register chip error!\n", __func__);
         ret = -EINVAL;
         goto err_gpio_enb_request_1;
     }
@@ -768,10 +798,6 @@ static __exit void tusb320_i2c_exit(void)
 {
     i2c_del_driver(&tusb320_i2c_driver);
 }
-
-#ifdef CONFIG_LLT_TEST
-#include "tusb320_static_llt.c"
-#endif
 
 module_init(tusb320_i2c_init);
 module_exit(tusb320_i2c_exit);

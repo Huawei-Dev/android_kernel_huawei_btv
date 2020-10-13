@@ -41,7 +41,7 @@
 #include <huawei_platform/usb/hw_typec_dev.h>
 #include <huawei_platform/usb/hw_typec_platform.h>
 #include <linux/hisi/usb/hisi_usb.h>
-#include "../switch/switch_usb_class.h"
+#include <huawei_platform/usb/switch/switch_ap/switch_usb_class.h>
 #ifdef CONFIG_DUAL_ROLE_USB_INTF
 #include <linux/usb/class-dual-role.h>
 #endif
@@ -495,6 +495,17 @@ static void typec_wdog_work(struct work_struct *w)
 }
 #endif
 
+int typec_current_notifier_register(struct notifier_block *nb)
+{
+	if (!g_typec_dev) {
+		pr_err("huawei typec device not ready!\n");
+		return -EBUSY;
+	}
+	if (!nb)
+		return -EINVAL;
+	return blocking_notifier_chain_register(&g_typec_dev->typec_current_nh, nb);
+}
+
 static void typec_attach(struct typec_device_info *di)
 {
     int port_mode, input_current, cc_orient;
@@ -631,6 +642,14 @@ static void typec_detach(struct typec_device_info *di)
     }
 #endif
 }
+void typec_current_notifier_call(struct typec_device_info *di)
+{
+	if (!di) {
+		hwlog_info("%s: invalid di\n", __func__);
+		return;
+	}
+	blocking_notifier_call_chain(&di->typec_current_nh,TYPEC_CURRENT_CHANGE, NULL);
+}
 
 /**
  * typec_intb_work() - handle the public interrupt work which is triggered by interrupts from type-c chips.
@@ -652,6 +671,7 @@ void typec_intb_work(struct work_struct *work)
         typec_detach(di);
     } else if (TYPEC_CUR_CHANGE_FOR_FSC == attach_status) {
         hwlog_info("%s: cc current change interrupt\n", __func__);
+        typec_current_notifier_call(di);
     } else if (TYPEC_ACC_MODE_CHANGE == attach_status) {
         hwlog_info("%s: accessory mode change interrupt\n", __func__);
     } else {
@@ -704,6 +724,7 @@ struct typec_device_info *typec_chip_register(struct typec_device_info *device_i
     di->ops = ops;
     di->owner = owner;
     di->typec_trigger_otg = device_info->typec_trigger_otg;
+    di->gpio_intb = device_info->gpio_intb;
 
     mutex_init(&di->typec_lock);
     INIT_WORK(&di->g_intb_work, typec_intb_work);
@@ -763,7 +784,7 @@ static int __init typec_init(void)
     }
 
     g_typec_dev = di;
-
+    BLOCKING_INIT_NOTIFIER_HEAD(&di->typec_current_nh);
     wake_lock_init(&di->wake_lock, WAKE_LOCK_SUSPEND, "typec_wake_lock");
 
     return 0;

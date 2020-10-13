@@ -32,7 +32,7 @@
 #define DISABLE_SET    0
 #define DISABLE_CLEAR    1
 #define TUSB320_RESET_DURATION_MS              25
-#define TUSB320_UFP_RESET_DURATION_MS          150
+#define TUSB320_UFP_RESET_DURATION_MS          100
 
 /* Register address */
 #define TUSB320_REG_DEVICE_ID                  0x00
@@ -66,5 +66,5 @@
 #define TUSB320_REG_SET_PORT_MODE               (BIT(5) | BIT(4))
 #define TUSB320_REG_SET_SOFT_RESET              BIT(3)
 #define TUSB320_REG_SET_DISABLE_RD_RP           BIT(2)
-
+#define TUSB320_REG_SET_DISABLE_TERM            BIT(0)
 #endif /*_TYPEC_TUSB320_H_*/

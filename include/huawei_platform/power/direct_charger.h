@@ -131,6 +131,9 @@
 #define INVALID -1
 #define VALID 0
 
+#define ENABLE 1
+#define DISABLE 0
+
 #define MAX_TIMES_FOR_SET_ADAPTER_VOL_20 20
 #define ADAPTER_VOL_DIFFRENCE_300_MV 300
 #define MAX_ADAPTER_VOL_4400_MV 4400
@@ -293,6 +296,7 @@ struct smart_charge_ops {
 	int (*scp_get_adaptor_temp)(int*);
 	int (*scp_get_adapter_vendor_id)(void);
 	int (*scp_get_usb_port_leakage_current_info)(void);
+	int (*scp_power_enable)(int);
 };
 struct loadswitch_ops {
 	int (*ls_init)(void);

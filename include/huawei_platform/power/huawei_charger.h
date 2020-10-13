@@ -202,6 +202,13 @@ enum fcp_retry_operate_type {
 	FCP_RETRY_OPERATE_RESET_SWITCH,
 	FCP_RETRY_OPERATE_UNVALID,
 };
+
+enum fcp_test_result{
+    FCP_TEST_SUCC,
+    FCP_TEST_FAIL,
+    FCP_NOT_SUPPORT,
+};
+
 static const char *const fcp_check_stage[] = {
 	[0] = "FCP_STAGE_DEFAUTL",
 	[1] = "FCP_STAGE_SUPPORT_DETECT",

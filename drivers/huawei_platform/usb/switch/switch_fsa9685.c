@@ -1,4 +1,24 @@
-
+/************************************************************
+*
+* Copyright (C), 1988-1999, Huawei Tech. Co., Ltd.
+* FileName: switch_fsa9685.c
+* Author: lixiuna(00213837)       Version : 0.1      Date:  2013-11-06
+*
+* This software is licensed under the terms of the GNU General Public
+* License version 2, as published by the Free Software Foundation, and
+* may be copied, distributed, and modified under those terms.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+*  Description:    .c file for switch chip
+*  Version:
+*  Function List:
+*  History:
+*  <author>  <time>   <version >   <desc>
+***********************************************************/
 
 #include <linux/i2c.h>
 #include <linux/delay.h>
@@ -33,6 +53,7 @@
 #ifdef CONFIG_HUAWEI_HW_DEV_DCT
 #include <huawei_platform/devdetect/hw_dev_dec.h>
 #endif
+
 #include <linux/wakelock.h>
 #include <huawei_platform/log/hw_log.h>
 #include <chipset_common/hwusb/hw_usb_rwswitch.h>
@@ -42,8 +63,8 @@
 #include <huawei_platform/power/direct_charger.h>
 #endif
 
-struct mutex accp_detect_lock;
-struct mutex accp_adaptor_reg_lock;
+static struct mutex accp_detect_lock;
+static struct mutex accp_adaptor_reg_lock;
 
 extern unsigned int get_boot_into_recovery_flag(void);
 static int fsa9685_is_support_scp(void);
@@ -66,6 +87,44 @@ static u32 fsa9685_scp_support = 0;
 static u32 fsa9685_mhl_detect_disable = 0;
 static u32 two_switch_flag = 0;/*disable for two switch*/
 static u32 scp_error_flag = 0;/*scp error flag*/
+static int boost_5v_use_common_gpio = 0;
+static int scp_power_en = 0;
+static int is_need_bst_ctrl = 0;
+static int bst_ctrl = 0;
+static int scp_need_extra_power = 0;
+static int rt8979_osc_lower_bound = 0; /* lower bound for OSC setting */
+static int rt8979_osc_upper_bound = 0; /* upper bound for OSC setting */
+static int rt8979_osc_trim_code = 0; /* osc trimming setting (read from IC) */
+static int rt8979_osc_trim_adjust = 0;	/* OSC adjustment */
+static int rt8979_osc_trim_default = 0;	/* While attaching, reset OSC adjustment*/
+static int is_pd_support = 0;
+static int fsa9685_dcd_timeout_enabled = 0;
+
+static int set_5v_boost_enable(int enable)
+{
+	int ret = SUCC;
+	hwlog_info("%s++\n",__func__);
+	if (scp_need_extra_power)
+	{
+		if (boost_5v_use_common_gpio)
+		{
+		}else
+		{
+			ret = gpio_direction_output(scp_power_en, enable);
+		}
+		if (is_need_bst_ctrl)
+		{
+			ret |= gpio_direction_output(bst_ctrl, enable);
+		}
+		if (ret)
+			ret = FAIL;
+		else
+			ret = SUCC;
+	}
+	return ret;
+}
+
+static bool rt8979_dcd_timeout_enabled = false;
 
 static inline bool is_rt8979(void)
 {
@@ -75,6 +134,7 @@ static bool rt8979_is_in_fm8(void);
 static void rt8979_auto_restart_accp_det(void);
 static void rt8979_force_restart_accp_det(bool open);
 static int rt8979_sw_open(bool open);
+static int rt8979_adjust_osc(int8_t val);
 
 static void usb_switch_wake_lock(void)
 {
@@ -93,6 +153,7 @@ static void usb_switch_wake_unlock(void)
 
 static void rt8979_regs_dump(void);
 int is_support_fcp(void);
+
 static int fsa9685_write_reg(int reg, int val)
 {
     int ret, i;
@@ -160,7 +221,7 @@ static int fsa9685_write_reg_mask(int reg, int value,int mask)
     return ret;
 }
 
-int fsa9685_manual_sw(int input_select)
+static int fsa9685_manual_switch(int input_select)
 {
     int value = 0, ret = 0;
     if (NULL == this_client) {
@@ -218,13 +279,14 @@ int fsa9685_manual_sw(int input_select)
         hwlog_err("%s: write FSA9685_REG_CONTROL error!!! ret=%d\n", __func__, ret);
         return ret;
     }
+    if (is_rt8979())
+        rt8979_sw_open(false);
 
     return 0;
 
 }
-EXPORT_SYMBOL_GPL(fsa9685_manual_sw);
 
-int fsa9685_manual_detach(void)
+static int fsa9685_manual_detach_work(void)
 {
     int ret = 0;
     if (NULL == this_client){
@@ -277,35 +339,56 @@ static void fsa9685_detach_work(struct work_struct *work)
     hwlog_info("%s: ------end.\n", __func__);
     return;
 }
-EXPORT_SYMBOL_GPL(fsa9685_manual_detach);
-
-int fsa9685_dcd_timeout_enable(bool enable_flag)
+static int fsa9685_dcd_timeout(bool enable_flag)
 {
 	int reg_val = 0;
 	int ret;
 
+	enable_flag |= fsa9685_dcd_timeout_enabled;
 	if (!is_rt8979()) {
 		reg_val = fsa9685_read_reg(FSA9685_REG_DEVICE_ID);
 		/*we need 9688c 9683 except 9688 not support enable dcd time out */
-		if(FSA9688_VERSION_ID == ((reg_val & FAS9685_VERSION_ID_BIT_MASK) >> FAS9685_VERSION_ID_BIT_SHIFT)) {
-			return -1;
+		if(FSA9688_VERSION_ID == ((reg_val & FAS9685_VERSION_ID_BIT_MASK) >> FAS9685_VERSION_ID_BIT_SHIFT)){
+			return SET_DCDTOUT_FAIL;
+		}
+		ret = fsa9685_write_reg_mask(FSA9685_REG_CONTROL2,enable_flag,FSA9685_DCD_TIME_OUT_MASK);
+		if(ret < 0){
+			hwlog_err("%s:write fsa9688c DCD enable_flag error!!!\n",__func__);
+			return SET_DCDTOUT_FAIL;
+		}
+	} else { /* RT8979 */
+		rt8979_dcd_timeout_enabled = enable_flag;
+		if (enable_flag){
+			ret = fsa9685_write_reg_mask(FSA9685_REG_TIMING_SET_2, 0, FSA9685_REG_TIMING_SET_2_DCDTIMEOUT);
+			if(ret < 0){
+				hwlog_err("%s:write fsa9688c DCD enable_flag error!!!\n",__func__);
+				return SET_DCDTOUT_FAIL;
+			}
+		}
+		else{
+			ret = fsa9685_write_reg_mask(FSA9685_REG_TIMING_SET_2, FSA9685_REG_TIMING_SET_2_DCDTIMEOUT, FSA9685_REG_TIMING_SET_2_DCDTIMEOUT);
+			if(ret < 0){
+				hwlog_err("%s:write fsa9688c DCD enable_flag error!!!\n",__func__);
+				return SET_DCDTOUT_FAIL;
+			}
+		}
+		ret = fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, FSA9685_DCD_TIME_OUT_MASK,FSA9685_DCD_TIME_OUT_MASK);
+		if(ret < 0){
+			hwlog_err("%s:write fsa9688c DCD enable_flag error!!!\n",__func__);
+			return SET_DCDTOUT_FAIL;
 		}
 	}
-	ret = fsa9685_write_reg_mask(FSA9685_REG_CONTROL2,enable_flag,FSA9685_DCD_TIME_OUT_MASK);
-	if(ret < 0) {
-		hwlog_err("%s:write fsa9688c DCD enable_flag error!!!\n",__func__);
-		return -1;
-	}
 	hwlog_info("%s:write fsa9688c DCD enable_flag is:%d!!!\n",__func__,enable_flag);
-	return 0;
+	return SET_DCDTOUT_SUCC;
 }
 
 static void fsa9685_intb_work(struct work_struct *work);
 static irqreturn_t fsa9685_irq_handler(int irq, void *dev_id)
 {
     int gpio_value;
-
+ 
     usb_switch_wake_lock();
+
     gpio_value = gpio_get_value(gpio);
     if(gpio_value==1)
         hwlog_err("%s: intb high when interrupt occured!!!\n", __func__);
@@ -345,7 +428,7 @@ int is_fcp_charger_type(void)
     }
     return false;
 }
-enum hisi_charger_type fsa9685_get_charger_type(void)
+static enum hisi_charger_type fsa9685_get_charger_type(void)
 {
     enum hisi_charger_type charger_type = CHARGER_TYPE_NONE;
     int val = 0, usb_status;
@@ -365,29 +448,29 @@ enum hisi_charger_type fsa9685_get_charger_type(void)
     }
 
 	if (is_rt8979()) {
-		muic_status1 = fsa9685_read_reg(RT8979_REG_MUIC_STATUS1);
+		muic_status1 = fsa9685_read_reg(RT8979_REG_MUIC_STATUS1); //Patrick Added, 2017/4/19
 		usb_status = fsa9685_read_reg(FSA9685_REG_DEVICE_TYPE_1);
 		if (usb_status != val)
 			charger_type = CHARGER_TYPE_NONE;
 		else if (muic_status1 & RT8979_DCDT)
 			charger_type = CHARGER_TYPE_NONE;
-		else if (val & FSA9685_USB_DETECTED) 
+		else if (val & FSA9685_USB_DETECTED)
 			charger_type = CHARGER_TYPE_SDP;
 		else if(val & FSA9685_CDP_DETECTED)
 			charger_type = CHARGER_TYPE_CDP;
 		else if(val & FSA9685_DCP_DETECTED)
 			charger_type = CHARGER_TYPE_DCP;
 		else
-			charger_type = CHARGER_TYPE_NONE;		
+			charger_type = CHARGER_TYPE_NONE;
 	} else {
-    if (val & FSA9685_USB_DETECTED)
-        charger_type = CHARGER_TYPE_SDP;
-    else if(val & FSA9685_CDP_DETECTED)
-        charger_type = CHARGER_TYPE_CDP;
-    else if(val & FSA9685_DCP_DETECTED)
-        charger_type = CHARGER_TYPE_DCP;
-    else
-        charger_type = CHARGER_TYPE_NONE;
+		if (val & FSA9685_USB_DETECTED)
+			charger_type = CHARGER_TYPE_SDP;
+		else if(val & FSA9685_CDP_DETECTED)
+			charger_type = CHARGER_TYPE_CDP;
+		else if(val & FSA9685_DCP_DETECTED)
+			charger_type = CHARGER_TYPE_DCP;
+		else
+			charger_type = CHARGER_TYPE_NONE;
 	}
 
     if((charger_type == CHARGER_TYPE_NONE) && is_fcp_charger_type())
@@ -421,20 +504,25 @@ int fsa9685_is_water_intrused(void)
 	}
 	return 1;
 }
+
 static int rt8979_sw_open(bool open)
 {
 	int ret;
-	hwlog_info("%s : %s\n", __func__, open ? "open" : "auto");	
+
+	hwlog_info("%s : %s\n", __func__, open ? "open" : "auto");
 	return fsa9685_write_reg_mask(FSA9685_REG_CONTROL,
 		open ? 0 : FSA9685_SWITCH_OPEN, FSA9685_SWITCH_OPEN);
 }
+
 static int rt8979_accp_enable(bool en)
 {
 	int ret;
+
 	return fsa9685_write_reg_mask(FSA9685_REG_CONTROL2,
             en ? FSA9685_ACCP_AUTO_ENABLE : 0,
             FSA9685_ACCP_AUTO_ENABLE);
 }
+
 static void rt8979_auto_restart_accp_det(void)
 {
 	hwlog_info("%s-%d +++\n", __func__, __LINE__);
@@ -452,6 +540,7 @@ static void rt8979_auto_restart_accp_det(void)
 	}
 	hwlog_info("%s-%d ---\n", __func__, __LINE__);
 }
+
 static void rt8979_force_restart_accp_det(bool open)
 {
 	hwlog_info("%s-%d +++\n", __func__, __LINE__);
@@ -466,6 +555,8 @@ static void rt8979_force_restart_accp_det(bool open)
     fsa9685_write_reg_mask(RT8979_REG_MUIC_CTRL, RT8979_REG_MUIC_CTRL_DISABLE_DCDTIMEOUT, RT8979_REG_MUIC_CTRL_DISABLE_DCDTIMEOUT);
 	hwlog_info("%s-%d ---\n", __func__, __LINE__);
 }
+
+
 static void rt8979_intb_work(struct work_struct *work)
 {
     int reg_ctl, reg_intrpt, reg_adc, reg_dev_type1, reg_dev_type2, reg_dev_type3, vbus_status;
@@ -478,30 +569,34 @@ static void rt8979_intb_work(struct work_struct *work)
     static int otg_attach = 0;
     static int pedestal_attach = 0;
 	static bool redo_bc12 = false;
-    reg_intrpt = fsa9685_read_reg(FSA9685_REG_INTERRUPT);
-    vbus_status = fsa9685_read_reg(FSA9685_REG_VBUS_STATUS);
+
+	reg_intrpt = fsa9685_read_reg(FSA9685_REG_INTERRUPT);
+	vbus_status = fsa9685_read_reg(FSA9685_REG_VBUS_STATUS);
     hwlog_info("%s: read FSA9685_REG_INTERRUPT. reg_intrpt=0x%x\n", __func__, reg_intrpt);
-	muic_status1 = fsa9685_read_reg(RT8979_REG_MUIC_STATUS1);
-	muic_status2 = fsa9685_read_reg(RT8979_REG_MUIC_STATUS2);
+	muic_status1 = fsa9685_read_reg(RT8979_REG_MUIC_STATUS1); //Patrick Added, 2017/4/19
+	muic_status2 = fsa9685_read_reg(RT8979_REG_MUIC_STATUS2); //Patrick Added, 2017/4/25
 	hwlog_info("%s: read MUIC STATUS1. reg_status=0x%x\n", __func__, muic_status1);
 	if (muic_status1 & RT8979_DCDT) {
-		hwlog_info("%s: DCD timoeut -> redo USB detection\n", __func__);
-		rt8979_accp_enable(false);
-		fsa9685_write_reg(FSA9685_REG_INTERRUPT_MASK, 0); // enable all interrupt, 2017/4/25
-		fsa9685_write_reg_mask(RT8979_REG_USBCHGEN, 0, RT8979_REG_USBCHGEN_ACCPDET_STAGE1);
-		fsa9685_write_reg_mask(FSA9685_REG_TIMING_SET_2, 0x38, 0x38);
-		fsa9685_write_reg_mask(RT8979_REG_USBCHGEN, RT8979_REG_USBCHGEN_ACCPDET_STAGE1, RT8979_REG_USBCHGEN_ACCPDET_STAGE1);
-		redo_bc12 = true;
-		goto OUT;
-	}
-	fsa9685_write_reg_mask(FSA9685_REG_INTERRUPT_MASK, 1 << 5, 1 <<5); // Mask VBUS change
+		hwlog_info("%s: DCD timoeut (DCT enable = %s)\n", __func__, rt8979_dcd_timeout_enabled ? "true" : "false");
+		if (!rt8979_dcd_timeout_enabled) {
+			hwlog_info("%s: DCD timoeut -> redo USB detection\n", __func__);
+			rt8979_accp_enable(false);
+			fsa9685_write_reg(FSA9685_REG_INTERRUPT_MASK, 0); // enable all interrupt, 2017/4/25
+			fsa9685_write_reg_mask(RT8979_REG_USBCHGEN, 0, RT8979_REG_USBCHGEN_ACCPDET_STAGE1);
+			fsa9685_write_reg_mask(FSA9685_REG_TIMING_SET_2, 0x38, 0x38);
+			fsa9685_write_reg_mask(RT8979_REG_USBCHGEN, RT8979_REG_USBCHGEN_ACCPDET_STAGE1, RT8979_REG_USBCHGEN_ACCPDET_STAGE1);
+			redo_bc12 = true;
+			goto OUT;
+		}
+	} else
+		fsa9685_write_reg_mask(FSA9685_REG_INTERRUPT_MASK, 1 << 5, 1 <<5); // Mask VBUS change
 	muic_status2 >>= 4;
 	muic_status2 &= 0x07;
 	if (redo_bc12) {
 		switch (muic_status2) {
 			case 2: // SDP
 				reg_intrpt |= FSA9685_ATTACH;
-				break;		
+				break;
 			case 5: // CDP
 				reg_intrpt |= FSA9685_ATTACH;
 				break;
@@ -517,7 +612,7 @@ static void rt8979_intb_work(struct work_struct *work)
         hwlog_info("disable fcp interrrupt again!!\n");
         ret2 |= fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, 0, FSA9685_ACCP_OSC_ENABLE);
 		if (!is_rt8979())
-			ret2 |= fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, 0,FSA9685_DCD_TIME_OUT_MASK);
+			ret2 |= fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, fsa9685_dcd_timeout_enabled,FSA9685_DCD_TIME_OUT_MASK);
         ret2 |= fsa9685_write_reg(FSA9685_REG_ACCP_INTERRUPT_MASK1, RT8979_REG_ALLMASK);
         ret2 |= fsa9685_write_reg(FSA9685_REG_ACCP_INTERRUPT_MASK2, RT8979_REG_ALLMASK);
         hwlog_info("%s : read ACCP interrupt,reg[0x59]=0x%x,reg[0x5A]=0x%x\n",__func__,
@@ -532,12 +627,17 @@ static void rt8979_intb_work(struct work_struct *work)
     } else if (unlikely(reg_intrpt == 0)) {
         hwlog_err("%s: read FSA9685_REG_INTERRUPT, and no intr!!!\n", __func__);
     } else {
-		if (reg_intrpt & RT8979_DEVICE_CHANGE) {
-			hwlog_info("%s: Device Change\n", __func__);
-		}
+        if (reg_intrpt & RT8979_DEVICE_CHANGE) {
+            hwlog_info("%s: Device Change\n", __func__);
+        }
+
         if ((reg_intrpt & FSA9685_ATTACH) && !rt8979_is_in_fm8()){
             hwlog_info("%s: FSA9685_ATTACH\n", __func__);
-			rt8979_sw_open(false);
+            rt8979_sw_open(false);
+            fsa9685_write_reg(FSA9685_REG_ACCP_CMD, RT8979_REG_ACCP_CMD_STAGE1);
+            fsa9685_write_reg(FSA9685_REG_ACCP_ADDR, RT8979_REG_ACCP_ADDR_VAL1);
+            rt8979_osc_trim_adjust = rt8979_osc_trim_default;
+            rt8979_adjust_osc(0);
             reg_dev_type1 = fsa9685_read_reg(FSA9685_REG_DEVICE_TYPE_1);
             reg_dev_type2 = fsa9685_read_reg(FSA9685_REG_DEVICE_TYPE_2);
             reg_dev_type3 = fsa9685_read_reg(FSA9685_REG_DEVICE_TYPE_3);
@@ -641,7 +741,8 @@ static void rt8979_intb_work(struct work_struct *work)
                 otg_attach = 0;
             }
 			else {
-            }
+				//hisi_usb_otg_bc_again(); // Added by Patrick
+			}
             if (pedestal_attach ==1) {
                 hwlog_info("%s: FSA9685_CUSTOMER_ACCESSORY5_DETACH\n", __func__);
                 pedestal_attach = 0;
@@ -675,11 +776,12 @@ static void rt8979_intb_work(struct work_struct *work)
                 (reg_intrpt & (FSA9685_ATTACH | FSA9685_RESERVED_ATTACH))) {
         invalid_times = 0;
     }
-    if((USB_SWITCH_NEED_WAKE_UNLOCK == usb_switch_wakelock_flag) &&
-            (0 == invalid_times)) {
-        usb_switch_wake_unlock();
-    }
 OUT:
+    if ((USB_SWITCH_NEED_WAKE_UNLOCK == usb_switch_wakelock_flag) &&
+            (0 == invalid_times)) {
+            usb_switch_wake_unlock();
+    }
+
     hwlog_info("%s: ------end.\n", __func__);
     return;
 }
@@ -704,7 +806,7 @@ static void fsa9685_intb_work(struct work_struct *work)
     {
         hwlog_info("disable fcp interrrupt again!!\n");
         ret2 |= fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, FSA9685_ACCP_OSC_ENABLE,FSA9685_ACCP_OSC_ENABLE);
-        ret2 |= fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, 0,FSA9685_DCD_TIME_OUT_MASK);
+        ret2 |= fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, fsa9685_dcd_timeout_enabled,FSA9685_DCD_TIME_OUT_MASK);
         ret2 |= fsa9685_write_reg(FSA9685_REG_ACCP_INTERRUPT_MASK1, 0xFF);
         ret2 |= fsa9685_write_reg(FSA9685_REG_ACCP_INTERRUPT_MASK2, 0xFF);
         hwlog_info("%s : read ACCP interrupt,reg[0x59]=0x%x,reg[0x5A]=0x%x\n",__func__,
@@ -863,10 +965,11 @@ static void fsa9685_intb_work(struct work_struct *work)
     }
 
 OUT:
-    if((USB_SWITCH_NEED_WAKE_UNLOCK == usb_switch_wakelock_flag) &&
+    if ((USB_SWITCH_NEED_WAKE_UNLOCK == usb_switch_wakelock_flag) &&
             (0 == invalid_times)) {
-        usb_switch_wake_unlock();
+            usb_switch_wake_unlock();
     }
+
     hwlog_info("%s: ------end.\n", __func__);
     return;
 }
@@ -983,28 +1086,6 @@ static ssize_t dump_regs_show(struct device *dev, struct device_attribute *attr,
 }
 static DEVICE_ATTR(dump_regs, S_IRUGO, dump_regs_show, NULL);
 #endif
-static ssize_t batovp_nv_ctrl_store(struct device *dev,
-                          struct device_attribute *attr, const char *buf, size_t size)
-{
-	int i;
-	for (i = 0; i < 10; i++)
-	{
-		hwlog_info("%s:i = %d\n",__func__,i);
-		msleep(6000);
-	}
-	hwlog_info("%s:vbat_ovp_notifier_list call start\n",__func__);
-	atomic_notifier_call_chain(&vbat_ovp_notifier_list,0, NULL);
-	hwlog_info("%s:vbat_ovp_notifier_list call done\n",__func__);
-	return size;
-}
-
-static ssize_t batovp_nv_ctrl_show(struct device *dev, struct device_attribute *attr,
-                char *buf)
-{
-	return 0;
-}
-
-static DEVICE_ATTR(batovp_nv_ctrl, S_IRUGO | S_IWUSR, batovp_nv_ctrl_show, batovp_nv_ctrl_store);
 static ssize_t jigpin_ctrl_store(struct device *dev,
                           struct device_attribute *attr, const char *buf, size_t size)
 {
@@ -1186,16 +1267,16 @@ static DEVICE_ATTR(switchctrl, S_IRUGO | S_IWUSR, switchctrl_show, switchctrl_st
 ***************************************************************************/
 int fcp_adapter_reset(void)
 {
-   int ret = 0,val = 0;
+	int ret = 0,val = 0;
 	if (is_rt8979()) {
 		fsa9685_write_reg_mask(FSA9685_REG_ACCP_CNTL, 0,FAS9685_ACCP_CNTL_MASK);
 		val = FSA9685_ACCP_MSTR_RST;
 	}
 	else
-   val = FSA9685_ACCP_MSTR_RST | FAS9685_ACCP_SENDCMD |FSA9685_ACCP_IS_ENABLE;
-   ret =  fsa9685_write_reg_mask(FSA9685_REG_ACCP_CNTL, val,FAS9685_ACCP_CNTL_MASK);
-   hwlog_info("%s : send fcp adapter reset %s \n",__func__,ret < 0 ? "fail": "sucess");
-   return ret;
+		val = FSA9685_ACCP_MSTR_RST | FAS9685_ACCP_SENDCMD |FSA9685_ACCP_IS_ENABLE;
+	ret =  fsa9685_write_reg_mask(FSA9685_REG_ACCP_CNTL, val,FAS9685_ACCP_CNTL_MASK);
+	hwlog_info("%s : send fcp adapter reset %s \n",__func__,ret < 0 ? "fail": "sucess");
+	return ret;
 }
 /****************************************************************************
   Function:     fcp_stop_charge_config
@@ -1207,7 +1288,21 @@ int fcp_adapter_reset(void)
 ***************************************************************************/
 static int fcp_stop_charge_config(void)
 {
-    //do nothing
+    int ret = 0;
+#ifdef CONFIG_DIRECT_CHARGER
+    if (!direct_charge_get_cutoff_normal_flag())
+    {
+#endif
+        ret = set_5v_boost_enable(DISABLE);
+        if (ret)
+        {
+            hwlog_err("[%s]:5v boost close fail!\n", __func__);
+            return BOOST_5V_CLOSE_FAIL;
+        }
+        hwlog_info("%s:5v boost close!\n", __func__);
+#ifdef CONFIG_DIRECT_CHARGER
+    }
+#endif
     return 0;
 }
 /****************************************************************************
@@ -1220,10 +1315,13 @@ static int fcp_stop_charge_config(void)
 ***************************************************************************/
 int switch_chip_reset(void)
 {
+	//const int rt8979_reset_delay = 300;
     int ret = 0,reg_ctl = 0,gpio_value = 0;
     int slave_good, accp_status_mask;
 	int reg_val1, reg_val2;
+
 	hwlog_info("%s++", __func__);
+	printk("caller is %pf/%pf\n", __builtin_return_address(1), __builtin_return_address(0)); // Only for debug
 	if (is_rt8979())
 		disable_irq(this_client->irq);
     ret = fsa9685_write_reg(0x19, 0x89);
@@ -1235,6 +1333,7 @@ int switch_chip_reset(void)
         msleep(1);
 		rt8979_accp_enable(true);
         fsa9685_write_reg_mask(FSA9685_REG_TIMING_SET_2, FSA9685_REG_TIMING_SET_2_DCDTIMEOUT, FSA9685_REG_TIMING_SET_2_DCDTIMEOUT);
+        rt8979_dcd_timeout_enabled = false;
     }
     ret = fsa9685_write_reg(FSA9685_REG_DETACH_CONTROL, 1);
     if ( ret < 0 ){
@@ -1244,14 +1343,13 @@ int switch_chip_reset(void)
     /* disable accp interrupt */
     ret |= fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, FSA9685_ACCP_OSC_ENABLE,FSA9685_ACCP_OSC_ENABLE);
     if (!is_rt8979())
-    ret |= fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, 0,FSA9685_DCD_TIME_OUT_MASK);
+    ret |= fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, fsa9685_dcd_timeout_enabled,FSA9685_DCD_TIME_OUT_MASK);
     ret |= fsa9685_write_reg(FSA9685_REG_ACCP_INTERRUPT_MASK1, 0xFF);
     ret |= fsa9685_write_reg(FSA9685_REG_ACCP_INTERRUPT_MASK2, 0xFF);
     if(ret < 0)
     {
         hwlog_err("accp interrupt mask write failed \n");
     }
-
     /* clear INT MASK */
     reg_ctl = fsa9685_read_reg(FSA9685_REG_CONTROL);
     if ( reg_ctl < 0 ) {
@@ -1293,7 +1391,7 @@ int switch_chip_reset(void)
     return 0;
 }
 /****************************************************************************
-  Function:     fcp_cmd_transfer_check
+  Function:     fsa9685_fcp_cmd_transfer_check
   Description:  check cmd transfer success or fail
   Input:         NA
   Output:       NA
@@ -1305,7 +1403,7 @@ int fsa9685_fcp_cmd_transfer_check(void)
     int reg_val1 = 0,reg_val2 =0,i =0;
     /*read accp interrupt registers until value is not zero */
     do{
-        msleep(10);
+        usleep_range(30000, 31000);
         reg_val1 = fsa9685_read_reg(FSA9685_REG_ACCP_INTERRUPT1);
         reg_val2 = fsa9685_read_reg(FSA9685_REG_ACCP_INTERRUPT2);
         i++;
@@ -1328,35 +1426,44 @@ int fsa9685_fcp_cmd_transfer_check(void)
     }
 
     /* judge if cmd transfer success */
-        if((reg_val1 & FAS9685_ACK) &&(reg_val1 & FAS9685_CMDCPL)
-            && !(reg_val1 & FAS9685_CRCPAR)
-            && !(reg_val2 & (FAS9685_CRCRX | FAS9685_PARRX)))
-        {
-            return 0;
-        }
+    if((reg_val1 & FAS9685_ACK) &&(reg_val1 & FAS9685_CMDCPL)
+        && !(reg_val1 & FAS9685_CRCPAR)
+        && !(reg_val2 & (FAS9685_CRCRX | FAS9685_PARRX)))
+    {
+        return 0;
+    }
+
+
     hwlog_err("%s : reg[0x59]=0x%x,reg[0x5A]=0x%x\n",__func__,reg_val1,reg_val2);
     return -1;
 }
+
+/****************************************************************************
+  Function:     rt8979_fcp_cmd_transfer_check
+  Description:  check cmd transfer success or fail
+  Input:         NA
+  Output:       NA
+  Return:        0: success
+                   -1: fail
+***************************************************************************/
 int rt8979_fcp_cmd_transfer_check(void)
 {
-	const int wait_time = 40;
-    int reg_val1 = 0,reg_val2 =0,i =0;
-	int scp_status;
-	scp_status = fsa9685_read_reg(REG_SCP_STATUS);
-	if (scp_status == 0)
-		return -1;
-#if 1
+    const int wait_time = RT8979_FCP_DM_TRANSFER_CHECK_WAIT_TIME;
+    int reg_val1 = 0,reg_val2 =0,i = -1;
+    int scp_status;
+    /*read accp interrupt registers until value is not zero */
+
+    scp_status = fsa9685_read_reg(REG_SCP_STATUS);
+    if (scp_status == 0)
+        return -1;
     do{
-        msleep(10);
+        usleep_range(30000,31000);
         reg_val1 = fsa9685_read_reg(FSA9685_REG_ACCP_INTERRUPT1);
         reg_val2 = fsa9685_read_reg(FSA9685_REG_ACCP_INTERRUPT2);
         i++;
     } while(i < MUIC_ACCP_INTREG_MAXREADCOUNT && reg_val1== 0 && reg_val2 == 0);
-#else	
-	msleep(wait_time);
-    reg_val1 = fsa9685_read_reg(FSA9685_REG_ACCP_INTERRUPT1);
-    reg_val2 = fsa9685_read_reg(FSA9685_REG_ACCP_INTERRUPT2);
-#endif	
+
+    hwlog_info("%s : ACCP_INT = 0x%02x, 0x%02x\n", __func__, reg_val1, reg_val2);
     if(reg_val1== 0 && reg_val2 == 0)
     {
         hwlog_info("%s : read accp interrupt time out,total time is %d ms\n",__func__, wait_time);
@@ -1367,24 +1474,60 @@ int rt8979_fcp_cmd_transfer_check(void)
         return -1;
     }
 
+    /*if something  changed print reg info */
     if(reg_val2 & (FAS9685_PROSTAT | FAS9685_DSDVCSTAT) )
     {
         hwlog_info("%s : ACCP state changed  ,reg[0x59]=0x%x,reg[0x5A]=0x%x\n",__func__,reg_val1,reg_val2);
     }
+
+    if (reg_val2 == 0) {
+        if (reg_val1 == FAS9685_CMDCPL) {
+            // increase OSC
+            hwlog_info("%s: increase OSC\n", __func__);
+            if (rt8979_adjust_osc(-1) == 0) {
+                return -RT8979_RETRY;
+            }
+        } else if (reg_val1	== (FAS9685_CMDCPL | FAS9685_CRCPAR)) {
+            // decrease OSC
+            hwlog_info("%s: decrease OSC\n", __func__);
+            if (rt8979_adjust_osc(1) == 0) {
+                return -RT8979_RETRY;
+            }
+        } else if (reg_val1	== (FAS9685_CMDCPL | FAS9685_ACK | FAS9685_CRCPAR)) {
+            hwlog_info("%s: decrease OSC\n", __func__);
+            if (rt8979_adjust_osc(1) == 0) {
+                return -RT8979_FAIL;
+            }
+        }
+    }
+
     hwlog_info("%s : RT8979 accp int1,2 = 0x%x, 0x%x\n", __func__, reg_val1, reg_val2);
     if ((reg_val1 & FAS9685_CMDCPL) && (reg_val1 & FAS9685_ACK)
         && !(reg_val1 & FAS9685_CRCPAR)
         && !(reg_val2 & (FAS9685_CRCRX | FAS9685_PARRX)))
         return 0;
+
     hwlog_err("%s : reg[0x59]=0x%x,reg[0x5A]=0x%x\n",__func__,reg_val1,reg_val2);
     return -1;
 }
+
+
+/****************************************************************************
+  Function:     fcp_cmd_transfer_check
+  Description:  check cmd transfer success or fail
+  Input:         NA
+  Output:       NA
+  Return:        0: success
+                   -1: fail
+***************************************************************************/
+
 int fcp_cmd_transfer_check(void)
 {
 	return is_rt8979() ? 
 		rt8979_fcp_cmd_transfer_check() : 
 		fsa9685_fcp_cmd_transfer_check();
 }
+
 /****************************************************************************
   Function:     fcp_protocol_restart
   Description:  disable accp protocol and enable again
@@ -1398,11 +1541,15 @@ void fcp_protocol_restart(void)
     int reg_val =0;
     int ret = 0;
     int slave_good, accp_status_mask;
+	
+	
+	
     if (is_rt8979()) {
         slave_good = RT8979_ACCP_STATUS_SLAVE_GOOD;
         accp_status_mask =  RT8979_ACCP_STATUS_MASK;
 		rt8979_sw_open(true);
 		rt8979_regs_dump();
+		/* RT8979 didn't support fcp_protocol_restart */
 		return;
     } else {
         slave_good = FSA9688_ACCP_STATUS_SLAVE_GOOD;
@@ -1410,7 +1557,7 @@ void fcp_protocol_restart(void)
     }
     /* disable accp protocol */
     fsa9685_write_reg_mask(FSA9685_REG_ACCP_CNTL, 0,FAS9685_ACCP_CNTL_MASK);
-    msleep(100);
+	usleep_range(100000,101000);
     reg_val = fsa9685_read_reg(FSA9685_REG_ACCP_STATUS);
 
     if(slave_good == (reg_val & accp_status_mask))
@@ -1420,7 +1567,7 @@ void fcp_protocol_restart(void)
 
     /* enable accp protocol */
     fsa9685_write_reg_mask(FSA9685_REG_ACCP_CNTL, FSA9685_ACCP_IS_ENABLE,FAS9685_ACCP_CNTL_MASK);
-    msleep(100);
+	usleep_range(100000,101000);
     reg_val = fsa9685_read_reg(FSA9685_REG_ACCP_STATUS);
     if(slave_good != (reg_val & accp_status_mask))
     {
@@ -1453,10 +1600,12 @@ void fcp_protocol_restart(void)
 int accp_adapter_reg_read(int* val, int reg)
 {
     int reg_val1 = 0,reg_val2 =0;
-    int i=0,ret =0;
-	hwlog_info("%s : reg = 0x%x\n", __func__, reg);
+    int i=0,ret =0, adjust_osc_count = 0;
+    int fcp_check_ret;
+
+    hwlog_info("%s : reg = 0x%x\n", __func__, reg);
     mutex_lock(&accp_adaptor_reg_lock);
-    for(i=0;i< FCP_RETRY_MAX_TIMES;i++)
+    for(i=0;i< FCP_RETRY_MAX_TIMES && adjust_osc_count < RT8979_ADJ_OSC_MAX_COUNT;i++)
     {
         /*before send cmd, read and clear accp interrupt registers */
         reg_val1 = fsa9685_read_reg(FSA9685_REG_ACCP_INTERRUPT1);
@@ -1473,18 +1622,22 @@ int accp_adapter_reg_read(int* val, int reg)
         }
 
         /* check cmd transfer success or fail */
-        if(0 ==fcp_cmd_transfer_check())
+        fcp_check_ret = fcp_cmd_transfer_check();
+        if(0 == fcp_check_ret)
         {
             /* recived data from adapter */
             *val = fsa9685_read_reg(FSA9685_REG_ACCP_DATA);
-			hwlog_info("%s-%d: reg = 0x%x, val = 0x%x\n", __func__, __LINE__, reg, *val);
+            hwlog_info("%s-%d: reg = 0x%x, val = 0x%x\n", __func__, __LINE__, reg, *val);
             break;
-        }
-
+        } else if (-RT8979_RETRY == fcp_check_ret) {
+			adjust_osc_count++;
+			i--; /* do retry, so decrease the retry count */
+		}
         /* if transfer failed, restart accp protocol */
         fcp_protocol_restart();
         hwlog_err("%s : adapter register read fail times=%d ,register=0x%x,data=0x%x,reg[0x59]=0x%x,reg[0x5A]=0x%x \n",__func__,i,reg,*val,reg_val1,reg_val2);
     }
+
     hwlog_debug("%s : adapter register retry times=%d ,register=0x%x,data=0x%x,reg[0x59]=0x%x,reg[0x5A]=0x%x \n",__func__,i,reg,*val,reg_val1,reg_val2);
     if(FCP_RETRY_MAX_TIMES == i)
     {
@@ -1511,10 +1664,12 @@ int accp_adapter_reg_read(int* val, int reg)
 int accp_adapter_reg_write(int val, int reg)
 {
     int reg_val1 = 0,reg_val2 =0;
-    int i = 0,ret = 0;
-	hwlog_info("%s : reg = 0x%x, val = 0x%x\n", __func__, reg, val);
+    int i = 0,ret = 0, adjust_osc_count = 0;
+    int fcp_check_ret;
+
+    hwlog_info("%s : reg = 0x%x, val = 0x%x\n", __func__, reg, val);
     mutex_lock(&accp_adaptor_reg_lock);
-    for(i=0;i< FCP_RETRY_MAX_TIMES;i++)
+    for(i=0;i< FCP_RETRY_MAX_TIMES && adjust_osc_count < RT8979_ADJ_OSC_MAX_COUNT;i++)
     {
         /*before send cmd, clear accp interrupt registers */
         reg_val1 = fsa9685_read_reg(FSA9685_REG_ACCP_INTERRUPT1);
@@ -1533,11 +1688,14 @@ int accp_adapter_reg_write(int val, int reg)
         }
 
         /* check cmd transfer success or fail */
-        if(0 ==fcp_cmd_transfer_check())
+	fcp_check_ret = fcp_cmd_transfer_check();
+        if(0 == fcp_check_ret)
         {
             break;
-        }
-
+        } else if (-RT8979_RETRY == fcp_check_ret) {
+            adjust_osc_count++;
+            i--; /* do retry, so decrease the retry count */
+	}
         /* if transfer failed, restart accp protocol */
         fcp_protocol_restart();
         hwlog_err("%s : adapter register write fail times=%d ,register=0x%x,data=0x%x,reg[0x59]=0x%x,reg[0x5A]=0x%x \n",__func__,i,reg,val,reg_val1,reg_val2);
@@ -1594,6 +1752,7 @@ int scp_adapter_reg_write(int val, int reg)
     }
     return 0;
 }
+
 static void rt8979_regs_dump(void)
 {
     const int reg_addr[] = {
@@ -1615,6 +1774,38 @@ static void rt8979_regs_dump(void)
         regval = fsa9685_read_reg(reg_addr[i]);
         hwlog_info("reg[0x%02x] = 0x%02x\n", reg_addr[i], regval);
     }
+}
+static int check_accp_ic_status(void)
+{
+	int check_times = 0;
+	int reg_dev_type1 = 0;
+	int ret = 0;
+
+	ret = set_5v_boost_enable(ENABLE);
+	if (ret)
+	{
+		hwlog_err("[%s]:5v boost open fail!\n", __func__);
+		return ACCP_NOT_PREPARE_OK;
+	}
+	hwlog_info("[%s]:5v boost open!\n", __func__);
+	for (check_times = 0; check_times < ADAPTOR_BC12_TYPE_MAX_CHECK_TIME; check_times++)
+	{
+		reg_dev_type1 = fsa9685_read_reg(FSA9685_REG_DEVICE_TYPE_1);
+		if (reg_dev_type1 & FSA9685_DCP_DETECTED)
+		{
+			hwlog_info("%s: FSA9685_DCP_DETECTED\n", __func__);
+			break;
+		}
+		hwlog_info("[%s]reg_dev_type1 = 0x%x,check_times = %d!\n", __func__,reg_dev_type1,check_times);
+		usleep_range(WAIT_FOR_BC12_DELAY*1000, (WAIT_FOR_BC12_DELAY+1)*1000);
+	}
+	if (ADAPTOR_BC12_TYPE_MAX_CHECK_TIME == check_times)
+	{
+		hwlog_info("[%s],check_times = %d!\n", __func__,check_times);
+		return ACCP_NOT_PREPARE_OK;
+	}
+	hwlog_info("[%s]:accp is ok,check_times = %d!\n", __func__,check_times);
+	return ACCP_PREPARE_OK;
 }
 /****************************************************************************
   Function:     acp_adapter_detect
@@ -1645,6 +1836,11 @@ static int fsa9865_accp_adapter_detect(void)
         accp_status_mask = FSA9688_ACCP_STATUS_MASK;
     }
 
+    if (ACCP_NOT_PREPARE_OK == check_accp_ic_status())
+    {
+        hwlog_err("check_accp_ic_status not prepare ok!\n");
+        return ACCP_ADAPTOR_DETECT_OTHER;
+    }
     mutex_lock(&accp_detect_lock);
     /*check accp status*/
     reg_val1 = fsa9685_read_reg(FSA9685_REG_DEVICE_TYPE_4);
@@ -1658,9 +1854,9 @@ static int fsa9865_accp_adapter_detect(void)
     }
 
     /* enable accp */
-        reg_val1 = fsa9685_read_reg(FSA9685_REG_CONTROL2);
-        reg_val1 |= FSA9685_ACCP_ENABLE;
-        fsa9685_write_reg(FSA9685_REG_CONTROL2, reg_val1);
+    reg_val1 = fsa9685_read_reg(FSA9685_REG_CONTROL2);
+    reg_val1 |= FSA9685_ACCP_ENABLE;
+    fsa9685_write_reg(FSA9685_REG_CONTROL2, reg_val1);
 
     hwlog_info("accp_adapter_detect, 0x0e=0x%x\r\n", reg_val1);
 
@@ -1674,7 +1870,7 @@ static int fsa9865_accp_adapter_detect(void)
         {
             break;
         }
-        msleep(ACCP_POLL_TIME);
+        usleep_range(ACCP_POLL_TIME*1000, (ACCP_POLL_TIME+1)*1000);
     }
     /*clear accp interrupt*/
     hwlog_info("%s : read ACCP interrupt,reg[0x59]=0x%x,reg[0x5A]=0x%x\n",__func__,
@@ -1706,6 +1902,11 @@ static int rt8979_accp_adapter_detect(void)
     {
         return ACCP_ADAPTOR_DETECT_OTHER;
     }
+    if (ACCP_NOT_PREPARE_OK == check_accp_ic_status())
+    {
+        hwlog_err("check_accp_ic_status not prepare ok!\n");
+        return ACCP_ADAPTOR_DETECT_OTHER;
+    }
     slave_good = RT8979_ACCP_STATUS_SLAVE_GOOD;
     accp_status_mask =  RT8979_ACCP_STATUS_MASK;
     rt8979_regs_dump();
@@ -1721,6 +1922,7 @@ static int rt8979_accp_adapter_detect(void)
         return ACCP_ADAPTOR_DETECT_SUCC;
     }
 	rt8979_auto_restart_accp_det();
+	/*
     fsa9685_write_reg_mask(FSA9685_REG_ACCP_CNTL, 0,FAS9685_ACCP_CNTL_MASK);
     fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, 0,
         FSA9685_ACCP_AUTO_ENABLE | FSA9685_ACCP_ENABLE);
@@ -1733,7 +1935,7 @@ static int rt8979_accp_adapter_detect(void)
         is_dcp = true;
         fsa9685_write_reg_mask(FSA9685_REG_CONTROL, FSA9685_SWITCH_OPEN, FSA9685_SWITCH_OPEN);
     }
-    reg_val1 = fsa9685_read_reg(FSA9685_REG_CONTROL2);
+    reg_val1 = fsa9685_read_reg(FSA9685_REG_CONTROL2);*/
     rt8979_regs_dump();
     vbus_present = (fsa9685_read_reg(RT8979_REG_MUIC_STATUS1) & RT8979_REG_MUIC_STATUS1_DCDT) ? false : true;
     for (j = 0; j < ACCP_MAX_TRYCOUNT && vbus_present; j++)
@@ -1747,7 +1949,7 @@ static int rt8979_accp_adapter_detect(void)
             {
                  break;
             }
-            msleep(ACCP_POLL_TIME);
+            usleep_range(ACCP_POLL_TIME*1000, (ACCP_POLL_TIME + 1)*1000);
         }
         hwlog_info("%s : read ACCP interrupt,reg[0x59]=0x%x,reg[0x5A]=0x%x, reg[0xA7]=0x%x\n",__func__,
         fsa9685_read_reg(FSA9685_REG_ACCP_INTERRUPT1), fsa9685_read_reg(FSA9685_REG_ACCP_INTERRUPT2),
@@ -1763,7 +1965,7 @@ static int rt8979_accp_adapter_detect(void)
             rt8979_regs_dump();
             vbus_present = (fsa9685_read_reg(RT8979_REG_MUIC_STATUS1) & RT8979_REG_MUIC_STATUS1_DCDT) ? false : true;
             if (vbus_present) {
-                switch_chip_reset();
+		rt8979_force_restart_accp_det(true);
             }
         } else {
             hwlog_info("accp adapter detect ok,take %d ms \n",i*ACCP_POLL_TIME);
@@ -2401,9 +2603,10 @@ static int fsa9685_scp_exit(struct direct_charge_device* di)
 		default:
 			hwlog_info("%s:not iWatt\n",__func__);
 	}
-	msleep(50);
+	usleep_range(50*1000, 51*1000);
 	hwlog_err("%s\n",__func__);
-	ret |= fsa9685_scp_chip_reset();
+	set_5v_boost_enable(DISABLE);
+	hwlog_info("%s:5v boost close!\n", __func__);
 	scp_error_flag = 0;
 	return ret;
 }
@@ -2673,6 +2876,7 @@ struct smart_charge_ops scp_fsa9685_ops = {
     .scp_get_adaptor_temp = fsa9685_scp_get_adaptor_temp,
     .scp_get_adapter_vendor_id = fsa9685_get_adapter_vendor_id,
     .scp_get_usb_port_leakage_current_info = fsa9685_get_usb_port_leakage_current_info,
+    .scp_power_enable = set_5v_boost_enable,
 };
 #endif
 struct fcp_adapter_device_ops fcp_fsa9688_ops = {
@@ -2746,6 +2950,178 @@ static const struct of_device_id switch_fsa9685_ids[] = {
 MODULE_DEVICE_TABLE(of, switch_fsa9685_ids);
 #endif
 
+static struct switch_extra_ops huawei_switch_extra_ops = {
+	.manual_switch = fsa9685_manual_switch,
+	.dcd_timeout_enable =  fsa9685_dcd_timeout,
+	.manual_detach = fsa9685_manual_detach_work,
+};
+static int fsa9685_parse_dts(struct device_node* np)
+{
+	int ret = 0;
+	ret = of_property_read_u32(of_find_compatible_node(NULL, NULL, "huawei,charger"), \
+			"pd_support", &is_pd_support);
+	if (ret) {
+		hwlog_err("get switch_get_pd_support fail!\n");
+		is_pd_support = false;
+	}
+	hwlog_info("switch_get_pd_support = %d\n", is_pd_support);
+
+	ret = of_property_read_u32(of_find_compatible_node(NULL, NULL, "huawei,charger"), \
+			"dcd_timeout_enabled", &fsa9685_dcd_timeout_enabled);
+	if (ret) {
+		hwlog_err("get dcd_timeout_enabled fail!\n");
+		fsa9685_dcd_timeout_enabled = 0;
+	}
+	hwlog_info("fsa9685_dcd_timeout_enabled = %d\n", fsa9685_dcd_timeout_enabled);
+
+	ret = of_property_read_u32(np, "scp_need_extra_power", &(scp_need_extra_power));
+	if (ret)
+	{
+		hwlog_err("scp_need_extra_power failed\n");
+		return;
+	}
+	hwlog_info("scp_need_extra_power = %d\n", scp_need_extra_power);
+	if (scp_need_extra_power)
+	{
+		ret = of_property_read_u32(np, "boost_5v_use_common_gpio", &(boost_5v_use_common_gpio));
+		if (ret)
+		{
+			hwlog_err("boost_5v_use_common_gpio failed\n");
+			return -EINVAL;
+		}
+		hwlog_info("boost_5v_use_common_gpio = %d\n", boost_5v_use_common_gpio);
+		ret = of_property_read_u32(np, "is_need_bst_ctrl", &(is_need_bst_ctrl));
+		if (ret)
+		{
+			hwlog_err("is_need_bst_ctrl failed\n");
+			return -EINVAL;
+		}
+		hwlog_info("is_need_bst_ctrl = %d\n", is_need_bst_ctrl);
+		if (!boost_5v_use_common_gpio)
+		{
+			scp_power_en = of_get_named_gpio(np, "scp_power_en", 0);
+			hwlog_info("scp_power_en = %d\n", scp_power_en);
+			if (!gpio_is_valid(scp_power_en))
+			{
+				hwlog_err("%s: get scp_power_en fail\n", __func__);
+				return -EINVAL;
+			}
+		}
+		if (is_need_bst_ctrl)
+		{
+			bst_ctrl = of_get_named_gpio(np, "bst_ctrl", 0);
+			hwlog_info("bst_ctrl = %d\n", bst_ctrl);
+			if (!gpio_is_valid(bst_ctrl))
+			{
+				hwlog_err("%s: get bst_ctrl fail\n", __func__);
+				return -EINVAL;
+			}
+		}
+	}
+	return 0;
+}
+
+static int rt8979_write_osc_pretrim(void)
+{
+	int retval = 0;
+
+	retval = fsa9685_write_reg(RT8979_REG_TEST_MODE, RT8979_REG_TEST_MODE_VAL1);
+	if (retval < 0)
+		return retval;
+	retval = fsa9685_write_reg(RT8979_REG_EFUSE_CTRL, RT8979_REG_EFUSE_CTRL_VAL);
+	if (retval < 0) {
+		fsa9685_write_reg(RT8979_REG_TEST_MODE, RT8979_REG_TEST_MODE_DEFAULT_VAL);
+		return retval;
+	}
+	retval = fsa9685_write_reg(RT8979_REG_EFUSE_PRETRIM_DATA,
+		(rt8979_osc_trim_code + rt8979_osc_trim_adjust) ^ RT8979_REG_EFUSE_PRETRIM_DATA_VAL);
+	if (retval < 0) {
+		fsa9685_write_reg(RT8979_REG_TEST_MODE, RT8979_REG_TEST_MODE_DEFAULT_VAL);
+		return retval;
+	}
+	retval = fsa9685_write_reg(RT8979_REG_EFUSE_PRETRIM_ENABLE, RT8979_REG_EFUSE_PRETRIM_ENABLE_VAL);
+	usleep_range(WRITE_OSC_PRETRIM_DELAY_MIN, WRITE_OSC_PRETRIM_DELAY_MAX);
+	retval = fsa9685_read_reg(RT8979_REG_EFUSE_READ_DATA);
+	hwlog_info("%s : trim code read = %d\n", __func__, retval);
+
+	retval = fsa9685_write_reg(RT8979_REG_TEST_MODE, RT8979_REG_TEST_MODE_DEFAULT_VAL);
+	return retval;
+}
+
+static int rt8979_adjust_osc(int8_t val) {
+	int8_t temp;
+
+	temp = rt8979_osc_trim_code + rt8979_osc_trim_adjust + val;
+	if (temp > rt8979_osc_upper_bound || temp < rt8979_osc_lower_bound) {
+		hwlog_err("%s : reach to upper/lower bound %d / %d\n", __func__,
+			rt8979_osc_trim_code, rt8979_osc_trim_adjust);
+		return -RT8979_FAIL;
+	}
+
+	rt8979_osc_trim_adjust += val;
+	hwlog_info("%s : adjust osc trim code %d / %d\n", __func__,
+		rt8979_osc_trim_code, rt8979_osc_trim_adjust);
+
+	return rt8979_write_osc_pretrim();
+}
+
+static int rt8979_init_osc_params(void)
+{
+	int retval = 0;
+
+	hwlog_info("%s : entry\n", __func__);
+	retval = fsa9685_write_reg(RT8979_REG_TEST_MODE, RT8979_REG_TEST_MODE_VAL1);
+	if (retval < 0)
+		return retval;
+
+	retval = fsa9685_write_reg(RT8979_REG_EFUSE_CTRL, RT8979_REG_EFUSE_CTRL_VAL);
+	if (retval < 0) {
+		fsa9685_write_reg(RT8979_REG_TEST_MODE, RT8979_REG_TEST_MODE_DEFAULT_VAL);
+		return retval;
+	}
+
+	retval = fsa9685_write_reg(RT8979_REG_EFUSE_PRETRIM_ENABLE, RT8979_REG_EFUSE_PRETRIM_ENABLE_VAL1);
+	if (retval < 0) {
+		fsa9685_write_reg(RT8979_REG_TEST_MODE, RT8979_REG_TEST_MODE_DEFAULT_VAL);
+		return retval;
+	}
+	usleep_range(WRITE_OSC_PRETRIM_DELAY_MIN_DEFAULT, WRITE_OSC_PRETRIM_DELAY_MIN);
+	retval = fsa9685_read_reg(RT8979_REG_EFUSE_READ_DATA);
+	if (retval < 0) {
+		fsa9685_write_reg(RT8979_REG_TEST_MODE, RT8979_REG_TEST_MODE_DEFAULT_VAL);
+		return retval;
+	}
+	hwlog_info("%s : trim code read = %d\n", __func__, retval);
+	rt8979_osc_trim_code = retval;
+	rt8979_osc_lower_bound = RT8979_OSC_BOUND_MIN;
+	rt8979_osc_upper_bound = RT8979_OSC_BOUND_MAX;
+	rt8979_osc_trim_adjust = RT8979_OSC_TRIM_ADJUST_DEFAULT;
+
+	retval = rt8979_osc_trim_code + rt8979_osc_trim_adjust;
+	if (retval < rt8979_osc_lower_bound)
+		retval = rt8979_osc_lower_bound;
+	if (retval > rt8979_osc_upper_bound)
+		retval = rt8979_osc_upper_bound;
+	rt8979_osc_trim_default = retval - rt8979_osc_trim_code;
+	rt8979_osc_trim_adjust = rt8979_osc_trim_default;
+
+	retval = fsa9685_write_reg(RT8979_REG_EFUSE_PRETRIM_DATA,
+		(retval) ^ RT8979_REG_EFUSE_PRETRIM_DATA_VAL);
+	hwlog_info("%s : trim code = %d, rt8979_osc_trim_adjust = %d, %d\n",
+			__func__, rt8979_osc_trim_code, rt8979_osc_trim_adjust,
+			(rt8979_osc_trim_code + rt8979_osc_trim_adjust) ^ RT8979_REG_EFUSE_PRETRIM_DATA_VAL);
+	if (retval < 0) {
+		fsa9685_write_reg(RT8979_REG_TEST_MODE, RT8979_REG_TEST_MODE_DEFAULT_VAL);
+		return retval;
+	}
+	fsa9685_write_reg(RT8979_REG_EFUSE_PRETRIM_ENABLE, RT8979_REG_EFUSE_PRETRIM_ENABLE_VAL);
+	usleep_range(WRITE_OSC_PRETRIM_DELAY_MIN, WRITE_OSC_PRETRIM_DELAY_MAX);
+	retval = fsa9685_read_reg(RT8979_REG_EFUSE_READ_DATA);
+	hwlog_info("%s : trim code read = %d\n", __func__, retval);
+
+	retval = fsa9685_write_reg(RT8979_REG_TEST_MODE, RT8979_REG_TEST_MODE_DEFAULT_VAL);
+	return retval;
+}
 static int fsa9685_probe(
     struct i2c_client *client, const struct i2c_device_id *id)
 {
@@ -2787,7 +3163,8 @@ static int fsa9685_probe(
         reg_ctl = fsa9685_read_reg(FSA9685_REG_DEVICE_TYPE_1);
         hwlog_info("%s : DEV_TYPE1 = 0x%x\n", __func__, reg_ctl);
         is_dcp = (reg_ctl & FSA9685_DCP_DETECTED) ? true : false;
-        if (is_dcp) {
+
+	if (is_dcp) {
             hwlog_info("%s: reset rt8979\n", __func__);
             fsa9685_write_reg(RT8979_REG_RESET, RT8979_REG_RESET_ENTIRE_IC);
             msleep(1);
@@ -2795,6 +3172,7 @@ static int fsa9685_probe(
 			rt8979_accp_enable(true);
         }
         fsa9685_write_reg_mask(FSA9685_REG_TIMING_SET_2, FSA9685_REG_TIMING_SET_2_DCDTIMEOUT, FSA9685_REG_TIMING_SET_2_DCDTIMEOUT);
+		rt8979_init_osc_params();
     }
 
 #ifdef CONFIG_FSA9685_DEBUG_FS
@@ -2820,8 +3198,6 @@ static int fsa9685_probe(
         goto err_create_jigpin_ctrl_failed;
     }
 
-    /* test battery ovp */
-    device_create_file(&client->dev, &dev_attr_batovp_nv_ctrl);
     mutex_init(&accp_detect_lock);
     mutex_init(&accp_adaptor_reg_lock);
     ret = device_create_file(&client->dev, &dev_attr_fcp_mmi);
@@ -2851,6 +3227,12 @@ static int fsa9685_probe(
     of_property_read_u32(node, "scp_support", &fsa9685_scp_support);
     of_property_read_u32(node, "mhl_detect_disable", &fsa9685_mhl_detect_disable);
     of_property_read_u32(node, "two-switch-flag", &two_switch_flag);
+    ret = fsa9685_parse_dts(node);
+    if (ret)
+    {
+        hwlog_err("%s:parse dts fail\n",__func__);
+        goto err_create_link_failed;
+    }
 
 /*create link end*/
     gpio = of_get_named_gpio(node, "fairchild_fsa9685,gpio-intb", 0);
@@ -2891,15 +3273,23 @@ static int fsa9685_probe(
     }
 
     if (!is_rt8979()) {
-        ret |= fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, 0,FSA9685_DCD_TIME_OUT_MASK);
+        ret |= fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, fsa9685_dcd_timeout_enabled,FSA9685_DCD_TIME_OUT_MASK);
         if ( ret < 0 ){
             hwlog_err("%s: write FSA9685_REG_CONTROL2 FSA9685_DCD_TIME_OUT_MASK error!!! ret=%d", __func__, ret);
+        }
+        ret |= fsa9685_write_reg_mask(FSA9685_REG_INTERRUPT_MASK,RT8979_DEVICE_CHANGE,RT8979_DEVICE_CHANGE);
+        if ( ret < 0 ){
+            hwlog_err("%s: write Mask  Device change intterrupt error!!! ret=%d", __func__, ret);
         }
     }
     /* if support fcp ,disable fcp interrupt */
     if( 0 == is_support_fcp())
     {
-        ret |= fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, 0, FSA9685_ACCP_OSC_ENABLE);
+        if (is_rt8979()) {
+            ret |= fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, 0, FSA9685_ACCP_OSC_ENABLE);
+        } else {
+            ret |= fsa9685_write_reg_mask(FSA9685_REG_CONTROL2, FSA9685_ACCP_OSC_ENABLE, FSA9685_ACCP_OSC_ENABLE);
+        }
         ret |= fsa9685_write_reg(FSA9685_REG_ACCP_INTERRUPT_MASK1, 0xFF);
         ret |= fsa9685_write_reg(FSA9685_REG_ACCP_INTERRUPT_MASK2, 0xFF);
         if(ret < 0)
@@ -2981,6 +3371,27 @@ static int fsa9685_probe(
         hwlog_info(" charge switch ops register success!\n");
     }
 #endif
+    if(scp_need_extra_power)
+    {
+        if (!boost_5v_use_common_gpio)
+        {
+            ret = gpio_request(scp_power_en, "scp_power_en");
+            if (ret)
+            {
+                hwlog_err("can not request scp_power_en\n");
+                goto err_gpio_direction_input;
+            }
+        }
+        if (is_need_bst_ctrl)
+        {
+            ret = gpio_request(bst_ctrl,"bst_ctrl");
+            if (ret)
+            {
+                hwlog_err("could not request bst_ctrl\n");
+                goto err_free_scp_power_en;
+            }
+        }
+    }
 #ifdef CONFIG_DIRECT_CHARGER
     /* if chip support scp ,register scp adapter ops */
     if( 0 == fsa9685_is_support_scp() && 0 ==scp_ops_register(&scp_fsa9685_ops))
@@ -2994,13 +3405,25 @@ static int fsa9685_probe(
     set_hw_dev_flag(DEV_I2C_USB_SWITCH);
 #endif
 
+    ret = switch_extra_ops_register(&huawei_switch_extra_ops);
+    if (ret) {
+    	hwlog_err("register extra switch ops failed!\n");
+    }
+
     if (is_rt8979() && is_dcp)
     {
         charge_type_dcp_detected_notify();
     }
     hwlog_info("%s: ------end. ret = %d.\n", __func__, ret);
     return ret;
-
+err_free_scp_power_en:
+    if(scp_need_extra_power)
+    {
+        if(!boost_5v_use_common_gpio)
+        {
+            gpio_free(scp_power_en);
+        }
+    }
 err_gpio_direction_input:
     gpio_free(gpio);
 err_create_link_failed:
@@ -3032,6 +3455,7 @@ static void fsa9685_shutdown(struct i2c_client *client)
 {
 
     int ret = 0;
+    set_5v_boost_enable(ENABLE);
     if (is_rt8979()) {
         ret = fsa9685_read_reg(RT8979_REG_MUIC_CTRL_4);
         ret = fsa9685_write_reg(RT8979_REG_MUIC_CTRL_4, ret&RT8979_REG_MUIC_CTRL_4_ENABLEID2_FUNCTION);

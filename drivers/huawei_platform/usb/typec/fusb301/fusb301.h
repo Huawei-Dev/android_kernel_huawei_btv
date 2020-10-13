@@ -24,6 +24,7 @@
 #define _TYPEC_FUSB301_H_
 
 #define FUSB301_REGISTER_NUM    32
+#define FUSB301_DUMP_REG_NUM    9
 
 #ifndef BIT
 #define BIT(x)        (1 << (x))

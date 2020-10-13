@@ -11,15 +11,27 @@
 #define CONFIG_DPM_USB_PD_CUSTOM_DBGACC
 #define CONFIG_DPM_TYPEC_CAP_DBGACC_SNK
 #define CONFIG_DPM_TYPEC_CAP_CUSTOM_SRC
+#define PD_DPM_HW_DOCK_SVID 0x12d1
+#define PD_DPM_CC_CHANGE_COUNTER_THRESHOLD 50
+#define PD_DPM_CC_CHANGE_INTERVAL 300 /*ms*/
 
 /* type-c inserted plug orientation */
 enum pd_cc_orient{
+    PD_DPM_CC_MODE_UFP = 0,
+    PD_DPM_CC_MODE_DRP,
+};
+enum pd_cc_mode {
     PD_CC_ORIENT_DEFAULT = 0,
     PD_CC_ORIENT_CC1,
     PD_CC_ORIENT_CC2,
     PD_CC_NOT_READY,
 };
 
+enum pd_wait_typec_complete {
+    NOT_COMPLETE,
+    COMPLETE_FROM_VBUS_DISCONNECT,
+    COMPLETE_FROM_TYPEC_CHANGE,
+};
 enum pd_connect_result {
     PD_CONNECT_NONE = 0,
     PD_CONNECT_TYPEC_ONLY,
@@ -65,6 +77,7 @@ enum {
     PD_DPM_PE_EVT_TYPEC_STATE,
     PD_DPM_PE_EVT_PD_STATE,
     PD_DPM_PE_EVT_BC12,
+    PD_DPM_PE_ABNORMAL_CC_CHANGE_HANDLER,
 };
 
 enum pd_typec_attach_type {
@@ -83,6 +96,13 @@ enum pd_typec_attach_type {
 #endif	/* CONFIG_TYPEC_CAP_CUSTOM_SRC */
 };
 
+enum pd_dpm_cable_event_type {
+    USB31_CABLE_IN_EVENT = 0,
+    DP_CABLE_IN_EVENT,
+    USB31_CABLE_OUT_EVENT,
+    DP_CABLE_OUT_EVENT,
+};
+
 enum pd_dpm_charger_event_type {
     PD_EVENT_CHARGER_TYPE_USB = 0,	/*SDP*/
     PD_EVENT_CHARGER_TYPE_BC_USB,	/*CDP*/
@@ -96,6 +116,7 @@ enum {
         PD_DPM_USB_TYPEC_DETACHED,
         PD_DPM_USB_TYPEC_DEVICE_ATTACHED,
         PD_DPM_USB_TYPEC_HOST_ATTACHED,
+        PD_DPM_USB_TYPEC_AUDIO_ATTACHED,
 };
 
 enum pd_dpm_uevent_type {
@@ -116,6 +137,12 @@ struct pd_dpm_typec_state {
     int new_state;
 };
 
+struct pd_dpm_ops {
+	void (*pd_dpm_hard_reset)(void*);
+	bool (*pd_dpm_get_hw_dock_svid_exist)(void*);
+	void (*pd_dpm_set_cc_mode)(int mode);
+	int (*pd_dpm_notify_direct_charge_status)(void*, bool mode);
+};
 struct pd_dpm_pd_state {
 	uint8_t connected;
 };
@@ -129,11 +156,29 @@ enum pd_dpm_vbus_type {
     PD_DPM_VBUS_TYPE_PD,
 };
 
+enum PD_DPM_VBOOST_CONTROL_SOURCE_TYPE{
+    PD_DPM_VBOOST_CONTROL_PD = 0,
+    PD_DPM_VBOOST_CONTROL_DC,
+};
+
+enum pd_dpm_cc_voltage_type {
+	PD_DPM_CC_VOLT_OPEN = 0,
+	PD_DPM_CC_VOLT_RA = 1,
+	PD_DPM_CC_VOLT_RD = 2,
+
+	PD_DPM_CC_VOLT_SNK_DFT = 5,
+	PD_DPM_CC_VOLT_SNK_1_5 = 6,
+	PD_DPM_CC_VOLT_SNK_3_0 = 7,
+
+	PD_DPM_CC_DRP_TOGGLING = 15,
+};
+
 struct pd_dpm_vbus_state {
     int mv;
     int ma;
     uint8_t vbus_type;
     bool ext_power;
+    int remote_rp_level;
 };
 
 struct pd_dpm_info{
@@ -148,7 +193,7 @@ struct pd_dpm_info{
     enum hisi_charger_type charger_type;
     struct notifier_block usb_nb;
     struct notifier_block chrg_wake_unlock_nb;
-    struct atomic_notifier_head pd_evt_nh;
+    struct blocking_notifier_head pd_evt_nh;
     struct atomic_notifier_head pd_wake_unlock_evt_nh;
 
     enum pd_dpm_uevent_type uevent_type;
@@ -156,6 +201,9 @@ struct pd_dpm_info{
     struct work_struct recovery_work;
 
     const char *tcpc_name;
+    int uart_use_sbu;
+    int uart_rx_gpio;
+    int uart_tx_gpio;
 
 	/* usb state update */
     struct mutex usb_lock;
@@ -164,15 +212,19 @@ struct pd_dpm_info{
     struct workqueue_struct *usb_wq;
     struct delayed_work usb_state_update_work;
 
-	
-
+    int vconn_en;
     bool bc12_finish_flag;
     bool pd_finish_flag;
     bool pd_source_vbus;
     unsigned long bc12_event;
     struct pd_dpm_vbus_state bc12_sink_vbus_state;
+    int cur_usb_event;
 };
 
+extern inline int hw_extern_pmic_config(int index, int voltage, int enable)
+{
+  return 0;
+}
 struct cc_check_ops {
 	int (*is_cable_for_direct_charge)(void);
 };
@@ -182,6 +234,8 @@ int cc_check_ops_register(struct cc_check_ops*);
 struct class *hw_pd_get_class(void);
 
 extern struct tcpc_device *tcpc_dev_get_by_name(const char *name);
+
+extern void pd_dpm_set_usb_speed(unsigned int usb_speed);
 
 extern int register_pd_dpm_notifier(struct notifier_block *nb);
 extern int unregister_pd_dpm_notifier(struct notifier_block *nb);
@@ -193,4 +247,26 @@ extern bool pd_dpm_get_pd_source_vbus(void);
 extern void pd_dpm_get_typec_state(int *typec_detach);
 extern void pd_dpm_get_charge_event(unsigned long *event, struct pd_dpm_vbus_state *state);
 extern bool pd_dpm_get_high_power_charging_status(void);
+extern bool pd_dpm_get_cc_orientation(void);
+extern int pd_dpm_handle_combphy_event(struct pd_dpm_combphy_event event);
+extern int pd_dpm_vboost_enable(bool enable, enum PD_DPM_VBOOST_CONTROL_SOURCE_TYPE type);
+void pd_dpm_set_cc_voltage(int type);
+enum pd_dpm_cc_voltage_type pd_dpm_get_cc_voltage(void);
+int pd_dpm_ops_register(struct pd_dpm_ops *ops, void*client);
+void pd_dpm_hard_reset(void);
+bool pd_dpm_get_hw_dock_svid_exist(void);
+
+extern bool pd_dpm_ignore_vbus_event(void);
+extern void pd_dpm_set_ignore_vbus_event(bool);
+extern bool pd_dpm_ignore_bc12_event_when_vbusoff(void);
+extern bool pd_dpm_ignore_bc12_event_when_vbuson(void);
+extern void pd_dpm_set_ignore_vbus_event_when_vbusoff(bool _ignore_vbus_event);
+extern void pd_dpm_set_ignore_bc12_event_when_vbuson(bool _ignore_bc12_event);
+extern bool pd_dpm_ignore_vbuson_event(void);
+extern bool pd_dpm_ignore_vbusoff_event(void);
+extern void pd_dpm_set_ignore_vbuson_event(bool _ignore_vbus_on_event);
+extern void pd_dpm_set_ignore_vbusoff_event(bool _ignore_vbus_off_event);
+
+extern int pd_dpm_get_cur_usb_event(void);
+extern void pd_dpm_audioacc_sink_vbus(unsigned long event, void *data);
 #endif

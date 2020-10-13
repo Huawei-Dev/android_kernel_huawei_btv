@@ -1,8 +1,8 @@
 /************************************************************
 *
 * Copyright (C), 1988-1999, Huawei Tech. Co., Ltd.
-* FileName: switch_fsa9685.h
-* Author: huxiaoqiang(00272253)       Version : 0.1      Date:  2013-11-07
+* FileName: switch_usb_class.h
+* Author: lixiuna(00213837)       Version : 0.1      Date:  2013-11-07
 *
 * This software is licensed under the terms of the GNU General Public
 * License version 2, as published by the Free Software Foundation, and
@@ -13,25 +13,23 @@
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 *
-*  Description:    .h file for switch fsa9685
+*  Description:    .h file for switch chip
 *  Version:
 *  Function List:
 *  History:
 *  <author>  <time>   <version >   <desc>
 ***********************************************************/
-#include <linux/hisi/usb/hisi_usb.h>
-#include <huawei_platform/usb/switch/switch_fsa9685_common.h>
+#define FSA9685_OPEN        0
+#define FSA9685_USB1        1
+#define FSA9685_USB2        2
+#define FSA9685_MHL     4
+#define FSA9685_USB1_ID_TO_IDBYPASS             1
 
-#define ADAPTOR_BC12_TYPE_MAX_CHECK_TIME 100
-#define WAIT_FOR_BC12_DELAY 5
-#define ACCP_NOT_PREPARE_OK -1
-#define ACCP_PREPARE_OK 0
-#define BOOST_5V_CLOSE_FAIL -1
-#define SET_DCDTOUT_FAIL -1
-#define SET_DCDTOUT_SUCC 0
+struct switch_usb_info {
+    struct atomic_notifier_head charger_type_notifier_head;
+    spinlock_t reg_flag_lock;
+};
 
-
-int fcp_read_switch_status (void);
-int fcp_read_adapter_status(void);
-void switch_dump_register(void);
-int is_fcp_charger_type(void);
+extern int fsa9685_manual_sw(int input_select);
+extern int fsa9685_manual_detach(void);
+extern int fsa9685_dcd_timeout_enable(bool enable_flag);

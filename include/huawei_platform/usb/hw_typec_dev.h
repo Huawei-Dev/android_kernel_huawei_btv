@@ -54,6 +54,9 @@ enum typec_attach_status{
     TYPEC_ACC_MODE_CHANGE,
     TYPEC_STATUS_NOT_READY,
 };
+enum typec_notify_type {
+    TYPEC_CURRENT_CHANGE = 0,
+};
 
 struct typec_device_ops{
     int (*clean_int_mask)(void);
@@ -100,6 +103,7 @@ struct typec_device_info{
     bool trysnk_attempt;
     int reverse_state;
 #endif
+    struct blocking_notifier_head typec_current_nh;
 };
 
 #ifdef CONFIG_DUAL_ROLE_USB_INTF

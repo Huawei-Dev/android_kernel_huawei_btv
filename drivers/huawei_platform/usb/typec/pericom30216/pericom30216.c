@@ -49,7 +49,7 @@
 #include <huawei_platform/devdetect/hw_dev_dec.h>
 #endif
 #include "pericom30216.h"
-#include "../../switch/switch_usb_class.h"
+#include <huawei_platform/usb/switch/switch_ap/switch_usb_class.h>
 #include <huawei_platform/usb/hw_typec_dev.h>
 #include <huawei_platform/usb/hw_typec_platform.h>
 
@@ -57,6 +57,7 @@
 HWLOG_REGIST();
 
 struct typec_device_info *g_pericom30216_dev = NULL;
+static int input_current = -1;
 
 static int pericom30216_read_reg(int regnr)
 {
@@ -332,12 +333,15 @@ static int pericom30216_ctrl_port_mode(int value)
 
     return 0;
 }
+static int pericom30216_detect_current_mode(void);
+static int pericom30216_detect_port_mode(void);
 
 static int pericom30216_detect_attachment_status(void)
 {
     struct typec_device_info *di = g_pericom30216_dev;
     u8 reg_val, reg_cc_status, reg_ctrl;
-
+    int reg_status = -1;
+    u8 port_mode = 0;
     //read control reg and mask interrupt
     pericom30216_read_control_reg();
     pericom30216_write_reg(PERICOM30216_REG_CONTROL, PERICOM30216_REG_CONTROL_INT_MASK | (di->reg[PERICOM30216_REG_CONTROL - 1]));
@@ -361,14 +365,34 @@ static int pericom30216_detect_attachment_status(void)
         pericom30216_read_reg(PERICOM30216_REG_CC_STATUS);
         pericom30216_write_reg(PERICOM30216_REG_CONTROL, reg_ctrl);
     }
-
+    reg_status = pericom30216_detect_current_mode();
     if (reg_val & PERICOM30216_REG_ATTACH) {
-        hwlog_info("%s: pericom ATTACH\n", __func__);
+        port_mode = pericom30216_detect_port_mode();
+        if (port_mode == TYPEC_DEV_PORT_MODE_UFP) {
+            input_current = reg_status;
+            hwlog_info("%s: pericom TYPEC_ATTACH with deferent attch_status\n", __func__);
+        }
         di->dev_st.attach_status = TYPEC_ATTACH;
     } else if (reg_val & PERICOM30216_REG_DETACH) {
         hwlog_info("%s: pericom DETACH\n", __func__);
         di->dev_st.attach_status = TYPEC_DETACH;
+        input_current = -1;
     } else {
+        port_mode = pericom30216_detect_port_mode();
+
+        if (port_mode == TYPEC_DEV_PORT_MODE_UFP) {
+            if ((input_current != reg_status) && reg_status != -1) {
+                input_current = reg_status;
+                di->dev_st.attach_status = TYPEC_CUR_CHANGE_FOR_FSC;
+                hwlog_info("%s: pericom TYPEC_CUR_CHANGE_FOR_FSC\n", __func__);
+            }else {
+               di->dev_st.attach_status =  TYPEC_STATUS_NOT_READY;
+		 hwlog_err("%s: wrong interrupt as UFP !\n", __func__);
+            }
+        } else {
+        	di->dev_st.attach_status =  TYPEC_STATUS_NOT_READY;
+	       hwlog_err("%s: wrong interrupt as DFP!\n", __func__);
+        }
         /* there will be two interrupts when a DFP device is detected.
          the first is attach and the next is a none-type interrupt as a chip feature. */
     }
@@ -476,6 +500,7 @@ static ssize_t dump_regs_show(struct device *dev, struct device_attribute *attr,
     return scnprintf(buf, PAGE_SIZE, "0x%02X,0x%02X,0x%02X,0x%02x\n",
                 di->reg[0], di->reg[1], di->reg[2], di->reg[3]);
 }
+
 static DEVICE_ATTR(dump_regs, S_IRUGO, dump_regs_show, NULL);
 
 static struct attribute *pericom30216_attributes[] = {
@@ -553,12 +578,12 @@ static int pericom30216_probe(
         struct i2c_client *client, const struct i2c_device_id *id)
 {
     int ret = 0;
-    int gpio_enb_val = 1;
+    unsigned int gpio_enb_val = 1;
     struct typec_device_info *di = NULL;
     struct typec_device_info *pdi = NULL;
     struct device_node *node;
-    int typec_trigger_otg = 0;
-    int mdelay = 0;
+    unsigned int typec_trigger_otg = 0;
+    unsigned int mdelay = 0;
     di = devm_kzalloc(&client->dev, sizeof(*di), GFP_KERNEL);
     if (!di) {
        hwlog_err("%s: alloc di error!\n", __func__);
@@ -626,16 +651,16 @@ static int pericom30216_probe(
     di->typec_trigger_otg = !!typec_trigger_otg;
     hwlog_info("%s: typec_trigger_otg = %d\n", __func__, typec_trigger_otg);
 
-    pdi = typec_chip_register(di, &pericom30216_ops, THIS_MODULE);
-    if (NULL == pdi) {
-        hwlog_err("%s: typec register chip error!\n", __func__);
+    di->gpio_intb = of_get_named_gpio(node, "pericom30216_typec,gpio_intb", 0);
+    if (!gpio_is_valid(di->gpio_intb)) {
+        hwlog_err("%s: of_get_named_gpio-intb error!!! ret=%d, gpio_intb=%d.\n", __func__, ret, di->gpio_intb);
         ret = -EINVAL;
         goto err_gpio_enb_request_1;
     }
 
-    di->gpio_intb = of_get_named_gpio(node, "pericom30216_typec,gpio_intb", 0);
-    if (!gpio_is_valid(di->gpio_intb)) {
-        hwlog_err("%s: of_get_named_gpio-intb error!!! ret=%d, gpio_intb=%d.\n", __func__, ret, di->gpio_intb);
+    pdi = typec_chip_register(di, &pericom30216_ops, THIS_MODULE);
+    if (NULL == pdi) {
+        hwlog_err("%s: typec register chip error!\n", __func__);
         ret = -EINVAL;
         goto err_gpio_enb_request_1;
     }

@@ -54,8 +54,8 @@
 #define HWLOG_TAG ptn5150h_typec
 HWLOG_REGIST();
 
-static struct i2c_driver ptn5150h_i2c_driver;
 struct typec_device_info *g_ptn5150h_dev = NULL;
+static int input_current = -1;
 
 static int ptn5150h_i2c_read(struct typec_device_info *di, u8 reg)
 {
@@ -211,20 +211,26 @@ static int ptn5150h_host_port_mode(u8 val)
     return 0;
 }
 
-
 static int ptn5150h_ctrl_port_mode(int value)
 {
     u8 val = 0;
+    u8 val3 = 0;
+    u8 val19 = 0;
     u8 val_1 = 0;
     int Rp_Miss_Count = 0;
+    int delay_count = 0;
     switch (value) {
         case TYPEC_HOST_PORT_MODE_DFP:
             hwlog_info("%s: set to DFP mode\n", __func__);
-            ptn5150h_write_reg(PTN5150H_REG_CONTROL, PTN5150H_REG_RP_HIGH | PTN5150H_REG_MODE_DFP | PTN5150H_REG_INT_MASK_DETACHED_ATTACHED);//set to DFP and disable interrupt
+            ptn5150h_write_reg(PTN5150H_REG_INT_MASK, PTN5150H_REG_ORIENTATION_FOUND_MASK
+                | PTN5150H_REG_ROLE_CHANGE_MASK | PTN5150H_REG_CC_COMPARATOR_CHANGE_MASK);//set to DFP and disable interrupt
+            ptn5150h_write_reg(PTN5150H_REG_CONTROL,PTN5150H_REG_INT_MASK_DETACHED_ATTACHED
+                | PTN5150H_REG_MODE_DFP|PTN5150H_REG_RP_DEFAULT);//mask interrupt
+            mdelay(PTN5150H_DISCONNECTION_INTERRUPT_DELAY);//delay 50ms for disconnection interrupt
             ptn5150h_read_reg(PTN5150H_REG_INT_REG_STATUS, &val); //clear interrupt
             ptn5150h_read_reg(PTN5150H_REG_INT_STATUS, &val);//clear interrupt
-            mdelay(PTN5150H_DFP_DELAY);//delay 350ms wait for UFP connection
-            ptn5150h_write_reg(PTN5150H_REG_CONTROL, PTN5150H_REG_RP_HIGH | PTN5150H_REG_MODE_DFP);//enable the interrupt
+            mdelay(PTN5150H_ATTACH_DELAY);//delay 50ms for attach
+            ptn5150h_write_reg(PTN5150H_REG_CONTROL, PTN5150H_REG_RP_DEFAULT | PTN5150H_REG_MODE_DFP);//enable the interrupt
             break;
         case TYPEC_HOST_PORT_MODE_UFP:
             ptn5150h_read_reg(PTN5150H_REG_INT_MASK, &val);
@@ -233,13 +239,15 @@ static int ptn5150h_ctrl_port_mode(int value)
             if(val != (PTN5150H_REG_CC_COMPARATOR_CHANGE_MASK | PTN5150H_REG_ROLE_CHANGE_MASK | PTN5150H_REG_ORIENTATION_FOUND_MASK))//after try sink, reg 0x18 equals 0x1C
             {
                 hwlog_info("%s: set to UFP mode\n", __func__);
-                ptn5150h_read_reg(PTN5150H_REG_INT_REG_STATUS, &val); //clear interrupt
-                ptn5150h_read_reg(PTN5150H_REG_INT_STATUS, &val);//clear interrupt
 
-                ptn5150h_write_reg(PTN5150H_REG_INT_MASK, PTN5150H_REG_CC_COMPARATOR_CHANGE_MASK | PTN5150H_REG_ROLE_CHANGE_MASK | PTN5150H_REG_DA_FOUND_MASK | PTN5150H_REG_AA_FOUND_MASK);//only enable oriental interrupt
                 ptn5150h_write_reg(PTN5150H_REG_ACC1, PTN5150H_DISABLE_ACC1);//disable accessory detech
                 ptn5150h_write_reg(PTN5150H_REG_ACC2, PTN5150H_DISABLE_ACC2);//disable accessory detech
-                ptn5150h_write_reg(PTN5150H_REG_CONTROL, PTN5150H_REG_RP_HIGH | PTN5150H_REG_INT_MASK_DETACHED_ATTACHED); //force to ufp mode, disable interrupt-- atttach /detach
+                ptn5150h_write_reg(PTN5150H_REG_CONTROL, PTN5150H_REG_RP_DEFAULT | PTN5150H_REG_INT_MASK_DETACHED_ATTACHED); //force to ufp mode, disable interrupt-- atttach /detach
+                ptn5150h_write_reg(PTN5150H_REG_INT_MASK, PTN5150H_REG_ORIENTATION_FOUND_MASK
+                    | PTN5150H_REG_ROLE_CHANGE_MASK | PTN5150H_REG_CC_COMPARATOR_CHANGE_MASK);//only enable oriental interrupt
+                mdelay(PTN5150H_DISCONNECTION_INTERRUPT_DELAY);//delay 50ms for disconnect interrupt
+                ptn5150h_read_reg(PTN5150H_REG_INT_STATUS, &val3);//clear interrupt
+                ptn5150h_read_reg(PTN5150H_REG_INT_REG_STATUS, &val19); //clear interrupt
 
                 mdelay(PTN5150H_DEBOUNCE_DELAY);//wait for debounce time
 
@@ -267,47 +275,48 @@ static int ptn5150h_ctrl_port_mode(int value)
 
                     if (val == PTN5150H_REG_PORT_ATTACH_STATUS_DFP_ATTACHED) //Vbus comes, reg 0x04[4:2]=001 means one DFP is connected to us.
                     {
-                        if((val_1 == PTN5150H_REG_RP1_DETECT) || (val_1 == PTN5150H_REG_RP2_DETECT))//in reverse, there is an error that wrong recognized UFP, so when Vbus and one Rp are both ready, go this branch.
-                        {
-                            Rp_Miss_Count = 4;
-                            hwlog_info("%s:  we are UFP \n", __func__);
-                            ptn5150h_write_reg(PTN5150H_REG_CONTROL, PTN5150H_REG_RP_HIGH);//set to UFP, open interrupt attach/detach
-                            ptn5150h_write_reg(PTN5150H_REG_ACC1, PTN5150H_ENABLE_ACC1);//enable accessory detection
-                            ptn5150h_write_reg(PTN5150H_REG_ACC2, PTN5150H_ENABLE_ACC2);//enable accessory detection
-                            ptn5150h_write_reg(PTN5150H_REG_INT_MASK, PTN5150H_REG_CC_COMPARATOR_CHANGE_MASK | PTN5150H_REG_ROLE_CHANGE_MASK | PTN5150H_REG_ORIENTATION_FOUND_MASK);//enable interrupt
-                        }
+                        Rp_Miss_Count = RP_MISS_COUNT_MAX;
+                        hwlog_info("%s:  we are UFP \n", __func__);
                     }
-                    if(Rp_Miss_Count == 3)//if 3 times no Rp, there is a UFP connect to us
+                    if(Rp_Miss_Count == (RP_MISS_COUNT_MAX-1))//if 3 times no Rp, there is a UFP connect to us
                     {
                         hwlog_info("%s:  we are DFP !! \n", __func__);
-
-                        ptn5150h_write_reg(PTN5150H_REG_CONTROL, PTN5150H_REG_RP_HIGH | PTN5150H_REG_MODE_DFP | PTN5150H_REG_INT_MASK_DETACHED_ATTACHED);//set to DFP mode, disable interrupt attach/detach
-                        mdelay(PTN5150H_VBUS_DETECT_TIME);// because from UFP to DFP, there would be a period that Vbus=0.no connection
-                        ptn5150h_write_reg(PTN5150H_REG_CONTROL, PTN5150H_REG_RP_HIGH | PTN5150H_REG_MODE_DFP);//set to DFP mode, open interrupt attach/detach
                         ptn5150h_write_reg(PTN5150H_REG_ACC1, PTN5150H_ENABLE_ACC1);//enable accessory detection
                         ptn5150h_write_reg(PTN5150H_REG_ACC2, PTN5150H_ENABLE_ACC2);//enable accessory detection
-                        ptn5150h_write_reg(PTN5150H_REG_INT_MASK, PTN5150H_REG_CC_COMPARATOR_CHANGE_MASK | PTN5150H_REG_ROLE_CHANGE_MASK | PTN5150H_REG_ORIENTATION_FOUND_MASK);//enable interrupt set 0x18=0x1C
+
+                        ptn5150h_write_reg(PTN5150H_REG_CONTROL, PTN5150H_REG_RP_DEFAULT | PTN5150H_REG_MODE_DFP
+                            | PTN5150H_REG_INT_MASK_DETACHED_ATTACHED);//set to DFP mode, disable interrupt attach/detach
+                        mdelay(PTN5150H_VBUS_DETECT_TIME);// because from UFP to DFP, there would be a period that Vbus=0.no connection
+                        ptn5150h_read_reg(PTN5150H_REG_INT_STATUS, &val3);
+                        ptn5150h_read_reg(PTN5150H_REG_INT_REG_STATUS, &val19);
                     }
-                    else if(Rp_Miss_Count < 3)
+                    else if(Rp_Miss_Count < (RP_MISS_COUNT_MAX-1))
                     {
                         mdelay(PTN5150H_RP_DETECT_TIME); //delay 10ms to loop detect Rp
+                        delay_count++;
                     }
-                }while(Rp_Miss_Count<3);
+                }while((Rp_Miss_Count<(RP_MISS_COUNT_MAX-1)) && (delay_count < DELAY_COUNT_MAX));
             }
             else //reverse
             {
                   hwlog_info("%s:  reverse here\n", __func__);
-                  ptn5150h_read_reg(PTN5150H_REG_INT_REG_STATUS, &val); //clear interrupt
-                  ptn5150h_read_reg(PTN5150H_REG_INT_STATUS, &val);//clear interrupt
+                  ptn5150h_write_reg(PTN5150H_REG_CONTROL,PTN5150H_REG_INT_MASK_DETACHED_ATTACHED | PTN5150H_REG_RP_DEFAULT);
+                  mdelay(PTN5150H_DISCONNECTION_INTERRUPT_DELAY);// delay 50ms for disconnect interrupt
+                  ptn5150h_read_reg(PTN5150H_REG_INT_REG_STATUS, &val19); //clear interrupt
+                  ptn5150h_read_reg(PTN5150H_REG_INT_STATUS, &val3);//clear interrupt
 
-                  ptn5150h_write_reg(PTN5150H_REG_CONTROL, PTN5150H_REG_RP_HIGH);//force to UFP 
-                  mdelay(PTN5150H_UFP_DELAY);
+                  mdelay(PTN5150H_UFP_DELAY);//20160510
+                  ptn5150h_write_reg(PTN5150H_REG_CONTROL, PTN5150H_REG_RP_DEFAULT);//force to UFP
             }
             break;
         case TYPEC_HOST_PORT_MODE_DRP:
             hwlog_info("%s: set to DRP mode\n", __func__);
+            ptn5150h_write_reg(PTN5150H_REG_ACC1, PTN5150H_ENABLE_ACC1);
+            ptn5150h_write_reg(PTN5150H_REG_ACC2, PTN5150H_ENABLE_ACC2);
             ptn5150h_host_port_mode(PTN5150H_REG_MODE_DRP);
-            ptn5150h_write_reg(PTN5150H_REG_INT_MASK, 0x00);//when set back to DRP, reg 18 set back to 0x00
+            ptn5150h_write_reg(PTN5150H_REG_INT_MASK, PTN5150H_REG_CC_COMPARATOR_CHANGE_MASK
+                | PTN5150H_REG_ROLE_CHANGE_MASK | PTN5150H_REG_ORIENTATION_FOUND_MASK
+                | PTN5150H_REG_DA_FOUND_MASK | PTN5150H_REG_AA_FOUND_MASK);//change to 0x1f
             break;
         default:
             hwlog_err("%s: wrong input action!\n", __func__);
@@ -317,13 +326,29 @@ static int ptn5150h_ctrl_port_mode(int value)
     return 0;
 }
 
+static void ptn5150h_mask_current_interrupt(bool enable)
+{
+    u8 reg_val = 0;
+    ptn5150h_read_reg(PTN5150H_REG_INT_MASK, &reg_val);
+    reg_val = enable ? reg_val & (~PTN5150H_REG_CC_COMPARATOR_CHANGE_MASK)\
+                    : reg_val | PTN5150H_REG_CC_COMPARATOR_CHANGE_MASK;
+
+    ptn5150h_write_reg(PTN5150H_REG_INT_MASK, reg_val);
+}
+static int ptn5150h_detect_input_current(void);
+static int ptn5150h_detect_port_mode(void);
+
 static int ptn5150h_detect_attachment_status(void)
 {
     int ret = 0;
     u8 reg_val = 0;
     u8 reg_val2 = 0;
+    u8 port_mode = 0;
+    int reg_status = -1;
     struct typec_device_info *di = g_ptn5150h_dev;
 
+    ptn5150h_read_reg(PTN5150H_REG_CONTROL, &reg_val2);
+    ptn5150h_write_reg(PTN5150H_REG_CONTROL, reg_val2 | PTN5150H_REG_INT_MASK_DETACHED_ATTACHED);//0x01
     ret = ptn5150h_read_reg(PTN5150H_REG_INT_STATUS, &reg_val);//read and clear the attach/detach interrupt
     if (ret < 0) {
         hwlog_err("%s: read REG_INT error ret = %d, reg_val = 0x%x\n", __func__, ret, reg_val);
@@ -336,15 +361,35 @@ static int ptn5150h_detect_attachment_status(void)
         return ret;
     }
 
+    reg_status = ptn5150h_detect_input_current();
+    hwlog_err("%s: reg_val:%d\n", __func__, (int)reg_val);
     if (reg_val & PTN5150H_REG_CABLE_ATTACH_INT) {
-        hwlog_info("%s: ptn5150h ATTACH", __func__);
+        port_mode = ptn5150h_detect_port_mode();
+        if (port_mode == TYPEC_DEV_PORT_MODE_UFP) {
+            input_current = reg_status;
+            ptn5150h_mask_current_interrupt(true);
+            hwlog_info("%s: ptn5150h TYPEC_ATTACH with different attach status", __func__);
+        }
         di->dev_st.attach_status = TYPEC_ATTACH;
     } else if (reg_val & PTN5150H_REG_CABLE_DETACH_INT) {
         hwlog_info("%s: ptn5150h DETACH", __func__);
         di->dev_st.attach_status = TYPEC_DETACH;
+        ptn5150h_mask_current_interrupt(false);
+        input_current = -1;
     } else {
-        hwlog_err("%s: wrong interrupt!\n", __func__);
-        di->dev_st.attach_status = TYPEC_STATUS_NOT_READY;
+        port_mode = ptn5150h_detect_port_mode();
+        if (port_mode == TYPEC_DEV_PORT_MODE_UFP) {
+            if ((input_current != reg_status) && reg_status != -1) {
+                input_current = reg_status;
+                di->dev_st.attach_status = TYPEC_CUR_CHANGE_FOR_FSC;
+                ptn5150h_mask_current_interrupt(true);
+                hwlog_info("%s: ptn5150h TYPEC_CUR_CHANGE_FOR_FSC", __func__);
+            } else
+                di->dev_st.attach_status = TYPEC_STATUS_NOT_READY;
+        } else {
+            hwlog_err("%s: wrong interrupt!\n", __func__);
+            di->dev_st.attach_status = TYPEC_STATUS_NOT_READY;
+        }
     }
 
     return di->dev_st.attach_status;
@@ -465,7 +510,7 @@ static ssize_t dump_regs_show(struct device *dev, struct device_attribute *attr,
 {
     int i, index;
     u8 reg_val = 0;
-    const int regaddr[] = {0x01, 0x02, 0x03, 0x04, 0x09, 0x0A, 0x10, 0x18, 0x19};
+    const int regaddr[PTN5150H_DUMP_REG_NUM] = {0x01, 0x02, 0x03, 0x04, 0x09, 0x0A, 0x10, 0x18, 0x19};
     const char str[] = "0123456789abcdef";
 
     /* If there is no register value, replace it with xx */
@@ -479,12 +524,12 @@ static ssize_t dump_regs_show(struct device *dev, struct device_attribute *attr,
     buf[0x2f] = '\n';   //change line for better print type
     buf[0x5f] = '\0';
 
-    for (i = 0; i < ARRAY_SIZE(regaddr); i++) {
+    for (i = 0; i < PTN5150H_DUMP_REG_NUM; i++) {
         index = regaddr[i];
         ptn5150h_read_reg(index, &reg_val);
-        buf[3 * index] = str[(reg_val & 0xf0) >> 4];
-        buf[3 * index + 1] = str[reg_val & 0x0f];
-        buf[3 * index + 2] = ' ';
+        buf[3 * (long)index] = str[(reg_val & 0xf0) >> 4];
+        buf[3 * (long)index + 1] = str[reg_val & 0x0f];
+        buf[3 * (long)index + 2] = ' ';
     }
 
     return 0x60;
@@ -549,23 +594,48 @@ static irqreturn_t ptn5150h_irq_handler(int irq, void *dev_id)
 
 static void ptn5150h_initialization(void)
 {
-    ptn5150h_ctrl_port_mode(TYPEC_HOST_PORT_MODE_DRP);
-    ptn5150h_write_reg(PTN5150H_REG_RESET, 0x1);
+    u8 reg_val = 0;
+    u8 reg_val04 = 0;
+    ptn5150h_read_reg(PTN5150H_INTERNAL_REG_SW_TDRPSWAP_RP, &reg_val);
+    hwlog_info("%s: duty cycle reg 4f %d\n", __func__, reg_val);
+    ptn5150h_read_reg(PTN5150H_INTERNAL_REG_SW_TDRPSWAP_RD, &reg_val);
+    hwlog_info("%s: duty cycle reg 51 %d\n", __func__, reg_val);
+    ptn5150h_write_reg(PTN5150H_INTERNAL_REG_SW_TDRPSWAP_RP, PTN5150H_SET_DUTY_CYCLE_RP_PRESENT_TIME);
+    ptn5150h_write_reg(PTN5150H_INTERNAL_REG_SW_TDRPSWAP_RD, PTN5150H_SET_DUTY_CYCLE_RD_PRESENT_TIME);
+    ptn5150h_read_reg(PTN5150H_INTERNAL_REG_SW_TDRPSWAP_RP, &reg_val);
+    hwlog_info("%s: duty cycle reg 4f again %d\n", __func__, reg_val);
+    ptn5150h_read_reg(PTN5150H_INTERNAL_REG_SW_TDRPSWAP_RD, &reg_val);
+    hwlog_info("%s: duty cycle reg 51 again %d\n", __func__, reg_val);
+    ptn5150h_read_reg(PTN5150H_REG_CC_STATUS, &reg_val04);
+    hwlog_info("%s: duty cycle reg 04 again %d\n", __func__, reg_val04);
+    ptn5150h_read_reg(PTN5150H_REG_INT_STATUS, &reg_val);
+    hwlog_info("%s: duty cycle reg 03 again %d\n", __func__, reg_val);
+    ptn5150h_read_reg(PTN5150H_REG_INT_REG_STATUS, &reg_val);
+    hwlog_info("%s: duty cycle reg 19 again %d\n", __func__, reg_val);
+    ptn5150h_read_reg(PTN5150H_REG_CONTROL, &reg_val);
+    hwlog_info("%s: duty cycle reg 02 again %d\n", __func__, reg_val);
+    /* if power on there is no DFP detach, then set port to DRP. else keep as UFP*/
+    if ((reg_val04 & (PTN5150H_REG_PORT_ATTACH_STATUS_DFP_ATTACHED | PTN5150H_REG_PORT_ATTACH_STATUS_UFP_ATTACHED
+        | PTN5150H_REG_PORT_ATTACH_STATUS_DA_ATTACHED)) != PTN5150H_REG_PORT_ATTACH_STATUS_DFP_ATTACHED) {
+        ptn5150h_ctrl_port_mode(TYPEC_HOST_PORT_MODE_DRP);
+    }
     ptn5150h_clean_mask();
     ptn5150h_write_reg(PTN5150H_REG_ACC1, PTN5150H_ENABLE_ACC1);
     ptn5150h_write_reg(PTN5150H_REG_ACC2, PTN5150H_ENABLE_ACC2);
-    ptn5150h_write_reg(PTN5150H_REG_INT_MASK, 0x00);//clear all int mask
+    ptn5150h_write_reg(PTN5150H_REG_INT_MASK, PTN5150H_REG_CC_COMPARATOR_CHANGE_MASK
+        | PTN5150H_REG_ROLE_CHANGE_MASK | PTN5150H_REG_ORIENTATION_FOUND_MASK
+        | PTN5150H_REG_DA_FOUND_MASK | PTN5150H_REG_AA_FOUND_MASK);//change to 0x1f
 }
 
 static int ptn5150h_probe(
         struct i2c_client *client, const struct i2c_device_id *id)
 {
     int ret = 0;
-    int gpio_enb_val = 1;
+    unsigned int gpio_enb_val = 1;
     struct typec_device_info *di = NULL;
     struct typec_device_info *pdi = NULL;
     struct device_node *node;
-    int typec_trigger_otg = 0;
+    unsigned int typec_trigger_otg = 0;
 
     di = devm_kzalloc(&client->dev, sizeof(*di), GFP_KERNEL);
     if (!di) {
@@ -622,16 +692,16 @@ static int ptn5150h_probe(
     di->typec_trigger_otg = !!typec_trigger_otg;
     hwlog_info("%s: typec_trigger_otg = %d\n", __func__, typec_trigger_otg);
 
-    pdi = typec_chip_register(di, &ptn5150h_ops, THIS_MODULE);
-    if (NULL == pdi) {
-        hwlog_err("%s: typec register chip error!\n", __func__);
+    di->gpio_intb = of_get_named_gpio(node, "ptn5150h_typec,gpio_intb", 0);
+    if (!gpio_is_valid(di->gpio_intb)) {
+        hwlog_err("%s: of_get_named_gpio-intb error!!! ret=%d, gpio_intb=%d.\n", __func__, ret, di->gpio_intb);
         ret = -EINVAL;
         goto err_gpio_enb_request_1;
     }
 
-    di->gpio_intb = of_get_named_gpio(node, "ptn5150h_typec,gpio_intb", 0);
-    if (!gpio_is_valid(di->gpio_intb)) {
-        hwlog_err("%s: of_get_named_gpio-intb error!!! ret=%d, gpio_intb=%d.\n", __func__, ret, di->gpio_intb);
+    pdi = typec_chip_register(di, &ptn5150h_ops, THIS_MODULE);
+    if (NULL == pdi) {
+        hwlog_err("%s: typec register chip error!\n", __func__);
         ret = -EINVAL;
         goto err_gpio_enb_request_1;
     }
@@ -655,6 +725,8 @@ static int ptn5150h_probe(
         goto err_gpio_intb_request_2;
     }
 
+    ptn5150h_initialization();
+
     ret = request_irq(di->irq_intb,
                ptn5150h_irq_handler,
                IRQF_NO_SUSPEND | IRQF_TRIGGER_FALLING,
@@ -670,8 +742,6 @@ static int ptn5150h_probe(
         hwlog_err("%s: create sysfs error %d\n", __func__, ret);
         goto err_irq_request_3;
     }
-
-    ptn5150h_initialization();
 
 #ifdef CONFIG_HUAWEI_HW_DEV_DCT
     /* detect current device successful, set the flag as present */

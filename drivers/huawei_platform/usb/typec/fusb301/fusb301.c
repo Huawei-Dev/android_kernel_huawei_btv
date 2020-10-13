@@ -56,7 +56,6 @@
 #define HWLOG_TAG fusb301_typec
 HWLOG_REGIST();
 
-static struct i2c_driver fusb301_i2c_driver;
 static struct notifier_block reboot_nb;
 struct typec_device_info *g_fusb301_dev = NULL;
 
@@ -211,6 +210,8 @@ static int fusb301_host_port_mode(u8 val)
 
 static void fusb301_set_port_state(int value)
 {
+    mdelay(1);
+
     switch (value) {
         case TYPEC_STATE_UNATTACHED_SINK:
             hwlog_info("%s: set to Unattached.SNK\n", __func__);
@@ -410,7 +411,7 @@ static ssize_t dump_regs_show(struct device *dev, struct device_attribute *attr,
 {
     int i, index;
     u8 reg_val = 0;
-    const int regaddr[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x10, 0x11, 0x12, 0x13};
+    const int regaddr[FUSB301_DUMP_REG_NUM] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x10, 0x11, 0x12, 0x13};
     const char str[] = "0123456789abcdef";
 
     /* If there is no register value, replace it with xx */
@@ -424,16 +425,17 @@ static ssize_t dump_regs_show(struct device *dev, struct device_attribute *attr,
     buf[0x2f] = '\n';   //change line for better print type
     buf[0x5f] = '\0';
 
-    for (i = 0; i < ARRAY_SIZE(regaddr); i++) {
+    for (i = 0; i < FUSB301_DUMP_REG_NUM; i++) {
         index = regaddr[i];
         fusb301_read_reg(index, &reg_val);
-        buf[3 * index] = str[(reg_val & 0xf0) >> 4];
-        buf[3 * index + 1] = str[reg_val & 0x0f];
-        buf[3 * index + 2] = ' ';
+        buf[3 * (long)index] = str[(reg_val & 0xf0) >> 4];
+        buf[3 * (long)index + 1] = str[reg_val & 0x0f];
+        buf[3 * (long)index + 2] = ' ';
     }
 
     return 0x60;
 }
+
 static DEVICE_ATTR(dump_regs, S_IRUGO, dump_regs_show, NULL);
 
 static struct attribute *fusb301_attributes[] = {
@@ -494,9 +496,27 @@ static irqreturn_t fusb301_irq_handler(int irq, void *dev_id)
 
 static void fusb301_initialization(void)
 {
-    int attach_status;
+    int ret = 0;
+    u8 val = 0;
+
+    /*reset FUSB301*/
+    ret = fusb301_write_reg(FUSB301_REG_RESET, FUSB301_RESET);
+    if (ret < 0) {
+        hwlog_err("%s: write REG_RESET error ret = %d, val= 0x%x\n", __func__, ret, val );
+    }
+
+    /* MUST Delay 10 MS */
+    mdelay(10);
+
+    /* Check manual register */
+    ret = fusb301_read_reg(FUSB301_REG_MANUAL, &val);
+    if (ret < 0 )
+        hwlog_err("%s: read FUSB301_REG_MANUAL error ret = %d, val = 0x%x\n", __func__, ret, val);
+    else
+        hwlog_info("%s: read FUSB301_REG_MANUAL = 0x%2x\n", __func__, val);
+
     /* read FUSB301_REG_INT register to clear the irq first */
-    attach_status = fusb301_detect_attachment_status();
+    fusb301_detect_attachment_status();
     fusb301_ctrl_port_mode(TYPEC_HOST_PORT_MODE_DRP);
     fusb301_clean_mask();
 }
@@ -522,11 +542,11 @@ static int fusb301_probe(
         struct i2c_client *client, const struct i2c_device_id *id)
 {
     int ret = 0;
-    int gpio_enb_val = 1;
+    unsigned int gpio_enb_val = 1;
     struct typec_device_info *di = NULL;
     struct typec_device_info *pdi = NULL;
     struct device_node *node;
-    int typec_trigger_otg = 0;
+    unsigned int typec_trigger_otg = 0;
     reboot_nb.notifier_call = NULL;
 
     di = devm_kzalloc(&client->dev, sizeof(*di), GFP_KERNEL);
@@ -587,16 +607,16 @@ static int fusb301_probe(
     di->typec_trigger_otg = !!typec_trigger_otg;
     hwlog_info("%s: typec_trigger_otg = %d\n", __func__, typec_trigger_otg);
 
-    pdi = typec_chip_register(di, &fusb301_ops, THIS_MODULE);
-    if (NULL == pdi) {
-        hwlog_err("%s: typec register chip error!\n", __func__);
+    di->gpio_intb = of_get_named_gpio(node, "fusb301_typec,gpio_intb", 0);
+    if (!gpio_is_valid(di->gpio_intb)) {
+        hwlog_err("%s: of_get_named_gpio-intb error!!! ret=%d, gpio_intb=%d.\n", __func__, ret, di->gpio_intb);
         ret = -EINVAL;
         goto err_gpio_enb_request_1;
     }
 
-    di->gpio_intb = of_get_named_gpio(node, "fusb301_typec,gpio_intb", 0);
-    if (!gpio_is_valid(di->gpio_intb)) {
-        hwlog_err("%s: of_get_named_gpio-intb error!!! ret=%d, gpio_intb=%d.\n", __func__, ret, di->gpio_intb);
+    pdi = typec_chip_register(di, &fusb301_ops, THIS_MODULE);
+    if (NULL == pdi) {
+        hwlog_err("%s: typec register chip error!\n", __func__);
         ret = -EINVAL;
         goto err_gpio_enb_request_1;
     }
@@ -619,7 +639,13 @@ static int fusb301_probe(
         hwlog_err("%s: gpio_direction_input error!!! ret=%d. gpio_intb=%d.\n", __func__, ret, di->gpio_intb);
         goto err_gpio_intb_request_2;
     }
+    ret = fusb301_create_sysfs();
+    if (ret < 0) {
+        hwlog_err("%s: create sysfs error %d\n", __func__, ret);
+        goto err_create_sysfs_3;
+    }
 
+    fusb301_initialization();
     ret = request_irq(di->irq_intb,
                fusb301_irq_handler,
                IRQF_NO_SUSPEND | IRQF_TRIGGER_FALLING,
@@ -627,16 +653,8 @@ static int fusb301_probe(
     if (ret) {
         hwlog_err("%s: request_irq error!!! ret=%d.\n", __func__, ret);
         di->irq_intb = -1;
-        goto err_gpio_intb_request_2;
+        goto err_create_sysfs_3;
     }
-
-    ret = fusb301_create_sysfs();
-    if (ret < 0) {
-        hwlog_err("%s: create sysfs error %d\n", __func__, ret);
-        goto err_irq_request_3;
-    }
-
-    fusb301_initialization();
 
 #ifdef CONFIG_HUAWEI_HW_DEV_DCT
     /* detect current device successful, set the flag as present */
@@ -651,9 +669,8 @@ static int fusb301_probe(
     hwlog_info("%s: ------end.\n", __func__);
     return ret;
 
-err_irq_request_3:
+err_create_sysfs_3:
     fusb301_remove_sysfs(di);
-    free_irq(di->gpio_intb, di);
 err_gpio_intb_request_2:
     gpio_free(di->gpio_intb);
 err_gpio_enb_request_1:

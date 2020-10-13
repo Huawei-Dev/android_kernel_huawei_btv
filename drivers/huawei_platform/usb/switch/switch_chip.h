@@ -45,10 +45,17 @@
 #define FSA9685_REG_WD_CTRL                  0x30
 #define RT8979_REG_MUIC_STATUS1              0x12
 #define RT8979_REG_MUIC_STATUS2              0x13
+#define RT8979_REG_TEST_MODE                 (0xa0)
 #define RT8979_REG_USBCHGEN                  (0xa4)
-#define RT8979_REG_QC_CTRL1					(0xa7)
-#define RT8979_REG_QC_CTRL2					(0xa8)
+#define RT8979_REG_QC_CTRL1                  (0xa7)
+#define RT8979_REG_QC_CTRL2                  (0xa8)
+#define RT8979_REG_EFUSE_PRETRIM_DATA        (0xd0)
+#define RT8979_REG_EFUSE_CTRL                (0xd1)
+#define RT8979_REG_EFUSE_PRETRIM_ENABLE      (0xd2)
+#define	RT8979_REG_EFUSE_READ_DATA           (0xd3)
+
 #define RT8979_MUIC_STATUS_DCDT              (1 << 3)
+
 
 /* Register FSA9685_REG_CONTROL (02) */
 #define FSA9685_INT_MASK             (1<<0)
@@ -216,11 +223,6 @@
 #define FCP_RETRY_MAX_TIMES     (3)  /* fcp retry max times */
 #define RT8979_FCP_RETRY_MAX_TIMES (4) // 8
 #define RT8979_FCP_RETRY_RESET_TIMES (4)
-enum fcp_mmi_test_result{
-    FCP_TEST_SUCC,
-    FCP_TEST_FAIL,
-    FCP_NOT_SUPPORT,
-};
 
 /******************************************************************************
 * fcp definitions  end
@@ -274,12 +276,39 @@ enum fcp_mmi_test_result{
 #define RT8979_REG_EXT3_VAL  (0x38)
 #define RT8979_REG_MUIC_CTRL_3_DISABLEID_FUNCTION  (0x28)
 #define RT8979_REG_MUIC_CTRL_4_ENABLEID2_FUNCTION  (0xFD)
+#define RT8979_REG_ACCP_CMD_STAGE1 (0x0B)
+#define RT8979_REG_ACCP_ADDR_VAL1 (0x00)
+#define RT8979_REG_TEST_MODE_DEFAULT_VAL (0x00)
+#define RT8979_REG_TEST_MODE_VAL1 (0x38)
+#define RT8979_REG_EFUSE_CTRL_VAL (0x0A)
+#define RT8979_REG_EFUSE_PRETRIM_DATA_VAL (0x08)
+#define RT8979_REG_EFUSE_PRETRIM_ENABLE_VAL (0x20)
+#define RT8979_REG_EFUSE_PRETRIM_ENABLE_VAL1 (0x40)
+
 #define RT8979_DCDT	BIT(3)
+
+#define RT8979_ADJ_OSC_MAX_COUNT	10
 #define MUIC_ACCP_INTREG_MAXREADCOUNT 5
-#define ACCP_MAX_TRYCOUNT  (3)
+#define ACCP_MAX_TRYCOUNT  (2)
+#define WRITE_OSC_PRETRIM_DELAY_MIN_DEFAULT 30
+#define WRITE_OSC_PRETRIM_DELAY_MIN 50
+#define WRITE_OSC_PRETRIM_DELAY_MAX 80
+
+#define RT8979_OSC_BOUND_MIN 1
+#define RT8979_OSC_BOUND_MAX 15
+#define RT8979_OSC_TRIM_ADJUST_DEFAULT 0
+
+#define RT8979_FCP_DM_TRANSFER_CHECK_WAIT_TIME 40
+
 enum {
     FSA9683 = 0x00,
     RT8979 = 0x01,
+};
+
+enum {
+    RT8979_SUCCESS = 0,
+    RT8979_FAIL,
+    RT8979_RETRY,
 };
 
 enum err_oprt_reg_num

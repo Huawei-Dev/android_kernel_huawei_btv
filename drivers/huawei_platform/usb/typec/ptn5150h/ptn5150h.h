@@ -24,18 +24,25 @@
 #define _TYPEC_PTN5150H_H_
 
 #define PTN5150H_REGISTER_NUM                            20
+#define PTN5150H_DUMP_REG_NUM                             9
 
+#define RP_MISS_COUNT_MAX                                   4
 #ifndef BIT
 #define BIT(x)                                           (1 << (x))
 #endif
 
 //time for delay
 #define PTN5150H_DFP_DELAY                               350
-#define PTN5150H_UFP_DELAY                               250
-#define PTN5150H_DEBOUNCE_DELAY                          120
-#define PTN5150H_VBUS_DETECT_TIME                        200
+#define PTN5150H_UFP_DELAY                               350
+#define PTN5150H_DEBOUNCE_DELAY                          80
+#define PTN5150H_VBUS_DETECT_TIME                        50
+#define PTN5150H_DISCONNECTION_INTERRUPT_DELAY           50
+#define PTN5150H_ATTACH_DELAY                            50
 #define PTN5150H_RP_DETECT_TIME                          10
-
+#define DELAY_COUNT_MAX                                     10
+//special regvalue for reverse(for 0x4f and 0x51)
+#define PTN5150H_SET_DUTY_CYCLE_RP_PRESENT_TIME          0x7c
+#define PTN5150H_SET_DUTY_CYCLE_RD_PRESENT_TIME          0xc8
 //special regvalue for reverse(for 0x43 and 0x4c)
 #define PTN5150H_DISABLE_ACC1                            0x40
 #define PTN5150H_DISABLE_ACC2                            0x34
@@ -55,6 +62,8 @@
 #define PTN5150H_REG_ACC1                                0x43
 #define PTN5150H_REG_ACC2                                0x4c
 #define PTN5150H_REG_DETECT_RP                           0x49
+#define PTN5150H_INTERNAL_REG_SW_TDRPSWAP_RP             0x4f
+#define PTN5150H_INTERNAL_REG_SW_TDRPSWAP_RD             0x51
 
 /* Register REG_DEVICE_ID  01 */
 #define PTN5150H_REG_VERSION_ID                          (BIT(7) | BIT(6) | BIT(5) | BIT(4) | BIT(3))

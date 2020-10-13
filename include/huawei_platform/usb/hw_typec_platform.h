@@ -16,4 +16,5 @@ void typec_wake_lock(struct typec_device_info *di);
 
 void typec_wake_unlock(struct typec_device_info *di);
 
+int typec_current_notifier_register(struct notifier_block *nb);
 #endif
