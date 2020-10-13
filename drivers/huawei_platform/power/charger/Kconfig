@@ -1,4 +1,3 @@
-source "drivers/huawei_platform/power/charger/direct_charger/Kconfig"
 config HUAWEI_CHARGER
 	bool "huawei charger"
 	default n
