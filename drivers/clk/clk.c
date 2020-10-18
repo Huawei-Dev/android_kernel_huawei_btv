@@ -140,7 +140,7 @@ static bool clk_core_is_enabled(struct clk_core *core)
 	return core->ops->is_enabled(core->hw);
 }
 
-static void clk_core_unprepare(struct clk_core *core);
+void clk_core_unprepare(struct clk_core *core);
 static void clk_core_disable(struct clk_core *core);
 
 static void clk_unprepare_unused_subtree(struct clk_core *core)
