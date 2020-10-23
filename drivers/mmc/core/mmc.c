@@ -1746,7 +1746,8 @@ static int mmc_init_card(struct mmc_host *host, u32 ocr,
 			if (err)
 				goto free_card;
 		}
-	} else {
+	}
+	if (!mmc_card_hs(card)) {
 		/*to support mmc card*/
 		mmc_select_bus_width(card);
 	}
