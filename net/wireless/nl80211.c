@@ -401,7 +401,6 @@ static const struct nla_policy nl80211_policy[NUM_NL80211_ATTR] = {
 	[NL80211_ATTR_NETNS_FD] = { .type = NLA_U32 },
 	[NL80211_ATTR_SCHED_SCAN_DELAY] = { .type = NLA_U32 },
 	[NL80211_ATTR_REG_INDOOR] = { .type = NLA_FLAG },
-	[NL80211_ATTR_PBSS] = { .type = NLA_FLAG },
 };
 
 /* policy for the key attributes */
@@ -3743,10 +3742,6 @@ static int nl80211_start_ap(struct sk_buff *skb, struct genl_info *info)
 	} else {
 		params.smps_mode = NL80211_SMPS_OFF;
 	}
-
-	params.pbss = nla_get_flag(info->attrs[NL80211_ATTR_PBSS]);
-	if (params.pbss && !rdev->wiphy.bands[IEEE80211_BAND_60GHZ])
-		return -EOPNOTSUPP;
 
 	if (info->attrs[NL80211_ATTR_ACL_POLICY]) {
 		params.acl = parse_acl_data(&rdev->wiphy, info);
@@ -8276,12 +8271,6 @@ static int nl80211_connect(struct sk_buff *skb, struct genl_info *info)
 			return -EINVAL;
 		}
 		connect.flags |= ASSOC_REQ_USE_RRM;
-	}
-
-	connect.pbss = nla_get_flag(info->attrs[NL80211_ATTR_PBSS]);
-	if (connect.pbss && !rdev->wiphy.bands[IEEE80211_BAND_60GHZ]) {
-		kzfree(connkeys);
-		return -EOPNOTSUPP;
 	}
 
 	wdev_lock(dev->ieee80211_ptr);

@@ -287,7 +287,7 @@ static struct cfg80211_bss *cfg80211_get_conn_bss(struct wireless_dev *wdev)
 			       wdev->conn->params.bssid,
 			       wdev->conn->params.ssid,
 			       wdev->conn->params.ssid_len,
-			       wdev->conn_bss_type,
+			       IEEE80211_BSS_TYPE_ESS,
 			       IEEE80211_PRIVACY(wdev->conn->params.privacy));
 	if (!bss)
 		return NULL;
@@ -737,7 +737,7 @@ void __cfg80211_connect_result(struct net_device *dev, const u8 *bssid,
 		WARN_ON_ONCE(!wiphy_to_rdev(wdev->wiphy)->ops->connect);
 		bss = cfg80211_get_bss(wdev->wiphy, NULL, bssid,
 				       wdev->ssid, wdev->ssid_len,
-				       wdev->conn_bss_type,
+				       IEEE80211_BSS_TYPE_ESS,
 				       IEEE80211_PRIVACY_ANY);
 		if (bss)
 			cfg80211_hold_bss(bss_from_pub(bss));
@@ -896,7 +896,7 @@ void cfg80211_roamed(struct net_device *dev,
 
 	bss = cfg80211_get_bss(wdev->wiphy, channel, bssid, wdev->ssid,
 			       wdev->ssid_len,
-			       wdev->conn_bss_type, IEEE80211_PRIVACY_ANY);
+			       IEEE80211_BSS_TYPE_ESS, IEEE80211_PRIVACY_ANY);
 	if (WARN_ON(!bss))
 		return;
 
@@ -1077,9 +1077,6 @@ int cfg80211_connect(struct cfg80211_registered_device *rdev,
 	wdev->connect_keys = connkeys;
 	memcpy(wdev->ssid, connect->ssid, connect->ssid_len);
 	wdev->ssid_len = connect->ssid_len;
-
-	wdev->conn_bss_type = connect->pbss ? IEEE80211_BSS_TYPE_PBSS :
-					      IEEE80211_BSS_TYPE_ESS;
 
 	if (!rdev->ops->connect)
 		err = cfg80211_sme_connect(wdev, connect, prev_bssid);
