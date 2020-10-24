@@ -6319,11 +6319,6 @@ static int nl80211_trigger_scan(struct sk_buff *skb, struct genl_info *info)
 	 * the specific BSSID use case instead of the random MAC address
 	 * (NL80211_ATTR_SCAN_FLAGS is used to enable random MAC address use).
 	 */
-	if (info->attrs[NL80211_ATTR_MAC])
-		memcpy(request->bssid, nla_data(info->attrs[NL80211_ATTR_MAC]),
-		       ETH_ALEN);
-	else
-		eth_broadcast_addr(request->bssid);
 
 	request->wdev = wdev;
 	request->wiphy = &rdev->wiphy;
