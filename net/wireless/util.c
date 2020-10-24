@@ -1507,7 +1507,7 @@ int cfg80211_validate_beacon_int(struct cfg80211_registered_device *rdev,
 	list_for_each_entry(wdev, &rdev->wdev_list, list) {
 		if (!wdev->beacon_interval)
 			continue;
-			
+
 		params.iftype_num[wdev->iftype]++;
 	}
 
@@ -1516,17 +1516,17 @@ int cfg80211_validate_beacon_int(struct cfg80211_registered_device *rdev,
 
 		if (!wdev->beacon_interval)
 			continue;
-		}
 
 		/* slight optimisation - skip identical BIs */
 		if (wdev->beacon_interval == beacon_int)
 			continue;
 
 		params.beacon_int_different = true;
-		
+
 		/* Get the GCD */
 		while (bi_prev != 0) {
 			u32 tmp_bi = bi_prev;
+
 			bi_prev = params.beacon_int_gcd % bi_prev;
 			params.beacon_int_gcd = tmp_bi;
 		}
