@@ -402,7 +402,6 @@ static const struct nla_policy nl80211_policy[NUM_NL80211_ATTR] = {
 	[NL80211_ATTR_SCHED_SCAN_DELAY] = { .type = NLA_U32 },
 	[NL80211_ATTR_REG_INDOOR] = { .type = NLA_FLAG },
 	[NL80211_ATTR_PBSS] = { .type = NLA_FLAG },
-	[NL80211_ATTR_BSSID] = { .len = ETH_ALEN },
 };
 
 /* policy for the key attributes */
@@ -6321,11 +6320,7 @@ static int nl80211_trigger_scan(struct sk_buff *skb, struct genl_info *info)
 	 * the specific BSSID use case instead of the random MAC address
 	 * (NL80211_ATTR_SCAN_FLAGS is used to enable random MAC address use).
 	 */
-	if (info->attrs[NL80211_ATTR_BSSID])
-		memcpy(request->bssid,
-		       nla_data(info->attrs[NL80211_ATTR_BSSID]), ETH_ALEN);
-	else if (!(request->flags & NL80211_SCAN_FLAG_RANDOM_ADDR) &&
-		 info->attrs[NL80211_ATTR_MAC])
+	if (info->attrs[NL80211_ATTR_MAC])
 		memcpy(request->bssid, nla_data(info->attrs[NL80211_ATTR_MAC]),
 		       ETH_ALEN);
 	else
