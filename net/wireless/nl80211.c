@@ -6264,16 +6264,6 @@ static int nl80211_trigger_scan(struct sk_buff *skb, struct genl_info *info)
 	request->no_cck =
 		nla_get_flag(info->attrs[NL80211_ATTR_TX_NO_CCK_RATE]);
 
-	/* Initial implementation used NL80211_ATTR_MAC to set the specific
-	 * BSSID to scan for. This was problematic because that same attribute
-	 * was already used for another purpose (local random MAC address). The
-	 * NL80211_ATTR_BSSID attribute was added to fix this. For backwards
-	 * compatibility with older userspace components, also use the
-	 * NL80211_ATTR_MAC value here if it can be determined to be used for
-	 * the specific BSSID use case instead of the random MAC address
-	 * (NL80211_ATTR_SCAN_FLAGS is used to enable random MAC address use).
-	 */
-
 	request->wdev = wdev;
 	request->wiphy = &rdev->wiphy;
 	request->scan_start = jiffies;
