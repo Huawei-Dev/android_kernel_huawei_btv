@@ -1328,16 +1328,12 @@ clock_set:
 			return;
 		}
 		timeout--;
-		spin_unlock_irq(&host->lock);
-		usleep_range(900, 1100);
-		spin_lock_irq(&host->lock);
+		mdelay(1);
 	}
 
 	clk |= SDHCI_CLOCK_CARD_EN;
 	sdhci_writew(host, clk, SDHCI_CLOCK_CONTROL);
-/*\B5\B1\B9ر\D5ʹ\C4\DCsd_clkʱ\D6ӣ\AC\D4ٴδ\F2\BF\AAʹ\C4\DCʱ\A3\AC\D0\E8Ҫ\D4ٵȴ\FD\D6\C1\C9\D98\B8\F6sd_clkʱ\D6\D3\D6\DC\C6ڣ\AC\B2\C5\C4ܷ\A2\C6\F0\D0µ\C4\C3\FC\C1
-400kʱ8\B8\F6ʱ\D6\D3\D6\DC\C6\DA\CA\C720΢\C3\EB
-*/
+
 	mdelay(1);
 }
 EXPORT_SYMBOL_GPL(sdhci_set_clock);
