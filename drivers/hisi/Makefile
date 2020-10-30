@@ -12,6 +12,7 @@ obj-$(CONFIG_HIFI_DSP_ONE_TRACK)		+= hifi_dsp/
 obj-$(CONFIG_HIFI_MAILBOX)			+= hifi_mailbox/
 obj-$(CONFIG_HISI_HILOG)			+= hilog/
 obj-$(CONFIG_HISI_HISEE)			+= hisee/
+obj-$(CONFIG_HISI_LOWMEM)			+= hisi_lmk/
 obj-$(CONFIG_HISI_SYSCOUNTER)			+= hisi_syscounter/
 obj-$(CONFIG_HISI_HISTAR_ISP)			+= isp/
 obj-$(CONFIG_LOAD_IMAGE)			+= load_image/

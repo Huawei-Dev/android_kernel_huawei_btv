@@ -1,4 +1,4 @@
-#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+#define pr_fmt(fmt) "hisi_lowmem: " fmt
 
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -19,11 +19,13 @@
 #include <linux/hisi/hisi_ion.h>
 #include <linux/version.h>
 
+#include "lowmem_killer.h"
+
 #define LMK_PRT_TSK_RSS 10000
 #define LMK_INTERVAL 3
 
 /* SERVICE_ADJ(5) * OOM_SCORE_ADJ_MAX / -OOM_DISABLE */
-#define LMK_SERVICE_ADJ 294
+#define LMK_SERVICE_ADJ 500
 
 static unsigned long long last_jiffs;
 
@@ -72,7 +74,11 @@ static void dump_tasks_hisi(bool verbose)
 			continue;
 		}
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 12, 0)
+		tsk_nr_ptes = (unsigned long)task->mm->nr_ptes;
+#else
 		tsk_nr_ptes = (unsigned long)atomic_long_read(&task->mm->nr_ptes);
+#endif
 		frozen_mark = frozen(task) ? '*' : ' ';
 
 		pr_info("[%5d] %5d %5d %8lu %6lu %5lu %5lu %5hd %c %s%c\n",

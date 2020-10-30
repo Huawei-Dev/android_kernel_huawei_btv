@@ -27,12 +27,6 @@ config HISI_BOOT_TIME
 	help
 	  Say 'Y' here if you want to print all boot slice.
 
-config HISI_LOWMEM_DBG
-	bool "Hisilicon Low Memory Killer debug"
-	default n
-	help
-	  print processes info when lmk happen per several seconds
-
 config HISI_BB_SYSCALL
 	bool "support print system call trace "
 	default n
