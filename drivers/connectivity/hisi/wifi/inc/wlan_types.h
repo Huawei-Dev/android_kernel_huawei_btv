@@ -205,22 +205,13 @@ extern "C" {
 /*****************************************************************************
   2.14 安全相关宏定义
 *****************************************************************************/
-    /* cipher suite selectors */
-#define WLAN_CIPHER_SUITE_USE_GROUP 0x000FAC00
-#define WLAN_CIPHER_SUITE_WEP40     0x000FAC01
-#define WLAN_CIPHER_SUITE_TKIP      0x000FAC02
-    /* reserved:                0x000FAC03 */
-#define WLAN_CIPHER_SUITE_CCMP      0x000FAC04
-#define WLAN_CIPHER_SUITE_WEP104    0x000FAC05
-#define WLAN_CIPHER_SUITE_AES_CMAC  0x000FAC06
-#undef  WLAN_CIPHER_SUITE_SMS4
-#define WLAN_CIPHER_SUITE_SMS4      0x00147201
+#include <linux/ieee80211.h>
 
 /* AKM suite selectors */
-#define WITP_WLAN_AKM_SUITE_8021X	     0x000FAC01
-#define WITP_WLAN_AKM_SUITE_PSK		     0x000FAC02
-#define WITP_WLAN_AKM_SUITE_WAPI_PSK     0x000FAC04
-#define WITP_WLAN_AKM_SUITE_WAPI_CERT    0x000FAC12
+#define WITP_WLAN_AKM_SUITE_8021X		WLAN_CIPHER_SUITE_WEP40
+#define WITP_WLAN_AKM_SUITE_PSK		WLAN_CIPHER_SUITE_TKIP
+#define WITP_WLAN_AKM_SUITE_WAPI_PSK     	WLAN_CIPHER_SUITE_CCMP
+#define WITP_WLAN_AKM_SUITE_WAPI_CERT    	0x000FAC12
 
 
 
