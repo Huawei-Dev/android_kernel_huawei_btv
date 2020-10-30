@@ -3287,10 +3287,10 @@ EXPORT_SYMBOL(mmc_detect_card_removed);
 
 void mmc_rescan(struct work_struct *work)
 {
-	struct mmc_host *host =
-		container_of(work, struct mmc_host, detect.work);
 	int i;
 	bool extend_wakelock = false;
+	struct mmc_host *host =
+		container_of(work, struct mmc_host, detect.work);
 
 	if (host->trigger_card_event && host->ops->card_event) {
 		host->ops->card_event(host);
@@ -3316,6 +3316,12 @@ void mmc_rescan(struct work_struct *work)
 		host->bus_ops->detect(host);
 
 	host->detect_change = 0;
+	
+	/* If the card was removed the bus will be marked
+	 * as dead - extend the wakelock so userspace
+	 * can respond */
+	if (host->bus_dead)
+		extend_wakelock = true;
 
 	/*
 	 * Let mmc_bus_put() free the bus/bus_ops if we've found that
