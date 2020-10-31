@@ -62,17 +62,6 @@ struct fscrypt_context {
 #define FS_AES_256_CBC_KEY_SIZE		32
 #define FS_AES_256_CTS_KEY_SIZE		32
 #define FS_AES_256_XTS_KEY_SIZE		64
-#define FS_MAX_KEY_SIZE			64
-
-#define FS_KEY_DESC_PREFIX		"fscrypt:"
-#define FS_KEY_DESC_PREFIX_SIZE		8
-
-/* This is passed in from userspace into the kernel keyring */
-struct fscrypt_key {
-	u32 mode;
-	u8 raw[FS_MAX_KEY_SIZE];
-	u32 size;
-} __packed;
 
 struct fscrypt_info {
 	u8 ci_data_mode;
