@@ -675,20 +675,9 @@ ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLA
 	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
 endif
 
-ifeq ($(SET_SYSTEM_PARTITION), oversea)
-    KBUILD_CFLAGS += -DCONFIG_MARKET_OVERSEA
-endif
-ifeq ($(SET_SYSTEM_PARTITION), internal)
-    KBUILD_CFLAGS += -DCONFIG_MARKET_INTERNAL
-endif
-ifeq ($(COMPILE_FEIMA3),true)
-    KBUILD_CFLAGS += -DCONFIG_VENDORIMAGE_FILE_SYSTEM_TYPE
-endif
+KBUILD_CFLAGS += -DCONFIG_MARKET_OVERSEA
 
-#release version complie
-ifeq (true,$(OBB_PRODUCT_FINAL_RELEASE))
-	KBUILD_CFLAGS += -DFINAL_RELEASE_MODE
-endif
+KBUILD_CFLAGS += -DCONFIG_VENDORIMAGE_FILE_SYSTEM_TYPE
 
 ifdef CONFIG_READABLE_ASM
 # Disable optimizations that make assembler listings hard to read.
