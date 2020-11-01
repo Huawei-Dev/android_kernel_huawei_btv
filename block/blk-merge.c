@@ -6,7 +6,6 @@
 #include <linux/bio.h>
 #include <linux/blkdev.h>
 #include <linux/scatterlist.h>
-#include <linux/fscrypto.h>
 
 #include "blk.h"
 
