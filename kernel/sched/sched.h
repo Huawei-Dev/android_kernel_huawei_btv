@@ -355,10 +355,6 @@ static inline void set_task_rq_fair(struct sched_entity *se,
 #endif /* CONFIG_SMP */
 #endif /* CONFIG_FAIR_GROUP_SCHED */
 
-extern void set_task_rq_fair(struct sched_entity *se,
-			     struct cfs_rq *prev, struct cfs_rq *next);
-#endif /* CONFIG_FAIR_GROUP_SCHED */
-
 extern struct task_group *css_tg(struct cgroup_subsys_state *css);
 #else /* CONFIG_CGROUP_SCHED */
 
