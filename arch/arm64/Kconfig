@@ -443,6 +443,22 @@ config CAVIUM_ERRATUM_27456
 
 endmenu
 
+config ARM64_ERRATUM_858921
+	bool "Cortex-A73 858921: Possible wrong read value for CNTVCT or CNTPCT value"
+	default y
+	depends on ARM_ARCH_TIMER && ARM64
+	help
+	  This option enables a workaround for Cortex-A73 Category B
+	  858921 ("Possible wrong read value for CNTVCT or CNTPCT
+	  value").
+
+	  CNTVCT and CNTPCT are updated according to the counter value given by
+	  CNTVALUEB input bus. If CNTVCT and CNTPCT are read while they are updated
+	  with the lower 32 bits rolled-over, it is possible to read a wrong transient
+	  value CNTVCT or CNTPCT respectively.
+
+	  The workaround is to read the CNTVCT or CNTPCT twice. If the bit 32 of the 2
+	  values is not same, use the first value otherwise use the second one.
 
 choice
 	prompt "Page size"
