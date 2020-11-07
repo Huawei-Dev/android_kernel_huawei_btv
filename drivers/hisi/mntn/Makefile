@@ -5,9 +5,6 @@ obj-$(CONFIG_HISILICON_PLATFORM_HISI_EASYSHELL)	+= hisi-easy-shell.o
 obj-$(CONFIG_HISI_BOOT_TIME) += boottime.o
 obj-$(CONFIG_HISI_BB) += blackbox/
 obj-$(CONFIG_HISI_DDRC_KERNEL_CODE_PROTECTION) += code_protect/
-ifeq ($(TARGET_VERSION_MODE),factory)
-obj-$(CONFIG_HISI_VIRT_TO_PHYS) += virt_to_phys.o
-endif
 obj-$(CONFIG_HISI_POWER_OFF)	+= hisi_poweroff.o
 obj-$(CONFIG_HISI_FIQ)	+= hisi_fiq.o
 obj-$(CONFIG_HISI_EAGLE_EYE)	+= eagle-eye/
