@@ -2408,6 +2408,14 @@ CONFIG_HISI_CAMERA_HISTAR_ISPV100=y
 #
 
 #
+# Customise DVB Frontends
+#
+CONFIG_DVB_AU8522=y
+CONFIG_DVB_AU8522_V4L=y
+CONFIG_DVB_TUNER_DIB0070=y
+CONFIG_DVB_TUNER_DIB0090=y
+
+#
 # Tools to develop new frontends
 #
 # CONFIG_DVB_DUMMY_FE is not set
