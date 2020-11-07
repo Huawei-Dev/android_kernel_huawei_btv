@@ -2428,7 +2428,6 @@ CONFIG_DVB_TUNER_DIB0090=y
 #
 # Hisilicon video vdec support
 #
-# CONFIG_HI_VCODEC_VDEC is not set
 CONFIG_IMAGINATION_D5500_VCODEC=y
 # CONFIG_IMG_VIDEO is not set
 # CONFIG_IMG_DEC is not set
