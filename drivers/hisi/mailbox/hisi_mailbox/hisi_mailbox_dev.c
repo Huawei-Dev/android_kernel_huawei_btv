@@ -24,6 +24,7 @@
 #include <linux/interrupt.h>
 #include <linux/hisi/hisi_mailbox.h>
 #include <linux/kern_levels.h>
+#include <linux/sched.h>
 
 #define IPCBITMASK(n)				(1 << (n))
 #define IPCMBxSOURCE(mdev)			((mdev) << 6)
@@ -59,11 +60,13 @@
 #define SYS_RPROC_NUMBER 0x9
 
 #define ISP_RPROC_NUMBER  0x2
+#define AO_RPROC_NUMBER  0x3
 #define STATE_NUMBER  0x4
 
 #define MAILBOX_ASYNC_UDELAY_CNT   (1000)
 
 #define ISP_INDEX_BASE				100
+#define AO_INDEX_BASE				200
 #define DEFAULT_MAILBOX_TIMEOUT	300
 #define DEFAULT_FIFO_SIZE			256
 #define DEFAULT_SCHED_PRIORITY	20
@@ -78,11 +81,13 @@
 /*MDEV_DEBUG used only in project  developing  phase*/
 #define MDEV_DEBUG(fmt, args ...)
 /*
-	({				\
-		pr_debug("%s(%d):" fmt "\n", \
-			MODULE_NAME, __LINE__, ##args); \
-	})
+       ({                              \
+               pr_debug("%s(%d):" fmt "\n", \
+                       MODULE_NAME, __LINE__, ##args); \
+       })
 */
+
+
 enum {
 	RX_BUFFER_TYPE = 0,
 	ACK_BUFFER_TYPE,
@@ -184,6 +189,11 @@ char *isp_rproc_name[ISP_RPROC_NUMBER] = {
 	"ISP"
 };
 
+char *ao_rproc_name[AO_RPROC_NUMBER] = {
+	"SENSORHUB",
+	"AP_LIT_CLUSTER",
+	"ISP"
+};
 /*
 **HiIPCV230 have a state machine, the state machine have 4 status:
 **4'b0001:IDLE_STATE
@@ -207,7 +217,10 @@ enum IPC_STATE_MACHINE {
 
 extern int hisi_rproc_init(void);
 
-static inline int hisi_irqaffinity_register(unsigned int irq, int cpu) { return -ENOSYS; }
+static inline int hisi_irqaffinity_register(unsigned int irq, int cpu) 
+{ 
+	return -ENOSYS; 
+}
 
 char *rproc_analysis(const char *mdev_name, unsigned int pro_code)
 {
@@ -221,14 +234,19 @@ char *rproc_analysis(const char *mdev_name, unsigned int pro_code)
 	else
 		return "ERR_RPROC";
 	/*sys ips's mailbox channel */
-	if (NULL == strstr(mdev_name, "isp")) {
-		if (likely(index < SYS_RPROC_NUMBER))
-			return sys_rproc_name[index];
+	if (NULL != strstr(mdev_name, "isp")) {
+		if (likely(index < ISP_RPROC_NUMBER))
+			return isp_rproc_name[index];
+		else
+			return "ERR_RPROC";
+	} else if (NULL != strstr(mdev_name, "ao")){
+		if (likely(index < AO_RPROC_NUMBER))
+			return ao_rproc_name[index];
 		else
 			return "ERR_RPROC";
 	} else {					/*isp  ips's mailbox channel */
-		if (likely(index < ISP_RPROC_NUMBER))
-			return isp_rproc_name[index];
+		if (likely(index < SYS_RPROC_NUMBER))
+			return sys_rproc_name[index];
 		else
 			return "ERR_RPROC";
 	}
@@ -273,92 +291,92 @@ static inline unsigned int __ipc_lock_status(void __iomem *base)
 
 static inline void __ipc_set_src(void __iomem *base, int source, int mdev)
 {
-	__raw_writel(IPCBITMASK(source), base + IPCMBxSOURCE(mdev));
+	__raw_writel(IPCBITMASK(source), base + IPCMBxSOURCE(mdev));/*lint !e679*/
 }
 
 static inline unsigned int __ipc_read_src(void __iomem *base, int mdev)
 {
-	return __raw_readl(base + IPCMBxSOURCE(mdev));
+	return __raw_readl(base + IPCMBxSOURCE(mdev));/*lint !e679*/
 }
 
 static inline void __ipc_set_des(void __iomem *base, int source, int mdev)
 {
-	__raw_writel(IPCBITMASK(source), base + IPCMBxDSET(mdev));
+	__raw_writel(IPCBITMASK(source), base + IPCMBxDSET(mdev));/*lint !e679*/
 }
 
 static inline void __ipc_clr_des(void __iomem *base, int source, int mdev)
 {
-	__raw_writel(IPCBITMASK(source), base + IPCMBxDCLR(mdev));
+	__raw_writel(IPCBITMASK(source), base + IPCMBxDCLR(mdev));/*lint !e679*/
 }
 
 static inline unsigned int __ipc_des_status(void __iomem *base, int mdev)
 {
-	return __raw_readl(base + IPCMBxDSTATUS(mdev));
+	return __raw_readl(base + IPCMBxDSTATUS(mdev));/*lint !e679*/
 }
 
 static inline void __ipc_send(void __iomem *base, unsigned int tosend, int mdev)
 {
-	__raw_writel(tosend, base + IPCMBxSEND(mdev));
+	__raw_writel(tosend, base + IPCMBxSEND(mdev));/*lint !e679*/
 }
 
 static inline unsigned int __ipc_read(void __iomem *base, int mdev, int index)
 {
-	return __raw_readl(base + IPCMBxDATA(mdev, index));
+	return __raw_readl(base + IPCMBxDATA(mdev, index));/*lint !e679*/
 }
 
 static inline void __ipc_write(void __iomem *base, u32 data, int mdev, int index)
 {
-	__raw_writel(data, base + IPCMBxDATA(mdev, index));
+	__raw_writel(data, base + IPCMBxDATA(mdev, index));/*lint !e679*/
 }
 
 static inline unsigned int __ipc_cpu_imask_get(void __iomem *base, int mdev)
 {
-	return __raw_readl(base + IPCMBxIMASK(mdev));
+	return __raw_readl(base + IPCMBxIMASK(mdev));/*lint !e679*/
 }
 
 static inline void __ipc_cpu_imask_clr(void __iomem *base, unsigned int toclr, int mdev)
 {
 	unsigned int reg;
 
-	reg = __raw_readl(base + IPCMBxIMASK(mdev));
+	reg = __raw_readl(base + IPCMBxIMASK(mdev));/*lint !e679*/
 	reg = reg & (~(toclr));
 
-	__raw_writel(reg, base + IPCMBxIMASK(mdev));
+	__raw_writel(reg, base + IPCMBxIMASK(mdev));/*lint !e679*/
 }
 
 static inline void __ipc_cpu_imask_all(void __iomem *base, int mdev)
 {
-	__raw_writel((~0), base + IPCMBxIMASK(mdev));
+	__raw_writel((~0), base + IPCMBxIMASK(mdev));/*lint !e679*/
 }
 
 static inline void __ipc_cpu_iclr(void __iomem *base, unsigned int toclr, int mdev)
 {
-	__raw_writel(toclr, base + IPCMBxICLR(mdev));
+	__raw_writel(toclr, base + IPCMBxICLR(mdev));/*lint !e679*/
 }
 
 static inline int __ipc_cpu_istatus(void __iomem *base, int mdev)
 {
-	return __raw_readl(base + IPCMBxICLR(mdev));
+	return __raw_readl(base + IPCMBxICLR(mdev));/*lint !e679*/
 }
 
 static inline unsigned int __ipc_mbox_istatus(void __iomem *base, int cpu)
 {
-	return __raw_readl(base + IPCCPUxIMST(cpu));
+	return __raw_readl(base + IPCCPUxIMST(cpu));/*lint !e679*/
 }
 
 static inline unsigned int __ipc_mbox_irstatus(void __iomem *base, int cpu)
 {
-	return __raw_readl(base + IPCCPUxIRST(cpu));
+	return __raw_readl(base + IPCCPUxIRST(cpu));/*lint !e679*/
 }
 
 static inline unsigned int __ipc_status(void __iomem *base, int mdev)
 {
-	return __raw_readl(base + IPCMBxMODE(mdev));
+	return __raw_readl(base + IPCMBxMODE(mdev));/*lint !e679*/
 }
 
 static inline void __ipc_mode(void __iomem *base, unsigned int mode, int mdev)
 {
-	__raw_writel(mode, base + IPCMBxMODE(mdev));
+	__raw_writel(mode, base + IPCMBxMODE(mdev));/*lint !e679*/
 }
 
 static int hisi_mdev_startup(struct hisi_mbox_device *mdev)
@@ -393,7 +411,7 @@ static void hisi_mdev_dump_status(struct hisi_mbox_device *mdev)
 	char *des_name = rproc_analysis(mdev->name, __ipc_des_status(priv->idev->base, priv->mbox_channel));
 	/*\0013 is the  KERN_SOH KERN_ERR */
 	char *direcstr = KERN_ERR "\n<INFO>: [%s]-->[%s], ";
-	char *machinestr = ipc_state_analysis(__ipc_status(priv->idev->base, priv->mbox_channel), &statem);
+	char *machinestr = ipc_state_analysis(__ipc_status(priv->idev->base, priv->mbox_channel), (unsigned char *)&statem);
 
 	memcpy(finalfortmat, direcstr, strlen(direcstr));
 
@@ -410,6 +428,13 @@ static void hisi_mdev_dump_status(struct hisi_mbox_device *mdev)
 	return;
 }
 
+static void hisi_mdev_dump_regs(struct hisi_mbox_device *mdev){
+	struct hisi_mbox_device_priv *priv = mdev->priv;
+	/* add dump_regs if need */
+	MDEV_ERR("%s CPU_IMST: 0x%08x",mdev->name, __ipc_mbox_istatus(priv->idev->base, priv->src));
+	MDEV_ERR("%s CPU_IRST: 0x%08x",mdev->name, __ipc_mbox_irstatus(priv->idev->base, priv->src));
+}
+
 static int hisi_mdev_check(struct hisi_mbox_device *mdev, mbox_mail_type_t mtype, int mdev_index)
 {
 	struct hisi_mbox_device_priv *priv = mdev->priv;
@@ -419,6 +444,12 @@ static int hisi_mdev_check(struct hisi_mbox_device *mdev, mbox_mail_type_t mtype
 		index = index + ISP_INDEX_BASE;
 		MDEV_DEBUG("isp-index is %d\n",index);
 	}
+	if (NULL != strstr(mdev->name, "ao")) {
+		index = index + AO_INDEX_BASE;
+		MDEV_DEBUG("ao-index is %d\n",index);
+	}
+
+
 	if ((TX_MAIL == mtype) && (SOURCE_MBOX & priv->func) && (index == mdev_index) && (priv->used == 1))
 		ret = RPACCESSIBLE;
 	else if ((RX_MAIL == mtype) && (DESTINATION_MBOX & priv->func) && (index == mdev_index) && (priv->used == 1))
@@ -434,7 +465,13 @@ static void hisi_mdev_clr_ack(struct hisi_mbox_device *mdev)
 	unsigned int toclr;
 
 	imask = __ipc_cpu_imask_get(priv->idev->base, priv->mbox_channel);
-	toclr = (IPCBITMASK(GIC_1) | IPCBITMASK(GIC_2)) & (~imask);
+
+	if (NULL != strstr(mdev->name, "ao")) {
+		toclr = IPCBITMASK(GIC_2) & (~imask);
+	} else {
+		toclr = (IPCBITMASK(GIC_1) | IPCBITMASK(GIC_2)) & (~imask);
+	}
+
 	__ipc_cpu_iclr(priv->idev->base, toclr, priv->mbox_channel);
 }
 
@@ -457,7 +494,13 @@ static void hisi_mdev_clr_irq_and_ack(struct hisi_mbox_device *mdev)
 	/*get the irq unmask core bits, and clear the irq according to the unmask core bits,
 	 * because the irq to be sure triggered to the unmasked cores
 	 */
-	todo = (IPCBITMASK(GIC_1) | IPCBITMASK(GIC_2)) & (~imask);
+
+	if (NULL != strstr(mdev->name, "ao")) {
+		todo = IPCBITMASK(GIC_2) & (~imask);
+	} else {
+		todo = (IPCBITMASK(GIC_1) | IPCBITMASK(GIC_2)) & (~imask);
+	}
+
 	__ipc_cpu_iclr(priv->idev->base, todo, priv->mbox_channel);
 
 	status = __ipc_status(priv->idev->base, priv->mbox_channel);
@@ -710,7 +753,11 @@ static int hisi_mdev_irq_request(struct hisi_mbox_device *mdev, irq_handler_t ha
 
 	if (priv->idev->cmbox_info->cmbox_gic_1_irq == priv->irq) {
 		if (!priv->idev->cmbox_info->gic_1_irq_requested++) {
+			#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
+			ret = request_irq(priv->irq, handler, IRQF_DISABLED, mdev->name, (void *)priv->idev->cmbox_info->cmdev);
+			#else
 			ret = request_irq(priv->irq, handler, 0, mdev->name, (void *)priv->idev->cmbox_info->cmdev);
+			#endif
 			if (ret) {
 				MDEV_ERR("fast source %s request gic_1_irq %d failed\n", mdev->name, priv->irq);
 				priv->idev->cmbox_info->gic_1_irq_requested--;
@@ -721,7 +768,11 @@ static int hisi_mdev_irq_request(struct hisi_mbox_device *mdev, irq_handler_t ha
 		}
 	} else if (priv->idev->cmbox_info->cmbox_gic_2_irq == priv->irq) {
 		if (!priv->idev->cmbox_info->gic_2_irq_requested++) {
+			#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
+			ret = request_irq(priv->irq, handler, IRQF_DISABLED, mdev->name, (void *)priv->idev->cmbox_info->cmdev);
+			#else
 			ret = request_irq(priv->irq, handler, 0, mdev->name, (void *)priv->idev->cmbox_info->cmdev);
+			#endif
 			if (ret) {
 				MDEV_ERR("fast source %s request gic_2_irq %d failed\n", mdev->name, priv->irq);
 				priv->idev->cmbox_info->gic_2_irq_requested--;
@@ -731,7 +782,11 @@ static int hisi_mdev_irq_request(struct hisi_mbox_device *mdev, irq_handler_t ha
 			hisi_irqaffinity_register(priv->irq, IPC_IRQ_AFFINITY_CPU);
 		}
 	} else {
+		#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
+		ret = request_irq(priv->irq, handler, IRQF_DISABLED, mdev->name, p);
+		#else
 		ret = request_irq(priv->irq, handler, 0, mdev->name, p);
+		#endif
 		if (ret) {
 			MDEV_ERR("fast desitnation %s request irq %d failed\n", mdev->name, priv->irq);
 			goto out;
@@ -792,14 +847,18 @@ static struct hisi_mbox_device *hisi_mdev_irq_to_mdev(struct hisi_mbox_device *_
 		goto out;
 	}
 
-	/* fast source & common mailboxes share GIC_1 & GIC_2 irq number */
-	if (irq == _priv->idev->cmbox_info->cmbox_gic_1_irq) {
-		src = GIC_1;
-	} else if (irq == _priv->idev->cmbox_info->cmbox_gic_2_irq) {
+	if (NULL != strstr(_mdev->name, "ao")) {
 		src = GIC_2;
 	} else {
-		MDEV_ERR("odd irq for hisi mailboxes\n");
-		goto out;
+		/* fast source & common mailboxes share GIC_1 & GIC_2 irq number */
+		if (irq == _priv->idev->cmbox_info->cmbox_gic_1_irq) {
+			src = GIC_1;
+		} else if (irq == _priv->idev->cmbox_info->cmbox_gic_2_irq) {
+			src = GIC_2;
+		} else {
+			MDEV_ERR("odd irq for hisi mailboxes\n");
+			goto out;
+		}
 	}
 
 	regval = __ipc_mbox_istatus(_priv->idev->base, src);
@@ -866,6 +925,7 @@ struct hisi_mbox_dev_ops hisi_mdev_ops = {
 	.clr_ack = hisi_mdev_clr_ack,
 	.ensure_channel = hisi_mdev_ensure_channel,
 	.status = hisi_mdev_dump_status,
+	.dump_regs = hisi_mdev_dump_regs,
 };
 
 static void hisi_mdev_put(struct hisi_ipc_device *idev)
@@ -943,7 +1003,7 @@ static int hisi_mdev_get(struct hisi_ipc_device *idev, struct hisi_mbox_device *
 
 	MDEV_DEBUG("ipc_base: 0x%lx\n", (unsigned long)ipc_base);
 
-	ret = of_property_read_u32(node, "capability", &capability);
+	ret = of_property_read_u32(node, "capability", (u32 *)&capability);
 	if (ret) {
 		MDEV_ERR("prop \"capability\" error %d\n", ret);
 		ret = -ENODEV;
@@ -968,7 +1028,7 @@ static int hisi_mdev_get(struct hisi_ipc_device *idev, struct hisi_mbox_device *
 	}
 
 	MDEV_DEBUG("unlock_key: 0x%x\n", (unsigned int)unlock);
-	ret = of_property_read_u32(node, "mailboxes", &mdev_num);
+	ret = of_property_read_u32(node, "mailboxes", (u32 *)&mdev_num);
 	if (ret) {
 		pr_err("%s: prop \"mailboxes\" error %d\n", MODULE_NAME, ret);
 		ret = -ENODEV;
@@ -976,7 +1036,7 @@ static int hisi_mdev_get(struct hisi_ipc_device *idev, struct hisi_mbox_device *
 	}
 
 	MDEV_DEBUG("mailboxes: %d\n", (int)mdev_num);
-	cmbox_info = kmalloc(sizeof(*cmbox_info), GFP_KERNEL);
+	cmbox_info = kzalloc(sizeof(*cmbox_info), GFP_KERNEL);
 	if (!cmbox_info) {
 		ret = -ENOMEM;
 		goto to_iounmap;
@@ -1006,7 +1066,7 @@ static int hisi_mdev_get(struct hisi_ipc_device *idev, struct hisi_mbox_device *
 	idev->mdev_res = mdevs;
 	idev->buf_pool = buf_pool;
 
-	for (i = 0; (son = of_get_next_child(node, son)); i++) {
+	for (i = 0; (son = of_get_next_child(node, son)); i++) {/*lint !e441*/
 		mdev = NULL;
 		priv = NULL;
 		mdev_name = NULL;
@@ -1042,15 +1102,15 @@ static int hisi_mdev_get(struct hisi_ipc_device *idev, struct hisi_mbox_device *
 
 		MDEV_DEBUG("mailbox node: %s\n", mdev_name);
 
-		ret = of_property_read_u32(son, "src_bit", &src_bit);
+		ret = of_property_read_u32(son, "src_bit", (u32 *)&src_bit);
 		if (ret)
 			goto free_priv;
 
-		ret = of_property_read_u32(son, "des_bit", &des_bit);
+		ret = of_property_read_u32(son, "des_bit", (u32 *)&des_bit);
 		if (ret)
 			goto free_priv;
 		/* get software code-index to mbox_channel and calculate the right mbox_channel */
-		ret = of_property_read_u32(son, "index", &mbox_channel);
+		ret = of_property_read_u32(son, "index", (u32 *)&mbox_channel);
 		if (ret)
 			goto free_priv;
 
@@ -1115,7 +1175,7 @@ static int hisi_mdev_get(struct hisi_ipc_device *idev, struct hisi_mbox_device *
 
 		rx_buffer = buf_pool + capability * RX_BUFFER_TYPE;
 		ack_buffer = buf_pool + capability * ACK_BUFFER_TYPE;
-		buf_pool = buf_pool + capability * MBOX_BUFFER_TYPE_MAX;
+		buf_pool = buf_pool + capability * MBOX_BUFFER_TYPE_MAX;/*lint !e679*/
 		MDEV_DEBUG("rx_buffer: 0x%lx\nack_buffer: 0x%lx\n", (unsigned long)rx_buffer, (unsigned long)ack_buffer);
 
 		priv->capability = capability;
@@ -1183,14 +1243,14 @@ static int hisi_mdev_probe(struct platform_device *pdev)
 		goto out;
 	}
 
-	idev = kmalloc(sizeof(*idev), GFP_KERNEL);
+	idev = kzalloc(sizeof(*idev), GFP_KERNEL);
 	if (!idev) {
 		MDEV_ERR("no mem for ipc resouce\n");
 		ret = -ENOMEM;
 		goto out;
 	}
 
-	ret = of_property_read_u32(node, "mailboxes", &mdev_num);
+	ret = of_property_read_u32(node, "mailboxes", (u32 *)&mdev_num);
 	if (ret) {
 		MDEV_ERR("no mailboxes resources\n");
 		ret = -ENODEV;

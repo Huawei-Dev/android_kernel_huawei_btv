@@ -50,6 +50,12 @@ typedef enum {
 	 HISI_RPROC_ISP_MBX1,
 	 HISI_RPROC_ISP_MBX2,
 	 HISI_RPROC_ISP_MBX3,
+	 HISI_RPROC_AO_MBX0 = 200,
+	 HISI_RPROC_AO_MBX1,
+	 HISI_RPROC_AO_MBX2,
+	 HISI_RPROC_AO_MBX3,
+	 HISI_RPROC_AO_MBX4,
+	 HISI_RPROC_AO_MBX5,
 	 HISI_RPROC_MAX = 0xFF
 }rproc_id_t;
 
@@ -69,7 +75,7 @@ hisi_rproc_rx_unregister(rproc_id, nb)
 
 #define RPROC_PUT(rproc_id)			hisi_rproc_put(rproc_id)
 #define RPROC_FLUSH_TX(rproc_id)	hisi_rproc_flush_tx(rproc_id)
-
+#define RPROC_IS_SUSPEND(rproc_id)			hisi_rproc_is_suspend(rproc_id)
 
 extern int hisi_rproc_xfer_sync(rproc_id_t rproc_id,
 				rproc_msg_t *msg,
@@ -86,7 +92,7 @@ extern int
 hisi_rproc_rx_unregister(rproc_id_t rproc_id, struct notifier_block *nb);
 extern int   hisi_rproc_put(rproc_id_t rproc_id);
 extern int   hisi_rproc_flush_tx(rproc_id_t rproc_id);
-
+extern int hisi_rproc_is_suspend(rproc_id_t rproc_id);
 #ifdef __cplusplus
 #if __cplusplus
 }

@@ -36,7 +36,7 @@
  * Alloc a static buffer for the tx_task, the num can be adjust according to different platform.
  * 512 allow 4 mdev-kfifo to be full fille (one mdev-kfifo can cache 256 tx_task node).
  */
-#define TX_TASK_DDR_NODE_NUM   512
+#define TX_TASK_DDR_NODE_NUM   585
 #define TX_TASK_DDR_NODE_AVA    0xA5A57777
 #define TX_TASK_DDR_NODE_OPY    0x7777A5A5
 
@@ -194,6 +194,7 @@ struct hisi_mbox_dev_ops {
 
 	/* mntn */
 	void		(*status)(struct hisi_mbox_device *mdev);
+	void		(*dump_regs)(struct hisi_mbox_device *mdev);
 };
 
 struct hisi_mbox {

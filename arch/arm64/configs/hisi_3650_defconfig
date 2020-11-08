@@ -3468,11 +3468,6 @@ CONFIG_HISI_MAILBOX=y
 CONFIG_HISI_RPROC=y
 
 #
-# hisi rproc kernel API debugfs
-#
-# CONFIG_HISI_RPROC_TESTFILE is not set
-
-#
 # bsp_reset_core_notify to support modem compile
 #
 # CONFIG_BSP_RESET_CORE_NOTIFY is not set

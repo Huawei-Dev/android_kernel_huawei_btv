@@ -28,14 +28,6 @@ config HISI_RPROC
 	help
 	  hisi kernel API about remote processor communication
 	  
-comment "hisi rproc kernel API debugfs"
-config HISI_RPROC_TESTFILE
-	bool "hisi rproc kernel API test file"
-	depends on HISI_RPROC
-	default n
-	help
-	  debug for hisi_rproc
-
 comment "bsp_reset_core_notify to support modem compile"
 config BSP_RESET_CORE_NOTIFY
 	bool "bsp_reset_core_notify"
