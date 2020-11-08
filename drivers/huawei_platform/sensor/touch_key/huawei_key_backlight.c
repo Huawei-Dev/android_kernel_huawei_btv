@@ -12,9 +12,12 @@
 #define KEY_BACKLIGHT_COMPATIBLE_ID		"huawei,key_backlight"
 #define HWLOG_TAG key_backlight
 
+#define CONFIG_BY_SENSOR	0
+#define CONFIG_BY_DR		1
+
 HWLOG_REGIST();
 
-#ifdef CONFIG_INPUTHUB
+#if defined(CONFIG_INPUTHUB) || defined(CONFIG_INPUTHUB_20)
 extern int huawei_set_key_backlight(void *param_t);
 #else
 int huawei_set_key_backlight(void *param_t)
@@ -22,9 +25,20 @@ int huawei_set_key_backlight(void *param_t)
 	return 0;
 }
 #endif
+
+#ifdef CONFIG_HW_RL_TOUCH_KEY
+extern int huawei_set_dr_key_backlight(void *param_t);
+#else
+int huawei_set_dr_key_backlight(void *param_t)
+{
+	return 0;
+}
+#endif
+
 int send_key_event_to_inputhub(struct key_param_t *param_t);
 static void huawei_led_set_brightness(struct led_classdev *led_ldev,
 				      enum led_brightness brightness);
+static int ctrl_mode = 0;
 
 struct huawei_led {
 	const char *name;
@@ -41,11 +55,29 @@ static struct led_classdev huawei_led_ldev=
 	.brightness_set = huawei_led_set_brightness,
 };
 
+static int set_brightness(void *param_t) {
+	int ret = 0;
+	switch(ctrl_mode){
+	case CONFIG_BY_SENSOR:
+		ret = huawei_set_key_backlight(param_t);
+		break;
+	case CONFIG_BY_DR:
+		ret = huawei_set_dr_key_backlight(param_t);
+		break;
+	default:
+		hwlog_err("not support control mode\n");
+		return -EINVAL;
+	}
+	return ret;
+}
+
 static void huawei_led_set_brightness(struct led_classdev *led_ldev,
 				      enum led_brightness brightness)
 {
 	int ret = 0;
 	struct key_param_t param;
+
+	hwlog_info("keypad set brightness = %d\n", brightness);
 
 	if(brightness < 0 || brightness > 255)
 	{
@@ -54,8 +86,10 @@ static void huawei_led_set_brightness(struct led_classdev *led_ldev,
 	}
 	param.brightness1 = brightness;
 	param.brightness2 = brightness;
+
+	hwlog_info("keypad set key backlight1 = 0x%x, backlight2 = 0x%x\n", param.brightness1, param.brightness2);
 	param.test_mode = 0;
-	ret = huawei_set_key_backlight(&param);
+	ret = set_brightness(&param);
 	if (ret < 0) {
 		hwlog_err("set key backlight err. ret:%d\n", ret);
 	}
@@ -84,7 +118,7 @@ static ssize_t store_keybacklight_attr(struct device *dev,
 		param.brightness1 = (uint8_t)(brightness & 0xff);
 		param.brightness2 = (uint8_t)((brightness>>8) & 0xff);
 		param.test_mode = 1;
-		ret = huawei_set_key_backlight(&param);
+		ret = set_brightness(&param);
 		if (ret < 0) {
 			hwlog_info("set backlight failed\n", brightness);
 		}
@@ -105,15 +139,24 @@ static const struct attribute_group key_backlight_node = {
 static int key_backlight_probe(struct platform_device *pdev)
 {
 	int ret = 0;
+	int val = 0;
 	hwlog_info("key_backlight device probe in\n");
-	
+
 	ret = led_classdev_register(&pdev->dev, &huawei_led_ldev);
 	if (ret < 0) {
 		hwlog_err("couldn't register LED %s\n", huawei_led_ldev.name);
 		goto error;
 	}
+
+	ret = of_property_read_u32(pdev->dev.of_node, "ctrl_mode", &val);
+    if (ret < 0) {
+		hwlog_info("couldn't get ctrl_mode\n");
+		val = 0;
+	}
+	ctrl_mode = val;
+
 	ret = sysfs_create_group(&huawei_led_ldev.dev->kobj, &key_backlight_node);
-	if (ret) 
+	if (ret)
 	{
 		hwlog_err("touch key backlight sysfs_create_group error ret =%d", ret);
 		goto unregister;

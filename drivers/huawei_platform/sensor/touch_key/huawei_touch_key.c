@@ -33,7 +33,7 @@ int touch_key_input_register(struct touch_key_device *touch_key_dev)
 		return -ENOMEM;
 
 	touch_key_dev->input_dev = input_allocate_device();
-	if (IS_ERR(touch_key_dev->input_dev)) {
+	if (IS_ERR_OR_NULL(touch_key_dev->input_dev)) {
 		hwlog_err("input dev alloc failed\n");
 		ret = -ENOMEM;
 		return ret;

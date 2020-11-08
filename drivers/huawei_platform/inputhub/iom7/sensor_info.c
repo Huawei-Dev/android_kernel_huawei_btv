@@ -1236,6 +1236,43 @@ APDS9251_ALS_PARA_TABLE apds_als_para_diff_tp_color_table[] = {
 
 void key_fb_notifier_action(int enable);
 
+enum SENSOR_POWER_CHECK {
+	SENSOR_POWER_STATE_OK = 0,
+	SENSOR_POWER_STATE_INIT_NOT_READY,
+	SENSOR_POWER_STATE_CHECK_ACTION_FAILED,
+	SENSOR_POWER_STATE_CHECK_RESULT_FAILED,
+	SENSOR_POWER_STATE_NOT_PMIC,
+};
+
+static int sensor_power_pmic_flag;
+static int sensor_power_init_finish;
+int sensor_pmic_power_check(void)
+{
+	int ret = 0;
+	int state = 0;
+	int result = SENSOR_POWER_STATE_OK;
+
+	if (!sensor_power_init_finish) {
+		result = SENSOR_POWER_STATE_INIT_NOT_READY;
+		goto out;
+	}
+	if (!sensor_power_pmic_flag) {
+		result =  SENSOR_POWER_STATE_NOT_PMIC;
+		goto out;
+	}
+
+	ret = hw_extern_pmic_query_state(1, &state);
+	if (ret) {
+		result = SENSOR_POWER_STATE_CHECK_ACTION_FAILED;
+		goto out;
+	}
+	if (!state)
+		result = SENSOR_POWER_STATE_CHECK_RESULT_FAILED;
+out:
+	hwlog_info("sensor check result:%d\n", result);
+	return result;
+}
+
 static bool should_be_processed_when_sr(int sensor_tag)
 {
 	bool ret = true;	/*can be closed default*/
@@ -1357,12 +1394,12 @@ static uint8_t gyro_sensor_calibrate_data[MAX_SENSOR_CALIBRATE_DATA_LENGTH];
 static uint8_t handpress_calibrate_data[MAX_SENSOR_CALIBRATE_DATA_LENGTH];
 /*******************************************************************************
 Function:	read_gsensor_offset_from_nv
-Description:   读取NV项中的gsensor 校准数据，并发送给mcu 侧
-Data Accessed:  无
-Data Updated:   无
-Input:         无
-Output:         无
-Return:         成功或者失败信息: 0->成功, -1->失败
+Description:   \B6\C1取NV\CF\EE\D6械\C4gsensor 校准\CA\FD\BE荩\AC\B2\A2\B7\A2\CB透\F8mcu \B2\E0
+Data Accessed:  \CE\DE
+Data Updated:   \CE\DE
+Input:         \CE\DE
+Output:         \CE\DE
+Return:         \B3晒\A6\BB\F2\D5\DF失\B0\DC\D0\C5息: 0->\B3晒\A6, -1->失\B0\DC
 *******************************************************************************/
 int read_gsensor_offset_from_nv(void)
 {
@@ -1429,12 +1466,12 @@ int read_gsensor_offset_from_nv(void)
 
 /*******************************************************************************
 Function:	write_gsensor_offset_to_nv
-Description:  将temp数据写入NV 项中
-Data Accessed:  无
-Data Updated:   无
+Description:  \BD\ABtemp\CA\FD\BE\DD写\C8\EBNV \CF\EE\D6\D0
+Data Accessed:  \CE\DE
+Data Updated:   \CE\DE
 Input:        g-sensor 校准值
-Output:         无
-Return:         成功或者失败信息: 0->成功, -1->失败
+Output:         \CE\DE
+Return:         \B3晒\A6\BB\F2\D5\DF失\B0\DC\D0\C5息: 0->\B3晒\A6, -1->失\B0\DC
 *******************************************************************************/
 int write_gsensor_offset_to_nv(char *temp)
 {
@@ -2286,38 +2323,6 @@ int send_fileid_to_mcu(void)
 	return 0;
 }
 
-static bool check_sensorhub_isensor_version(void)
-{
-	int len = 0;
-	struct device_node *sensorhub_node = NULL;
-	const char *is_isensor = NULL;
-	sensorhub_node =
-	    of_find_compatible_node(NULL, NULL, "huawei,sensorhub");
-	if (!sensorhub_node) {
-		hwlog_err("%s, can't find node sensorhub\n", __func__);
-		__dmd_log_report(DSM_SHB_ERR_IOM7_CFG_DATA, __func__,
-			       "can't find node sensorhub\n");
-		return false;
-	}
-	is_isensor = of_get_property(sensorhub_node, "isensor_version", &len);
-	if (!is_isensor) {
-		hwlog_err("%s, can't find property isensor_version\n",
-			  __func__);
-		__dmd_log_report(DSM_SHB_ERR_IOM7_CFG_DATA, __func__,
-			       "can't find property isensor_version\n");
-		return false;
-	}
-	if (strstr(is_isensor, "yes")) {
-		hwlog_info("%s, sensorhub is isensor interface version\n",
-			   __func__);
-		return true;
-	} else {
-		hwlog_info("%s, sensorhub is not isensor interface version\n",
-			   __func__);
-		return false;
-	}
-}
-
 static int check_sensor_1V8_from_pmic(void)
 {
 	int len = 0, ret = 0, i = 0;
@@ -2339,6 +2344,7 @@ static int check_sensor_1V8_from_pmic(void)
 			  __func__);
 		return 1;
 	}
+	sensor_power_pmic_flag = 1;
 	if (strstr(sensor_1v8_from_pmic, "yes")) {
 		hwlog_info("%s, sensor_1v8 from pmic\n",__func__);
 		if (of_property_read_u32(sensorhub_node, "sensor_1v8_ldo", &sensor_1v8_ldo)){
@@ -2368,6 +2374,7 @@ static int check_sensor_1V8_from_pmic(void)
 			return 0;
 		}
 	}
+	sensor_power_init_finish = 1;
 	return 1;
 }
 
@@ -2737,12 +2744,12 @@ const char *get_sensor_info_by_tag(int tag)
 
 /*******************************************************************************
 Function:	sensor_set_cfg_data
-Description: 其他配置信息，例如是否需要根据电池电流大小校准指南针
-Data Accessed:  无
-Data Updated:   无
-Input:        无
-Output:         无
-Return:         成功或者失败信息: 0->成功, -1->失败
+Description: \C6\E4\CB\FB\C5\E4\D6\C3\D0\C5息\A3\AC\C0\FD\C8\E7\CA欠\F1\D0\E8要\B8\F9\BE莸\E7\B3氐\E7\C1\F7\B4\F3小校准指\C4\CF\D5\EB
+Data Accessed:  \CE\DE
+Data Updated:   \CE\DE
+Input:        \CE\DE
+Output:         \CE\DE
+Return:         \B3晒\A6\BB\F2\D5\DF失\B0\DC\D0\C5息: 0->\B3晒\A6, -1->失\B0\DC
 *******************************************************************************/
 int sensor_set_current_info(void)
 {
@@ -6395,6 +6402,8 @@ static int sensorhub_io_driver_probe(struct platform_device *pdev)
 		pr_err("[%s] platform_get_irq err\n", __func__);
 		return -ENXIO;
 	}
+	sensor_power_pmic_flag = 0;
+	sensor_power_init_finish = 0;
 	hwlog_err("%s: sensorhub_io_driver_probe success!\n", __func__);
 	return 0;
 }

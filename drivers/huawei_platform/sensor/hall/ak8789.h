@@ -41,6 +41,10 @@
 #define HALL_DATA_REPORT_INPUTDEV
 #endif
 
+#if defined(CONFIG_INPUTHUB) || defined(CONFIG_INPUTHUB_20)
+#define HALL_INPUTHUB_ROUTE
+#endif
+
 #if defined(CONFIG_HUAWEI_DSM) && defined(DSM_HALL_ERROR_NO)
 #define HALL_DSM_CONFIG
 #endif

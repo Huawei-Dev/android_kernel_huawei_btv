@@ -18,6 +18,7 @@
  */
 
 #include <linux/delay.h>
+#include <linux/version.h>
 #include "hall_sensor.h"
 #include "ak8789.h"
 
@@ -48,6 +49,15 @@ static struct dsm_dev dsm_hall = {
 	.fops = NULL,
 	.buff_size = 1024,
 };
+#endif
+
+#if defined(HALL_DATA_REPORT_INPUTHUB) && defined(HALL_INPUTHUB_ROUTE)
+extern int sensor_pmic_power_check(void);
+#else
+static inline int sensor_pmic_power_check(void)
+{
+	return 0;
+}
 #endif
 
 int ak8789_register_report_data(int ms);
@@ -438,8 +448,7 @@ static irqreturn_t ak8789_event_handler(int irq, void *hall_dev)
 	}
 
 	h_dev = (struct hall_device *)hall_dev;
-
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0))
 	trig_val = h_desc->irq_data.state_use_accessors & IRQD_TRIGGER_MASK;
 #else
 	trig_val = h_desc->irq_data.common->state_use_accessors & IRQD_TRIGGER_MASK;
@@ -513,6 +522,7 @@ static void hall_interrupt_abnormity_work(struct work_struct *work)
 	struct hall_device *temp_dev;
 	int count = 0;
 	int hall_type;
+	int check_result = 0;
 
 	list_for_each_entry(temp_dev, &data->head, list) {
 		hall_type = temp_dev->hall_type;
@@ -522,18 +532,19 @@ static void hall_interrupt_abnormity_work(struct work_struct *work)
 			count = atomic_read(&temp_dev->h_info.irq_err_count[0]);
 			hwlog_info("[%s]count:%d[1]\n", __func__, count);
 			if (count >= 3) {
+				check_result = sensor_pmic_power_check();
 #ifdef HALL_DSM_CONFIG
 				/* dsm report err */
 				if (!dsm_client_ocuppy(data->hall_dclient)) {
 					dsm_client_record(data->hall_dclient,
-							  "hall id[%d], north irq abnormity.\n",
-							  temp_dev->hall_id);
+							  "hall id[%d], north irq abnormity.result:%d\n",
+							  temp_dev->hall_id, check_result);
 					dsm_client_notify(data->hall_dclient,
 							  DSM_HALL_ERROR_NO);
 				}
 #endif
-				hwlog_err("hall irq abnormity, id[%d], north\n",
-					  temp_dev->hall_id);
+				hwlog_err("hall irq abnormity, id[%d], north. state:%d\n",
+					  temp_dev->hall_id, check_result);
 				count = 0;
 				atomic_set(&temp_dev->h_info.irq_err_count[0],
 					   0);
@@ -543,18 +554,19 @@ static void hall_interrupt_abnormity_work(struct work_struct *work)
 			count = atomic_read(&temp_dev->h_info.irq_err_count[1]);
 			hwlog_info("[%s]count:%d[2]\n", __func__, count);
 			if (count >= 3) {
+				check_result = sensor_pmic_power_check();
 #ifdef HALL_DSM_CONFIG
 				/* dsm report err */
 				if (!dsm_client_ocuppy(data->hall_dclient)) {
 					dsm_client_record(data->hall_dclient,
-							  "hall id[%d], south irq abnormity.\n",
-							  temp_dev->hall_id);
+							  "hall id[%d], south irq abnormity.result:%d\n",
+							  temp_dev->hall_id, check_result);
 					dsm_client_notify(data->hall_dclient,
 							  DSM_HALL_ERROR_NO);
 				}
 #endif
-				hwlog_err("hall irq abnormity, id[%d], south\n",
-					  temp_dev->hall_id);
+				hwlog_err("hall irq abnormity, id[%d], south. state:%d\n",
+					  temp_dev->hall_id, check_result);
 				count = 0;
 				atomic_set(&temp_dev->h_info.irq_err_count[1],
 					   0);
@@ -735,7 +747,7 @@ static int ak8789_probe(struct platform_device *pdev)
 	INIT_WORK(&data->inter_work, hall_interrupt_abnormity_work);
 
 	data->hall_wq = create_singlethread_workqueue("hall_wq");
-	if (IS_ERR(data->hall_wq)) {
+	if (IS_ERR_OR_NULL(data->hall_wq)) {
 		hwlog_err("[%s] work_wq kmalloc error!\n", __func__);
 		ret = -ENOMEM;
 		goto free_wake_lock;

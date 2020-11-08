@@ -1,7 +1,12 @@
 #include "ak8789.h"
 
-#ifdef HALL_DATA_REPORT_INPUTHUB
+#if defined(HALL_DATA_REPORT_INPUTHUB) && defined(HALL_INPUTHUB_ROUTE)
 extern int ap_hall_report(int value);
+#else
+static inline int ap_hall_report(int value)
+{
+	return 0;
+}
 #endif
 
 #ifdef HALL_DATA_REPORT_INPUTDEV
