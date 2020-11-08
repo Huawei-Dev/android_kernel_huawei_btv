@@ -9,6 +9,7 @@
 #include <linux/cpu.h>
 #include <linux/security.h>
 #include <linux/cpuset.h>
+#include "../../../kernel/sched/sched.h"
 
 #define LITTLE_CPU_START 0
 #define BIG_CPU_START    4
@@ -23,14 +24,25 @@ enum cpu_cluster {
 	CPU_CLUSTER_ALL,
 };
 
+/**
+ * find_process_by_pid - find a process with a matching PID value.
+ * @pid: the pid in question.
+ *
+ * The task of @pid, if found. %NULL otherwise.
+ */
+static struct task_struct *find_process_by_pid(pid_t pid)
+{
+	return pid ? find_task_by_vpid(pid) : current;
+}
+
+
 static int bind_cpu_cluster(enum cpu_cluster e_cpu_cluster, pid_t pid)
 {
 	cpumask_var_t cpus_allowed, new_mask;
-	struct task_struct *p = NULL;
+	struct task_struct *p;
 	int retval;
 	struct cpumask mask;
 	int cpu_no;
-	const struct cred *pcred = NULL;
 
 	cpumask_clear(&mask);
 
@@ -43,7 +55,7 @@ static int bind_cpu_cluster(enum cpu_cluster e_cpu_cluster, pid_t pid)
 	get_online_cpus();
 	rcu_read_lock();
 
-	p = find_task_by_vpid(pid);
+	p = find_process_by_pid(pid);
 	if (!p) {
 		rcu_read_unlock();
 		put_online_cpus();
@@ -52,7 +64,6 @@ static int bind_cpu_cluster(enum cpu_cluster e_cpu_cluster, pid_t pid)
 
 	/* Prevent p going away */
 	get_task_struct(p);
-	pcred = __task_cred(p);
 	rcu_read_unlock();
 
 	if (p->flags & PF_NO_SETAFFINITY) {
@@ -74,6 +85,23 @@ static int bind_cpu_cluster(enum cpu_cluster e_cpu_cluster, pid_t pid)
 
 	cpuset_cpus_allowed(p, cpus_allowed);
 	cpumask_and(new_mask, &mask, cpus_allowed);
+
+	/*
+	 * Since bandwidth control happens on root_domain basis,
+	 * if admission test is enabled, we only admit -deadline
+	 * tasks allowed to run on all the CPUs in the task's
+	 * root_domain.
+	 */
+	if (task_has_dl_policy(p) && dl_bandwidth_enabled()) {
+		rcu_read_lock();
+		if (!cpumask_subset(task_rq(p)->rd->span, new_mask)) {
+			retval = -EBUSY;
+			rcu_read_unlock();
+			goto out_unlock;
+		}
+		rcu_read_unlock();
+	}
+
 again:
 	retval = set_cpus_allowed_ptr(p, new_mask);
 
@@ -102,7 +130,13 @@ out_put_task:
 
 static ssize_t perfhub_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
-	return snprintf(buf, PAGE_SIZE, "%c|%d\n", g_last_tag, g_last_pid);
+	if (buf == NULL)
+	{
+		pr_err("buf is NULL.");
+		return -EINVAL;
+	}
+
+	return snprintf(buf, PAGE_SIZE, "%c|%d\n", g_last_tag, g_last_pid);// unsafe_function_ignore: snprintf
 }
 
 static ssize_t perfhub_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t count)
@@ -110,11 +144,17 @@ static ssize_t perfhub_store(struct kobject *kobj, struct kobj_attribute *attr, 
 	char tag;
 	long pid;
 	int ret;
-	char *pstrchr = NULL;
+	const char *pstrchr;
+
+	if (buf == NULL)
+	{
+		pr_err("buf is NULL.");
+		return -EINVAL;
+	}
 
 	tag = *buf;
 
-	pstrchr = strchr(buf, '|');
+	pstrchr = strchr(buf, '|');//lint !e158
 	if (NULL == pstrchr)
 		return -EINVAL;
 
