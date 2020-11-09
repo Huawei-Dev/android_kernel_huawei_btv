@@ -224,6 +224,10 @@ static int __get_v4l2_format32(struct v4l2_format __user *kp,
 	case V4L2_BUF_TYPE_SDR_OUTPUT:
 		return copy_in_user(&kp->fmt.sdr, &up->fmt.sdr,
 				    sizeof(kp->fmt.sdr)) ? -EFAULT : 0;
+	case V4L2_BUF_TYPE_PRIVATE:
+		if (copy_from_user(kp, up, sizeof(kp->fmt.raw_data)))
+			return -EFAULT;
+		return 0;
 	default:
 		return -EINVAL;
 	}
@@ -1026,7 +1030,6 @@ static long do_video_ioctl(struct file *file, unsigned int cmd, unsigned long ar
 	int compatible_arg = 1;
 	long err = 0;
 
-	memset(&karg, 0, sizeof(karg));
 	/* First, convert the command. */
 	switch (cmd) {
 	case VIDIOC_G_FMT32: cmd = VIDIOC_G_FMT; break;
