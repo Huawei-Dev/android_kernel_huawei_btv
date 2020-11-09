@@ -203,7 +203,7 @@ static void hisi_ion_flush_cache_all(void *dummy)
 {
 	unsigned int midr = read_cpuid_id();
 
-	if (MIDR_PARTNUM(midr) == ARM_CPU_PART_CORTEX_ARTEMIS)
+	if (MIDR_PARTNUM(midr) == ARM_CPU_PART_CORTEX_A73)
 		artemis_flush_cache_all();
 	else
 		flush_cache_all();
