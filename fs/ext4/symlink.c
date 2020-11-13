@@ -34,9 +34,6 @@ static const char *ext4_follow_link(struct dentry *dentry, void **cookie)
 	int res;
 	u32 plen, max_size = inode->i_sb->s_blocksize;
 
-	if (!ext4_encrypted_inode(inode))
-		return page_follow_link_light(dentry, nd);
-
 	res = ext4_get_encryption_info(inode);
 	if (res)
 		return ERR_PTR(res);
