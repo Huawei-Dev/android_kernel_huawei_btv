@@ -1619,23 +1619,18 @@ composite_setup(struct usb_gadget *gadget, const struct usb_ctrlrequest *ctrl)
 		case USB_DT_DEVICE:
 			cdev->desc.bNumConfigurations =
 				count_configs(cdev, USB_DT_DEVICE);
-			if (cdev->desc.bNumConfigurations == 0) {
-				pr_err("%s:config is not active. send stall\n",
-								__func__);
-				break;
-			}
-
 			cdev->desc.bMaxPacketSize0 =
 				cdev->gadget->ep0->maxpacket;
+			cdev->desc.bcdUSB = cpu_to_le16(0x0200);
 			if (gadget_is_superspeed(gadget)) {
 				if (gadget->speed >= USB_SPEED_SUPER) {
-					cdev->desc.bcdUSB = cpu_to_le16(0x0310);
+					cdev->desc.bcdUSB = cpu_to_le16(0x0300);
 					cdev->desc.bMaxPacketSize0 = 9;
-				} else {
+				} else if (gadget->l1_supported)  {
 					cdev->desc.bcdUSB = cpu_to_le16(0x0210);
 				}
-			} else {
-				cdev->desc.bcdUSB = cpu_to_le16(0x0200);
+			} else if (gadget->l1_supported) {
+				cdev->desc.bcdUSB = cpu_to_le16(0x0210);
 			}
 
 			value = min(w_length, (u16) sizeof cdev->desc);
