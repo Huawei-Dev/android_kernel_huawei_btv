@@ -1538,7 +1538,7 @@ static int debug_mtp_read_stats(struct seq_file *s, void *unused)
 		seq_printf(s, "vfs write: bytes:%ld\t\t time:%d\n",
 				dev->perf[i].vfs_wbytes,
 				dev->perf[i].vfs_wtime);
-		if (dev->perf[i].vfs_wbytes == mtp_rx_req_len) {
+		if (dev->perf[i].vfs_wbytes == dev->bulk_buffer_size) {
 			sum += dev->perf[i].vfs_wtime;
 			if (min > dev->perf[i].vfs_wtime)
 				min = dev->perf[i].vfs_wtime;
@@ -1560,7 +1560,7 @@ static int debug_mtp_read_stats(struct seq_file *s, void *unused)
 		seq_printf(s, "vfs read: bytes:%ld\t\t time:%d\n",
 				dev->perf[i].vfs_rbytes,
 				dev->perf[i].vfs_rtime);
-		if (dev->perf[i].vfs_rbytes == mtp_tx_req_len) {
+		if (dev->perf[i].vfs_rbytes == dev->bulk_buffer_size) {
 			sum += dev->perf[i].vfs_rtime;
 			if (min > dev->perf[i].vfs_rtime)
 				min = dev->perf[i].vfs_rtime;
