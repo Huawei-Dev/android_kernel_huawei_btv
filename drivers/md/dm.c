@@ -2318,8 +2318,6 @@ static void dm_init_old_md_queue(struct mapped_device *md)
 
 static void cleanup_mapped_device(struct mapped_device *md)
 {
-	cleanup_srcu_struct(&md->io_barrier);
-
 	if (md->wq)
 		destroy_workqueue(md->wq);
 	if (md->kworker_task)
