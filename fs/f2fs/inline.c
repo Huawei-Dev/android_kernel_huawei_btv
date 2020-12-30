@@ -11,6 +11,7 @@
 
 #include "f2fs.h"
 #include "node.h"
+#include <trace/events/android_fs.h>
 
 bool f2fs_may_inline_data(struct inode *inode)
 {
@@ -95,7 +96,7 @@ int f2fs_read_inline_data(struct inode *inode, struct page *page)
 						path, current->comm);
 	}
 
-	ipage = get_node_page(F2FS_I_SB(inode), inode->i_ino);
+	ipage = f2fs_get_node_page(F2FS_I_SB(inode), inode->i_ino);
 	if (IS_ERR(ipage)) {
 		unlock_page(page);
 		return PTR_ERR(ipage);
