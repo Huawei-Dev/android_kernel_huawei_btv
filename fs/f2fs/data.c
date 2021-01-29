@@ -1679,7 +1679,7 @@ zero_out:
 	if (bio && (*last_block_in_bio != block_nr - 1 ||
 		!__same_bdev(F2FS_I_SB(inode), block_nr, bio))) {
 submit_and_realloc:
-		__submit_bio(F2FS_I_SB(inode), bio, DATA);
+		__f2fs_submit_read_bio(F2FS_I_SB(inode), bio, DATA);
 		bio = NULL;
 	}
 	if (bio == NULL) {
@@ -1707,7 +1707,7 @@ submit_and_realloc:
 	goto out;
 confused:
 	if (bio) {
-		__submit_bio(F2FS_I_SB(inode), bio, DATA);
+		__f2fs_submit_read_bio(F2FS_I_SB(inode), bio, DATA);
 		bio = NULL;
 	}
 	unlock_page(page);
