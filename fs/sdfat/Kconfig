@@ -1,6 +1,6 @@
 config SDFAT_FS
 	tristate "sdFAT fs support"
-	default n
+	default y
 	select NLS
 	select NLS_UTF8
 	select NLS_CODEPAGE_437
@@ -17,21 +17,21 @@ config SDFAT_FS
 
 config SDFAT_USE_FOR_EXFAT
 	bool "Register sdFAT as exFAT"
-	default n
+	default y
 	depends on SDFAT_FS && !EXFAT_FS
 	help
 	  If you want to register sdFAT as available for exFAT, say Y.
 
 config SDFAT_USE_FOR_VFAT
 	bool "Register sdFAT as VFAT"
-	default n
+	default y
 	depends on SDFAT_FS && !VFAT_FS
 	help
 	  If you want to register sdFAT as available for VFAT, say Y.
 
 config SDFAT_DELAYED_META_DIRTY
 	bool "Enable delayed metadata dirty"
-	default n
+	default y
 	depends on SDFAT_FS
 	help
 	  If you enable this feature, metadata(FAT/Directory entry) is updated
@@ -69,12 +69,12 @@ config SDFAT_CHECK_RO_ATTR
 
 config SDFAT_ALIGNED_MPAGE_WRITE
 	bool "Enable supporting aligned mpage_write"
-	default n
+	default y
 	depends on SDFAT_FS
 
 config SDFAT_VIRTUAL_XATTR
 	bool "Virtual xattr support for sdFAT"
-	default n
+	default y
 	depends on SDFAT_FS
 	help
 	  To support virtual xattr.
@@ -88,13 +88,13 @@ config SDFAT_VIRTUAL_XATTR_SELINUX_LABEL
 
 config SDFAT_SUPPORT_STLOG
 	bool "Enable storage log"
-	default n
+	default y
 	depends on SDFAT_FS && PROC_STLOG
 
 config SDFAT_DEBUG
 	bool "Enable debug features"
 	depends on SDFAT_FS
-	default n
+	default y
 
 config SDFAT_DBG_IOCTL
 	bool "Enable debug-ioctl features"
@@ -104,7 +104,7 @@ config SDFAT_DBG_IOCTL
 config SDFAT_DBG_MSG
 	bool "Enable debug messages"
 	depends on SDFAT_FS && SDFAT_DEBUG
-	default n
+	default y
 
 config SDFAT_DBG_BUGON
 	bool "Enable strict BUG_ON() for debugging"
@@ -119,9 +119,9 @@ config SDFAT_DBG_WARNON
 config SDFAT_STATISTICS
 	bool "Enable statistics for bigdata"
 	depends on SDFAT_FS
-	default n
+	default y
 
 config SDFAT_UEVENT
 	bool "enable uevent"
 	depends on SDFAT_FS
-	default n
+	default y
