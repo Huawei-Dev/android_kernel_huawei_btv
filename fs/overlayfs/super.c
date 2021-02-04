@@ -1181,10 +1181,6 @@ static int ovl_fill_super(struct super_block *sb, void *data, int silent)
 	sb->s_root = root_dentry;
 	sb->s_fs_info = ufs;
 
-#ifdef CONFIG_SECURITY
-	security_sb_clone_mnt_opts(oe->lowerstack[0].mnt->mnt_sb, sb);
-#endif
-
 	return 0;
 
 out_free_oe:
