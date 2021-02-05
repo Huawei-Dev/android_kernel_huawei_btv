@@ -379,7 +379,7 @@ err:
 void usbtv_audio_free(struct usbtv *usbtv)
 {
 	if (usbtv->snd && usbtv->udev) {
-		snd_card_free(usbtv->snd);
+		snd_card_free_when_closed(usbtv->snd);
 		usbtv->snd = NULL;
 	}
 }
