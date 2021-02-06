@@ -36,7 +36,6 @@
 #include <linux/sched.h>
 #include <linux/fs.h>
 #include <linux/path.h>
-#include <linux/timekeeping.h>
 
 #include <asm/uaccess.h>
 #include <asm/mmu_context.h>
@@ -237,10 +236,9 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm)
 				break;
 			/* UNIX time of coredump */
 			case 't': {
-				time64_t time;
-
-				time = ktime_get_real_seconds();
-				err = cn_printf(cn, "%lld", time);
+				struct timeval tv;
+				do_gettimeofday(&tv);
+				err = cn_printf(cn, "%lu", tv.tv_sec);
 				break;
 			}
 			/* hostname */
