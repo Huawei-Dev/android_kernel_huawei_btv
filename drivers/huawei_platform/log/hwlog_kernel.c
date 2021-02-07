@@ -21,6 +21,7 @@
 #include <huawei_platform/log/hw_log.h>
 #include <linux/hrtimer.h>
 #include <linux/time.h>
+#include <linux/version.h>
 
 #define MAX_WORK_COUNT   20
 #define MAX_TAG_SIZE     64
@@ -191,7 +192,11 @@ static int __write_to_kernel_kernel(struct my_work_struct  *phwlog)
 	}
 	oldfs = get_fs();
 	set_fs(get_ds());
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 250))
+	ret = vfs_writev(filp[phwlog->nbufid], vec, vlen, &(filp[phwlog->nbufid])->f_pos, 0);
+#else
 	ret = vfs_writev(filp[phwlog->nbufid], vec, vlen, &(filp[phwlog->nbufid])->f_pos);
+#endif
 	set_fs(oldfs);
 	if (unlikely(ret < 0))
 		hwlog_err("failed to write %s\n", log_name[phwlog->nbufid]);
