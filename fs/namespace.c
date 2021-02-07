@@ -304,10 +304,10 @@ static inline void mnt_dec_writers(struct mount *mnt)
 #endif
 }
 
-static int mnt_get_writers(struct mount *mnt)
+static unsigned int mnt_get_writers(struct mount *mnt)
 {
 #ifdef CONFIG_SMP
-	int count = 0;
+	unsigned int count = 0;
 	int cpu;
 
 	for_each_possible_cpu(cpu) {
