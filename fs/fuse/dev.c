@@ -22,13 +22,11 @@
 #include <linux/swap.h>
 #include <linux/splice.h>
 #include <linux/freezer.h>
-#include <linux/suspend.h>
 
 MODULE_ALIAS_MISCDEV(FUSE_MINOR);
 MODULE_ALIAS("devname:fuse");
 
 static struct kmem_cache *fuse_req_cachep;
-static int in_suspend;
 
 static struct fuse_dev *fuse_get_dev(struct file *file)
 {
@@ -504,7 +502,9 @@ static void request_wait_answer(struct fuse_conn *fc, struct fuse_req *req)
 	 * Either request is already in userspace, or it was forced.
 	 * Wait it out.
 	 */
-	wait_event(req->waitq, test_bit(FR_FINISHED, &req->flags));
+	while (!test_bit(FR_FINISHED, &req->flags))
+		wait_event_freezable(req->waitq,
+				test_bit(FR_FINISHED, &req->flags));
 }
 
 static void __fuse_request_send(struct fuse_conn *fc, struct fuse_req *req)
@@ -2360,26 +2360,6 @@ static struct miscdevice fuse_miscdevice = {
 	.fops = &fuse_dev_operations,
 };
 
-static int fuse_stats_notifier(struct notifier_block *nb,
-			       unsigned long event, void *dummy)
-{
-	switch (event) {
-		case PM_SUSPEND_PREPARE:
-			in_suspend = 1;
-			break;
-
-		case PM_POST_SUSPEND:
-			in_suspend = 0;
-			break;
-	}
-
-	return 0;
-}
-
-static struct notifier_block fuse_stats_notifier_block = {
-	.notifier_call = fuse_stats_notifier,
-};
-
 int __init fuse_dev_init(void)
 {
 	int err = -ENOMEM;
@@ -2393,14 +2373,8 @@ int __init fuse_dev_init(void)
 	if (err)
 		goto out_cache_clean;
 
-	err = register_pm_notifier(&fuse_stats_notifier_block);
-	if (err)
-		goto out_misc;
-
 	return 0;
 
- out_misc:
-	misc_deregister(&fuse_miscdevice);
  out_cache_clean:
 	kmem_cache_destroy(fuse_req_cachep);
  out:
