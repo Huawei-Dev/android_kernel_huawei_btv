@@ -1448,10 +1448,8 @@ static int follow_dotdot(struct nameidata *nd)
 			/* rare case of legitimate dget_parent()... */
 			nd->path.dentry = dget_parent(nd->path.dentry);
 			dput(old);
-			if (unlikely(!path_connected(&nd->path))) {
-				path_put(&nd->path);
+			if (unlikely(!path_connected(&nd->path)))
 				return -ENOENT;
-			}
 			break;
 		}
 		if (!follow_up(&nd->path))
@@ -2658,18 +2656,6 @@ struct dentry *lock_rename(struct dentry *p1, struct dentry *p2)
 		return NULL;
 	}
 
-	/*lint -save -e730*/
-	if (unlikely(p2->d_inode == p1->d_inode)) {
-	/*lint -restore*/
-		printk(KERN_ERR "lock_rename fatal, p1:[%lu, %s], p2[%lu, %s], magic:%lu\n",
-			p1->d_inode->i_ino, p1->d_name.name,
-			p2->d_inode->i_ino, p2->d_name.name,
-			p1->d_inode->i_sb->s_magic);
-		dump_stack();
-		mutex_lock_nested(&p1->d_inode->i_mutex, I_MUTEX_PARENT);
-		return NULL;
-	}
-
 	mutex_lock(&p1->d_inode->i_sb->s_vfs_rename_mutex);
 
 	p = d_ancestor(p2, p1);
@@ -2696,10 +2682,6 @@ void unlock_rename(struct dentry *p1, struct dentry *p2)
 {
 	mutex_unlock(&p1->d_inode->i_mutex);
 	if (p1 != p2) {
-		/*lint -save -e730*/
-		if (unlikely(p2->d_inode == p1->d_inode))
-		/*lint -restore*/
-			return;
 		mutex_unlock(&p2->d_inode->i_mutex);
 		mutex_unlock(&p1->d_inode->i_sb->s_vfs_rename_mutex);
 	}
@@ -3318,7 +3300,7 @@ static int do_tmpfile(struct nameidata *nd, unsigned flags,
 		goto out;
 	dir = path.dentry->d_inode;
 	/* we want directory to be writable */
-	error = inode_permission2(nd->path.mnt, nd->inode, MAY_WRITE | MAY_EXEC);
+	error = inode_permission2(path.mnt, dir, MAY_WRITE | MAY_EXEC);
 	if (error)
 		goto out2;
 	if (!dir->i_op->tmpfile) {
