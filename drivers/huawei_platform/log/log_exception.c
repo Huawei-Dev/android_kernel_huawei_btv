@@ -5,6 +5,7 @@
 #include<linux/uaccess.h>
 #include<linux/aio.h>
 #include<linux/types.h>
+#include<linux/version.h>
 #include<uapi/linux/uio.h>
 
 #include <huawei_platform/log/hw_log.h>
@@ -51,7 +52,11 @@ int log_to_exception(char* tag, char* msg)
 	vec[2].iov_base = msg;
 	vec[2].iov_len = strlen(msg)+1;
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 250))
+	ret = vfs_writev(filp, vec, 3, &filp->f_pos, 0);
+#else
 	ret = vfs_writev(filp, vec, 3, &filp->f_pos);
+#endif
 	if (ret < 0) {
 		hwlog_err("%s: write '%s' fail %d\n", __func__, LOG_EXCEPTION_FS, ret);
 		filp_close(filp, NULL);
