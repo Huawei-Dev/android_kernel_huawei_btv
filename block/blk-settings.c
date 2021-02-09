@@ -867,31 +867,6 @@ void blk_queue_flush_queueable(struct request_queue *q, bool queueable)
 }
 EXPORT_SYMBOL_GPL(blk_queue_flush_queueable);
 
-/**
- * blk_queue_write_cache - configure queue's write cache
- * @q:		the request queue for the device
- * @wc:		write back cache on or off
- * @fua:	device supports FUA writes, if true
- *
- * Tell the block layer about the write cache of @q.
- */
-void blk_queue_write_cache(struct request_queue *q, bool wc, bool fua)
-{
-	spin_lock_irq(q->queue_lock);
-	if (wc)
-		queue_flag_set(QUEUE_FLAG_WC, q);
-	else
-		queue_flag_clear(QUEUE_FLAG_WC, q);
-	if (fua)
-		queue_flag_set(QUEUE_FLAG_FUA, q);
-	else
-		queue_flag_clear(QUEUE_FLAG_FUA, q);
-	spin_unlock_irq(q->queue_lock);
-
-	wbt_set_write_cache(q->rq_wb, test_bit(QUEUE_FLAG_WC, &q->queue_flags));
-}
-EXPORT_SYMBOL_GPL(blk_queue_write_cache);
-
 static int __init blk_settings_init(void)
 {
 	blk_max_low_pfn = max_low_pfn - 1;

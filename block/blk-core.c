@@ -39,7 +39,6 @@
 #include <linux/ratelimit.h>
 #include <linux/pm_runtime.h>
 #include <linux/blk-cgroup.h>
-#include <linux/wbt.h>
 
 #ifdef CONFIG_BLOCK_PERF_FRAMEWORK
 #include <linux/ktime.h>
@@ -895,8 +894,7 @@ blk_init_allocated_queue(struct request_queue *q, request_fn_proc *rfn,
 
 fail:
 	blk_free_flush_queue(q->fq);
-	wbt_exit(q->rq_wb);
-	q->rq_wb = NULL;
+	q->fq = NULL;
 	return NULL;
 }
 EXPORT_SYMBOL(blk_init_allocated_queue);
@@ -1381,29 +1379,6 @@ struct request *blk_make_request(struct request_queue *q, struct bio *bio,
 }
 EXPORT_SYMBOL(blk_make_request);
 
-static void __blk_put_back_rq(struct request_queue *q, struct request *rq)
-{
-	blk_delete_timer(rq);
-	blk_clear_rq_complete(rq);
-
-	if (rq->cmd_flags & REQ_QUEUED)
-		blk_queue_end_tag(q, rq);
-
-	BUG_ON(blk_queued_rq(rq));
-
-	if (rq->cmd_flags & REQ_URGENT) {
-		/*
-		 * It's not compliant with the design to re-insert
-		 * urgent requests. We want to be able to track this
-		 * down.
-		 */
-		pr_debug("%s(): requeueing/reinserting an URGENT request",
-			__func__);
-		WARN_ON(!q->dispatched_urgent);
-		q->dispatched_urgent = false;
-	}
-}
-
 /**
  * blk_rq_set_block_pc - initialize a request to type BLOCK_PC
  * @rq:		request to be initialized
@@ -1431,46 +1406,18 @@ EXPORT_SYMBOL(blk_rq_set_block_pc);
  */
 void blk_requeue_request(struct request_queue *q, struct request *rq)
 {
-	__blk_put_back_rq(q, rq);
+	blk_delete_timer(rq);
+	blk_clear_rq_complete(rq);
 	trace_block_rq_requeue(q, rq);
-	wbt_requeue(q->rq_wb, &rq->wb_stat);
+
+	if (rq->cmd_flags & REQ_QUEUED)
+		blk_queue_end_tag(q, rq);
+
+	BUG_ON(blk_queued_rq(rq));
 
 	elv_requeue_request(q, rq);
 }
 EXPORT_SYMBOL(blk_requeue_request);
-
-/**
- * blk_reinsert_request() - Insert a request back to the scheduler
- *  <at> q:		request queue
- *  <at> rq:		request to be inserted
- *
- * This function inserts the request back to the scheduler as if
- * it was never dispatched.
- *
- * Return: 0 on success, error code on fail
- */
-int blk_reinsert_request(struct request_queue *q, struct request *rq)
-{
-	__blk_put_back_rq(q, rq);
-	return elv_reinsert_request(q, rq);
-}
-EXPORT_SYMBOL(blk_reinsert_request);
-
-/**
- * blk_reinsert_req_sup() - check whether the scheduler supports
- *          reinsertion of requests
- *  <at> q:		request queue
- *
- * Returns true if the current scheduler supports reinserting
- * request. False otherwise
- */
-bool blk_reinsert_req_sup(struct request_queue *q)
-{
-	if (unlikely(!q))
-		return false;
-	return q->elevator->type->ops.elevator_reinsert_req_fn ? true : false;
-}
-EXPORT_SYMBOL(blk_reinsert_req_sup);
 
 static void add_acct_request(struct request_queue *q, struct request *rq,
 			     int where)
@@ -1562,8 +1509,6 @@ void __blk_put_request(struct request_queue *q, struct request *req)
 
 	/* this is a bio leak if the bio is not tagged with BIO_DONTFREE */
 	WARN_ON(req->bio && !bio_flagged(req->bio, BIO_DONTFREE));
-
-	wbt_done(q->rq_wb, &req->wb_stat, (bool)(req->cmd_flags & REQ_FG));
 
 	/*
 	 * Request may not have originated from ll_rw_blk. if not,
@@ -1776,17 +1721,14 @@ out:
 void init_request_from_bio(struct request *req, struct bio *bio)
 {
 	req->cmd_type = REQ_TYPE_FS;
-	req_latency_check(req,REQ_PROC_STAGE_INIT_FROM_BIO);
 
 	req->cmd_flags |= bio->bi_rw & REQ_COMMON_MASK;
 	if (bio->bi_rw & REQ_RAHEAD)
 		req->cmd_flags |= REQ_FAILFAST_MASK;
 
 	req->errors = 0;
-
 	req->__sector = bio->bi_iter.bi_sector;
 	req->ioprio = bio_prio(bio);
-	req->req_iosche_bypass = bio->bi_iosche_bypass;
 	blk_rq_bio_prep(req->q, req, bio);
 }
 EXPORT_SYMBOL(init_request_from_bio);
@@ -1798,7 +1740,6 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
 	int el_ret, rw_flags, where = ELEVATOR_INSERT_SORT;
 	struct request *req;
 	unsigned int request_count = 0;
-	bool wb_acct;
 
 	/*
 	 * low level driver can indicate that it wants pages above a
@@ -1852,8 +1793,6 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
 	}
 
 get_rq:
-	wb_acct = wbt_wait(q->rq_wb, bio->bi_rw, q->queue_lock);
-
 	/*
 	 * This sync check and mask will be re-done in init_request_from_bio(),
 	 * but we need to set it earlier to expose the sync flag to the
@@ -1864,20 +1803,20 @@ get_rq:
 		rw_flags |= REQ_SYNC;
 
 	/*
+	 * Add in META/PRIO flags, if set, before we get to the IO scheduler
+	 */
+	rw_flags |= (bio->bi_rw & (REQ_META | REQ_PRIO));
+
+	/*
 	 * Grab a free request. This is might sleep but can not fail.
 	 * Returns with the queue unlocked.
 	 */
 	req = get_request(q, rw_flags, bio, GFP_NOIO);
 	if (IS_ERR(req)) {
-		if (wb_acct)
-			__wbt_done(q->rq_wb);
 		bio->bi_error = PTR_ERR(req);
 		bio_endio(bio);
 		goto out_unlock;
 	}
-
-	if (wb_acct)
-		wbt_mark_tracked(&req->wb_stat);
 
 	/*
 	 * After dropping the lock and possibly sleeping here, our request
@@ -3174,10 +3113,6 @@ void blk_start_request(struct request *req)
 {
 	blk_dequeue_request(req);
 
-	req_latency_check(req,REQ_PROC_STAGE_START);
-
-	wbt_issue(req->q->rq_wb, &req->wb_stat, (bool)(req->cmd_flags & REQ_FG));
-
 	/*
 	 * We are now handing the request to the hardware, initialize
 	 * resid_len to full count and add the timeout handler.
@@ -3244,14 +3179,6 @@ bool blk_update_request(struct request *req, int error, unsigned int nr_bytes)
 	int total_bytes;
 
 	trace_block_rq_complete(req->q, req, nr_bytes);
-
-#ifdef CONFIG_WBT
-	/*lint -save -e514*/
-	blk_stat_add(&req->q->rq_stats[rq_data_dir(req)], req);
-	if (req->cmd_flags & REQ_FG)
-		blk_stat_add(&req->q->rq_stats[2 + rq_data_dir(req)], req);
-	/*lint -restore*/
-#endif
 
 	if (!req->bio)
 		return false;
@@ -3428,10 +3355,9 @@ void blk_finish_request(struct request *req, int error)
 
 	blk_account_io_done(req);
 
-	if (req->end_io) {
-		wbt_done(req->q->rq_wb, &req->wb_stat, (bool)(req->cmd_flags & REQ_FG));
+	if (req->end_io)
 		req->end_io(req, error);
-	} else {
+	else {
 		if (blk_bidi_rq(req))
 			__blk_put_request(req->next_rq->q, req->next_rq);
 
