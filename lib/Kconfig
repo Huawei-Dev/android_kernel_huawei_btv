@@ -539,9 +539,6 @@ config ARCH_HAS_SG_CHAIN
 config ARCH_HAS_PMEM_API
 	bool
 
-config WBT
-	bool "buffered writeback throttling"
-
 config STACKDEPOT
 	bool
 	select STACKTRACE

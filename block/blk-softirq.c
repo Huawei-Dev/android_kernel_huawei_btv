@@ -167,7 +167,6 @@ void blk_complete_request(struct request *req)
 {
 	if (unlikely(blk_should_fake_timeout(req->q)))
 		return;
-	req_latency_check(req,REQ_PROC_STAGE_COMPLETE);
 	if (!blk_mark_rq_complete(req))
 		__blk_complete_request(req);
 }
