@@ -13,11 +13,6 @@
 #include <linux/of.h>
 #include <linux/of_address.h>
 
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-#include <huawei_platform/log/log_usertype/log-usertype.h>
-#include <linux/hisi/hw_cmdline_parse.h> /*for runmode_is_factory*/
-#endif
-
 static unsigned int scbbpdrxstat1;
 static unsigned int scbbpdrxstat2;
 static unsigned int fpga_flag;
@@ -200,28 +195,5 @@ int get_console_name(char *name, int name_buf_len)
 	}
 
 	return -1;
-}
-#endif
-
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-int printk_level = LOGLEVEL_DEBUG;
-int sysctl_printk_level = LOGLEVEL_DEBUG;
-extern raw_spinlock_t *g_logbuf_level_lock_ex;
-/*
- * if loglevel > level, the log will not be saved to memory in no log load
- * log load and factory mode load will not be affected
- */
-void printk_level_setup(int level)
-{
-	unsigned int type = get_logusertype_flag();
-
-	if (type != COMMERCIAL_USER || runmode_is_factory())
-		return;
-
-	pr_alert("printk_level_setup: %d\n", level);
-	raw_spin_lock(g_logbuf_level_lock_ex);
-	if (level >= LOGLEVEL_EMERG && level <= LOGLEVEL_DEBUG)
-		printk_level = level;
-	raw_spin_unlock(g_logbuf_level_lock_ex);
 }
 #endif

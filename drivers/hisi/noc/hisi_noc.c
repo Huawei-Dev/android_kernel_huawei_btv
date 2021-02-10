@@ -346,7 +346,6 @@ static irqreturn_t hisi_noc_irq_handler(int irq, void *data)
 
     /* Get NoC Bus Irq Status From PCTRL. */
 	pending = noc_get_irq_status(noc_dev->pctrl_base);
-	printk_level_setup(LOGLEVEL_DEBUG);
 
 	/* Stop Other Cpus Immediately to Dump Call Stack. */
 	if (!noc_property_dt.packet_enable || !noc_property_dt.transcation_enable) {
@@ -451,7 +450,6 @@ NOC_ERROR_CHECK:
 	}
 
 noc_ret:
-	printk_level_setup(sysctl_printk_level);
 	return IRQ_HANDLED;
 }
 

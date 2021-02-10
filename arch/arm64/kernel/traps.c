@@ -289,10 +289,6 @@ static unsigned long oops_begin(void)
 	int cpu;
 	unsigned long flags;
 
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-	printk_level_setup(LOGLEVEL_DEBUG);
-#endif
-
 	oops_enter();
 
 	/* racy, but better than risking deadlock. */
@@ -332,9 +328,6 @@ static void oops_end(unsigned long flags, struct pt_regs *regs, int notify)
 		panic("Fatal exception");
 	if (notify != NOTIFY_STOP)
 		do_exit(SIGSEGV);
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-	printk_level_setup(sysctl_printk_level);
-#endif
 }
 
 /*
@@ -446,15 +439,9 @@ asmlinkage void __exception do_undefinstr(struct pt_regs *regs)
 		return;
 
 	if (unhandled_signal(current, SIGILL) && show_unhandled_signals_ratelimited()) {
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-		printk_level_setup(LOGLEVEL_DEBUG);
-#endif
 		pr_info("%s[%d]: undefined instruction: pc=%p\n",
 			current->comm, task_pid_nr(current), pc);
 		dump_instr(KERN_INFO, regs);
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-		printk_level_setup(sysctl_printk_level);
-#endif
 	}
 
 	info.si_signo = SIGILL;
