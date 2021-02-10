@@ -83,7 +83,6 @@ void rdr_register_system_error(u32 modid, u32 arg1, u32 arg2)
 void rdr_system_error(u32 modid, u32 arg1, u32 arg2)
 {
 	char *modid_str = NULL;
-	printk_level_setup(LOGLEVEL_DEBUG);
 	BB_PRINT_START();
 	if (in_atomic() || irqs_disabled() || in_irq()) {
 		BB_PRINT_ERR("%s: in atomic or irqs disabled or in irq\n",
@@ -96,13 +95,11 @@ void rdr_system_error(u32 modid, u32 arg1, u32 arg2)
 	if (!rdr_init_done()) {
 		BB_PRINT_ERR("rdr init faild!\n");
 		BB_PRINT_END();
-		printk_level_setup(sysctl_printk_level);
 		return;
 	}
 	rdr_register_system_error(modid, arg1, arg2);
 	up(&rdr_sem);
 	BB_PRINT_END();
-	printk_level_setup(sysctl_printk_level);
 	return;
 }
 
@@ -113,8 +110,6 @@ void rdr_syserr_process_for_ap(u32 modid, u64 arg1, u64 arg2)
 	char date[DATATIME_MAXLEN];
 	struct rdr_syserr_param_s p;
 	BB_PRINT_START();
-
-	printk_level_setup(LOGLEVEL_DEBUG);
 
 	p.modid = modid, p.arg1 = arg1, p.arg2 = arg2;
 	preempt_disable();
@@ -142,7 +137,6 @@ void rdr_syserr_process_for_ap(u32 modid, u64 arg1, u64 arg2)
 	rdr_notify_module_reset(modid, p_exce_info);
 
 	preempt_enable();
-	printk_level_setup(sysctl_printk_level);
 	BB_PRINT_END();
 	return;
 }
@@ -419,13 +413,8 @@ static int rdr_main_thread_body(void *arg)
 
 			list_del(process);
 			spin_unlock(&g_rdr_syserr_list_lock);
-
-			printk_level_setup(LOGLEVEL_DEBUG);
 			rdr_syserr_process(e_process);
-			printk_level_setup(sysctl_printk_level);
-
 			kfree(e_process);
-
 			e_priority = RDR_PPRI_MAX;
 			process = NULL;
 			e_process = NULL;

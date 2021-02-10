@@ -224,22 +224,6 @@ static int sysrq_sysctl_handler(struct ctl_table *table, int write,
 
 #endif
 
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-static int proc_dointvec_printk_level(struct ctl_table *table, int write,
-				void __user *buffer, size_t *lenp, loff_t *ppos)
-{
-	int error;
-
-	error = proc_dointvec(table, write, buffer, lenp, ppos);
-	if (error)
-		return error;
-
-	printk_level_setup(sysctl_printk_level);
-
-	return 0;
-}
-#endif
-
 static struct ctl_table kern_table[];
 static struct ctl_table vm_table[];
 static struct ctl_table fs_table[];
@@ -1143,15 +1127,6 @@ static struct ctl_table kern_table[] = {
 		.proc_handler	= proc_dointvec_minmax_sysadmin,
 		.extra1		= &zero,
 		.extra2		= &two,
-	},
-#endif
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-	{
-		.procname	= "printk_level",
-		.data		= &sysctl_printk_level,
-		.maxlen		= sizeof(int),
-		.mode		= 0644,
-		.proc_handler	= proc_dointvec_printk_level,
 	},
 #endif
 	{

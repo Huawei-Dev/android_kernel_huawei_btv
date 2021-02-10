@@ -694,9 +694,6 @@ static void check_hung_task(struct task_struct *t, unsigned long timeout)
 	if (sysctl_hung_task_warnings > 0)
 		sysctl_hung_task_warnings--;
 
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-	printk_level_setup(LOGLEVEL_DEBUG);
-#endif
 	/*
 	 * Ok, the task did not get scheduled for more than 2 minutes,
 	 * complain:
@@ -718,9 +715,6 @@ static void check_hung_task(struct task_struct *t, unsigned long timeout)
 	touch_nmi_watchdog();
 
 	show_state_filter(TASK_UNINTERRUPTIBLE);/*lint !e747 */
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-	printk_level_setup(sysctl_printk_level);
-#endif
 	if (sysctl_hung_task_panic) {
 		trigger_all_cpu_backtrace();
 		panic("hung_task: blocked tasks");

@@ -259,9 +259,6 @@ static DEFINE_RAW_SPINLOCK(logbuf_lock);
 #ifdef CONFIG_HISI_TIME
 raw_spinlock_t *g_logbuf_lock_ex = &logbuf_lock;
 #endif
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-raw_spinlock_t *g_logbuf_level_lock_ex = &logbuf_lock;
-#endif
 
 #ifdef CONFIG_PRINTK
 DECLARE_WAIT_QUEUE_HEAD(log_wait);
@@ -1805,16 +1802,6 @@ asmlinkage int vprintk_emit(int facility, int level,
 
 	if (level == LOGLEVEL_DEFAULT)
 		level = default_message_loglevel;
-
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-	if (level > printk_level) {
-		logbuf_cpu = UINT_MAX;
-		raw_spin_unlock(&logbuf_lock);
-		lockdep_on();
-		local_irq_restore(flags);
-		return 0;
-	}
-#endif
 
 	if (dict)
 		lflags |= LOG_PREFIX|LOG_NEWLINE;

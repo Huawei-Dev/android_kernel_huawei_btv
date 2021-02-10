@@ -86,10 +86,6 @@ void panic(const char *fmt, ...)
 	struct pt_regs regs;
 #endif
 
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-	printk_level_setup(LOGLEVEL_DEBUG);
-#endif
-
 #ifdef CONFIG_HISI_CORESIGHT_TRACE
 	etm4_disable_all();
 #endif

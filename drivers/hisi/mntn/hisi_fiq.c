@@ -28,7 +28,6 @@ asmlinkage void fiq_dump(struct pt_regs *regs, unsigned int esr)
 	bust_spinlocks(1);
 	flush_ftrace_buffer_cache();
 
-	printk_level_setup(LOGLEVEL_DEBUG);
 	pr_crit("fiq_dump begin!\n");
 	dmss_fiq_handler();
 	console_verbose();

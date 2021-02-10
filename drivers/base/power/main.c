@@ -443,15 +443,8 @@ static void dpm_watchdog_handler(unsigned long data)
 {
 	struct dpm_watchdog *wd = (void *)data;
 
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-	printk_level_setup(LOGLEVEL_DEBUG);
-#endif
 	dev_emerg(wd->dev, "**** DPM device timeout ****\n");
 	show_stack(wd->tsk, NULL);
-
-#ifdef CONFIG_HUAWEI_PRINTK_CTRL
-	printk_level_setup(sysctl_printk_level);
-#endif
 
 	panic("%s %s: unrecoverable failure\n",
 		dev_driver_string(wd->dev), dev_name(wd->dev));

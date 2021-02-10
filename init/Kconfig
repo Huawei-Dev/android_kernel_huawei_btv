@@ -1547,14 +1547,6 @@ config PRINTK
 	  very difficult to diagnose system problems, saying N here is
 	  strongly discouraged.
 
-config HUAWEI_PRINTK_CTRL
-	default n
-	bool "Enable support for log level control" if EXPERT
-	help
-	  This option enables log level control in no log load, Warning
-	  , Info, Debug kernel log will not be saved to memory if this
-	  option is enabled
-
 config BUG
 	bool "BUG() support" if EXPERT
 	default y
