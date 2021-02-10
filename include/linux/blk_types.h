@@ -89,7 +89,6 @@ struct bio {
 	unsigned long		bi_rw;		/* bottom bits READ/WRITE,
 						 * top bits priority
 						 */
-	unsigned char bi_async_flush;
 	struct bvec_iter	bi_iter;
 
 #ifdef CONFIG_BLOCK_PERF_FRAMEWORK
