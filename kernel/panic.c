@@ -23,9 +23,6 @@
 #include <linux/sysrq.h>
 #include <linux/init.h>
 #include <linux/nmi.h>
-#ifdef CONFIG_HISI_CORESIGHT_TRACE
-#include <linux/coresight.h>
-#endif
 #include <linux/console.h>
 #ifdef CONFIG_HISI_BB
 #include <asm/ptrace.h>
@@ -84,10 +81,6 @@ void panic(const char *fmt, ...)
 	int state = 0;
 #ifdef CONFIG_HISI_BB
 	struct pt_regs regs;
-#endif
-
-#ifdef CONFIG_HISI_CORESIGHT_TRACE
-	etm4_disable_all();
 #endif
 
 #ifdef CONFIG_HISI_BB

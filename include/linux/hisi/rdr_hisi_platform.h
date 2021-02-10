@@ -47,10 +47,6 @@ typedef enum {
 	MODU_MAX
 } dump_mem_module;
 
-#ifdef CONFIG_HISI_CORESIGHT_TRACE
-#define		ETR_DUMP_NAME		"etr_dump.ad"
-#endif
-
 typedef int (*rdr_hisiap_dump_func_ptr) (void *dump_addr, unsigned int size);
 
 #ifdef CONFIG_HISI_BB
