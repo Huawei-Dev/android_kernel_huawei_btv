@@ -24,9 +24,7 @@
 #include <linux/sched.h>
 #include <linux/cpu.h>
 #include "dt_idle_states.h"
-#ifdef CONFIG_HISI_CORESIGHT_TRACE
-#include <linux/coresight.h>
-#endif
+
 
 enum {
 	LITTLE_CLUSTER_ID = 0,
@@ -107,10 +105,6 @@ static int hisi_enter_idle_state(struct cpuidle_device *dev,
 		 * parameter.
 		 */
 		ret = arm_cpuidle_suspend(idx);
-#ifdef CONFIG_HISI_CORESIGHT_TRACE
-		/*Restore ETM registers */
-		_etm4_cpuilde_restore();
-#endif
 #ifdef CONFIG_ARCH_HISI
 		local_fiq_enable();
 #endif

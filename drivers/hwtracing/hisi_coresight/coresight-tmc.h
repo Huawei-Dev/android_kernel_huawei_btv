@@ -21,10 +21,6 @@ struct tcm_dump_head {
 	u32 data_size;
 	char name[TMC_NAME_LEN];
 };
-#ifdef CONFIG_HISI_CORESIGHT_TRACE
-extern void set_etr_trace_info(u64 paddr, u32 size, u32 offset);
-#else
-static inline void set_etr_trace_info(u64 paddr, u32 size, u32 offset){}
-#endif
 
+static inline void set_etr_trace_info(u64 paddr, u32 size, u32 offset){}
 #endif

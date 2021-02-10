@@ -16,7 +16,7 @@
 #include <linux/bitops.h>
 #include <linux/io.h>
 #include <linux/coresight.h>
-#include "coresight-cti.h"
+
 /*
  * Coresight management registers (0xf00-0xfcc)
  * 0xfa0 - 0xfa4: Management	registers in PFTv1.0
