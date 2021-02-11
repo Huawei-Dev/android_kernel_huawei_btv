@@ -1769,7 +1769,6 @@ static inline bool bio_remaining_done(struct bio *bio)
  **/
 void bio_endio(struct bio *bio)
 {
-	bio_latency_check(bio,BIO_PROC_STAGE_ENDBIO);
 	while (bio) {
 		if (unlikely(!bio_remaining_done(bio)))
 			break;

@@ -19,14 +19,6 @@ typedef void (bio_end_io_t) (struct bio *);
 typedef void (bio_destructor_t) (struct bio *);
 typedef void (bio_throtl_end_io_t) (struct bio *);
 
-enum bio_process_stage_enum {
-	BIO_PROC_STAGE_SUBMIT = 0,
-	BIO_PROC_STAGE_GENERIC_MAKE_REQ,
-	BIO_PROC_STAGE_WBT,
-	BIO_PROC_STAGE_ENDBIO,
-	BIO_PROC_STAGE_MAX,
-};
-
 enum req_process_stage_enum {
 	REQ_PROC_STAGE_INIT_FROM_BIO = 0,
 	REQ_PROC_STAGE_MQ_IO_DECISION_IN,
@@ -345,5 +337,4 @@ struct blk_rq_stat {
 #define REQ_DELAY_WARNING_MQ_REQ_INT_BACK			(50)
 #define REQ_DELAY_WARNING_MQ_REQ_FREE				(500)
 
-static inline void bio_latency_check(struct bio *bio,enum bio_process_stage_enum bio_stage){}
 #endif /* __LINUX_BLK_TYPES_H */

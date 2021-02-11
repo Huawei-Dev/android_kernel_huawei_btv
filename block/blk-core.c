@@ -2137,8 +2137,6 @@ blk_qc_t generic_make_request(struct bio *bio)
 	struct bio_list bio_list_on_stack[2];
 	blk_qc_t ret = BLK_QC_T_NONE;
 
-	bio_latency_check(bio,BIO_PROC_STAGE_SUBMIT);
-
 	if (!generic_make_request_checks(bio))
 		goto out;
 
