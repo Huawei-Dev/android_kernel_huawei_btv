@@ -305,7 +305,6 @@ static void ufshcd_pltfrm_shutdown(struct platform_device *pdev)
 
 
 	dev_err(&pdev->dev, "%s ++\n", __func__);
-	blk_mq_shutdown_freeze_tagset(&hba->host->tag_set);
 	/*set all scsi device state to quiet to forbid io form blk level*/
 	__set_quiesce_for_each_device(hba->host);
 

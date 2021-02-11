@@ -70,8 +70,6 @@ static void blkg_free(struct blkcg_gq *blkg)
 		if (blkg->pd[i])
 			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
 
-	percpu_counter_destroy(&blkg->nr_dirtied);
-
 	if (blkg->blkcg != &blkcg_root)
 		blk_exit_rl(&blkg->rl);
 
@@ -93,7 +91,6 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
 {
 	struct blkcg_gq *blkg;
 	int i;
-	int ret;
 
 	/* alloc and init base part */
 	blkg = kzalloc_node(sizeof(*blkg), gfp_mask, q->node);
@@ -108,7 +105,6 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
 	INIT_LIST_HEAD(&blkg->q_node);
 	blkg->blkcg = blkcg;
 	atomic_set(&blkg->refcnt, 1);
-	atomic_set(&blkg->writers, 0);
 
 	/* root blkg uses @q->root_rl, init rl only for !root blkgs */
 	if (blkcg != &blkcg_root) {
@@ -134,11 +130,6 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
 		pd->plid = i;
 	}
 
-	ret = percpu_counter_init(&blkg->nr_dirtied, (s64)0, gfp_mask);
-	if (ret)
-		goto err_free;
-
-	blkg->weight = blkcg->weight;
 	return blkg;
 
 err_free:
@@ -279,7 +270,6 @@ struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
 {
 	struct blkcg_gq *blkg;
 
-	/*lint -save -e727 -e730 -e732 -e747*/
 	WARN_ON_ONCE(!rcu_read_lock_held());
 	lockdep_assert_held(q->queue_lock);
 
@@ -311,7 +301,6 @@ struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
 		if (pos == blkcg || IS_ERR(blkg))
 			return blkg;
 	}
-	/*lint -restore*/
 }
 
 static void blkg_destroy(struct blkcg_gq *blkg)
@@ -324,7 +313,6 @@ static void blkg_destroy(struct blkcg_gq *blkg)
 	lockdep_assert_held(&blkcg->lock);
 
 	/* Something wrong if we are trying to remove same group twice */
-	/*lint -save -e727 -e730 -e732 -e747*/
 	WARN_ON_ONCE(list_empty(&blkg->q_node));
 	WARN_ON_ONCE(hlist_unhashed(&blkg->blkcg_node));
 
@@ -345,17 +333,14 @@ static void blkg_destroy(struct blkcg_gq *blkg)
 	radix_tree_delete(&blkcg->blkg_tree, blkg->q->id);
 	list_del_init(&blkg->q_node);
 	hlist_del_init_rcu(&blkg->blkcg_node);
-	/*lint -restore*/
 
 	/*
 	 * Both setting lookup hint to and clearing it from @blkg are done
 	 * under queue_lock.  If it's not pointing to @blkg now, it never
 	 * will.  Hint assignment itself can race safely.
 	 */
-	/*lint -save -e50 -e58 -e529 -e744 -e774 -e845 -e1058 -e1564*/
 	if (rcu_access_pointer(blkcg->blkg_hint) == blkg)
 		rcu_assign_pointer(blkcg->blkg_hint, NULL);
-	/*lint -restore*/
 
 	/*
 	 * Put the reference taken at the time of creation so that when all
@@ -376,9 +361,7 @@ static void blkg_destroy_all(struct request_queue *q)
 
 	lockdep_assert_held(q->queue_lock);
 
-	/*lint -save -e64 -e530 -e826*/
 	list_for_each_entry_safe(blkg, n, &q->blkg_list, q_node) {
-	/*lint -restore*/
 		struct blkcg *blkcg = blkg->blkcg;
 
 		spin_lock(&blkcg->lock);
@@ -433,9 +416,7 @@ struct request_list *__blk_queue_next_rl(struct request_list *rl,
 		if (list_empty(ent))
 			return NULL;
 	} else {
-		/*lint -save -e826*/
 		blkg = container_of(rl, struct blkcg_gq, rl);
-		/*lint -restore*/
 		ent = &blkg->q_node;
 	}
 
@@ -446,9 +427,7 @@ struct request_list *__blk_queue_next_rl(struct request_list *rl,
 	if (ent == &q->blkg_list)
 		return NULL;
 
-	/*lint -save -e826*/
 	blkg = container_of(ent, struct blkcg_gq, q_node);
-	/*lint -restore*/
 	return &blkg->rl;
 }
 
@@ -599,9 +578,7 @@ EXPORT_SYMBOL_GPL(__blkg_prfill_rwstat);
  */
 u64 blkg_prfill_stat(struct seq_file *sf, struct blkg_policy_data *pd, int off)
 {
-	/*lint -save -e124*/
 	return __blkg_prfill_u64(sf, pd, blkg_stat_read((void *)pd + off));
-	/*lint -restore*/
 }
 EXPORT_SYMBOL_GPL(blkg_prfill_stat);
 
@@ -616,11 +593,9 @@ EXPORT_SYMBOL_GPL(blkg_prfill_stat);
 u64 blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
 		       int off)
 {
-	/*lint -save -e124*/
 	struct blkg_rwstat rwstat = blkg_rwstat_read((void *)pd + off);
 
 	return __blkg_prfill_rwstat(sf, pd, &rwstat);
-	/*lint -restore*/
 }
 EXPORT_SYMBOL_GPL(blkg_prfill_rwstat);
 
@@ -765,9 +740,7 @@ struct blkg_rwstat blkg_rwstat_recursive_sum(struct blkcg_gq *blkg,
 {
 	struct blkcg_gq *pos_blkg;
 	struct cgroup_subsys_state *pos_css;
-	/*lint -save -e785*/
 	struct blkg_rwstat sum = { };
-	/*lint -restore*/
 	int i;
 
 	lockdep_assert_held(blkg->q->queue_lock);
@@ -1311,9 +1284,7 @@ void blkcg_deactivate_policy(struct request_queue *q,
 
 	__clear_bit(pol->plid, q->blkcg_pols);
 
-	/*lint -save -e64 -e826*/
 	list_for_each_entry(blkg, &q->blkg_list, q_node) {
-	/*lint -restore*/
 		/* grab blkcg lock too while removing @pd from @blkg */
 		spin_lock(&blkg->blkcg->lock);
 
@@ -1416,9 +1387,7 @@ void blkcg_policy_unregister(struct blkcg_policy *pol)
 
 	mutex_lock(&blkcg_pol_register_mutex);
 
-	/*lint -save -e730*/
 	if (WARN_ON(blkcg_policy[pol->plid] != pol))
-	/*lint -restore*/
 		goto out_unlock;
 
 	/* kill the intf files first */

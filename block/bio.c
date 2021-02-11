@@ -1988,9 +1988,7 @@ EXPORT_SYMBOL(bioset_create_nobvec);
  */
 int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css)
 {
-	/*lint -save -e730*/
 	if (unlikely(bio->bi_css))
-	/*lint -restore*/
 		return -EBUSY;
 	css_get(blkcg_css);
 	bio->bi_css = blkcg_css;

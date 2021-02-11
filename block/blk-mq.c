@@ -135,9 +135,6 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
 }
 EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
 
-void blk_mq_shutdown_freeze_tagset(struct blk_mq_tag_set *tag_set){}
-EXPORT_SYMBOL_GPL(blk_mq_shutdown_freeze_tagset);
-
 void blk_mq_wake_waiters(struct request_queue *q)
 {
 	struct blk_mq_hw_ctx *hctx;
@@ -813,7 +810,6 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
 			break;
 		default:
 			pr_err("blk-mq: bad return on queue: %d\n", ret);
-			/* fallthrough */
 		case BLK_MQ_RQ_QUEUE_ERROR:
 			rq->errors = -EIO;
 			blk_mq_end_request(rq, rq->errors);
@@ -881,11 +877,6 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
 	}
 
 	return hctx->next_cpu;
-}
-
-void blk_mq_run_hw_queue_unlocked(struct blk_mq_hw_ctx *hctx)
-{
-	__blk_mq_run_hw_queue(hctx);
 }
 
 void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
@@ -1162,7 +1153,7 @@ static inline bool blk_mq_merge_queue_io(struct blk_mq_hw_ctx *hctx,
 					 struct blk_mq_ctx *ctx,
 					 struct request *rq, struct bio *bio)
 {
-	if (!hctx_allow_merges(hctx) || !bio_mergeable(bio)|| (rq->cmd_type == REQ_TYPE_BLOCK_PC)) {
+	if (!hctx_allow_merges(hctx) || !bio_mergeable(bio)) {
 		blk_mq_bio_to_request(rq, bio);
 		spin_lock(&ctx->lock);
 insert_rq:
@@ -1224,13 +1215,6 @@ static struct request *blk_mq_map_request(struct request_queue *q,
 		hctx = alloc_data.hctx;
 	}
 
-	if (!rq) {
-		pr_err("%s: alloc request failed\n", __func__);
-		blk_mq_put_ctx(ctx);
-		bio_endio(bio);
-		return NULL;
-	}
-
 	hctx->queued++;
 	data->hctx = hctx;
 	data->ctx = ctx;
@@ -1242,7 +1226,7 @@ static int blk_mq_direct_issue_request(struct request *rq, blk_qc_t *cookie)
 	int ret;
 	struct request_queue *q = rq->q;
 	struct blk_mq_hw_ctx *hctx = q->mq_ops->map_queue(q,
-			(int)rq->mq_ctx->cpu);
+			rq->mq_ctx->cpu);
 	struct blk_mq_queue_data bd = {
 		.rq = rq,
 		.list = NULL,
@@ -1257,14 +1241,14 @@ static int blk_mq_direct_issue_request(struct request *rq, blk_qc_t *cookie)
 	 */
 	ret = q->mq_ops->queue_rq(hctx, &bd);
 
-	if (likely(ret == BLK_MQ_RQ_QUEUE_OK)) {
+	if (ret == BLK_MQ_RQ_QUEUE_OK) {
 		*cookie = new_cookie;
 		return 0;
 	}
 
 	__blk_mq_requeue_request(rq);
 
-	if (unlikely(ret == BLK_MQ_RQ_QUEUE_ERROR)) {
+	if (ret == BLK_MQ_RQ_QUEUE_ERROR) {
 		*cookie = BLK_QC_T_NONE;
 		rq->errors = -EIO;
 		blk_mq_end_request(rq, rq->errors);
@@ -1286,7 +1270,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
 	struct blk_map_ctx data;
 	struct request *rq;
 	unsigned int request_count = 0;
-	struct blk_plug *plug = NULL;
+	struct blk_plug *plug;
 	struct request *same_queue_rq = NULL;
 	blk_qc_t cookie;
 
@@ -1515,7 +1499,6 @@ static struct blk_mq_tags *blk_mq_init_rq_map(struct blk_mq_tag_set *set,
 				 GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
 				 set->numa_node);
 	if (!tags->rqs) {
-		pr_err("%s: alloc rqs failed\n", __func__);
 		blk_mq_free_tags(tags);
 		return NULL;
 	}
@@ -1570,7 +1553,6 @@ static struct blk_mq_tags *blk_mq_init_rq_map(struct blk_mq_tag_set *set,
 				if (set->ops->init_request(set->driver_data,
 						tags->rqs[i], hctx_idx, i,
 						set->numa_node)) {
-					pr_err("%s: init_request failed\n", __func__);
 					tags->rqs[i] = NULL;
 					goto fail;
 				}
@@ -1634,8 +1616,6 @@ static int blk_mq_hctx_cpu_offline(struct blk_mq_hw_ctx *hctx, int cpu)
 	if (list_empty(&tmp))
 		return NOTIFY_OK;
 
-	pr_info("%s: ctx%d rq_list not empty, spliced to current ctx%d\n",
-				__func__, ctx->cpu, raw_smp_processor_id());
 	ctx = blk_mq_get_ctx(q);
 	spin_lock(&ctx->lock);
 
