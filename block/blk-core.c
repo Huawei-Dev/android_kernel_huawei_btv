@@ -337,14 +337,7 @@ inline void __blk_run_queue_uncond(struct request_queue *q)
 	 * can wait until all these request_fn calls have finished.
 	 */
 	q->request_fn_active++;
-	if (!q->notified_urgent &&
-		q->elevator->type->ops.elevator_is_urgent_fn &&
-		q->urgent_request_fn &&
-		q->elevator->type->ops.elevator_is_urgent_fn(q)) {
-		q->notified_urgent = true;
-		q->urgent_request_fn(q);
-	} else
-		q->request_fn(q);
+	q->request_fn(q);
 	q->request_fn_active--;
 }
 EXPORT_SYMBOL_GPL(__blk_run_queue_uncond);
@@ -1090,7 +1083,6 @@ static struct request *__get_request(struct request_list *rl, int rw_flags,
 	struct io_cq *icq = NULL;
 	const bool is_sync = rw_is_sync(rw_flags) != 0;
 	int may_queue;
-	u64 cmd_flags = (u64)(unsigned int)rw_flags;
 
 	if (unlikely(blk_queue_dying(q)))
 		return ERR_PTR(-ENODEV);
@@ -1148,14 +1140,14 @@ static struct request *__get_request(struct request_list *rl, int rw_flags,
 	 * it will be created after releasing queue_lock.
 	 */
 	if (blk_rq_should_init_elevator(bio) && !blk_queue_bypass(q)) {
-		cmd_flags |= REQ_ELVPRIV;
+		rw_flags |= REQ_ELVPRIV;
 		q->nr_rqs_elvpriv++;
 		if (et->icq_cache && ioc)
 			icq = ioc_lookup_icq(ioc, q);
 	}
 
 	if (blk_queue_io_stat(q))
-		cmd_flags |= REQ_IO_STAT;
+		rw_flags |= REQ_IO_STAT;
 	spin_unlock_irq(q->queue_lock);
 
 	/* allocate and init request */
@@ -1165,10 +1157,10 @@ static struct request *__get_request(struct request_list *rl, int rw_flags,
 
 	blk_rq_init(q, rq);
 	blk_rq_set_rl(rq, rl);
-	rq->cmd_flags = cmd_flags | REQ_ALLOCED;
+	rq->cmd_flags = rw_flags | REQ_ALLOCED;
 
 	/* init elvpriv */
-	if (cmd_flags & REQ_ELVPRIV) {
+	if (rw_flags & REQ_ELVPRIV) {
 		if (unlikely(et->icq_cache && !icq)) {
 			if (ioc)
 				icq = ioc_create_icq(ioc, q, gfp_mask);
@@ -1298,8 +1290,6 @@ static struct request *blk_old_get_request(struct request_queue *q, int rw,
 		gfp_t gfp_mask)
 {
 	struct request *rq;
-
-	BUG_ON(rw != READ && rw != WRITE);
 
 	/* create ioc upfront */
 	create_io_context(gfp_mask, q->node);
@@ -1951,69 +1941,6 @@ static inline int bio_check_eod(struct bio *bio, unsigned int nr_sectors)
 	return 0;
 }
 
-#define UPDATE_TIME (HZ / 2)
-static void blk_update_perf(struct request_queue *q,
-	struct hd_struct *p)
-{
-	unsigned long now = jiffies;
-	unsigned long last = q->bw_timestamp;
-	sector_t read_sect, write_sect, tmp_sect;
-	unsigned long read_ios, write_ios, tmp_ios;
-	unsigned long current_ticks;
-	unsigned long busy_ticks;
-
-	/*lint -save -e550 -e774*/
-	if (time_before(now, last + UPDATE_TIME))
-		return;
-	/*lint -restore*/
-
-	/*lint -save -e50 -e747 -e774 -e1072*/
-	if (cmpxchg(&q->bw_timestamp, last, now) != last)
-		return;
-	/*lint -restore*/
-
-	/*lint -save -e40 -e409 -e530 -e570 -e574 -e713 -e737 -e1058 -e1514*/
-	tmp_sect = part_stat_read(p, sectors[READ]);
-	read_sect = tmp_sect - q->last_sects[READ];
-	q->last_sects[READ] = tmp_sect;
-	tmp_sect = part_stat_read(p, sectors[WRITE]);
-	write_sect = tmp_sect - q->last_sects[WRITE];
-	q->last_sects[WRITE] = tmp_sect;
-
-	tmp_ios = part_stat_read(p, ios[READ]);
-	read_ios = tmp_ios - q->last_ios[READ];
-	q->last_ios[READ] = tmp_ios;
-	tmp_ios = part_stat_read(p, ios[WRITE]);
-	write_ios = tmp_ios - q->last_ios[WRITE];
-	q->last_ios[WRITE] = tmp_ios;
-
-	current_ticks = part_stat_read(p, io_ticks);
-	busy_ticks = current_ticks - q->last_ticks;
-	q->last_ticks = current_ticks;
-	/*lint -restore*/
-
-	/* Don't account for long idle */
-	if (now - last > UPDATE_TIME * 2)
-		return;
-	/* Disk load is too low or driver doesn't account io_ticks */
-	if (busy_ticks == 0)
-		return;
-
-	if (busy_ticks > now - last)
-		busy_ticks = now - last;
-
-	/*lint -save -e712 -e713*/
-	tmp_sect = (read_sect + write_sect) * HZ;
-	sector_div(tmp_sect, busy_ticks);
-	q->disk_bw = tmp_sect;
-	/*lint -restore*/
-
-	tmp_ios = (read_ios + write_ios) * HZ / busy_ticks;
-	q->disk_iops = tmp_ios;
-/*lint -save -e550*/
-}
-/*lint -restore*/
-
 static noinline_for_stack bool
 generic_make_request_checks(struct bio *bio)
 {
@@ -2058,8 +1985,7 @@ generic_make_request_checks(struct bio *bio)
 	 * drivers without flush support don't have to worry
 	 * about them.
 	 */
-	if ((bio->bi_rw & (REQ_FLUSH | REQ_FUA)) &&
-	    !test_bit(QUEUE_FLAG_WC, &q->queue_flags)) {
+	if ((bio->bi_rw & (REQ_FLUSH | REQ_FUA)) && !q->flush_flags) {
 		bio->bi_rw &= ~(REQ_FLUSH | REQ_FUA);
 		if (!nr_sectors) {
 			err = 0;
@@ -2086,9 +2012,6 @@ generic_make_request_checks(struct bio *bio)
 	 * layer knows how to live with it.
 	 */
 	create_io_context(GFP_ATOMIC, q->node);
-
-	blk_update_perf(q,
-		part->partno ? &part_to_disk(part)->part0 : part);
 
 	if (!blkcg_bio_issue_check(q, bio))
 		return false;
@@ -3006,10 +2929,6 @@ struct request *blk_peek_request(struct request_queue *q)
 			 * not be passed by new incoming requests
 			 */
 			rq->cmd_flags |= REQ_STARTED;
-			if (rq->cmd_flags & REQ_URGENT) {
-				WARN_ON(q->dispatched_urgent);
-				q->dispatched_urgent = true;
-			}
 			trace_block_rq_issue(q, rq);
 		}
 
@@ -3755,12 +3674,6 @@ int kblockd_schedule_delayed_work_on(int cpu, struct delayed_work *dwork,
 }
 EXPORT_SYMBOL(kblockd_schedule_delayed_work_on);
 
-int kblockd_schedule_delayed_work_cancel(struct delayed_work *dwork)
-{
-	return cancel_delayed_work(dwork);
-}
-EXPORT_SYMBOL(kblockd_schedule_delayed_work_cancel);
-
 /**
  * blk_start_plug - initialize blk_plug and track it inside the task_struct
  * @plug:	The &struct blk_plug that needs to be initialized
@@ -4143,8 +4056,6 @@ void blk_post_runtime_resume(struct request_queue *q, int err)
 EXPORT_SYMBOL(blk_post_runtime_resume);
 #endif
 
-static void blk_latency_log_init(void){}
-
 int __init blk_dev_init(void)
 {
 	BUILD_BUG_ON(__REQ_NR_BITS > 8 *
@@ -4159,13 +4070,12 @@ int __init blk_dev_init(void)
 	request_cachep = kmem_cache_create("blkdev_requests",
 			sizeof(struct request), 0, SLAB_PANIC, NULL);
 
-	blk_requestq_cachep = kmem_cache_create("blkdev_queue",
+	blk_requestq_cachep = kmem_cache_create("request_queue",
 			sizeof(struct request_queue), 0, SLAB_PANIC, NULL);
 
 #ifdef CONFIG_HISI_BLOCK_FREQUENCE_CONTROL
 	hisi_blk_freq_ctrl_init();
 #endif
-	blk_latency_log_init();
 
 	blk_init_perf();
 	return 0;

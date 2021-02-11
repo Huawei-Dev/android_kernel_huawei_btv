@@ -179,24 +179,6 @@ static void bounce_end_io_read_isa(struct bio *bio)
 	__bounce_end_io_read(bio, isa_page_pool);
 }
 
-#ifdef CONFIG_NEED_BOUNCE_POOL
-static int must_snapshot_stable_pages(struct request_queue *q, struct bio *bio)
-{
-	if (bio_data_dir(bio) != WRITE)
-		return 0;
-
-	if (!bdi_cap_stable_pages_required(&q->backing_dev_info))
-		return 0;
-
-	return bio_flagged(bio, BIO_SNAP_STABLE);
-}
-#else
-static int must_snapshot_stable_pages(struct request_queue *q, struct bio *bio)
-{
-	return 0;
-}
-#endif /* CONFIG_NEED_BOUNCE_POOL */
-
 static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
 			       mempool_t *pool)
 {

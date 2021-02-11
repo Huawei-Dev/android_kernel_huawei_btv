@@ -141,7 +141,7 @@ static unsigned int blk_flush_policy(unsigned long fflags, struct request *rq)
 	if (blk_rq_sectors(rq))
 		policy |= REQ_FSEQ_DATA;
 
-	if (fflags & (1UL << QUEUE_FLAG_WC)) {
+	if (fflags & REQ_FLUSH) {
 		if (rq->cmd_flags & REQ_FLUSH)
 			policy |= REQ_FSEQ_PREFLUSH;
 		/*
@@ -379,7 +379,6 @@ static bool blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq)
 		struct blk_mq_hw_ctx *hctx;
 
 		flush_rq->mq_ctx = first_rq->mq_ctx;
-		flush_rq->mq_ctx_dispatch = first_rq->mq_ctx_dispatch;
 		flush_rq->tag = first_rq->tag;
 		fq->orig_rq = first_rq;
 
@@ -460,7 +459,7 @@ void blk_insert_flush(struct request *rq)
 	 * REQ_FLUSH and FUA for the driver.
 	 */
 	rq->cmd_flags &= ~REQ_FLUSH;
-	if (!(fflags & (1UL << QUEUE_FLAG_FUA)))
+	if (!(fflags & REQ_FUA))
 		rq->cmd_flags &= ~REQ_FUA;
 
 	/*
