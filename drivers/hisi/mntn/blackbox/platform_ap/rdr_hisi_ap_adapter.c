@@ -52,7 +52,6 @@
 #include "../rdr_inner.h"
 #include "../../mntn_filesys.h"
 #include <linux/hisi/mntn_dump.h>
-#include <linux/hisi/eeye_ftrace_pub.h>
 
 
 #define BUFFER_SIZE			128
@@ -1493,8 +1492,6 @@ void rdr_hisiap_reset(u32 modid, u32 etype, u64 coreid)
 		preempt_disable();
 		smp_send_stop();
 	}
-
-	flush_ftrace_buffer_cache();
 
 	kmsg_dump(KMSG_DUMP_PANIC);
 	flush_cache_all();

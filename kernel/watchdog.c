@@ -27,8 +27,6 @@
 #include <linux/perf_event.h>
 #include <linux/kthread.h>
 
-#include <linux/hisi/eagle_eye.h>
-
 /*
  * The run state of the lockup detectors is controlled by the content of the
  * 'watchdog_enabled' variable. Each lockup detector has its dedicated bit -
@@ -464,8 +462,6 @@ static enum hrtimer_restart watchdog_timer_fn(struct hrtimer *hrtimer)
 
 	/* test for hardlockups on the next cpu */
 	watchdog_check_hardlockup_other_cpu();
-
-	(void)eeye_alarm_detect();
 
 	/* kick the softlockup detector */
 	wake_up_process(__this_cpu_read(softlockup_watchdog));
