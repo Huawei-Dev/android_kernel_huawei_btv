@@ -180,6 +180,5 @@ obj-$(CONFIG_HISILICON_PLATFORM)+= hisi/
 obj-$(CONFIG_HUAWEI_PLATFORM) 	+= huawei_platform/
 obj-$(CONFIG_HUAWEI_DSM)	+= dsm/
 obj-$(CONFIG_CONNECTIVITY_HI110X)     += connectivity/
-obj-$(CONFIG_CONTEXTHUB)	+= contexthub/
 obj-$(CONFIG_HW_GADGET) += hwusb/
 obj-$(CONFIG_HW_CPULOAD_NOTI) += cpuload/
