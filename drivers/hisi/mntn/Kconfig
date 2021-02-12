@@ -12,7 +12,6 @@ config HISILICON_PLATFORM_HISI_EASYSHELL
 	  including easy shell, etc.
 source "drivers/hisi/mntn/blackbox/Kconfig"
 source "drivers/hisi/mntn/code_protect/Kconfig"
-source "drivers/hisi/mntn/eagle-eye/Kconfig"
 source "drivers/hisi/mntn/hisee/Kconfig"
 
 config HISI_BOOT_TIME

@@ -7,7 +7,6 @@ obj-$(CONFIG_HISI_BB) += blackbox/
 obj-$(CONFIG_HISI_DDRC_KERNEL_CODE_PROTECTION) += code_protect/
 obj-$(CONFIG_HISI_POWER_OFF)	+= hisi_poweroff.o
 obj-$(CONFIG_HISI_FIQ)	+= hisi_fiq.o
-obj-$(CONFIG_HISI_EAGLE_EYE)	+= eagle-eye/
 hisilicon_platform_mntn-y := util.o dump.o fastbootlog.o mntn_filesys.o hisi_mntn_test.o hisi_bootup_keypoint.o
 subdir-ccflags-$(CONFIG_HISI_BB)               += -Idrivers/hisi/mntn/blackbox/
 obj-$(CONFIG_HISI_MNTNDUMP)       += mntn_dump.o
