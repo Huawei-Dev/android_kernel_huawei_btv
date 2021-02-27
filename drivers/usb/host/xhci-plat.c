@@ -25,8 +25,6 @@
 #include "xhci-mvebu.h"
 #include "xhci-rcar.h"
 
-#include "xhci-debugfs.h"
-
 static struct hc_driver __read_mostly xhci_plat_hc_driver;
 
 static int xhci_plat_setup(struct usb_hcd *hcd);
@@ -251,12 +249,6 @@ static int xhci_plat_probe(struct platform_device *pdev)
 	if (ret)
 		goto dealloc_usb2_hcd;
 
-	ret = xhci_create_debug_file(xhci);
-	if (ret) {
-		dev_err(&pdev->dev, "failed to initialize debugfs\n");
-		goto dealloc_usb3_hcd;
-	}
-
 	ret = device_create_file(&pdev->dev, &dev_attr_config_imod);
 	if (ret)
 		dev_err(&pdev->dev, "%s: unable to create imod sysfs entry\n",
@@ -294,9 +286,6 @@ static int xhci_plat_remove(struct platform_device *dev)
 
 	device_remove_file(&dev->dev, &dev_attr_config_imod);
 	xhci->xhc_state |= XHCI_STATE_REMOVING;
-
-	/* add for xhci debug */
-	xhci_remove_debug_file();
 
 	usb_remove_hcd(xhci->shared_hcd);
 	usb_phy_shutdown(hcd->usb_phy);
