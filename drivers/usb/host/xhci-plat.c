@@ -272,9 +272,6 @@ static int xhci_plat_probe(struct platform_device *pdev)
 
 	return 0;
 
-dealloc_usb3_hcd:
-	usb_remove_hcd(xhci->shared_hcd);
-
 dealloc_usb2_hcd:
 	usb_remove_hcd(hcd);
 
@@ -315,8 +312,6 @@ static int xhci_plat_remove(struct platform_device *dev)
 		clk_disable_unprepare(clk);
 	usb_put_hcd(hcd);
 	
-	pm_runtime_disable(&dev->dev);
-
 	pm_runtime_set_suspended(&dev->dev);
 	pm_runtime_disable(&dev->dev);
 
@@ -347,7 +342,7 @@ static int xhci_plat_resume(struct device *dev)
 
 	dev_dbg(dev, "xhci-plat PM resume\n");
 
-	return xhci_resume(xhci, false);
+	return (!hcd_to_bus(hcd)->skip_resume) ? xhci_resume(xhci, false) : 0;
 }
 #endif
 
