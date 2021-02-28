@@ -1982,7 +1982,7 @@ void xhci_mem_cleanup(struct xhci_hcd *xhci)
 	struct device	*dev = xhci_to_hcd(xhci)->self.controller;
 	int i, j, num_ports;
 
-	del_timer_sync(&xhci->cmd_timer);
+	cancel_delayed_work_sync(&xhci->cmd_timer);
 
 	xhci_event_ring_cleanup(xhci);
 
