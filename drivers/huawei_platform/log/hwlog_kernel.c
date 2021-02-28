@@ -192,7 +192,7 @@ static int __write_to_kernel_kernel(struct my_work_struct  *phwlog)
 	}
 	oldfs = get_fs();
 	set_fs(get_ds());
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 250))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 130))
 	ret = vfs_writev(filp[phwlog->nbufid], vec, vlen, &(filp[phwlog->nbufid])->f_pos, 0);
 #else
 	ret = vfs_writev(filp[phwlog->nbufid], vec, vlen, &(filp[phwlog->nbufid])->f_pos);

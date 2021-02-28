@@ -52,7 +52,7 @@ int log_to_exception(char* tag, char* msg)
 	vec[2].iov_base = msg;
 	vec[2].iov_len = strlen(msg)+1;
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 250))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 130))
 	ret = vfs_writev(filp, vec, 3, &filp->f_pos, 0);
 #else
 	ret = vfs_writev(filp, vec, 3, &filp->f_pos);
