@@ -833,6 +833,7 @@ batadv_tt_prepare_tvlv_local_data(struct batadv_priv *bat_priv,
 	hlist_for_each_entry_rcu(vlan, &bat_priv->softif_vlan_list, list) {
 		tt_vlan->vid = htons(vlan->vid);
 		tt_vlan->crc = htonl(vlan->tt.crc);
+		tt_vlan->reserved = 0;
 
 		tt_vlan++;
 	}
