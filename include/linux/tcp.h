@@ -357,7 +357,10 @@ struct tcp_sock {
 	u32 dack_rcv_nxt; /*client send d-ack with this seq*/
 	u32 dack_seq_num; /*the counts of client send d-ack with this seq continuously*/
 #endif
-
+#ifdef CONFIG_CHR_NETLINK_MODULE
+	u8 first_data_flag;
+	u8 data_net_flag;
+#endif
 	u32	*saved_syn;
 };
 

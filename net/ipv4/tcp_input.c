@@ -137,6 +137,7 @@ int sysctl_tcp_default_init_rwnd __read_mostly = TCP_INIT_CWND * 2;
 
 #ifdef CONFIG_CHR_NETLINK_MODULE
 extern void notify_chr_thread_to_send_msg(unsigned int dst_addr, unsigned int src_addr);
+extern void notify_chr_thread_to_update_rtt(u32 seq_rtt_us, struct sock *sk, u8 data_net_flag);
 #endif
 
 #ifdef CONFIG_HW_WIFI
@@ -3232,6 +3233,19 @@ static int tcp_clean_rtx_queue(struct sock *sk, int prior_fackets,
 		sack_rtt_us = skb_mstamp_us_delta(&now, &sack->first_sackt);
 		ca_rtt_us = skb_mstamp_us_delta(&now, &sack->last_sackt);
 	}
+
+#ifdef CONFIG_CHR_NETLINK_MODULE
+	if (flag & FLAG_SYN_ACKED) {
+
+		tp->first_data_flag = true;
+		tp->data_net_flag = false;
+	}
+
+	if (flag & FLAG_DATA_ACKED && tp->first_data_flag) {
+		notify_chr_thread_to_update_rtt((u32)seq_rtt_us, sk, tp->data_net_flag);
+		tp->first_data_flag = false;
+	}
+#endif	
 
 	rtt_update = tcp_ack_update_rtt(sk, flag, seq_rtt_us, sack_rtt_us,
 					ca_rtt_us);
