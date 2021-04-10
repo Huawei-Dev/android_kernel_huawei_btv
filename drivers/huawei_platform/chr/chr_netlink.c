@@ -13,6 +13,7 @@
 #include <linux/netlink.h>
 #include <uapi/linux/netlink.h>
 #include <linux/kthread.h>
+#include "wbc_hw_hook.h"
 #include "chr_netlink.h"
 
 #undef HWLOG_TAG
@@ -33,7 +34,7 @@ DEFINE_MUTEX(chr_send_sem);
 /*netlink socket fd*/
 static struct sock *g_chr_nlfd;
 /*save user space progress pid when user space netlink socket registering.*/
-static unsigned int g_user_space_pid;
+unsigned int g_user_space_pid;
 static struct task_struct *g_chr_netlink_task;
 static int g_chr_module_state = CHR_NETLINK_EXIT;
 /*save server's address when data speed is slow.*/
@@ -44,30 +45,34 @@ static unsigned int g_dest_addr_temp;
 static unsigned int g_src_addr_temp;
 /*chr timer state,there is 2 state:3 minute and 60 minute.*/
 static unsigned int g_chr_timer_state;
-/*tcp protocol use this semaphone to inform chr netlink thread when data speed is slow*/
+/*
+ * Tcp protocol use this semaphone to inform chr netlink thread when data speed
+ * is slow
+ */
 static struct semaphore g_chr_netlink_sync_sema;
 /*this lock is used to protect global variable.*/
 static spinlock_t dest_addr_timer_lock;
 static struct timer_list g_chr_netlink_timer;
 /*send a msg with server's address and port.*/
-static int chr_notify_event(int event, int pid, unsigned int src_ip);
 void notify_chr_thread_to_send_msg(unsigned int dst_addr, unsigned int src_addr)
 {
-	if (CHR_NETLINK_INIT == g_chr_module_state)  {
+	if (g_chr_module_state == CHR_NETLINK_INIT)  {
 		spin_lock_bh(&dest_addr_timer_lock);
 
-		/*save server's address and port when the timer state is CHR_TIMER_3.*/
-		if (CHR_TIMER_3 == g_chr_timer_state) {
+		/*
+		 * Save server's address and port when the timer state is
+		 * CHR_TIMER_3.
+		 */
+		if (g_chr_timer_state == CHR_TIMER_3) {
 			g_dest_addr_temp = dst_addr;
 			g_src_addr_temp = src_addr;
 			spin_unlock_bh(&dest_addr_timer_lock);
 
-			hwlog_info("chr: notify_chr_thread_to_send_msg!dst_addr=0x%x,src_addr=0x%x\n", g_dest_addr_temp, g_src_addr_temp);
 			/*inform chr netlink thread when data speed is slow*/
 			up(&g_chr_netlink_sync_sema);
 		} else {
-			spin_unlock_bh(&dest_addr_timer_lock);/*release the lock.*/
-			hwlog_info("chr: notify_chr_thread_to_send_msg!g_chr_timer_state == CHR_TIMER_60!\n");
+			/*release the lock.*/
+			spin_unlock_bh(&dest_addr_timer_lock);
 		}
 	}
 }
@@ -77,44 +82,62 @@ void notify_chr_thread_to_send_msg(unsigned int dst_addr, unsigned int src_addr)
 				STATIC  FUNCTION  DEFINES
 *************************************************************/
 
-/* netlink socket's callback function,it will be called by system when
-user space send a message to kernel.
-this function will save user space progress pid.*/
+/*
+ * Netlink socket's callback function,it will be called by system when
+ * user space send a message to kernel.
+ * this function will save user space progress pid.
+ */
 static void kernel_chr_receive(struct sk_buff *__skb)
 {
 	struct nlmsghdr *nlh;
 	struct sk_buff *skb;
+	struct tag_chr_msg2knl *hmsg = NULL;
 
-	hwlog_info("chr: kernel_chr_receive!\n");
-
+	if (NULL == __skb) {
+		hwlog_err("Invalid parameter: zero pointer reference(__skb)\n");
+		return;
+	}
 	skb = skb_get(__skb);
-
+	if (NULL == skb) {
+		hwlog_err("kernel_chr_receive: skb = NULL\n");
+		return;
+	}
 	mutex_lock(&chr_receive_sem);
-
 	if (skb->len >= NLMSG_HDRLEN) {
 		nlh = nlmsg_hdr(skb);
-
+		if (NULL == nlh) {
+			hwlog_err("kernel_chr_receive:  nlh = NULL\n");
+			kfree_skb(skb);
+			mutex_unlock(&chr_receive_sem);
+			return;
+		}
 		if ((nlh->nlmsg_len >= sizeof(struct nlmsghdr)) &&
 			(skb->len >= nlh->nlmsg_len)) {
-			hwlog_info("chr netlink receive a packet,nlmsg_type=%d\n", nlh->nlmsg_type);
-			if (NETLINK_CHR_REG == nlh->nlmsg_type) {
-				/*save user space progress pid when register netlink socket.*/
+			if (nlh->nlmsg_type == NETLINK_CHR_REG) {
+				/*
+				 * Save user space progress pid when register
+				 * netlink socket.
+				 */
 				g_user_space_pid = nlh->nlmsg_pid;
-				hwlog_info("chr netlink receive reg packet: g_user_space_pid = %d\n", nlh->nlmsg_pid);
-			} else if (NETLINK_CHR_UNREG == nlh->nlmsg_type) {
-				hwlog_info("chr netlink receive reg packet\n");
+			} else if (nlh->nlmsg_type == NETLINK_CHR_UNREG) {
 				g_user_space_pid = 0;
+			} else if (nlh->nlmsg_type == NETLINK_CHR_SET_APP_UID) {
+				hmsg = (struct tag_chr_msg2knl *)nlh;
+				set_report_app_uid(hmsg->index, hmsg->uid);
 			}
 		}
 	}
+	kfree_skb(skb);
 	mutex_unlock(&chr_receive_sem);
 }
 
-/* netlink socket thread,
-1.it will receive the message from tcp protocal;
-2.save server's address and port;
-3.change timer state;
-4.send a message to user space when data speed is slow;*/
+/*
+ * Netlink socket thread,
+ * 1.it will receive the message from tcp protocal;
+ * 2.save server's address and port;
+ * 3.change timer state;
+ * 4.send a message to user space when data speed is slow;
+ */
 static int chr_netlink_thread(void *data)
 {
 	int i = 0;
@@ -125,25 +148,27 @@ static int chr_netlink_thread(void *data)
 		if (kthread_should_stop())
 			break;
 
-		/*netlink thread will block at this semaphone when data speed is
-		nomal,only tcp protocol up the sema this thread will go to next
-		sentence.*/
+		/*
+		 * Netlink thread will block at this semaphone when data speed
+		 * is nomal, only tcp protocol up the sema this thread will go
+		 * to next sentence.
+		 */
 		down(&g_chr_netlink_sync_sema);
-		hwlog_info("chr_netlink_thread get sema success!\n");
 
-		if (0 != g_user_space_pid) {
+		if (g_user_space_pid != 0) {
 			spin_lock_bh(&dest_addr_timer_lock);
 
 			for (i = 0; i < DIFF_SRC_IP_ADDR_MAX; i++) {
-				if (0 == g_chr_netIfInfo_struct[i].src_addr) {
-					g_chr_netIfInfo_struct[i].src_addr = g_src_addr_temp;
+				if (g_chr_netIfInfo_struct[i].src_addr == 0) {
+					g_chr_netIfInfo_struct[i].src_addr =
+						g_src_addr_temp;
 					break;
 				} else if (g_chr_netIfInfo_struct[i].src_addr == g_src_addr_temp) {
 					break;
 				}
 			}
 
-			if (DIFF_SRC_IP_ADDR_MAX != i) {
+			if (i != DIFF_SRC_IP_ADDR_MAX) {
 				netIfInfo_struct_ptr = &(g_chr_netIfInfo_struct[i]);
 				if (netIfInfo_struct_ptr->dstAddrArrayIndex < DIFF_DST_IP_ADDR_MAX) {
 					/*if the server's address is different,
@@ -158,16 +183,22 @@ static int chr_netlink_thread(void *data)
 						netIfInfo_struct_ptr->dstAddrArrayIndex++;
 					}
 				}
-				/*if there is 3 different server address if recoeded,will
-				change timer state to CHR_TIMER_60,timer's timeout will
-				change to 60 minute.*/
-				if ((DIFF_DST_IP_ADDR_MAX == netIfInfo_struct_ptr->dstAddrArrayIndex) && (CHR_TIMER_3 == g_chr_timer_state)) {
+				/*
+				 * If there is 3 different server address if
+				 * recoeded, will change timer state to
+				 * CHR_TIMER_60, timer's timeout will change to
+				 * 60 minute.
+				 */
+				if ((netIfInfo_struct_ptr->dstAddrArrayIndex == DIFF_DST_IP_ADDR_MAX) && (g_chr_timer_state == CHR_TIMER_3)) {
 					spin_unlock_bh(&dest_addr_timer_lock);
-					mod_timer(&g_chr_netlink_timer, jiffies + TIMER_60_MINUTES);
+					mod_timer(&g_chr_netlink_timer,
+						jiffies + TIMER_60_MINUTES);
 					g_chr_timer_state = CHR_TIMER_60;
-					hwlog_info("chr_netlink_thread:change timer state to CHR_TIMER_60!\n");
 
-					chr_notify_event(CHR_SPEED_SLOW_EVENT, g_user_space_pid, netIfInfo_struct_ptr->src_addr);
+					chr_notify_event(CHR_SPEED_SLOW_EVENT,
+						g_user_space_pid,
+						netIfInfo_struct_ptr->src_addr,
+						NULL);
 				} else {
 					spin_unlock_bh(&dest_addr_timer_lock);
 				}
@@ -182,37 +213,41 @@ static int chr_netlink_thread(void *data)
 /*timer's expired process function.*/
 static void chr_netlink_timer(unsigned long data)
 {
-	if (CHR_TIMER_60 == g_chr_timer_state) {
-		/*if timer state is CHR_TIMER_60,and the timer is expired,change
-		timer state to CHR_TIMER_3,and change timer's expire time to
-		3 minute.*/
+	if (g_chr_timer_state == CHR_TIMER_60) {
+		/*
+		 * If timer state is CHR_TIMER_60,and the timer is expired,
+		 * change timer state to CHR_TIMER_3,and change timer's expire
+		 * time to 3 minute.
+		 */
 		spin_lock_bh(&dest_addr_timer_lock);
-		memset(g_chr_netIfInfo_struct, 0, DIFF_SRC_IP_ADDR_MAX * sizeof(struct chr_netinterface_info_struct));
+		memset(g_chr_netIfInfo_struct, 0, DIFF_SRC_IP_ADDR_MAX *
+			sizeof(struct chr_netinterface_info_struct));
 		spin_unlock_bh(&dest_addr_timer_lock);
 
 		g_chr_netlink_timer.expires = jiffies + TIMER_3_MINUTES;
 		add_timer(&g_chr_netlink_timer);/*restart timer*/
 		g_chr_timer_state = CHR_TIMER_3;
-		hwlog_info("chr_netlink_timer:change timer state to CHR_TIMER_3:CHR_TIMER_60-->CHR_TIMER_3!\n");
-	} else if (CHR_TIMER_3 == g_chr_timer_state) {
-		if (DIFF_DST_IP_ADDR_MAX == g_chr_netIfInfo_struct[0].dstAddrArrayIndex
-			|| DIFF_DST_IP_ADDR_MAX == g_chr_netIfInfo_struct[1].dstAddrArrayIndex) {
-			/*if there is 3 different server address if recoeded,will
-			change timer state to CHR_TIMER_60,timer's timeout will
-			change to 60 minute.*/
-			g_chr_netlink_timer.expires = jiffies + TIMER_60_MINUTES;
+	} else if (g_chr_timer_state == CHR_TIMER_3) {
+		if (g_chr_netIfInfo_struct[0].dstAddrArrayIndex == DIFF_DST_IP_ADDR_MAX
+			|| g_chr_netIfInfo_struct[1].dstAddrArrayIndex == DIFF_DST_IP_ADDR_MAX) {
+			/*
+			 * If there is 3 different server address if recoeded,
+			 * will change timer state to CHR_TIMER_60,
+			 * timer's timeout will change to 60 minute.
+			 */
+			g_chr_netlink_timer.expires = jiffies +
+				TIMER_60_MINUTES;
 			add_timer(&g_chr_netlink_timer);/*restart timer*/
 			g_chr_timer_state = CHR_TIMER_60;
-			hwlog_info("chr_netlink_timer:change timer state to CHR_TIMER_60:CHR_TIMER_3->CHR_TIMER_60!\n");
 		} else {
 			spin_lock_bh(&dest_addr_timer_lock);
-			memset(g_chr_netIfInfo_struct, 0, DIFF_SRC_IP_ADDR_MAX * sizeof(struct chr_netinterface_info_struct));
+			memset(g_chr_netIfInfo_struct, 0, DIFF_SRC_IP_ADDR_MAX *
+				sizeof(struct chr_netinterface_info_struct));
 			spin_unlock_bh(&dest_addr_timer_lock);
 
 			g_chr_netlink_timer.expires = jiffies + TIMER_3_MINUTES;
 			add_timer(&g_chr_netlink_timer);/*restart timer*/
 			g_chr_timer_state = CHR_TIMER_3;
-			hwlog_info("chr_netlink_timer:change timer state to CHR_TIMER_3:CHR_TIMER_3->CHR_TIMER_3!\n");
 		}
 	}
 }
@@ -239,8 +274,10 @@ static void chr_netlink_init(void)
 	g_chr_netlink_timer.expires = jiffies + 180*HZ;
 	add_timer(&g_chr_netlink_timer);
 	g_chr_timer_state = CHR_TIMER_3;
-	memset(g_chr_netIfInfo_struct, 0, DIFF_SRC_IP_ADDR_MAX * sizeof(struct chr_netinterface_info_struct));
-	g_chr_netlink_task = kthread_run(chr_netlink_thread, NULL, "chr_netlink_thread");
+	memset(g_chr_netIfInfo_struct, 0, DIFF_SRC_IP_ADDR_MAX *
+		sizeof(struct chr_netinterface_info_struct));
+	g_chr_netlink_task = kthread_run(chr_netlink_thread, NULL,
+		"chr_netlink_thread");
 }
 
 /*netlink deinit function.*/
@@ -258,15 +295,14 @@ static void chr_netlink_deinit(void)
 }
 
 /*send a message to user space.*/
-static int chr_notify_event(int event, int pid, unsigned int src_ip)
+int chr_notify_event(int event, int pid,
+		unsigned int src_addr, struct http_return *prtn)
 {
 	int ret;
 	int size;
 	struct sk_buff *skb = NULL;
 	struct nlmsghdr *nlh = NULL;
 	struct chr_nl_packet_msg *packet = NULL;
-
-	hwlog_err("%s enter\n", __func__);
 
 	mutex_lock(&chr_send_sem);
 	if (!pid || !g_chr_nlfd) {
@@ -292,12 +328,19 @@ static int chr_notify_event(int event, int pid, unsigned int src_ip)
 	}
 	packet = nlmsg_data(nlh);
 	memset(packet, 0, sizeof(struct chr_nl_packet_msg));
-	packet->chr_event = event;
-	packet->src_addr = src_ip;
+	if (event == CHR_SPEED_SLOW_EVENT) {
+		packet->chr_event = event;
+		packet->src_addr = src_addr;
+		memset(&(packet->rtn_stat), 0, sizeof(struct http_return));
+	} else if (event == CHR_WEB_STAT_EVENT) {
+		packet->chr_event = event;
+		packet->src_addr = ZERO;
+		memcpy(&(packet->rtn_stat), prtn, RNT_SIZE*sizeof(struct http_return));
+	}
 
 	/*skb will be freed in netlink_unicast*/
 	ret = netlink_unicast(g_chr_nlfd, skb, pid, MSG_DONTWAIT);
-	hwlog_info("%s:send a msg to apk,data speed is slow!srcaddr=0x%x\n", __func__, src_ip);
+	hwlog_info("%s:data speed is slow!srcaddr=0x%x\n", __func__, src_addr);
 	goto end;
 
 end:
@@ -309,11 +352,13 @@ static int __init chr_netlink_module_init(void)
 {
 	chr_netlink_init();
 	g_chr_module_state = CHR_NETLINK_INIT;
+	web_chr_init();
 	return 0;
 }
 
 static void __exit chr_netlink_module_exit(void)
 {
+	web_chr_exit();
 	g_chr_module_state = CHR_NETLINK_EXIT;
 	chr_netlink_deinit();
 }
