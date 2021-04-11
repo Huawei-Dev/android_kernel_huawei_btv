@@ -95,7 +95,6 @@ int long_presspowerkey_happen(void *data)
 	printk(KERN_ERR "long_presspowerkey_happen start\n");
 	while (!kthread_should_stop()) {
 		down(&long_presspowerkey_happen_sem);
-		blk_power_off_flush(BLK_FLUSH_EMERGENCY); /*Flush the storage device cache*/
 #ifdef CONFIG_HISI_BB
 		if (STAGE_BOOTUP_END != get_boot_keypoint()) {
 			save_log_to_dfx_tempbuffer(AP_S_PRESS6S);
