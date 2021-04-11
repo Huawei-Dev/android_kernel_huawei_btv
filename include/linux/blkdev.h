@@ -1093,11 +1093,7 @@ struct request_queue *blk_alloc_queue(gfp_t);
 struct request_queue *blk_alloc_queue_node(gfp_t, int);
 extern void blk_put_queue(struct request_queue *);
 extern void blk_set_queue_dying(struct request_queue *);
-#define BLK_FLUSH_NORMAL		0
-#define BLK_FLUSH_EMERGENCY	1
-static inline void blk_flush_set_async( struct bio *bio){}
-static inline void blk_power_off_flush(int emergency){}
-static inline int blk_flush_async_support(struct block_device	*bi_bdev){return 0;}
+
 /*
  * block layer runtime pm functions
  */

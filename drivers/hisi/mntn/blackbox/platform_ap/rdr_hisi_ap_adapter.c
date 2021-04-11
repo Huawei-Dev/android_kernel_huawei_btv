@@ -1485,7 +1485,6 @@ void rdr_hisiap_reset(u32 modid, u32 etype, u64 coreid)
 	if (!in_atomic() && !irqs_disabled() && !in_irq()) {
 		sys_sync();
 	}
-	blk_power_off_flush(BLK_FLUSH_NORMAL); /*Flush the storage device cache*/
 	if (AP_S_PANIC != etype) {
 		printk(KERN_ERR "etype is not panic\n");
 		dump_stack();
