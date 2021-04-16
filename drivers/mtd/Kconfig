@@ -168,6 +168,11 @@ config HISI_NVE
           memory chips, and also use ioctl() to obtain information about
           the device, or to erase parts of it.
 
+config HISI_NVE_WHITELIST
+	boolean "hisi NVE whitelist"
+	depends on HISI_NVE
+	help
+	  This provides protect for valuable NV entries.
 
 #
 # MTD block device support is select'ed if needed
