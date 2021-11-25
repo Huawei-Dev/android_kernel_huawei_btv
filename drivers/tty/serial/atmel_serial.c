@@ -840,6 +840,8 @@ static void atmel_tx_dma(struct uart_port *port)
 			/* DMA done, stop TX, start RX for RS485 */
 			atmel_start_rx(port);
 		}
+
+		dma_async_issue_pending(chan);
 	}
 
 	if (uart_circ_chars_pending(xmit) < WAKEUP_CHARS)
@@ -1096,6 +1098,8 @@ static int atmel_prepare_rx_dma(struct uart_port *port)
 	desc->callback_param = port;
 	atmel_port->desc_rx = desc;
 	atmel_port->cookie_rx = dmaengine_submit(desc);
+
+	dma_async_issue_pending(atmel_port->chan_rx);
 
 	return 0;
 
