@@ -20,6 +20,9 @@ subdir-ccflags-y += -I$(srctree)/drivers/hisi/modem/include/taf/common/
 subdir-ccflags-y += -I$(srctree)/drivers/hisi/modem/include/taf/acore/
 subdir-ccflags-y += -I$(srctree)/drivers/hisi/modem/config/product/$(OBB_PRODUCT_NAME)/config
 
+# Ignore invalid pragma(s) here, since clang goes crazy.
+subdir-ccflags-y += -Wno-pragmas -Wno-pragma-pack
+
 obj-$(CONFIG_HISI_BALONG_MODEM) +=drv/
 
 ifneq ($(OBB_SEPARATE),true)
