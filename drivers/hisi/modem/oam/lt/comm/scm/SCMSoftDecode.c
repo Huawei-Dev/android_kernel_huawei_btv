@@ -321,11 +321,6 @@ VOS_VOID SCM_SoftDecodeCfgRcvSelfTask(
     VOS_UINT32                          i;
     VOS_ULONG                           ulLockLevel;
 
-    ulPara1 = ulPara1;
-    ulPara2 = ulPara2;
-    ulPara3 = ulPara3;
-    ulPara4 = ulPara4;
-
     for (;;)
     {
         if (VOS_OK != VOS_SmP(g_stSCMDataRcvTaskCtrlInfo.SmID, 0))
