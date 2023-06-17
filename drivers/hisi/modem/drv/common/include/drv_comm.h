@@ -174,7 +174,6 @@ typedef unsigned int (*PWRCTRLFUNCPTR)(unsigned int arg);     /* ptr to function
 #if defined(BSP_CORE_MODEM) || defined(PRODUCT_CFG_CORE_TYPE_MODEM)
 #else
 
-typedef BSP_VOID (*VOIDFUNCPTR)(BSP_U32);
 #define SEM_FULL            (1)
 #define SEM_EMPTY           (0)
 #define IVEC_TO_INUM(intVec)    ((int)(intVec))
