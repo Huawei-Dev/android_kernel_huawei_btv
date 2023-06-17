@@ -46,7 +46,7 @@
  *
  */
 #ifndef __MDM_DUMP_H__
-#define __MDP_DUMP_H__
+#define __MDM_DUMP_H__
 
 #ifdef BSP_CONFIG_PHONE_TYPE
 #include "../../adrv/adrv.h"
