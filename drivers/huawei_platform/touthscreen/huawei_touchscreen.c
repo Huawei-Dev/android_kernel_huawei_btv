@@ -5613,7 +5613,7 @@ static long ts_ioctl_set_coordinates(unsigned long arg)
 
 	if(!input_dev){
 		TS_LOG_ERR("The command node or input device is not exist!\n");
-		return;
+		return -1;
 	}
 
 	//TS_LOG_ERR("[MUTI_AFT] ts_ioctl_set_coordinates enter\n");
@@ -6335,7 +6335,7 @@ out:
 		kfree(info);
 	TS_LOG_INFO("%s done\n", __FUNCTION__);
 
-	return error;
+	return;
 }
 
 static int ts_init(void)
