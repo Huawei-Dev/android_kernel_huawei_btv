@@ -3,8 +3,6 @@
 #include "soc_acpu_baseaddr_interface.h"
 #include "pmic_interface.h"
 #include "global_ddr_map.h"
-typedef unsigned long long u64;
-typedef unsigned int u32;
 #define PMU_RESET_REG_OFFSET (PMIC_HRST_REG0_ADDR(0)<<2)
 #define RST_FLAG_MASK (0xFF)
 #define PMU_RESET_VALUE_USED 0xFFFFFF00
