@@ -64,8 +64,6 @@ typedef enum {
 
 #endif /* __cplusplus */
 
-typedef unsigned int        BSP_U32;
-
 #ifdef __KERNEL__
 #include <linux/types.h>
 #ifndef __ASSEMBLY__
