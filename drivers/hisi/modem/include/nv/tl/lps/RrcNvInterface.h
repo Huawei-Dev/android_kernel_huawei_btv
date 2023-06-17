@@ -7,13 +7,13 @@
   Description     : RrcNvInterface.h header file
   History           :
      1.Name+ID      yyyy-mm-dd  Draft Enact
-     2.guojiyu 00149868   2010-02-1  BJ9D02655:规划修改NV项信息,把锁频、锁小区以及NV读取失败的处理综合考虑
-     3.wangyue 00151278   2010-2-24 BJ9D02691:SIB接收优化
-     4.Wang Yangcai 49178 2010-03-04 BJ9D02803:分模块编译代码整理
-     5.Zhu Hua   00161499 2010-03-12 BJ9D02761:NV锁信息处理修改
-     6.Wang Yangcai 49178 2011-02-15 DTS2011013100231:合入快速校准
-     7.lidui 143774 2011-06-27 DTS2011062001924:UE能力四字节对齐修改
-	 8.lishangfeng  55206 2011-09-11 DTS2011091100356:候补信息维护策略改进，并且能够支持多Band时的维护
+     2.guojiyu 00149868   2010-02-1  BJ9D02655:????????NV??????,??????????????????NV??????????????????????
+     3.wangyue 00151278   2010-2-24 BJ9D02691:SIB????????
+     4.Wang Yangcai 49178 2010-03-04 BJ9D02803:??????????????????
+     5.Zhu Hua   00161499 2010-03-12 BJ9D02761:NV??????????????
+     6.Wang Yangcai 49178 2011-02-15 DTS2011013100231:????????????
+     7.lidui 143774 2011-06-27 DTS2011062001924:UE??????????????????
+	 8.lishangfeng  55206 2011-09-11 DTS2011091100356:????????????????????????????????????Band????????
 ******************************************************************************/
 
 #ifndef __RRCNVINTERFACE_H__
@@ -36,16 +36,16 @@ extern "C" {
 /*****************************************************************************
   2 macro
 *****************************************************************************/
-	/* 非标准频段 begin */
+	/* ?????????? begin */
 #define LTE_COMM_NONSTANDARD_BAND_BEGIN                     101
 #define LTE_COMM_NONSTANDARD_BAND_END                       116
 
 #define LTE_COMM_NONSTANDARD_BAND_MAX_COUNT                 16
-	/* 非标准频段 end */
+	/* ?????????? end */
 
 
 /* reportCGI stub Begin */
-/* CMM保存小区CGI信息列表结构 */
+/* CMM????????CGI???????????? */
 #define RRC_NV_USER_SET_CGI_MAX_NUM             (5)
 #define RRC_NV_AUTO_SRCH_CGI_MAX_NUM            (16)
 #define RRC_UU_MAX_NUM_OF_PLMN_ID_LIST_2        (5)
@@ -60,15 +60,15 @@ extern "C" {
 /* End: 2016/1/4 cr develop */
 
 #define RRC_NV_CSEL_MAX_INTER_FREQ_COUNT        (8)
-#define RRC_NV_EACH_BAND_FREQ_COUNT             (32)                            /* 每个band中nv存储的频点个数 */
+#define RRC_NV_EACH_BAND_FREQ_COUNT             (32)                            /* ????band??nv?????????????? */
 #define RRC_MAX_NUM_OF_COUNT_IN_ONE_BAND        (4)
 #define RRC_NV_CSEL_MAX_STORED_CELL_COUNT_PER_FREQ (4)
-#define RRC_CSEL_MAX_FREQ_COUNT                 (128)                            /* csel本地保存的频点最大数 */
+#define RRC_CSEL_MAX_FREQ_COUNT                 (128)                            /* csel???????????????????? */
 #define RRC_NV_EACH_BAND_BANDS_COUNT            (4)
 
 #define RRC_NV_LWCLASH_RANGE_COUNT              (16)
 
-/* UE能力相关宏定义 */
+/* UE?????????????? */
 #define RRC_MAX_NUM_OF_BANDS                    (64)
 #define RRC_MAX_NUM_OF_CDMA_BAND_CLASS          (32)
 #define RRC_MAX_NUM_OF_FEATURE_GROUP            (32)
@@ -100,8 +100,8 @@ extern "C" {
 
 /* v7r2 LLD begin */
 /*begin: modify for feature v700r500*/
-#define RRC_MAX_NUM_OF_BAND_COMB_R10            (64)  /*协议值为128，数组过大，拆分为2个64*/
-#define RRC_MAX_NUM_OF_BAND_COMB_R11            (64)  /*协议值为256，数组过大，拆分为4个64*/
+#define RRC_MAX_NUM_OF_BAND_COMB_R10            (64)  /*????????128??????????????????2??64*/
+#define RRC_MAX_NUM_OF_BAND_COMB_R11            (64)  /*????????256??????????????????4??64*/
 /*end: modify for feature v700r500*/
 
 #define RRC_MAX_NUM_OF_SIMULTANEOUS_BANDS_R10   (4)
@@ -121,11 +121,11 @@ extern "C" {
 #define RRC_REL12_ACCESS_STRATUM_REL            0x10
 /*end: add for feature v700r500*/
 
-#define RRC_NUM_OF_MCC_CA_NV                    (7)     /* mcc NV个数 */
-#define RRC_MAX_NUM_OF_MCC                      (15)    /* 规格值100，NV超出大小，拆成7个NV */
+#define RRC_NUM_OF_MCC_CA_NV                    (7)     /* mcc NV???? */
+#define RRC_MAX_NUM_OF_MCC                      (15)    /* ??????100??NV??????????????7??NV */
 #define RRC_MAX_NUM_OF_CA_PER_MCC               (32)
 
-#define RRC_NUM_OF_MCC_BAND_NV                       (70)     /* mcc NV个数 */
+#define RRC_NUM_OF_MCC_BAND_NV                       (70)     /* mcc NV???? */
 #define LRRC_LTE_MAX_NUM_OF_BAND_PER_MCC             (16)
 #define LRRC_UTRAN_MAX_NUM_OF_BAND_PER_MCC           (8)
 
@@ -138,24 +138,24 @@ extern "C" {
   4 Enum
 *****************************************************************************/
 /*****************************************************************************
- 枚举名    : LRRC_LTE_MODE_TYPE_ENUM_UINT16
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : LTE模式类型
+ ??????    : LRRC_LTE_MODE_TYPE_ENUM_UINT16
+ ????????  :
+ ASN.1???? :
+ ????????  : LTE????????
 *****************************************************************************/
 enum LTE_COMM_BAND_MODE_TYPE_ENUM
 {
-	LTE_COMM_BAND_MODE_TYPE_FDD 			   = 0, 							/* LTE FDD 制式 */
-	LTE_COMM_BAND_MODE_TYPE_TDD 			   = 1, 							/* LTE TDD 制式 */
+	LTE_COMM_BAND_MODE_TYPE_FDD 			   = 0, 							/* LTE FDD ???? */
+	LTE_COMM_BAND_MODE_TYPE_TDD 			   = 1, 							/* LTE TDD ???? */
 	LTE_COMM_BAND_MODE_TYPE_BUTT
 };
 typedef VOS_UINT8 LTE_COMM_BAND_MODE_TYPE_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CATEGORY_ENUM_UINT8
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : UE Category
+ ??????    : RRC_UE_CATEGORY_ENUM_UINT8
+ ????????  :
+ ASN.1???? :
+ ????????  : UE Category
 *****************************************************************************/
 enum RRC_UE_CATEGORY_ENUM
 {
@@ -169,10 +169,10 @@ enum RRC_UE_CATEGORY_ENUM
 typedef VOS_UINT8 RRC_UE_CATEGORY_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CATEGORY_EXT_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : UE Category Ext
+ ??????    : RRC_UE_CATEGORY_EXT_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : UE Category Ext
 *****************************************************************************/
 enum RRC_UE_CATEGORY_EXT_ENUM
 {
@@ -188,10 +188,10 @@ enum RRC_UE_CATEGORY_EXT_ENUM
 typedef VOS_UINT8 RRC_UE_CATEGORY_EXT_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CAP_ROH_CONTEXT_ENUM_UINT8
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : maxNumberROHC-ContextSessions
+ ??????    : RRC_UE_CAP_ROH_CONTEXT_ENUM_UINT8
+ ????????  :
+ ASN.1???? :
+ ????????  : maxNumberROHC-ContextSessions
 *****************************************************************************/
 enum RRC_UE_CAP_ROH_CONTEXT_ENUM
 {
@@ -214,10 +214,10 @@ enum RRC_UE_CAP_ROH_CONTEXT_ENUM
 typedef VOS_UINT8 RRC_UE_CAP_ROH_CONTEXT_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CAP_UTRA_FDD_BAND_ENUM_UINT8
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : utra-FDD-Band
+ ??????    : RRC_UE_CAP_UTRA_FDD_BAND_ENUM_UINT8
+ ????????  :
+ ASN.1???? :
+ ????????  : utra-FDD-Band
 *****************************************************************************/
 enum RRC_UE_CAP_UTRA_FDD_BAND_ENUM
 {
@@ -258,10 +258,10 @@ enum RRC_UE_CAP_UTRA_FDD_BAND_ENUM
 typedef VOS_UINT8 RRC_UE_CAP_UTRA_FDD_BAND_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CAP_UTRA_TDD128_BAND_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : utra-TDD128Band
+ ??????    : RRC_UE_CAP_UTRA_TDD128_BAND_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : utra-TDD128Band
 *****************************************************************************/
 enum RRC_UE_CAP_UTRA_TDD128_BAND_ENUM
 {
@@ -286,10 +286,10 @@ enum RRC_UE_CAP_UTRA_TDD128_BAND_ENUM
 typedef VOS_UINT8 RRC_UE_CAP_UTRA_TDD128_BAND_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CAP_UTRA_TDD384_BAND_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : utra-TDD384Band
+ ??????    : RRC_UE_CAP_UTRA_TDD384_BAND_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : utra-TDD384Band
 *****************************************************************************/
 enum RRC_UE_CAP_UTRA_TDD384_BAND_ENUM
 {
@@ -314,10 +314,10 @@ enum RRC_UE_CAP_UTRA_TDD384_BAND_ENUM
 typedef VOS_UINT8 RRC_UE_CAP_UTRA_TDD384_BAND_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CAP_UTRA_TDD768_BAND_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : utra-TDD768Band
+ ??????    : RRC_UE_CAP_UTRA_TDD768_BAND_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : utra-TDD768Band
 *****************************************************************************/
 enum RRC_UE_CAP_UTRA_TDD768_BAND_ENUM
 {
@@ -342,10 +342,10 @@ enum RRC_UE_CAP_UTRA_TDD768_BAND_ENUM
 typedef VOS_UINT8 RRC_UE_CAP_UTRA_TDD768_BAND_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CAP_GERAN_BAND_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : geran-Band
+ ??????    : RRC_UE_CAP_GERAN_BAND_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : geran-Band
 *****************************************************************************/
 enum RRC_UE_CAP_GERAN_BAND_ENUM
 {
@@ -365,10 +365,10 @@ enum RRC_UE_CAP_GERAN_BAND_ENUM
 typedef VOS_UINT8 RRC_UE_CAP_GERAN_BAND_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CAP_CDMA2000_HRPD_TX_CONFIG_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : cdma2000-HRPD-TxConfig
+ ??????    : RRC_UE_CAP_CDMA2000_HRPD_TX_CONFIG_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : cdma2000-HRPD-TxConfig
 *****************************************************************************/
 enum RRC_UE_CAP_CDMA2000_HRPD_TX_CONFIG_ENUM
 {
@@ -379,10 +379,10 @@ enum RRC_UE_CAP_CDMA2000_HRPD_TX_CONFIG_ENUM
 typedef VOS_UINT8 RRC_UE_CAP_CDMA2000_HRPD_TX_CONFIG_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CAP_CDMA2000_HRPD_RX_CONFIG_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : cdma2000-HRPD-RxConfig
+ ??????    : RRC_UE_CAP_CDMA2000_HRPD_RX_CONFIG_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : cdma2000-HRPD-RxConfig
 *****************************************************************************/
 enum RRC_UE_CAP_CDMA2000_HRPD_RX_CONFIG_ENUM
 {
@@ -393,10 +393,10 @@ enum RRC_UE_CAP_CDMA2000_HRPD_RX_CONFIG_ENUM
 typedef VOS_UINT8 RRC_UE_CAP_CDMA2000_HRPD_RX_CONFIG_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CAP_CDMA2000_1X_RTT_TX_CONFIG_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : cdma2000-1xRTT-TxConfig
+ ??????    : RRC_UE_CAP_CDMA2000_1X_RTT_TX_CONFIG_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : cdma2000-1xRTT-TxConfig
 *****************************************************************************/
 enum RRC_UE_CAP_CDMA2000_1X_RTT_TX_CONFIG_ENUM
 {
@@ -407,10 +407,10 @@ enum RRC_UE_CAP_CDMA2000_1X_RTT_TX_CONFIG_ENUM
 typedef VOS_UINT8 RRC_UE_CAP_CDMA2000_1X_RTT_TX_CONFIG_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CAP_CDMA2000_1X_RTT_RX_CONFIG_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : cdma2000-1xRTT-RxConfig
+ ??????    : RRC_UE_CAP_CDMA2000_1X_RTT_RX_CONFIG_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : cdma2000-1xRTT-RxConfig
 *****************************************************************************/
 enum RRC_UE_CAP_CDMA2000_1X_RTT_RX_CONFIG_ENUM
 {
@@ -421,10 +421,10 @@ enum RRC_UE_CAP_CDMA2000_1X_RTT_RX_CONFIG_ENUM
 typedef VOS_UINT8 RRC_UE_CAP_CDMA2000_1X_RTT_RX_CONFIG_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CAP_CDMA2000_BANDCLASS_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : CDMA2000-Bandclass
+ ??????    : RRC_UE_CAP_CDMA2000_BANDCLASS_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : CDMA2000-Bandclass
 *****************************************************************************/
 enum RRC_UE_CAP_CDMA2000_BANDCLASS_ENUM
 {
@@ -451,25 +451,25 @@ enum RRC_UE_CAP_CDMA2000_BANDCLASS_ENUM
 typedef VOS_UINT8 RRC_UE_CAP_CDMA2000_BANDCLASS_ENUM_UINT8;
 
 /*****************************************************************************
- 结构名    : RRC_NV_LOCK_INFO_ENUM
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 锁定指示
+ ??????    : RRC_NV_LOCK_INFO_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????
  *****************************************************************************/
 enum RRC_NV_LOCK_INFO_ENUM
 {
-    RRC_NV_LOCK_NONE           = 0,                                           /* 不锁定 */
-    RRC_NV_LOCK_BAND,                                                         /* 锁定BAND */
-    RRC_NV_LOCK_FREQ,                                                         /* 锁定频点 */
-    RRC_NV_LOCK_CELL,                                                         /* 锁定小区 */
+    RRC_NV_LOCK_NONE           = 0,                                           /* ?????? */
+    RRC_NV_LOCK_BAND,                                                         /* ????BAND */
+    RRC_NV_LOCK_FREQ,                                                         /* ???????? */
+    RRC_NV_LOCK_CELL,                                                         /* ???????? */
     RRC_NV_LOCK_BUTT
 };
 typedef VOS_UINT32  RRC_NV_LOCK_INFO_ENUM_UINT32;
 /*****************************************************************************
- 结构名    : RRC_NV_UE_RFRD_TYPE_ENUM
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 射频类型指示
+ ??????    : RRC_NV_UE_RFRD_TYPE_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????????
  *****************************************************************************/
 enum RRC_NV_UE_RFRD_TYPE_ENUM
 {
@@ -480,10 +480,10 @@ enum RRC_NV_UE_RFRD_TYPE_ENUM
 typedef VOS_UINT8  RRC_NV_UE_RFRD_TYPE_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CAP_FEATURE_SUPPORT_FLAG_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : 用来指示特性是否支持
+ ??????    : RRC_UE_CAP_FEATURE_SUPPORT_FLAG_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????????????????
 *****************************************************************************/
 enum RRC_UE_CAP_FEATURE_SUPPORT_FLAG_ENUM
 {
@@ -494,10 +494,10 @@ enum RRC_UE_CAP_FEATURE_SUPPORT_FLAG_ENUM
 typedef VOS_UINT8 RRC_UE_CAP_FEATURE_SUPPORT_FLAG_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_UE_CAP_DEVICE_TYPE_R9_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : 用来指示是否获取NW-based省电优化
+ ??????    : RRC_UE_CAP_DEVICE_TYPE_R9_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????????????NW-based????????
 *****************************************************************************/
 enum RRC_UE_CAP_DEVICE_TYPE_R9_ENUM
 {
@@ -509,10 +509,10 @@ typedef VOS_UINT8 RRC_UE_CAP_DEVICE_TYPE_R9_ENUM_UINT8;
 
 /* v7r2 LLD begin */
 /*****************************************************************************
- 枚举名    : RRC_CA_BANDWIDTH_CLASS_R10_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  :
+ ??????    : RRC_CA_BANDWIDTH_CLASS_R10_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 enum RRC_CA_BANDWIDTH_CLASS_R10_ENUM
 {
@@ -526,10 +526,10 @@ enum RRC_CA_BANDWIDTH_CLASS_R10_ENUM
 typedef VOS_UINT8 RRC_CA_BANDWIDTH_CLASS_R10_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_MIMO_CAP_UL_R10_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  :
+ ??????    : RRC_MIMO_CAP_UL_R10_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 enum RRC_MIMO_CAP_UL_R10_ENUM
 {
@@ -539,10 +539,10 @@ enum RRC_MIMO_CAP_UL_R10_ENUM
 typedef VOS_UINT8 RRC_MIMO_CAP_UL_R10_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : RRC_MIMO_CAP_DL_R10_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  :
+ ??????    : RRC_MIMO_CAP_DL_R10_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 enum RRC_MIMO_CAP_DL_R10_ENUM
 {
@@ -553,10 +553,10 @@ enum RRC_MIMO_CAP_DL_R10_ENUM
 typedef VOS_UINT8 RRC_MIMO_CAP_DL_R10_ENUM_UINT8;
 
 /*********************************************************************
-枚举名    : RRC_PDCP_SN_EXT_R11_ENUM
-协议表格  :
-ASN.1描述 :
-枚举说明  :
+??????    : RRC_PDCP_SN_EXT_R11_ENUM
+????????  :
+ASN.1???? :
+????????  :
 *********************************************************************/
 typedef enum
 {
@@ -564,10 +564,10 @@ typedef enum
 }RRC_PDCP_SN_EXT_R11_ENUM;
 typedef VOS_UINT8                 RRC_PDCP_SN_EXT_R11_ENUM_UINT8;
 /*********************************************************************
-枚举名    : RRC_SUPPORT_ROHC_CONTEXT_CONTINUE_R11_ENUM
-协议表格  :
-ASN.1描述 :
-枚举说明  :
+??????    : RRC_SUPPORT_ROHC_CONTEXT_CONTINUE_R11_ENUM
+????????  :
+ASN.1???? :
+????????  :
 *********************************************************************/
 typedef enum
 {
@@ -576,8 +576,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_SUPPORT_ROHC_CONTEXT_CONTINUE_R11_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: crs-InterfHandl-r11
-* 取值范围: ENUM(0..0)
+* ASN ????: crs-InterfHandl-r11
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -586,8 +586,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_CRS_INTERF_HANDL_R11_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: ePDCCH-r11
-* 取值范围: ENUM(0..0)
+* ASN ????: ePDCCH-r11
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -596,8 +596,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_EPDCCH_R11_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: multiACK-CSI-Reporting-r11
-* 取值范围: ENUM(0..0)
+* ASN ????: multiACK-CSI-Reporting-r11
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -606,8 +606,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_MULTI_ACK_CSI_RPRTING_R11_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: ss-CCH-InterfHandl-r11
-* 取值范围: ENUM(0..0)
+* ASN ????: ss-CCH-InterfHandl-r11
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -616,8 +616,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_SS_CCH_INTERF_HANDL_R11_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: tdd-SpecialSubframe-r11
-* 取值范围: ENUM(0..0)
+* ASN ????: tdd-SpecialSubframe-r11
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -626,8 +626,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_TDD_SPECIAL_SUBFRAME_R11_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: txDiv-PUCCH1b-ChSelect-r11
-* 取值范围: ENUM(0..0)
+* ASN ????: txDiv-PUCCH1b-ChSelect-r11
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -636,8 +636,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_TX_DIV_PUCCH1B_CH_SELECT_R11_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: ul-CoMP-r11
-* 取值范围: ENUM(0..0)
+* ASN ????: ul-CoMP-r11
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -646,8 +646,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_UL_COMP_R11_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: multipleTimingAdvance-r11
-* 取值范围: ENUM(0..0)
+* ASN ????: multipleTimingAdvance-r11
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -656,8 +656,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_MULTIPLE_TIMING_ADVANCE_R11_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: simultaneousRx-Tx-r11
-* 取值范围: ENUM(0..0)
+* ASN ????: simultaneousRx-Tx-r11
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -666,8 +666,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_SIMUL_RX_TX_R11_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: supportedCSI-Proc-r11
-* 取值范围: ENUM(0..2)
+* ASN ????: supportedCSI-Proc-r11
+* ????????: ENUM(0..2)
 *********************************************************************/
 typedef enum
 {
@@ -678,8 +678,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_SUPP_CSI_PROC_R11_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: rsrqMeasWideband-r11
-* 取值范围: ENUM(0..0)
+* ASN ????: rsrqMeasWideband-r11
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -688,8 +688,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_RSRQ_MEAS_WIDEBAND_R11_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: cdma2000-NW-Sharing-r11
-* 取值范围: ENUM(0..0)
+* ASN ????: cdma2000-NW-Sharing-r11
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -699,8 +699,8 @@ typedef VOS_UINT8                 RRC_CDMA2000_NW_SHARING_R11_ENUM_UINT8;
 
 
 /*********************************************************************
-* ASN 文本: inDeviceCoexInd-r11
-* 取值范围: ENUM(0..0)
+* ASN ????: inDeviceCoexInd-r11
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -709,8 +709,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_IN_DEVICE_COEX_IND_R11_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: powerPrefInd-r11
-* 取值范围: ENUM(0..0)
+* ASN ????: powerPrefInd-r11
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -719,8 +719,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_PWR_PREF_IND_R11_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: ue-Rx-TxTimeDiffMeasurements-r11
-* 取值范围: ENUM(0..0)
+* ASN ????: ue-Rx-TxTimeDiffMeasurements-r11
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -731,10 +731,10 @@ typedef VOS_UINT8                 RRC_UE_RX_TX_TIME_DIFF_MEAS_R11_ENUM_UINT8;
 /* v7r2 LLD end */
 
 /*********************************************************************
-枚举名    : RRC_FREQ_BAND_RETRIEVAL_R11_ENUM
-协议表格  :
-ASN.1描述 :
-枚举说明  :
+??????    : RRC_FREQ_BAND_RETRIEVAL_R11_ENUM
+????????  :
+ASN.1???? :
+????????  :
 *********************************************************************/
 typedef enum
 {
@@ -743,10 +743,10 @@ typedef enum
 typedef VOS_UINT8                 RRC_FREQ_BAND_RETRIEVAL_R11_ENUM_UINT8;
 
 /*********************************************************************
-枚举名    : RRC_SUPP_CSI_PROC_R11_BAND_PARAM_R11_ENUM
-协议表格  :
-ASN.1描述 :
-枚举说明  :
+??????    : RRC_SUPP_CSI_PROC_R11_BAND_PARAM_R11_ENUM
+????????  :
+ASN.1???? :
+????????  :
 *********************************************************************/
 typedef enum
 {
@@ -757,10 +757,10 @@ typedef enum
 typedef VOS_UINT8                 RRC_SUPP_CSI_PROC_R11_BAND_PARAM_R11_ENUM_UINT8;
 
 /*********************************************************************
-枚举名    : RRC_MULTIPLE_TIMING_ADVANCE_R11_BAND_COMB_PARAM_R11_ENUM
-协议表格  :
-ASN.1描述 :
-枚举说明  :
+??????    : RRC_MULTIPLE_TIMING_ADVANCE_R11_BAND_COMB_PARAM_R11_ENUM
+????????  :
+ASN.1???? :
+????????  :
 *********************************************************************/
 typedef enum
 {
@@ -769,10 +769,10 @@ typedef enum
 typedef VOS_UINT8                 RRC_MULTIPLE_TIMING_ADVANCE_R11_BAND_COMB_PARAM_R11_ENUM_UINT8;
 
 /*********************************************************************
-枚举名    : RRC_SIMUL_RX_TX_R11_BAND_COMB_PARAM_R11_ENUM
-协议表格  :
-ASN.1描述 :
-枚举说明  :
+??????    : RRC_SIMUL_RX_TX_R11_BAND_COMB_PARAM_R11_ENUM
+????????  :
+ASN.1???? :
+????????  :
 *********************************************************************/
 typedef enum
 {
@@ -781,10 +781,10 @@ typedef enum
 typedef VOS_UINT8                 RRC_SIMUL_RX_TX_R11_BAND_COMB_PARAM_R11_ENUM_UINT8;
 
 /*********************************************************************
-枚举名    : RRC_MBMS_SCELL_R11_ENUM
-协议表格  :
-ASN.1描述 :
-枚举说明  :
+??????    : RRC_MBMS_SCELL_R11_ENUM
+????????  :
+ASN.1???? :
+????????  :
 *********************************************************************/
 typedef enum
 {
@@ -793,10 +793,10 @@ typedef enum
 typedef VOS_UINT8                 RRC_MBMS_SCELL_R11_ENUM_UINT8;
 
 /*********************************************************************
-枚举名    : RRC_MBMS_NON_SERVING_CELL_R11_ENUM
-协议表格  :
-ASN.1描述 :
-枚举说明  :
+??????    : RRC_MBMS_NON_SERVING_CELL_R11_ENUM
+????????  :
+ASN.1???? :
+????????  :
 *********************************************************************/
 typedef enum
 {
@@ -805,10 +805,10 @@ typedef enum
 typedef VOS_UINT8                 RRC_MBMS_NON_SERVING_CELL_R11_ENUM_UINT8;
 
 /*********************************************************************
-枚举名    : RRC_EXTENDED_RLC_LI_FIELD_R12_ENUM
-协议表格  :
-ASN.1描述 :
-枚举说明  :
+??????    : RRC_EXTENDED_RLC_LI_FIELD_R12_ENUM
+????????  :
+ASN.1???? :
+????????  :
 *********************************************************************/
 typedef enum
 {
@@ -817,8 +817,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_EXTENDED_RLC_LI_FIELD_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: e-HARQ-Pattern-FDD-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: e-HARQ-Pattern-FDD-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -827,8 +827,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_E_HARQ_PATTERN_FDD_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: enhanced-4TxCodebook-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: enhanced-4TxCodebook-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -837,8 +837,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_ENHNC_4TX_CODEBOOK_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: phy-TDD-ReConfig-TDDPCell-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: phy-TDD-ReConfig-TDDPCell-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -847,8 +847,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_PHY_TDD_RE_CONFIG_TDD_PCELL_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: phy-TDD-ReConfig-FDDPCell-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: phy-TDD-ReConfig-FDDPCell-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -857,8 +857,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_PHY_TDD_RE_CONFIG_FDD_PCELL_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: pusch-FeedbackMode-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: pusch-FeedbackMode-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -867,8 +867,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_PUSCH_FEEDBACK_MODE_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: pusch-SRS-PowerControl-SubframeSet-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: pusch-SRS-PowerControl-SubframeSet-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -877,8 +877,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_PUSCH_SRS_PWR_CTRL_SUBFRAME_SET_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: csi-SubframeSet-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: csi-SubframeSet-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -887,8 +887,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_CSI_SUBFRAME_SET_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: noResourceRestrictionForTTIBundling-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: noResourceRestrictionForTTIBundling-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -897,8 +897,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_NO_RSRC_RSTRIC_FOR_TTI_BUNDLING_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: discoverySignalsInDeactSCell-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: discoverySignalsInDeactSCell-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -907,8 +907,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_DISCOVERY_SIGNALS_IN_DEACT_SCELL_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: numberOfAggregatedPRB-r12
-* 取值范围: ENUM(0..15)
+* ASN ????: numberOfAggregatedPRB-r12
+* ????????: ENUM(0..15)
 *********************************************************************/
 typedef enum
 {
@@ -932,8 +932,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_NUM_OF_AGGREGATED_PRB_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: dl-256QAM-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: dl-256QAM-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -942,8 +942,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_DL_256_QAM_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: ul-64QAM-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: ul-64QAM-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -952,8 +952,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_UL_64_QAM_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: asynchronous-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: asynchronous-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -962,8 +962,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_ASYNCHRONOUS_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: freqBandPriorityAdjustment-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: freqBandPriorityAdjustment-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -972,8 +972,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_FREQ_BAND_PRIOR_ADJ_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: loggedMBSFNMeasurements-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: loggedMBSFNMeasurements-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -982,8 +982,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_LOGGED_MBSFN_MEAS_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: wlan-IW-RAN-Rules-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: wlan-IW-RAN-Rules-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -992,8 +992,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_WLAN_IW_RAN_RULES_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: wlan-IW-ANDSF-Policies-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: wlan-IW-ANDSF-Policies-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1002,8 +1002,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_WLAN_IW_ANDSF_POLICIES_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: timerT312-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: timerT312-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1012,8 +1012,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_TIMER_T312_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: alternativeTimeToTrigger-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: alternativeTimeToTrigger-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1022,8 +1022,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_ALTERNATIVE_TIME_TO_TRIG_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: incMonEUTRA-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: incMonEUTRA-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1032,8 +1032,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_INC_MON_EUTRA_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: incMonUTRA-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: incMonUTRA-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1042,8 +1042,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_INC_MON_UTRA_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: extendedMaxMeasId-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: extendedMaxMeasId-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1052,8 +1052,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_EXTENDED_MAX_MEAS_ID_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: extendedRSRQ-LowerRange-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: extendedRSRQ-LowerRange-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1062,8 +1062,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_EXTENDED_RSRQ_LOWER_RANGE_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: rsrqOnAllSymbols-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: rsrqOnAllSymbols-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1072,8 +1072,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_RSRQ_ON_ALL_SYMBOLS_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: crs-DiscoverySignalsMeas-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: crs-DiscoverySignalsMeas-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1082,8 +1082,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_CRS_DISCOVERY_SIGNALS_MEAS_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: csi-RS-DiscoverySignalsMeas-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: csi-RS-DiscoverySignalsMeas-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1092,8 +1092,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_CSI_RS_DISCOVERY_SIGNALS_MEAS_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: drb-TypeSplit-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: drb-TypeSplit-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1102,8 +1102,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_DRB_TYPE_SPLIT_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: drb-TypeSCG-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: drb-TypeSCG-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1112,8 +1112,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_DRB_TYPE_SCG_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: mbms-AsyncDC-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: mbms-AsyncDC-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1122,8 +1122,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_MBMS_ASYNC_DC_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: logicalChannelSR-ProhibitTimer-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: logicalChannelSR-ProhibitTimer-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1132,8 +1132,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_LOGIC_CH_SR_PROHB_TIMER_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: longDRX-Command-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: longDRX-Command-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1142,8 +1142,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_LONG_DRX_CMD_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: commSimultaneousTx-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: commSimultaneousTx-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1152,8 +1152,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_COMM_SIMUL_TX_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: support-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: support-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1162,8 +1162,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_SUPPORT_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: discScheduledResourceAlloc-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: discScheduledResourceAlloc-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1172,8 +1172,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_DISC_SCHEDULED_RSRC_ALLOC_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: disc-UE-SelectedResourceAlloc-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: disc-UE-SelectedResourceAlloc-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1182,8 +1182,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_DISC_UE_SELECTED_RSRC_ALLOC_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: disc-SLSS-r12
-* 取值范围: ENUM(0..0)
+* ASN ????: disc-SLSS-r12
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1192,8 +1192,8 @@ typedef enum
 typedef VOS_UINT8                 RRC_DISC_SLSS_R12_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本: discSupportedProc-r12
-* 取值范围: ENUM(0..1)
+* ASN ????: discSupportedProc-r12
+* ????????: ENUM(0..1)
 *********************************************************************/
 typedef enum
 {
@@ -1207,35 +1207,35 @@ typedef VOS_UINT8                 RRC_DISC_SUPP_PROC_R12_ENUM_UINT8;
    5 STRUCT
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : RRC_NV_CSEL_CAND_FREQ_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 关于某个候补频率的信息
+ ??????    : RRC_NV_CSEL_CAND_FREQ_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ??????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usFreqInfo;                             /* 频率频点 */
-    VOS_UINT16                          usCellCount;                            /* 频率中的小区ID */
-    VOS_UINT16                          ausCellIds[RRC_NV_CSEL_MAX_STORED_CELL_COUNT_PER_FREQ]; /* 邻小区列表 */
+    VOS_UINT16                          usFreqInfo;                             /* ???????? */
+    VOS_UINT16                          usCellCount;                            /* ????????????ID */
+    VOS_UINT16                          ausCellIds[RRC_NV_CSEL_MAX_STORED_CELL_COUNT_PER_FREQ]; /* ?????????? */
 } RRC_NV_CSEL_CAND_FREQ_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_NV_CSEL_FREQ_BAND_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 单个频带信息
+ ??????    : RRC_NV_CSEL_FREQ_BAND_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usFreqBegin;                            /* 起始频率 */
-    VOS_UINT16                          usFreqEnd;                              /* 结束频率 */
+    VOS_UINT16                          usFreqBegin;                            /* ???????? */
+    VOS_UINT16                          usFreqEnd;                              /* ???????? */
 } RRC_NV_CSEL_FREQ_BAND_INFO_STRU;
 /* reportCGI stub begin */
 /*****************************************************************************
- 结构名    : RRC_UU_MCC_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    : RRC_UU_MCC_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
@@ -1244,10 +1244,10 @@ typedef struct
 }RRC_UU_MCC_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UU_MNC_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    : RRC_UU_MNC_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
@@ -1256,10 +1256,10 @@ typedef struct
 }RRC_UU_MNC_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UU_PLMN_ID_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    : RRC_UU_PLMN_ID_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
@@ -1268,10 +1268,10 @@ typedef struct
 }RRC_UU_PLMN_ID_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UU_CGI_EUTRA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    : RRC_UU_CGI_EUTRA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
@@ -1280,10 +1280,10 @@ typedef struct
 }RRC_UU_CGI_EUTRA_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UU_PLMN_ID_LIST2_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 小区CGI信息结构
+ ??????    : RRC_UU_PLMN_ID_LIST2_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????CGI????????
 *****************************************************************************/
 typedef struct
 {
@@ -1292,10 +1292,10 @@ typedef struct
 }RRC_UU_PLMN_ID_LIST2_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UU_CGI_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 小区CGI信息结构
+ ??????    : RRC_UU_CGI_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????CGI????????
 *****************************************************************************/
 typedef struct
 {
@@ -1305,10 +1305,10 @@ typedef struct
 }RRC_UU_CGI_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_CMM_CGI_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 小区CGI信息结构
+ ??????    : RRC_CMM_CGI_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????CGI????????
 *****************************************************************************/
 typedef struct
 {
@@ -1318,10 +1318,10 @@ typedef struct
 }RRC_NV_CGI_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_CMM_USER_SET_CGI_LIST_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 用户手动设置的小区CGI信息列表结构
+ ??????    : RRC_CMM_USER_SET_CGI_LIST_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ??????????????????CGI????????????
 *****************************************************************************/
 typedef struct
 {
@@ -1331,10 +1331,10 @@ typedef struct
 }RRC_NV_USER_SET_CGI_LIST_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_CMM_AUTO_SRCH_CGI_LIST_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE自动搜索得到的小区CGI信息列表结构
+ ??????    : RRC_CMM_AUTO_SRCH_CGI_LIST_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE??????????????????CGI????????????
 *****************************************************************************/
 typedef struct
 {
@@ -1344,37 +1344,37 @@ typedef struct
 }RRC_NV_AUTO_SRCH_CGI_LIST_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_CMM_CELL_CGI_LIST_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 小区CGI信息列表结构
+ ??????    : RRC_CMM_CELL_CGI_LIST_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????CGI????????????
 *****************************************************************************/
 typedef struct
 {
-    RRC_NV_USER_SET_CGI_LIST_STRU      stUserSetCgiList;                       /* 用户手动设置的CGI信息列表 */
-    RRC_NV_AUTO_SRCH_CGI_LIST_STRU     stAutoSrchCgiList;                      /* UE自动获取的CGI信息列表 */
+    RRC_NV_USER_SET_CGI_LIST_STRU      stUserSetCgiList;                       /* ??????????????CGI???????? */
+    RRC_NV_AUTO_SRCH_CGI_LIST_STRU     stAutoSrchCgiList;                      /* UE??????????CGI???????? */
 }RRC_NV_CELL_CGI_LIST_STRU;
 /* reportCGI stub end */
 
 /*****************************************************************************
- 结构名    : RRC_NV_SIB_SUPPORT_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE支持的系统信息表结构
+ ??????    : RRC_NV_SIB_SUPPORT_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE????????????????????
 *****************************************************************************/
 typedef struct
 {
-    /* MBMS　begin */
+    /* MBMS??begin */
     VOS_UINT8   aucSibn[32];
-    /* MBMS　end */
+    /* MBMS??end */
 }RRC_NV_SIB_SUPPORT_STRU;
 
-/* UE能力结构定义 */
+/* UE???????????? */
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_SUPP_ROH_CPROFILES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中PDCP->ROHC参数
+ ??????    : RRC_UE_CAP_SUPP_ROH_CPROFILES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????PDCP->ROHC????
 *****************************************************************************/
 typedef struct
 {
@@ -1391,10 +1391,10 @@ typedef struct
 }RRC_UE_CAP_SUPP_ROH_CPROFILES_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_PDCP_PARA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中PDCP参数
+ ??????    : RRC_UE_CAP_PDCP_PARA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????PDCP????
 *****************************************************************************/
 typedef struct
 {
@@ -1404,10 +1404,10 @@ typedef struct
 } RRC_UE_CAP_PDCP_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_PDCP_PARA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中PHY参数
+ ??????    : RRC_UE_CAP_PDCP_PARA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????PHY????
 *****************************************************************************/
 typedef struct
 {
@@ -1417,10 +1417,10 @@ typedef struct
 } RRC_UE_CAP_PHY_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_SUPP_EUTRA_BAND_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中RF->Band参数
+ ??????    : RRC_UE_CAP_SUPP_EUTRA_BAND_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????RF->Band????
 *****************************************************************************/
 typedef struct
 {
@@ -1430,10 +1430,10 @@ typedef struct
 } RRC_UE_CAP_SUPP_EUTRA_BAND_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_RF_PARA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中RF参数
+ ??????    : RRC_UE_CAP_RF_PARA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????RF????
 *****************************************************************************/
 typedef struct
 {
@@ -1443,10 +1443,10 @@ typedef struct
 } RRC_UE_CAP_RF_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_INTER_FREQ_EUTRA_BAND_LIST_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中MEAS->EutraInterFreqBand参数
+ ??????    : RRC_INTER_FREQ_EUTRA_BAND_LIST_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????MEAS->EutraInterFreqBand????
 *****************************************************************************/
 typedef struct
 {
@@ -1455,10 +1455,10 @@ typedef struct
 } RRC_INTER_FREQ_EUTRA_BAND_LIST_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_INTER_FREQ_EUTRA_BAND_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中MEAS->InterFreqBand参数
+ ??????    : RRC_INTER_FREQ_EUTRA_BAND_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????MEAS->InterFreqBand????
 *****************************************************************************/
 typedef struct
 {
@@ -1468,10 +1468,10 @@ typedef struct
 } RRC_INTER_FREQ_EUTRA_BAND_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_INTER_RAT_BAND_LIST_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中MEAS->InterRatBand参数
+ ??????    : RRC_INTER_RAT_BAND_LIST_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????MEAS->InterRatBand????
 *****************************************************************************/
 typedef struct
 {
@@ -1480,10 +1480,10 @@ typedef struct
 } RRC_INTER_RAT_BAND_LIST_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_INTER_RAT_BAND_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中MEAS->InterRatBand参数
+ ??????    : RRC_INTER_RAT_BAND_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????MEAS->InterRatBand????
 *****************************************************************************/
 typedef struct
 {
@@ -1493,10 +1493,10 @@ typedef struct
 } RRC_INTER_RAT_BAND_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_MEAS_PARA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中MEAS参数
+ ??????    : RRC_UE_CAP_MEAS_PARA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????MEAS????
 *****************************************************************************/
 typedef struct
 {
@@ -1506,10 +1506,10 @@ typedef struct
 } RRC_UE_CAP_MEAS_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_IRAT_UTRA_FDD_PARA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedUTRA-FDD-BandListItem
+ ??????    : RRC_IRAT_UTRA_FDD_PARA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedUTRA-FDD-BandListItem
 *****************************************************************************/
 typedef struct
 {
@@ -1518,10 +1518,10 @@ typedef struct
 } RRC_UE_CAP_SUPP_UTRA_FDD_BAND_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_IRAT_UTRA_FDD_PARA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中INTER RAT->UTRA FDD参数
+ ??????    : RRC_IRAT_UTRA_FDD_PARA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????INTER RAT->UTRA FDD????
 *****************************************************************************/
 typedef struct
 {
@@ -1531,10 +1531,10 @@ typedef struct
 } RRC_IRAT_UTRA_FDD_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_SUPP_UTRA_TDD128_BAND_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedUTRA-TDD128BandListItem
+ ??????    : RRC_UE_CAP_SUPP_UTRA_TDD128_BAND_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedUTRA-TDD128BandListItem
 *****************************************************************************/
 typedef struct
 {
@@ -1543,10 +1543,10 @@ typedef struct
 } RRC_UE_CAP_SUPP_UTRA_TDD128_BAND_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_IRAT_UTRA_TDD128_PARA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedUTRA-TDD128BandList
+ ??????    : RRC_IRAT_UTRA_TDD128_PARA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedUTRA-TDD128BandList
 *****************************************************************************/
 typedef struct
 {
@@ -1556,10 +1556,10 @@ typedef struct
 } RRC_IRAT_UTRA_TDD128_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_SUPP_UTRA_TDD384_BAND_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedUTRA-TDD384BandListItem
+ ??????    : RRC_UE_CAP_SUPP_UTRA_TDD384_BAND_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedUTRA-TDD384BandListItem
 *****************************************************************************/
 typedef struct
 {
@@ -1568,10 +1568,10 @@ typedef struct
 } RRC_UE_CAP_SUPP_UTRA_TDD384_BAND_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_IRAT_UTRA_TDD384_PARA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedUTRA-TDD384BandList
+ ??????    : RRC_IRAT_UTRA_TDD384_PARA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedUTRA-TDD384BandList
 *****************************************************************************/
 typedef struct
 {
@@ -1581,10 +1581,10 @@ typedef struct
 } RRC_IRAT_UTRA_TDD384_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_SUPP_UTRA_TDD768_BAND_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedUTRA-TDD768BandListItem
+ ??????    : RRC_UE_CAP_SUPP_UTRA_TDD768_BAND_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedUTRA-TDD768BandListItem
 *****************************************************************************/
 typedef struct
 {
@@ -1593,10 +1593,10 @@ typedef struct
 } RRC_UE_CAP_SUPP_UTRA_TDD768_BAND_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_IRAT_UTRA_TDD768_PARA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedUTRA-TDD768BandList
+ ??????    : RRC_IRAT_UTRA_TDD768_PARA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedUTRA-TDD768BandList
 *****************************************************************************/
 typedef struct
 {
@@ -1606,10 +1606,10 @@ typedef struct
 } RRC_IRAT_UTRA_TDD768_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_SUPP_GERAN_BAND_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedGERAN-BandListItem
+ ??????    : RRC_UE_CAP_SUPP_GERAN_BAND_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedGERAN-BandListItem
 *****************************************************************************/
 typedef struct
 {
@@ -1618,10 +1618,10 @@ typedef struct
 } RRC_UE_CAP_SUPP_GERAN_BAND_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_IRAT_GERAN_PARA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : IRAT-GERAN-Parameters
+ ??????    : RRC_IRAT_GERAN_PARA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : IRAT-GERAN-Parameters
 *****************************************************************************/
 typedef struct
 {
@@ -1632,10 +1632,10 @@ typedef struct
 } RRC_IRAT_GERAN_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_SUPP_HRPD_BAND_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedHRPD-BandList
+ ??????    : RRC_UE_CAP_SUPP_HRPD_BAND_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedHRPD-BandList
 *****************************************************************************/
 typedef struct
 {
@@ -1645,10 +1645,10 @@ typedef struct
 } RRC_UE_CAP_SUPP_HRPD_BAND_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_IRAT_CDMA2000_HRPD_PARA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : IRAT-CDMA2000-HRPD-Parameters
+ ??????    : RRC_IRAT_CDMA2000_HRPD_PARA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : IRAT-CDMA2000-HRPD-Parameters
 *****************************************************************************/
 typedef struct
 {
@@ -1659,10 +1659,10 @@ typedef struct
 } RRC_IRAT_CDMA2000_HRPD_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_SUPP_1X_RTT_BAND_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : Supported1xRTT-BandList
+ ??????    : RRC_UE_CAP_SUPP_1X_RTT_BAND_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : Supported1xRTT-BandList
 *****************************************************************************/
 typedef struct
 {
@@ -1672,10 +1672,10 @@ typedef struct
 } RRC_UE_CAP_SUPP_1X_RTT_BAND_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_IRAT_CDMA2000_1X_RTT_PARA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : IRAT-CDMA2000-1xRTT-Parameters
+ ??????    : RRC_IRAT_CDMA2000_1X_RTT_PARA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : IRAT-CDMA2000-1xRTT-Parameters
 *****************************************************************************/
 typedef struct
 {
@@ -1686,10 +1686,10 @@ typedef struct
 } RRC_IRAT_CDMA2000_1X_RTT_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_INTER_RAT_PARA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中INTER RAT参数
+ ??????    : RRC_UE_CAP_INTER_RAT_PARA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????INTER RAT????
 *****************************************************************************/
 typedef struct
 {
@@ -1707,11 +1707,11 @@ typedef struct
 } RRC_UE_CAP_INTER_RAT_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_FEATURE_GROUP_IND_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中特性组指示，aucFeatureInd[]: 1－支持，0－不支持，
-             数组元素0指示Group1,元素1指示Group2,依次类推
+ ??????    : RRC_UE_CAP_FEATURE_GROUP_IND_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????????????????aucFeatureInd[]: 1????????0??????????
+             ????????0????Group1,????1????Group2,????????
 
 *****************************************************************************/
 typedef struct
@@ -1721,11 +1721,11 @@ typedef struct
 
 /* v7r2 LLD begin */
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_FEATURE_GROUP_IND_R9ADD_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中特性组指示，aucFeatureInd[]: 1－支持，0－不支持，
-             数组元素0指示Group33,元素1指示Group64,依次类推
+ ??????    : RRC_UE_CAP_FEATURE_GROUP_IND_R9ADD_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????????????????aucFeatureInd[]: 1????????0??????????
+             ????????0????Group33,????1????Group64,????????
 
 *****************************************************************************/
 typedef struct
@@ -1735,10 +1735,10 @@ typedef struct
 /* v7r2 LLD end */
 
 /*****************************************************************************
- 结构名    : RRC_PHY_LAYER_PARAM_V920_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : PhyLayerParameters-v920
+ ??????    : RRC_PHY_LAYER_PARAM_V920_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : PhyLayerParameters-v920
 *****************************************************************************/
 typedef struct
 {
@@ -1748,10 +1748,10 @@ typedef struct
 }RRC_PHY_LAYER_PARAM_V920_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_IRAT_PARAM_GERAN_V920_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : IRAT-ParametersGERAN-v920
+ ??????    : RRC_IRAT_PARAM_GERAN_V920_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : IRAT-ParametersGERAN-v920
 *****************************************************************************/
 typedef struct
 {
@@ -1761,10 +1761,10 @@ typedef struct
 }RRC_IRAT_PARAM_GERAN_V920_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_IRAT_PARAM_UTRA_V920_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : IRAT-ParametersUTRA-v920
+ ??????    : RRC_IRAT_PARAM_UTRA_V920_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : IRAT-ParametersUTRA-v920
 *****************************************************************************/
 typedef struct
 {
@@ -1773,10 +1773,10 @@ typedef struct
 }RRC_IRAT_PARAM_UTRA_V920_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_IRAT_PARAM_CDMA2000_1XRTT_V920_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : IRAT-ParametersCDMA2000-1XRTT-v920
+ ??????    : RRC_IRAT_PARAM_CDMA2000_1XRTT_V920_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : IRAT-ParametersCDMA2000-1XRTT-v920
 *****************************************************************************/
 typedef struct
 {
@@ -1786,10 +1786,10 @@ typedef struct
 }RRC_IRAT_PARAM_CDMA2000_1XRTT_V920_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_CSG_PROXIMITY_IND_PARAM_R9_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : CSG-ProximityIndicationParameters-r9
+ ??????    : RRC_CSG_PROXIMITY_IND_PARAM_R9_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : CSG-ProximityIndicationParameters-r9
 *****************************************************************************/
 typedef struct
 {
@@ -1800,10 +1800,10 @@ typedef struct
 }RRC_CSG_PROXIMITY_IND_PARAM_R9_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_NEIGH_CELL_SI_ACQ_PARAM_R9_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : NeighCellSI-AcquisitionParameters-r9
+ ??????    : RRC_NEIGH_CELL_SI_ACQ_PARAM_R9_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : NeighCellSI-AcquisitionParameters-r9
 *****************************************************************************/
 typedef struct
 {
@@ -1814,10 +1814,10 @@ typedef struct
 }RRC_NEIGH_CELL_SI_ACQ_PARAM_R9_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_SON_PARAM_R9_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SON-Parameters-r9
+ ??????    : RRC_SON_PARAM_R9_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SON-Parameters-r9
 *****************************************************************************/
 typedef struct
 {
@@ -1827,10 +1827,10 @@ typedef struct
 
 /* v7r2 LLD begin */
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_ADD_XDD_MODE_R9_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-CapabilityAddXDD-Mode-r9
+ ??????    : RRC_UE_EUTRA_CAP_ADD_XDD_MODE_R9_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-CapabilityAddXDD-Mode-r9
 *****************************************************************************/
 typedef struct
 {
@@ -1856,10 +1856,10 @@ typedef struct
 typedef VOS_UINT16           RRC_FREQ_BAND_IND_V9E0_UINT16;
 
 /*****************************************************************************
- 结构名    : RRC_OTDOA_POSITION_CAP_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : OTDOA-PositioningCapbilities-r10
+ ??????    : RRC_OTDOA_POSITION_CAP_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : OTDOA-PositioningCapbilities-r10
 *****************************************************************************/
 typedef struct
 {
@@ -1873,10 +1873,10 @@ typedef struct
 }RRC_OTDOA_POSITION_CAP_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V10C0_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v10c0-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V10C0_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v10c0-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -1888,10 +1888,10 @@ typedef struct
 }RRC_UE_EUTRA_CAP_V10C0_IES_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_RF_PARAM_V10F0_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RRC_RF_PARAM_V10F0_STRU
+ ??????    : RRC_RF_PARAM_V10F0_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RRC_RF_PARAM_V10F0_STRU
 *****************************************************************************/
 typedef struct
 {
@@ -1902,10 +1902,10 @@ typedef struct
 }RRC_RF_PARAM_V10F0_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V10C0_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v10c0-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V10C0_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v10c0-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -1918,8 +1918,8 @@ typedef struct
 
 /* Begin: 2016/1/4 cr develop */
 /*********************************************************************
-* ASN 文本: fourLayerTM3-TM4-r10
-* 取值范围: ENUM(0..0)
+* ASN ????: fourLayerTM3-TM4-r10
+* ????????: ENUM(0..0)
 *********************************************************************/
 typedef enum
 {
@@ -1928,7 +1928,7 @@ typedef enum
 typedef VOS_UINT8                 RRC_UE_EUTRA_CAP_TM3_TM4_R10_ENUM_UINT8;
 
 /*********************************************************************
-* ASN 文本 :CA-MIMO-ParametersDL-v10i0
+* ASN ???? :CA-MIMO-ParametersDL-v10i0
 *********************************************************************/
 typedef struct
 {
@@ -1946,7 +1946,7 @@ typedef struct
 }RRC_UE_EUTRA_CAP_BAND_PARAM_DL_V10I0_STRU;
 
 /*********************************************************************
-* ASN 文本 :BandParameters-v10i0
+* ASN ???? :BandParameters-v10i0
 *********************************************************************/
 typedef struct
 {
@@ -1960,7 +1960,7 @@ typedef struct
 }RRC_UE_EUTRA_CAP_BAND_PARAM_LIST_V10I0_STRU;
 
 /*********************************************************************
-* ASN 文本 :BandCombinationParameters-v10i0
+* ASN ???? :BandCombinationParameters-v10i0
 *********************************************************************/
 typedef struct
 {
@@ -1968,7 +1968,7 @@ typedef struct
 }RRC_UE_EUTRA_CAP_BAND_COMB_PARAM_V10I0_STRU;
 
 /*********************************************************************
-* ASN 文本 :SupportedBandCombination-v10i0
+* ASN ???? :SupportedBandCombination-v10i0
 *********************************************************************/
 typedef struct
 {
@@ -1977,7 +1977,7 @@ typedef struct
 }RRC_UE_EUTRA_CAP_SUPP_BAND_COMB_V10I0_STRU;
 
 /*********************************************************************
-* ASN 文本 :RF-Parameters-v10i0
+* ASN ???? :RF-Parameters-v10i0
 *********************************************************************/
 typedef struct
 {
@@ -1993,7 +1993,7 @@ typedef struct
 }RRC_UE_EUTRA_CAP_V10I0_IES_STRU;
 
 /*********************************************************************
-* ASN 文本 :SupportedBandCombinationAdd-v11d0
+* ASN ???? :SupportedBandCombinationAdd-v11d0
 *********************************************************************/
 typedef struct
 {
@@ -2002,14 +2002,14 @@ typedef struct
 }RRC_UE_EUTRA_SUPP_BAND_COMB_ADD_V11D0_STRU;
 
 /*********************************************************************
-* ASN 文本 :RF-Parameters-v11d0
+* ASN ???? :RF-Parameters-v11d0
 *********************************************************************/
 typedef struct
 {
     RRC_UE_EUTRA_SUPP_BAND_COMB_ADD_V11D0_STRU    SuppBandCombAddV11d0;         /* optional */
 }RRC_UE_EUTRA_RF_PARAM_V11D0_STRU;
 /*********************************************************************
-* ASN 文本 :UE-EUTRA-Capability-v11d0-IEs
+* ASN ???? :UE-EUTRA-Capability-v11d0-IEs
 *********************************************************************/
 typedef struct
 {
@@ -2021,10 +2021,10 @@ typedef struct
 /* End: 2016/1/4 cr develop */
 
 /*****************************************************************************
- 结构名    : RRC_IRAT_PARAM_UTRA_V9H0_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : IRAT-ParametersUTRA-v9h0
+ ??????    : RRC_IRAT_PARAM_UTRA_V9H0_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : IRAT-ParametersUTRA-v9h0
 *****************************************************************************/
 typedef struct
 {
@@ -2036,10 +2036,10 @@ typedef struct
 }RRC_IRAT_PARAM_UTRA_V9H0_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V9H0_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v9h0-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V9H0_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v9h0-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -2055,10 +2055,10 @@ typedef struct
 }RRC_UE_EUTRA_CAP_V9H0_IES_STRU;
 
 /*********************************************************************
-结构名    : RRC_SUPP_BAND_EUTRA_V9E0_STRU
-协议表格  :
-ASN.1描述 :
-结构说明  : bandEUTRA-v9e0
+??????    : RRC_SUPP_BAND_EUTRA_V9E0_STRU
+????????  :
+ASN.1???? :
+????????  : bandEUTRA-v9e0
 *********************************************************************/
 typedef struct
 {
@@ -2070,10 +2070,10 @@ typedef struct
 }RRC_SUPP_BAND_EUTRA_V9E0_STRU;
 
 /*********************************************************************
-结构名    : RRC_SUPP_BAND_LIST_EUTRA_V9E0_STRU
-协议表格  :
-ASN.1描述 :
-结构说明  : SupportedBandListEutra-v9e0
+??????    : RRC_SUPP_BAND_LIST_EUTRA_V9E0_STRU
+????????  :
+ASN.1???? :
+????????  : SupportedBandListEutra-v9e0
 *********************************************************************/
 typedef struct
 {
@@ -2083,10 +2083,10 @@ typedef struct
 }RRC_SUPP_BAND_LIST_EUTRA_V9E0_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_RF_PARAM_V9E0_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RF-Parameters-v9e0
+ ??????    : RRC_RF_PARAM_V9E0_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RF-Parameters-v9e0
 *****************************************************************************/
 typedef struct
 {
@@ -2097,10 +2097,10 @@ typedef struct
 }RRC_RF_PARAM_V9E0_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V9E0_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v9e0-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V9E0_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v9e0-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -2115,10 +2115,10 @@ typedef struct
 }RRC_UE_EUTRA_CAP_V9E0_IES_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_PHY_LAYER_PARAM_V9D0_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : PhyLayerParameters-v9d0
+ ??????    : RRC_PHY_LAYER_PARAM_V9D0_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : PhyLayerParameters-v9d0
 *****************************************************************************/
 typedef struct
 {
@@ -2132,10 +2132,10 @@ typedef struct
 }RRC_PHY_LAYER_PARAM_V9D0_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V9D0_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v9d0-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V9D0_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v9d0-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -2150,10 +2150,10 @@ typedef struct
 }RRC_UE_EUTRA_CAP_V9D0_IES_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_IRAT_PARAM_UTRA_V9C0_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : IRAT-ParametersUTRA-v9c0
+ ??????    : RRC_IRAT_PARAM_UTRA_V9C0_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : IRAT-ParametersUTRA-v9c0
 *****************************************************************************/
 typedef struct
 {
@@ -2175,10 +2175,10 @@ typedef struct
 }RRC_IRAT_PARAM_UTRA_V9C0_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V9C0_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v9c0-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V9C0_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v9c0-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -2196,10 +2196,10 @@ typedef struct
 
 /*begin: modify for feature v700r500*/
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V9A0_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v9a0-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V9A0_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v9a0-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -2216,10 +2216,10 @@ typedef struct
 /*end: modify for feature v700r500*/
 
 /*****************************************************************************
- 结构名    : RRC_NON_CONTI_UL_RA_WITHIN_CC_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : NonContiguousUL-RA-WithinCC-r10
+ ??????    : RRC_NON_CONTI_UL_RA_WITHIN_CC_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : NonContiguousUL-RA-WithinCC-r10
 *****************************************************************************/
 typedef struct
 {
@@ -2228,10 +2228,10 @@ typedef struct
 }RRC_NON_CONTI_UL_RA_WITHIN_CC_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_NON_CONT_UL_RA_WITHIN_CC_LIST_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : NonContiguousUL-RA-WithinCC-List-r10
+ ??????    : RRC_NON_CONT_UL_RA_WITHIN_CC_LIST_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : NonContiguousUL-RA-WithinCC-List-r10
 *****************************************************************************/
 typedef struct
 {
@@ -2241,10 +2241,10 @@ typedef struct
 }RRC_NON_CONT_UL_RA_WITHIN_CC_LIST_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_PHY_LAYER_PARAM_V1020_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : PhyLayerParameters-v1020
+ ??????    : RRC_PHY_LAYER_PARAM_V1020_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : PhyLayerParameters-v1020
 *****************************************************************************/
 typedef struct
 {
@@ -2260,10 +2260,10 @@ typedef struct
 }RRC_PHY_LAYER_PARAM_V1020_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_CA_MIMO_PARAM_UL_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : CA-MIMO-ParametersUL-r10
+ ??????    : RRC_CA_MIMO_PARAM_UL_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : CA-MIMO-ParametersUL-r10
 *****************************************************************************/
 typedef struct
 {
@@ -2276,10 +2276,10 @@ typedef struct
 }RRC_CA_MIMO_PARAM_UL_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_CA_MIMO_PARAM_DL_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : CA-MIMO-ParametersDL-r10
+ ??????    : RRC_CA_MIMO_PARAM_DL_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : CA-MIMO-ParametersDL-r10
 *****************************************************************************/
 typedef struct
 {
@@ -2292,10 +2292,10 @@ typedef struct
 }RRC_CA_MIMO_PARAM_DL_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_BAND_PARAM_UL_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : BandParametersUL-r10
+ ??????    : RRC_BAND_PARAM_UL_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : BandParametersUL-r10
 *****************************************************************************/
 typedef struct
 {
@@ -2305,10 +2305,10 @@ typedef struct
 }RRC_BAND_PARAM_UL_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_BAND_PARAM_DL_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : BandParametersDL-r10
+ ??????    : RRC_BAND_PARAM_DL_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : BandParametersDL-r10
 *****************************************************************************/
 typedef struct
 {
@@ -2318,10 +2318,10 @@ typedef struct
 }RRC_BAND_PARAM_DL_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_BAND_PARAM_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : BandParameters-r10
+ ??????    : RRC_BAND_PARAM_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : BandParameters-r10
 *****************************************************************************/
 typedef struct
 {
@@ -2332,10 +2332,10 @@ typedef struct
 }RRC_BAND_PARAM_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_BAND_COMB_PARAM_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : BandCombinationParameters-r10
+ ??????    : RRC_BAND_COMB_PARAM_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : BandCombinationParameters-r10
 *****************************************************************************/
 typedef struct
 {
@@ -2345,10 +2345,10 @@ typedef struct
 }RRC_BAND_COMB_PARAM_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_SUPP_BAND_COMB_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedBandCombination-r10
+ ??????    : RRC_SUPP_BAND_COMB_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedBandCombination-r10
 *****************************************************************************/
 typedef struct
 {
@@ -2358,10 +2358,10 @@ typedef struct
 }RRC_SUPP_BAND_COMB_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_RF_PARAM_V1020_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RF-Parameters-v1020
+ ??????    : RRC_RF_PARAM_V1020_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RF-Parameters-v1020
 *****************************************************************************/
 typedef struct
 {
@@ -2369,10 +2369,10 @@ typedef struct
 }RRC_RF_PARAM_V1020_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_MEAS_EUTRA_BAND_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中MEAS->Band参数
+ ??????    : RRC_UE_CAP_MEAS_EUTRA_BAND_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????MEAS->Band????
 *****************************************************************************/
 typedef struct
 {
@@ -2381,10 +2381,10 @@ typedef struct
 }RRC_UE_CAP_MEAS_EUTRA_BAND_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_BAND_COMB_LIST_EUTRA_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : BandCombinationListEUTRA-r10
+ ??????    : RRC_BAND_COMB_LIST_EUTRA_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : BandCombinationListEUTRA-r10
 *****************************************************************************/
 typedef struct
 {
@@ -2394,10 +2394,10 @@ typedef struct
 }RRC_BAND_COMB_LIST_EUTRA_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_MEAS_PARAM_V1020_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : MeasParameters-v1020
+ ??????    : RRC_MEAS_PARAM_V1020_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : MeasParameters-v1020
 *****************************************************************************/
 typedef struct
 {
@@ -2405,10 +2405,10 @@ typedef struct
 }RRC_MEAS_PARAM_V1020_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_BASED_NETW_PERF_MEAS_PARAM_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-BasedNetwPerfMeasParameters-r10
+ ??????    : RRC_UE_BASED_NETW_PERF_MEAS_PARAM_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-BasedNetwPerfMeasParameters-r10
 *****************************************************************************/
 typedef struct
 {
@@ -2418,10 +2418,10 @@ typedef struct
 }RRC_UE_BASED_NETW_PERF_MEAS_PARAM_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_IRAT_PARAM_UTRA_TDD_V1020_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : IRAT-ParametersUTRA-TDD-v1020
+ ??????    : RRC_IRAT_PARAM_UTRA_TDD_V1020_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : IRAT-ParametersUTRA-TDD-v1020
 *****************************************************************************/
 typedef struct
 {
@@ -2429,11 +2429,11 @@ typedef struct
 }RRC_IRAT_PARAM_UTRA_TDD_V1020_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_FEATURE_GROUP_IND_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE EUTRA能力中特性组指示，aucFeatureIndR10[]: 1－支持，0－不支持，
-             数组元素0指示Group1,元素1指示Group2,依次类推
+ ??????    : RRC_UE_CAP_FEATURE_GROUP_IND_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE EUTRA??????????????????aucFeatureIndR10[]: 1????????0??????????
+             ????????0????Group1,????1????Group2,????????
 
 *****************************************************************************/
 typedef struct
@@ -2442,10 +2442,10 @@ typedef struct
 } RRC_UE_CAP_FEATURE_GROUP_IND_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1060_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-CapabilityAddXDD-Mode-v1060
+ ??????    : RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1060_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-CapabilityAddXDD-Mode-v1060
 *****************************************************************************/
 typedef struct
 {
@@ -2460,23 +2460,23 @@ typedef struct
 }RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1060_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_SUPP_BANDWIDTH_COMB_SET_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RF-Parameters-v1060
+ ??????    : RRC_SUPP_BANDWIDTH_COMB_SET_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RF-Parameters-v1060
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16          usBitCnt;  /* 1..(8 * RRC_MAX_NUM_OF_SUPPORT_BAND_WIDTH_COMB_SET_R10) 有效bit位*/
+    VOS_UINT16          usBitCnt;  /* 1..(8 * RRC_MAX_NUM_OF_SUPPORT_BAND_WIDTH_COMB_SET_R10) ????bit??*/
     VOS_UINT8           aucReserved[2];
     VOS_UINT8           aucItem[RRC_MAX_NUM_OF_SUPPORT_BAND_WIDTH_COMB_SET_R10];
 }RRC_SUPP_BANDWIDTH_COMB_SET_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_BAND_COMB_PARAM_EXT_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RF-Parameters-v1060
+ ??????    : RRC_BAND_COMB_PARAM_EXT_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RF-Parameters-v1060
 *****************************************************************************/
 typedef struct
 {
@@ -2487,10 +2487,10 @@ typedef struct
 }RRC_BAND_COMB_PARAM_EXT_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_SUPP_BAND_COMB_EXT_R10_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RF-Parameters-v1060
+ ??????    : RRC_SUPP_BAND_COMB_EXT_R10_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RF-Parameters-v1060
 *****************************************************************************/
 typedef struct
 {
@@ -2500,10 +2500,10 @@ typedef struct
 }RRC_SUPP_BAND_COMB_EXT_R10_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_RF_PARAM_V1060_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RF-Parameters-v1060
+ ??????    : RRC_RF_PARAM_V1060_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RF-Parameters-v1060
 *****************************************************************************/
 typedef struct
 {
@@ -2511,10 +2511,10 @@ typedef struct
 }RRC_RF_PARAM_V1060_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_RF_MEAS_PARAM_V1020_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RF-MEAS-Parameters-v1020
+ ??????    : RRC_RF_MEAS_PARAM_V1020_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RF-MEAS-Parameters-v1020
 *****************************************************************************/
 typedef struct
 {
@@ -2532,10 +2532,10 @@ typedef struct
 typedef     VOS_UINT16      RRC_FREQ_BAND_IND_R11_UINT16;
 
 /*****************************************************************************
- 结构名    : RRC_BAND_PARAM_R11_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : BandParameters-r11
+ ??????    : RRC_BAND_PARAM_R11_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : BandParameters-r11
 *****************************************************************************/
 typedef struct
 {
@@ -2550,10 +2550,10 @@ typedef struct
 }RRC_BAND_PARAM_R11_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_BAND_PARAM_LIST_R11_BAND_COMB_PARAM_R11_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    : RRC_BAND_PARAM_LIST_R11_BAND_COMB_PARAM_R11_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
@@ -2564,10 +2564,10 @@ typedef struct
 
 typedef    RRC_UE_CAP_MEAS_EUTRA_BAND_STRU    RRC_BAND_INFO_EUTRA_STRU;
 /*****************************************************************************
- 结构名    : RRC_BAND_COMB_PARAM_R11_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : BandCombinationParameters-r11
+ ??????    : RRC_BAND_COMB_PARAM_R11_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : BandCombinationParameters-r11
 *****************************************************************************/
 typedef struct
 {
@@ -2585,10 +2585,10 @@ typedef struct
 }RRC_BAND_COMB_PARAM_R11_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_SUPP_BAND_COMB_ADD_R11_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : supportedBandCombinationAdd-r11
+ ??????    : RRC_SUPP_BAND_COMB_ADD_R11_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : supportedBandCombinationAdd-r11
 *****************************************************************************/
 typedef struct
 {
@@ -2598,10 +2598,10 @@ typedef struct
 }RRC_SUPP_BAND_COMB_ADD_R11_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_REPORTED_FREQ_BANDS_R11_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : requestedBands-r11
+ ??????    : RRC_REPORTED_FREQ_BANDS_R11_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : requestedBands-r11
 *****************************************************************************/
 typedef struct
 {
@@ -2612,10 +2612,10 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : RRC_RF_PARAM_V1180_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : rf-Parameters-v1180
+ ??????    : RRC_RF_PARAM_V1180_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : rf-Parameters-v1180
 *****************************************************************************/
 typedef struct
 {
@@ -2630,10 +2630,10 @@ typedef struct
 }RRC_RF_PARAM_V1180_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_MBMS_PARAM_R11_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : MBMS-Parameters-r11
+ ??????    : RRC_MBMS_PARAM_R11_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : MBMS-Parameters-r11
 *****************************************************************************/
 typedef struct
 {
@@ -2647,10 +2647,10 @@ typedef struct
 }RRC_MBMS_PARAM_R11_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1180_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-CapabilityAddXDD-Mode-v1180
+ ??????    : RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1180_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-CapabilityAddXDD-Mode-v1180
 *****************************************************************************/
 typedef struct
 {
@@ -2658,10 +2658,10 @@ typedef struct
 }RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1180_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_NAICS_CAP_ENTRY_R12_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : NAICS-Capability-Entry-r12
+ ??????    : RRC_NAICS_CAP_ENTRY_R12_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : NAICS-Capability-Entry-r12
 *****************************************************************************/
 typedef struct
 {
@@ -2671,10 +2671,10 @@ typedef struct
 }RRC_NAICS_CAP_ENTRY_R12_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_NAICS_CAP_LIST_R12_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : NAICS-Capability-List-r12
+ ??????    : RRC_NAICS_CAP_LIST_R12_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : NAICS-Capability-List-r12
 *****************************************************************************/
 typedef struct
 {
@@ -2685,10 +2685,10 @@ typedef struct
 
 typedef     VOS_UINT8         RRC_TDD_FDD_CA_PCELL_DUPLEX_R12_UINT8;
 /*****************************************************************************
- 结构名    : RRC_PHY_LAYER_PARAM_V1250_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v1250-IEs
+ ??????    : RRC_PHY_LAYER_PARAM_V1250_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v1250-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -2719,10 +2719,10 @@ typedef struct
 }RRC_PHY_LAYER_PARAM_V1250_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_SUPP_BAND_EUTRA_V1250_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedBandEUTRA-v1250
+ ??????    : RRC_SUPP_BAND_EUTRA_V1250_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedBandEUTRA-v1250
 *****************************************************************************/
 typedef struct
 {
@@ -2736,10 +2736,10 @@ typedef struct
 }RRC_SUPP_BAND_EUTRA_V1250_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_SUPP_BAND_LIST_EUTRA_V1250_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedBandListEUTRA-v1250
+ ??????    : RRC_SUPP_BAND_LIST_EUTRA_V1250_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedBandListEUTRA-v1250
 *****************************************************************************/
 typedef struct
 {
@@ -2749,28 +2749,28 @@ typedef struct
 }RRC_SUPP_BAND_LIST_EUTRA_V1250_STRU;
 
 /*********************************************************************
-* ASN 文本: threeEntries-r12
-* 取值范围: BIT STRING (SIZE(3))
+* ASN ????: threeEntries-r12
+* ????????: BIT STRING (SIZE(3))
 *********************************************************************/
 typedef     VOS_UINT8         RRC_THREE_ENTRIES_R12_UINT8;
 
 /*********************************************************************
-* ASN 文本: fourEntries-r12
-* 取值范围: BIT STRING (SIZE(7))
+* ASN ????: fourEntries-r12
+* ????????: BIT STRING (SIZE(7))
 *********************************************************************/
 typedef     VOS_UINT8         RRC_FOUR_ENTRIES_R12_UINT8;
 
 /*********************************************************************
-* ASN 文本: fiveEntries-r12
-* 取值范围: BIT STRING (SIZE(15))
+* ASN ????: fiveEntries-r12
+* ????????: BIT STRING (SIZE(15))
 *********************************************************************/
 typedef     VOS_UINT16        RRC_FIVE_ENTRIES_R12_UINT16;
 
 /*****************************************************************************
- 结构名    : RRC_SUPP_CELL_GROUPING_R12_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : supportedCellGrouping-r12
+ ??????    : RRC_SUPP_CELL_GROUPING_R12_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : supportedCellGrouping-r12
 *****************************************************************************/
 typedef struct
 {
@@ -2791,10 +2791,10 @@ typedef struct
 }RRC_SUPP_CELL_GROUPING_R12_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_DC_SUPPORT_R12_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : dc-Support-r12
+ ??????    : RRC_DC_SUPPORT_R12_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : dc-Support-r12
 *****************************************************************************/
 typedef struct
 {
@@ -2808,36 +2808,36 @@ typedef struct
 }RRC_DC_SUPPORT_R12_STRU;
 
 /*********************************************************************
- 结构名    : RRC_SUPP_NAICS_2CRS_AP_R12_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : supportedNAICS-2CRS-AP-r12
+ ??????    : RRC_SUPP_NAICS_2CRS_AP_R12_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : supportedNAICS-2CRS-AP-r12
 *********************************************************************/
 typedef struct
 {
-    VOS_UINT16         usBitCnt;  /* 1..(8 * UU_MAX_SUPP_NAICS_2CRS_AP_R12) 有效bit位*/
+    VOS_UINT16         usBitCnt;  /* 1..(8 * UU_MAX_SUPP_NAICS_2CRS_AP_R12) ????bit??*/
     VOS_UINT8          aucRev[2];
     VOS_UINT8          aucItem[RRC_MAX_SUPP_NAICS_2CRS_AP_R12];
 }RRC_SUPP_NAICS_2CRS_AP_R12_STRU;
 
 /*********************************************************************
- 结构名    : RRC_COMM_SUPP_BANDS_PER_BC_R12_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : commSupportedBandsPerBC-r12
+ ??????    : RRC_COMM_SUPP_BANDS_PER_BC_R12_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : commSupportedBandsPerBC-r12
 *********************************************************************/
 typedef struct
 {
-    VOS_UINT16         usBitCnt;  /* 1..(8 * UU_MAX_BIT_LEN_OF_COMM_SUPPBANDS_PERBC_R12) 有效bit位*/
+    VOS_UINT16         usBitCnt;  /* 1..(8 * UU_MAX_BIT_LEN_OF_COMM_SUPPBANDS_PERBC_R12) ????bit??*/
     VOS_UINT8          aucRev[2];
     VOS_UINT8          aucItem[RRC_MAX_BIT_LEN_OF_COMM_SUPPBANDS_PERBC_R12];
 }RRC_COMM_SUPP_BANDS_PER_BC_R12_STRU;
 
 /*********************************************************************
- 结构名    : RRC_BAND_COMB_PARAM_V1250_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : BandCombinationParameters-v1250
+ ??????    : RRC_BAND_COMB_PARAM_V1250_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : BandCombinationParameters-v1250
 *********************************************************************/
 typedef struct
 {
@@ -2852,10 +2852,10 @@ typedef struct
 }RRC_BAND_COMB_PARAM_V1250_STRU;
 
 /*********************************************************************
- 结构名    : RRC_SUPP_BAND_COMB_V1250_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedBandCombination-v1250
+ ??????    : RRC_SUPP_BAND_COMB_V1250_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedBandCombination-v1250
 *********************************************************************/
 typedef struct
 {
@@ -2865,10 +2865,10 @@ typedef struct
 }RRC_SUPP_BAND_COMB_V1250_STRU;
 
 /*********************************************************************
- 结构名    : RRC_SUPP_BAND_COMB_ADD_V1250_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedBandCombinationAdd-v1250
+ ??????    : RRC_SUPP_BAND_COMB_ADD_V1250_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedBandCombinationAdd-v1250
 *********************************************************************/
 typedef struct
 {
@@ -2878,10 +2878,10 @@ typedef struct
 }RRC_SUPP_BAND_COMB_ADD_V1250_STRU;
 
 /*********************************************************************
- 结构名    : RRC_RF_PARAM_V1250_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RF-Parameters-v1250
+ ??????    : RRC_RF_PARAM_V1250_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RF-Parameters-v1250
 *********************************************************************/
 typedef struct
 {
@@ -2896,10 +2896,10 @@ typedef struct
 }RRC_RF_PARAM_V1250_STRU;
 
 /*********************************************************************
- 结构名    : RRC_UE_BASED_NETW_PERF_MEAS_PARAM_V1250_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-BasedNetwPerfMeasParameters-v1250
+ ??????    : RRC_UE_BASED_NETW_PERF_MEAS_PARAM_V1250_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-BasedNetwPerfMeasParameters-v1250
 *********************************************************************/
 typedef struct
 {
@@ -2908,10 +2908,10 @@ typedef struct
 }RRC_UE_BASED_NETW_PERF_MEAS_PARAM_V1250_STRU;
 
 /*********************************************************************
- 结构名    : RRC_WLAN_IW_PARAM_R12_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : WLAN-IW-Parameters-r12
+ ??????    : RRC_WLAN_IW_PARAM_R12_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : WLAN-IW-Parameters-r12
 *********************************************************************/
 typedef struct
 {
@@ -2925,10 +2925,10 @@ typedef struct
 }RRC_WLAN_IW_PARAM_R12_STRU;
 
 /*********************************************************************
- 结构名    : RRC_MEAS_PARAM_V1250_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : MeasParameters-v1250
+ ??????    : RRC_MEAS_PARAM_V1250_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : MeasParameters-v1250
 *********************************************************************/
 typedef struct
 {
@@ -2956,10 +2956,10 @@ typedef struct
 }RRC_MEAS_PARAM_V1250_STRU;
 
 /*********************************************************************
- 结构名    : RRC_DC_PARAM_R12_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : DC-Parameters-r12
+ ??????    : RRC_DC_PARAM_R12_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : DC-Parameters-r12
 *********************************************************************/
 typedef struct
 {
@@ -2973,10 +2973,10 @@ typedef struct
 }RRC_DC_PARAM_R12_STRU;
 
 /*********************************************************************
- 结构名    : RRC_MBMS_PARAM_V1250_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : MBMS-Parameters-v1250
+ ??????    : RRC_MBMS_PARAM_V1250_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : MBMS-Parameters-v1250
 *********************************************************************/
 typedef struct
 {
@@ -2988,10 +2988,10 @@ typedef struct
 }RRC_MBMS_PARAM_V1250_STRU;
 
 /*********************************************************************
- 结构名    : RRC_MAC_PARAM_R12_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : MAC-Parameters-r12
+ ??????    : RRC_MAC_PARAM_R12_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : MAC-Parameters-r12
 *********************************************************************/
 typedef struct
 {
@@ -3005,10 +3005,10 @@ typedef struct
 }RRC_MAC_PARAM_R12_STRU;
 
 /*********************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1250_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-CapabilityAddXDD-Mode-v1250
+ ??????    : RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1250_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-CapabilityAddXDD-Mode-v1250
 *********************************************************************/
 typedef struct
 {
@@ -3021,10 +3021,10 @@ typedef struct
 }RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1250_STRU;
 
 /*********************************************************************
- 结构名    : RRC_FREQ_BAND_IND_LIST_EUTRA_R12_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : FreqBandIndicatorListEUTRA-r12
+ ??????    : RRC_FREQ_BAND_IND_LIST_EUTRA_R12_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : FreqBandIndicatorListEUTRA-r12
 *********************************************************************/
 typedef struct
 {
@@ -3034,10 +3034,10 @@ typedef struct
 }RRC_FREQ_BAND_IND_LIST_EUTRA_R12_STRU;
 
 /*********************************************************************
- 结构名    : RRC_SUPP_BAND_INFO_R12_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedBandInfo-r12
+ ??????    : RRC_SUPP_BAND_INFO_R12_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedBandInfo-r12
 *********************************************************************/
 typedef struct
 {
@@ -3048,10 +3048,10 @@ typedef struct
 }RRC_SUPP_BAND_INFO_R12_STRU;
 
 /*********************************************************************
- 结构名    : RRC_SUPP_BAND_INFO_LIST_R12_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SupportedBandInfoList-r12
+ ??????    : RRC_SUPP_BAND_INFO_LIST_R12_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SupportedBandInfoList-r12
 *********************************************************************/
 typedef struct
 {
@@ -3061,7 +3061,7 @@ typedef struct
 }RRC_SUPP_BAND_INFO_LIST_R12_STRU;
 
 /*********************************************************************
-* ASN 文本 :SL-Parameters-r12
+* ASN ???? :SL-Parameters-r12
 *********************************************************************/
 typedef struct
 {
@@ -3084,10 +3084,10 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : RRC_RLC_PARAM_R12_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RRC_RLC_PARAM_R12_STRU
+ ??????    : RRC_RLC_PARAM_R12_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RRC_RLC_PARAM_R12_STRU
 *****************************************************************************/
 typedef struct
 {
@@ -3096,10 +3096,10 @@ typedef struct
 }RRC_RLC_PARAM_R12_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V1250_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RRC_UE_EUTRA_CAP_V1250_IES_STRU
+ ??????    : RRC_UE_EUTRA_CAP_V1250_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RRC_UE_EUTRA_CAP_V1250_IES_STRU
 *****************************************************************************/
 typedef struct
 {
@@ -3129,10 +3129,10 @@ typedef struct
 }RRC_UE_EUTRA_CAP_V1250_IES_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V1180_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v1180-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V1180_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v1180-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -3151,10 +3151,10 @@ typedef struct
 }RRC_UE_EUTRA_CAP_V1180_IES_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_MEAS_PARAM_V11A0_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RRC_MEAS_PARAM_V11A0_STRU
+ ??????    : RRC_MEAS_PARAM_V11A0_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RRC_MEAS_PARAM_V11A0_STRU
 *****************************************************************************/
 typedef struct
 {
@@ -3166,10 +3166,10 @@ typedef struct
 }RRC_MEAS_PARAM_V11A0_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V11A0_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RRC_UE_EUTRA_CAP_V11A0_IES_STRU
+ ??????    : RRC_UE_EUTRA_CAP_V11A0_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RRC_UE_EUTRA_CAP_V11A0_IES_STRU
 *****************************************************************************/
 typedef struct
 {
@@ -3185,10 +3185,10 @@ typedef struct
 }RRC_UE_EUTRA_CAP_V11A0_IES_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_INTER_BAND_TDD_CA_DIFF_CFG_R11_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : interBandTDD-CA-WithDifferentConfig-r11  BIT STRING(SIZE (2))
+ ??????    : RRC_INTER_BAND_TDD_CA_DIFF_CFG_R11_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : interBandTDD-CA-WithDifferentConfig-r11  BIT STRING(SIZE (2))
 *****************************************************************************/
 typedef struct
 {
@@ -3197,10 +3197,10 @@ typedef struct
 } RRC_INTER_BAND_TDD_CA_DIFF_CFG_R11_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_PHY_LAYER_PARAM_V1170_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : phyLayerParameters-v1170
+ ??????    : RRC_PHY_LAYER_PARAM_V1170_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : phyLayerParameters-v1170
 *****************************************************************************/
 typedef struct
 {
@@ -3211,10 +3211,10 @@ typedef struct
 }RRC_PHY_LAYER_PARAM_V1170_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V1170_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v1170-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V1170_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v1170-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -3232,7 +3232,7 @@ typedef struct
 }RRC_UE_EUTRA_CAP_V1170_IES_STRU;
 
 /*********************************************************************
-* ASN 文本 :PhyLayerParameters-v1130
+* ASN ???? :PhyLayerParameters-v1130
 *********************************************************************/
 typedef struct
 {
@@ -3256,10 +3256,10 @@ typedef struct
 }RRC_PHY_LAYER_PARAM_V1130_STRU;
 
 /*********************************************************************
-结构名    : RRC_PDCP_PARAM_V1130_STRU
-协议表格  :
-ASN.1描述 :
-结构说明  : RRC_PDCP_PARAM_V1130_STRU-IEs
+??????    : RRC_PDCP_PARAM_V1130_STRU
+????????  :
+ASN.1???? :
+????????  : RRC_PDCP_PARAM_V1130_STRU-IEs
 *********************************************************************/
 typedef struct
 {
@@ -3273,7 +3273,7 @@ typedef struct
 }RRC_PDCP_PARAM_V1130_STRU;
 
 /*********************************************************************
-* ASN 文本 :BandParameters-v1130
+* ASN ???? :BandParameters-v1130
 *********************************************************************/
 typedef struct
 {
@@ -3289,7 +3289,7 @@ typedef struct
 }RRC_BAND_PARAM_LIST_R11_STRU;
 
 /*********************************************************************
-* ASN 文本 :BandCombinationParameters-v1130
+* ASN ???? :BandCombinationParameters-v1130
 *********************************************************************/
 typedef struct
 {
@@ -3304,7 +3304,7 @@ typedef struct
 }RRC_BAND_COMB_PARAM_V1130_STRU;
 
 /*********************************************************************
-* ASN 文本 :SupportedBandCombination-v1130
+* ASN ???? :SupportedBandCombination-v1130
 *********************************************************************/
 typedef struct
 {
@@ -3314,10 +3314,10 @@ typedef struct
 }RRC_SUPP_BAND_COMB_V1130_STRU;
 
 /*********************************************************************
-结构名    : RRC_RF_PARAM_V1130_STRU
-协议表格  :
-ASN.1描述 :
-结构说明  : RRC_RF_PARAM_V1130_STRU-IEs
+??????    : RRC_RF_PARAM_V1130_STRU
+????????  :
+ASN.1???? :
+????????  : RRC_RF_PARAM_V1130_STRU-IEs
 *********************************************************************/
 typedef struct
 {
@@ -3325,10 +3325,10 @@ typedef struct
 }RRC_RF_PARAM_V1130_STRU;
 
 /*********************************************************************
-结构名    : RRC_MEAS_PARAM_V1130_STRU
-协议表格  :
-ASN.1描述 :
-结构说明  : RRC_MEAS_PARAM_V1130_STRU-IEs
+??????    : RRC_MEAS_PARAM_V1130_STRU
+????????  :
+ASN.1???? :
+????????  : RRC_MEAS_PARAM_V1130_STRU-IEs
 *********************************************************************/
 typedef struct
 {
@@ -3341,10 +3341,10 @@ typedef struct
 
 
 /*********************************************************************
-结构名    : RRC_IRAT_PARAM_CDMA2000_V1130_STRU
-协议表格  :
-ASN.1描述 :
-结构说明  : RRC_IRAT_PARAM_CDMA2000_V1130_STRU-IEs
+??????    : RRC_IRAT_PARAM_CDMA2000_V1130_STRU
+????????  :
+ASN.1???? :
+????????  : RRC_IRAT_PARAM_CDMA2000_V1130_STRU-IEs
 *********************************************************************/
 typedef struct
 {
@@ -3358,10 +3358,10 @@ typedef struct
 
 
 /*********************************************************************
-结构名    : RRC_OTHER_PARAM_R11_STRU
-协议表格  :
-ASN.1描述 :
-结构说明  : RRC_OTHER_PARAM_R11_STRU-IEs
+??????    : RRC_OTHER_PARAM_R11_STRU
+????????  :
+ASN.1???? :
+????????  : RRC_OTHER_PARAM_R11_STRU-IEs
 *********************************************************************/
 typedef struct
 {
@@ -3378,10 +3378,10 @@ typedef struct
 
 /*begin: add for feature v700r500*/
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1130_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-CapabilityAddXDD-Mode-v1130
+ ??????    : RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1130_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-CapabilityAddXDD-Mode-v1130
 *****************************************************************************/
 typedef struct
 {
@@ -3398,10 +3398,10 @@ typedef struct
 
 /*begin: modify for feature v700r500*/
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V1130_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v1130-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V1130_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v1130-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -3426,10 +3426,10 @@ typedef struct
 /*end: modify for feature v700r500*/
 
 /*********************************************************************
-结构名    : RRC_BAND_PARAM_V1090_STRU
-协议表格  :
-ASN.1描述 :
-结构说明  : RRC_BAND_PARAM_V1090_STRU-IEs
+??????    : RRC_BAND_PARAM_V1090_STRU
+????????  :
+ASN.1???? :
+????????  : RRC_BAND_PARAM_V1090_STRU-IEs
 *********************************************************************/
 typedef struct
 {
@@ -3441,10 +3441,10 @@ typedef struct
 }RRC_BAND_PARAM_V1090_STRU;
 
 /*********************************************************************
-结构名    : RRC_BAND_COMB_PARAM_V1090_STRU
-协议表格  :
-ASN.1描述 :
-结构说明  : RRC_BAND_COMB_PARAM_V1090_STRU-IEs
+??????    : RRC_BAND_COMB_PARAM_V1090_STRU
+????????  :
+ASN.1???? :
+????????  : RRC_BAND_COMB_PARAM_V1090_STRU-IEs
 *********************************************************************/
 typedef struct
 {
@@ -3454,10 +3454,10 @@ typedef struct
 }RRC_BAND_COMB_PARAM_V1090_STRU;
 
 /*********************************************************************
-结构名    : RRC_SUPP_BAND_COMB_V1090_STRU
-协议表格  :
-ASN.1描述 :
-结构说明  : RRC_SUPP_BAND_COMB_V1090_STRU-IEs
+??????    : RRC_SUPP_BAND_COMB_V1090_STRU
+????????  :
+ASN.1???? :
+????????  : RRC_SUPP_BAND_COMB_V1090_STRU-IEs
 *********************************************************************/
 typedef struct
 {
@@ -3467,10 +3467,10 @@ typedef struct
 }RRC_SUPP_BAND_COMB_V1090_STRU;
 
 /*********************************************************************
-结构名    : RRC_RF_PARAM_V1090_STRU
-协议表格  :
-ASN.1描述 :
-结构说明  : RRC_RF_PARAM_V1090_STRU-IEs
+??????    : RRC_RF_PARAM_V1090_STRU
+????????  :
+ASN.1???? :
+????????  : RRC_RF_PARAM_V1090_STRU-IEs
 *********************************************************************/
 typedef struct
 {
@@ -3478,10 +3478,10 @@ typedef struct
 }RRC_RF_PARAM_V1090_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V1090_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v1090-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V1090_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v1090-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -3494,10 +3494,10 @@ typedef struct
 }RRC_UE_EUTRA_CAP_V1090_IES_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V1060_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v1060-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V1060_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v1060-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -3509,20 +3509,20 @@ typedef struct
 
     RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1060_STRU    stFddAddUeEutraCapabilitiesV1060;    /* optional */
     RRC_UE_EUTRA_CAP_ADD_XDD_MODE_V1060_STRU    stTddAddUeEutraCapabilitiesV1060;    /* optional */
-    /* R10 NV修改 begin*/
+    /* R10 NV???? begin*/
     //RRC_RF_PARAM_V1060_STRU                     stRfParamV1060;                 /* optional */
-    /* R10 NV修改 end*/
+    /* R10 NV???? end*/
 }RRC_UE_EUTRA_CAP_V1060_IES_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V1020_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v1020-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V1020_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v1020-IEs
 *****************************************************************************/
 typedef struct
 {
-    /* R10 NV 修改 begin */
+    /* R10 NV ???? begin */
     VOS_UINT32    bitUeCatgV1020Present                       : 1;
     VOS_UINT32    bitPhyLayerParamV1020Present                : 1;
     //VOS_UINT32    bitRfParamV1020Present                      : 1;
@@ -3547,15 +3547,15 @@ typedef struct
     RRC_RF_MEAS_PARAM_V1020_STRU                stRfMeasParamV1020;
     RRC_RF_MEAS_PARAM_V1020_STRU                stRfMeasParamV1020Ext;
     /* optional */
-    /* R10 NV 修改 end */
+    /* R10 NV ???? end */
 
 }RRC_UE_EUTRA_CAP_V1020_IES_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V940_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v940-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V940_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v940-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -3571,10 +3571,10 @@ typedef struct
 /* v7r2 LLD end */
 
 /*****************************************************************************
- 结构名    : RRC_UE_EUTRA_CAP_V920_IES_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UE-EUTRA-Capability-v920-IEs
+ ??????    : RRC_UE_EUTRA_CAP_V920_IES_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UE-EUTRA-Capability-v920-IEs
 *****************************************************************************/
 typedef struct
 {
@@ -3601,57 +3601,57 @@ typedef struct
 
 /* add by lishangfeng for NorStandard begin */
 /*****************************************************************************
- 结构名    : LTE_NON_STANDARD_BAND_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 非标频段的频点信息相关的数据结构,与36101 talbe 5.7.3-1对应
+ ??????    : LTE_NON_STANDARD_BAND_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????????????????????????????,??36101 talbe 5.7.3-1????
 
             RealFreq = usFLow + (RealArfcn - usRangOfNLow),
-            其中 RealFreq 真实的频点信息；usRangOfNLow、usFLow从NV项中获取，具体含义
-            见数据结构中的说明; RealArfcn实际的arfcn。
+            ???? RealFreq ????????????????usRangOfNLow??usFLow??NV??????????????????
+            ??????????????????; RealArfcn??????arfcn??
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                                usFLow;                           /* 起始频点，单位是100khz */
-    VOS_UINT16                                usFHigh;                          /* 结束频点，单位是100khz */
-    VOS_UINT16                                usRangOfNLow;                     /* Nlow,与Noffset一致 */
+    VOS_UINT16                                usFLow;                           /* ????????????????100khz */
+    VOS_UINT16                                usFHigh;                          /* ????????????????100khz */
+    VOS_UINT16                                usRangOfNLow;                     /* Nlow,??Noffset???? */
     VOS_UINT16                                usRangOfNHigh;                    /* Nhigh*/
 }LTE_COMM_NON_STANDARD_FREQ_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : LTE_NON_STANDARD_POWER_CLASS_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 非标频段power class相关的数据结构
+ ??????    : LTE_NON_STANDARD_POWER_CLASS_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????power class??????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_UINT16                                 usUEPowerClass;
-    VOS_INT16                                  sPowerToleranceHigh;    /* 单位 0.1dBm */
-    VOS_INT16                                  sPowerToleranceLow;     /* 单位 0.1dBm */
+    VOS_INT16                                  sPowerToleranceHigh;    /* ???? 0.1dBm */
+    VOS_INT16                                  sPowerToleranceLow;     /* ???? 0.1dBm */
     VOS_UINT8                                  aucReservered[2];
 }LTE_COMM_NON_STANDARD_POWER_CLASS_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : LTE_NON_STANDARD_BAND_TEST_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 非标频段的测试信息相关的数据结构
+ ??????    : LTE_NON_STANDARD_BAND_TEST_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????????????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                                   ucBandWidth;                       /* 带宽，单位0.1MHz，可选值14;30;50;150;200 */
+    VOS_UINT8                                   ucBandWidth;                       /* ??????????0.1MHz????????14;30;50;150;200 */
     VOS_UINT8                                   aucReservered[3];
-    VOS_UINT16                                  usTestFreqs[3];                    /* 测试低、中、高频点，单位0.1MHz */
-    VOS_INT16					                sRxRefSensPower;                   /* 下行测试灵敏度功率，单位0.1dBm */
+    VOS_UINT16                                  usTestFreqs[3];                    /* ????????????????????????0.1MHz */
+    VOS_INT16					                sRxRefSensPower;                   /* ????????????????????????0.1dBm */
     VOS_UINT32                                  aulReservered[16];
 }LTE_NON_STANDARD_BAND_TEST_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : LTE_NON_STANDARD_BAND_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 非标频段的频点信息相关的数据结构
+ ??????    : LTE_NON_STANDARD_BAND_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????????????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -3661,17 +3661,17 @@ typedef struct
     LTE_COMM_NON_STANDARD_FREQ_INFO_STRU        stUlFreqInfo;
     LTE_COMM_NON_STANDARD_FREQ_INFO_STRU        stDlFreqInfo;
     LTE_COMM_NON_STANDARD_POWER_CLASS_INFO_STRU stUePowerClassInfo;
-    LTE_NON_STANDARD_BAND_TEST_INFO_STRU		stTestInfo[6];                 /*1.4MHz；3MHz；5MHz,10MHz,15MHz；20MHz带宽的测试参数 */
+    LTE_NON_STANDARD_BAND_TEST_INFO_STRU		stTestInfo[6];                 /*1.4MHz??3MHz??5MHz,10MHz,15MHz??20MHz?????????????? */
     VOS_UINT32                                  aulReservered[16];
 }LTE_COMM_NON_STANDARD_BAND_COMM_STRU;
 
 /* add by lishangfeng for NorStandard end */
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_MCC_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 每个MCC对应的CA组合结构 132Byte
+ ??????    : RRC_UE_CAP_MCC_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????MCC??????CA???????? 132Byte
 *****************************************************************************/
 typedef struct
 {
@@ -3680,10 +3680,10 @@ typedef struct
 }RRC_UE_CAP_MCC_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_MCC_CA_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 根据MCC上报CA组合结构
+ ??????    : RRC_UE_CAP_MCC_CA_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????MCC????CA????????
 *****************************************************************************/
 typedef struct
 {
@@ -3691,29 +3691,29 @@ typedef struct
 }RRC_UE_CAP_MCC_CA_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_MCC_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 每个MCC对应的Band组合结构 132Byte
+ ??????    : RRC_UE_CAP_MCC_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????MCC??????Band???????? 132Byte
 *****************************************************************************/
 typedef struct
 {
     VOS_UINT16              usMcc;
-    VOS_UINT8               ucLteSupportBandNum;                                /* 指示该MCC下支持的 Lte Band个数 */
-    VOS_UINT8               ucUtranSupportBandNum;                              /* 指示该MCC下支持的 Utran Band个数 */
+    VOS_UINT8               ucLteSupportBandNum;                                /* ??????MCC???????? Lte Band???? */
+    VOS_UINT8               ucUtranSupportBandNum;                              /* ??????MCC???????? Utran Band???? */
     VOS_UINT8               aucMccLteSupportBand[LRRC_LTE_MAX_NUM_OF_BAND_PER_MCC];
     VOS_UINT8               aucMccUtranSupportBand[LRRC_UTRAN_MAX_NUM_OF_BAND_PER_MCC];
 }RRC_UE_CAP_MCC_BAND_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_UE_CAP_MCC_BAND_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 根据MCC上报Band结构
+ ??????    : RRC_UE_CAP_MCC_BAND_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????MCC????Band????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                   ulMccNum;                                      /* 指示多少组MCC有效 */
+    VOS_UINT32                   ulMccNum;                                      /* ??????????MCC???? */
     RRC_UE_CAP_MCC_BAND_STRU     astUeCapMccBand[RRC_NUM_OF_MCC_BAND_NV];
 }RRC_UE_CAP_MCC_BAND_INFO_STRU;
 

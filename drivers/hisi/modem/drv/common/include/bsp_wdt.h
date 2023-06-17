@@ -58,8 +58,6 @@
 #include <bsp_nvim.h>
 #include <bsp_softtimer.h>
 
-
-
 #define  wdt_err(fmt,...)		(bsp_trace(BSP_LOG_LEVEL_ERROR, BSP_MUDU_WDT, "[wdt]:"fmt, ##__VA_ARGS__))
 #define  wdt_pinfo(fmt,...)		(bsp_trace(BSP_LOG_LEVEL_INFO, BSP_MUDU_WDT, "[wdt]:"fmt, ##__VA_ARGS__))
 #define  wdt_debug(fmt,...)		(bsp_trace(BSP_LOG_LEVEL_DEBUG, BSP_MUDU_WDT, "[wdt]:"fmt,##__VA_ARGS__))
@@ -68,7 +66,6 @@
 #define ARRAY_SIZE(a) (sizeof(a)/(sizeof((a)[0])))
 #endif
 
-/* 整理后 */
 #define WDT_NUM              			(2)
 #define WDT_INDEX                		(0)
 #define TIMER_INDEX              		(1)
@@ -78,7 +75,6 @@
 #define WDT_NULL            			(void*)0
 #define WDT_RES_NUM              		(4)
 
-/*硬狗使用*/
 #define WDT_UNLOCK               		(0x1ACCE551)
 #define WDT_LOCK                 		(0x0)
 #define WDT_COUNT_DEFAULT       		(0xf0000)
@@ -87,7 +83,7 @@
 #else
 #define WDT_RST_INT_EN 					(0x3)
 #endif
-#define WDT_DEF_CLK_FREQ         		(32768)                  /* 32khz */
+#define WDT_DEF_CLK_FREQ         		(32768)
 #define WDT_KEEPALIVE_TIME				(15)
 
 #define HARD_WATCHDOG					(0xaaaaaaaa)
@@ -95,7 +91,7 @@
 #ifdef __KERNEL__
 #define WATCHDOG_TIMEOUT_SEC			(32768 * 30)
 #define WDT_HI_TIMER_CLK				(32768)
-//4fe1fe00
+
 #define STOP_WDT_TRACR_RUN_FLAG			(((SRAM_SMALL_SECTIONS * )((unsigned long)SRAM_BASE_ADDR + SRAM_OFFSET_SMALL_SECTIONS))->SRAM_WDT_AM_FLAG)
 #elif defined( __OS_VXWORKS__)||defined( __OS_RTOSCK__)
 #define WATCHDOG_TIMEOUT_SEC				(32768 * 30)
@@ -104,7 +100,6 @@
 #elif defined(__CMSIS_RTOS)
 #endif /* end of __KERNEL__ */
 
-
 #ifndef BSP_WDT_SUSPEND_TIMEROUT
 #define BSP_WDT_SUSPEND_TIMEROUT		(30)
 #endif
@@ -112,9 +107,7 @@
 #define	 BSP_WDT_SOFTTIMEROUT			(1000)
 #endif
 
-
 #define BSP_SW_WDT_PERIOD       		(1500)
-
 
 struct wdt_info{
 		s32  lowtaskid;
@@ -138,7 +131,7 @@ typedef enum _WDT_CORE_ID{
 	MAX_WDT_CORE_ID,
 }WDT_CORE_ID;
 
-typedef void(*wdt_timeout_cb)(void);/*A、C核共用*/
+typedef void(*wdt_timeout_cb)(void);
 
 /*functions*/
 /*A C core functions*/

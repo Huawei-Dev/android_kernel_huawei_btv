@@ -46,8 +46,6 @@
  *
  */
 
-
-/*lint -save -e537*/
 #include <linux/vmalloc.h>
 #include <bsp_nvim.h>
 #include "nv_comm.h"
@@ -57,7 +55,6 @@
 #include "nv_crc.h"
 #include "nv_partition_bakup.h"
 #include "bsp_dump.h"
-/*lint -restore +e537*/
 
 nv_ctrl_info_s      *g_nv_bakup_ctrl    = NULL;
 nv_global_info_s    *g_nv_bakup_global  = NULL;
@@ -289,13 +286,11 @@ bool nv_bakup_validity(void)
     u32 ret;
     nv_ctrl_info_s *bakup_ctrl;
 
-    /*文件不存在*/
     if(nv_file_access((s8*)NV_BACK_PATH,0))
     {
         return false;
     }
 
-    /*有未写入完成的标志 */
     if(true == nv_flag_file_isExist((s8*)NV_BACK_FLAG_PATH))
     {
         nv_mntn_record("%s  last time write abornormal !\n",NV_BACK_FLAG_PATH);
@@ -307,16 +302,6 @@ bool nv_bakup_validity(void)
     {
         return false;
     }
-
-    /*imei号检查*/
-    /*
-    ret = nv_imei_data_comp((s8*)filePath);
-    if(ret)
-    {
-        nv_mntn_record("%s imei compare with factory data is not same ret :0x%x!\n",filePath,ret);
-        return false;
-    }
-    */
 
     return true;
 }
@@ -482,13 +467,6 @@ out1:
     return ret;
 }
 
-/*****************************************************************************
- 函 数 名  : nv_resume_item_from_img
- 功能描述  : 从工作恢复一个NV项
- 输入参数  : void
- 输出参数  : 无
- 返 回 值  : 无
-*****************************************************************************/
 u32 nv_bakup_resume_item(nv_item_info_s *item_info, u32 modem_id)
 {
     u32 ret         = NV_ERROR;
@@ -589,9 +567,3 @@ EXPORT_SYMBOL(nv_bakup_global);
 EXPORT_SYMBOL(nv_bakup_get_item_data);
 EXPORT_SYMBOL(nv_bakup_get_item_mdmdata);
 EXPORT_SYMBOL(nv_bakup_resume_item);
-/*lint -restore*/
-
-
-
-
-

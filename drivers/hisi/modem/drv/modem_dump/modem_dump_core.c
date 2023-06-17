@@ -46,8 +46,6 @@
  *
  */
 
-
-/*lint -save -e537*/
 #include <linux/sched.h>
 #include <linux/timer.h>
 #include <linux/rtc.h>
@@ -102,7 +100,6 @@
 #include "bsp_wdt.h"
 #include "modem_dump_wdt.h"
 #include "modem_dump_hook.h"
-/*lint -restore*/
 
 mdm_dump_crtl_s                     g_mdm_dump_core_ctrl = {0,0};
 extern dump_reboot_contex_s         g_dump_reboot_contex; 
@@ -451,19 +448,6 @@ struct rdr_exception_info_s g_mbb_exc_info[] =
     },
 };
 
-/*****************************************************************************
-* 函 数 名  : bsp_om_save_reboot_log
-* 功能描述  : 对外接口用于开关机接口保存开关机信息
-*
-* 输入参数  :
-* 输出参数  :
-
-* 返 回 值  :
-
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void bsp_om_save_reboot_log(const char * func_name, const void* caller)
 {
 
@@ -487,20 +471,6 @@ void bsp_om_save_reboot_log(const char * func_name, const void* caller)
 
 }
 
-
-/*****************************************************************************
-* 函 数 名  : dump_save_rdr_global_info
-* 功能描述  : 在手机平台上更新rdr的global 头
-*
-* 输入参数  :
-* 输出参数  :
-
-* 返 回 值  :
-
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_save_rdr_global_info(u32 mod_id)
 {
     struct timex txc = {0,};
@@ -540,7 +510,6 @@ void dump_save_rdr_global_info(u32 mod_id)
     memcpy(global_base_info->e_module, rdr_exc_info->e_from_module,16);
     global_base_info->e_type = rdr_exc_info->e_exce_type;
 
-    /*这里为了hids工具显示，做了特殊处理，填充在rdr的ecore与注册给rdr的不一致*/
     if(g_dump_reboot_contex.reboot_core  == DUMP_CPU_COMM)
     {
         global_base_info->e_core = RDR_CP;
@@ -558,19 +527,7 @@ void dump_save_rdr_global_info(u32 mod_id)
     dump_fetal("update modem rdr global info finish\n");
 
 }
-/*****************************************************************************
-* 函 数 名  : dump_int_handle
-* 功能描述  : 处理modem cp发送过来的中断
-*
-* 输入参数  :
-* 输出参数  :
 
-* 返 回 值  :
-
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_int_handle(s32 param)
 {
     dump_base_info_t* modem_cp_base_info = NULL;
@@ -648,19 +605,6 @@ void dump_int_handle(s32 param)
     return;
 }
 
-/*****************************************************************************
-* 函 数 名  : modem_error_proc
-* 功能描述  : modem异常的特殊处理，主要针对dmss和noc异常
-*
-* 输入参数  :
-* 输出参数  :
-
-* 返 回 值  :
-
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void modem_error_proc(u32 modid)
 {
     if (DUMP_INIT_FLAG != g_mdm_dump_core_ctrl.init_flag)
@@ -689,20 +633,6 @@ void modem_error_proc(u32 modid)
 
 }
 
-
-/*****************************************************************************
-* 函 数 名  : dump_callback
-* 功能描述  : modem异常的回调处理函数
-*
-* 输入参数  :
-* 输出参数  :
-
-* 返 回 值  :
-
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 u32 dump_callback(u32 modid, u32 etype, u64 coreid, char* logpath, pfn_cb_dump_done fndone)
 {
     modem_exc_info_s* exc_info = NULL;
@@ -756,19 +686,6 @@ u32 dump_callback(u32 modid, u32 etype, u64 coreid, char* logpath, pfn_cb_dump_d
     return BSP_OK;
 }
 
-/*****************************************************************************
-* 函 数 名  : dump_reset
-* 功能描述  : modem 复位处理函数
-*
-* 输入参数  :
-* 输出参数  :
-
-* 返 回 值  :
-
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_reset(u32 modid, u32 etype, u64 coreid)
 {
     s32 ret = -1;
@@ -846,19 +763,6 @@ void dump_reset(u32 modid, u32 etype, u64 coreid)
 
 }
 
-/*****************************************************************************
-* 函 数 名  : system_error
-* 功能描述  : modem 异常函数入口
-*
-* 输入参数  :
-* 输出参数  :
-
-* 返 回 值  :
-
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void system_error(u32 mod_id, u32 arg1, u32 arg2, char *data, u32 length)
 {
     u32 rdr_mod_id = RDR_MODEM_AP_MOD_ID;
@@ -941,19 +845,6 @@ void system_error(u32 mod_id, u32 arg1, u32 arg2, char *data, u32 length)
     return;
 }
 
-/*****************************************************************************
-* 函 数 名  : dump_init_phase1
-* 功能描述  : modem dump初始化第一阶段
-*
-* 输入参数  :
-* 输出参数  :
-
-* 返 回 值  :
-
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 s32 dump_init_phase1(void)
 {
     s32 ret = BSP_ERROR;
@@ -988,19 +879,6 @@ s32 dump_init_phase1(void)
     return BSP_OK;
 }
 
-/*****************************************************************************
-* 函 数 名  : dump_init_phase2
-* 功能描述  : modem dump初始化第二阶段
-*
-* 输入参数  :
-* 输出参数  :
-
-* 返 回 值  :
-
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 s32 dump_init_phase2(void)
 {
     struct rdr_module_ops_pub   soc_ops = {NULL,NULL};
@@ -1082,19 +960,6 @@ s32 dump_init_phase2(void)
     return BSP_OK;
 }
 
-/*****************************************************************************
-* 函 数 名  : bsp_dump_init
-* 功能描述  : modem dump 初始化函数
-*
-* 输入参数  :
-* 输出参数  :
-
-* 返 回 值  :
-
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 s32 __init bsp_dump_init(void)
 {
     s32 ret = BSP_ERROR;
@@ -1130,5 +995,3 @@ s32 __init bsp_dump_init(void)
 
 EXPORT_SYMBOL_GPL(system_error);
 module_init(bsp_dump_init);
-
-

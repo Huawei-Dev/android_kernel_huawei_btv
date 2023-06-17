@@ -94,11 +94,11 @@ u32 g_pm_om_magic_tbl[PM_OM_MOD_ID_MAX]={
 };
 u32 ring_buffer_in(struct ring_buffer *rb, void *data, u32 len)
 {
-	/* 首先拷贝 rb->write到buffer末尾的一段数据 */
+	/* ???????? rb->write??buffer?????????????? */
 	u32 left = min(len,  rb->size - rb->write);
 	(void)memcpy_s((void *)(rb->buf + rb->write), rb->size, (void *)data, left);/*lint !e124 */
 
-	/* 接着将剩余待写入数据 (如果还有的话)从buffer的开始位置拷贝 */
+	/* ???????????????????? (????????????)??buffer?????????????? */
 	(void)memcpy_s((void *)rb->buf, rb->size, (void *)(data + left), len - left);/*lint !e124 */
 
 	rb->write += len;
@@ -131,7 +131,7 @@ int pm_om_log_out(u32 mod_id, u32 typeid, u32 data_len , void *data)
 	u32  consuming_time = 0;
 	UNUSED(flags);
 
-	/* 记录log过长会影响DRX寻呼(栈上变量) */
+	/* ????log??????????DRX????(????????) */
 	if (data_len > PM_OM_LOG_MAX_LEN)
 	{
 		return PM_OM_ERR_LEN_LIMIT;
@@ -147,7 +147,7 @@ int pm_om_log_out(u32 mod_id, u32 typeid, u32 data_len , void *data)
 		return PM_OM_ERR_MOD_OFF;
 	}
 
-	/* 操作ring buffer之前, 先将核间指针取到本核 */
+	/* ????ring buffer????, ???????????????????? */
 	g_pmom_ctrl.log.rb.write     = g_pmom_ctrl.log.smem->mem_info.write;
 	g_pmom_ctrl.log.rb.read      = g_pmom_ctrl.log.smem->mem_info.read;
 
@@ -159,7 +159,7 @@ int pm_om_log_out(u32 mod_id, u32 typeid, u32 data_len , void *data)
 	pm_om_spin_lock(&g_pmom_ctrl.log.lock, flags);
 	log_head.sn        = (g_pmom_ctrl.log.smem->sn)++;
 
-	/* 出现log覆盖: 抛弃新数据 */
+	/* ????log????: ?????????? */
 	left_size = bsp_ring_buffer_writable_size(&g_pmom_ctrl.log.rb);
 	if ((head_len + data_len) > left_size)
 	{
@@ -173,17 +173,17 @@ int pm_om_log_out(u32 mod_id, u32 typeid, u32 data_len , void *data)
 
 	(void)ring_buffer_in_with_header(&g_pmom_ctrl.log.rb, (void *)&log_head, head_len, data, data_len);
 
-	/* 数据写入之后更新核间ring buffer 写指针 */
+	/* ????????????????????ring buffer ?????? */
 	g_pmom_ctrl.log.smem->mem_info.write = g_pmom_ctrl.log.rb.write;
 	cache_sync();
 
 out:
 	consuming_time = pm_om_log_time_rec(log_head.timestamp);
 
-	/* bsp_ipc_spin_unlock可保证调用cache_sync冲出write buffer */
+	/* bsp_ipc_spin_unlock??????????cache_sync????write buffer */
 	pm_om_spin_unlock((&g_pmom_ctrl.log.lock), flags);
 
-	/* 写入数据超过log水线,唤醒acore写文件 */
+	/* ????????????log????,????acore?????? */
 	if (bsp_ring_buffer_readable_size(&g_pmom_ctrl.log.rb) >= g_pmom_ctrl.log.threshold && !g_pmom_ctrl.log.buf_is_full)
 	{
 		(void)pm_om_fwrite_trigger();
@@ -291,7 +291,7 @@ __init int bsp_pm_om_log_init(void)
 	(void)memset_s((void *)&nv_cfg, sizeof(nv_cfg), 0, sizeof(nv_cfg));
 	(void)memset_s((void *)&g_pmom_ctrl.log, sizeof(g_pmom_ctrl.log), 0, sizeof(g_pmom_ctrl.log));
 
-	/* 当前debug和platform主要和log强相关, dump比较独立 */
+	/* ????debug??platform??????log??????, dump???????? */
 	g_pmom_ctrl.platform = NULL;
 	g_pmom_ctrl.debug = NULL;
 
@@ -305,7 +305,7 @@ __init int bsp_pm_om_log_init(void)
 	g_pmom_ctrl.log.smem = (struct pm_om_smem_cfg *)PM_OM_LOG_AREA;
 	if (PM_OM_USE_NORMAL_DDR == nv_cfg.mem_ctrl && PM_OM_PROT_MAGIC2 == g_pmom_ctrl.log.smem->file_head.reserved)
 	{
-		/* 使用socp的1M往后的内存 */
+		/* ????socp??1M?????????? */
 		socp_sect_query.enSectType = BSP_DDR_SECT_TYPE_SOCP;
 		(void)mdrv_get_fix_ddr_addr(&socp_sect_query, &socp_sect_info);
 		g_pmom_ctrl.log.smem = (struct pm_om_smem_cfg *)((unsigned long)socp_sect_info.pSectVirtAddr + PM_OM_SOCP_OFFSET);

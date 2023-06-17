@@ -54,7 +54,7 @@ extern "C"
 {
 #endif
 
-/*公共头文件*/
+/*??????????*/
 #include "mdrv_public.h"
 #include "mdrv_version.h"
 
@@ -77,7 +77,7 @@ extern "C"
 #include "mdrv_misc.h"
 #include "mdrv_ipf.h"
 
-/*封装层*/
+/*??????*/
 #include "mdrv_udi.h"
 #include "mdrv_om.h"
 #include "mdrv_rfile.h"
@@ -96,7 +96,7 @@ extern "C"
 /*stub*/
 #include "mdrv_stub.h"
 
-#include "drv_mailbox_cfg.h"    /* 多核ICC项目后此头文件删除 */
+#include "drv_mailbox_cfg.h"    /* ????ICC?????????????????? */
 #include "mdrv_hsuart.h"
 #include "mdrv_crypto.h"
 #include "mdrv_applog.h"

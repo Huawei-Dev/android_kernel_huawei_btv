@@ -50,7 +50,7 @@
 #define __RNICDEBUG_H__
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "vos.h"
 #include "PsCommonDef.h"
@@ -68,13 +68,13 @@ extern "C" {
 #pragma pack(4)
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
 
 #define RNIC_DBG_NET_TX_RMNETID_ERR_NUM(n)          (g_stRnicMntnStats.ulNetTxRmNetIdErrNum += (n))
 #define RNIC_DBG_SPE_TX_PORTID_ERR_NUM(n)           (g_stRnicMntnStats.ulSpeTxPortIdErrNum += (n))
 
-/* 上行统计信息 */
+/* ???????????? */
 #define  RNIC_DBG_RECV_UL_IPV4_PKT_NUM(n, index)       (g_astRnicStats[index].ulUlRecvIpv4PktNum += (n))
 #define  RNIC_DBG_RECV_UL_IPV6_PKT_NUM(n, index)       (g_astRnicStats[index].ulUlRecvIpv6PktNum += (n))
 #define  RNIC_DBG_RECV_UL_IPV4V6_PKT_NUM(n, index)     (g_astRnicStats[index].ulUlRecvIpv4v6PktNum += (n))
@@ -96,7 +96,7 @@ extern "C" {
 #define  RNIC_DBG_MODEM_ID_UL_DISCARD_NUM(n, index)    (g_astRnicStats[index].ulUlModemIdDiscardNum += (n))
 #define  RNIC_DBG_PDN_ID_ERR_NUM(n, index)             (g_astRnicStats[index].ulUlPdnIdErr += (n))
 
-/* 下行统计信息 */
+/* ???????????? */
 #define  RNIC_DBG_RECV_DL_IPV4_PKT_NUM(n, index)       (g_astRnicStats[index].ulDlRecvIpv4PktNum += (n))
 #define  RNIC_DBG_RECV_DL_IPV6_PKT_NUM(n, index)       (g_astRnicStats[index].ulDlRecvIpv6PktNum += (n))
 #define  RNIC_DBG_SEND_DL_PKT_NUM(n, index)            (g_astRnicStats[index].ulDlSendPktNum += (n))
@@ -140,21 +140,21 @@ extern "C" {
 
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 
 /*****************************************************************************
-  5 消息头定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  6 消息定义
+  5 ??????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  7 STRUCT定义
+  6 ????????
+*****************************************************************************/
+
+
+/*****************************************************************************
+  7 STRUCT????
 *****************************************************************************/
 
 typedef struct
@@ -165,66 +165,66 @@ typedef struct
 } RNIC_MNTN_STATS_STRU;
 
 /*****************************************************************************
- 结构名    : RNIC_STATS_INFO_STRU
- 结构说明  : RNIC统计量
-  1.日    期   : 2012年1月20日
-    作    者   : S62952
-    修改内容   : 创建文件
+ ??????    : RNIC_STATS_INFO_STRU
+ ????????  : RNIC??????
+  1.??    ??   : 2012??1??20??
+    ??    ??   : S62952
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
-    /* 上行统计信息 */
-    VOS_UINT32              ulUlRecvIpv4PktNum;                                 /* RNIC收到上行IPV4数据的个数 */
-    VOS_UINT32              ulUlRecvIpv6PktNum;                                 /* RNIC收到上行IPV6数据的个数 */
-    VOS_UINT32              ulUlRecvIpv4v6PktNum;                               /* IPV4V6类型激活时RNIC收到上行数据的个数(IPV4、IPV6) */
-    VOS_UINT32              ulUlRecvUndiaPktNum;                                /* RNIC未激活时收到上行数据的个数 */
-    VOS_UINT32              ulUlSendPktNum;                                     /* RNIC上行发送给ADS数据的个数 */
-    VOS_UINT32              ulUlSendPktFailNum;                                 /* RNIC调ADS发送上行数据失败的个数 */
-    VOS_UINT32              ulUlIpv4BrdcstPktNum;                               /* RNIC未拨上号前上行收到IPV4广播包的个数 */
-    VOS_UINT32              ulUlImmzcFailPktNum;                                /* RNIC上行转换为IMM_ZC失败的个数 */
-    VOS_UINT32              ulUlRmvMacHdrFailPktNum;                            /* RNIC上行去除MAC头失败的个数 */
-    VOS_UINT32              ulUlNetCardDiscardNum;                              /* RNIC网卡私有数据错误丢掉上行数据包的个数 */
-    VOS_UINT32              ulUlFlowCtrlDiscardNum;                             /* RNIC网卡流控丢掉上行数据包的个数 */
-    VOS_UINT32              ulUlRecvErrPktNum;                                  /* RNIC收到错误数据包的个数(非ipv4、ipv6包) */
-    VOS_UINT32              ulUlSendAppDialUpSucc;                              /* RNIC成功上报APP按需拨号 */
-    VOS_UINT32              ulUlSendAppDialUpFail;                              /* RNIC上报APP按需拨号失败 */
-    VOS_UINT32              ulUlSendAppDialDownSucc;                            /* RNIC成功上报APP断开拨号 */
-    VOS_UINT32              ulUlSendAppDialDownFail;                            /* RNIC上报APP断开拨号失败 */
-    VOS_UINT32              ulUlRabIdErr;                                       /* Rab id错误 */
-    VOS_UINT32              ulUlNetIdDiscardNum;                                /* RNIC网卡ID错误丢掉上行数据包的个数 */
-    VOS_UINT32              ulUlModemIdDiscardNum;                              /* RNIC Modem ID错误丢掉上行数据包的个数 */
+    /* ???????????? */
+    VOS_UINT32              ulUlRecvIpv4PktNum;                                 /* RNIC????????IPV4?????????? */
+    VOS_UINT32              ulUlRecvIpv6PktNum;                                 /* RNIC????????IPV6?????????? */
+    VOS_UINT32              ulUlRecvIpv4v6PktNum;                               /* IPV4V6??????????RNIC??????????????????(IPV4??IPV6) */
+    VOS_UINT32              ulUlRecvUndiaPktNum;                                /* RNIC?????????????????????????? */
+    VOS_UINT32              ulUlSendPktNum;                                     /* RNIC??????????ADS?????????? */
+    VOS_UINT32              ulUlSendPktFailNum;                                 /* RNIC??ADS?????????????????????? */
+    VOS_UINT32              ulUlIpv4BrdcstPktNum;                               /* RNIC??????????????????IPV4???????????? */
+    VOS_UINT32              ulUlImmzcFailPktNum;                                /* RNIC??????????IMM_ZC?????????? */
+    VOS_UINT32              ulUlRmvMacHdrFailPktNum;                            /* RNIC????????MAC???????????? */
+    VOS_UINT32              ulUlNetCardDiscardNum;                              /* RNIC???????????????????????????????????? */
+    VOS_UINT32              ulUlFlowCtrlDiscardNum;                             /* RNIC???????????????????????????? */
+    VOS_UINT32              ulUlRecvErrPktNum;                                  /* RNIC????????????????????(??ipv4??ipv6??) */
+    VOS_UINT32              ulUlSendAppDialUpSucc;                              /* RNIC????????APP???????? */
+    VOS_UINT32              ulUlSendAppDialUpFail;                              /* RNIC????APP???????????? */
+    VOS_UINT32              ulUlSendAppDialDownSucc;                            /* RNIC????????APP???????? */
+    VOS_UINT32              ulUlSendAppDialDownFail;                            /* RNIC????APP???????????? */
+    VOS_UINT32              ulUlRabIdErr;                                       /* Rab id???? */
+    VOS_UINT32              ulUlNetIdDiscardNum;                                /* RNIC????ID???????????????????????? */
+    VOS_UINT32              ulUlModemIdDiscardNum;                              /* RNIC Modem ID???????????????????????? */
 
-    /* 下行统计信息 */
-    VOS_UINT32              ulDlRecvIpv4PktNum;                                 /* RNIC收到下行IPV4数据的个数 */
-    VOS_UINT32              ulDlRecvIpv6PktNum;                                 /* RNIC收到下行IPV6数据的个数 */
-    VOS_UINT32              ulDlSendPktNum;                                     /* RNIC发送下行数据的个数 */
-    VOS_UINT32              ulDlSendPktFailNum;                                 /* RNIC发送下行数据失败的个数 */
-    VOS_UINT32              ulDlRecvBigPktNum;                                  /* RNIC收到下行数据包大于MTU的个数 */
-    VOS_UINT32              ulDlDiscardPktNum;                                  /* RNIC网卡未激活丢弃的数据个数 */
-    VOS_UINT32              ulDlAddMacHdFailNum;                                /* RNIC下行加MAC头失败的个数 */
-    VOS_UINT32              ulDlNetCardDiscardNum;                              /* RNIC网卡私有数据错误丢掉下行数据包的个数 */
-    VOS_UINT32              ulDlRecvErrPktNum;                                  /* RNIC收到错误数据包的个数(非ipv4、ipv6包) */
-    VOS_UINT32              ulDlNetIdDiscardNum;                                /* RNIC网卡ID错误丢掉下行数据包的个数 */
+    /* ???????????? */
+    VOS_UINT32              ulDlRecvIpv4PktNum;                                 /* RNIC????????IPV4?????????? */
+    VOS_UINT32              ulDlRecvIpv6PktNum;                                 /* RNIC????????IPV6?????????? */
+    VOS_UINT32              ulDlSendPktNum;                                     /* RNIC?????????????????? */
+    VOS_UINT32              ulDlSendPktFailNum;                                 /* RNIC?????????????????????? */
+    VOS_UINT32              ulDlRecvBigPktNum;                                  /* RNIC??????????????????MTU?????? */
+    VOS_UINT32              ulDlDiscardPktNum;                                  /* RNIC???????????????????????? */
+    VOS_UINT32              ulDlAddMacHdFailNum;                                /* RNIC??????MAC???????????? */
+    VOS_UINT32              ulDlNetCardDiscardNum;                              /* RNIC???????????????????????????????????? */
+    VOS_UINT32              ulDlRecvErrPktNum;                                  /* RNIC????????????????????(??ipv4??ipv6??) */
+    VOS_UINT32              ulDlNetIdDiscardNum;                                /* RNIC????ID???????????????????????? */
     VOS_UINT8               aucReserved[4];
 
-    /* 复位信号量信息 */
-    VOS_SEM                 hBinarySemId;                                       /* 二进制信号量ID */
-    VOS_UINT32              ulSemInitFlg;                                       /* 初始化标识, VOS_TRUE: 成功; VOS_FALSE: 失败 */
-    VOS_UINT32              ulCreateBinarySemFailNum;                           /* 创建二进制信号量失败次数 */
-    VOS_UINT32              ulLockBinarySemFailNum;                             /* 锁二进制信号量失败次数 */
-    VOS_UINT32              ulLastBinarySemErrRslt;                             /* 最后一次锁二进制信号量失败结果 */
-    VOS_UINT32              ulResetSucessNum;                                   /* C核复位成功的次数 */
+    /* ?????????????? */
+    VOS_SEM                 hBinarySemId;                                       /* ????????????ID */
+    VOS_UINT32              ulSemInitFlg;                                       /* ??????????, VOS_TRUE: ????; VOS_FALSE: ???? */
+    VOS_UINT32              ulCreateBinarySemFailNum;                           /* ???????????????????????? */
+    VOS_UINT32              ulLockBinarySemFailNum;                             /* ?????????????????????? */
+    VOS_UINT32              ulLastBinarySemErrRslt;                             /* ?????????????????????????????? */
+    VOS_UINT32              ulResetSucessNum;                                   /* C???????????????? */
 
-    VOS_UINT32              ulUlPdnIdErr;                                       /* Pdn id错误 */
+    VOS_UINT32              ulUlPdnIdErr;                                       /* Pdn id???? */
 }RNIC_STATS_INFO_STRU;
 
-/* Added by m00217266 for L-C互操作项目, 2014-2-19, begin */
+/* Added by m00217266 for L-C??????????, 2014-2-19, begin */
 /*****************************************************************************
- 结构名    : RNIC_RMNET_CONFIG_CHECK_INFO_STRU
- 结构说明  : RNIC 网卡配置检验信息统计
-  1.日    期   : 2014年2月19日
-    作    者   : m00217266
-    修改内容   : 新建
+ ??????    : RNIC_RMNET_CONFIG_CHECK_INFO_STRU
+ ????????  : RNIC ????????????????????
+  1.??    ??   : 2014??2??19??
+    ??    ??   : m00217266
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
@@ -240,10 +240,10 @@ typedef struct
     VOS_UINT8                           ucSuccCnt;
 }RNIC_RMNET_CONFIG_CHECK_INFO_STRU;
 
-/* Added by m00217266 for L-C互操作项目, 2014-2-19, end */
+/* Added by m00217266 for L-C??????????, 2014-2-19, end */
 
 /*****************************************************************************
-  8 全局变量声明
+  8 ????????????
 *****************************************************************************/
 
 extern RNIC_MNTN_STATS_STRU                    g_stRnicMntnStats;
@@ -254,17 +254,17 @@ extern VOS_UINT32                              g_ulRnicPrintDlDataFlg;
 
 
 /*****************************************************************************
-  8 UNION定义
+  8 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  9 OTHERS定义
+  9 OTHERS????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 
 VOS_VOID RNIC_ShowDataFromIpStack(

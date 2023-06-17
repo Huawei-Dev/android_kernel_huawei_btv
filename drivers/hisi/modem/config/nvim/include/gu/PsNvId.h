@@ -1,19 +1,19 @@
 /******************************************************************************
 
-                  版权所有 (C), 2001-2011, 华为技术有限公司
+                  ???????? (C), 2001-2011, ????????????????
 
  ******************************************************************************
-  文 件 名   : PsNvId.h
-  版 本 号   :
-  作    者   : 胡骏 59254
-  生成日期   : 2009年5月14日
-  最近修改   :
-  功能描述   : 定义了协议栈NV项ID枚举定义
-  函数列表   :
-  修改历史   :
-  1.日    期   : 2009年5月14日
-    作    者   : 胡骏 59254
-    修改内容   : 创建文件
+  ?? ?? ??   : PsNvId.h
+  ?? ?? ??   :
+  ??    ??   : ???? 59254
+  ????????   : 2009??5??14??
+  ????????   :
+  ????????   : ????????????NV??ID????????
+  ????????   :
+  ????????   :
+  1.??    ??   : 2009??5??14??
+    ??    ??   : ???? 59254
+    ????????   : ????????
 
 ******************************************************************************/
 
@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "NvIddef.h"
 
@@ -37,7 +37,7 @@ extern "C" {
 enum PS_NV_ID_ENUM
 {
 
-                 /* 快速开机 */
+                 /* ???????? */
 /*  0x1A00 */    en_NV_Item_FollowOn_OpenSpeed_Flag =GU_RF_BASE_NV_ID_MIN + 2559,
 /* 6657  */      en_NV_Item_EF6F62,
 /* 6658  */      en_NV_Item_EF6F7B,
@@ -101,9 +101,9 @@ enum PS_NV_ID_ENUM
 /* 8238  */      en_NV_Item_SMS_EFSMSS_Para,
 /* 8239  */      en_NV_Item_SMS_EFSMSP_Para,
 /* 8240  */      en_NV_Item_CBS_Service_Para,
-/* 8241  */      en_NV_Item_CBS_MID_List,         /*用于存储当前拒绝CBS消息ID列表*/
-/* 8242  */      en_NV_Item_CBS_MID_Range_List,   /*用于存储当前拒绝CBS消息ID范围列表*/
-/* 8243  */      en_NV_Item_Gsm_NFreq_Threshold,          /* GSM 邻频干扰过滤门限 */
+/* 8241  */      en_NV_Item_CBS_MID_List,         /*????????????????CBS????ID????*/
+/* 8242  */      en_NV_Item_CBS_MID_Range_List,   /*????????????????CBS????ID????????*/
+/* 8243  */      en_NV_Item_Gsm_NFreq_Threshold,          /* GSM ???????????????? */
 /* 8244  */      en_NV_Item_Usim_PB_Ctrl_Info,
 /* 8246  */      en_NV_Item_NetWorkPara = 8246,
 /* 8248  */      en_NV_Item_Wcdma_Ind_Freq = 8248,
@@ -186,7 +186,7 @@ enum PS_NV_ID_ENUM
 /* 8329 */       en_NV_Item_GSM_PLMN_SEARCH_ARFCN_MAX_NUM,
 /* 8330 */       en_NV_Item_Stk_SmsInd_Ctrl = 8330,
 /* 8331 */       en_NV_Item_LAPDM_RAND_BIT = 8331,
-/* 8332  */      en_NV_Item_CBS_MID_Range_List_New = 8332,                     /*用于存储当前拒绝CBS消息ID范围列表*/
+/* 8332  */      en_NV_Item_CBS_MID_Range_List_New = 8332,                     /*????????????????CBS????ID????????*/
 /* 8333 */       en_NV_Item_CBS_W_DRX_Switch           = 8333,
 /* 8334 */       en_NV_Item_CBS_W_WaitNewCBSMsgTimer  = 8334,
 /* 8335 */       en_NV_Item_CBS_W_WaitSchedMsgTimer   = 8335,
@@ -201,9 +201,9 @@ enum PS_NV_ID_ENUM
 /* 8345 */       en_NV_Item_CREG_CGREG_CI_Four_Byte_Rpt = 8345,
 /* 8449 */       en_NV_Item_Repeated_Acch_Capability = 0x2101,
 /* 8450 */       en_NV_Item_ALS_LINE_Config = 8450,
-             /* 关于NV项en_NV_Item_Taf_PdpPara_0~en_NV_Item_Taf_PdpPara_11的说明:
-                  这11个NV项在V3版本较V2版本扩展了长度(R7协议升级)，为了保证V2和V3间的一致性，
-                  修改这11个NV项的ID值，范围为[8451,8462] */
+             /* ????NV??en_NV_Item_Taf_PdpPara_0~en_NV_Item_Taf_PdpPara_11??????:
+                  ??11??NV????V3??????V2??????????????(R7????????)??????????V2??V3????????????
+                  ??????11??NV????ID??????????[8451,8462] */
 /* 8451  */      en_NV_Item_Taf_PdpPara_0 = 8451,
 /* 8452  */      en_NV_Item_Taf_PdpPara_1,
 /* 8453  */      en_NV_Item_Taf_PdpPara_2,
@@ -276,18 +276,18 @@ enum PS_NV_ID_ENUM
 /* 9005  */      en_NV_Item_EUTRA_CAPA_COMM_INFO = 9005,
 /* 9006  */      en_NV_Item_TIN_INFO = 9006,
 /* 9007  */      en_NV_Item_RAT_PRIO_LIST = 9007,
-/* 9008  */      en_NV_Item_WAS_RadioAccess_Capa_New = 9008,/* WAS新增NV项 */
+/* 9008  */      en_NV_Item_WAS_RadioAccess_Capa_New = 9008,/* WAS????NV?? */
 /* 9009  */      en_NV_Item_GAS_High_Multislot_Class = 9009,
 /* 9010  */      en_NV_Item_NDIS_DIALUP_ADDRESS = 9010,
-/* 9011  */      en_NV_Item_WPHY_CPC_DRX_STRU = 9011,                           /*WPHY CPC DRX项目新增加的NV项*/
+/* 9011  */      en_NV_Item_WPHY_CPC_DRX_STRU = 9011,                           /*WPHY CPC DRX????????????NV??*/
 
 /* 9012  */      en_NV_Item_PS_START                 = 9012,
 /* 9013  */      en_NV_Item_W_HSPA_CQI_TABLE1 = 9013,
 /* 9014  */      en_NV_Item_W_HSPA_CQI_TABLE2,
 /* 9015  */      en_NV_Item_W_HSPA_CQI_TABLE3,
 /* 9016  */      en_NV_Item_W_HSPA_CQI_TABLE4,
-/* 9017 */       en_NV_Item_USER_SET_LTEBANDS = 9017,                           /* V7R1_PHASEII新增NV,保存用户设置的LTE频段 */
-/* 9018 */       en_NV_Item_SINGLE_DOMAIN_FAIL_SRCH_PLMN_CNT = 9018,           /* DT的定制需求，单域注册被拒时，需要发起搜网 */
+/* 9017 */       en_NV_Item_USER_SET_LTEBANDS = 9017,                           /* V7R1_PHASEII????NV,??????????????LTE???? */
+/* 9018 */       en_NV_Item_SINGLE_DOMAIN_FAIL_SRCH_PLMN_CNT = 9018,           /* DT???????????????????????????????????????? */
 /* 9019  */      en_NV_Item_Ps_Loci = 9019,
 
 /* 9020  */      en_NV_Item_W_RX_EEIC_EN = 9020,
@@ -314,39 +314,39 @@ enum PS_NV_ID_ENUM
 
 /* 9039 */       en_NV_Item_ADS_Queue_Scheduler_Pri  = 9039,
 
-/* 9055 */       en_NV_Item_NVIM_WCDMA_PRIORITY_GSM_SUPPORT_FLG = 9055,         /*H3G需求,W网络优先于GSM网络定制 */
-/* 9056 */       en_NV_Item_NVIM_PS_ONLY_CS_SERVICE_SUPPORT_FLG = 9056,         /* 服务域设置为PS ONLY时，是否支持CS域短信和呼叫业务(紧急呼叫除外)*/
-/* 9057 */       en_NV_Item_NVIM_CCBS_SUPPORT_FLG = 9057,                       /*CCBS(遇忙呼叫完成)业务*/
-/* 9058 */       en_NV_Item_NVIM_SIM_CALL_CONTROL_SUPPORT_FLG = 9058,           /* SIM卡Call Control业务*/
-/* 9059 */       en_NV_Item_NVIM_CALL_DEFLECTION_SUPPORT_FLG = 9059,            /*支持呼叫偏转业务*/
-/* 9060 */       en_NV_Item_NVIM_ALS_SUPPORT_FLG = 9060,                        /* 支持线路切换业务*/
-/* 9061 */       en_NV_Item_NVIM_GET_CSMP_PARA_FROM_USIM_SUPPORT_FLG = 9061,    /*从(U)SIM卡中读取CSMP参数 */
-/* 9062 */       en_NV_Item_NVIM_SMS_PP_DOWNLOAD_SUPPORT_FLG = 9062,            /*表明是否支持短信的PP-DOWNLOAD功能*/
-/* 9063 */       en_NV_Item_NVIM_SMS_NVIM_SMSREXIST_SUPPORT_FLG = 9063,         /*表明NVIM中是否能保存短信状态报告*/
-/* 9064 */       en_NV_Item_NVIM_SMS_STATUS_REPORT_IN_EFSMS_SUPPORT_FLG = 9064, /*支持短信状态报告存到EFSMS文件*/
+/* 9055 */       en_NV_Item_NVIM_WCDMA_PRIORITY_GSM_SUPPORT_FLG = 9055,         /*H3G????,W??????????GSM???????? */
+/* 9056 */       en_NV_Item_NVIM_PS_ONLY_CS_SERVICE_SUPPORT_FLG = 9056,         /* ????????????PS ONLY????????????CS????????????????(????????????)*/
+/* 9057 */       en_NV_Item_NVIM_CCBS_SUPPORT_FLG = 9057,                       /*CCBS(????????????)????*/
+/* 9058 */       en_NV_Item_NVIM_SIM_CALL_CONTROL_SUPPORT_FLG = 9058,           /* SIM??Call Control????*/
+/* 9059 */       en_NV_Item_NVIM_CALL_DEFLECTION_SUPPORT_FLG = 9059,            /*????????????????*/
+/* 9060 */       en_NV_Item_NVIM_ALS_SUPPORT_FLG = 9060,                        /* ????????????????*/
+/* 9061 */       en_NV_Item_NVIM_GET_CSMP_PARA_FROM_USIM_SUPPORT_FLG = 9061,    /*??(U)SIM????????CSMP???? */
+/* 9062 */       en_NV_Item_NVIM_SMS_PP_DOWNLOAD_SUPPORT_FLG = 9062,            /*??????????????????PP-DOWNLOAD????*/
+/* 9063 */       en_NV_Item_NVIM_SMS_NVIM_SMSREXIST_SUPPORT_FLG = 9063,         /*????NVIM????????????????????????*/
+/* 9064 */       en_NV_Item_NVIM_SMS_STATUS_REPORT_IN_EFSMS_SUPPORT_FLG = 9064, /*????????????????????EFSMS????*/
 
-/* Modified by z40661 for 泰国AIS特性 2012-05-17, begin */
+/* Modified by z40661 for ????AIS???? 2012-05-17, begin */
                 en_NV_Item_NVIM_AIS_ROAMING_CFG  = 9073                        ,       /*  */
-/* Modified by z40661 for 泰国AIS特性 2012-05-17, end */
+/* Modified by z40661 for ????AIS???? 2012-05-17, end */
 
-                 /* Custom NV项 */
-/* 9074 */       en_NV_Item_User_Auto_Resel_Switch = 9074,                      /* User Reselction功能是否使能 */
-
-
-/* 9075 */		 en_NV_Item_PRIO_HPLMNACT_CFG = 9075,                               /* 定制的HplmnAct的优先接入技术 */
+                 /* Custom NV?? */
+/* 9074 */       en_NV_Item_User_Auto_Resel_Switch = 9074,                      /* User Reselction???????????? */
 
 
-/* 9093 */       en_NV_Item_UE_POSITION_CAPABILITIES = 9093,                    /* UE定位能力 */
+/* 9075 */		 en_NV_Item_PRIO_HPLMNACT_CFG = 9075,                               /* ??????HplmnAct?????????????? */
 
-/* 9109 */       en_NV_Item_NVIM_SMS_BUFFER_CAPABILITY = 9109,                         /* SMS的缓冲大小 */
 
-/* Added by t00212959 for DCM定制需求和遗留问题, 2012-8-15, begin */
-/* 9106 */       en_NV_Item_PLMN_EXACTLY_COMPARE_FLG = 9106,                    /*表明是否精确比较PLMN(MNC比较三位)*/
-/* Added by t00212959 for DCM定制需求和遗留问题, 2012-8-15, end */
+/* 9093 */       en_NV_Item_UE_POSITION_CAPABILITIES = 9093,                    /* UE???????? */
 
-/* Modified by z00161729 for DCM定制需求和遗留问题, 2012-8-14, begin */
-/* 9105 */      en_NV_Item_Csfb_Emg_Call_LaiChg_Lau_First_CFG = 9105,     /* csfb紧急呼叫到GU,LAI改变先做lau再进行呼叫配置*/
-/* Modified by z00161729 for DCM定制需求和遗留问题, 2012-8-14, end */
+/* 9109 */       en_NV_Item_NVIM_SMS_BUFFER_CAPABILITY = 9109,                         /* SMS?????????? */
+
+/* Added by t00212959 for DCM??????????????????, 2012-8-15, begin */
+/* 9106 */       en_NV_Item_PLMN_EXACTLY_COMPARE_FLG = 9106,                    /*????????????????PLMN(MNC????????)*/
+/* Added by t00212959 for DCM??????????????????, 2012-8-15, end */
+
+/* Modified by z00161729 for DCM??????????????????, 2012-8-14, begin */
+/* 9105 */      en_NV_Item_Csfb_Emg_Call_LaiChg_Lau_First_CFG = 9105,     /* csfb??????????GU,LAI????????lau??????????????*/
+/* Modified by z00161729 for DCM??????????????????, 2012-8-14, end */
                  en_NV_Item_W_DRX_LTE_EVALUATE_PARA_STRU = 9107,
 /* 9108 */      en_NV_Item_USIM_Status_Need_Fcp = 9108,
 
@@ -358,9 +358,9 @@ enum PS_NV_ID_ENUM
 
 /* 9137  */      en_NV_Item_NasIsrSupport = 9137,
 
-/* Added by y00142674 for GSM自主重定向到LTE, 2013-08-05, begin */
-/* 9139 */       en_NV_Item_GSM_AUTO_FR_LTE_MEAS_CONFIG = 9139,                 /* GSM自主重定向到LTE的LTE频点测量配置 */
-/* Added by y00142674 for GSM自主重定向到LTE, 2013-08-05, end */
+/* Added by y00142674 for GSM????????????LTE, 2013-08-05, begin */
+/* 9139 */       en_NV_Item_GSM_AUTO_FR_LTE_MEAS_CONFIG = 9139,                 /* GSM????????????LTE??LTE???????????? */
+/* Added by y00142674 for GSM????????????LTE, 2013-08-05, end */
                  
 /* 9140 */       en_NV_Item_NAS_GMM_REL_CONN_AFTER_PDP_DEACT = 9140,
 
@@ -379,9 +379,9 @@ enum PS_NV_ID_ENUM
 
 /* 9253 */      en_NV_Item_CBS_DRX_OPTIMIZATION_CFG = 9253,
 
-/* Added by p00166345 for DTS2014050808614(离网重选), 2014-01-16, begin */
+/* Added by p00166345 for DTS2014050808614(????????), 2014-01-16, begin */
 /* 9255 */      en_NV_Item_Gsm_Cell_Info_Rpt_Cfg    = 9255,
-/* Added by p00166345 for DTS2014050808614(离网重选), 2014-01-16, end */
+/* Added by p00166345 for DTS2014050808614(????????), 2014-01-16, end */
 
 /* 9260 */      en_NV_Item_YOIGO_CUSTOM_PARA_INFO   = 9260,
 
@@ -397,7 +397,7 @@ enum PS_NV_ID_ENUM
 /* 2316 */      en_NV_Item_ENHANCED_OPERATOR_NAME_SRV_CFG = 2316,
 /* 2323 */      en_NV_Item_REFRESH_ALL_FILE_RESTART_CFG   = 2323,
 
-                 /* Custom NV项 */
+                 /* Custom NV?? */
                  en_NV_Item_ManufactureInfo = GU_CUSTOM_BASE_NV_ID_MIN,
 /* 32769 */      en_NV_Item_PPP_CONFIG_MRU_Type,
 

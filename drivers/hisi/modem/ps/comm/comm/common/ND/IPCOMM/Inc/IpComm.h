@@ -67,7 +67,7 @@ extern "C" {
 #endif
 #endif
 /*****************************************************************************
-  #pragma pack(*)    设置字节对齐方式
+  #pragma pack(*)    ????????????????
 *****************************************************************************/
 #if (VOS_OS_VER != VOS_WIN32)
 #pragma pack(4)
@@ -84,13 +84,13 @@ extern "C" {
 #define          ND_TASK_PID                  UEPS_PID_NDSERVER
 #endif
 
-/*通过ModemId和EpsId组合成exEpsId，高2bit为ModemId,第6bit为EpsId*/
+/*????ModemId??EpsId??????exEpsId????2bit??ModemId,??6bit??EpsId*/
 #define ND_FORM_EXEPSID(ModemId,EpsId)          (VOS_UINT8)((VOS_UINT8)(((ModemId) << 6) | (EpsId)))
 
-/*从ExEpsId中获得ModemId*/
+/*??ExEpsId??????ModemId*/
 #define ND_GET_MODEMID_FROM_EXEPSID(ExEpsId)    (VOS_UINT16)(((ExEpsId) & 0xC0) >> 6)
 
-/*从ExEpsId中获得EpsId*/
+/*??ExEpsId??????EpsId*/
 #define ND_GET_EPSID_FROM_EXEPSID(ExEpsId)      (VOS_UINT8)((ExEpsId) & 0x3F)
 #define IP_DHCPV4SERVER_OFF                                 (0)
 #define IP_DHCPV4SERVER_ON                                  (1)
@@ -100,8 +100,8 @@ extern "C" {
 #define IP_IPV6_ND_HOP_LIMIT                                (0xff)
 #define IP_IPV6_ND_VALID_CODE                               (0)
 
-#define ND_MAX_EPSB_ID             (15)                /*最大的承载号*/
-#define ND_MIN_EPSB_ID             (5)                 /*最小的承载号*/
+#define ND_MAX_EPSB_ID             (15)                /*????????????*/
+#define ND_MIN_EPSB_ID             (5)                 /*????????????*/
 
 #define ND_IP_MAX_PREFIX_NUM_IN_RA      (6)
 #define ND_IPV6_IF_OFFSET               (8)
@@ -123,7 +123,7 @@ extern "C" {
 #define IP_IPV6_DHCP6_TYPE_REPLY          (7)
 #define IP_IPV6_DHCP6_TRANS_ID_LEN        (3)
 #define IP_IPV6_DHCP6_OPT_DNS_SERVERS     (23)
-#define IP_IPV6_DHCP6_REPLY_HDR_LEN       (8) /*DHCP REPLY 头四字节 + Option头四字节*/
+#define IP_IPV6_DHCP6_REPLY_HDR_LEN       (8) /*DHCP REPLY ???????? + Option????????*/
 
 #define IP_IPV6_HW_TYPE                     (1)
 #define IP_IPV6_MAX_DNS_NUM                 (2)
@@ -176,7 +176,7 @@ extern "C" {
 
 #define IP_ND_OPT_UNIT_LEN                                  (8)
 
-/*内存操作*/
+/*????????*/
 #define IP_MEM_CPY(pucDestBuffer, pucSrcBuffer, ulBufferLen) \
              (VOS_VOID)VOS_MemCpy( pucDestBuffer, pucSrcBuffer, ulBufferLen )
 
@@ -289,7 +289,7 @@ extern "C" {
                 (*((pucFirstByte) + 3)) = (ulUint32Data) & 0xff;\
             }
 
-/*封装写IP消息头的宏*/
+/*??????IP??????????*/
 #define ND_IP_WRITE_MSG_HEAD(pstMsg, ulRabmMsgID, ulSendPid, ulReceivePid)\
                     (pstMsg)->ulMsgId   = (ulRabmMsgID);\
                     (pstMsg)->ulSenderCpuId = VOS_LOCAL_CPUID;\
@@ -409,26 +409,26 @@ extern "C" {
 *****************************************************************************/
 
 /*****************************************************************************
- 结构名    : IP_ERR_ENUM
- 结构说明  : IP模块错误码
+ ??????    : IP_ERR_ENUM
+ ????????  : IP??????????
  *****************************************************************************/
 enum    IP_ERR_ENUM
 {
     IP_SUCC                         = 0x00000000,
     IP_FAIL                                     ,
 
-    IP_MSG_DISCARD                              ,       /* 丢弃该消息，即该消息不被该当前状态处理 */
-    IP_MSG_HANDLED                              ,       /* 该消息已被当前状态处理 */
+    IP_MSG_DISCARD                              ,       /* ?????????????????????????????????????? */
+    IP_MSG_HANDLED                              ,       /* ?????????????????????? */
 
     IP_ERR_BUTT
 };
 typedef VOS_UINT32  IP_ERR_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名    : IP_BOOL_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : PS统一布尔类型枚举定义
+ ??????    : IP_BOOL_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : PS????????????????????
 *****************************************************************************/
 enum IP_BOOL_ENUM
 {
@@ -439,10 +439,10 @@ enum IP_BOOL_ENUM
 typedef VOS_UINT8   IP_BOOL_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : IP_ICMPV6_TYPE_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : 扩展头类型枚举
+ ??????    : IP_ICMPV6_TYPE_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : ??????????????
 *****************************************************************************/
 enum IP_ICMPV6_TYPE_ENUM
 {
@@ -472,10 +472,10 @@ enum IP_ICMPV6_OPT_TYPE_ENUM
 typedef VOS_UINT32 IP_ICMPV6_OPT_TYPE_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名    : IP_EXTENSION_HEADER_TYPE_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : 扩展头类型枚举
+ ??????    : IP_EXTENSION_HEADER_TYPE_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : ??????????????
 *****************************************************************************/
 enum IP_EXTENSION_HEADER_TYPE_ENUM
 {
@@ -495,10 +495,10 @@ typedef VOS_UINT32 IP_EXTENSION_HEADER_TYPE_ENUM_UINT32;
   5 STRUCT
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : ND_IP_IPV6_PREFIX_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : ND_IP_IPV6_PREFIX_STRU的数据结构
+ ??????    : ND_IP_IPV6_PREFIX_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ND_IP_IPV6_PREFIX_STRU??????????
 *****************************************************************************/
 typedef struct
 {
@@ -513,14 +513,14 @@ typedef struct
 }ND_IP_IPV6_PREFIX_STRU;
 
 /*****************************************************************************
- 结构名    : ND_IP_IPV6_DNS_SER_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : NAS_IP_IPV6_DNS_SER_STRU的数据结构
+ ??????    : ND_IP_IPV6_DNS_SER_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : NAS_IP_IPV6_DNS_SER_STRU??????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucDnsSerNum;        /*DNS服务器个数*/
+    VOS_UINT8                           ucDnsSerNum;        /*DNS??????????*/
     VOS_UINT8                           aucReserved[3];
 
     VOS_UINT8                           aucPriDnsServer[IP_IPV6_ADDR_LEN];
@@ -528,14 +528,14 @@ typedef struct
 }ND_IP_IPV6_DNS_SER_STRU;
 
 /*****************************************************************************
- 结构名    : ND_IP_IPV6_SIP_SER_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : NAS_IP_IPV6_SIP_SER_STRU的数据结构
+ ??????    : ND_IP_IPV6_SIP_SER_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : NAS_IP_IPV6_SIP_SER_STRU??????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucSipSerNum;        /*SIP服务器个数*/
+    VOS_UINT8                           ucSipSerNum;        /*SIP??????????*/
     VOS_UINT8                           aucReserved[3];
 
     VOS_UINT8                           aucPriSipServer[IP_IPV6_ADDR_LEN];
@@ -543,10 +543,10 @@ typedef struct
 }ND_IP_IPV6_SIP_SER_STRU;
 
 /*****************************************************************************
- 结构名    : ESM_IP_IPV6_NW_PARA_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : ESM_IP_IPV6_NW_PARA_STRU的数据结构
+ ??????    : ESM_IP_IPV6_NW_PARA_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ESM_IP_IPV6_NW_PARA_STRU??????????
 *****************************************************************************/
 typedef struct
 {
@@ -563,14 +563,14 @@ typedef struct
     ND_IP_IPV6_PREFIX_STRU              astPrefixList[ND_IP_MAX_PREFIX_NUM_IN_RA];
 
     ND_IP_IPV6_DNS_SER_STRU            stDnsSer;
-    ND_IP_IPV6_SIP_SER_STRU            stSipSer;                               /* SIP服务器 */
+    ND_IP_IPV6_SIP_SER_STRU            stSipSer;                               /* SIP?????? */
 }ESM_IP_IPV6_NW_PARA_STRU;
 
 typedef struct
 {
-    VOS_UINT32                          ulSendMsgSize;         /* 消息的总长度 */
-    VOS_UINT32                          ulResv;                /*为了同64位操作系统兼容，指针放在在8字节对齐位置*/
-    VOS_UINT8                          *pucSendMsg;            /* 消息的首地址 */
+    VOS_UINT32                          ulSendMsgSize;         /* ???????????? */
+    VOS_UINT32                          ulResv;                /*??????64??????????????????????????8????????????*/
+    VOS_UINT8                          *pucSendMsg;            /* ???????????? */
 }IP_SND_MSG_STRU;
 
 typedef struct
@@ -651,25 +651,25 @@ typedef struct
 
 /*Moved by huibo begin*/
 /*****************************************************************************
- 结构名    : IPv6_PSEDUOHEADER_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : IPV6伪首部
+ ??????    : IPv6_PSEDUOHEADER_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : IPV6??????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           aucIPSrc[IP_IPV6_ADDR_LEN];             /*源IP地址*/
-    VOS_UINT8                           aucIPDes[IP_IPV6_ADDR_LEN];             /*目的IP地址*/
-    VOS_UINT32                          ulUpperLength;                          /*整个UPPER-LAYER长度，不包括伪首部长度*/
-    VOS_UINT8                           ucZero[3];                              /*全部为0*/
+    VOS_UINT8                           aucIPSrc[IP_IPV6_ADDR_LEN];             /*??IP????*/
+    VOS_UINT8                           aucIPDes[IP_IPV6_ADDR_LEN];             /*????IP????*/
+    VOS_UINT32                          ulUpperLength;                          /*????UPPER-LAYER??????????????????????*/
+    VOS_UINT8                           ucZero[3];                              /*??????0*/
     VOS_UINT8                           ucNextHead;
 }IPV6_PSEDUOHEADER_STRU;
 
 /*****************************************************************************
- 结构名    : NDIS_IP6_HDR_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : IPV6地址
+ ??????    : NDIS_IP6_HDR_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : IPV6????
 *****************************************************************************/
 typedef struct
 {
@@ -682,10 +682,10 @@ typedef struct
 }NDIS_IP6_ADDR_STRU;
 
 /*****************************************************************************
- 结构名    : NDIS_IP6_HDR_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : IPV6首部
+ ??????    : NDIS_IP6_HDR_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : IPV6????
 *****************************************************************************/
 typedef struct
 {
@@ -698,24 +698,24 @@ typedef struct
 }NDIS_IP6_HDR_STRU;
 
 /*****************************************************************************
- 结构名    : UDP_HEAD_ST
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UDP头部结构
+ ??????    : UDP_HEAD_ST
+ ????????  :
+ ASN.1???? :
+ ????????  : UDP????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16  usSrcPort;              /*源端口*/
-    VOS_UINT16  usDstPort;              /*目的端口*/
-    VOS_UINT16  usLen;                  /*UDP包长度*/
-    VOS_UINT16  usCheck;                /*UDP校验和*/
+    VOS_UINT16  usSrcPort;              /*??????*/
+    VOS_UINT16  usDstPort;              /*????????*/
+    VOS_UINT16  usLen;                  /*UDP??????*/
+    VOS_UINT16  usCheck;                /*UDP??????*/
 }UDP_HEAD_ST;
 
 /*****************************************************************************
- 结构名    : UDP_HEAD_ST
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UDP头部结构
+ ??????    : UDP_HEAD_ST
+ ????????  :
+ ASN.1???? :
+ ????????  : UDP????????
 *****************************************************************************/
 typedef struct
 {
@@ -726,10 +726,10 @@ typedef struct
 }IPV6_DHCP_DNS_OPTION_STRU;
 
 /*****************************************************************************
- 结构名    : IPV6_PKT_DHCP_OPT_HDR_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : UDP头部结构
+ ??????    : IPV6_PKT_DHCP_OPT_HDR_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : UDP????????
 *****************************************************************************/
 /* DHCP Options */
 typedef struct

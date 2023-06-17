@@ -48,7 +48,7 @@
 #undef REJECTED
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
 #define    THIS_FILE_ID        PS_FILE_ID_IPCP_C
 
@@ -209,10 +209,10 @@ IpcpInitRestartCounter(struct fsm *fp, VOS_INT32 what)
 /*   fp->FsmTimer.load = ipcp->cfg.fsm.timeout * SECTICKS;*/
   switch (what) {
     case FSM_REQ_TIMER:
-      fp->restart = ipcp->cfg.fsm.maxreq; /* [false alarm]:移植开源代码 */
+      fp->restart = ipcp->cfg.fsm.maxreq; /* [false alarm]:???????????? */
       break;
     case FSM_TRM_TIMER:
-      fp->restart = ipcp->cfg.fsm.maxtrm; /* [false alarm]:移植开源代码 */
+      fp->restart = ipcp->cfg.fsm.maxtrm; /* [false alarm]:???????????? */
       break;
     default:
       fp->restart = 1;
@@ -241,7 +241,7 @@ IpcpInitRestartCounter(struct fsm *fp, VOS_INT32 what)
 void
 IpcpSendConfigReq(struct fsm *fp)
 {
-/*因为在3G文档里，不需要向对方发送config帧*/
+/*??????3G????????????????????????config??*/
   VOS_CHAR buff[24];
   struct fsm_opt *o;
 
@@ -271,7 +271,7 @@ IpcpLayerStart(struct fsm *fp)
   struct ipcp *ipcp = fsm2ipcp(fp);
 
   PPP_MNTN_LOG(PS_PID_APP_PPP, 0, PS_PRINT_NORMAL, "ipcp LayerStart");
-  throughput_start(&ipcp->throughput, "IPCP throughput", /* [false alarm]:移植开源代码 */
+  throughput_start(&ipcp->throughput, "IPCP throughput", /* [false alarm]:???????????? */
                    /*Enabled(fp->bundle, OPT_THROUGHPUT)*/1);
   fp->more.reqs = fp->more.naks = fp->more.rejs = ipcp->cfg.fsm.maxreq * 3;
   ipcp->peer_req = 0;
@@ -284,7 +284,7 @@ IpcpLayerFinish(struct fsm *fp)
   struct ipcp *ipcp = fsm2ipcp(fp);
 
   PPP_MNTN_LOG(PS_PID_APP_PPP, 0, PS_PRINT_NORMAL, "ipcp LayerFinish");
-  throughput_stop(&ipcp->throughput); /* [false alarm]:移植开源代码 */
+  throughput_stop(&ipcp->throughput); /* [false alarm]:???????????? */
 
 }
 void
@@ -297,18 +297,18 @@ IpcpLayerUp(struct fsm *fp)
   /* We're now up */
   struct ipcp *ipcp = fsm2ipcp(fp);
 
-  fp->more.reqs = fp->more.naks = fp->more.rejs = ipcp->cfg.fsm.maxreq * 3; /* [false alarm]:移植开源代码 */
+  fp->more.reqs = fp->more.naks = fp->more.rejs = ipcp->cfg.fsm.maxreq * 3; /* [false alarm]:???????????? */
   return 1;
 }
 
 
 /*****************************************************************************
  Prototype      : StringCompare
- Description    : 对于两个字符串比较他们从头起的一段。
+ Description    : ????????????????????????????????????
 
- Input          : ---两个字符串的首地址与比较的长度
+ Input          : ---??????????????????????????????
  Output         : ---
- Return Value   : ---相等返回VOS_OK，否则返回VOS_ERR
+ Return Value   : ---????????VOS_OK??????????VOS_ERR
  Calls          : ---
  Called By      : ---
 
@@ -332,13 +332,13 @@ VOS_UINT32 StringCompare(VOS_CHAR* pString1,VOS_VOID* pString2,VOS_UINT16 len)
 
 /*****************************************************************************
  Prototype      : DecodeAtIndication
- Description    : 解析从AT接收到的ACK与NAK报文。
+ Description    : ??????AT????????ACK??NAK??????
 
- Input          : ---pIpcp:指向该报文所在的ipcp结构
-                  ---pEchoBuffer:指向接收到的来自AT的ACK或NAK报文的首地址
-                  ---BufferLen:指向接收到的来自AT的ACK或NAK报文的长度
+ Input          : ---pIpcp:????????????????ipcp????
+                  ---pEchoBuffer:????????????????AT??ACK??NAK????????????
+                  ---BufferLen:????????????????AT??ACK??NAK??????????
  Output         : ---
- Return Value   : ---成功返回VOS_OK，否则返回VOS_ERR
+ Return Value   : ---????????VOS_OK??????????VOS_ERR
  Calls          : ---
  Called By      : ---
 
@@ -440,7 +440,7 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
 
       switch (mode_type) {
       case MODE_REQ:
-        ipcp->peer_req = 1; /* [false alarm]:移植开源代码 */
+        ipcp->peer_req = 1; /* [false alarm]:???????????? */
 
 /*fanzhibin f49086 add it begin*/
         if (!IsAccepted(ipcp->IpAddr_neg))
@@ -473,7 +473,7 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
       case MODE_REQ:
 
 /*fanzhibin f49086 add it begin*/
-        if (!IsAccepted(ipcp->CompressProto_neg)) /* [false alarm]:移植开源代码 */
+        if (!IsAccepted(ipcp->CompressProto_neg)) /* [false alarm]:???????????? */
         {
           if (fp->link->ipcp.stage == IPCP_SUCCESS_FROM_GGSN)
           {
@@ -528,7 +528,7 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
 
       switch (mode_type) {
       case MODE_REQ:
-        if (!IsAccepted(ipcp->PriNbns_neg)) /* [false alarm]:移植开源代码 */
+        if (!IsAccepted(ipcp->PriNbns_neg)) /* [false alarm]:???????????? */
         {
           if (fp->link->ipcp.stage == IPCP_SUCCESS_FROM_GGSN)
           {
@@ -568,7 +568,7 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
 
       switch (mode_type) {
       case MODE_REQ:
-        if (!IsAccepted(ipcp->SecNbns_neg)) /* [false alarm]:移植开源代码 */
+        if (!IsAccepted(ipcp->SecNbns_neg)) /* [false alarm]:???????????? */
         {
           if (fp->link->ipcp.stage == IPCP_SUCCESS_FROM_GGSN)
           {
@@ -607,7 +607,7 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
     case TY_PRIMARY_DNS:    /* primary dns */
       switch (mode_type) {
       case MODE_REQ:
-        if (!IsAccepted(ipcp->PriDns_neg)) /* [false alarm]:移植开源代码 */
+        if (!IsAccepted(ipcp->PriDns_neg)) /* [false alarm]:???????????? */
         {
             if (fp->link->ipcp.stage == IPCP_SUCCESS_FROM_GGSN)
             {
@@ -646,7 +646,7 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
     case TY_SECONDARY_DNS:    /* primary dns */
       switch (mode_type) {
       case MODE_REQ:
-        if (!IsAccepted(ipcp->SecDns_neg)) /* [false alarm]:移植开源代码 */
+        if (!IsAccepted(ipcp->SecDns_neg)) /* [false alarm]:???????????? */
         {
             if (fp->link->ipcp.stage == IPCP_SUCCESS_FROM_GGSN)
             {
@@ -689,7 +689,7 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
 
     default:
       if (mode_type != MODE_NOP) {
-        ipcp->my_reject |= (1 << opt->hdr.id); /* [false alarm]:移植开源代码 */
+        ipcp->my_reject |= (1 << opt->hdr.id); /* [false alarm]:???????????? */
         fsm_rej(dec, opt);
       }
       break;
@@ -698,7 +698,7 @@ IpcpDecodeConfig(struct fsm *fp, VOS_CHAR *cp, VOS_CHAR *end, VOS_INT32 mode_typ
 
 
   if (mode_type != MODE_NOP) {
-    if (mode_type == MODE_REQ && !ipcp->peer_req) { /* [false alarm]:移植开源代码 */
+    if (mode_type == MODE_REQ && !ipcp->peer_req) { /* [false alarm]:???????????? */
       if (dec->rejend == dec->rej && dec->nakend == dec->nak) {
         /*
          * Pretend the peer has requested an IP.
@@ -723,10 +723,10 @@ VOS_VOID Ppp_ProcConfigInfoInd(VOS_UINT16 usPppId)
 {
     PPP_MNTN_LOG(PS_PID_APP_PPP, 0, PS_PRINT_NORMAL,"Ppp_ProcConfigInfoInd begain\r\n");
 
-    /* 可维可测信息上报*/
+    /* ????????????????*/
     Ppp_EventMntnInfo(usPppId, PPP_CONFIG_INFO_PROC_NOTIFY);
 
-    /* PPP ID非法*/
+    /* PPP ID????*/
     if((usPppId < 1)
            ||(usPppId > PPP_MAX_ID_NUM))
     {
@@ -734,7 +734,7 @@ VOS_VOID Ppp_ProcConfigInfoInd(VOS_UINT16 usPppId)
     	return ;
     }
 
-	/*定时器关闭*/
+	/*??????????*/
 	if (VOS_NULL_PTR != (PPP_LINK(usPppId)->ipcp.hIpcpPendTimer))
 	{
 		PS_STOP_REL_TIMER(&(PPP_LINK(usPppId)->ipcp.hIpcpPendTimer));
@@ -742,21 +742,21 @@ VOS_VOID Ppp_ProcConfigInfoInd(VOS_UINT16 usPppId)
 	}
 
 
-	/*处理待处理IPCP帧*/
+	/*??????????IPCP??*/
 	if (VOS_NULL_PTR != (PPP_LINK(usPppId)->ipcp.pstIpcpPendFrame))
 	{
 		if (PHASE_NETWORK != PPP_LINK(usPppId)->phase )
 		{
-			/* 如果当前不是IPCP阶段则直接丢弃待处理帧返回*/
+			/* ????????????IPCP??????????????????????????*/
 			ppp_m_freem(PPP_LINK(usPppId)->ipcp.pstIpcpPendFrame);
 		}
 		else
 		{
-			/* 如果是IPCP阶段,则直接处理*/
+			/* ??????IPCP????,??????????*/
 			fsm_Input(&(PPP_LINK(usPppId)->ipcp.fsm), PPP_LINK(usPppId)->ipcp.pstIpcpPendFrame);
 		}
 
-		/*待处理IPCP帧置空*/
+		/*??????IPCP??????*/
 		PPP_LINK(usPppId)->ipcp.pstIpcpPendFrame = VOS_NULL_PTR;
 	}
 
@@ -780,7 +780,7 @@ ipcp_Input(/*struct bundle *bundle, */struct link *l, PPP_ZC_STRU *pstMem)
 		return VOS_NULL_PTR;
 	}
 
-	/* 如果当前还不是IPCP阶段则直接丢弃返回*/
+	/* ??????????????IPCP??????????????????*/
 	if (PHASE_NETWORK != l->phase )
 	{
 		if (l->phase < PHASE_NETWORK)
@@ -792,20 +792,20 @@ ipcp_Input(/*struct bundle *bundle, */struct link *l, PPP_ZC_STRU *pstMem)
 		ppp_m_freem(bp);
 		return VOS_NULL_PTR;
 	}
-	/*else if ( l->phase == PHASE_NETWORK) 后续是当前为IPCP阶段的处理*/
+	/*else if ( l->phase == PHASE_NETWORK) ????????????IPCP??????????*/
 
 
-	/*如果不是IPCP Config Request则应该立即处理*/
+	/*????????IPCP Config Request??????????????*/
   	ppp_mbuf_View(bp, &ucCode, sizeof (ucCode));
 	if (ucCode != CODE_CONFIGREQ)
 	{
 		fsm_Input(&(l->ipcp.fsm), bp);
 		return VOS_NULL_PTR;
 	}
-	/*else if (ucCode == CODE_CONFIGREQ) 后续是IPCP Config Request的处理*/
+	/*else if (ucCode == CODE_CONFIGREQ) ??????IPCP Config Request??????*/
 
 
-	/*释放待处理帧,收到新的IPCP Config Request帧,则说明老的帧已经失效*/
+	/*????????????,????????IPCP Config Request??,????????????????????*/
 	if (VOS_NULL_PTR  != l->ipcp.pstIpcpPendFrame)
 	{
 		ppp_m_freem(l->ipcp.pstIpcpPendFrame);
@@ -813,26 +813,26 @@ ipcp_Input(/*struct bundle *bundle, */struct link *l, PPP_ZC_STRU *pstMem)
 	}
 
 
-	/*网侧已经激活或还未开始激活,则直接处理并返回*/
+	/*??????????????????????????,????????????????*/
 	if ( IPCP_SUCCESS_FROM_GGSN == l->ipcp.stage
 		|| IPCP_NOT_RECEIVE_REQ  == l->ipcp.stage)
 	{
 		fsm_Input(&(l->ipcp.fsm), bp);
 		return VOS_NULL_PTR;
 	}
-	/*else if (l->ipcp.stage != IPCP_SUCCESS_FROM_GGSN) 后续是当前为PDP未激活阶段的处理*/
+	/*else if (l->ipcp.stage != IPCP_SUCCESS_FROM_GGSN) ????????????PDP????????????????*/
 
 
-	/*网侧在等待激活,则起定时器,并保存待处理包*/
+	/*??????????????,??????????,??????????????*/
 	if (VOS_NULL_PTR == l->ipcp.hIpcpPendTimer)
 	{
-		/*====================*/ /* 启动定时器 */
+		/*====================*/ /* ?????????? */
         ulRtn = VOS_StartRelTimer(&(l->ipcp.hIpcpPendTimer),  PS_PID_APP_PPP,
 			PPP_IPCP_PENDING_TIMER_LEN,  PPP_LINK_TO_ID(l),  PHASE_PDP_ACT_PENDING,  VOS_RELTIMER_NOLOOP,VOS_TIMER_PRECISION_0);
 	}
 
 
-	/*起定时器失败,则立即处理*/
+	/*????????????,??????????*/
 	if (VOS_OK != ulRtn)
 	{
 		fsm_Input(&(l->ipcp.fsm), bp);

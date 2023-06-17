@@ -48,25 +48,25 @@
 
 /******************************************************************************
 
-                  版权所有 (C), 2015-2025, 华为技术有限公司
+                  ???????? (C), 2015-2025, ????????????????
 
  ******************************************************************************
-  文 件 名   : Cbtapprl.c
-  版 本 号   : 初稿
-  作    者   :
-  生成日期   :
-  最近修改   :
-  功能描述   : 进行CBT通道的数据包分包和组包
-  函数列表   :
-  修改历史   :
-  1.日    期   : 2015年2月27日
-    作    者   : x00263027
-    修改内容   :
+  ?? ?? ??   : Cbtapprl.c
+  ?? ?? ??   : ????
+  ??    ??   :
+  ????????   :
+  ????????   :
+  ????????   : ????CBT??????????????????????
+  ????????   :
+  ????????   :
+  1.??    ??   : 2015??2??27??
+    ??    ??   : x00263027
+    ????????   :
 
 ***************************************************************************** */
 
 /*****************************************************************************
-  1 头文件包含
+  1 ??????????
 **************************************************************************** */
 
 #include "OmHdlcInterface.h"
@@ -81,7 +81,7 @@
 
 #define    THIS_FILE_ID        PS_FILE_ID_APP_CBT_RL_C
 /*****************************************************************************
-  2 全局变量定义
+  2 ????????????
 *****************************************************************************/
 
 VOS_UINT32                              g_ulCbtAcpuDbgFlag = VOS_FALSE;
@@ -89,7 +89,7 @@ VOS_UINT32                              g_ulCbtAcpuDbgFlag = VOS_FALSE;
 
 #define COMPONENT_MODE_COMBINE(CompMode, MsgId)  (((CompMode)<<16) | (MsgId))
 
-/* CBT通道控制信息全局变量 */
+/* CBT???????????????????? */
 CBT_RCV_CHAN_CTRL_INFO_STRU             g_stAcpuCbtCtrlInfo;
 CBT_HDLC_ENCODE_MEM_CTRL                g_stCbtHdlcEncodeBuf;
 
@@ -99,25 +99,25 @@ VOS_UINT32                              g_ulCbtMsgSN;
 
 
 /*****************************************************************************
-  3 函数实现
+  3 ????????
 *****************************************************************************/
 
 /*****************************************************************************
- 函 数 名  : CBT_AcpuUsbFrameInit
- 功能描述  : 当为虚拟串口时，需要初始化缓冲区
- 输入参数  : VOS_VOID
- 输出参数  : VOS_VOID
- 返 回 值  : VOS_UINT32
- 修改历史  :
-   1.日    期  : 2009年3月28日
-     作    者  : g47350
-     修改内容  : Creat Function
+ ?? ?? ??  : CBT_AcpuUsbFrameInit
+ ????????  : ????????????????????????????????
+ ????????  : VOS_VOID
+ ????????  : VOS_VOID
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+   1.??    ??  : 2009??3??28??
+     ??    ??  : g47350
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_UINT32 CBT_AcpuUsbFrameInit(VOS_VOID)
 {
     VOS_UINT_PTR                        ulRealAddr;
 
-    /* 申请CBT通道HDLC编码使用的uncached memory */
+    /* ????CBT????HDLC??????????uncached memory */
     VOS_MemSet(&g_stCbtHdlcEncodeBuf, 0, sizeof(g_stCbtHdlcEncodeBuf));
 
     g_stCbtHdlcEncodeBuf.pucBuf = (VOS_UINT8 *)VOS_UnCacheMemAlloc(2 * CBT_HDLC_BUF_MAX_LEN, &ulRealAddr);
@@ -128,7 +128,7 @@ VOS_UINT32 CBT_AcpuUsbFrameInit(VOS_VOID)
         return VOS_ERR;
     }
 
-    /* 保存buf实地址 */
+    /* ????buf?????? */
     g_stCbtHdlcEncodeBuf.pucRealBuf = (VOS_UINT8 *)ulRealAddr;
     g_stCbtHdlcEncodeBuf.ulBufSize  = 2 * CBT_HDLC_BUF_MAX_LEN;
 
@@ -136,23 +136,23 @@ VOS_UINT32 CBT_AcpuUsbFrameInit(VOS_VOID)
 }
 
 /*****************************************************************************
- 函 数 名     : CBT_AcpuInit
- 功能描述  : OMRL模块的初始化函数
- 输入参数  :
- 输出参数  :
- 返 回 值  :
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2015年3月2日
-     作    者  : x00263027
-     修改内容  : Creat Function
+ ?? ?? ??     : CBT_AcpuInit
+ ????????  : OMRL????????????????
+ ????????  :
+ ????????  :
+ ?? ?? ??  :
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2015??3??2??
+     ??    ??  : x00263027
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_UINT32 CBT_AcpuInit(VOS_VOID)
 {
     g_ulCbtMsgSN       = 0;
     VOS_MemSet(&g_stAcpuCbtCtrlInfo, 0, sizeof(CBT_RCV_CHAN_CTRL_INFO_STRU));
-    /* 首包序号为0 */
+    /* ??????????0 */
     g_stAcpuCbtCtrlInfo.stMsgCombineInfo.ucExpectedSegSn = 0;
     g_stAcpuCbtCtrlInfo.stMsgCombineInfo.usTimeStampH    = 0;
     g_stAcpuCbtCtrlInfo.ulCbtSwitchOnOff = CBT_STATE_IDLE;
@@ -163,7 +163,7 @@ VOS_UINT32 CBT_AcpuInit(VOS_VOID)
         return VOS_ERR;
     }
 
-    /* 创建发送信号量 */
+    /* ?????????????? */
     if (VOS_OK != VOS_SmMCreate("TXCBT", VOS_SEMA4_PRIOR | VOS_SEMA4_INVERSION_SAFE, &g_ulTxCbtSem))
     {
         LogPrint("OM_AcpuInit: Error, VOS_SmMCreate Fail\n");
@@ -173,17 +173,17 @@ VOS_UINT32 CBT_AcpuInit(VOS_VOID)
     return VOS_OK;
 }
 /*****************************************************************************
- 函 数 名  : CBT_AcpuCpuIdToPid
- 功能描述  : 根据SSID ID找到对应模块的PID
- 输入参数  : ucSsId:   ssid ID
- 输出参数  : pulPid -- 指向模块PID
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2015年2月27日
-     作    者  : x00263027
-     修改内容  : Creat Function
+ ?? ?? ??  : CBT_AcpuCpuIdToPid
+ ????????  : ????SSID ID??????????????PID
+ ????????  : ucSsId:   ssid ID
+ ????????  : pulPid -- ????????PID
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2015??2??27??
+     ??    ??  : x00263027
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_UINT32 CBT_AcpuSsIdToPid(VOS_UINT8 ucSsId, VOS_UINT32 *pulPid)
 {
@@ -207,17 +207,17 @@ VOS_UINT32 CBT_AcpuSsIdToPid(VOS_UINT8 ucSsId, VOS_UINT32 *pulPid)
 }
 
 /*****************************************************************************
- 函 数 名  : CBT_AcpuMsgDispatch
- 功能描述  : 将数据包分发出去
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2015年2月27日
-     作    者  : x00263027
-     修改内容  : Creat Function
+ ?? ?? ??  : CBT_AcpuMsgDispatch
+ ????????  : ????????????????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2015??2??27??
+     ??    ??  : x00263027
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_UINT32 CBT_AcpuMsgDispatch(CBT_RCV_CHAN_CTRL_INFO_STRU * pstCtrlInfo)
 {
@@ -236,7 +236,7 @@ VOS_UINT32 CBT_AcpuMsgDispatch(CBT_RCV_CHAN_CTRL_INFO_STRU * pstCtrlInfo)
         return VOS_ERR;
     }
 
-    /*消息是建链请求*/
+    /*??????????????*/
     if (APP_OM_ESTABLISH_REQ == pstCbtMsg->usMsgId)
     {
         g_ulExpRcvTransId  = ulTransId;
@@ -244,7 +244,7 @@ VOS_UINT32 CBT_AcpuMsgDispatch(CBT_RCV_CHAN_CTRL_INFO_STRU * pstCtrlInfo)
 
     if (g_ulExpRcvTransId != ulTransId)
     {
-        /*记录TransId错误的统计信息*/
+        /*????TransId??????????????*/
         pstCtrlInfo->stPcToUeErrRecord.usTransIdErr++;
     }
 
@@ -254,13 +254,13 @@ VOS_UINT32 CBT_AcpuMsgDispatch(CBT_RCV_CHAN_CTRL_INFO_STRU * pstCtrlInfo)
     CBT_ACPU_DEBUG_TRACE((pstCombineInfo->pstWholeMsg)->aucValue, (pstCombineInfo->pstWholeMsg)->ulLength, CBT_ACPU_DISPATCH_MSG);
     /*lint +e40 +e534*/
 
-    /* 通过OSA 消息发送给CBT */
-    if (CCPU_PID_CBT == (pstCombineInfo->pstWholeMsg)->ulReceiverPid)/* 发送到C核 */
+    /* ????OSA ??????????CBT */
+    if (CCPU_PID_CBT == (pstCombineInfo->pstWholeMsg)->ulReceiverPid)/* ??????C?? */
     {
         pstCtrlInfo->stPcToUeSucRecord.stCcpuData.ulDataLen += (pstCombineInfo->pstWholeMsg)->ulLength;
         pstCtrlInfo->stPcToUeSucRecord.stCcpuData.ulNum++;
     }
-    else /* 发送到A核 */
+    else /* ??????A?? */
     {
         pstCtrlInfo->stPcToUeSucRecord.stAcpuData.ulDataLen += (pstCombineInfo->pstWholeMsg)->ulLength;
         pstCtrlInfo->stPcToUeSucRecord.stAcpuData.ulNum++;
@@ -277,20 +277,20 @@ VOS_UINT32 CBT_AcpuMsgDispatch(CBT_RCV_CHAN_CTRL_INFO_STRU * pstCtrlInfo)
 
 }
 /*****************************************************************************
- 函 数 名  : CBT_AcpuMsgCombine
- 功能描述  : 对消息 组包并发送给对应CPU OM消息处理模块处理
- 输入参数  : pucData:   需要处理的数据内容
-             ulDataLen: 数据长度
+ ?? ?? ??  : CBT_AcpuMsgCombine
+ ????????  : ?????? ????????????????CPU OM????????????????
+ ????????  : pucData:   ??????????????????
+             ulDataLen: ????????
 
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年2月26日
-    作    者   : x00263027
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??2??26??
+    ??    ??   : x00263027
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 CBT_AcpuMsgCombine(CBT_RCV_CHAN_CTRL_INFO_STRU *pstCtrlInfo, VOS_UINT8 *pucData, VOS_UINT32 usLen)
@@ -324,7 +324,7 @@ VOS_UINT32 CBT_AcpuMsgCombine(CBT_RCV_CHAN_CTRL_INFO_STRU *pstCtrlInfo, VOS_UINT
     }
 
     pstMsgHeader = (CBT_MSG_HEAD_STRU *)pucData;
-    /*第一个字节固定为0x07(新CBT码流格式的第一个字节). 老的建链消息以5555aaaa开始，将被拦截*/
+    /*????????????????0x07(??CBT????????????????????). ??????????????5555aaaa??????????????*/
     if (CBT_MSG_FIRST_BYTE != pstMsgHeader->ucSid)
     {
         pstCtrlInfo->stPcToUeErrRecord.usDatatypeErr++;
@@ -340,7 +340,7 @@ VOS_UINT32 CBT_AcpuMsgCombine(CBT_RCV_CHAN_CTRL_INFO_STRU *pstCtrlInfo, VOS_UINT
     ulTimeStampL   = pstMsgHeader->stTimeStamp.ulTimestampL;
     usTimeStampH   = pstMsgHeader->stTimeStamp.usTimestampH;
 
-    /*不分段*/
+    /*??????*/
     if (0 == ucFragFlag)
     {
         ucCurrentSegSn = 0;
@@ -381,7 +381,7 @@ VOS_UINT32 CBT_AcpuMsgCombine(CBT_RCV_CHAN_CTRL_INFO_STRU *pstCtrlInfo, VOS_UINT
         pstAppCbtMsg = (CBT_UNIFORM_MSG_STRU *)pucData;
         pstCombineInfo->ulTotalMsgLen = pstAppCbtMsg->ulMsgLength + CBT_MSG_HEADER_LENGTH + CBT_MSG_IDLEN_LENGTH;
 
-        /* 组包完成后判断是否大于阈值*/
+        /* ??????????????????????????*/
         if (CBT_TOTAL_MSG_MAX_LEN < pstCombineInfo->ulTotalMsgLen)
         {
             pstCtrlInfo->stPcToUeErrRecord.usMsgTooLongErr++;
@@ -391,7 +391,7 @@ VOS_UINT32 CBT_AcpuMsgCombine(CBT_RCV_CHAN_CTRL_INFO_STRU *pstCtrlInfo, VOS_UINT
                         (VOS_INT32)pstCombineInfo->ulTotalMsgLen);
             /*lint +e534*/
 
-            /* 底软最大支持保存1024字节的内容，底软没有提供宏，这里直接使用数字 */
+            /* ????????????????1024???????????????????????????????????????????? */
             VOS_ProtectionReboot(OAM_PC_LENGTH_TOO_BIG, (VOS_INT)pstCombineInfo->ulTotalMsgLen, 0, (VOS_CHAR *)pucData, 1024);
 
             return VOS_ERR;
@@ -410,11 +410,11 @@ VOS_UINT32 CBT_AcpuMsgCombine(CBT_RCV_CHAN_CTRL_INFO_STRU *pstCtrlInfo, VOS_UINT
             return VOS_ERR;
         }
 
-        /* 根据SSID查找到相应的PID */
+        /* ????SSID????????????PID */
         ulRslt = CBT_AcpuSsIdToPid(pstAppCbtMsg->stMsgHeader.stModemSsid.ucSsid, &(pstCombineInfo->pstWholeMsg)->ulReceiverPid);
         if (VOS_OK != ulRslt)
         {
-            /* 释放消息空间 */
+            /* ???????????? */
             if (VOS_OK != VOS_FreeMsg(PC_PID_TOOL, pstCombineInfo->pstWholeMsg))
             {
             }
@@ -442,7 +442,7 @@ VOS_UINT32 CBT_AcpuMsgCombine(CBT_RCV_CHAN_CTRL_INFO_STRU *pstCtrlInfo, VOS_UINT
         LogPrint2("CBT_AcpuMsgCombine: expected TransId is %d, current SN is %d.", (VOS_INT)pstCombineInfo->ulTransId, (VOS_INT)ulTransId);
         /*lint +e534*/
 
-        /* 释放消息空间 */
+        /* ???????????? */
         if (VOS_OK != VOS_FreeMsg(PC_PID_TOOL, pstCombineInfo->pstWholeMsg))
         {
         }
@@ -462,7 +462,7 @@ VOS_UINT32 CBT_AcpuMsgCombine(CBT_RCV_CHAN_CTRL_INFO_STRU *pstCtrlInfo, VOS_UINT
         LogPrint("CBT_AcpuMsgCombine: expected TimeStamp is inCorrect.");
         /*lint +e534*/
 
-        /* 释放消息空间 */
+        /* ???????????? */
         if (VOS_OK != VOS_FreeMsg(PC_PID_TOOL, pstCombineInfo->pstWholeMsg))
         {
         }
@@ -482,7 +482,7 @@ VOS_UINT32 CBT_AcpuMsgCombine(CBT_RCV_CHAN_CTRL_INFO_STRU *pstCtrlInfo, VOS_UINT
         LogPrint2("CBT_AcpuMsgCombine: expected SN is %d, current SN is %d.", (VOS_INT)pstCombineInfo->ucExpectedSegSn, (VOS_INT)ucCurrentSegSn);
         /*lint +e534*/
 
-        /* 释放消息空间 */
+        /* ???????????? */
         if (VOS_OK != VOS_FreeMsg(PC_PID_TOOL, pstCombineInfo->pstWholeMsg))
         {
         }
@@ -502,7 +502,7 @@ VOS_UINT32 CBT_AcpuMsgCombine(CBT_RCV_CHAN_CTRL_INFO_STRU *pstCtrlInfo, VOS_UINT
         LogPrint("CBT_AcpuMsgCombine: The length of the packet is biger than the size of allocated memory.\n");
         /*lint +e534*/
 
-        /* 释放消息空间 */
+        /* ???????????? */
         if (VOS_OK != VOS_FreeMsg(PC_PID_TOOL, pstCombineInfo->pstWholeMsg))
         {
         }
@@ -537,18 +537,18 @@ VOS_UINT32 CBT_AcpuMsgCombine(CBT_RCV_CHAN_CTRL_INFO_STRU *pstCtrlInfo, VOS_UINT
     return VOS_OK;
 }
 /*****************************************************************************
- 函 数 名  : CBT_AcpuRcvData
- 功能描述  : ACPU接收CBT通道上的数据
- 输入参数  : pucData:   需要发送的数据内容
-             ulSize: 数据长度
-             pucRBData:回卷数据内容
-             ulRBSize:回卷数据大小
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
- 修改历史  :
-   1.日    期  : 2015年3月2日
-     作    者  : x00263027
-     修改内容  : Creat Function
+ ?? ?? ??  : CBT_AcpuRcvData
+ ????????  : ACPU????CBT????????????
+ ????????  : pucData:   ??????????????????
+             ulSize: ????????
+             pucRBData:????????????
+             ulRBSize:????????????
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+   1.??    ??  : 2015??3??2??
+     ??    ??  : x00263027
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_UINT32 CBT_AcpuRcvData(VOS_UINT8 *pucData, VOS_UINT32 ulSize)
 {
@@ -556,23 +556,23 @@ VOS_UINT32 CBT_AcpuRcvData(VOS_UINT8 *pucData, VOS_UINT32 ulSize)
 }
 
 /*****************************************************************************
- 函 数 名  : CBT_AcpuSendSegData
- 功能描述  : 将CBT相关消息经HDLC封装后调接口发走
- 输入参数  : pucSrc:指向待发送校准数据
-             usSrcLen:数据长度
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
- 修改历史  :
-   1.日    期   : 2015年3月2日
-     作    者   : x00263027
-     修改内容   : creat
+ ?? ?? ??  : CBT_AcpuSendSegData
+ ????????  : ??CBT??????????HDLC????????????????
+ ????????  : pucSrc:??????????????????
+             usSrcLen:????????
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+   1.??    ??   : 2015??3??2??
+     ??    ??   : x00263027
+     ????????   : creat
 *****************************************************************************/
 VOS_UINT32 CBT_AcpuSendSegData(VOS_UINT8 * pucSrc, VOS_UINT16 usSrcLen)
 {
     VOS_UINT16                         usHdlcEncLen;
     VOS_UINT32                         ulResult;
 
-    /*进行互斥操作*/
+    /*????????????*/
     if ( VOS_OK != VOS_SmP(g_ulTxCbtSem, OM_PV_TIMEOUT) )
     {
         /*lint -e534*/
@@ -582,7 +582,7 @@ VOS_UINT32 CBT_AcpuSendSegData(VOS_UINT8 * pucSrc, VOS_UINT16 usSrcLen)
         return VOS_ERR;
     }
 
-    /* 做HDLC编码 */
+    /* ??HDLC???? */
     if ( VOS_OK != Om_HdlcEncap(pucSrc,
                                 usSrcLen,
                                 g_stCbtHdlcEncodeBuf.pucBuf,
@@ -608,8 +608,8 @@ VOS_UINT32 CBT_AcpuSendSegData(VOS_UINT8 * pucSrc, VOS_UINT16 usSrcLen)
 /*****************************************************************************
  Prototype      : CBT_AcpuSendData
  Description    : CBT sends the data to tool side.
- Input          : pstMsg      - 待发送数据.
-                  usMsgLen    - 数据长度.
+ Input          : pstMsg      - ??????????.
+                  usMsgLen    - ????????.
  Output         : void
  Return Value   : VOS_OK - Success.
 
@@ -620,25 +620,25 @@ VOS_UINT32 CBT_AcpuSendSegData(VOS_UINT8 * pucSrc, VOS_UINT16 usSrcLen)
  *****************************************************************************/
 VOS_UINT32 CBT_AcpuSendData(CBT_UNIFORM_MSG_STRU * pstMsg, VOS_UINT16 usMsgLen)
 {
-    VOS_UINT8                           ucCurSegNum = 0; /*当前段序号*/
+    VOS_UINT8                           ucCurSegNum = 0; /*??????????*/
     VOS_UINT_PTR                        ulTempAddress;
-    VOS_UINT8                           ucMsgCnt    = 1; /*分段的数量*/
+    VOS_UINT8                           ucMsgCnt    = 1; /*??????????*/
 
     VOS_UINT8                          *pucBuf = VOS_NULL_PTR;
     VOS_UINT8                          *pucTmpBuf;
 
-    /*如果没有建链 并且不是 建链消息的CNF 则直接返回*/
+    /*???????????? ???????? ??????????CNF ??????????*/
     if ((CBT_STATE_IDLE == g_stAcpuCbtCtrlInfo.ulCbtSwitchOnOff)
      && (OM_APP_ESTABLISH_CNF != pstMsg->usMsgId))
     {
         return VOS_OK;
     }
 
-    /************************ 拆包然后hdlc编码后发送 ***********************/
-    /* 计算分包个数 */
+    /************************ ????????hdlc?????????? ***********************/
+    /* ???????????? */
     ucMsgCnt = (VOS_UINT8)((usMsgLen - CBT_MSG_HEADER_LENGTH + (CBT_MSG_CONTEXT_MAX_LENGTH - 1))/(CBT_MSG_CONTEXT_MAX_LENGTH));
 
-    /*分配分包结构的内存空间*/
+    /*??????????????????????*/
     pucTmpBuf = (VOS_UINT8*)VOS_MemAlloc(PC_PID_TOOL,
                 DYNAMIC_MEM_PT, CBT_MSG_SEGMENT_LEN + CBT_RL_DATATYPE_LEN);
 
@@ -650,20 +650,20 @@ VOS_UINT32 CBT_AcpuSendData(CBT_UNIFORM_MSG_STRU * pstMsg, VOS_UINT16 usMsgLen)
         return VOS_ERR;
     }
 
-    /*TransId 和 时间戳*/
+    /*TransId ?? ??????*/
     pstMsg->stMsgHeader.ulTransId                = g_ulCbtMsgSN++;
     pstMsg->stMsgHeader.stTimeStamp.ulTimestampL = VOS_GetSlice();
     pstMsg->stMsgHeader.stTimeStamp.usTimestampH = 0;
     pstMsg->stMsgHeader.stMsgSegment.ucFragFlag  = 0;
 
-    /* 每包需要添加一字节datatype*/
+    /* ??????????????????datatype*/
     pucTmpBuf[0] = 0x01;
     pucBuf = pucTmpBuf + CBT_RL_DATATYPE_LEN;
 
     ulTempAddress = (VOS_UINT_PTR)pstMsg + CBT_MSG_HEADER_LENGTH;
     usMsgLen -= CBT_MSG_HEADER_LENGTH;
 
-    /* 大于最大分包大小的数据，按照最大分包大小进行数据发送的处理 */
+    /* ?????????????????????????????????????????????????????????? */
     for (ucCurSegNum = 0; ucCurSegNum < ucMsgCnt-1; ucCurSegNum++)
     {
         pstMsg->stMsgHeader.stMsgSegment.ucFragIndex = ucCurSegNum;
@@ -676,7 +676,7 @@ VOS_UINT32 CBT_AcpuSendData(CBT_UNIFORM_MSG_STRU * pstMsg, VOS_UINT16 usMsgLen)
         /*lint +e534*/
         ulTempAddress += CBT_MSG_SEGMENT_LEN - CBT_MSG_HEADER_LENGTH;
 
-        /* 消息头前加上长度并调用USB接口发送出去 */
+        /* ??????????????????????USB???????????? */
         if (VOS_OK != CBT_AcpuSendSegData(pucTmpBuf, CBT_RL_DATATYPE_LEN + CBT_MSG_SEGMENT_LEN))
         {
             /*lint -e534*/
@@ -688,7 +688,7 @@ VOS_UINT32 CBT_AcpuSendData(CBT_UNIFORM_MSG_STRU * pstMsg, VOS_UINT16 usMsgLen)
 
         pucBuf = pucTmpBuf + CBT_RL_DATATYPE_LEN;
 
-        /* 计算剩余数据包大小 */
+        /* ?????????????????? */
         usMsgLen -= (CBT_MSG_SEGMENT_LEN - CBT_MSG_HEADER_LENGTH);
     }
 
@@ -700,7 +700,7 @@ VOS_UINT32 CBT_AcpuSendData(CBT_UNIFORM_MSG_STRU * pstMsg, VOS_UINT16 usMsgLen)
     VOS_MemCpy(pucBuf + CBT_MSG_HEADER_LENGTH, (VOS_UINT8*)ulTempAddress, usMsgLen);
     /*lint +e534*/
 
-    /* 消息头前加上长度并调用USB接口发送出去 */
+    /* ??????????????????????USB???????????? */
     if ( VOS_OK != CBT_AcpuSendSegData(pucTmpBuf, CBT_RL_DATATYPE_LEN + usMsgLen + CBT_MSG_HEADER_LENGTH))
     {
         /*lint -e534*/
@@ -721,7 +721,7 @@ VOS_VOID CBT_AcpuResetMsgHead(CBT_UNIFORM_MSG_STRU * pstCbtMsg)
     pstCbtMsg->stMsgHeader.ucSid = 0x07;
     pstCbtMsg->stMsgHeader.ucSessionID = 0x01;
 
-    /*分段信息*/
+    /*????????*/
     pstCbtMsg->stMsgHeader.stMsgSegment.ucMsgType = CBT_MT_CNF;
     pstCbtMsg->stMsgHeader.stMsgSegment.ucFragIndex = 0;
     pstCbtMsg->stMsgHeader.stMsgSegment.ucEof = 1;
@@ -774,17 +774,17 @@ VOS_VOID CBT_AcpuSendContentChannel(CBT_MODEM_SSID_STRU stModemSsid, CBT_COMPONE
 
 
 /*****************************************************************************
- 函 数 名  : CBT_AcpuRcvSucShow
- 功能描述  : 打印数据从PC侧发往UE侧时正常处理的数据
- 输入参数  :
- 输出参数  :
- 返 回 值  :
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2015年3月16日
-     作    者  : x00263027
-     修改内容  : Creat Function
+ ?? ?? ??  : CBT_AcpuRcvSucShow
+ ????????  : ??????????PC??????UE??????????????????
+ ????????  :
+ ????????  :
+ ?? ?? ??  :
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2015??3??16??
+     ??    ??  : x00263027
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_VOID CBT_AcpuRcvSucShow(VOS_VOID)
 {
@@ -821,17 +821,17 @@ VOS_VOID CBT_AcpuRcvSucShow(VOS_VOID)
 }
 
 /*****************************************************************************
- 函 数 名  : CBT_AcpuRcvErrShow
- 功能描述  : 打印数据从PC侧发往UE侧时异常数据
- 输入参数  :
- 输出参数  :
- 返 回 值  :
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2015年3月016日
-     作    者  : x00263027
-     修改内容  : Creat Function
+ ?? ?? ??  : CBT_AcpuRcvErrShow
+ ????????  : ??????????PC??????UE????????????
+ ????????  :
+ ????????  :
+ ?? ?? ??  :
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2015??3??016??
+     ??    ??  : x00263027
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_VOID CBT_AcpuRcvErrShow(VOS_VOID)
 {
@@ -889,17 +889,17 @@ VOS_VOID CBT_AcpuRcvErrShow(VOS_VOID)
 }
 
 /*****************************************************************************
- 函 数 名  : CBT_OpenLog
- 功能描述  : 打印当前OM通道的状态
- 输入参数  :
- 输出参数  :
- 返 回 值  :
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2015年11月18日
-     作    者  : j00334311
-     修改内容  : Creat Function
+ ?? ?? ??  : CBT_OpenLog
+ ????????  : ????????OM??????????
+ ????????  :
+ ????????  :
+ ?? ?? ??  :
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2015??11??18??
+     ??    ??  : j00334311
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_VOID CBT_AcpuOpenLog(VOS_UINT32 ulFlag)
 {

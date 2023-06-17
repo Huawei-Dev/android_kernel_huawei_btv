@@ -57,7 +57,7 @@ extern "C" {
 #pragma pack(4)
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "vos.h"
 #include "AtRnicInterface.h"
@@ -73,12 +73,12 @@ extern "C" {
 #include "RnicSndMsg.h"
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
 
 /*lint -e778 */
 /*lint -e572 */
-#ifndef VOS_NTOHL                   /* 大小字节序转换*/
+#ifndef VOS_NTOHL                   /* ??????????????*/
 #if VOS_BYTE_ORDER==VOS_BIG_ENDIAN
 #define VOS_NTOHL(x)    (x)
 #define VOS_HTONL(x)    (x)
@@ -109,7 +109,7 @@ extern "C" {
 #define RNIC_NETIF_RX_NI                 (1)
 
 #if (defined(CONFIG_BALONG_SPE))
-/* 设置SPE端口参数 */
+/* ????SPE???????? */
 /*lint -emacro({717}, RNIC_SET_SPE_PORT_ATTR)*/
 #define RNIC_SET_SPE_PORT_ATTR(pstAttr,pstNetDev,ulTdNum,ulRdNum)\
             do\
@@ -164,73 +164,73 @@ extern "C" {
 #endif
 
 /*******************************************************************************
-  3 枚举定义
+  3 ????????
 *******************************************************************************/
 
 /*********************************************
- 枚举名   :RNIC_RESULT_TYPE_ENUM
- 枚举说明 :RNIC函数返回值枚举类型
- 1.日    期   : 2011年12月08日
-   作    者   : f00179208
-   修改内容   : 新建
+ ??????   :RNIC_RESULT_TYPE_ENUM
+ ???????? :RNIC??????????????????
+ 1.??    ??   : 2011??12??08??
+   ??    ??   : f00179208
+   ????????   : ????
 *********************************************/
 enum RNIC_RESULT_TYPE_ENUM
 {
-    RNIC_OK             = 0,                                                    /* 正常返回 */
-    RNIC_NOTSTARTED     = 1,                                                    /* 未开始 */
-    RNIC_INPROGRESS     = 2,                                                    /* 运行中 */
+    RNIC_OK             = 0,                                                    /* ???????? */
+    RNIC_NOTSTARTED     = 1,                                                    /* ?????? */
+    RNIC_INPROGRESS     = 2,                                                    /* ?????? */
     RNIC_PERM           = 3,
     RNIC_NOENT          = 4,
     RNIC_IO             = 5,
     RNIC_NXIO           = 6,
-    RNIC_NOMEM          = 7,                                                    /* 未申请到内存 */                                                    /* 未申请到内存 */
-    RNIC_BUSY           = 8,                                                    /* RNIC网卡设备忙 */
-    RNIC_NODEV          = 9,                                                    /* 无设备 */
-    RNIC_INVAL          = 10,                                                   /* 非法设备 */
-    RNIC_NOTSUPP        = 11,                                                   /* 操作不支持 */
-    RNIC_TIMEDOUT       = 12,                                                   /* 超时 */
-    RNIC_SUSPENDED      = 13,                                                   /* 挂起 */
-    RNIC_UNKNOWN        = 14,                                                   /* 未知错误 */
-    RNIC_TEST_FAILED    = 15,                                                   /* 测试失败 */
-    RNIC_STATE          = 16,                                                   /* 状态错误 */
-    RNIC_STALLED        = 17,                                                   /* 失速 */
-    RNIC_PARAM          = 18,                                                   /* 参数错误 */
-    RNIC_ABORTED        = 19,                                                   /* 请求取消 */
-    RNIC_SHORT          = 20,                                                   /* 资源不足 */
-    RNIC_EXPIRED        = 21,                                                   /* 溢出 */
+    RNIC_NOMEM          = 7,                                                    /* ???????????? */                                                    /* ???????????? */
+    RNIC_BUSY           = 8,                                                    /* RNIC?????????? */
+    RNIC_NODEV          = 9,                                                    /* ?????? */
+    RNIC_INVAL          = 10,                                                   /* ???????? */
+    RNIC_NOTSUPP        = 11,                                                   /* ?????????? */
+    RNIC_TIMEDOUT       = 12,                                                   /* ???? */
+    RNIC_SUSPENDED      = 13,                                                   /* ???? */
+    RNIC_UNKNOWN        = 14,                                                   /* ???????? */
+    RNIC_TEST_FAILED    = 15,                                                   /* ???????? */
+    RNIC_STATE          = 16,                                                   /* ???????? */
+    RNIC_STALLED        = 17,                                                   /* ???? */
+    RNIC_PARAM          = 18,                                                   /* ???????? */
+    RNIC_ABORTED        = 19,                                                   /* ???????? */
+    RNIC_SHORT          = 20,                                                   /* ???????? */
+    RNIC_EXPIRED        = 21,                                                   /* ???? */
 
-    RNIC_ADDR_INVALID   = 22,                                                   /* 无法分配地址 */
-    RNIC_OUT_RANGE      = 23,                                                   /* 不在有效范围内 */
-    RNIC_PKT_TYPE_INVAL = 24,                                                   /* 无效ip类型 */
-    RNIC_ADDMAC_FAIL    = 25,                                                   /* 添加mac头失败 */
-    RNIC_RX_PKT_FAIL    = 26,                                                   /* 调用内核接口接收数据失败 */
-    RNIC_ERROR          = 0xff,                                                 /* RNIC返回失败 */
+    RNIC_ADDR_INVALID   = 22,                                                   /* ???????????? */
+    RNIC_OUT_RANGE      = 23,                                                   /* ?????????????? */
+    RNIC_PKT_TYPE_INVAL = 24,                                                   /* ????ip???? */
+    RNIC_ADDMAC_FAIL    = 25,                                                   /* ????mac?????? */
+    RNIC_RX_PKT_FAIL    = 26,                                                   /* ???????????????????????? */
+    RNIC_ERROR          = 0xff,                                                 /* RNIC???????? */
     RNIC_BUTT
 };
 typedef VOS_INT32 RNIC_RESULT_TYPE_ENUM_INT32;
 
 /*****************************************************************************
-  4 全局变量声明
+  4 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  5 消息头定义
+  5 ??????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 消息定义
+  6 ????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  7 STRUCT定义
+  7 STRUCT????
 *****************************************************************************/
 
 /*****************************************************************************
- 结构名称  : RNIC_SPE_MEM_CB_STRU
- 结构说明  : SPE MEM CB结构
+ ????????  : RNIC_SPE_MEM_CB_STRU
+ ????????  : SPE MEM CB????
 *****************************************************************************/
 typedef struct
 {
@@ -240,12 +240,12 @@ typedef struct
 
 
 /*****************************************************************************
-  8 UNION定义
+  8 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  9 OTHERS定义
+  9 OTHERS????
 *****************************************************************************/
 
 /*lint -e762*/
@@ -255,7 +255,7 @@ extern int netif_rx_ni(struct sk_buff *skb);
 
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 #if (FEATURE_ON == FEATURE_IMS)
 VOS_VOID RNIC_ProcVoWifiULData(
@@ -278,7 +278,7 @@ VOS_VOID RNIC_SendULIpv6Data(
     RNIC_SPEC_CTX_STRU                 *pstNetCntxt
 );
 
-/* Modified by m00217266 for L-C互操作项目, 2014-01-06, Begin */
+/* Modified by m00217266 for L-C??????????, 2014-01-06, Begin */
 VOS_UINT32 RNIC_SendDlData(
     RNIC_RMNET_ID_ENUM_UINT8            enRmNetId,
     IMM_ZC_STRU                        *pstData,
@@ -298,7 +298,7 @@ VOS_UINT32  RNIC_RcvAdsDlData(
     ADS_PKT_TYPE_ENUM_UINT8             enPktType,
     VOS_UINT32                          ucExParam
 );
-/* Modified by m00217266 for L-C互操作项目, 2014-01-06, End */
+/* Modified by m00217266 for L-C??????????, 2014-01-06, End */
 
 VOS_VOID RNIC_RcvInsideModemUlData(
     struct sk_buff                     *pstSkb,

@@ -46,34 +46,6 @@
  *
  */
 
-/*****************************************************************************/
-/*                                                                           */
-/*                Copyright 1999 - 2003, Huawei Tech. Co., Ltd.              */
-/*                           ALL RIGHTS RESERVED                             */
-/*                                                                           */
-/* FileName: v_sem.h                                                         */
-/*                                                                           */
-/* Author: Yang Xiangqian                                                    */
-/*                                                                           */
-/* Version: 1.0                                                              */
-/*                                                                           */
-/* Date: 2006-10                                                             */
-/*                                                                           */
-/* Description: implement semaphore                                          */
-/*                                                                           */
-/* Others:                                                                   */
-/*                                                                           */
-/* History:                                                                  */
-/* 1. Date:                                                                  */
-/*    Author:                                                                */
-/*    Modification: Create this file                                         */
-/*                                                                           */
-/* 2. Date: 2006-10                                                          */
-/*    Author: Xu Cheng                                                       */
-/*    Modification: Standardize code                                         */
-/*                                                                           */
-/*****************************************************************************/
-
 #ifndef _VOS_SEM_H
 #define _VOS_SEM_H
 
@@ -86,7 +58,6 @@ extern "C" {
 #include "v_typdef.h"
 #include "vos_config.h"
 
-/* errno definiens */
 #define VOS_ERRNO_SEMA4_CCREATE_NAME_NULL                   0x2002005A
 #define VOS_ERRNO_SEMA4_CCREATE_INVALID_SMID                0x20020001
 #define VOS_ERRNO_SEMA4_CCREATE_FLAG_ERR                    0x20020002
@@ -110,43 +81,32 @@ extern "C" {
 
 #define VOS_ERRNO_SEMA4_FULL                                0x2002FFFF
 
-
-
 #define VOS_SEMA4_FIFO                                      0x00000001
 #define VOS_SEMA4_PRIOR                                     0x00000002
 #define VOS_SEMA4_DELETE_SAFE                               0x00000004
 #define VOS_SEMA4_INVERSION_SAFE                            0x00000008
 #define VOS_SEMA4_GLOBAL                                    0x00000010
 
-/**
- * 二进制信号量空闲状态，互斥型信号量初始计数值。
- */
 #define VOS_SEM_FULL                                        (1)
 
-/**
- * 二进制信号量占用状态，同步型信号量初始计数值。
- */
 #define VOS_SEM_EMPTY                                       (0)
 
-/* the state of control block */
 #define VOS_SEM_CTRL_BLK_IDLE                               0
 #define VOS_SEM_CTRL_BLK_BUSY                               1
 
-/* errno define */
 #define VOS_MAX_SEM_ID_NULL                                 VOS_NULL_PTR
 
 #define VOS_MAX_SEM_NAME_LENGTH                             8
 
-/* define SEM's type */
 #define VOS_SEM_TYPE_COUNT                                  0
 #define VOS_SEM_TYPE_BINARY                                 1
 #define VOS_SEM_TYPE_MUTEX                                  2
 
 #if (VOS_WIN32 == VOS_OS_VER)
-/* the Max Sem number supported by VOS */
+
 #define VOS_MAX_SEM_NUMBER                                  465
 #else
-/* the Max Sem number supported by VOS */
+
 #define VOS_MAX_SEM_NUMBER                                  365
 #endif
 

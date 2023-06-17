@@ -73,23 +73,23 @@ extern "C" {
 *****************************************************************************/
 enum NVIM_TDS_FREQ_BAND_LIST_ENUM
 {
-    ID_NVIM_TDS_FREQ_BAND_A         = 0x01,         /* 频点范围: 9504~9596  10054~10121 */
-    ID_NVIM_TDS_FREQ_BAND_B         = 0x02,         /* 频点范围: 9254~9546  9654~9946 */
-    ID_NVIM_TDS_FREQ_BAND_C         = 0x04,         /* 频点范围: 9554~9646 */
-    ID_NVIM_TDS_FREQ_BAND_D         = 0x08,         /* 频点范围: 12854~13096 */
-    ID_NVIM_TDS_FREQ_BAND_E         = 0x10,         /* 频点范围: 11504~11996 */
-    ID_NVIM_TDS_FREQ_BAND_F         = 0x20,         /* 频点范围: 9404~9596 */
+    ID_NVIM_TDS_FREQ_BAND_A         = 0x01,         /* ????????: 9504~9596  10054~10121 */
+    ID_NVIM_TDS_FREQ_BAND_B         = 0x02,         /* ????????: 9254~9546  9654~9946 */
+    ID_NVIM_TDS_FREQ_BAND_C         = 0x04,         /* ????????: 9554~9646 */
+    ID_NVIM_TDS_FREQ_BAND_D         = 0x08,         /* ????????: 12854~13096 */
+    ID_NVIM_TDS_FREQ_BAND_E         = 0x10,         /* ????????: 11504~11996 */
+    ID_NVIM_TDS_FREQ_BAND_F         = 0x20,         /* ????????: 9404~9596 */
     ID_NVIM_TDS_FREQ_BAND_BUTT
 };
 typedef VOS_UINT8  NVIM_TDS_FREQ_BAND_LIST_ENUM_UINT8;
 
 /*****************************************************************************
- 枚 举 名  : NVIM_BAND_IND
- 枚举说明  : NV的BAND指示
- 修改历史  :
-  1.日  期   : 2015年9月14日
-    作  者   : s00184266
-    修改内容 : 新生成枚举
+ ?? ?? ??  : NVIM_BAND_IND
+ ????????  : NV??BAND????
+ ????????  :
+  1.??  ??   : 2015??9??14??
+    ??  ??   : s00184266
+    ???????? : ??????????
 
 *****************************************************************************/
 enum NVIM_BAND_IND_ENUM
@@ -108,13 +108,13 @@ typedef VOS_UINT8 NVIM_BAND_IND_ENUM_UINT8;
 *****************************************************************************/
 /*****************************************************************************
 *                                                                            *
-*                           参数设置消息结构                                 *
+*                           ????????????????                                 *
 *                                                                            *
 ******************************************************************************/
 
 /*****************************************************************************
- 结构名    : NVIM_ULTRA_CLASSMARK_STRU
- 结构说明  : en_NV_Item_Ultra_Classmark 结构
+ ??????    : NVIM_ULTRA_CLASSMARK_STRU
+ ????????  : en_NV_Item_Ultra_Classmark ????
 *****************************************************************************/
 typedef struct
 {
@@ -122,8 +122,8 @@ typedef struct
 }NVIM_ULTRA_CLASSMARK_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_MULTIRATE_FLAG_STRU
- 结构说明  : en_NV_Item_Gas_MultiRateFlag 结构
+ ??????    : NVIM_GAS_MULTIRATE_FLAG_STRU
+ ????????  : en_NV_Item_Gas_MultiRateFlag ????
 *****************************************************************************/
 typedef struct
 {
@@ -132,8 +132,8 @@ typedef struct
 }NVIM_GAS_MULTIRATE_FLAG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_BAND_PWR_STRU
- 结构说明  : en_NV_Item_Band_Pwr 结构
+ ??????    : NVIM_BAND_PWR_STRU
+ ????????  : en_NV_Item_Band_Pwr ????
 *****************************************************************************/
 typedef struct
 {
@@ -141,8 +141,8 @@ typedef struct
 }NVIM_BAND_PWR_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_VGCS_FLAG_STRU
- 结构说明  : en_NV_Item_Vgcs_Flag 结构
+ ??????    : NVIM_VGCS_FLAG_STRU
+ ????????  : en_NV_Item_Vgcs_Flag ????
 *****************************************************************************/
 typedef struct
 {
@@ -151,8 +151,8 @@ typedef struct
 }NVIM_VGCS_FLAG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_EGPRS_MULTI_SLOT_CLASS_STRU
- 结构说明  : en_NV_Item_Egprs_Multi_Slot_Class 结构
+ ??????    : NVIM_EGPRS_MULTI_SLOT_CLASS_STRU
+ ????????  : en_NV_Item_Egprs_Multi_Slot_Class ????
 *****************************************************************************/
 typedef struct
 {
@@ -161,8 +161,8 @@ typedef struct
 }NVIM_EGPRS_MULTI_SLOT_CLASS_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_CLASSMARK1_STRU
- 结构说明  : en_NV_Item_Gsm_Classmark1 结构
+ ??????    : NVIM_GSM_CLASSMARK1_STRU
+ ????????  : en_NV_Item_Gsm_Classmark1 ????
 *****************************************************************************/
 typedef struct
 {
@@ -171,8 +171,8 @@ typedef struct
 }NVIM_GSM_CLASSMARK1_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_CLASSMARK2_STRU
- 结构说明  : en_NV_Item_Gsm_Classmark2 结构
+ ??????    : NVIM_GSM_CLASSMARK2_STRU
+ ????????  : en_NV_Item_Gsm_Classmark2 ????
 *****************************************************************************/
 typedef struct
 {
@@ -180,8 +180,8 @@ typedef struct
 }NVIM_GSM_CLASSMARK2_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_CLASSMARK3_STRU
- 结构说明  : en_NV_Item_Gsm_Classmark3 结构
+ ??????    : NVIM_GSM_CLASSMARK3_STRU
+ ????????  : en_NV_Item_Gsm_Classmark3 ????
 *****************************************************************************/
 typedef struct
 {
@@ -189,8 +189,8 @@ typedef struct
 }NVIM_GSM_CLASSMARK3_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_IND_FREQ_STRU
- 结构说明  : en_NV_Item_Gsm_Ind_Freq 结构
+ ??????    : NVIM_GSM_IND_FREQ_STRU
+ ????????  : en_NV_Item_Gsm_Ind_Freq ????
 *****************************************************************************/
 typedef struct
 {
@@ -199,8 +199,8 @@ typedef struct
 }NVIM_GSM_IND_FREQ_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GCF_ITEM_STRU
- 结构说明  : en_NV_Item_GCF_Item 结构
+ ??????    : NVIM_GCF_ITEM_STRU
+ ????????  : en_NV_Item_GCF_Item ????
 *****************************************************************************/
 typedef struct
 {
@@ -208,8 +208,8 @@ typedef struct
 }NVIM_GCF_ITEM_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_G2W_RSSI_RSCP_OFFSET_STRU
- 结构说明  : en_NV_Item_G2W_RSSI_RSCP_OFFSET 结构
+ ??????    : NVIM_G2W_RSSI_RSCP_OFFSET_STRU
+ ????????  : en_NV_Item_G2W_RSSI_RSCP_OFFSET ????
 *****************************************************************************/
 typedef struct
 {
@@ -218,8 +218,8 @@ typedef struct
 }NVIM_G2W_RSSI_RSCP_OFFSET_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_BA_COUNT_STRU
- 结构说明  : en_NV_Item_GSM_Ba_Count 结构
+ ??????    : NVIM_GSM_BA_COUNT_STRU
+ ????????  : en_NV_Item_GSM_Ba_Count ????
 *****************************************************************************/
 typedef struct
 {
@@ -228,8 +228,8 @@ typedef struct
 }NVIM_GSM_BA_COUNT_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_BA_LIST_STRU
- 结构说明  : en_NV_Item_GSM_Ba_List 结构
+ ??????    : NVIM_GSM_BA_LIST_STRU
+ ????????  : en_NV_Item_GSM_Ba_List ????
 *****************************************************************************/
 typedef struct
 {
@@ -240,8 +240,8 @@ typedef struct
 }NVIM_GSM_BA_LIST_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_EGPRS_FLAG_STRU
- 结构说明  : en_NV_Item_Egprs_Flag 结构
+ ??????    : NVIM_EGPRS_FLAG_STRU
+ ????????  : en_NV_Item_Egprs_Flag ????
 *****************************************************************************/
 typedef struct
 {
@@ -250,8 +250,8 @@ typedef struct
 }NVIM_EGPRS_FLAG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_EGPRS_RA_CAPABILITY_STRU
- 结构说明  : en_NV_Item_EgprsRaCapability 结构
+ ??????    : NVIM_EGPRS_RA_CAPABILITY_STRU
+ ????????  : en_NV_Item_EgprsRaCapability ????
 *****************************************************************************/
 typedef struct
 {
@@ -261,8 +261,8 @@ typedef struct
 }NVIM_EGPRS_RA_CAPABILITY_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_PREFER_GSM_PLMN_COUNT_STRU
- 结构说明  : en_NV_Item_Prefer_GSM_PLMN_Count 结构
+ ??????    : NVIM_PREFER_GSM_PLMN_COUNT_STRU
+ ????????  : en_NV_Item_Prefer_GSM_PLMN_Count ????
 *****************************************************************************/
 typedef struct
 {
@@ -271,8 +271,8 @@ typedef struct
 }NVIM_PREFER_GSM_PLMN_COUNT_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_PREFER_GSM_PLMN_LIST_STRU
- 结构说明  : en_NV_Item_Prefer_GSM_PLMN_List 结构
+ ??????    : NVIM_PREFER_GSM_PLMN_LIST_STRU
+ ????????  : en_NV_Item_Prefer_GSM_PLMN_List ????
 *****************************************************************************/
 typedef struct
 {
@@ -280,8 +280,8 @@ typedef struct
 }NVIM_PREFER_GSM_PLMN_LIST_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_DEC_FAIL_ARFCN_COUNT_STRU
- 结构说明  : en_NV_Item_GSM_DEC_FAIL_ARFCN_Count 结构
+ ??????    : NVIM_GSM_DEC_FAIL_ARFCN_COUNT_STRU
+ ????????  : en_NV_Item_GSM_DEC_FAIL_ARFCN_Count ????
 *****************************************************************************/
 typedef struct
 {
@@ -290,8 +290,8 @@ typedef struct
 }NVIM_GSM_DEC_FAIL_ARFCN_COUNT_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_DEC_FAIL_ARFCN_LIST_STRU
- 结构说明  : en_NV_Item_GSM_DEC_FAIL_ARFCN_List 结构
+ ??????    : NVIM_GSM_DEC_FAIL_ARFCN_LIST_STRU
+ ????????  : en_NV_Item_GSM_DEC_FAIL_ARFCN_List ????
 *****************************************************************************/
 typedef struct
 {
@@ -299,8 +299,8 @@ typedef struct
 }NVIM_GSM_DEC_FAIL_ARFCN_LIST_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_PREFER_GSM_PLMN_SWITCH_STRU
- 结构说明  : en_NV_Item_Prefer_GSM_PLMN_Switch 结构
+ ??????    : NVIM_PREFER_GSM_PLMN_SWITCH_STRU
+ ????????  : en_NV_Item_Prefer_GSM_PLMN_Switch ????
 *****************************************************************************/
 typedef struct
 {
@@ -309,31 +309,31 @@ typedef struct
 }NVIM_PREFER_GSM_PLMN_SWITCH_STRU;
 
 /*****************************************************************************
- 结 构 名  : NVIM_PREFER_GSM_PLMN_CUSTOMIZE_CFG_STRU
- 结构说明  : 优选小区性能定制
- 修改历史  :
-  1.日  期   : 2015年9月9日
-    作  者   : s00184266
-    修改内容 : 新生成结构
+ ?? ?? ??  : NVIM_PREFER_GSM_PLMN_CUSTOMIZE_CFG_STRU
+ ????????  : ????????????????
+ ????????  :
+  1.??  ??   : 2015??9??9??
+    ??  ??   : s00184266
+    ???????? : ??????????
 
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucAgingEnable;                          /* 优选小区老化的NV使能 */
-    VOS_UINT8                           ucRsrv1;                                /* 保留位 */
-    VOS_UINT8                           ucRsrv2;                                /* 保留位 */
-    VOS_UINT8                           ucRsrv3;                                /* 保留位 */
-    VOS_INT16                           sDecFailedRssiThreshold;                /* 从优选小区列表中删除解码失败的RSSI门限 */
-    VOS_UINT16                          usRsrv1;                                /* 保留位 */
-    VOS_UINT16                          usRsrv2;                                /* 保留位 */
-    VOS_UINT16                          usRsrv3;                                /* 保留位 */
-    VOS_UINT32                          ulRsrv1;                                /* 保留位 */
-    VOS_UINT32                          ulRsrv2;                                /* 保留位 */
+    VOS_UINT8                           ucAgingEnable;                          /* ??????????????NV???? */
+    VOS_UINT8                           ucRsrv1;                                /* ?????? */
+    VOS_UINT8                           ucRsrv2;                                /* ?????? */
+    VOS_UINT8                           ucRsrv3;                                /* ?????? */
+    VOS_INT16                           sDecFailedRssiThreshold;                /* ??????????????????????????????RSSI???? */
+    VOS_UINT16                          usRsrv1;                                /* ?????? */
+    VOS_UINT16                          usRsrv2;                                /* ?????? */
+    VOS_UINT16                          usRsrv3;                                /* ?????? */
+    VOS_UINT32                          ulRsrv1;                                /* ?????? */
+    VOS_UINT32                          ulRsrv2;                                /* ?????? */
 }NVIM_PREFER_GSM_PLMN_CUSTOMIZE_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GERAN_FEATURE_PACKAGE1_STRU
- 结构说明  : en_NV_Item_Geran_Feature_Package1 结构
+ ??????    : NVIM_GERAN_FEATURE_PACKAGE1_STRU
+ ????????  : en_NV_Item_Geran_Feature_Package1 ????
 *****************************************************************************/
 typedef struct
 {
@@ -342,8 +342,8 @@ typedef struct
 }NVIM_GERAN_FEATURE_PACKAGE1_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_A5_STRU
- 结构说明  : en_NV_Item_Gsm_A5 结构
+ ??????    : NVIM_GSM_A5_STRU
+ ????????  : en_NV_Item_Gsm_A5 ????
 *****************************************************************************/
 typedef struct
 {
@@ -352,8 +352,8 @@ typedef struct
 }NVIM_GSM_A5_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_LOW_COST_EDGE_FLAG_STRU
- 结构说明  : en_NV_Item_LowCostEdge_Flag 结构
+ ??????    : NVIM_LOW_COST_EDGE_FLAG_STRU
+ ????????  : en_NV_Item_LowCostEdge_Flag ????
 *****************************************************************************/
 typedef struct
 {
@@ -362,8 +362,8 @@ typedef struct
 }NVIM_LOW_COST_EDGE_FLAG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GPRS_ACTIVE_TIMER_LENGTH_STRU
- 结构说明  : en_NV_Item_GPRS_ActiveTimerLength 结构
+ ??????    : NVIM_GPRS_ACTIVE_TIMER_LENGTH_STRU
+ ????????  : en_NV_Item_GPRS_ActiveTimerLength ????
 *****************************************************************************/
 typedef struct
 {
@@ -371,8 +371,8 @@ typedef struct
 }NVIM_GPRS_ACTIVE_TIMER_LENGTH_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GPRS_MULTI_SLOT_CLASS_STRU
- 结构说明  : en_Nv_Item_Gprs_Multi_Slot_Class 结构
+ ??????    : NVIM_GPRS_MULTI_SLOT_CLASS_STRU
+ ????????  : en_Nv_Item_Gprs_Multi_Slot_Class ????
 *****************************************************************************/
 typedef struct
 {
@@ -381,8 +381,8 @@ typedef struct
 }NVIM_GPRS_MULTI_SLOT_CLASS_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_PLMN_SEARCH_ARFCN_MAX_NUM_STRU
- 结构说明  : en_NV_Item_GSM_PLMN_SEARCH_ARFCN_MAX_NUM 结构
+ ??????    : NVIM_GSM_PLMN_SEARCH_ARFCN_MAX_NUM_STRU
+ ????????  : en_NV_Item_GSM_PLMN_SEARCH_ARFCN_MAX_NUM ????
 *****************************************************************************/
 typedef struct
 {
@@ -391,8 +391,8 @@ typedef struct
 }NVIM_GSM_PLMN_SEARCH_ARFCN_MAX_NUM_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GCBS_CONF_STRU
- 结构说明  : en_Nv_Item_GCBS_Conf 结构
+ ??????    : NVIM_GCBS_CONF_STRU
+ ????????  : en_Nv_Item_GCBS_Conf ????
 *****************************************************************************/
 typedef struct
 {
@@ -402,8 +402,8 @@ typedef struct
 }NVIM_GCBS_CONF_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_REPEATED_ACCH_CAPABILITY_STRU
- 结构说明  : en_NV_Item_Repeated_Acch_Capability 结构
+ ??????    : NVIM_REPEATED_ACCH_CAPABILITY_STRU
+ ????????  : en_NV_Item_Repeated_Acch_Capability ????
 *****************************************************************************/
 typedef struct
 {
@@ -413,8 +413,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : NVIM_ES_IND_STRU
- 结构说明  : en_NV_Item_ES_IND 结构
+ ??????    : NVIM_ES_IND_STRU
+ ????????  : en_NV_Item_ES_IND ????
 *****************************************************************************/
 typedef struct
 {
@@ -423,8 +423,8 @@ typedef struct
 }NVIM_ES_IND_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GPRS_EXTENDED_DYNAMIC_ALLOCATION_CAPABILITY_STRU
- 结构说明  : en_NV_Item_GPRS_Extended_Dynamic_Allocation_Capability 结构
+ ??????    : NVIM_GPRS_EXTENDED_DYNAMIC_ALLOCATION_CAPABILITY_STRU
+ ????????  : en_NV_Item_GPRS_Extended_Dynamic_Allocation_Capability ????
 *****************************************************************************/
 typedef struct
 {
@@ -433,8 +433,8 @@ typedef struct
 }NVIM_GPRS_EXTENDED_DYNAMIC_ALLOCATION_CAPABILITY_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_EGPRS_EXTENDED_DYNAMIC_ALLOCATION_CAPABILITY_STRU
- 结构说明  : en_NV_Item_EGPRS_Extended_Dynamic_Allocation_Capability 结构
+ ??????    : NVIM_EGPRS_EXTENDED_DYNAMIC_ALLOCATION_CAPABILITY_STRU
+ ????????  : en_NV_Item_EGPRS_Extended_Dynamic_Allocation_Capability ????
 *****************************************************************************/
 typedef struct
 {
@@ -443,8 +443,8 @@ typedef struct
 }NVIM_EGPRS_EXTENDED_DYNAMIC_ALLOCATION_CAPABILITY_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_REVISION_LEVEL_INDICATOR_STRU
- 结构说明  : en_NV_Item_Revision_Level_Indicator 结构
+ ??????    : NVIM_REVISION_LEVEL_INDICATOR_STRU
+ ????????  : en_NV_Item_Revision_Level_Indicator ????
 *****************************************************************************/
 typedef struct
 {
@@ -453,27 +453,27 @@ typedef struct
 }NVIM_REVISION_LEVEL_INDICATOR_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_REVISION_LEVEL_CUSTOMIZE_STRU
- 结构说明  : en_NV_Item_GAS_Revision_Level_Customization 结构
+ ??????    : NVIM_GAS_REVISION_LEVEL_CUSTOMIZE_STRU
+ ????????  : en_NV_Item_GAS_Revision_Level_Customization ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                            ucInterRatCustomizeFlag;       /* 异系统获取classmark2中的Revison level IE能力定制，
-                                                                           0:异系统获取能力不定制；
-                                                                           1:表示定制生效，异系统获取能力classmark2中Revison level固定填充R99或以后版本
+    VOS_UINT8                            ucInterRatCustomizeFlag;       /* ??????????classmark2????Revison level IE??????????
+                                                                           0:??????????????????????
+                                                                           1:????????????????????????????classmark2??Revison level????????R99??????????
                                                                         */
     
-    VOS_UINT8                            ucRsv1;                        /* 保留位1 */
+    VOS_UINT8                            ucRsv1;                        /* ??????1 */
     
-    VOS_UINT8                            ucRsv2;                        /* 保留位2 */
+    VOS_UINT8                            ucRsv2;                        /* ??????2 */
     
-    VOS_UINT8                            ucRsv3;                        /* 保留位3 */
+    VOS_UINT8                            ucRsv3;                        /* ??????3 */
 
 }NVIM_GAS_REVISION_LEVEL_CUSTOMIZE_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_DOWNLINK_ADVANCED_RECEIVER_PERFORMANCE_STRU
- 结构说明  : en_NV_Item_Downlink_Advanced_Receiver_Performance 结构
+ ??????    : NVIM_DOWNLINK_ADVANCED_RECEIVER_PERFORMANCE_STRU
+ ????????  : en_NV_Item_Downlink_Advanced_Receiver_Performance ????
 *****************************************************************************/
 typedef struct
 {
@@ -482,8 +482,8 @@ typedef struct
 }NVIM_DOWNLINK_ADVANCED_RECEIVER_PERFORMANCE_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_EXT_RLC_MAC_CTRL_MSG_SEGMENT_CAPABILITY_STRU
- 结构说明  : en_NV_Item_Ext_RLC_MAC_Ctrl_Msg_Segment_Capability 结构
+ ??????    : NVIM_EXT_RLC_MAC_CTRL_MSG_SEGMENT_CAPABILITY_STRU
+ ????????  : en_NV_Item_Ext_RLC_MAC_Ctrl_Msg_Segment_Capability ????
 *****************************************************************************/
 typedef struct
 {
@@ -492,8 +492,8 @@ typedef struct
 }NVIM_EXT_RLC_MAC_CTRL_MSG_SEGMENT_CAPABILITY_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_PS_HANDOVER_CAPABILITY_STRU
- 结构说明  : en_NV_Item_PS_Handover_Capability 结构
+ ??????    : NVIM_PS_HANDOVER_CAPABILITY_STRU
+ ????????  : en_NV_Item_PS_Handover_Capability ????
 *****************************************************************************/
 typedef struct
 {
@@ -502,8 +502,8 @@ typedef struct
 }NVIM_PS_HANDOVER_CAPABILITY_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_WEAK_SIGNAL_THREHOLD_STRU
- 结构说明  : en_NV_Item_GAS_Errorlog_Energy_Threshold 结构
+ ??????    : NVIM_GAS_WEAK_SIGNAL_THREHOLD_STRU
+ ????????  : en_NV_Item_GAS_Errorlog_Energy_Threshold ????
 *****************************************************************************/
 typedef struct
 {
@@ -512,8 +512,8 @@ typedef struct
 }NVIM_GAS_WEAK_SIGNAL_THREHOLD_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_MULTIRATE_CAP_STRU
- 结构说明  : en_NV_Item_GSM_Multirate_Capability 结构
+ ??????    : NVIM_GSM_MULTIRATE_CAP_STRU
+ ????????  : en_NV_Item_GSM_Multirate_Capability ????
 *****************************************************************************/
 typedef struct
 {
@@ -522,8 +522,8 @@ typedef struct
 }NVIM_GSM_MULTIRATE_CAP_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_CLASSMARK3_R8_STRU
- 结构说明  : en_NV_Item_Gsm_Classmark3_R8 结构
+ ??????    : NVIM_GSM_CLASSMARK3_R8_STRU
+ ????????  : en_NV_Item_Gsm_Classmark3_R8 ????
 *****************************************************************************/
 typedef struct
 {
@@ -531,8 +531,8 @@ typedef struct
 }NVIM_GSM_CLASSMARK3_R8_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_EUTRA_MEAS_AND_REPORTING_SUPPORT_FLG_STRU
- 结构说明  : en_NV_Item_EUTRA_MEAS_AND_REPORTING_SUPPORT_FLG 结构
+ ??????    : NVIM_EUTRA_MEAS_AND_REPORTING_SUPPORT_FLG_STRU
+ ????????  : en_NV_Item_EUTRA_MEAS_AND_REPORTING_SUPPORT_FLG ????
 *****************************************************************************/
 typedef struct
 {
@@ -541,8 +541,8 @@ typedef struct
 }NVIM_EUTRA_MEAS_AND_REPORTING_SUPPORT_FLG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_PRI_BASED_RESEL_SUPPORT_FLG_STRU
- 结构说明  : en_NV_Item_PRI_BASED_RESEL_SUPPORT_FLG 结构
+ ??????    : NVIM_PRI_BASED_RESEL_SUPPORT_FLG_STRU
+ ????????  : en_NV_Item_PRI_BASED_RESEL_SUPPORT_FLG ????
 *****************************************************************************/
 typedef struct
 {
@@ -551,8 +551,8 @@ typedef struct
 }NVIM_PRI_BASED_RESEL_SUPPORT_FLG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GERAN_TO_EUTRA_SUPPORT_IN_TRANSFER_MODE_STRU
- 结构说明  : en_NV_Item_GERAN_TO_EUTRA_SUPPORT_IN_TRANSFER_MODE 结构
+ ??????    : NVIM_GERAN_TO_EUTRA_SUPPORT_IN_TRANSFER_MODE_STRU
+ ????????  : en_NV_Item_GERAN_TO_EUTRA_SUPPORT_IN_TRANSFER_MODE ????
 *****************************************************************************/
 typedef struct
 {
@@ -561,8 +561,8 @@ typedef struct
 }NVIM_GERAN_TO_EUTRA_SUPPORT_IN_TRANSFER_MODE_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_UE_EUTRA_FREQ_BAND_INFO_STRU
- 结构说明  : 用于描述一个 LTE 频段
+ ??????    : NVIM_UE_EUTRA_FREQ_BAND_INFO_STRU
+ ????????  : ???????????? LTE ????
 *****************************************************************************/
 typedef struct
 {
@@ -572,8 +572,8 @@ typedef struct
 }NVIM_UE_EUTRA_FREQ_BAND_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_UE_EUTRA_SUPPORT_FREQ_BAND_LIST_STRU
- 结构说明  : en_NV_Item_EUTRA_CAPA_COMM_INFO 结构
+ ??????    : NVIM_UE_EUTRA_SUPPORT_FREQ_BAND_LIST_STRU
+ ????????  : en_NV_Item_EUTRA_CAPA_COMM_INFO ????
 *****************************************************************************/
 typedef struct
 {
@@ -583,8 +583,8 @@ typedef struct
 }NVIM_UE_EUTRA_SUPPORT_FREQ_BAND_LIST_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_HIGH_MULTISLOT_CLASS_STRU
- 结构说明  : en_NV_Item_GAS_High_Multislot_Class 结构
+ ??????    : NVIM_GAS_HIGH_MULTISLOT_CLASS_STRU
+ ????????  : en_NV_Item_GAS_High_Multislot_Class ????
 *****************************************************************************/
 typedef struct
 {
@@ -593,8 +593,8 @@ typedef struct
 }NVIM_GAS_HIGH_MULTISLOT_CLASS_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GPRS_NON_DRX_TIMER_LENGTH_STRU
- 结构说明  : en_NV_Item_GPRS_Non_Drx_Timer_Length 结构
+ ??????    : NVIM_GPRS_NON_DRX_TIMER_LENGTH_STRU
+ ????????  : en_NV_Item_GPRS_Non_Drx_Timer_Length ????
 *****************************************************************************/
 typedef struct
 {
@@ -603,8 +603,8 @@ typedef struct
 }NVIM_GPRS_NON_DRX_TIMER_LENGTH_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_UE_TDS_SUPPORT_FREQ_BAND_LIST_STRU
- 结构说明  : en_NV_Item_UTRAN_TDD_FREQ_BAND 结构
+ ??????    : NVIM_UE_TDS_SUPPORT_FREQ_BAND_LIST_STRU
+ ????????  : en_NV_Item_UTRAN_TDD_FREQ_BAND ????
 *****************************************************************************/
 typedef struct
 {
@@ -614,8 +614,8 @@ typedef struct
 }NVIM_UE_TDS_SUPPORT_FREQ_BAND_LIST_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_QSEARCH_CUSTOMIZATION_STRU
- 结构说明  : en_NV_Item_QSearch_Customization 结构
+ ??????    : NVIM_QSEARCH_CUSTOMIZATION_STRU
+ ????????  : en_NV_Item_QSearch_Customization ????
 *****************************************************************************/
 typedef struct
 {
@@ -624,8 +624,8 @@ typedef struct
 }NVIM_QSEARCH_CUSTOMIZATION_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_POOR_RXQUAL_THRESHOLD_STRU
- 结构说明  : en_NV_Item_Gsm_Poor_RxQual_ThresHold 结构
+ ??????    : NVIM_GSM_POOR_RXQUAL_THRESHOLD_STRU
+ ????????  : en_NV_Item_Gsm_Poor_RxQual_ThresHold ????
 *****************************************************************************/
 typedef struct
 {
@@ -634,8 +634,8 @@ typedef struct
 }NVIM_GSM_POOR_RXQUAL_THRESHOLD_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_CSFB_CUSTOMIZATION_STRU
- 结构说明  : en_NV_Item_Csfb_Customization 结构
+ ??????    : NVIM_CSFB_CUSTOMIZATION_STRU
+ ????????  : en_NV_Item_Csfb_Customization ????
 *****************************************************************************/
 typedef struct
 {
@@ -644,8 +644,8 @@ typedef struct
 }NVIM_CSFB_CUSTOMIZATION_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_CBS_MID_LIST_STRU
- 结构说明  : en_NV_Item_CBS_MID_List 结构
+ ??????    : NVIM_CBS_MID_LIST_STRU
+ ????????  : en_NV_Item_CBS_MID_List ????
 *****************************************************************************/
 typedef struct
 {
@@ -653,8 +653,8 @@ typedef struct
 }NVIM_CBS_MID_LIST_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_CBS_MID_RANGE_LIST_STRU
- 结构说明  : en_NV_Item_CBS_MID_Range_List 结构
+ ??????    : NVIM_CBS_MID_RANGE_LIST_STRU
+ ????????  : en_NV_Item_CBS_MID_Range_List ????
 *****************************************************************************/
 typedef struct
 {
@@ -662,104 +662,104 @@ typedef struct
 }NVIM_CBS_MID_RANGE_LIST_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_AUTO_FR_LTE_MEAS_CONFIG_STRU
- 结构说明  : GSM自主重定向到LTE的LTE频点测量配置
- 修改历史  :
- 1.日    期    : 2013年08月05日
-   作    者    : y00142674
-   修改内容    : 新建结构体, GSM自主重定向到LTE
+ ??????    : NVIM_GSM_AUTO_FR_LTE_MEAS_CONFIG_STRU
+ ????????  : GSM????????????LTE??LTE????????????
+ ????????  :
+ 1.??    ??    : 2013??08??05??
+   ??    ??    : y00142674
+   ????????    : ??????????, GSM????????????LTE
 *****************************************************************************/
 typedef struct
 {
-   VOS_UINT8                            ucFrLteMeasFlag;                        /* 是否开启GSM自主重定向到LTE的LTE频点测量，0: 关闭, 1: 开启，默认值为1 */
-   VOS_UINT8                            ucMaxSavedMeasTimes;                    /* 最大保存的测量次数，默认值为8，范围:[0,8] */
+   VOS_UINT8                            ucFrLteMeasFlag;                        /* ????????GSM????????????LTE??LTE??????????0: ????, 1: ??????????????1 */
+   VOS_UINT8                            ucMaxSavedMeasTimes;                    /* ????????????????????????????8??????:[0,8] */
 
-   VOS_UINT8                            ucFrInvalidMeasFlag;                    /* 是否开启用测量结果判断GSM自主重定向到LTE是否有效，0: 关闭, 1: 开启，默认值为1 */
-   VOS_UINT8                            ucMaxInvalidMeasTimes;                  /* 最大无效测量次数，用来判定频点是否有效，不大于最大保存的测量次数，默认值为8，范围:[0,8] */
+   VOS_UINT8                            ucFrInvalidMeasFlag;                    /* ??????????????????????GSM????????????LTE??????????0: ????, 1: ??????????????1 */
+   VOS_UINT8                            ucMaxInvalidMeasTimes;                  /* ??????????????????????????????????????????????????????????????????????????8??????:[0,8] */
 }NVIM_GSM_AUTO_FR_LTE_MEAS_CONFIG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_C1_CUSTOMIZE_CFG_STRU
- 结构说明  : C1准则定制配置
- 修改历史  :
- 1.日    期    : 2014年01月17日
-   作    者    : w00146666
-   修改内容    : 新建结构体, 应用于C1准则定制
+ ??????    : NVIM_GSM_C1_CUSTOMIZE_CFG_STRU
+ ????????  : C1????????????
+ ????????  :
+ 1.??    ??    : 2014??01??17??
+   ??    ??    : w00146666
+   ????????    : ??????????, ??????C1????????
 *****************************************************************************/
 typedef struct
 {
-   VOS_UINT8                            ucC1CustomizeSwitchFlag;          /* 是否开启路损C1定制，0: 关闭, 1: 开启，默认值为0 */
-   VOS_UINT8                            ucRxlevAccessMin;                 /* 开启路损C1定制后，定制的最小接入电平等级，默认等级为8，范围:[0,63] */
-   VOS_UINT8                            ucC1ValueThreshold;               /* C1阈值 */
+   VOS_UINT8                            ucC1CustomizeSwitchFlag;          /* ????????????C1??????0: ????, 1: ??????????????0 */
+   VOS_UINT8                            ucRxlevAccessMin;                 /* ????????C1??????????????????????????????????????????8??????:[0,63] */
+   VOS_UINT8                            ucC1ValueThreshold;               /* C1???? */
    VOS_UINT8                            aucRsv[1];
 }NVIM_GSM_C1_CUSTOMIZE_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_NFREQ_THRESHOLD_STRU
- 结构说明  : en_NV_Item_Gsm_NFreq_Threshold 结构
+ ??????    : NVIM_GSM_NFREQ_THRESHOLD_STRU
+ ????????  : en_NV_Item_Gsm_NFreq_Threshold ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                            ucFirstNFreqThreshold;                 /* 邻频干扰过滤门限 */
+    VOS_UINT8                            ucFirstNFreqThreshold;                 /* ???????????????? */
     VOS_UINT8                            aucRsv[3];
 }NVIM_GSM_NFREQ_THRESHOLD_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_W_NON_NCELL_MEAS_CTRL_STRU
- 结构说明  : en_NV_Item_Gas_W_Non_NCell_Meas_Ctrl 结构
+ ??????    : NVIM_GAS_W_NON_NCELL_MEAS_CTRL_STRU
+ ????????  : en_NV_Item_Gas_W_Non_NCell_Meas_Ctrl ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                            ucIdleNonNCellMeasEnable;              /* 空闲态下是否启动非邻区测量 */
-    VOS_UINT8                            ucTransferNonNCellMeasEnable;          /* 传输态下是否启动非邻区测量 */
-    VOS_INT16                            sRscpThreshold;                        /* 启动非邻区测量的 RSCP 门限 */
-    VOS_INT16                            sEcn0Threshold;                        /* 启动非邻区测量的 ECN0 门限 */
-    VOS_INT16                            sRssiThreshold;                        /* 启动非邻区测量的 RSSI 门限 */
+    VOS_UINT8                            ucIdleNonNCellMeasEnable;              /* ?????????????????????????? */
+    VOS_UINT8                            ucTransferNonNCellMeasEnable;          /* ?????????????????????????? */
+    VOS_INT16                            sRscpThreshold;                        /* ???????????????? RSCP ???? */
+    VOS_INT16                            sEcn0Threshold;                        /* ???????????????? ECN0 ???? */
+    VOS_INT16                            sRssiThreshold;                        /* ???????????????? RSSI ???? */
 }NVIM_GAS_W_NON_NCELL_MEAS_CTRL_STRU;
 /* Added by l67237 for Gas Dsds Feature, 2014-3-4, begin */
 /*****************************************************************************
- 结构名    : NV_GSM_RF_UNAVAILABLE_CFG_STRU
- 结构说明  : en_NV_Item_GSM_RF_UNAVAILABLE_CFG 结构
+ ??????    : NV_GSM_RF_UNAVAILABLE_CFG_STRU
+ ????????  : en_NV_Item_GSM_RF_UNAVAILABLE_CFG ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucStartSearchFlag;                      /* 是否启动搜网:,1:是; 0:否 */
-    VOS_UINT8                           ucSearchTimerLen;                       /* 多长时间启动搜网，单位:s */
-    VOS_UINT8                           ucEnableScellSbFbFlag;                  /* 是否生效服务小区同步，1:是；0:否 */
+    VOS_UINT8                           ucStartSearchFlag;                      /* ????????????:,1:??; 0:?? */
+    VOS_UINT8                           ucSearchTimerLen;                       /* ??????????????????????:s */
+    VOS_UINT8                           ucEnableScellSbFbFlag;                  /* ??????????????????????1:????0:?? */
     VOS_UINT8                           ucRsv;
 }NV_GSM_RF_UNAVAILABLE_CFG_STRU;
 /* Added by l67237 for Gas Dsds Feature, 2014-3-4, end */
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_CELL_INFO_RPT_CFG_STRU
- 结构说明  : en_NV_Item_Gsm_Cell_Info_Rpt_Cfg 结构
+ ??????    : NVIM_GSM_CELL_INFO_RPT_CFG_STRU
+ ????????  : en_NV_Item_Gsm_Cell_Info_Rpt_Cfg ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                            ucCellInfoRptFlg;      /* 是否启动上报: 0:不启动; 1:启动 */
-    VOS_UINT8                            aucRsv[1];             /* 保留位 */
-    VOS_UINT16                           usRptInterval;         /* 上报周期长度, 单位: ms */
+    VOS_UINT8                            ucCellInfoRptFlg;      /* ????????????: 0:??????; 1:???? */
+    VOS_UINT8                            aucRsv[1];             /* ?????? */
+    VOS_UINT16                           usRptInterval;         /* ????????????, ????: ms */
 }NVIM_GSM_CELL_INFO_RPT_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_INDIVIDUAL_CUSTOMIZE_CFG_STRU
- 结构说明  : en_NV_Item_Gas_Individual_Customize_Cfg 结构,用于设置非标的特殊定制相关的配置
+ ??????    : NVIM_GAS_INDIVIDUAL_CUSTOMIZE_CFG_STRU
+ ????????  : en_NV_Item_Gas_Individual_Customize_Cfg ????,????????????????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucAccFailNoPunishCfg;                   /* 是否惩罚随即接入失败的小区:
-                                                                                   bit0: 1: PS失败不惩罚; 0: PS失败惩罚
-                                                                                   bit1: 1: CS失败不惩罚; 0: CS失败惩罚 */
-    VOS_INT8                            cFreqRxlevThreshold;                    /* 有效频点能量门限,主要用于搜网流程
-                                                                                   被动重选 目标小区选择时也会用到 */
+    VOS_UINT8                           ucAccFailNoPunishCfg;                   /* ??????????????????????????:
+                                                                                   bit0: 1: PS??????????; 0: PS????????
+                                                                                   bit1: 1: CS??????????; 0: CS???????? */
+    VOS_INT8                            cFreqRxlevThreshold;                    /* ????????????????,????????????????
+                                                                                   ???????? ?????????????????????? */
 
-    VOS_UINT8                           ucAutoFrNonChanRelCase;                 /* 没有收到 Channel Release 的异常场景下是否启动 FR:
-                                                                                   bit0: 1: 主动挂断时启动 FR;
-                                                                                         0: 主动挂断时不启动FR
-                                                                                   bit1: 1: 语音链路失败启动FR;
-                                                                                         0: 语音链路失败不启动FR
-                                                                                   bit2: 1: 无线链路失效自主返回前需要先尝试呼叫重建;
-                                                                                         0: 无线链路失效自主返回前不需要先尝试呼叫重建 */
+    VOS_UINT8                           ucAutoFrNonChanRelCase;                 /* ???????? Channel Release ???????????????????? FR:
+                                                                                   bit0: 1: ?????????????? FR;
+                                                                                         0: ????????????????FR
+                                                                                   bit1: 1: ????????????????FR;
+                                                                                         0: ??????????????????FR
+                                                                                   bit2: 1: ????????????????????????????????????????;
+                                                                                         0: ?????????????????????????????????????????? */
 
     VOS_UINT8                           ucScellPrioFastEnableFlg;
 
@@ -767,65 +767,65 @@ typedef struct
 }NVIM_GAS_INDIVIDUAL_CUSTOMIZE_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_MNTN_CONFIG_STRU
- 结构说明  : GSM可维可测相关的NV配置
- 修改历史  :
- 1.日    期    : 2014年07月03日
-   作    者    : w00146666
-   修改内容    : 新建结构体
- 2.日    期    : 2015年10月26日
-   作    者    : w00146666
-   修改内容    : 调整结构，新增两次伪基站CHR上报的最短时间间隔 NV配置 
- 3.日    期    : 2016年04月14日
-   作    者    : w00146666
-   修改内容    : 调整结构，新增GSM PA CHR的NV配置(连续随机接入无响应次数, 小区信号强度，两次上报的最短时间间隔)   
+ ??????    : NVIM_GSM_MNTN_CONFIG_STRU
+ ????????  : GSM??????????????NV????
+ ????????  :
+ 1.??    ??    : 2014??07??03??
+   ??    ??    : w00146666
+   ????????    : ??????????
+ 2.??    ??    : 2015??10??26??
+   ??    ??    : w00146666
+   ????????    : ????????????????????????CHR?????????????????? NV???? 
+ 3.??    ??    : 2016??04??14??
+   ??    ??    : w00146666
+   ????????    : ??????????????GSM PA CHR??NV????(??????????????????????, ????????????????????????????????????)   
 *****************************************************************************/
 typedef struct
 {
-   VOS_UINT16                           usCsHoTimeAlarmThreshold;              /* CS切换时间长度门限，超过该切换时间，GAS主动上报告警信息 */
+   VOS_UINT16                           usCsHoTimeAlarmThreshold;              /* CS??????????????????????????????????GAS???????????????? */
 
-   VOS_UINT16                           usRptPseudBtsMinTimeInterval;          /* 两次伪基站CHR上报的最短时间间隔，单位:分钟；默认值为30分钟 */   
+   VOS_UINT16                           usRptPseudBtsMinTimeInterval;          /* ??????????CHR????????????????????????:??????????????30???? */   
 
-   VOS_UINT16                           usRsv1;                                /* 预留位1，为以后KWKC预留 */
+   VOS_UINT16                           usRsv1;                                /* ??????1????????KWKC???? */
 
-   VOS_UINT16                           usRptRaNoRspMinTimeInterval;           /* 两次随机接入无响应CHR上报的最短时间间隔，单位:分钟；默认值为30分钟 */   
+   VOS_UINT16                           usRptRaNoRspMinTimeInterval;           /* ??????????????????CHR????????????????????????:??????????????30???? */   
    
-   VOS_INT16                            sRaNoRspRssiThreshold;                 /* 一次有效的随机接入无响应的能量门限，超过该能量，GAS记录一次有效的随机接入无响应,默认值为-85dBm */
+   VOS_INT16                            sRaNoRspRssiThreshold;                 /* ????????????????????????????????????????????????GAS????????????????????????????,????????-85dBm */
    
-   VOS_UINT8                            usRaNoRspAlarmTimesThreshold;          /* 连续随机接入无响应次数门限，超过该次数，GAS主动上报告警信息，默认值是10次 */   
+   VOS_UINT8                            usRaNoRspAlarmTimesThreshold;          /* ????????????????????????????????????????GAS??????????????????????????10?? */   
 
-   VOS_UINT8                            ucRsv5;                                /* 预留位5，为以后KWKC预留 */      
+   VOS_UINT8                            ucRsv5;                                /* ??????5????????KWKC???? */      
 
-   VOS_UINT32                           ulRsv6;                                /* 预留位6，为以后KWKC预留 */
+   VOS_UINT32                           ulRsv6;                                /* ??????6????????KWKC???? */
 
-   VOS_UINT32                           ulRsv7;                                /* 预留位7，为以后KWKC预留 */
+   VOS_UINT32                           ulRsv7;                                /* ??????7????????KWKC???? */
 }NVIM_GAS_MNTN_CONFIG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_UTRAN_TDD_DEFAULT_Q_RXLMIN
- 结构说明  : en_NV_Item_GAS_UTRAN_TDD_DEFAULT_Q_RXLMIN NV结构 网络没有配置
-             基于优先级的 UTRAN 重选参数时, 默认的 UTRAN TDD Q_RXLMIN. 仅在基于
-             优先级重选时使用. 基于 Ranking 的默认重选门限是 -90dB, 不需要定制
- 修改历史  :
- 1.日    期    : 2014年12月20日
-   作    者    : p00166345
-   修改内容    : 新建结构体
+ ??????    : NVIM_GAS_UTRAN_TDD_DEFAULT_Q_RXLMIN
+ ????????  : en_NV_Item_GAS_UTRAN_TDD_DEFAULT_Q_RXLMIN NV???? ????????????
+             ???????????? UTRAN ??????????, ?????? UTRAN TDD Q_RXLMIN. ????????
+             ????????????????. ???? Ranking ???????????????? -90dB, ??????????
+ ????????  :
+ 1.??    ??    : 2014??12??20??
+   ??    ??    : p00166345
+   ????????    : ??????????
 *****************************************************************************/
 typedef struct
 {
-   VOS_UINT8                            ucTdsDefaultQRxlMin;            /* TDS 默认重选门限, 单位: -1dB */
+   VOS_UINT8                            ucTdsDefaultQRxlMin;            /* TDS ????????????, ????: -1dB */
 
-   VOS_UINT8                            aucRsv[3];                      /* 保留位 */
+   VOS_UINT8                            aucRsv[3];                      /* ?????? */
 }NVIM_GAS_UTRAN_TDD_DEFAULT_Q_RXLMIN;
 
 /* Added by yangsicong for L2G REDIR C1 CUSTUME, 2015-1-26, begin */
 /*****************************************************************************
- 结构名    : NVIM_GAS_C1_CALC_OPT_PLMN_WHITE_LIST_STRU
- 结构说明  : C1计算优化网络白名单(目前仅在L CSFB G流程中使用)
- 修改历史  : 
- 1.日    期    : 2015年02月06日
-   作    者    : y00265681
-   修改内容    : 新建结构体
+ ??????    : NVIM_GAS_C1_CALC_OPT_PLMN_WHITE_LIST_STRU
+ ????????  : C1??????????????????(????????L CSFB G??????????)
+ ????????  : 
+ 1.??    ??    : 2015??02??06??
+   ??    ??    : y00265681
+   ????????    : ??????????
 *****************************************************************************/
 typedef struct
 {
@@ -835,35 +835,35 @@ typedef struct
 
 typedef struct
 {
-   VOS_UINT16                           usPlmnCnt;                          /* 白名单中PLMN个数 */
-   VOS_UINT16                           usRxlevAccessMin;                   /* 白名单中小区定制的最小接入电平等级, 默认等级为8，范围:[0,63]
-                                                                               0值表示这个域不生效, 定制门限使用 NV9248 中 ucRxlevAccessMin 域的值 */
+   VOS_UINT16                           usPlmnCnt;                          /* ????????PLMN???? */
+   VOS_UINT16                           usRxlevAccessMin;                   /* ??????????????????????????????????, ??????????8??????:[0,63]
+                                                                               0??????????????????, ???????????? NV9248 ?? ucRxlevAccessMin ?????? */
 
-   NVIM_GAS_PLMN_ID_STRU                astPlmn[NVIM_GAS_C1_CALC_OPT_PLMN_WHITE_LIST_CNT_MAX];       /* 预留位，为以后KWKC预留 */
+   NVIM_GAS_PLMN_ID_STRU                astPlmn[NVIM_GAS_C1_CALC_OPT_PLMN_WHITE_LIST_CNT_MAX];       /* ??????????????KWKC???? */
 }NVIM_GAS_C1_CALC_OPT_PLMN_WHITE_LIST_STRU;
 /* Added by yangsicong for L2G REDIR C1 CUSTUME, 2015-1-26, end */
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_RAPID_HO_CUSTOMIZE_CFG_STRU
- 结构说明  : en_NV_Item_GSM_RAPID_HO_CUSTOMIZE_CFG 结构,GSM快速切换定制特性相关配置
+ ??????    : NVIM_GSM_RAPID_HO_CUSTOMIZE_CFG_STRU
+ ????????  : en_NV_Item_GSM_RAPID_HO_CUSTOMIZE_CFG ????,GSM????????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucSwitchFlag;                   /* 特性开关 */
-    VOS_UINT8                           ucBadQualityThreshold;          /* 信号质量判定门限.误码率.单位: 百分之一 */
-    VOS_UINT16                          usAlpha;                        /* Alpha因子. 单位: 0.001 */
-    VOS_UINT8                           ucBadQualityCntThreshold;       /* 信号质量差统计门限 */
-    VOS_UINT8                           ucNCellRptAddValue;             /* 邻区上报增加值 */
-    VOS_UINT8                           aucRsv[2];                      /* 保留位 */
+    VOS_UINT8                           ucSwitchFlag;                   /* ???????? */
+    VOS_UINT8                           ucBadQualityThreshold;          /* ????????????????.??????.????: ???????? */
+    VOS_UINT16                          usAlpha;                        /* Alpha????. ????: 0.001 */
+    VOS_UINT8                           ucBadQualityCntThreshold;       /* ?????????????????? */
+    VOS_UINT8                           ucNCellRptAddValue;             /* ?????????????? */
+    VOS_UINT8                           aucRsv[2];                      /* ?????? */
 }NVIM_GSM_RAPID_HO_CUSTOMIZE_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_BAND_CUSTOMIZE_STRU
- 结构说明  : GSM 频段定制结构定义
- 修改历史  : 
- 1.日    期    : 2015-04-23
-   作    者    : p00166345
-   修改内容    : 新建结构体
+ ??????    : NVIM_GSM_BAND_CUSTOMIZE_STRU
+ ????????  : GSM ????????????????
+ ????????  : 
+ 1.??    ??    : 2015-04-23
+   ??    ??    : p00166345
+   ????????    : ??????????
 *****************************************************************************/
 typedef struct
 {
@@ -872,357 +872,357 @@ typedef struct
 }NVIM_GSM_BAND_CUSTOMIZE_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_GSM_BAND_CUSTOMIZE_CFG_STRU
- 结构说明  : en_NV_Item_GAS_GSM_BAND_CUSTOMIZE_CFG NV 结构定义
- 修改历史  : 
- 1.日    期    : 2015-04-23
-   作    者    : p00166345
-   修改内容    : 新建结构体
+ ??????    : NVIM_GAS_GSM_BAND_CUSTOMIZE_CFG_STRU
+ ????????  : en_NV_Item_GAS_GSM_BAND_CUSTOMIZE_CFG NV ????????
+ ????????  : 
+ 1.??    ??    : 2015-04-23
+   ??    ??    : p00166345
+   ????????    : ??????????
 *****************************************************************************/
 typedef struct
 {
-   VOS_UINT16                           usItemCnt;                  /* 定制项个数 */
-   VOS_UINT16                           usRestoreEnableMask;        /* 启用被丢弃的超出协议范围的频点生效场景 */
-   VOS_UINT32                           ulCustomizeBandEnableMask;  /* 定制 Band 生效场景 */
+   VOS_UINT16                           usItemCnt;                  /* ?????????? */
+   VOS_UINT16                           usRestoreEnableMask;        /* ?????????????????????????????????????? */
+   VOS_UINT32                           ulCustomizeBandEnableMask;  /* ???? Band ???????? */
    NVIM_GSM_BAND_CUSTOMIZE_STRU         astCustomizeBand[NVIM_GAS_GSM_BAND_CUSTOMIZE_LIST_MAX_CNT];
 }NVIM_GAS_GSM_BAND_CUSTOMIZE_CFG_STRU;
 
-/* Added by y00142674 for 漫游搜网优化, 2015-04-30, begin */
+/* Added by y00142674 for ????????????, 2015-04-30, begin */
 /*****************************************************************************
- 结构名    : NVIM_GSM_SEARCH_CUSTOMIZE_CFG_STRU
- 结构说明  : en_NV_Item_GSM_SEARCH_CUSTOMIZE_CFG 结构，GSM搜网流程相关配置
+ ??????    : NVIM_GSM_SEARCH_CUSTOMIZE_CFG_STRU
+ ????????  : en_NV_Item_GSM_SEARCH_CUSTOMIZE_CFG ??????GSM????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucRsv1;                                 /* 废弃，高质量指定搜流程是否使用历史频点 */
-    VOS_UINT8                           ucRsv2;                                 /* 废弃，GOos搜流程是否使用历史频点 */
+    VOS_UINT8                           ucRsv1;                                 /* ?????????????????????????????????????? */
+    VOS_UINT8                           ucRsv2;                                 /* ??????GOos?????????????????????? */
 
-    VOS_UINT8                           ucGeoHighUseStoreFlag;           /* 高质量获取地理信息流程是否使用历史频点 */
-    VOS_UINT8                           ucGeoHighRemoveStoreFlag;        /* 高质量获取地理信息流程是否在高质量扫频阶段删除历史频点 */
-    VOS_UINT8                           ucGeoNormalUseStoreFlag;         /* 非高质量获取地理信息流程是否使用历史频点 */
+    VOS_UINT8                           ucGeoHighUseStoreFlag;           /* ?????????????????????????????????????? */
+    VOS_UINT8                           ucGeoHighRemoveStoreFlag;        /* ?????????????????????????????????????????????????????? */
+    VOS_UINT8                           ucGeoNormalUseStoreFlag;         /* ???????????????????????????????????????? */
 
-    VOS_UINT8                           ucRmvDecFailSamePlmnFlag;        /* 频点解码失败后是否删除所有相同PLMN的优选小区 */
+    VOS_UINT8                           ucRmvDecFailSamePlmnFlag;        /* ??????????????????????????????PLMN?????????? */
 
-    VOS_UINT8                           ucUpdateRssiBySi;                /* 根据系统消息更新信号强度 */
+    VOS_UINT8                           ucUpdateRssiBySi;                /* ???????????????????????? */
 
-    VOS_UINT8                           ucHistorySrchOperatorCustomizeCellCnt;  /* HISTORY搜索运营商定制频点的个数范围 */
+    VOS_UINT8                           ucHistorySrchOperatorCustomizeCellCnt;  /* HISTORY???????????????????????????? */
 
 }NVIM_GSM_SEARCH_CUSTOMIZE_CFG_STRU;
-/* Added by y00142674 for 漫游搜网优化, 2015-04-30, end */
+/* Added by y00142674 for ????????????, 2015-04-30, end */
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_GSM_CELL_HISTORY_BCCH_SI_CFG_STRU
- 结构说明  : en_NV_Item_GAS_GSM_CELL_HISTORY_BCCH_SI_CFG NV 结构定义
- 修改历史  : 
- 1.日    期    : 2015-05-06
-   作    者    : p00166345
-   修改内容    : 新建结构体
- 2.日    期    : 2015-07-15
-   作    者    : y00142674
-   修改内容    : 增加邻区系统消息使能标志和有效时长
+ ??????    : NVIM_GAS_GSM_CELL_HISTORY_BCCH_SI_CFG_STRU
+ ????????  : en_NV_Item_GAS_GSM_CELL_HISTORY_BCCH_SI_CFG NV ????????
+ ????????  : 
+ 1.??    ??    : 2015-05-06
+   ??    ??    : p00166345
+   ????????    : ??????????
+ 2.??    ??    : 2015-07-15
+   ??    ??    : y00142674
+   ????????    : ??????????????????????????????????
 
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucEnableFlg;                    /* 是否生效 */
-    VOS_UINT8                           ucRefreshTimeLen;               /* 使用历史系统消息驻留后多久强制刷新系统消息.
-                                                                           单位:秒. 0表示不强制刷新 */
+    VOS_UINT8                           ucEnableFlg;                    /* ???????? */
+    VOS_UINT8                           ucRefreshTimeLen;               /* ??????????????????????????????????????????.
+                                                                           ????:??. 0?????????????? */
 
-    VOS_UINT16                          usValidTimeLen;                 /* 有效时长, 单位:分钟 */
-    VOS_UINT32                          ulUsableMask;                   /* 用于指定可以使用历史系统消息驻留的流程 */
-    VOS_UINT8                           ucNcellEnableFlg;               /* 邻区系统消息是否生效 */
-    VOS_UINT8                           ucNcellValidTimeLen;            /* 有效时长, 单位:秒 */
-    VOS_UINT8                           ucRsv3;                         /* 保留位 */
-    VOS_UINT8                           ucRsv4;                         /* 保留位 */
+    VOS_UINT16                          usValidTimeLen;                 /* ????????, ????:???? */
+    VOS_UINT32                          ulUsableMask;                   /* ?????????????????????????????????????? */
+    VOS_UINT8                           ucNcellEnableFlg;               /* ???????????????????? */
+    VOS_UINT8                           ucNcellValidTimeLen;            /* ????????, ????:?? */
+    VOS_UINT8                           ucRsv3;                         /* ?????? */
+    VOS_UINT8                           ucRsv4;                         /* ?????? */
 }NVIM_GAS_GSM_CELL_HISTORY_BCCH_SI_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_H_PRIO_CONDITION_FLAG_STRU
- 结构说明  : H_PRIO使用场景定制配置 
- 修改历史  : 
- 1.日    期    : 2015年05月17日
-   作    者    : w00146666
-   修改内容    : 新建结构体
+ ??????    : NVIM_GAS_H_PRIO_CONDITION_FLAG_STRU
+ ????????  : H_PRIO???????????????? 
+ ????????  : 
+ 1.??    ??    : 2015??05??17??
+   ??    ??    : w00146666
+   ????????    : ??????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                            ucHPrioCustomizeFlag;   /* H_PRIO使用场景定制配置, 0表示使用H_PRIO参数不考虑异系统小区的优先级，
-                                                                    1表示使用H_PRIO参数的前提条件是异系统小区的优先级比服务小区优先级低 */
+    VOS_UINT8                            ucHPrioCustomizeFlag;   /* H_PRIO????????????????, 0????????H_PRIO??????????????????????????????
+                                                                    1????????H_PRIO???????????????????????????????????????????????????? */
     
-    VOS_UINT8                            ucRsv1;                 /* 保留位1 */
+    VOS_UINT8                            ucRsv1;                 /* ??????1 */
     
-    VOS_UINT8                            ucRsv2;                 /* 保留位2 */
+    VOS_UINT8                            ucRsv2;                 /* ??????2 */
     
-    VOS_UINT8                            ucRsv3;                 /* 保留位3 */
+    VOS_UINT8                            ucRsv3;                 /* ??????3 */
 }NVIM_GAS_INTER_RAT_RESEL_H_PRIO_CUSTOMIZE_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_FAST_AREA_LOST_CFG_STRU
- 结构说明  : en_NV_Item_GAS_FAST_AREA_LOST_CFG NV结构
-             用于定制 RR 随机接入失败后是否快速给 NAS 上报丢网
- 修改历史  : 
- 1.日    期    : 2015年05月15日
-   作    者    : p00166345
-   修改内容    : 新建结构体
+ ??????    : NVIM_GAS_FAST_AREA_LOST_CFG_STRU
+ ????????  : en_NV_Item_GAS_FAST_AREA_LOST_CFG NV????
+             ???????? RR ???????????????????????? NAS ????????
+ ????????  : 
+ 1.??    ??    : 2015??05??15??
+   ??    ??    : p00166345
+   ????????    : ??????????
 *****************************************************************************/
 typedef struct
 {
-   VOS_UINT8                            ucRrRaFailEnableFlg;        /* 生效标志 */
+   VOS_UINT8                            ucRrRaFailEnableFlg;        /* ???????? */
 
-   VOS_UINT8                            ucRsv1;                     /* 保留位 */
-   VOS_UINT8                            ucRsv2;                     /* 保留位 */
-   VOS_UINT8                            ucRsv3;                     /* 保留位 */
+   VOS_UINT8                            ucRsv1;                     /* ?????? */
+   VOS_UINT8                            ucRsv2;                     /* ?????? */
+   VOS_UINT8                            ucRsv3;                     /* ?????? */
 }NVIM_GAS_FAST_AREA_LOST_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_AUTO_FR_CFG_STRU
- 结构说明  : en_NV_Item_GAS_AUTO_FR_CFG NV结构
-             用于配置在具体场景下是否可以启动自主 FR.
- 修改历史  : 
- 1.日    期    : 2015-06-09
-   作    者    : p00166345
-   修改内容    : 新建结构体
+ ??????    : NVIM_GAS_AUTO_FR_CFG_STRU
+ ????????  : en_NV_Item_GAS_AUTO_FR_CFG NV????
+             ???????????????????????????????????? FR.
+ ????????  : 
+ 1.??    ??    : 2015-06-09
+   ??    ??    : p00166345
+   ????????    : ??????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                            ucAutoFrInvalidMask;   /* 生效标志。各bit值 0 表示可以返回, 1 表示无效不可以返回 */
-                                                                /* bit0: CSFB 主叫, NAS仍未反馈业务建立结果的情况下是否可以返回 */
-                                                                /* bit1: CSFB 被叫, NAS仍未反馈业务建立结果的情况下是否可以返回 */
-                                                                /* bit2~bit8: 保留位 */
+    VOS_UINT8                            ucAutoFrInvalidMask;   /* ????????????bit?? 0 ????????????, 1 ?????????????????? */
+                                                                /* bit0: CSFB ????, NAS???????????????????????????????????????? */
+                                                                /* bit1: CSFB ????, NAS???????????????????????????????????????? */
+                                                                /* bit2~bit8: ?????? */
 
-    VOS_UINT8                            ucAutoFrNonCsfbFlg;       /* 非CSFB场景下, 业务结束时是否自主返回 */
-    VOS_UINT8                            ucRsv2;                /* 保留位 */
-    VOS_UINT8                            ucRsv3;                /* 保留位 */
+    VOS_UINT8                            ucAutoFrNonCsfbFlg;       /* ??CSFB??????, ?????????????????????? */
+    VOS_UINT8                            ucRsv2;                /* ?????? */
+    VOS_UINT8                            ucRsv3;                /* ?????? */
 }NVIM_GAS_AUTO_FR_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_INTER_RAT_RESEL_CFG_STRU
- 结构说明  : en_NV_Item_GAS_INTER_RAT_RESEL_CFG NV结构
-             用于配置异系统重选相关流程.
- 修改历史  : 
- 1.日    期    : 2015-07-07
-   作    者    : p00166345
-   修改内容    : 新建结构体
+ ??????    : NVIM_GAS_INTER_RAT_RESEL_CFG_STRU
+ ????????  : en_NV_Item_GAS_INTER_RAT_RESEL_CFG NV????
+             ??????????????????????????.
+ ????????  : 
+ 1.??    ??    : 2015-07-07
+   ??    ??    : p00166345
+   ????????    : ??????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucPrioReselDisableMask; /* 禁用基于优先级测量和重选准则的场景.以下各 bit 值1表示禁用.0表示不禁用 */
-                                                                /* 注: 配置为0时是否启用基于优先级的算法仍受协议和 NV 9003的约束 */
-                                                                /* bit0: LTE 模式不支持, 且没有3G优先级参数的场景 */
-                                                                /* bit1: LTE 模式被 Disable, 且没有3G优先级参数的场景 */
-                                                                /* bit2~bit8: 保留位 */
+    VOS_UINT8                           ucPrioReselDisableMask; /* ??????????????????????????????????.?????? bit ??1????????.0?????????? */
+                                                                /* ??: ??????0???????????????????????????????????? NV 9003?????? */
+                                                                /* bit0: LTE ??????????, ??????3G???????????????? */
+                                                                /* bit1: LTE ?????? Disable, ??????3G???????????????? */
+                                                                /* bit2~bit8: ?????? */
 
-    VOS_UINT8                           ucRsv1;                 /* 保留位 */
-    VOS_UINT8                           ucRsv2;                 /* 保留位 */
-    VOS_UINT8                           ucRsv3;                 /* 保留位 */
-    VOS_UINT16                          usRsv4;                 /* 保留位 */
-    VOS_UINT16                          usRsv5;                 /* 保留位 */
+    VOS_UINT8                           ucRsv1;                 /* ?????? */
+    VOS_UINT8                           ucRsv2;                 /* ?????? */
+    VOS_UINT8                           ucRsv3;                 /* ?????? */
+    VOS_UINT16                          usRsv4;                 /* ?????? */
+    VOS_UINT16                          usRsv5;                 /* ?????? */
 }NVIM_GAS_INTER_RAT_RESEL_CFG_STRU;
 
-/* Added by p00166345 for DTS2015052601104(伪基站识别), 2015-08-02, begin */
+/* Added by p00166345 for DTS2015052601104(??????????), 2015-08-02, begin */
 /*****************************************************************************
  Structure      : NVIM_GAS_PSEUD_BTS_IDENT_CUSTOMIZE_CFG_STRU
- Description    : 伪基站判断定制用NV结构
+ Description    : ????????????????NV????
  Message origin :
- 修改历史 :
-  1.日    期    : 2015年07月29日
-    作    者    : yangsicong
-    修改内容    : 伪基站识别项目
+ ???????? :
+  1.??    ??    : 2015??07??29??
+    ??    ??    : yangsicong
+    ????????    : ??????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16      usEnableBitmap;             /* 识别算法是否使能 ：0=是；1=否 */
-                                                    /* bit0: X2G REDIR流程是否使能识别算法; */
-                                                    /* bit1: X2G reselect流程是否使能识别算法; */
-                                                    /* bit2: X2G CCO流程是否使能识别算法; */
-                                                    /* bit3: GSM  SPEC搜/GOOS搜流程是否使能识别算法; */
-                                                    /* bit4: GSM HISTORY搜/GSM FAST搜流程是否使能识别算法; */
-                                                    /* bit5~bit15: 预留 */
-    VOS_UINT16      ucReserve1;                 /* 备用字段 */
-    VOS_UINT16      usFeatureSetEnableBitmap;   /* 使能的伪基站特征集BITMAP: bit (n)=1表示第n个特征集是有效的; */
-    VOS_UINT16      usReserve2;                 /* 备用字段 */
-    VOS_UINT16      usPseudBTSFeatureSet0;      /* 特征集0,每个bit代表一个特征,该bit为1时表示该特征属于这个特征集合:
-                                                    bit0代表 RX_ACCESS_MIN=0; 
-                                                    bit1 代表 CCCH-CONF='001'时,BS-AG-BLKS-RES=2; 
-                                                    bit2 代表 不支持GPRS; 
-                                                    bit3 代码CRO超过 60;
-                                                    bit4 代码MCC为460;
-                                                    bit5~bit15预留 */
-    VOS_UINT16      usPseudBTSFeatureSet1;      /* 备用字段*/
-    VOS_UINT16      usPseudBTSFeatureSet2;      /* 备用字段*/
-    VOS_UINT16      usPseudBTSFeatureSet3;      /* 备用字段*/
-    VOS_UINT16      usPseudBTSFeatureSet4;      /* 备用字段*/
-    VOS_UINT16      usPseudBTSFeatureSet5;      /* 备用字段*/
-    VOS_UINT16      usPseudBTSFeatureSet6;      /* 备用字段*/
-    VOS_UINT16      usPseudBTSFeatureSet7;      /* 备用字段*/
+    VOS_UINT16      usEnableBitmap;             /* ???????????????? ??0=????1=?? */
+                                                    /* bit0: X2G REDIR????????????????????; */
+                                                    /* bit1: X2G reselect????????????????????; */
+                                                    /* bit2: X2G CCO????????????????????; */
+                                                    /* bit3: GSM  SPEC??/GOOS??????????????????????; */
+                                                    /* bit4: GSM HISTORY??/GSM FAST??????????????????????; */
+                                                    /* bit5~bit15: ???? */
+    VOS_UINT16      ucReserve1;                 /* ???????? */
+    VOS_UINT16      usFeatureSetEnableBitmap;   /* ??????????????????BITMAP: bit (n)=1??????n????????????????; */
+    VOS_UINT16      usReserve2;                 /* ???????? */
+    VOS_UINT16      usPseudBTSFeatureSet0;      /* ??????0,????bit????????????,??bit??1????????????????????????????:
+                                                    bit0???? RX_ACCESS_MIN=0; 
+                                                    bit1 ???? CCCH-CONF='001'??,BS-AG-BLKS-RES=2; 
+                                                    bit2 ???? ??????GPRS; 
+                                                    bit3 ????CRO???? 60;
+                                                    bit4 ????MCC??460;
+                                                    bit5~bit15???? */
+    VOS_UINT16      usPseudBTSFeatureSet1;      /* ????????*/
+    VOS_UINT16      usPseudBTSFeatureSet2;      /* ????????*/
+    VOS_UINT16      usPseudBTSFeatureSet3;      /* ????????*/
+    VOS_UINT16      usPseudBTSFeatureSet4;      /* ????????*/
+    VOS_UINT16      usPseudBTSFeatureSet5;      /* ????????*/
+    VOS_UINT16      usPseudBTSFeatureSet6;      /* ????????*/
+    VOS_UINT16      usPseudBTSFeatureSet7;      /* ????????*/
 } NVIM_GAS_PSEUD_BTS_IDENT_CUSTOMIZE_CFG_STRU;
-/* Added by p00166345 for DTS2015052601104(伪基站识别), 2015-08-02, end */
+/* Added by p00166345 for DTS2015052601104(??????????), 2015-08-02, end */
 
 /*****************************************************************************
- 结 构 名  : NVIM_GAS_NETWORK_SEARCH_CUSTOMIZE_CFG_STRU
- 结构说明  : 网络搜索定制NV
- 修改历史  :
-  1.日  期   : 2015年9月14日
-    作  者   : s00184266
-    修改内容 : 新生成结构
+ ?? ?? ??  : NVIM_GAS_NETWORK_SEARCH_CUSTOMIZE_CFG_STRU
+ ????????  : ????????????NV
+ ????????  :
+  1.??  ??   : 2015??9??14??
+    ??  ??   : s00184266
+    ???????? : ??????????
 
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32              ulHistoryFreqEnableBitmap;                          /* 历史频点搜索流程使能bit位 */
-    VOS_UINT32              ulOperateFreqEnableBitmap;                          /* 运营商定制频点搜索流程使能bit位 */
-    VOS_UINT32              ulFullListEnableBitmap;                             /* 全频段搜索流程使能bit位 */
-    VOS_UINT32              ulHistoryFilterSrchedFreqEnableBitmap;              /* 历史频点搜索流程过滤已搜索频点功能使能 bit位 */
-    VOS_UINT32              ulOperateFilterSrchedFreqEnableBitmap;              /* 运营商定制频点搜索流程过滤已搜索频点功能使能 bit位 */
-    VOS_UINT32              ulFullListFilterSrchedFreqEnableBitmap;             /* 全频段频点搜索流程过滤已搜索频点功能使能 bit位 */
-    VOS_UINT32              ulIgnoreLowPrioJudgeEnableBitmap;                   /* 不区分低优先级功能使能bit位 */
-    VOS_UINT32              ulCloudFreqEnableBitmap;                            /* 云端定制频点搜索流程使能bit位 */
-    VOS_UINT32              ulHistoryFreqBandSrchEnableBitmap;                  /* 历史频点所在频段搜索流程使能位 */
-    VOS_UINT32              ulPresetFreqBandSrchEnableBitmap;                   /* 预置频点搜做频段搜索流程使能位 */
-    VOS_UINT32              ulCloudBandEnableBitmap;                            /* 云端定制频段搜索流程使能bit位 */
-    VOS_UINT32              ulCloudFreqFilterSrchedFreqEnableBitmap;            /* 云端频点搜索流程过滤已搜索频点功能使能 bit位 */
-    VOS_UINT32              ulReserved1;                                        /* 保留位 */
-    VOS_UINT32              ulReserved2;                                        /* 保留位 */
-    VOS_UINT32              ulReserved3;                                        /* 保留位 */
-    VOS_UINT32              ulReserved4;                                        /* 保留位 */
-    VOS_UINT32              ulReserved5;                                        /* 保留位 */
+    VOS_UINT32              ulHistoryFreqEnableBitmap;                          /* ????????????????????bit?? */
+    VOS_UINT32              ulOperateFreqEnableBitmap;                          /* ??????????????????????????bit?? */
+    VOS_UINT32              ulFullListEnableBitmap;                             /* ??????????????????bit?? */
+    VOS_UINT32              ulHistoryFilterSrchedFreqEnableBitmap;              /* ?????????????????????????????????????? bit?? */
+    VOS_UINT32              ulOperateFilterSrchedFreqEnableBitmap;              /* ???????????????????????????????????????????? bit?? */
+    VOS_UINT32              ulFullListFilterSrchedFreqEnableBitmap;             /* ???????????????????????????????????????? bit?? */
+    VOS_UINT32              ulIgnoreLowPrioJudgeEnableBitmap;                   /* ??????????????????????bit?? */
+    VOS_UINT32              ulCloudFreqEnableBitmap;                            /* ????????????????????????bit?? */
+    VOS_UINT32              ulHistoryFreqBandSrchEnableBitmap;                  /* ?????????????????????????????? */
+    VOS_UINT32              ulPresetFreqBandSrchEnableBitmap;                   /* ?????????????????????????????? */
+    VOS_UINT32              ulCloudBandEnableBitmap;                            /* ????????????????????????bit?? */
+    VOS_UINT32              ulCloudFreqFilterSrchedFreqEnableBitmap;            /* ?????????????????????????????????????? bit?? */
+    VOS_UINT32              ulReserved1;                                        /* ?????? */
+    VOS_UINT32              ulReserved2;                                        /* ?????? */
+    VOS_UINT32              ulReserved3;                                        /* ?????? */
+    VOS_UINT32              ulReserved4;                                        /* ?????? */
+    VOS_UINT32              ulReserved5;                                        /* ?????? */
 }NVIM_GSM_NETWORK_SEARCH_CUSTOMIZE_CFG_STRU;
 
 /*****************************************************************************
- 结 构 名  : NVIM_GSM_OPERATE_CUSTOMIZE_FREQ_RANGE_STRU
- 结构说明  : GSM运营商定制的频点范围结构
- 修改历史  :
-  1.日  期   : 2015年8月28日
-    作  者   : s00184266
-    修改内容 : 新生成结构
+ ?? ?? ??  : NVIM_GSM_OPERATE_CUSTOMIZE_FREQ_RANGE_STRU
+ ????????  : GSM????????????????????????
+ ????????  :
+  1.??  ??   : 2015??8??28??
+    ??  ??   : s00184266
+    ???????? : ??????????
 
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usFreqBegin;                            /* 起始频点 */
-    VOS_UINT16                          usFreqEnd;                              /* 终止频点 */
-    NVIM_BAND_IND_ENUM_UINT8            enBand;                                 /* BAND指示 */
-    VOS_UINT8                           ucRsv1;                                 /* 保留位 */
-    VOS_UINT8                           ucRsv2;                                 /* 保留位 */
-    VOS_UINT8                           ucRsv3;                                 /* 保留位 */
+    VOS_UINT16                          usFreqBegin;                            /* ???????? */
+    VOS_UINT16                          usFreqEnd;                              /* ???????? */
+    NVIM_BAND_IND_ENUM_UINT8            enBand;                                 /* BAND???? */
+    VOS_UINT8                           ucRsv1;                                 /* ?????? */
+    VOS_UINT8                           ucRsv2;                                 /* ?????? */
+    VOS_UINT8                           ucRsv3;                                 /* ?????? */
 }NVIM_GSM_OPERATE_CUSTOMIZE_FREQ_RANGE_STRU;
 
 /*****************************************************************************
- 结 构 名  : NVIM_GSM_OPERATE_CUSTOMIZE_DISCRETE_STRU
- 结构说明  : GSM运营商定制的GSM离散频点结构
- 修改历史  :
-  1.日  期   : 2015年9月1日
-    作  者   : s00184266
-    修改内容 : 新生成结构
+ ?? ?? ??  : NVIM_GSM_OPERATE_CUSTOMIZE_DISCRETE_STRU
+ ????????  : GSM????????????GSM????????????
+ ????????  :
+  1.??  ??   : 2015??9??1??
+    ??  ??   : s00184266
+    ???????? : ??????????
 
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usFreq;                                 /* 频点号 */
-    NVIM_BAND_IND_ENUM_UINT8            enBand;                                 /* BAND指示 */
-    VOS_UINT8                           ucRsv1;                                 /* 保留位 */
+    VOS_UINT16                          usFreq;                                 /* ?????? */
+    NVIM_BAND_IND_ENUM_UINT8            enBand;                                 /* BAND???? */
+    VOS_UINT8                           ucRsv1;                                 /* ?????? */
 }NVIM_GSM_OPERATE_CUSTOMIZE_DISCRETE_STRU;
 
 /*****************************************************************************
- 结 构 名  : NVIM_GSM_OPERATOR_CUSTOMIZE_PLMN_ITEM_STRU
- 结构说明  : 运营商定制的GSM频点列表，由PLMN、BAND、起始频点、终止频点、离散频点
- 修改历史  :
-  1.日  期   : 2015年8月28日
-    作  者   : s00184266
-    修改内容 : 新生成结构
+ ?? ?? ??  : NVIM_GSM_OPERATOR_CUSTOMIZE_PLMN_ITEM_STRU
+ ????????  : ????????????GSM????????????PLMN??BAND??????????????????????????????
+ ????????  :
+  1.??  ??   : 2015??8??28??
+    ??  ??   : s00184266
+    ???????? : ??????????
 
 *****************************************************************************/
 typedef struct
 {
-    NVIM_GAS_PLMN_ID_STRU                       stPlmn;                         /* PLMN结构 */
-    VOS_UINT8                                   ucRangeCnt;                     /* 频点范围的个数，最大个数:NVIM_GSM_OPERATE_CUSTOMIZE_FREQ_RANGE_MAX_CNT */
-    VOS_UINT8                                   ucDiscreteCnt;                  /* 离散频点的个数，最大个数:NVIM_GSM_OPERATE_CUSTOMIZE_DESCRETE_FREQ_MAX_CNT */
-    VOS_UINT8                                   ucRsv1;                         /* 保留位 */
-    VOS_UINT8                                   ucRsv2;                         /* 保留位 */
+    NVIM_GAS_PLMN_ID_STRU                       stPlmn;                         /* PLMN???? */
+    VOS_UINT8                                   ucRangeCnt;                     /* ????????????????????????:NVIM_GSM_OPERATE_CUSTOMIZE_FREQ_RANGE_MAX_CNT */
+    VOS_UINT8                                   ucDiscreteCnt;                  /* ????????????????????????:NVIM_GSM_OPERATE_CUSTOMIZE_DESCRETE_FREQ_MAX_CNT */
+    VOS_UINT8                                   ucRsv1;                         /* ?????? */
+    VOS_UINT8                                   ucRsv2;                         /* ?????? */
     NVIM_GSM_OPERATE_CUSTOMIZE_FREQ_RANGE_STRU  astGsmOperateCustomFreqRange[NVIM_GSM_OPERATE_CUSTOMIZE_FREQ_RANGE_MAX_CNT];
-                                                                                /* 频点范围结构列表 */
+                                                                                /* ???????????????? */
     NVIM_GSM_OPERATE_CUSTOMIZE_DISCRETE_STRU    astGsmOperateCustomDiscrete[NVIM_GSM_OPERATE_CUSTOMIZE_DESCRETE_FREQ_MAX_CNT];
-                                                                                /* 离散频点结构列表 */
-    VOS_UINT8                                   ucRsv3;                         /* 保留位 */
-    VOS_UINT8                                   ucRsv4;                         /* 保留位 */
-    VOS_UINT16                                  usRsv1;                         /* 保留位 */
-    VOS_UINT32                                  ulRsv1;                         /* 保留位 */
+                                                                                /* ???????????????? */
+    VOS_UINT8                                   ucRsv3;                         /* ?????? */
+    VOS_UINT8                                   ucRsv4;                         /* ?????? */
+    VOS_UINT16                                  usRsv1;                         /* ?????? */
+    VOS_UINT32                                  ulRsv1;                         /* ?????? */
 }NVIM_GSM_OPERATOR_CUSTOMIZE_PLMN_ITEM_STRU;
 
 /*****************************************************************************
- 结 构 名  : NVIM_GSM_OPERATOR_CUSTOMIZE_FREQ_CFG_STRU
- 结构说明  : 运营商定制的GSM频点列表的NV结构
- 修改历史  :
-  1.日  期   : 2015年8月28日
-    作  者   : s00184266
-    修改内容 : 新生成结构
+ ?? ?? ??  : NVIM_GSM_OPERATOR_CUSTOMIZE_FREQ_CFG_STRU
+ ????????  : ????????????GSM??????????NV????
+ ????????  :
+  1.??  ??   : 2015??8??28??
+    ??  ??   : s00184266
+    ???????? : ??????????
 
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                                   ucPlmnCnt;                      /* 运营商定制的PLMN列表个数，最大个数:NVIM_GSM_OPERATE_CUSTOMIZE_FREQ_PLMN_MAX_CNT */
-    VOS_UINT8                                   ucRsv1;                         /* 保留位 */
-    VOS_UINT8                                   ucRsv2;                         /* 保留位 */
-    VOS_UINT8                                   ucRsv3;                         /* 保留位 */
+    VOS_UINT8                                   ucPlmnCnt;                      /* ????????????PLMN??????????????????:NVIM_GSM_OPERATE_CUSTOMIZE_FREQ_PLMN_MAX_CNT */
+    VOS_UINT8                                   ucRsv1;                         /* ?????? */
+    VOS_UINT8                                   ucRsv2;                         /* ?????? */
+    VOS_UINT8                                   ucRsv3;                         /* ?????? */
     NVIM_GSM_OPERATOR_CUSTOMIZE_PLMN_ITEM_STRU  astGsmOperatorCustomPlmnItem[NVIM_GSM_OPERATE_CUSTOMIZE_FREQ_PLMN_MAX_CNT];   
-                                                                                /* 定制的PLMN列表 */
+                                                                                /* ??????PLMN???? */
 }NVIM_GSM_OPERATOR_CUSTOMIZE_FREQ_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_PARALLEL_SEARCH_CUSTOMIZE_CFG_STRU
- 结构说明  : en_NV_Item_GSM_PARALLEL_SEARCH_CUSTOMIZE_CFG 结构，GSM并行搜网流程相关配置
+ ??????    : NVIM_GSM_PARALLEL_SEARCH_CUSTOMIZE_CFG_STRU
+ ????????  : en_NV_Item_GSM_PARALLEL_SEARCH_CUSTOMIZE_CFG ??????GSM????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulWaitFirstUsableMask;          /* 用于指定等待第一小区的流程 */
-    VOS_UINT16                          usWaitFirstTimerLen;            /* 等待第一小区定时器长度，单位:ms */
+    VOS_UINT32                          ulWaitFirstUsableMask;          /* ?????????????????????????? */
+    VOS_UINT16                          usWaitFirstTimerLen;            /* ????????????????????????????:ms */
 
-    VOS_INT16                           sSameLaiThreshold;              /* 优先选择同一个LAI频点的RSSI门限 */
-    VOS_UINT32                          ulSameLaiUsableMask;            /* 用于指定优先选择同一个LAI的流程 */
-    VOS_UINT16                          usSameLaiTimerLen;              /* 等待同一个LAI小区定时器长度，单位:ms */
-    VOS_UINT8                           ucStoreSameLaiFlag;             /* 历史频点阶段是否优先选择同一个LAI频点 */
-    VOS_UINT8                           ucFullSameLaiFlag;              /* 全频段阶段是否优先选择同一个LAI频点 */
+    VOS_INT16                           sSameLaiThreshold;              /* ??????????????LAI??????RSSI???? */
+    VOS_UINT32                          ulSameLaiUsableMask;            /* ??????????????????????LAI?????? */
+    VOS_UINT16                          usSameLaiTimerLen;              /* ??????????LAI????????????????????:ms */
+    VOS_UINT8                           ucStoreSameLaiFlag;             /* ??????????????????????????????LAI???? */
+    VOS_UINT8                           ucFullSameLaiFlag;              /* ????????????????????????????LAI???? */
 
-    VOS_UINT32                          ulWithSiUsableMask;             /* 用于指定优先选择带系统消息的流程 */
-    VOS_UINT8                           ucStoreWithSiFlag;              /* 历史频点阶段是否优先选择带系统消息频点 */
-    VOS_UINT8                           ucFullWithSiFlag;               /* 全频段阶段是否优先选择带系统消息频点 */
-    VOS_INT16                           sWithSiThreshold;               /* 优先选择带系统消息频点的RSSI门限 */
+    VOS_UINT32                          ulWithSiUsableMask;             /* ???????????????????????????????? */
+    VOS_UINT8                           ucStoreWithSiFlag;              /* ?????????????????????????????????????? */
+    VOS_UINT8                           ucFullWithSiFlag;               /* ???????????????????????????????????? */
+    VOS_INT16                           sWithSiThreshold;               /* ????????????????????????RSSI???? */
 
-    VOS_UINT8                           ucRmvUtranImpactFlg;            /* 扫频结果中是否删除Utran干扰频点 */
-    VOS_UINT8                           ucRmvPseudoNCell;               /* 扫频结果中是否删除邻频干扰频点 */
-    VOS_UINT8                           ucAutoAnycellCamp;              /* 指定搜SUITABLE驻留失败后是否主动尝试ANYCELL驻留 */
-    VOS_UINT8                           ucMaxArfcnNum;                  /* 并行搜搜索最大频点个数 */
+    VOS_UINT8                           ucRmvUtranImpactFlg;            /* ??????????????????Utran???????? */
+    VOS_UINT8                           ucRmvPseudoNCell;               /* ?????????????????????????????? */
+    VOS_UINT8                           ucAutoAnycellCamp;              /* ??????SUITABLE??????????????????????ANYCELL???? */
+    VOS_UINT8                           ucMaxArfcnNum;                  /* ?????????????????????? */
 
-    VOS_UINT8                           ucFirstTcIgnoreSi2Q;            /* 第一个TC周期前是否忽略SI2Quater */
-    VOS_UINT8                           ucRmvNoNeedCellFlg;             /* 阶段搜索过程中是否删除已经确认无用的小区 */
-    VOS_UINT8                           ucRmvCellBetterThreshold;       /* 阶段搜索过程中删除无用小区要求信号变好的门限 */
-    VOS_UINT8                           ucRsv6;                         /* 保留位 */
+    VOS_UINT8                           ucFirstTcIgnoreSi2Q;            /* ??????TC??????????????SI2Quater */
+    VOS_UINT8                           ucRmvNoNeedCellFlg;             /* ???????????????????????????????????????? */
+    VOS_UINT8                           ucRmvCellBetterThreshold;       /* ???????????????????????????????????????????? */
+    VOS_UINT8                           ucRsv6;                         /* ?????? */
 
-    VOS_UINT16                          usRsv1;                         /* 保留位 */
-    VOS_UINT16                          usRsv2;                         /* 保留位 */
-    VOS_UINT16                          usRsv3;                         /* 保留位 */
-    VOS_UINT16                          usRsv4;                         /* 保留位 */
+    VOS_UINT16                          usRsv1;                         /* ?????? */
+    VOS_UINT16                          usRsv2;                         /* ?????? */
+    VOS_UINT16                          usRsv3;                         /* ?????? */
+    VOS_UINT16                          usRsv4;                         /* ?????? */
 
-    VOS_INT16                           sRmvCellLastRxlevThreshold;     /* 阶段搜索过程中删除无用小区要求频点列表搜信号的门限 */
-    VOS_INT16                           sRsv2;                          /* 保留位 */
-    VOS_INT16                           sRsv3;                          /* 保留位 */
-    VOS_INT16                           sRsv4;                          /* 保留位 */
+    VOS_INT16                           sRmvCellLastRxlevThreshold;     /* ?????????????????????????????????????????????????? */
+    VOS_INT16                           sRsv2;                          /* ?????? */
+    VOS_INT16                           sRsv3;                          /* ?????? */
+    VOS_INT16                           sRsv4;                          /* ?????? */
 
-    VOS_UINT32                          ulRsv1;                         /* 保留位 */
-    VOS_UINT32                          ulRsv2;                         /* 保留位 */
-    VOS_UINT32                          ulRsv3;                         /* 保留位 */
-    VOS_UINT32                          ulRsv4;                         /* 保留位 */
+    VOS_UINT32                          ulRsv1;                         /* ?????? */
+    VOS_UINT32                          ulRsv2;                         /* ?????? */
+    VOS_UINT32                          ulRsv3;                         /* ?????? */
+    VOS_UINT32                          ulRsv4;                         /* ?????? */
 
 }NVIM_GSM_PARALLEL_SEARCH_CUSTOMIZE_CFG_STRU;
 
 /*****************************************************************************
- 结 构 名  : NVIM_GSM_ENABLE_HISTORY_ARFCN_WITH_SPEC_ARFCN_LST_STRU
- 结构说明  : en_NV_Item_GSM_ENABLE_HISTORY_ARFCN_WITH_SPEC_ARFCN_LST NV结构
-             L2G 重定向过程中,搜索网络指定频点时使用历史频点的相关配置
- 修改历史  :
-  1.日  期   : 2015-10-16
-    作  者   : p00166345
-    修改内容 : 新生成结构
+ ?? ?? ??  : NVIM_GSM_ENABLE_HISTORY_ARFCN_WITH_SPEC_ARFCN_LST_STRU
+ ????????  : en_NV_Item_GSM_ENABLE_HISTORY_ARFCN_WITH_SPEC_ARFCN_LST NV????
+             L2G ????????????,????????????????????????????????????????
+ ????????  :
+  1.??  ??   : 2015-10-16
+    ??  ??   : p00166345
+    ???????? : ??????????
 *****************************************************************************/
 typedef struct
 {
@@ -1237,88 +1237,88 @@ typedef struct
 }NVIM_GSM_ENABLE_HISTORY_ARFCN_WITH_SPEC_ARFCN_LST_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_RR_CONNECT_FAIL_PUNISH_CFG_STRU
- 结构说明  : RR建链失败惩罚的开关以及门限配置
- 修改历史  :
-  1.日  期   : 2015年10月21日
-    作  者   : w00146666
-    修改内容 : 新生成结构
-  2.日  期   : 2015年12月4日
-    作  者   : w00146666
-    修改内容 : for DTS2015112600361, 增加信号强度变化老化和时间老化机制
+ ??????    : NVIM_GAS_RR_CONNECT_FAIL_PUNISH_CFG_STRU
+ ????????  : RR??????????????????????????????
+ ????????  :
+  1.??  ??   : 2015??10??21??
+    ??  ??   : w00146666
+    ???????? : ??????????
+  2.??  ??   : 2015??12??4??
+    ??  ??   : w00146666
+    ???????? : for DTS2015112600361, ??????????????????????????????????
 *****************************************************************************/
 typedef struct
 {
-    /* ===============惩罚机制总体相关的NV配置项===================== */
-    VOS_UINT8           ucCsAccFailPunishSwitchFlag;        /* 是否开启CS随机接入失败惩罚机制，0: 关闭, 1: 开启，默认值为1 */
+    /* ===============??????????????????NV??????===================== */
+    VOS_UINT8           ucCsAccFailPunishSwitchFlag;        /* ????????CS??????????????????????0: ????, 1: ??????????????1 */
 
-    VOS_UINT8           ucPsAccFailPunishSwitchFlag;        /* 是否开启PS随机接入失败惩罚机制，0: 关闭, 1: 开启，默认值为0 */
+    VOS_UINT8           ucPsAccFailPunishSwitchFlag;        /* ????????PS??????????????????????0: ????, 1: ??????????????0 */
 
-    VOS_UINT8           ucRrConnFailOptimizeSwtichFlag;     /* 是否开启接入失败优化机制开关，
-                                                               0: 关闭, 1: 开启，默认值为1
-                                                               打开该NV项后，
+    VOS_UINT8           ucRrConnFailOptimizeSwtichFlag;     /* ??????????????????????????????
+                                                               0: ????, 1: ??????????????1
+                                                               ??????NV??????
                                                                1.
-                                                               随机接入失败一次后该小区为FORBIND优先级小区，
-                                                               随机接入失败超过一定次数启动惩罚机制，惩罚周期内将认为该小区被BAR；惩罚时间超时则认为是低优先级小区；
+                                                               ??????????????????????????FORBIND????????????
+                                                               ??????????????????????????????????????????????????????????????BAR????????????????????????????????????
 
                                                                2.
-                                                               N200失败次数达到一定次数(NV可配置)，执行被动重选；
-                                                               N200失败达到一定次数(NV可配置), 启动惩罚机制，惩罚周期内将认为该小区被BAR；惩罚时间超时则认为是低优先级小区；
+                                                               N200????????????????????(NV??????)????????????????
+                                                               N200????????????????(NV??????), ??????????????????????????????????????BAR????????????????????????????????????
 
                                                                3.
-                                                               重新随机接入成功，如果该小区是因为随机接入失败加入列表，从列表中删除该小区；
-                                                               重新层二建链成功，如果该小区是因为N200失败加入列表，从列表中删除该小区；                                                               
+                                                               ????????????????????????????????????????????????????????????????????????????
+                                                               ??????????????????????????????????N200??????????????????????????????????                                                               
 
-                                                               关闭该NV项，则FORBIND优先级没有迭代惩罚策略；也没有N200惩罚机制
-                                                               随机接入失败一次后该小区为FORBIND优先级小区，超过3次不能驻留；
+                                                               ??????NV??????FORBIND??????????????????????????????N200????????
+                                                               ??????????????????????????FORBIND????????????????3????????????
                                                                */
 
-    /* ===============随机接入失败相关的NV配置项===================== */
-    VOS_UINT8           ucStartPunishRaFailTimesThreshold;     /* 在该GSM小区上随机接入失败次数门限, 达到该次数对该小区启动惩罚机制 */
+    /* ===============??????????????????NV??????===================== */
+    VOS_UINT8           ucStartPunishRaFailTimesThreshold;     /* ????GSM??????????????????????????, ?????????????????????????????? */
 
-    VOS_UINT8           ucRssiOffset;                         /* 历史信号强度低于门限，小区信号强度增加门限达到该门限将该小区从Bar列表中删除 */
+    VOS_UINT8           ucRssiOffset;                         /* ??????????????????????????????????????????????????????????????Bar?????????? */
 
 
-    /* ===============N200相关的NV配置项============================== */
-    VOS_UINT8           ucN200FailPunishSwitchFlag;             /* 是否开启N200失败惩罚机制，0: 关闭, 1: 开启，默认值为1 */
+    /* ===============N200??????NV??????============================== */
+    VOS_UINT8           ucN200FailPunishSwitchFlag;             /* ????????N200??????????????0: ????, 1: ??????????????1 */
 
-    VOS_UINT8           ucStartReselN200FailTimesThreshold;     /* 在该GSM小区上N200失败次数门限, 达到该次数对启动被动重选 */
+    VOS_UINT8           ucStartReselN200FailTimesThreshold;     /* ????GSM??????N200????????????, ???????????????????????? */
 
-    VOS_UINT8           ucStartPunishN200FailTimesThreshold;    /* 在该GSM小区上N200失败次数门限, 达到该次数对该小区启动惩罚机制 */
+    VOS_UINT8           ucStartPunishN200FailTimesThreshold;    /* ????GSM??????N200????????????, ?????????????????????????????? */
     
-    VOS_INT16           sN200FailRssiThreshold;                 /* 在该GSM小区上N200失败RSSI门限，单位:dBm  */
+    VOS_INT16           sN200FailRssiThreshold;                 /* ????GSM??????N200????RSSI??????????:dBm  */
 
-    /* ===============惩罚时间相关的NV配置项============================== */
-    VOS_UINT16          usInitialForbidTimeLen;                /* 建链失败第一次的惩罚时间，单位:秒 */
+    /* ===============??????????????NV??????============================== */
+    VOS_UINT16          usInitialForbidTimeLen;                /* ??????????????????????????????:?? */
 
-    VOS_UINT16          usMaxForbidTimeLen;                    /* 建链失败的小区的最大惩罚时长，单位:秒 */
+    VOS_UINT16          usMaxForbidTimeLen;                    /* ??????????????????????????????????:?? */
 
-    VOS_INT16           sRssiHighThresh;                      /* 单位:dBm, 加入惩罚列表的小区如果信号强度超过该值，该小区从惩罚列表中移除将不考虑信号强度变化 */
+    VOS_INT16           sRssiHighThresh;                      /* ????:dBm, ?????????????????????????????????????????????????????????????????????????????????? */
 
-    VOS_UINT32          ulForbidCellMaxReServeTimeLen;        /* Forbid小区在惩罚列表中的最大保留时长，单位:分 */
+    VOS_UINT32          ulForbidCellMaxReServeTimeLen;        /* Forbid????????????????????????????????????:?? */
     
-    VOS_UINT32          ulRsv4;                              /* 保留位 */
-    VOS_UINT32          ulRsv5;                              /* 保留位 */
-    VOS_UINT32          ulRsv6;                              /* 保留位 */
-    VOS_UINT32          ulRsv7;                              /* 保留位 */
+    VOS_UINT32          ulRsv4;                              /* ?????? */
+    VOS_UINT32          ulRsv5;                              /* ?????? */
+    VOS_UINT32          ulRsv6;                              /* ?????? */
+    VOS_UINT32          ulRsv7;                              /* ?????? */
 
 }NVIM_GAS_RR_CONNECT_FAIL_PUNISH_CFG_STRU;
 
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_PING_PONG_HO_CUSTOMIZE_CFG_STRU
- 结构说明  : en_NV_Item_GSM_PING_PONG_HO_CUSTOMIZE_CFG 结构,GSM 乒乓切换定制特性相关配置
+ ??????    : NVIM_GSM_PING_PONG_HO_CUSTOMIZE_CFG_STRU
+ ????????  : en_NV_Item_GSM_PING_PONG_HO_CUSTOMIZE_CFG ????,GSM ????????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucSwitchFlag;                   /* 特性开关 */
-    VOS_UINT8                           ucHoTimeThreshold;              /* 统计范围内的小区平均驻留时间门限, 初步推荐30s */
-    VOS_UINT8                           ucBadCellTimeScale;             /* 坏小区平均时间评估因子, 单位: 0.1, 初步推荐 20 */
-    VOS_UINT8                           ucGoodQualityThreshold;         /* 信号质量好判定门限.误码率. 单位: 千分之一, 初步推荐值为5 */
-    VOS_UINT8                           ucGoodQualityCntThreshold;      /* 信号质量好的统计次数门限, 初步推荐值 3 */
-    VOS_UINT8                           ucNCellRptReduceValue;          /* 优化生效时,邻区上报调整量, 单位 dB, 初步推荐值为20 */
-    VOS_UINT8                           ucWatchHoTimes;                 /* 切换次数, 初步推荐值为 4 */
-    VOS_UINT8                           aucRsv1;                        /* 保留位 */
+    VOS_UINT8                           ucSwitchFlag;                   /* ???????? */
+    VOS_UINT8                           ucHoTimeThreshold;              /* ????????????????????????????????, ????????30s */
+    VOS_UINT8                           ucBadCellTimeScale;             /* ??????????????????????, ????: 0.1, ???????? 20 */
+    VOS_UINT8                           ucGoodQualityThreshold;         /* ??????????????????.??????. ????: ????????, ????????????5 */
+    VOS_UINT8                           ucGoodQualityCntThreshold;      /* ????????????????????????, ?????????? 3 */
+    VOS_UINT8                           ucNCellRptReduceValue;          /* ??????????,??????????????, ???? dB, ????????????20 */
+    VOS_UINT8                           ucWatchHoTimes;                 /* ????????, ???????????? 4 */
+    VOS_UINT8                           aucRsv1;                        /* ?????? */
     VOS_UINT16                          ausRsv1;
     VOS_UINT16                          ausRsv2;
     VOS_UINT8                           aucRsv3;
@@ -1328,18 +1328,18 @@ typedef struct
 }NVIM_GSM_PING_PONG_HO_CUSTOMIZE_CFG_STRU;
 
 /*****************************************************************************
- 结 构 名  : NVIM_GSM_LTE_MEASURE_CFG_STRU
- 结构说明  : GSM测量LTE配置NV
- 修改历史  :
-  1.日  期   : 2015年12月7日
-    作  者   : s00184266
-    修改内容 : dts2015100803984,新生成结构
+ ?? ?? ??  : NVIM_GSM_LTE_MEASURE_CFG_STRU
+ ????????  : GSM????LTE????NV
+ ????????  :
+  1.??  ??   : 2015??12??7??
+    ??  ??   : s00184266
+    ???????? : dts2015100803984,??????????
 
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucDistLteAcsTypeEnable;         /* 使能区分LTE制式进行测量的开关 */
-    VOS_UINT8                           aucRsv1;                        /* 保留位 */
+    VOS_UINT8                           ucDistLteAcsTypeEnable;         /* ????????LTE?????????????????? */
+    VOS_UINT8                           aucRsv1;                        /* ?????? */
     VOS_UINT8                           aucRsv2;
     VOS_UINT8                           aucRsv3;
     VOS_UINT16                          ausRsv1;
@@ -1347,15 +1347,15 @@ typedef struct
 }NVIM_GSM_LTE_MEASURE_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_SEC_RXQUAL_SUB_ALPHA_FILTERING_CFG_STRU
- 结构说明  : en_NV_Item_GSM_SEC_RXQUAL_SUB_ALPHA_FILTERING_CFG 结构,对GSM SUB集的误码率进行ALPHA滤波, 以判断服务小区是否可以继续驻留的相关配置
+ ??????    : NVIM_GSM_SEC_RXQUAL_SUB_ALPHA_FILTERING_CFG_STRU
+ ????????  : en_NV_Item_GSM_SEC_RXQUAL_SUB_ALPHA_FILTERING_CFG ????,??GSM SUB??????????????ALPHA????, ????????????????????????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usSecRrPoorRxQualSubThresHold;  /* 信号质量误码率判定门限, 精度:千分之一, 有效值为0~1000, 推荐值: 80, 即误码率为8% */
-    VOS_UINT16                          usSecRxQualSubAlpha;            /* Alpha因子, 精度:千分之一, 有效值为0~1000, 推荐值: 250, 即Alpha为0.25 */
-    VOS_UINT16                          usSecConSubBerCntThresHold;     /* 连续usSecConSubBerCntThresHold个数样点大于阈值, 再开启Poor机制, 推荐值: 2, 即连续三次 */
-    VOS_UINT8                           ucRsv1;                         /* 保留位 */
+    VOS_UINT16                          usSecRrPoorRxQualSubThresHold;  /* ??????????????????????, ????:????????, ????????0~1000, ??????: 80, ??????????8% */
+    VOS_UINT16                          usSecRxQualSubAlpha;            /* Alpha????, ????:????????, ????????0~1000, ??????: 250, ??Alpha??0.25 */
+    VOS_UINT16                          usSecConSubBerCntThresHold;     /* ????usSecConSubBerCntThresHold????????????????, ??????Poor????, ??????: 2, ?????????? */
+    VOS_UINT8                           ucRsv1;                         /* ?????? */
     VOS_UINT8                           ucRsv2;
     VOS_UINT16                          usRsv1;
     VOS_UINT16                          usRsv2;
@@ -1363,12 +1363,12 @@ typedef struct
 
 #if defined( __PS_WIN32_RECUR__ ) || defined (DMT)
 /*****************************************************************************
- 结 构 名  : NVIM_GAS_CHR_PC_CFG_STRU
- 结构说明  : 
- 修改历史  :
-  1.日  期   : 2015年12月28日
-    作  者   : w00146666
-    修改内容 : 新生成结构
+ ?? ?? ??  : NVIM_GAS_CHR_PC_CFG_STRU
+ ????????  : 
+ ????????  :
+  1.??  ??   : 2015??12??28??
+    ??  ??   : w00146666
+    ???????? : ??????????
 *****************************************************************************/
 typedef struct  
 {
@@ -1380,34 +1380,34 @@ typedef struct
 #endif
 
 /*****************************************************************************
- 结构名    : NVIM_Item_GAS_SAME_LAI_PREFER_CFG_STRU
- 结构说明  : en_NV_Item_GAS_SAME_LAI_PREFER_CFG 结构, 搜网过程中优先选择相同 LAI 小区
-             的相关配置.
+ ??????    : NVIM_Item_GAS_SAME_LAI_PREFER_CFG_STRU
+ ????????  : en_NV_Item_GAS_SAME_LAI_PREFER_CFG ????, ?????????????????????? LAI ????
+             ??????????.
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucMtSwitchFlag;                 /* 特性开关 */
-    VOS_UINT8                           ucMoSwitchFlag;                 /* 特性开关 */
+    VOS_UINT8                           ucMtSwitchFlag;                 /* ???????? */
+    VOS_UINT8                           ucMoSwitchFlag;                 /* ???????? */
 
-    VOS_INT8                            cFirstLevelAddValue;           /* 第一能量等级中相同 LAI 小区排序时的能量增加值 */
-    VOS_INT8                            cFirstLevelThreshold;          /* 第一能量等级门限 */
+    VOS_INT8                            cFirstLevelAddValue;           /* ?????????????????? LAI ?????????????????????? */
+    VOS_INT8                            cFirstLevelThreshold;          /* ???????????????? */
 
-    VOS_INT8                            cSecLevelAddValue;             /* 第二能量等级中相同 LAI 小区排序时的能量增加值 */
-    VOS_INT8                            cSecLevelThreshold;            /* 第二能量等级门限 */
-    VOS_UINT16                          usValidTimeLen;                 /* 有效时长, 单位:分钟 */
-    VOS_UINT8                           aucRsv1;                        /* 保留位 */
-	VOS_UINT8                           aucRsv2;                        /* 保留位 */
-    VOS_UINT8                           aucRsv3;                        /* 保留位 */
-    VOS_UINT8                           aucRsv4;                        /* 保留位 */
+    VOS_INT8                            cSecLevelAddValue;             /* ?????????????????? LAI ?????????????????????? */
+    VOS_INT8                            cSecLevelThreshold;            /* ???????????????? */
+    VOS_UINT16                          usValidTimeLen;                 /* ????????, ????:???? */
+    VOS_UINT8                           aucRsv1;                        /* ?????? */
+	VOS_UINT8                           aucRsv2;                        /* ?????? */
+    VOS_UINT8                           aucRsv3;                        /* ?????? */
+    VOS_UINT8                           aucRsv4;                        /* ?????? */
 }NVIM_Item_GAS_SAME_LAI_PREFER_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_HO_CUSTOMIZE_CFG_STRU
- 结构说明  : en_NV_Item_GSM_HO_CUSTOMIZE_CFG 结构,GSM 切换定制特性相关配置
+ ??????    : NVIM_GSM_HO_CUSTOMIZE_CFG_STRU
+ ????????  : en_NV_Item_GSM_HO_CUSTOMIZE_CFG ????,GSM ????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucChanModeRptIndication;        /* 语音信道切换切换过程,中给 MM 上报 GAS_RR_CHAN_IND 的时机 */
+    VOS_UINT8                           ucChanModeRptIndication;        /* ????????????????????,???? MM ???? GAS_RR_CHAN_IND ?????? */
     VOS_UINT8                           aucRsv1;
     VOS_UINT16                          ausRsv1;
     VOS_UINT8                           aucRsv2;
@@ -1417,12 +1417,12 @@ typedef struct
 }NVIM_GSM_HO_CUSTOMIZE_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GSM_PMR_CFG_STRU
- 结构说明  : en_NV_Item_GSM_PMR_CFG 结构,GSM PMR相关定制
+ ??????    : NVIM_GSM_PMR_CFG_STRU
+ ????????  : en_NV_Item_GSM_PMR_CFG ????,GSM PMR????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucNcReportPeriodIMin;           /* 空闲态 PMR 周期最小值 */
+    VOS_UINT8                           ucNcReportPeriodIMin;           /* ?????? PMR ?????????? */
     VOS_UINT8                           aucRsv1;
     VOS_UINT16                          ausRsv1;
     VOS_UINT8                           aucRsv2;
@@ -1432,32 +1432,32 @@ typedef struct
 }NVIM_GSM_PMR_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_GSM_ACTIVE_CELL_RESELECT_CFG_STRU
- 结构说明  : en_NV_Item_GAS_GSM_CELL_RESELECT_CFG 结构, GAS 层G2G重选流程相关配置
+ ??????    : NVIM_GAS_GSM_ACTIVE_CELL_RESELECT_CFG_STRU
+ ????????  : en_NV_Item_GAS_GSM_CELL_RESELECT_CFG ????, GAS ??G2G????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucC2ReselPartialReadFlg;        /* 主动重选是否需要部分读
-                                                                           1: 需要;
-                                                                           0: 不需要 */
+    VOS_UINT8                           ucC2ReselPartialReadFlg;        /* ??????????????????????
+                                                                           1: ????;
+                                                                           0: ?????? */
     VOS_UINT8                           ucRsv1;
-    VOS_UINT16                          usHistorySi3ValidTimeLen;       /* 驻留阶段历史SI3有效时长. 单位: s */
+    VOS_UINT16                          usHistorySi3ValidTimeLen;       /* ????????????SI3????????. ????: s */
     VOS_UINT8                           ucRsv2;
     VOS_UINT8                           ucRsv3;
     VOS_UINT8                           ucRsv4;
     VOS_UINT8                           ucRsv5;
 
-    VOS_UINT8                           ucC2ReselPunishSwitchFlg;       /* 主动重选邻区惩罚特性是否开启
-                                                                           1: 开启;
-                                                                           0: 关闭 */
+    VOS_UINT8                           ucC2ReselPunishSwitchFlg;       /* ????????????????????????????
+                                                                           1: ????;
+                                                                           0: ???? */
     VOS_UINT8                           ucRsv6;
-    VOS_INT16                           sScellRssiThreshold;            /* 服务小区能量波动阈值，单位: dBm */
-    VOS_UINT16                          usScellPchBerThreshold;         /* 服务小区PCH误码率Alpha滤波阈值，单位: %，千分之一精度 */
-    VOS_UINT16                          usScellPchBerAlpha;             /* 服务小区PCH误码率Alpha滤波，Alpha因子，单位: %，千分之一精度 */
-    VOS_UINT16                          usForbiddenCellPunishTimeLen;   /* Forbidden 小区重选惩罚时长，当超过时长，将小区清除，单位: s */
-    VOS_UINT16                          usForbiddenCellPunishStep;      /* 当服务小区为好小区时，对邻区进行惩罚步进值，单位: dBm */
-    VOS_UINT8                           ucScellRaSuccStep;              /* 服务小区RA成功一次步进值 */
-    VOS_UINT8                           ucScellRaFailStep;              /* 服务小区RA失败一次步进值 */
+    VOS_INT16                           sScellRssiThreshold;            /* ??????????????????????????: dBm */
+    VOS_UINT16                          usScellPchBerThreshold;         /* ????????PCH??????Alpha??????????????: %?????????????? */
+    VOS_UINT16                          usScellPchBerAlpha;             /* ????????PCH??????Alpha??????Alpha??????????: %?????????????? */
+    VOS_UINT16                          usForbiddenCellPunishTimeLen;   /* Forbidden ??????????????????????????????????????????????: s */
+    VOS_UINT16                          usForbiddenCellPunishStep;      /* ????????????????????????????????????????????????: dBm */
+    VOS_UINT8                           ucScellRaSuccStep;              /* ????????RA?????????????? */
+    VOS_UINT8                           ucScellRaFailStep;              /* ????????RA?????????????? */
     VOS_UINT8                           ucRsv9;
     VOS_UINT8                           ucRsv10;  
     VOS_UINT16                          usRsv1;
@@ -1465,22 +1465,22 @@ typedef struct
 }NVIM_GAS_GSM_ACTIVE_CELL_RESELECT_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NVIM_GAS_GSM_PASSIVE_RESELECT_OPTIMIZE_CFG_STRU
- 结构说明  : en_NV_Item_GAS_GSM_PASSIVE_RESELECT_OPTIMIZE_CFG 结构，立即指派被拒优化和T3166/T3168超时优化
+ ??????    : NVIM_GAS_GSM_PASSIVE_RESELECT_OPTIMIZE_CFG_STRU
+ ????????  : en_NV_Item_GAS_GSM_PASSIVE_RESELECT_OPTIMIZE_CFG ????????????????????????T3166/T3168????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucImmAssRejOptSwitchFlg;            /* 特性开关 */
-    VOS_UINT8                           ucImmAssRejCntThreshold;            /* 最大立即指派被拒次数 */
-    VOS_UINT8                           ucImmAssRejWaitIndThreshold;        /* 最大立即指派被拒时长，单位: s */
+    VOS_UINT8                           ucImmAssRejOptSwitchFlg;            /* ???????? */
+    VOS_UINT8                           ucImmAssRejCntThreshold;            /* ???????????????????? */
+    VOS_UINT8                           ucImmAssRejWaitIndThreshold;        /* ??????????????????????????: s */
 
-    VOS_UINT8                           ucCcAbnormalRelCnt;                 /* 连续失败超过此门限时发起被动重选, 0xFF 表示关闭对应功能 */
+    VOS_UINT8                           ucCcAbnormalRelCnt;                 /* ????????????????????????????????, 0xFF ???????????????? */
 
-    VOS_UINT8                           ucT3166T3168ExpiredOptSwitchFlg;    /* 特性开关 */
-    VOS_UINT8                           ucT3166T3168ExpiredCntThreshold;    /* T3166/T3168超时允许最大超时次数 */
-    VOS_UINT16                          usT3166T3168ExpiredPunishTimeLen;   /* T3166/T3168超时惩罚定时器时长，单位: ms */
+    VOS_UINT8                           ucT3166T3168ExpiredOptSwitchFlg;    /* ???????? */
+    VOS_UINT8                           ucT3166T3168ExpiredCntThreshold;    /* T3166/T3168???????????????????? */
+    VOS_UINT16                          usT3166T3168ExpiredPunishTimeLen;   /* T3166/T3168????????????????????????: ms */
 
-    VOS_UINT8                           ucRsv1;                             /* 保留位 */
+    VOS_UINT8                           ucRsv1;                             /* ?????? */
     VOS_UINT8                           ucRsv2;
     VOS_UINT8                           ucRsv3;
     VOS_UINT8                           ucRsv4;

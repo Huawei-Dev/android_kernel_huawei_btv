@@ -49,7 +49,7 @@
 #define _AT_INPUT_PROC_H_
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 
 #include "ImmInterface.h"
@@ -69,20 +69,20 @@ extern "C" {
 #pragma pack(4)
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
 
 /*Begin - yaochaoqun - 2009-4-2 - for new PNP*/
 #define  SCSI_CMD_LEN                       (31)
 /*End - yaochaoqun - 2009-4-2 - for new PNP*/
 
-/* 向底软最大重传次数 */
+/* ?????????????????? */
 #define AT_NDIS_MAX_RESEND_TIMES            (60)
 
-/* Modified by s62952 for AT Project，2011-10-17,  Begin*/
-/*AT数据初始长度*/
+/* Modified by s62952 for AT Project??2011-10-17,  Begin*/
+/*AT????????????*/
 #define AT_INIT_DATA_LEN                    (0)
-/* Modified by s62952 for AT Project，2011-10-17,  end*/
+/* Modified by s62952 for AT Project??2011-10-17,  end*/
 
 #define AT_MODEM_UL_DATA_BUFF_SIZE      (1536)
 #define AT_MODEM_UL_DATA_BUFF_NUM       (16)
@@ -90,169 +90,169 @@ extern "C" {
 #define AT_UART_UL_DATA_BUFF_SIZE       (1536)
 #define AT_UART_UL_DATA_BUFF_NUM        (16)
 
-/* HSIC AT通道，底软向协议栈发送数据的上行缓存规格 */
+/* HSIC AT???????????????????????????????????????? */
 #define AT_HSIC_UL_DATA_BUFF_SIZE       (5*1024)
 #define AT_HSIC_UL_DATA_BUFF_NUM        (2)
 
-/* 来电RI管脚电平控制定时器名称 */
+/* ????RI?????????????????????? */
 #define AT_SET_VOICE_RI_TMR_NAME(ulTmrName)\
             (ulTmrName)  = AT_VOICE_RI_TIMER;\
             (ulTmrName) |= AT_INTERNAL_PROCESS_TYPE
 
-/* 来电RI管脚电平控制定时器参数 */
+/* ????RI?????????????????????? */
 #define AT_SET_VOICE_RI_TMR_PARAM(ulTmrParam, ucIndex, ucCallId)\
             ((ulTmrParam) = ((ucCallId) << 8) | (ucIndex))
 
-/* 从来电RI管脚电平控制定时器超时消息中获取CALLID */
+/* ??????RI????????????????????????????????CALLID */
 #define AT_GET_VOICE_RI_CALLID_FROM_TMR_PARAM(ulTmrParam)\
             ((VOS_UINT8)(((ulTmrParam) & 0x0000FF00) >> 8))
 
-/* 从来电RI管脚电平控制定时器超时消息中获取端口ID */
+/* ??????RI????????????????????????????????????ID */
 #define AT_GET_VOICE_RI_CLIENTID_FROM_TMR_PARAM(ulTmrParam)\
             ((VOS_UINT8)((ulTmrParam) & 0x000000FF))
 
-/* 新短信RI管脚电平控制定时器名称 */
+/* ??????RI?????????????????????? */
 #define AT_SET_SMS_RI_TMR_NAME(ulTmrName)\
             (ulTmrName)  = AT_SMS_RI_TIMER;\
             (ulTmrName) |= AT_INTERNAL_PROCESS_TYPE
 
-/* 新短信RI管脚电平控制定时器参数 */
+/* ??????RI?????????????????????? */
 #define AT_SET_SMS_RI_TMR_PARAM(ulTmrParam, ucIndex)\
             ((ulTmrParam) = (ucIndex))
 
-/* 从新短信RI管脚电平控制定时器超时消息中获取端口ID */
+/* ????????RI????????????????????????????????????ID */
 #define AT_GET_SMS_RI_CLIENTID_FROM_TMR_PARAM(ulTmrParam)\
             ((VOS_UINT8)((ulTmrParam) & 0x000000FF))
 
-/* UART端口数据帧格式映射表指针和大小 */
+/* UART?????????????????????????????? */
 #define AT_UART_GET_FORMAT_TBL_PTR()    (g_astAtUartFormatTab)
 #define AT_UART_GET_FORMAT_TBL_SIZE()   (AT_ARRAY_SIZE(g_astAtUartFormatTab))
 
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 /*****************************************************************************
- 结构名称: AT_MEM_SOURCE_TYPE_ENUM
- 协议表格:
- 结构说明: MODEM设备内存来源类型
- 1.日    期   : 2011年10月17日
-  作    者   : s62952
-  修改内容   : 创建文件
+ ????????: AT_MEM_SOURCE_TYPE_ENUM
+ ????????:
+ ????????: MODEM????????????????
+ 1.??    ??   : 2011??10??17??
+  ??    ??   : s62952
+  ????????   : ????????
 *****************************************************************************/
 enum AT_MEM_SOURCE_TYPE_ENUM
 {
-    AT_MEM_SOURCE_UDI_UL_BUF,                                                   /*MODEM设备buffer内存*/
-    AT_MEM_SOURCE_UDI_DL_BUF,                                                   /*使用的DDR内存*/
+    AT_MEM_SOURCE_UDI_UL_BUF,                                                   /*MODEM????buffer????*/
+    AT_MEM_SOURCE_UDI_DL_BUF,                                                   /*??????DDR????*/
 
     AT_MEM_SOURCE_TYPE_BUTT
 };
 typedef VOS_UINT32 AT_MEM_SOURCE_TYPE_ENUM_UINT32;
 
 /*****************************************************************************
-  4 全局变量声明
+  4 ????????????
 *****************************************************************************/
 extern  VOS_UINT32  g_ATNdisSendSem;
 
-/*USB NCM的UDI句柄*/
+/*USB NCM??UDI????*/
 extern UDI_HANDLE                              g_ulAtUdiNdisHdl;
 
-/* UDI句柄 */
+/* UDI???? */
 extern UDI_HANDLE                              g_alAtUdiHandle[AT_CLIENT_BUTT];
 
 
 /*****************************************************************************
-  5 消息头定义
+  5 ??????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 消息定义
+  6 ????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  7 STRUCT定义
+  7 STRUCT????
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : AT_HSIC_CONTEXT_STRU
- 结构说明  : AP-MODEM新增3个HSIC AT通道，该结构用于这三个AT通道的统一管理及配置
- 1.日    期   : 2012年02月20日
-   作    者   : L47619
-   修改内容   : 新增结构
+ ??????    : AT_HSIC_CONTEXT_STRU
+ ????????  : AP-MODEM????3??HSIC AT??????????????????????AT????????????????????
+ 1.??    ??   : 2012??02??20??
+   ??    ??   : L47619
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
-    UDI_DEVICE_ID_E         enAcmChannelId;   /* 目前HSIC AT通道所用的HSIC ACM通道ID为:
+    UDI_DEVICE_ID_E         enAcmChannelId;   /* ????HSIC AT??????????HSIC ACM????ID??:
                                                                 UDI_ACM_HSIC_ACM0_ID
                                                                 UDI_ACM_HSIC_ACM2_ID
                                                                 UDI_ACM_HSIC_ACM4_ID */
 
 
-    AT_HSIC_REPORT_TYPE_ENUM_UINT32 enRptType;        /* 指定HSIC AT通道是否允许AT命令主动上报，
-                                                                与^APRPTPORTSEL命令配套使用，上电时默认为AT_HSIC_REPORT_ON*/
+    AT_HSIC_REPORT_TYPE_ENUM_UINT32 enRptType;        /* ????HSIC AT????????????AT??????????????
+                                                                ??^APRPTPORTSEL??????????????????????????AT_HSIC_REPORT_ON*/
 
-    VOS_VOID                       *pReadDataCB;      /* 注册给底软的接口，用于获取底软发送给协议栈的AT码流 */
+    VOS_VOID                       *pReadDataCB;      /* ????????????????????????????????????????????AT???? */
 
-    VOS_VOID                       *pFreeDlDataCB;    /* 注册给底软的接口，用于底软释放协议栈发送给底软的数据内存 */
+    VOS_VOID                       *pFreeDlDataCB;    /* ???????????????????????????????????????????????????????? */
 
-    UDI_HANDLE                      lHdlId;           /* HSIC AT的ACM通道句柄 */
+    UDI_HANDLE                      lHdlId;           /* HSIC AT??ACM???????? */
 
-    AT_CLIENT_ID_ENUM_UINT16        enAtClientId;     /* HSIC AT通道所对应的AT CLIENT ID*/
+    AT_CLIENT_ID_ENUM_UINT16        enAtClientId;     /* HSIC AT????????????AT CLIENT ID*/
 
-    AT_CLIENT_TAB_INDEX_UINT8       ucAtClientTabIdx; /* HSIC所使用的gastAtClientTab的index索引 */
+    AT_CLIENT_TAB_INDEX_UINT8       ucAtClientTabIdx; /* HSIC????????gastAtClientTab??index???? */
 
-    AT_USER_TYPE                    ucHsicUser;       /* HSIC AT通道所对应的AT USER type */
+    AT_USER_TYPE                    ucHsicUser;       /* HSIC AT????????????AT USER type */
 
-    AT_PORT_NO                      ucHsicPort;       /* HSIC AT通道所对应的AT PORT NO */
+    AT_PORT_NO                      ucHsicPort;       /* HSIC AT????????????AT PORT NO */
 
     VOS_UINT8                       aucReserved[7];
 }AT_HSIC_CONTEXT_STRU;
 
 
-/* Added by j00174725 for V3R3 Cut Out Memory，2013-11-07,  Begin */
+/* Added by j00174725 for V3R3 Cut Out Memory??2013-11-07,  Begin */
 #if (FEATURE_ON == FEATURE_AT_HSIC)
 extern AT_HSIC_CONTEXT_STRU                    g_astAtHsicCtx[];
 #endif
-/* Added by j00174725 for V3R3 Cut Out Memory，2013-11-07,  End */
+/* Added by j00174725 for V3R3 Cut Out Memory??2013-11-07,  End */
 
 
 /*****************************************************************************
-  8 UNION定义
+  8 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  9 OTHERS定义
+  9 OTHERS????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 /*****************************************************************************
- 函 数 名  : AT_SendDataToModem
- 功能描述  : 下行发送数据给modem口
- 输入参数  : pucDataBuf   ----    待发送下行数据内存指针
-             usLen        ----    数据长度
- 输出参数  :
- 返 回 值  : AT_SUCCESS ----      成功；
-             AT_FAILURE ----      失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_SendDataToModem
+ ????????  : ??????????????modem??
+ ????????  : pucDataBuf   ----    ??????????????????????
+             usLen        ----    ????????
+ ????????  :
+ ?? ?? ??  : AT_SUCCESS ----      ??????
+             AT_FAILURE ----      ????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2010年1月22日
-    作    者   : sunshaohua
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2010??1??22??
+    ??    ??   : sunshaohua
+    ????????   : ??????????
 
 *****************************************************************************/
 extern VOS_INT OM_RcvDiagCmdFromPC(VOS_UINT8 ucPortNo, VOS_UINT8 *pData, VOS_UINT16 uslength);
-/* Modified by L60609 for AT Project，2011-10-20,  Begin*/
+/* Modified by L60609 for AT Project??2011-10-20,  Begin*/
 #if (VOS_WIN32 == VOS_OS_VER)
 extern VOS_INT32 Sock_RecvCallbackRegister(VOS_UINT8 ucPortNo, pSockRecv pCallback);
 #endif
-/* Modified by L60609 for AT Project，2011-10-20,  End*/
+/* Modified by L60609 for AT Project??2011-10-20,  End*/
 
 extern int  App_VcomRecvCallbackRegister(unsigned char  uPortNo, pComRecv pCallback);
 extern VOS_INT32 AT_AppComEst(VOS_VOID);
@@ -646,7 +646,7 @@ VOS_VOID AT_RcvTiVoiceRiExpired(REL_TIMER_MSG *pstTmrMsg);
 VOS_VOID AT_ProcFormatResultMsc(VOS_UINT8 ucIndex, VOS_UINT32 ulReturnCode);
 
 
-/* Added by j00174725 for V3R3 Cut Out Memory，2013-11-07,  Begin */
+/* Added by j00174725 for V3R3 Cut Out Memory??2013-11-07,  Begin */
 #if (FEATURE_ON == FEATURE_AT_HSIC)
 extern VOS_VOID AT_HsicFourFreeDlDataBuf(VOS_UINT8 *pucBuf);
 extern VOS_VOID AT_HsicFourReadDataCB( VOS_VOID );
@@ -697,7 +697,7 @@ extern VOS_VOID AT_HsicModemEnableCB(VOS_UINT8 ucEnable);
 extern VOS_VOID AT_HsicModemReadDataCB( VOS_VOID );
 extern VOS_VOID AT_HsicModemReadMscCB(AT_DCE_MSC_STRU *pstRcvedMsc);
 #endif
-/* Added by j00174725 for V3R3 Cut Out Memory，2013-11-07,  End */
+/* Added by j00174725 for V3R3 Cut Out Memory??2013-11-07,  End */
 
 #if (VOS_OS_VER == VOS_WIN32)
 #pragma pack()

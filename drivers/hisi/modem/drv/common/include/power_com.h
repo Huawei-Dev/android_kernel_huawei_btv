@@ -48,9 +48,6 @@
 #ifndef __POWER_COM_H__
 #define __POWER_COM_H__
 
-//#include "drv_onoff.h"
-//#include "mdrv_sysboot.h"
-
 #define LOCAL_1 static
 
 typedef enum {
@@ -88,7 +85,7 @@ typedef struct
     unsigned int wdg_rst_cnt;
     unsigned int reboot_cmd;
     unsigned int dload_complt_magic;
-    unsigned int c_power_state;              /* 标识C核启动状态 */
+    unsigned int c_power_state;
     unsigned int a_power_state;
 }power_info_s;
 
@@ -111,7 +108,7 @@ typedef enum {
     POWER_OS_OK,
     POWER_BSP_OK,
     POWER_MSP_OK,
-    POWER_DSP_OK,           /* 升级阶段保证C核 MSP启动OK(AXI值大于等于POWER_MSP_OK)，才认为升级成功 */
+    POWER_DSP_OK,
     POWER_PS_OK,
     POWER_ST_BUILT
 }c_power_st_e;
@@ -120,15 +117,14 @@ typedef enum {
     POWER_NORMAL          = 0x50127895,
     POWER_RECOVERY_A      = 0x504F4F33,
     POWER_RECOVERY_B        = 0x504F4E54
-}a_kernel_st_e;                 /* fastboot启动模式状态机，只在fastboot中根据启动状态设置 */
+}a_kernel_st_e;
 
-/* 操作类型 */
 typedef enum _tagePowType
 {
     E_POWER_ON_MODE_GET= 0,
-    E_POWER_SHUT_DOWN,      /* 关机，带关机原因 */
-    E_POWER_POWER_OFF,      /* 下电 */
-    E_POWER_POWER_REBOOT,   /* 重启 */
+    E_POWER_SHUT_DOWN,
+    E_POWER_POWER_OFF,
+    E_POWER_POWER_REBOOT,
     E_POWER_BUILT
 }ePowCrtlType;
 
@@ -139,34 +135,31 @@ void balong_power_off(void);
 #if defined(__KERNEL__)
 typedef enum
 {
-    NORMAL_VERTYPE_FLAG = 0,       /* 当前版本为正常版本 */
-    FACTORY_VERTYPE_FLAG,          /* 当前版本为工厂版本 */
+    NORMAL_VERTYPE_FLAG = 0,
+    FACTORY_VERTYPE_FLAG,
     INVALID_VERTYPE_FLAG
 }DRV_SOFT_VER_TYPE;
 
 typedef enum
 {
-    NORMAL_CHARGING_MODE = 0,          /* 开机充电模式 */
-    POWER_DOWN_CHARGING_MODE,         /* 关机充电模式 */
+    NORMAL_CHARGING_MODE = 0,
+    POWER_DOWN_CHARGING_MODE,
     INVALID_CHARGING_MODE
 }DRV_CHARGING_MODE;
 
 typedef enum
 {
-    NORMAL_RESET_FLAG = 0,         /* 正常复位版本 */
-    ABNORMAL_RESET_FLAG,           /* 异常复位版本 */
+    NORMAL_RESET_FLAG = 0,
+    ABNORMAL_RESET_FLAG,
     INVALID_RESET_FLAG
 }DRV_RESET_TYPE;
 
 typedef enum
 {
-    RUN_MODE_NORMAL = 0,         /* 正常版本 */
-    RUN_MODE_RECOVERY,           /* RECOVERY */
+    RUN_MODE_NORMAL = 0,
+    RUN_MODE_RECOVERY,
     RUN_MODE_INVALID
 }DRV_RUN_MODE;
-
-
-
 
 DRV_CHARGING_MODE get_pd_charge_flag(void);
 DRV_RUN_MODE get_run_mode(void);
@@ -178,14 +171,12 @@ DRV_SOFT_VER_TYPE get_version_type(void);
 
 typedef enum
 {
-	DRV_START_MODE_CHARGING = 0, /* 充电开机模式, ps 等业务不启动  */
-	DRV_START_MODE_NORMAL , 	/* 正常开机模式，所有业务启动	  */
-	DRV_START_MODE_UPDATE,		/* 升级模式 */
+	DRV_START_MODE_CHARGING = 0,
+	DRV_START_MODE_NORMAL ,
+	DRV_START_MODE_UPDATE,
 	DRV_START_MODE_BUILT
 }DRV_START_MODE_E;
 
 #endif
-
-
 
 #endif

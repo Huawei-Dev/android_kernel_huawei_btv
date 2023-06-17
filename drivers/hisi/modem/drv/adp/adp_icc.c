@@ -102,7 +102,7 @@ s32 icc_write_cb_wraper(u32 real_channel_id , void* context)
 	return ICC_OK;
 }
 
-/* 逻辑通道到物理通道的转换 */
+/* ???????????????????????? */
 int icc_channel_logic2phy(u32 u32ChanId, u32 *channel_id)
 {
     int i = 0;
@@ -252,7 +252,7 @@ BSP_S32 BSP_ICC_Ioctl(BSP_U32 u32ChanId, BSP_U32 cmd, BSP_VOID *param)
 	{
 		u32ChanId = u32ChanId - UDI_ICC_GUOM0 + ICC_CHN_GUOM0;
 	}
-	channel_id = ((u16)u32ChanId << 16 | (u16)ICC_DEFAULT_SUB_CHANNEL);/* [false alarm]:屏蔽Fortify错误 */
+	channel_id = ((u16)u32ChanId << 16 | (u16)ICC_DEFAULT_SUB_CHANNEL);/* [false alarm]:????Fortify???? */
 	
 	if(u32ChanId >= ICC_CHN_ID_MAX)
 	{

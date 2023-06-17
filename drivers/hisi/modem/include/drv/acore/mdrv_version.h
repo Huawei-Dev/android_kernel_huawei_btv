@@ -57,7 +57,7 @@ extern "C"
 #define BUILD_DATE_LEN  12
 #define BUILD_TIME_LEN  12
 
-/*memVersionCtrl接口操作类型*/
+/*memVersionCtrl????????????*/
 #define VERIONREADMODE                  0
 #define VERIONWRITEMODE                1
 
@@ -81,7 +81,7 @@ typedef enum{
 
 typedef struct  tagMPRODUCT_INFO_S
 {
-	unsigned char *  productname;  /*芯片名称 */ /* BSP*/
+	unsigned char *  productname;  /*???????? */ /* BSP*/
 	unsigned int   productnamelen;
 	BSP_CHIP_TYPE_E echiptype;  /* PV500_CHIP V7R1_CHIP? */
 	unsigned int  platforminfo ;     /* FPGA ASIC?*/
@@ -89,7 +89,7 @@ typedef struct  tagMPRODUCT_INFO_S
 	unsigned short chip_id;   /*0x3650 0x3660 0x6932 0x6950*/
 } MPRODUCT_INFO_S;
 
-/* 芯片Modem 的软件版本信息*/
+/* ????Modem ??????????????*/
 typedef  struct  tagMSW_VER_INFO_S
 {
 	unsigned short  ulVVerNO;
@@ -105,13 +105,13 @@ typedef  struct  tagMSW_VER_INFO_S
 
 typedef  struct  tagMHW_VER_INFO_S
 {
-	int  hwindex;  /* HKADC检测到的硬件ID号(板级）*/
-	unsigned int  hwidsub;  /* HKADC检测到的子版本号*/
-	unsigned char *  hwfullver;  /* 硬件版本信息 MBB使用 */
+	int  hwindex;  /* HKADC????????????ID??(??????*/
+	unsigned int  hwidsub;  /* HKADC????????????????*/
+	unsigned char *  hwfullver;  /* ???????????? MBB???? */
 	unsigned int  hwfullverlen;
-	unsigned char *  hwname;  /* 外部产品名称  MBB使用 CPE? */
+	unsigned char *  hwname;  /* ????????????  MBB???? CPE? */
 	unsigned int  hwnamelen;
-	unsigned char *  hwinname;  /* 内部产品名称  MBB使用*/
+	unsigned char *  hwinname;  /* ????????????  MBB????*/
 	unsigned int  hwinnamelen;
 } MHW_VER_INFO_S;
 
@@ -150,8 +150,8 @@ typedef enum
 
 
 /*****************************************************************************
- 函 数 名  : mdrv_ver_get_info
- 功能描述  : 返回modem版本信息
+ ?? ?? ??  : mdrv_ver_get_info
+ ????????  : ????modem????????
 ****************************************************************************/
 const MODEM_VER_INFO_S * mdrv_ver_get_info(void);
 

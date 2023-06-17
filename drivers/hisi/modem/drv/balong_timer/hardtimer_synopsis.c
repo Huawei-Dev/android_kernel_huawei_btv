@@ -46,8 +46,6 @@
  *
  */
 
-/*lint --e{438,537,713}*/
-
 #include <bsp_hardtimer.h>
 #include "hardtimer_core.h"
 static u32 is_timer_enabled(struct timer_device *device)
@@ -113,7 +111,6 @@ static void timer_int_clear(struct timer_device *device)
 }
 static s32 timer_disable(struct timer_device *device)
 {
-	/*最后1bit写0,关闭之前先清中断*/
 	u32 ret = 0;
 	ret = readl(TIMER_INTSTATUS(device->base_addr));
 	if (ret )
@@ -135,13 +132,13 @@ static s32 timer_config_init(struct timer_device *device)
 	u32 readValue = 0;
 	(void)timer_disable(device);
 	timer_set_value(device,device->timer_ctrl.timeout);
-	if (TIMER_ONCE_COUNT == device->timer_ctrl.mode||TIMER_FREERUN_COUNT == device->timer_ctrl.mode)/*自由模式,第2bit写0*/
+	if (TIMER_ONCE_COUNT == device->timer_ctrl.mode||TIMER_FREERUN_COUNT == device->timer_ctrl.mode)
 	{
 		readValue = readl(TIMER_CONTROLREG(device->base_addr));
 		readValue &= (~0x2);
 		writel(readValue,TIMER_CONTROLREG(device->base_addr));
 	}
-	else/*周期模式,第2bit写1*/
+	else
 	{
 		readValue = readl(TIMER_CONTROLREG(device->base_addr));
 		readValue |= 0x2;
@@ -149,8 +146,6 @@ static s32 timer_config_init(struct timer_device *device)
 	}
 	return BSP_OK;
 }
-
-
 
 static s32 timer_enable(struct timer_device *device)
 {
@@ -183,7 +178,6 @@ static void timer_resume(struct timer_device *device)
 	return ;
 }
 
-
 static struct timer_core_ops  synopsis_timer_ops = {
 	.timer_init = timer_config_init,
 	.timer_enable = timer_enable,
@@ -210,6 +204,3 @@ void synopsis_timer_drviver_init(void)
 	INIT_LIST_HEAD(&synopsis_timer_driver.timer_drivers);
     bsp_timer_driver_register(&synopsis_timer_driver);
 }
-
-
-

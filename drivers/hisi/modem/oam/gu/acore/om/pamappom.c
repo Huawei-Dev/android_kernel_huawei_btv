@@ -52,7 +52,7 @@
   Author       : zhuli 00100318
   Version      : v00R002
   Date         : 2008-5-15
-  Description  : 该C文件给出了---Base模块实现
+  Description  : ??C??????????---Base????????
   Function List:
   History      :
 ************************************************************************/
@@ -73,24 +73,24 @@
 
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
 /*lint -e767*/
 #define    THIS_FILE_ID PS_FILE_ID_PAM_APP_OM_C
 /*lint +e767*/
 
 
-/* 记录收到消息信息的buffer及当前长度 */
+/* ??????????????????buffer?????????? */
 OM_RECORD_BUF_STRU                      g_astAcpuRecordInfo[VOS_EXC_DUMP_MEM_NUM_BUTT];
 
 VOS_UINT32                              g_ulAcpuOmFilterFlag;
 
-/* AT<->AT的屏蔽处理，移到GuNasLogFilter.c */
+/* AT<->AT????????????????GuNasLogFilter.c */
 
 /*****************************************************************************
  Prototype       : OM_RecordInfoEnd
- Description     : A核保留桩函数
- Input           : ulNumer -- 任务号
+ Description     : A????????????
+ Input           : ulNumer -- ??????
  Output          : None
  Return Value    : VOS_VOID
 
@@ -118,7 +118,7 @@ VOS_VOID OM_RecordInfoEnd(VOS_EXC_DUMP_MEM_NUM_ENUM_UINT32 enNumber)
         return;
     }
 
-    /* 在start中已经变更了记录endslice的长度，因此此处回退四个字节填写endslice的值 */
+    /* ??start????????????????endslice????????????????????????????????endslice???? */
     pulBuf = (VOS_UINT32*)(g_astAcpuRecordInfo[enNumber].pucBuf + g_astAcpuRecordInfo[enNumber].ulLen - sizeof(VOS_UINT32));
 
     *pulBuf = VOS_GetSlice();
@@ -128,11 +128,11 @@ VOS_VOID OM_RecordInfoEnd(VOS_EXC_DUMP_MEM_NUM_ENUM_UINT32 enNumber)
 
 /*****************************************************************************
  Prototype       : OM_RecordInfoStart
- Description     : A核保留桩函数
- Input           : ulNumer -- 任务号
-                   ulSendPid -- 发送PID
-                   ulRcvPid -- 接收PID
-                   ulMsgName -- 消息名称
+ Description     : A????????????
+ Input           : ulNumer -- ??????
+                   ulSendPid -- ????PID
+                   ulRcvPid -- ????PID
+                   ulMsgName -- ????????
  Output          : None
  Return Value    : VOS_VOID
 
@@ -175,7 +175,7 @@ VOS_VOID OM_RecordInfoStart(VOS_EXC_DUMP_MEM_NUM_ENUM_UINT32 enNumber, VOS_UINT3
 
 /*****************************************************************************
  Prototype       : OM_RecordMemInit
- Description     : 可谓可测空间分配
+ Description     : ????????????????
  Input           : None
  Output          : None
  Return Value    : VOS_VOID
@@ -193,7 +193,7 @@ VOS_VOID OM_RecordMemInit(VOS_VOID)
    VOS_MemSet(g_astAcpuRecordInfo, 0, sizeof(g_astAcpuRecordInfo));
    /*lint +e534*/
 
-   /* 分配每个模块记录可谓可测信息的空间 */
+   /* ?????????????????????????????????? */
    for(i = 0; i < VOS_EXC_DUMP_MEM_NUM_BUTT; i++)
    {
       g_astAcpuRecordInfo[i].pucBuf = (VOS_UINT8*)VOS_ExcDumpMemAlloc(i);
@@ -221,7 +221,7 @@ VOS_VOID PAMOM_QuereyPidInfo(VOS_VOID)
     pstMsg = (PAM_VOS_QUEREY_PID_INFO_REQ_STRU *)VOS_AllocMsg(ACPU_PID_PAM_OM,
                             sizeof(PAM_VOS_QUEREY_PID_INFO_REQ_STRU) - VOS_MSG_HEAD_LENGTH);
 
-    /* 分配消息失败 */
+    /* ???????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return;
@@ -251,7 +251,7 @@ VOS_VOID PAMOM_QuereyPidInfoMsgProc(MsgBlock* pMsg)
         pstCnfMsg = (PAM_VOS_QUEREY_PID_INFO_CNF_STRU *)VOS_AllocMsg(ACPU_PID_PAM_OM,
                             sizeof(PAM_VOS_QUEREY_PID_INFO_CNF_STRU) - VOS_MSG_HEAD_LENGTH + ulLen);
 
-        /* 分配消息失败 */
+        /* ???????????? */
         if (VOS_NULL_PTR == pstCnfMsg)
         {
             return;
@@ -295,7 +295,7 @@ VOS_VOID PAMOM_QuereyPidInfoMsgProc(MsgBlock* pMsg)
     }
     else
     {
-        Om_AcpuQueryDumpMsgProc(pMsg);/* GUTL 归一后需要整改 */
+        Om_AcpuQueryDumpMsgProc(pMsg);/* GUTL ?????????????? */
     }
 
     return;
@@ -358,7 +358,7 @@ VOS_UINT32 PAMOM_AcpuInit(VOS_VOID)
 
     PAMOM_QuereyPidInfo();
 
-    /* SC文件有效性自检 */
+    /* SC?????????????? */
     (VOS_VOID)SC_COMM_Restore();
 
     if (NV_OK != NV_ReadEx(MODEM_ID_0,
@@ -439,7 +439,7 @@ VOS_UINT32 PAMOM_APP_FID_Init(enum VOS_INIT_PHASE_DEFINE ip)
                 return VOS_ERR;
             }
 
-            /* 如目录不存在则创建 */
+            /* ?????????????????? */
             if (VOS_OK != mdrv_file_access(PAM_LOG_PARTH, PAM_FILE_EXIST))
             {
                 (VOS_VOID)mdrv_file_mkdir(PAM_LOG_PARTH);
@@ -455,18 +455,18 @@ VOS_UINT32 PAMOM_APP_FID_Init(enum VOS_INIT_PHASE_DEFINE ip)
 }
 
 /*****************************************************************************
- 函 数 名  : VOS_ICCError_CB
- 功能描述  : 用于ICC WIFI通道的数据读取回调函数
- 输入参数  : ulChannelID:   当前通道ID
-             ulLen:         当前通道数据长度
- 输出参数  : 无
- 返 回 值  : VOS_ERROR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2011年3月10日
-     作    者  : l46160
-     修改内容  : Creat Function
+ ?? ?? ??  : VOS_ICCError_CB
+ ????????  : ????ICC WIFI??????????????????????
+ ????????  : ulChannelID:   ????????ID
+             ulLen:         ????????????????
+ ????????  : ??
+ ?? ?? ??  : VOS_ERROR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2011??3??10??
+     ??    ??  : l46160
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_UINT VOS_ICCError_CB(VOS_UINT ulChanID, VOS_UINT ulEvent, VOS_VOID* pParam)
 {
@@ -479,23 +479,23 @@ VOS_UINT VOS_ICCError_CB(VOS_UINT ulChanID, VOS_UINT ulEvent, VOS_VOID* pParam)
 }
 
 /*****************************************************************************
- 函 数 名  : OM_ComRx_ICC_Init
- 功能描述  : 用于OM在CCPU初始化ICC通道
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2011年3月10日
-     作    者  : l46160
-     修改内容  : Creat Function
+ ?? ?? ??  : OM_ComRx_ICC_Init
+ ????????  : ????OM??CCPU??????ICC????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2011??3??10??
+     ??    ??  : l46160
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_UINT32 VOS_ICC_Init(VOS_VOID)
 {
     OM_ICC_UDI_CTRL_STRU                astACPUICCCtrlTable;
 
-    /*初始化 ICC通道*/
+    /*?????? ICC????*/
     /*lint -e534*/
     VOS_MemSet((&astACPUICCCtrlTable), 0, sizeof(astACPUICCCtrlTable));
     /*lint +e534*/
@@ -505,7 +505,7 @@ VOS_UINT32 VOS_ICC_Init(VOS_VOID)
                                                                     sizeof(ICC_CHAN_ATTR_S));
     if(VOS_NULL_PTR == astACPUICCCtrlTable.pstICCAttr)
     {
-        return VOS_ERR;             /*分配内存失败单板会重启，因此不需要释放之前已经申请的内存*/
+        return VOS_ERR;             /*????????????????????????????????????????????????????????*/
     }
 
     astACPUICCCtrlTable.enICCId               = UDI_ICC_GUOM4;
@@ -520,7 +520,7 @@ VOS_UINT32 VOS_ICC_Init(VOS_VOID)
 
     if(VOS_ERROR == DRV_ICC_OPEN(astACPUICCCtrlTable.enICCId, astACPUICCCtrlTable.pstICCAttr))
     {
-        /* 打开失败时记录当前ICC通道信息 */
+        /* ??????????????????ICC???????? */
         VOS_ProtectionReboot(OM_APP_ICC_INIT_ERROR, THIS_FILE_ID, __LINE__,VOS_NULL_PTR,0);
 
         return VOS_ERR;
@@ -532,16 +532,16 @@ VOS_UINT32 VOS_ICC_Init(VOS_VOID)
 }
 
 /*****************************************************************************
- 函 数 名  : OM_OSAEvent
- 功能描述  : 上报OSA的可维可测消息
- 输入参数  :
- 输出参数  : 无
- 返 回 值  : 无
+ ?? ?? ??  : OM_OSAEvent
+ ????????  : ????OSA??????????????
+ ????????  :
+ ????????  : ??
+ ?? ?? ??  : ??
 
- 修改历史      :
-  1.日    期   : 2013年7月27日
-    作    者   : x51137
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2013??7??27??
+    ??    ??   : x51137
+    ????????   : ??????????
 *****************************************************************************/
 VOS_VOID OM_OSAEvent(VOS_VOID *pData, VOS_UINT32 ulLength)
 {
@@ -561,19 +561,19 @@ VOS_VOID OM_OSAEvent(VOS_VOID *pData, VOS_UINT32 ulLength)
 }
 
 /*****************************************************************************
- 函 数 名  : PAM_OM_LayerMsgFilter
- 功能描述  : 过滤PAM中的敏感信息
- 输入参数  : const VOID *pMsg:消息指针
- 输出参数  : 无
- 返 回 值  : VOS_UINT32:
-                返回VOS_TRUE:  表示该消息需要进行过滤
-                返回VOS_FALSE: 表示该消息无需进行过滤
- 调用函数  :
- 被调函数  :
- 修改历史      :
-  1.日    期   : 2015年10月28日
-    作    者   : zhuli
-    修改内容   : 新生成函数
+ ?? ?? ??  : PAM_OM_LayerMsgFilter
+ ????????  : ????PAM????????????
+ ????????  : const VOID *pMsg:????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32:
+                ????VOS_TRUE:  ??????????????????????
+                ????VOS_FALSE: ??????????????????????
+ ????????  :
+ ????????  :
+ ????????      :
+  1.??    ??   : 2015??10??28??
+    ??    ??   : zhuli
+    ????????   : ??????????
 *****************************************************************************/
 VOS_UINT32 PAM_OM_LayerMsgFilter(
     const VOS_VOID                      *pMsg
@@ -588,7 +588,7 @@ VOS_UINT32 PAM_OM_LayerMsgFilter(
 
     pstMsgHead = (OM_FILTER_MSG_HEAD_STRU*)pMsg;
 
-    /* SIM消息过滤 */
+    /* SIM???????? */
     if (  ((I0_WUEPS_PID_USIM <= pstMsgHead->ulSenderPid)&&(I0_MAPS_PB_PID >= pstMsgHead->ulSenderPid))
         ||((I1_WUEPS_PID_USIM <= pstMsgHead->ulSenderPid)&&(I1_MAPS_PB_PID >= pstMsgHead->ulSenderPid))
         ||((I2_WUEPS_PID_USIM <= pstMsgHead->ulSenderPid)&&(I2_MAPS_PB_PID >= pstMsgHead->ulSenderPid))
@@ -608,6 +608,6 @@ VOS_UINT32 PAM_OM_LayerMsgFilter(
     return VOS_FALSE;
 }
 
-/* AT<->AT的屏蔽处理，移到GuNasLogFilter.c */
+/* AT<->AT????????????????GuNasLogFilter.c */
 
 

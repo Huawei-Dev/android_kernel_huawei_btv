@@ -55,19 +55,6 @@ modem_sysctrl_cfg_t  g_modem_sysctrl_cfg;
 PERCTRL2_REG g_perctrl2_reg = {0,};
 u32 g_perctrl_reg_val = 0;
 
-/*****************************************************************************
-* 函 数 名  : dump_perctrl2_memmap
-* 功能描述  : 映射perctrl2寄存器
-*
-* 输入参数  :            
-* 输出参数  : 
-
-* 返 回 值  : 
-              
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 s32 dump_perctrl2_memmap(void)
 {
     if(dump_get_product_type() == DUMP_PHONE)
@@ -116,19 +103,7 @@ s32 dump_perctrl2_memmap(void)
     return BSP_OK;
 
 }
-/*****************************************************************************
-* 函 数 名  : dump_get_perctrl2_status
-* 功能描述  : 查询perctrl2寄存器状态
-*
-* 输入参数  :            
-* 输出参数  : 
 
-* 返 回 值  : 
-              
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 s32 dump_get_perctrl2_status(void)
 {
     if(dump_get_product_type() == DUMP_PHONE)
@@ -171,19 +146,6 @@ s32 dump_get_perctrl2_status(void)
 
 }
 
-/*****************************************************************************
-* 函 数 名  : dump_modem_sysctrl_memmap
-* 功能描述  : 映射邋sys_ctrl寄存器
-*
-* 输入参数  :            
-* 输出参数  : 
-
-* 返 回 值  : 
-              
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 s32 dump_modem_sysctrl_memmap(void)
 {
     if(DUMP_PHONE == dump_get_product_type())
@@ -250,19 +212,6 @@ s32 dump_modem_sysctrl_memmap(void)
     return BSP_OK;
 }
 
-/*****************************************************************************
-* 函 数 名  : dump_get_sysctrl_status
-* 功能描述  : 查询modem系统控制器状态
-*
-* 输入参数  :            
-* 输出参数  : 
-
-* 返 回 值  : 
-              
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 s32 dump_get_sysctrl_status(void)
 {
     if(DUMP_PHONE == dump_get_product_type())
@@ -314,19 +263,6 @@ s32 dump_get_sysctrl_status(void)
 
 }
 
-/*****************************************************************************
-* 函 数 名  : dump_coresight_memmap
-* 功能描述  : 映射modem cp 的etb以及相关控制寄存器地址
-*
-* 输入参数  :            
-* 输出参数  : 
-
-* 返 回 值  : 
-              
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 s32 dump_coresight_memmap(void)
 {  
 
@@ -375,19 +311,6 @@ s32 dump_coresight_memmap(void)
     return BSP_OK;
 }
 
-/*****************************************************************************
-* 函 数 名  : dump_stop_etm
-* 功能描述  : 停止modem 的etm
-*
-* 输入参数  :            
-* 输出参数  : 
-
-* 返 回 值  : 
-              
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_stop_etm(void)
 {
     volatile void* etm_addr = NULL;
@@ -428,19 +351,7 @@ void dump_stop_etm(void)
  
 
 }
-/*****************************************************************************
-* 函 数 名  : dump_cs_etb
-* 功能描述  : 保存etb信息
-*
-* 输入参数  :            
-* 输出参数  : 
 
-* 返 回 值  : 
-              
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_cs_etb(WDT_CORE_ID core_id)
 {
     u32     reg_value;
@@ -480,25 +391,20 @@ void dump_cs_etb(WDT_CORE_ID core_id)
         return;
     }
 
-    /*先停止etm*/
     dump_stop_etm();
 
-    /* unlock etb, 配置ETF_LOCK_ACCESS */
     writel(0xC5ACCE55, tmcRegAddr + 0xFB0);
 
-    /* stop etb, 配置ETF_FORMAT_FLUSH_CTRL */
     reg_value = readl(tmcRegAddr + 0x304);
-    /* FFCR StopOnFl */
+
     reg_value |= 1 << 12;
-    /* FFCR FlushMem */
+
     reg_value |= 1 << 6;
     writel(reg_value, tmcRegAddr + 0x304);
 
     for(i=0; i<10000; i++)
     {
-        /* read etb status, 读取ETF_STATUS */
         reg_value = readl(tmcRegAddr + 0x304);
-        /* bit2为TMCReady指示位 */
         if(0 != ((reg_value & (1 << 6)) >> 6))
         {
             break;
@@ -509,31 +415,24 @@ void dump_cs_etb(WDT_CORE_ID core_id)
     {
         dump_fetal("ETF_STATUS register is not ready\n");
     }
-    /* 等待TMCReady */
     for(i=0; i<10000; i++)
     {
-        /* read etb status, 读取ETF_STATUS */
         reg_value = readl(tmcRegAddr + 0xc);
-        /* bit2为TMCReady指示位 */
         if(0 != (reg_value & 0x4))
         {
             break;
         }
         udelay(10);
     }
-
-    /* 超时判断 */
     if(i >= 10000)
     {
         dump_fetal("save etb time out\n");
     }
 
-    /* 导出etb数据 */
     memset((void *)dst_addr, 0x0, dst_size);
     data = (u32 *)(dst_addr + 8);
     for(i=0; i<(1024*8)/4; i++)
     {
-        /* read etb, 读取ETF_RAM_RD_DATA */
         reg_value = readl(tmcRegAddr + 0x10);
         *data = reg_value;
         data++;
@@ -543,12 +442,10 @@ void dump_cs_etb(WDT_CORE_ID core_id)
         }
     }
 
-    /* 0-3字节存放标识码 */
     *((u32 *)dst_addr) = (u32)0x89ABCDEF;
-    /* 4-7个字节存放ETB数据长度 */
+
     *((u32 *)dst_addr + 1) = i*4;
 
-    /* lock etb, 配置ETF_LOCK_ACCESS */
     writel(0x1, tmcRegAddr + 0xFB0);
 
     dump_fetal("the magic has writed 0x%x\n",*((u32 *)dst_addr));

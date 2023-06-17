@@ -46,34 +46,6 @@
  *
  */
 
-/*****************************************************************************/
-/*                                                                           */
-/*                Copyright 1999 - 2003, Huawei Tech. Co., Ltd.              */
-/*                           ALL RIGHTS RESERVED                             */
-/*                                                                           */
-/* FileName: v_msg.h                                                         */
-/*                                                                           */
-/* Author: Yang Xiangqian                                                    */
-/*                                                                           */
-/* Version: 1.0                                                              */
-/*                                                                           */
-/* Date: 2006-10                                                             */
-/*                                                                           */
-/* Description: implement message function                                   */
-/*                                                                           */
-/* Others:                                                                   */
-/*                                                                           */
-/* History:                                                                  */
-/* 1. Date:                                                                  */
-/*    Author:                                                                */
-/*    Modification: Create this file                                         */
-/*                                                                           */
-/* 2. Date: 2006-10                                                          */
-/*    Author: Xu Cheng                                                       */
-/*    Modification: Standardize code                                         */
-/*                                                                           */
-/*****************************************************************************/
-
 #ifndef _VOS_MSG_H
 #define _VOS_MSG_H
 
@@ -88,7 +60,6 @@ extern "C" {
 #endif /* __cpluscplus */
 #endif /* __cpluscplus */
 
-/* errno definiens */
 #define VOS_ERRNO_MSG_GETPRIO_INPUT1ISNULL                  0x20040003
 #define VOS_ERRNO_MSG_FREE_INPUTMSGISNULL                   0x20040091
 #define VOS_ERRNO_MSG_FREE_INPUTPIDINVALID                  0x20040035
@@ -122,10 +93,9 @@ extern "C" {
 #define VOS_ERRNO_MSG_ICC_WRITEMSGFULL                      0x20050066
 #define VOS_ERRNO_MSG_ICC_WRITEHIFIMSGFULL                  0x20050067
 
-/* The message block (packege) head for each message package    */
 typedef struct tagMsgBlockHead_S
 {
-    VOS_UINT32    ulFlag;  /* The message head flag, = VOS_MSG_HEAD_FLAG  */
+    VOS_UINT32    ulFlag;
 } MSG_BLOCK_HEAD;
 
 #if(VOS_OS_VER == VOS_WIN32)
@@ -144,13 +114,10 @@ typedef struct tagMsgBlockHead_S
                         VOS_UINT32 ulReceiverPid;  \
                         VOS_UINT32 ulLength;
 
-/* VOS common message header length, sizeof(VOS_MSG_HEADER) */
 #define VOS_MSG_HEAD_LENGTH              20
 
-/* length of message block head */
 #define VOS_MSG_BLK_HEAD_LEN    ( sizeof(MSG_BLOCK_HEAD) )
 
-/* Flag of message packet valid */
 #define VOS_MSG_HEAD_FLAG                0xA1D538FB
 #define VOS_MSG_RESERVED_HEAD_FLAG       0xA1D538FF
 
@@ -190,9 +157,9 @@ typedef struct
 
 typedef struct
 {
-    VOS_UINT32 ulMailBoxCode;   /*邮箱编码*/
-    VOS_UINT32 ulFileID;        /*函数调用的文件ID*/
-    VOS_INT32 lLineNo;          /*函数调用的行号*/
+    VOS_UINT32 ulMailBoxCode;
+    VOS_UINT32 ulFileID;
+    VOS_INT32 lLineNo;
 }VOS_DRVMB_MSG_PARA_STRU;
 
 #ifdef __DART__
@@ -207,7 +174,6 @@ VOS_UINT32 VOS_ReserveMsg( VOS_PID Pid, MsgBlock * pMsg);
 VOS_UINT32 VOS_FreeReservedMsg( VOS_PID Pid, MsgBlock * pMsg );
 #else
 
-/*lint -function(malloc(1),V_AllocMsg(2))*/
 MsgBlock * V_AllocMsg( VOS_PID Pid, VOS_UINT32 ulLength,
                        VOS_UINT32 ulFileID, VOS_INT32 usLineNo );
 
@@ -216,7 +182,7 @@ MsgBlock * VOS_AllocTimerMsg( VOS_PID Pid, VOS_UINT32 ulLength );
 #ifndef DMT
 #define VOS_AllocMsg( Pid, ulLength ) \
     V_AllocMsg( (Pid), (ulLength), VOS_FILE_ID, __LINE__)
-#endif /* DMT */
+#endif
 
 #define VOS_AllocMsgPrior( Pid, ulLength, ulPrio )\
     V_AllocMsg( (Pid), (ulLength), VOS_FILE_ID, __LINE__)
@@ -239,14 +205,14 @@ VOS_UINT32 V_SendMsgNormally(VOS_PID Pid, VOS_VOID **ppMsg,
 
 #define VOS_SendMsgNormally( Pid, pMsg )\
     V_SendMsgNormally( (Pid), (VOS_VOID**)(&(pMsg)), VOS_FILE_ID, __LINE__ )
-#endif /* DMT */
+#endif
 
 VOS_UINT32 V_SendUrgentMsg( VOS_PID Pid, VOS_VOID **ppMsg,
                                  VOS_UINT32 ulFileID, VOS_INT32 usLineNo );
 #ifndef DMT
 #define VOS_SendUrgentMsg( Pid, pMsg )\
     V_SendUrgentMsg( (Pid), (VOS_VOID**)(&(pMsg)), VOS_FILE_ID, __LINE__ )
-#endif /* DMT */
+#endif
 
 
 VOS_UINT32 V_PostMsg( VOS_PID Pid, VOS_VOID * pMsg,
@@ -254,8 +220,6 @@ VOS_UINT32 V_PostMsg( VOS_PID Pid, VOS_VOID * pMsg,
 
 #define VOS_PostMsg( Pid, pMsg )\
     V_PostMsg( (Pid), (pMsg), VOS_FILE_ID, __LINE__ )
-
-/*VOS_VOID*  VOS_GetMsg( VOS_UINT32 ulTaskID );*/
 
 VOS_UINT32 V_ReserveMsg( VOS_PID Pid, MsgBlock * pMsg,
                             VOS_UINT32 ulFileID, VOS_INT32 usLineNo );
@@ -274,7 +238,6 @@ VOS_UINT32 V_FreeReservedMsg( VOS_PID Pid, VOS_VOID **ppMsg,
 
 #define VOS_FreeReservedMsg( Pid, pMsg )\
     V_FreeReservedMsg( (Pid), (VOS_VOID**)(&(pMsg)),  VOS_FILE_ID, __LINE__  )
-
 
 VOS_UINT32 V_SendLocalMsg( VOS_PID Pid, VOS_VOID **ppMsg,
                             VOS_UINT32 ulFileID, VOS_INT32 usLineNo );
@@ -325,7 +288,6 @@ VOS_UINT32 VOS_CheckInterrupt( VOS_VOID );
 VOS_UINT32 VOS_CheckRcvPid(VOS_UINT32 ulReceiverPid);
 
 VOS_VOID VOS_IccDebugInfoInit(VOS_VOID);
-
 
 #ifdef __cplusplus
 #if __cplusplus

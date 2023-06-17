@@ -46,16 +46,11 @@
  *
  */
 
-
 #ifndef __OM_SOCKET_PPM_H__
 #define __OM_SOCKET_PPM_H__
 
-/*****************************************************************************
-  1 其他头文件包含
-*****************************************************************************/
 #include "vos.h"
 #include "omnvinterface.h"
-
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -65,24 +60,18 @@ extern "C" {
 
 #pragma pack(4)
 
-/*****************************************************************************
-  2 宏定义
-*****************************************************************************/
+#define SOCKET_NUM_MAX          (1)
 
-#define SOCKET_NUM_MAX          (1)                   /* OM、AT在各自的端口上只监听接收一个链接 */
+#define SOCK_WIFI_ADDR_LEN      (16)
 
-#define SOCK_WIFI_ADDR_LEN      (16)                  /*WIFI网关的地址的最大长度*/
+#define SOCK_WIFI_DEFAULT_ADDR  ("127.0.0.1")
 
-#define SOCK_WIFI_DEFAULT_ADDR  ("127.0.0.1")         /*WIFI通信的默认IP地址*/
+#define SOCK_OM_IND_SRC_PORT_NUM    (20253)
 
-#define SOCK_OM_IND_SRC_PORT_NUM    (20253)           /* OM IND源端口号，UDP */
-
-#define SOCK_OM_CFG_SRC_PORT_NUM    (3000)            /* OM CFG源端口号，TCP */
-#define SOCK_AT_SRC_PORT_NUM        (20249)           /* AT源端口号，TCP */
-
+#define SOCK_OM_CFG_SRC_PORT_NUM    (3000)
+#define SOCK_AT_SRC_PORT_NUM        (20249)
 
 #define SOCK_OM_MSG_LEN             (1000)
-
 
 #if  (VOS_LINUX == VOS_OS_VER)
 #define SOCK_NULL               (-1)
@@ -132,10 +121,6 @@ extern "C" {
 
 #endif
 
-/*****************************************************************************
-  3 枚举定义
-*****************************************************************************/
-
 enum
 {
     SOCK_OK = 0,
@@ -161,25 +146,6 @@ enum OM_SOCKET_TYPE_ENUM
 
 typedef VOS_UINT32 OM_SOCKET_TYPE_ENUM_U32;
 
-/*****************************************************************************
-  4 全局变量声明
-*****************************************************************************/
-
-
-/*****************************************************************************
-  5 消息头定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  6 消息定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  7 STRUCT定义
-*****************************************************************************/
-
 #if (VOS_LINUX == VOS_OS_VER)
 
 typedef int    SOCKET;
@@ -204,31 +170,13 @@ typedef struct
 {
     VOS_BOOL            bStatus;
     struct sockaddr_in  stAddr;
-    VOS_UINT32          ulTotalLen;         /* 发送的总字节数 */
+    VOS_UINT32          ulTotalLen;
 }SOCKET_UDP_INFO_STRU;
-
-/*****************************************************************************
-  8 UNION定义
-*****************************************************************************/
-
-
-
-
-/*****************************************************************************
-  9 OTHERS定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  10 函数声明
-*****************************************************************************/
-
 
 extern VOS_VOID  Sock_ShutdownAll(VOS_VOID);
 extern VOS_UINT32 PPM_SockUdpInit(VOS_VOID);
 extern VOS_BOOL PPM_SockIsEnable(VOS_VOID);
 extern VOS_UINT32 PPM_SocketGetUdpInfo(VOS_VOID);
-
 
 #if ((VOS_OS_VER == VOS_WIN32) || (VOS_OS_VER == VOS_NUCLEUS))
 #pragma pack()
@@ -243,4 +191,3 @@ extern VOS_UINT32 PPM_SocketGetUdpInfo(VOS_VOID);
 #endif
 
 #endif /* end of OmCommonPpm.h */
-

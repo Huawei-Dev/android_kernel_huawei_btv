@@ -46,7 +46,6 @@
  *
  */
 
-
 #ifndef ICC_PLATFORM_H
 #define ICC_PLATFORM_H
 
@@ -80,7 +79,6 @@ extern "C" {
 
 #define ICC_CHANNEL_INIT_COMPITABLE  "hisilicon,icc_balong_app"
 
-
 #define  ICC_THIS_CPU                 (ICC_CPU_APP)
 #define  ICC_SEND_CPU                 (ICC_CPU_MODEM)
 #define  ICC_RECV_IPC_SHARED          (IPC_ACPU_INT_SRC_CCPU_ICC)
@@ -109,7 +107,6 @@ do {                               \
 
 typedef struct task_struct*  icc_task_id;
 
-/* 数据类型定义start */
 struct icc_pm_debug{
 	FUNCPTR_1 debug_routine;
 	int para;
@@ -117,24 +114,24 @@ struct icc_pm_debug{
 
 struct icc_channel_vector
 {
-	read_cb_func  read_cb;        /* 接收向量的读回调函数指针 */
-	void          *read_context;  /* 接收向量的读回调函数context */
-	write_cb_func write_cb;       /* 接收向量的写回调函数指针 */
-	void          *write_context; /* 接收向量的写回调函数context */
+	read_cb_func  read_cb;
+	void          *read_context;
+	write_cb_func write_cb;
+	void          *write_context;
 	struct icc_pm_debug pm_debug;
 };
 
 struct icc_control
 {
-	u32                      cpu_id;                    /* 当前核cpu id */
-	u32                      state;                     /* icc控制结构体状态: 可用|不可用 */
-	icc_task_id              shared_task_id;            /* 通道共享任务id */
-	u32                      shared_recv_ipc_irq_id;    /* 通道共享的接收数据使用ipc中断 */
-	osl_sem_id               shared_task_sem;           /* 唤醒通道共享任务的信号量 */
+	u32                      cpu_id;
+	u32                      state;
+	icc_task_id              shared_task_id;
+	u32                      shared_recv_ipc_irq_id;
+	osl_sem_id               shared_task_sem;
 	u32                      wake_up_flag;
 	u32                      sleep_flag;
-	struct icc_channel       *channels[ICC_CHN_ID_MAX]; /* icc_channel的结构体指针数组 */
-	u32                      channel_size;              /* 本核上有的通道数目 */
+	struct icc_channel       *channels[ICC_CHN_ID_MAX];
+	u32                      channel_size;
 	struct     wake_lock     wake_lock;
 	struct notifier_block    pm_notify;
 };
@@ -162,7 +159,4 @@ void icc_debug_after_recv(struct icc_channel_packet *pkg_header);
 #ifdef __cplusplus
 }
 #endif
-
 #endif
-
-

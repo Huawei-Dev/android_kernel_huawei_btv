@@ -81,11 +81,11 @@
 #include "PhyNvDefine.h"
 #include "NVIM_Interface.h"
 
-/* LINUX不支持 */
+/* LINUX?????? */
 
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
 /*lint -e767 modify:x51137; review:h59254; cause:print log */
 #define    THIS_FILE_ID        PS_FILE_ID_V_RTC_TIMER_C
@@ -215,7 +215,7 @@ VOS_UINT32                RTC_Start_Value = ELAPESD_TIME_INVAILD;
 
 VOS_CHAR g_acRtcTimerCtrlBuf[RTC_TIMER_CTRL_BUF_SIZE];
 
-/* 循环记录SOC Timer的启停记录 */
+/* ????????SOC Timer?????????? */
 enum
 {
     RTC_SOC_TIMER_SEND_ERR = 0xfffffffd,
@@ -227,7 +227,7 @@ VOS_UINT32  g_ulRtcSocTimerDebugInfoSuffix = 0;
 
 RTC_SOC_TIMER_DEBUG_INFO_STRU g_astRtcSocTimerDebugInfo[RTC_MAX_TIMER_NUMBER];
 
-/* 记录 RTC timer 可维可测信息 */
+/* ???? RTC timer ???????????? */
 VOS_TIMER_SOC_TIMER_INFO_STRU g_stRtcSocTimerInfo;
 
 /* Added by g47350 for DRX timer Project, 2012/11/5, begin */
@@ -286,11 +286,11 @@ VOS_UINT32 VOS_TimerLpmCb(VOS_INT x)
 
 /*****************************************************************************
  Function   : RTC_MUL_32_DOT_768
- Description: 乘以32.768
+ Description: ????32.768
  Input      : ulValue -- timer's value.uint is 32K cycle.
-              ulFileID -- 文件ID
-              usLineNo -- 行号
- Return     : 与32.768做乘法的结果
+              ulFileID -- ????ID
+              usLineNo -- ????
+ Return     : ??32.768????????????
  Other      :
  *****************************************************************************/
 VOS_UINT32 RTC_MUL_32_DOT_768(VOS_UINT32 ulValue,VOS_UINT32 ulFileID,
@@ -328,11 +328,11 @@ VOS_UINT32 RTC_MUL_32_DOT_768(VOS_UINT32 ulValue,VOS_UINT32 ulFileID,
 
 /*****************************************************************************
  Function   : RTC_DIV_32_DOT_768
- Description: 除以32.768
+ Description: ????32.768
  Input      : ulValue -- timer's value.uint is 32K cycle.
-              ulFileID -- 文件ID
-              usLineNo -- 行号
- Return     : 与32.768做除法的结果
+              ulFileID -- ????ID
+              usLineNo -- ????
+ Return     : ??32.768????????????
  Other      :
  *****************************************************************************/
 VOS_UINT32 RTC_DIV_32_DOT_768(VOS_UINT32 ulValue,VOS_UINT32 ulFileID,
@@ -372,11 +372,11 @@ VOS_UINT32 RTC_DIV_32_DOT_768(VOS_UINT32 ulValue,VOS_UINT32 ulFileID,
 
 /*****************************************************************************
  Function   : RTC_MUL_DOT_32768
- Description: 乘以0.32768
+ Description: ????0.32768
  Input      : ulValue -- timer's value.uint is 32K cycle.
-              ulFileID -- 文件ID
-              usLineNo -- 行号
- Return     : 与0.32768做乘法的结果
+              ulFileID -- ????ID
+              usLineNo -- ????
+ Return     : ??0.32768????????????
  Other      :
  *****************************************************************************/
 VOS_UINT32 RTC_MUL_DOT_32768(VOS_UINT32 ulValue,VOS_UINT32 ulFileID,
@@ -504,7 +504,7 @@ VOS_VOID RTC_DualTimerIsrEntry(VOS_VOID)
         else
         {
             /*lint -e613 */
-            RTC_TimerCtrlBlkexpiredTail->next = RTC_TimerCtrlBlkCurrent;/* [false alarm]: 屏蔽Fortify 错误 */
+            RTC_TimerCtrlBlkexpiredTail->next = RTC_TimerCtrlBlkCurrent;/* [false alarm]: ????Fortify ???? */
             /*lint +e613 */
             RTC_TimerCtrlBlkexpiredTail = RTC_TimerCtrlBlkCurrent;
         }
@@ -752,7 +752,7 @@ RTC_TIMER_CONTROL_BLOCK *RTC_TimerCtrlBlkGet(VOS_UINT32 ulFileID, VOS_INT32 usLi
         VOS_MemSet_s(pDumpBuffer, VOS_DUMP_MEM_TOTAL_SIZE, 0, VOS_DUMP_MEM_TOTAL_SIZE);
         /*lint +e534*/
 
-        /* 防止拷贝内存越界，取最小值 */
+        /* ?????????????????????????? */
         /*lint -e506 -e534 */
         VOS_MemCpy_s(pDumpBuffer, VOS_DUMP_MEM_TOTAL_SIZE, (VOS_VOID *)g_acRtcTimerCtrlBuf,
                    ((VOS_DUMP_MEM_TOTAL_SIZE < RTC_TIMER_CTRL_BUF_SIZE) ? VOS_DUMP_MEM_TOTAL_SIZE : RTC_TIMER_CTRL_BUF_SIZE ));
@@ -899,7 +899,7 @@ VOS_VOID RTC_TimerTaskFunc( VOS_UINT32 Para0, VOS_UINT32 Para1,
 
             TempValue = (VOS_UINT_PTR)(RTC_TimerCtrlBlkexpired->CallBackFunc);
 
-            /* CallBackFunc需要用32位传入，所以和name互换位置保证数据不丢失 */
+            /* CallBackFunc??????32??????????????name?????????????????????? */
             OM_RecordInfoStart(VOS_EXC_DUMP_MEM_NUM_3, (VOS_UINT32)(RTC_TimerCtrlBlkexpired->Pid), RTC_TimerCtrlBlkexpired->Name, (VOS_UINT32)TempValue);
 
             if ( VOS_NULL_PTR == RTC_TimerCtrlBlkexpired->CallBackFunc )
@@ -1303,20 +1303,20 @@ VOS_UINT32 R_Get32KRelTmRemainTime( HTIMER * phTm, VOS_UINT32 * pulTime,
 }
 
 /*****************************************************************************
- 函 数 名  : RTC_CheckTimer
- 功能描述  : 检查TIMER是否正确
- 输入参数  : HTIMER  *phTm
+ ?? ?? ??  : RTC_CheckTimer
+ ????????  : ????TIMER????????
+ ????????  : HTIMER  *phTm
              VOS_UINT32 ulFileID
              VOS_INT32 usLineNo
- 输出参数  : VOS_UINT32 *ulTimerID
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : VOS_UINT32 *ulTimerID
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年5月5日
-    作    者   : s00207770
-    修改内容   : 规避TimerId被修改导致的检查错误发起主动复位
+ ????????      :
+  1.??    ??   : 2014??5??5??
+    ??    ??   : s00207770
+    ????????   : ????TimerId????????????????????????????????
 
 *****************************************************************************/
 VOS_UINT32 RTC_CheckTimer( HTIMER  *phTm, VOS_UINT32 *ulTimerID,

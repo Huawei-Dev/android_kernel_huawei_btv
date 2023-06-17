@@ -65,7 +65,7 @@ int pm_log_read(struct log_usr_info *usr_info, char *buf, u32 count)
 	struct ring_buffer rb;
 	modem_log_ring_buffer_get(usr_info, &rb);
 
-    if(bsp_ring_buffer_writable_size(&rb) <= 200) /* ÌáÇ°Çå¿Õbuffer */
+    if(bsp_ring_buffer_writable_size(&rb) <= 200) /* ????????buffer */
     {
         usr_info->mem->read = usr_info->mem->write;
 	}

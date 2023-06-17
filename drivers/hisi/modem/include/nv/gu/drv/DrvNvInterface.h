@@ -49,13 +49,13 @@ typedef unsigned char       BSP_U8;
 
 #define DYN_MAX_PORT_CNT          (17)
 
-/* 设备枚举最大端口个数 */
+/* ???????????????????? */
 #if defined (DYNAMIC_PID_MAX_PORT_NUM)
 #undef DYNAMIC_PID_MAX_PORT_NUM
 #endif
 #define DYNAMIC_PID_MAX_PORT_NUM  (17)
 
-/* 版本信息每条的最大长度 */
+/* ?????????????????????? */
 #if defined (VER_MAX_LENGTH)
 #undef VER_MAX_LENGTH
 #endif
@@ -63,11 +63,11 @@ typedef unsigned char       BSP_U8;
 
 #define NV_HW_CFG_LENTH           (0x40)
 
-/*NPNP 特性一级开关判断用宏*/
+/*NPNP ????????????????????*/
 #define NPNP_OPEN    1
 #define NPNP_CLOSE    0
 
-/*NPNP特性NV项判断用宏*/
+/*NPNP????NV??????????*/
 #define NV_NPNP_ENABLE    1
 #define NV_NPNP_DISABLE    0
 /*****************************************************************************
@@ -85,13 +85,13 @@ typedef unsigned char       BSP_U8;
 *****************************************************************************/
 /*****************************************************************************
 *                                                                            *
-*                           参数设置消息结构                                 *
+*                           ????????????????                                 *
 *                                                                            *
 ******************************************************************************/
 
 /*****************************************************************************
- 结构名    : RESUME_FLAG_STRU
- 结构说明  : RESUME_FLAG结构
+ ??????    : RESUME_FLAG_STRU
+ ????????  : RESUME_FLAG????
 *****************************************************************************/
 typedef struct
 {
@@ -99,18 +99,18 @@ typedef struct
 }RESUME_FLAG_STRU;
 
 /*****************************************************************************
- 结构名    : LED_CONTROL_NV_STRU
- 结构说明  : LED_CONTROL_NV结构 ID=7
+ ??????    : LED_CONTROL_NV_STRU
+ ????????  : LED_CONTROL_NV???? ID=7
 *****************************************************************************/
 typedef struct
 {
-    BSP_U8   ucLedColor;      /*三色灯颜色，对应LED_COLOR的值*/
-    BSP_U8   ucTimeLength;    /*该配置持续的时间长度，单位100ms*/
+    BSP_U8   ucLedColor;      /*????????????????LED_COLOR????*/
+    BSP_U8   ucTimeLength;    /*??????????????????????????100ms*/
 }LED_CONTROL_NV_STRU;
 
 /*****************************************************************************
- 结构名    : LED_CONTROL_STRU
- 结构说明  : LED_CONTROL结构
+ ??????    : LED_CONTROL_STRU
+ ????????  : LED_CONTROL????
 *****************************************************************************/
 typedef struct
 {
@@ -118,8 +118,8 @@ typedef struct
 }LED_CONTROL_STRU;
 
 /*****************************************************************************
- 结构名    : LED_CONTROL_STRU_ARRAY
- 结构说明  : 三色灯状态序列单元结构
+ ??????    : LED_CONTROL_STRU_ARRAY
+ ????????  : ??????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -127,8 +127,8 @@ typedef struct
 }LED_CONTROL_STRU_ARRAY;
 
 /*****************************************************************************
- 结构名    : NV_WDT_TIMEOUT_STRU
- 结构说明  : NV_WDT_TIMEOUT结构 ID=11
+ ??????    : NV_WDT_TIMEOUT_STRU
+ ????????  : NV_WDT_TIMEOUT???? ID=11
 *****************************************************************************/
 typedef struct
 {
@@ -137,8 +137,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : USIM_TEMP_SENSOR_TABLE
- 结构说明  : USIM_TEMP_SENSOR_TABLE结构
+ ??????    : USIM_TEMP_SENSOR_TABLE
+ ????????  : USIM_TEMP_SENSOR_TABLE????
 *****************************************************************************/
 typedef struct
 {
@@ -147,8 +147,8 @@ typedef struct
 }USIM_TEMP_SENSOR_TABLE;
 
 /*****************************************************************************
- 结构名    : USIM_TEMP_SENSOR_TABLE_STRU
- 结构说明  : USIM_TEMP_SENSOR_TABLE结构
+ ??????    : USIM_TEMP_SENSOR_TABLE_STRU
+ ????????  : USIM_TEMP_SENSOR_TABLE????
 *****************************************************************************/
 typedef struct
 {
@@ -157,8 +157,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : EXCEPTION_RECORD_STRU
- 结构说明  : EXCEPTION_RECORD结构
+ ??????    : EXCEPTION_RECORD_STRU
+ ????????  : EXCEPTION_RECORD????
 *****************************************************************************/
 typedef struct
 {
@@ -169,8 +169,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : NV_SYS_PRT_STRU
- 结构说明  : NV_SYS_PRT结构
+ ??????    : NV_SYS_PRT_STRU
+ ????????  : NV_SYS_PRT????
 *****************************************************************************/
 typedef struct
 {
@@ -179,8 +179,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : USB_ENUM_STATUS_STRU
- 结构说明  : USB_ENUM_STATUS结构
+ ??????    : USB_ENUM_STATUS_STRU
+ ????????  : USB_ENUM_STATUS????
 *****************************************************************************/
 typedef struct
 {
@@ -192,8 +192,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : LIVE_TIME_CONTROL_STRU
- 结构说明  : LIVE_TIME_CONTROL结构
+ ??????    : LIVE_TIME_CONTROL_STRU
+ ????????  : LIVE_TIME_CONTROL????
 *****************************************************************************/
 typedef struct
 {
@@ -203,8 +203,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : LIVE_TIME_STRU
- 结构说明  : LIVE_TIME结构
+ ??????    : LIVE_TIME_STRU
+ ????????  : LIVE_TIME????
 *****************************************************************************/
 typedef struct
 {
@@ -213,8 +213,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : USB_SN_NV_INFO_STRU
- 结构说明  : USB_SN_NV_INFO结构
+ ??????    : USB_SN_NV_INFO_STRU
+ ????????  : USB_SN_NV_INFO????
 *****************************************************************************/
 typedef struct
 {
@@ -226,8 +226,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : NVHWVER
- 结构说明  : NVHWVER结构
+ ??????    : NVHWVER
+ ????????  : NVHWVER????
 *****************************************************************************/
 typedef struct
 {
@@ -236,8 +236,8 @@ typedef struct
 } NVHWVER;
 
 /*****************************************************************************
- 结构名    : nv_pid_enable_type
- 结构说明  : nv_pid_enable_type结构
+ ??????    : nv_pid_enable_type
+ ????????  : nv_pid_enable_type????
 *****************************************************************************/
 typedef struct
 {
@@ -246,8 +246,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : NV_AT_SHELL_OPEN_FLAG_STRU
- 结构说明  : NV_AT_SHELL_OPEN_FLAG结构
+ ??????    : NV_AT_SHELL_OPEN_FLAG_STRU
+ ????????  : NV_AT_SHELL_OPEN_FLAG????
 *****************************************************************************/
 typedef struct
 {
@@ -255,8 +255,8 @@ typedef struct
 }NV_AT_SHELL_OPEN_FLAG_STRU;
 
 /*****************************************************************************
- 结构名    : TEMP_ADC_STRU
- 结构说明  : TEMP_ADC结构
+ ??????    : TEMP_ADC_STRU
+ ????????  : TEMP_ADC????
 *****************************************************************************/
 typedef struct
 {
@@ -265,8 +265,8 @@ typedef struct
 }TEMP_ADC_STRU;
 
 /*****************************************************************************
- 结构名    : TEMP_ADC_STRU_ARRAY
- 结构说明  : TEMP_ADC_STRU_ARRAY结构
+ ??????    : TEMP_ADC_STRU_ARRAY
+ ????????  : TEMP_ADC_STRU_ARRAY????
 *****************************************************************************/
 typedef struct
 {
@@ -274,8 +274,8 @@ typedef struct
 }TEMP_ADC_STRU_ARRAY;
 
 /*****************************************************************************
- 结构名    : nv_drv_customize_type
- 结构说明  : nv_drv_customize_type结构
+ ??????    : nv_drv_customize_type
+ ????????  : nv_drv_customize_type????
 *****************************************************************************/
 typedef struct DRV_CUSTOMIZE_TYPE
 {
@@ -283,8 +283,8 @@ typedef struct DRV_CUSTOMIZE_TYPE
 } nv_drv_customize_type;
 
 /*****************************************************************************
- 结构名    : NV_ITEM_MODIFY_LINKINFO_FLAG_STRU
- 结构说明  : NV_ITEM_MODIFY_LINKINFO_FLAG结构
+ ??????    : NV_ITEM_MODIFY_LINKINFO_FLAG_STRU
+ ????????  : NV_ITEM_MODIFY_LINKINFO_FLAG????
 *****************************************************************************/
 typedef struct
 {
@@ -293,8 +293,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : CHG_TEMP_ADC_TYPE
- 结构说明  : CHG_TEMP_ADC_TYPE结构
+ ??????    : CHG_TEMP_ADC_TYPE
+ ????????  : CHG_TEMP_ADC_TYPE????
 *****************************************************************************/
 typedef struct
 {
@@ -303,9 +303,9 @@ typedef struct
 }CHG_TEMP_ADC_TYPE;
 
 /*****************************************************************************
- 结构名    : FACTORY_MODE_TYPE
- 结构说明  : FACTORY_MODE_TYPE结构
-             工厂模式nv项,0 : 工厂模式 1: 非工厂模式 36
+ ??????    : FACTORY_MODE_TYPE
+ ????????  : FACTORY_MODE_TYPE????
+             ????????nv??,0 : ???????? 1: ?????????? 36
 *****************************************************************************/
 typedef struct
 {
@@ -313,8 +313,8 @@ typedef struct
 }FACTORY_MODE_TYPE;
 
 /*****************************************************************************
- 结构名    : NV_WEBNAS_SD_WORKMODE_STRU
- 结构说明  : NV_WEBNAS_SD_WORKMODE结构
+ ??????    : NV_WEBNAS_SD_WORKMODE_STRU
+ ????????  : NV_WEBNAS_SD_WORKMODE????
 *****************************************************************************/
 typedef struct
 {
@@ -322,8 +322,8 @@ typedef struct
 }NV_WEBNAS_SD_WORKMODE_STRU;
 
 /*****************************************************************************
- 结构名    : HW_WDT_FLAG_STRU
- 结构说明  : HW_WDT_FLAG结构
+ ??????    : HW_WDT_FLAG_STRU
+ ????????  : HW_WDT_FLAG????
 *****************************************************************************/
 typedef struct
 {
@@ -331,8 +331,8 @@ typedef struct
 }HW_WDT_FLAG_STRU;
 
 /*****************************************************************************
- 结构名    : POWER_LED_ENABLE_STRU
- 结构说明  : POWER_LED_ENABLE结构
+ ??????    : POWER_LED_ENABLE_STRU
+ ????????  : POWER_LED_ENABLE????
 *****************************************************************************/
 typedef struct
 {
@@ -340,10 +340,10 @@ typedef struct
 }POWER_LED_ENABLE_STRU;
 
 /*****************************************************************************
- 结构名    : NV_HW_CONFIG_STRU
- 结构说明  : NV_HW_CONFIG结构
+ ??????    : NV_HW_CONFIG_STRU
+ ????????  : NV_HW_CONFIG????
 *****************************************************************************/
-/* PMU每一路配置,8Byte */
+/* PMU??????????,8Byte */
 typedef struct
 {
 	BSP_U8 PowerEn;
@@ -355,7 +355,7 @@ typedef struct
 	BSP_U16 Voltage;
 }PMU_POWER_CFG;
 
-/*针对个别电源需要限定电压输出范围,使用相同的结构,但是重新命名*/
+/*????????????????????????????????,??????????????,????????????*/
 /*BUCK1*/
 typedef struct
 {
@@ -368,7 +368,7 @@ typedef struct
 	BSP_U16 Voltage;  /*Range:[0,2200]*/
 }PMU_POWER_CFG_RFICTX;
 
-/* PMU配置,16路 */
+/* PMU????,16?? */
 typedef struct
 {
 	PMU_POWER_CFG 		 RF0_PA;
@@ -395,7 +395,7 @@ typedef struct
 typedef struct
 {
     BSP_U16 ConsumerID;
-    BSP_U16 PowerEn;/*0:该路电源无效；1: 有效电源*/
+    BSP_U16 PowerEn;/*0:??????????????1: ????????*/
     BSP_U16 Voltage;
     BSP_U16 ModuleID;
     BSP_U16 DevID;
@@ -404,7 +404,7 @@ typedef struct
 }RF_PMU_CFG_STRU;
 
 #define RF_POWER_MAX_NUM (24)
-#define RF_POWER_RESERVE_NUM  (8)/*不能用24-14-2，工具HIMS解析不支持*/
+#define RF_POWER_RESERVE_NUM  (8)/*??????24-14-2??????HIMS??????????*/
 
 typedef struct
 {
@@ -433,22 +433,22 @@ typedef struct
     RF_PMU_CFG_STRU PMU_CFG[RF_POWER_RESERVE_NUM];
  }RF_VOLT_CONFIG_STRU;
 
-/*----------------------【RF RSE方案】Begin--------------------------------*/
-/* gpio控制 天线开关特性NV*/
+/*----------------------??RF RSE??????Begin--------------------------------*/
+/* gpio???? ????????????NV*/
 #define DRV_ANT_SW_UNPD_ENFLAG_DISABLE 0
 #define DRV_ANT_SW_UNPD_ENFLAG_ENABLE  1
 typedef struct
 {
-    BSP_U32 is_enable;/*Range [0,1] 其中: 0-特性关闭 1-特性打开*/
+    BSP_U32 is_enable;/*Range [0,1] ????: 0-???????? 1-????????*/
  }DRV_ANT_SW_UNPD_ENFLAG;
 
 #define DRV_ANT_GPIO_CFG_UNUSED 0
 #define DRV_ANT_GPIO_CFG_USED   1
 typedef struct
 {
-    BSP_U32 gpio_num;/*gpio编号*//*给出的是RF_GPIO_NUM ??*/
-    BSP_U32 is_used;  /*Range[0,1]*//*是否使用*/
-    BSP_U32 value;   /*配置值*/
+    BSP_U32 gpio_num;/*gpio????*//*????????RF_GPIO_NUM ??*/
+    BSP_U32 is_used;  /*Range[0,1]*//*????????*/
+    BSP_U32 value;   /*??????*/
 }DRV_ANT_GPIO_CFG;
 
 #define GPIO_RF_ANT_SW_MAX 8
@@ -458,23 +458,23 @@ typedef struct{
 
 typedef struct
 {
-    DRV_ANT_SW_UNPD_CFG  all_switch[3];/*其中，下标0对应主卡主集，1对应主卡分集，2对应副卡*/
+    DRV_ANT_SW_UNPD_CFG  all_switch[3];/*??????????0??????????????1??????????????2????????*/
 } NV_DRV_ANT_SW_UNPD_CFG;
 
 
-/* mipi控制 天线开关特性NV*/
+/* mipi???? ????????????NV*/
 #define DRV_ANT_SW_MIPI_ENFLAG_DISABLE 0
 #define DRV_ANT_SW_MIPI_ENFLAG_ENABLE  1
 typedef struct
 {
-	BSP_U32 is_enable;/*Range:[0,1] 其中，0-特性关闭 1-特性打开*/
+	BSP_U32 is_enable;/*Range:[0,1] ??????0-???????? 1-????????*/
 } DRV_ANT_SW_MIPI_ENFLAG;
 
 #define DRV_ANT_SW_MIPI_INVALID 0
 #define DRV_ANT_SW_MIPI_VALID   1
 typedef struct
 {
-    BSP_U32 is_invalid;/*Range:[0,1] 其中，0-该组数据无效 1-该组数据有效*/
+    BSP_U32 is_invalid;/*Range:[0,1] ??????0-???????????? 1-????????????*/
     BSP_U8 mipi_chn;/*Range:[0,1]*/
     BSP_U8 slave_id;
     BSP_U8 reg_offset;
@@ -489,64 +489,64 @@ typedef struct
 
 typedef struct
 {
-	DRV_ANT_SW_MIPI_CONFIG all_switch[2];/*其中，下标0对应主卡，1对应副卡*/
+	DRV_ANT_SW_MIPI_CONFIG all_switch[2];/*??????????0??????????1????????*/
 } DRV_DRV_ANT_SW_MIPI_CONFIG;
 
-/*----------------------【RF RSE方案】End--------------------------------*/
+/*----------------------??RF RSE??????End--------------------------------*/
 
-/*----------------------【TDS/L B34/39 & GSM B3共存抗干扰方案】Begin--------------------------------*/
+/*----------------------??TDS/L B34/39 & GSM B3????????????????Begin--------------------------------*/
 
 #define NV_GSM_GPIO_RESERVED_NUM_L 2
 /*****************************************************************************
- 结构名    : UCOM_NV_GSM_GPIO_FUNC_SEL_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : GPIO2~5功能选择
+ ??????    : UCOM_NV_GSM_GPIO_FUNC_SEL_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : GPIO2~5????????
 *****************************************************************************/
 typedef struct
 {
-    BSP_U16 uhwGpioAndOrSel;        /* GPIO输出与或选择
+    BSP_U16 uhwGpioAndOrSel;        /* GPIO????????????
                                         bit0~1	 	Reserved
-                                        bit2    	GPIO2的与或选择    0--GPIO双modem相或输出(默认)、1--GPIO双modem相与输出
-                                        bit3 		GPIO3的与或选择    类似
-                                        bit4 		GPIO4的与或选择    类似
-                                        bit5 		GPIO5的与或选择    类似
+                                        bit2    	GPIO2??????????    0--GPIO??modem????????(????)??1--GPIO??modem????????
+                                        bit3 		GPIO3??????????    ????
+                                        bit4 		GPIO4??????????    ????
+                                        bit5 		GPIO5??????????    ????
                                         bit6~15	Reserved*/
-    BSP_U16 uhwGpioCtrlAbbTxSel;    /* GPIO与或输出是否控制abb tx
+    BSP_U16 uhwGpioCtrlAbbTxSel;    /* GPIO????????????????abb tx
                                         bit0~1	 	Reserved
-                                        bit2    	GPIO2的与或输出是否控制abb tx   0--不控制abb的tx(默认)、1--控制abb的tx
-                                        bit3 		GPIO3的与或输出是否控制abb tx   	类似
+                                        bit2    	GPIO2??????????????????abb tx   0--??????abb??tx(????)??1--????abb??tx
+                                        bit3 		GPIO3??????????????????abb tx   	????
                                         bit4~15	Reserved*/
 }UCOM_NV_GSM_GPIO_FUNC_SEL_STRU;
 
-/*----------------------【TDS/L B34/39 & GSM B3共存抗干扰方案】End--------------------------------*/
+/*----------------------??TDS/L B34/39 & GSM B3????????????????End--------------------------------*/
 
-/*过热保护设置*/
+/*????????????*/
 typedef struct
 {
-	BSP_U8 OTMP_TMP;          /*过热保护温度设置*/
-	BSP_U8 OTMP_PWR_DOWN;     /*过热后，非核心电源是否下点*/
-	BSP_U8 OTMP_RESET;        /*过热后，是否进行软复位*/
+	BSP_U8 OTMP_TMP;          /*????????????????*/
+	BSP_U8 OTMP_PWR_DOWN;     /*??????????????????????????*/
+	BSP_U8 OTMP_RESET;        /*??????????????????????*/
 	BSP_U8 RESERVE;
 }PMU_PROTECT_STRU;
 
 typedef struct
 {
-	BSP_U32 RESERVE0;           	/* 保留,4Byte */
-	BSP_U16 W_PA_V;            		/* W PA电压 2Byte */
-	BSP_U16 G_PA_V;             	/* G PA电压 2Byte */
-	BSP_U32 USB_EYE_CFG;        	/* USB眼图 4Byte */
-	BSP_U32 APT_MODE;           	/* APT 模式 4Byte，参见DR_APT_CFG_ENUM */
-	PMU_PROTECT_STRU PMU_PROTECT;   /* PMU 过热保护 4Byte*/
-	BSP_U32 DRV_LOG_CTRL;       	/* DRVLOG打印开关 4Byte */
-	BSP_U32 DRV_LOG_LEVEL;      	/* DRVLOG打印等级 4Byte */
-	BSP_U32 RESERVE7;           	/* 保留,4Byte */
+	BSP_U32 RESERVE0;           	/* ????,4Byte */
+	BSP_U16 W_PA_V;            		/* W PA???? 2Byte */
+	BSP_U16 G_PA_V;             	/* G PA???? 2Byte */
+	BSP_U32 USB_EYE_CFG;        	/* USB???? 4Byte */
+	BSP_U32 APT_MODE;           	/* APT ???? 4Byte??????DR_APT_CFG_ENUM */
+	PMU_PROTECT_STRU PMU_PROTECT;   /* PMU ???????? 4Byte*/
+	BSP_U32 DRV_LOG_CTRL;       	/* DRVLOG???????? 4Byte */
+	BSP_U32 DRV_LOG_LEVEL;      	/* DRVLOG???????? 4Byte */
+	BSP_U32 RESERVE7;           	/* ????,4Byte */
 
-	/*PMU NV项配置*/
+	/*PMU NV??????*/
 	PMU_CFG_STRU PMU_CFG;
-	BSP_U32 PMU_CRC32;	     /* PMU CRC校验,4Byte */
+	BSP_U32 PMU_CRC32;	     /* PMU CRC????,4Byte */
 
-	/* 保留,剩余23(*)4Byte */
+	/* ????,????23(*)4Byte */
 	BSP_U32 RESERVE41;
 	BSP_U32 RESERVE42;
 	BSP_U32 RESERVE43;
@@ -573,12 +573,12 @@ typedef struct
 }NV_HW_CONFIG_STRU;
 
 /*****************************************************************************
- 枚举名    : UART_SWITCH_ENUM
- 枚举说明  : UART特性是否使能
+ ??????    : UART_SWITCH_ENUM
+ ????????  : UART????????????
 
-  1.日    期   : 2013年12月19日
-    作    者   : f00204170
-    修改内容   : UART项目新增
+  1.??    ??   : 2013??12??19??
+    ??    ??   : f00204170
+    ????????   : UART????????
 *****************************************************************************/
 enum UART_SWITCH_ENUM
 {
@@ -589,14 +589,14 @@ enum UART_SWITCH_ENUM
 
 typedef BSP_U8 UART_SWITCH_ENUM_UINT8;
 /*****************************************************************************
- 结构名    : NV_UART_SWITCH_STRU
- 协议表格  : 无
- 结构说明  :  用于记录UART功能是否处于使能状态
+ ??????    : NV_UART_SWITCH_STRU
+ ????????  : ??
+ ????????  :  ????????UART????????????????????
 
- 修改历史      :
-  1.日    期   : 2013年12月19日
-    作    者   : f00204170
-    修改内容   :
+ ????????      :
+  1.??    ??   : 2013??12??19??
+    ??    ??   : f00204170
+    ????????   :
 *****************************************************************************/
 typedef struct
 {
@@ -605,8 +605,8 @@ typedef struct
 }NV_UART_SWITCH_STRU;
 
 /*****************************************************************************
- 结构名    : KPD_NV_VERSION_1_1_T
- 结构说明  : KPD_NV_VERSION_1_1_T结构
+ ??????    : KPD_NV_VERSION_1_1_T
+ ????????  : KPD_NV_VERSION_1_1_T????
 *****************************************************************************/
 typedef struct
 {
@@ -617,8 +617,8 @@ typedef struct
 }KPD_NV_VERSION_1_1_T;                     /* version 1.1 structure */
 
 /*****************************************************************************
- 结构名    : HWIFI_TARGET_ASSERT_ENABLE_STRU
- 结构说明  : HWIFI_TARGET_ASSERT_ENABLE结构
+ ??????    : HWIFI_TARGET_ASSERT_ENABLE_STRU
+ ????????  : HWIFI_TARGET_ASSERT_ENABLE????
 *****************************************************************************/
 typedef struct
 {
@@ -627,8 +627,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : HILINK_AUTORUN_FLAG_STRU
- 结构说明  : HILINK_AUTORUN_FLAG结构
+ ??????    : HILINK_AUTORUN_FLAG_STRU
+ ????????  : HILINK_AUTORUN_FLAG????
 *****************************************************************************/
 typedef struct
 {
@@ -636,8 +636,8 @@ typedef struct
 }HILINK_AUTORUN_FLAG_STRU;
 
 /*****************************************************************************
- 结构名    : VBAT_CALIBART_TYPE
- 结构说明  : 电池校准参数数据结构
+ ??????    : VBAT_CALIBART_TYPE
+ ????????  : ????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -646,8 +646,8 @@ typedef struct
 }VBAT_CALIBART_TYPE;
 
 /*****************************************************************************
- 结构名    : NV_FACTORY_INFO_I_STRU
- 结构说明  : NV_FACTORY_INFO_I结构
+ ??????    : NV_FACTORY_INFO_I_STRU
+ ????????  : NV_FACTORY_INFO_I????
 *****************************************************************************/
 typedef struct
 {
@@ -655,8 +655,8 @@ typedef struct
 }NV_FACTORY_INFO_I_STRU;
 
 /*****************************************************************************
- 结构名    : NV_USB_LOG_SAVE_LEV
- 结构说明  : NV_USB_LOG_SAVE_LEV结构
+ ??????    : NV_USB_LOG_SAVE_LEV
+ ????????  : NV_USB_LOG_SAVE_LEV????
 *****************************************************************************/
 typedef struct
 {
@@ -665,18 +665,18 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : DR_NV_ENHANCE_SIMCARD_LOCK_STATUS_STRU
- 结构说明  : 增强的锁卡状态结构体   ID=8517
+ ??????    : DR_NV_ENHANCE_SIMCARD_LOCK_STATUS_STRU
+ ????????  : ????????????????????   ID=8517
 *****************************************************************************/
 typedef struct
 {
-    BSP_U8  EnhanceSimcardStatus;     /* 增强的锁卡特性是否激活 0:不激活, 1: 激活 */
-    BSP_U8  SimcardStatus;            /* SimCardLockStatus各种状态 1: 锁卡版本, 2: 非锁卡版本 */
+    BSP_U8  EnhanceSimcardStatus;     /* ?????????????????????? 0:??????, 1: ???? */
+    BSP_U8  SimcardStatus;            /* SimCardLockStatus???????? 1: ????????, 2: ?????????? */
 }DR_NV_ENHANCE_SIMCARD_LOCK_STATUS_STRU;
 
 /*****************************************************************************
- 结构名    : NV_BREATH_LED_STR
- 结构说明  : NV_BREATH_LED结构     ID=9051
+ ??????    : NV_BREATH_LED_STR
+ ????????  : NV_BREATH_LED????     ID=9051
 *****************************************************************************/
 typedef struct
 {
@@ -687,8 +687,8 @@ typedef struct
 }NV_BREATH_LED_STR;
 
 /*****************************************************************************
- 结构名    : CHG_BATTERY_TEMP_PROTECT_NV_TYPE
- 结构说明  : CHG_BATTERY_TEMP_PROTECT_NV_TYPE结构     ID=50016
+ ??????    : CHG_BATTERY_TEMP_PROTECT_NV_TYPE
+ ????????  : CHG_BATTERY_TEMP_PROTECT_NV_TYPE????     ID=50016
 *****************************************************************************/
 typedef struct
 {
@@ -698,8 +698,8 @@ typedef struct
 }CHG_BATTERY_TEMP_PROTECT_NV_TYPE;
 
 /*****************************************************************************
- 结构名    : nv_huawei_connect_display_rate_type
- 结构说明  : nv_huawei_connect_display_rate_type结构     ID=50027
+ ??????    : nv_huawei_connect_display_rate_type
+ ????????  : nv_huawei_connect_display_rate_type????     ID=50027
 *****************************************************************************/
 typedef struct
 {
@@ -708,13 +708,13 @@ typedef struct
     BSP_U8 edge_connect_rate;
     BSP_U8 wcdma_connect_rate;
     BSP_U8 hspda_connect_rate;
-    BSP_U8 reserved;           /*对齐使用*/
+    BSP_U8 reserved;           /*????????*/
 }nv_huawei_connect_display_rate_type;
 
 
 /*****************************************************************************
- 结构名    : PROIDNvInfo
- 结构说明  : PROIDNvInfo结构     ID=50018,ID=50048
+ ??????    : PROIDNvInfo
+ ????????  : PROIDNvInfo????     ID=50018,ID=50048
 *****************************************************************************/
 typedef struct _productIDNvInfo
 {
@@ -723,8 +723,8 @@ typedef struct _productIDNvInfo
 } PROIDNvInfo;
 
 /*****************************************************************************
- 结构名    : NV_HUAWEI_PCCW_HS_HSPA_BLUE_STRU
- 结构说明  : NV_HUAWEI_PCCW_HS_HSPA_BLUE结构 ID=50032
+ ??????    : NV_HUAWEI_PCCW_HS_HSPA_BLUE_STRU
+ ????????  : NV_HUAWEI_PCCW_HS_HSPA_BLUE???? ID=50032
 *****************************************************************************/
 typedef struct
 {
@@ -733,8 +733,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : nvi_cust_pid_type
- 结构说明  : nvi_cust_pid_type结构
+ ??????    : nvi_cust_pid_type
+ ????????  : nvi_cust_pid_type????
 *****************************************************************************/
 typedef struct
 {
@@ -745,8 +745,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : nv_protocol_base_type
- 结构说明  : nv_protocol_base_type结构
+ ??????    : nv_protocol_base_type
+ ????????  : nv_protocol_base_type????
 *****************************************************************************/
 typedef struct
 {
@@ -755,8 +755,8 @@ typedef struct
 }nv_protocol_base_type;
 
 /*****************************************************************************
- 结构名    : nv_huawei_dynamic_pid_type
- 结构说明  : nv_huawei_dynamic_pid_type结构 ID=50091 端口形态
+ ??????    : nv_huawei_dynamic_pid_type
+ ????????  : nv_huawei_dynamic_pid_type???? ID=50091 ????????
 *****************************************************************************/
 typedef struct PACKED_POST
 {
@@ -768,8 +768,8 @@ typedef struct PACKED_POST
 
 
 /*****************************************************************************
- 结构名    : USB_NV_SN_INFO_T
- 结构说明  : USB_NV_SN_INFO_T结构
+ ??????    : USB_NV_SN_INFO_T
+ ????????  : USB_NV_SN_INFO_T????
 *****************************************************************************/
 typedef struct tagUSB_NV_SN_INFO_T
 {
@@ -780,8 +780,8 @@ typedef struct tagUSB_NV_SN_INFO_T
 } USB_NV_SN_INFO_T;
 
 /*****************************************************************************
- 结构名    : USB_NV_DEV_INFO_T
- 结构说明  : USB_NV_DEV_INFO_T结构
+ ??????    : USB_NV_DEV_INFO_T
+ ????????  : USB_NV_DEV_INFO_T????
 *****************************************************************************/
 typedef struct tagUSB_NV_DEV_INFO_T
 {
@@ -793,8 +793,8 @@ typedef struct tagUSB_NV_DEV_INFO_T
 } USB_NV_DEV_INFO_T;
 
 /*****************************************************************************
- 结构名    : USB_NV_SERIAL_NUM_T
- 结构说明  : USB_NV_SERIAL_NUM_T结构
+ ??????    : USB_NV_SERIAL_NUM_T
+ ????????  : USB_NV_SERIAL_NUM_T????
 *****************************************************************************/
 typedef struct tagUSB_NV_SERIAL_NUM_T
 {
@@ -805,8 +805,8 @@ typedef struct tagUSB_NV_SERIAL_NUM_T
 } USB_NV_SERIAL_NUM_T;
 
 /*****************************************************************************
- 结构名    : USB_NV_NEW_PID_INFO_T
- 结构说明  : USB_NV_NEW_PID_INFO_T结构
+ ??????    : USB_NV_NEW_PID_INFO_T
+ ????????  : USB_NV_NEW_PID_INFO_T????
 *****************************************************************************/
 typedef struct tagUSB_NV_NEW_PID_INFO_T
 {
@@ -814,8 +814,8 @@ typedef struct tagUSB_NV_NEW_PID_INFO_T
 } USB_NV_NEW_PID_INFO_T;
 
 /*****************************************************************************
- 结构名    : USB_NV_PID_UNION_T
- 结构说明  : USB_NV_PID_UNION_T结构
+ ??????    : USB_NV_PID_UNION_T
+ ????????  : USB_NV_PID_UNION_T????
 *****************************************************************************/
 typedef struct tagUSB_NV_PID_UNION_T
 {
@@ -826,8 +826,8 @@ typedef struct tagUSB_NV_PID_UNION_T
 } USB_NV_PID_UNION_T;
 
 /*****************************************************************************
- 结构名    : USB_NV_DEV_PROFILE_T
- 结构说明  : USB_NV_DEV_PROFILE_T结构
+ ??????    : USB_NV_DEV_PROFILE_T
+ ????????  : USB_NV_DEV_PROFILE_T????
 *****************************************************************************/
 typedef struct tagUSB_NV_DEV_PROFILE_T
 {
@@ -839,8 +839,8 @@ typedef struct tagUSB_NV_DEV_PROFILE_T
 
 
 /*****************************************************************************
- 结构名    : NV_SECBOOT_ENABLE_FLAG
- 结构说明  : NV_SECBOOT_ENABLE_FLAG结构 ID=50201
+ ??????    : NV_SECBOOT_ENABLE_FLAG
+ ????????  : NV_SECBOOT_ENABLE_FLAG???? ID=50201
 *****************************************************************************/
 typedef struct
 {
@@ -849,8 +849,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : nv_wifibs_type
- 结构说明  : nv_wifibs_type结构
+ ??????    : nv_wifibs_type
+ ????????  : nv_wifibs_type????
 *****************************************************************************/
 typedef struct
 {
@@ -878,8 +878,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : CHG_BATTERY_LOW_TEMP_PROTECT_NV
- 结构说明  : CHG_BATTERY_LOW_TEMP_PROTECT_NV结构 ID=52005
+ ??????    : CHG_BATTERY_LOW_TEMP_PROTECT_NV
+ ????????  : CHG_BATTERY_LOW_TEMP_PROTECT_NV???? ID=52005
 *****************************************************************************/
 typedef struct
 {
@@ -889,8 +889,8 @@ typedef struct
 }CHG_BATTERY_LOW_TEMP_PROTECT_NV;
 
 /*****************************************************************************
- 结构名    : NV_SCI_CFG_STRU
- 结构说明  : NV_SCI_CFG结构 ID=128
+ ??????    : NV_SCI_CFG_STRU
+ ????????  : NV_SCI_CFG???? ID=128
 *****************************************************************************/
 typedef struct
 {
@@ -898,8 +898,8 @@ typedef struct
 } NV_SCI_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NV_GCF_TYPE_CONTENT_STRU
- 结构说明  : NV_GCF_TYPE_CONTENT结构 ID=8250
+ ??????    : NV_GCF_TYPE_CONTENT_STRU
+ ????????  : NV_GCF_TYPE_CONTENT???? ID=8250
 *****************************************************************************/
 typedef struct
 {
@@ -907,8 +907,8 @@ typedef struct
 }NV_GCF_TYPE_CONTENT_STRU;
 
 /*****************************************************************************
- 结构名    : nv_wifi_info
- 结构说明  : nv_wifi_info结构
+ ??????    : nv_wifi_info
+ ????????  : nv_wifi_info????
 *****************************************************************************/
 typedef struct
 {
@@ -928,17 +928,17 @@ typedef struct
 }nv_wifi_info;
 
 /*****************************************************************************
- 结构名    : NV_ITEM_USB_PKT_HOOK_STRU
- 结构说明  : NV_ITEM_USB_PKT_HOOK结构 ID=119
+ ??????    : NV_ITEM_USB_PKT_HOOK_STRU
+ ????????  : NV_ITEM_USB_PKT_HOOK???? ID=119
 *****************************************************************************/
 typedef struct
 {
     BSP_U16 usUsbPktHookFlag;
-}NV_ITEM_USB_PKT_HOOK_STRU;   /*USB勾包NV控制项*/
+}NV_ITEM_USB_PKT_HOOK_STRU;   /*USB????NV??????*/
 
 /*****************************************************************************
- 结构名    : TEM_VOLT_TABLE
- 结构说明  : TEM_VOLT_TABLE结构
+ ??????    : TEM_VOLT_TABLE
+ ????????  : TEM_VOLT_TABLE????
 *****************************************************************************/
 typedef struct tem_volt_table
 {
@@ -947,8 +947,8 @@ typedef struct tem_volt_table
 }TEM_VOLT_TABLE;
 
 /*****************************************************************************
- 结构名    : UE_POINT_CTRL_STRU
- 结构说明  : UE_POINT_CTRL结构 ID=15
+ ??????    : UE_POINT_CTRL_STRU
+ ????????  : UE_POINT_CTRL???? ID=15
 *****************************************************************************/
 typedef struct
 {
@@ -960,8 +960,8 @@ typedef struct
 }UE_POINT_CTRL_STRU;
 
 /*****************************************************************************
- 结构名    : NV_CUSTOMIZE_REWIND_DELAY_TIME_I_STRU
- 结构说明  : NV_CUSTOMIZE_REWIND_DELAY_TIME_I结构 ID=25
+ ??????    : NV_CUSTOMIZE_REWIND_DELAY_TIME_I_STRU
+ ????????  : NV_CUSTOMIZE_REWIND_DELAY_TIME_I???? ID=25
 *****************************************************************************/
 typedef struct
 {
@@ -970,8 +970,8 @@ typedef struct
 }NV_CUSTOMIZE_REWIND_DELAY_TIME_I_STRU;
 
 /*****************************************************************************
- 结构名    : NV_OLED_TEMP_ADC_STRU
- 结构说明  : NV_OLED_TEMP_ADC结构
+ ??????    : NV_OLED_TEMP_ADC_STRU
+ ????????  : NV_OLED_TEMP_ADC????
 *****************************************************************************/
 typedef struct
 {
@@ -980,8 +980,8 @@ typedef struct
 }NV_OLED_TEMP_ADC_STRU;
 
 /*****************************************************************************
- 结构名    : NV_OLED_TEMP_ADC_STRU_ARRAY
- 结构说明  : NV_OLED_TEMP_ADC_STRU_ARRAY结构  ID=49
+ ??????    : NV_OLED_TEMP_ADC_STRU_ARRAY
+ ????????  : NV_OLED_TEMP_ADC_STRU_ARRAY????  ID=49
 *****************************************************************************/
 typedef struct
 {
@@ -989,8 +989,8 @@ typedef struct
 }NV_OLED_TEMP_ADC_STRU_ARRAY;
 
 /*****************************************************************************
- 结构名    : NV_SW_VER_STRU
- 结构说明  : NV_SW_VER结构
+ ??????    : NV_SW_VER_STRU
+ ????????  : NV_SW_VER????
 *****************************************************************************/
 typedef struct
 {
@@ -999,8 +999,8 @@ typedef struct
 }NV_SW_VER_STRU;
 
 /*****************************************************************************
- 结构名    : NV_TCXO_CFG_STRU
- 结构说明  : NV_TCXO_CFG结构 ID=9217
+ ??????    : NV_TCXO_CFG_STRU
+ ????????  : NV_TCXO_CFG???? ID=9217
 *****************************************************************************/
 typedef struct
 {
@@ -1008,8 +1008,8 @@ typedef struct
 }NV_TCXO_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NV_KADC_PHYTOLOGICAL_CONFIGTCXO_CFG_STRU
- 结构说明  : NV_KADC_PHYTOLOGICAL_CONFIGTCXO_CFG结构 ID=9216
+ ??????    : NV_KADC_PHYTOLOGICAL_CONFIGTCXO_CFG_STRU
+ ????????  : NV_KADC_PHYTOLOGICAL_CONFIGTCXO_CFG???? ID=9216
 *****************************************************************************/
 typedef struct
 {
@@ -1017,8 +1017,8 @@ typedef struct
 }NV_KADC_PHYTOLOGICAL_CONFIGTCXO_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NV_THERMAL_HKADC_CONFIG
- 结构说明  : NV_THERMAL_HKADC_CONFIG结构 ID=9232
+ ??????    : NV_THERMAL_HKADC_CONFIG
+ ????????  : NV_THERMAL_HKADC_CONFIG???? ID=9232
 *****************************************************************************/
 typedef struct
 {
@@ -1033,8 +1033,8 @@ typedef struct
 }NV_THERMAL_HKADC_CONFIG;
 
 /*****************************************************************************
- 结构名    : NV_THERMAL_HKADC_CONFIG_STRU
- 结构说明  : NV_THERMAL_HKADC_CONFIG结构 ID=9215
+ ??????    : NV_THERMAL_HKADC_CONFIG_STRU
+ ????????  : NV_THERMAL_HKADC_CONFIG???? ID=9215
 *****************************************************************************/
 typedef struct
 {
@@ -1042,8 +1042,8 @@ typedef struct
 }NV_THERMAL_HKADC_CONFIG_STRU;
 
 /*****************************************************************************
- 结构名    : NV_THERMAL_BAT_CONFIG_STRU
- 结构说明  : NV_THERMAL_BAT_CONFIG结构 ID=9214
+ ??????    : NV_THERMAL_BAT_CONFIG_STRU
+ ????????  : NV_THERMAL_BAT_CONFIG???? ID=9214
 *****************************************************************************/
 typedef struct
 {
@@ -1058,8 +1058,8 @@ typedef struct
 }NV_THERMAL_BAT_CONFIG_STRU;
 
 /*****************************************************************************
- 结构名    : NV_THERMAL_TSENSOR_CONFIG_STRU
- 结构说明  : NV_THERMAL_TSENSOR_CONFIG结构 ID=9213
+ ??????    : NV_THERMAL_TSENSOR_CONFIG_STRU
+ ????????  : NV_THERMAL_TSENSOR_CONFIG???? ID=9213
 *****************************************************************************/
 typedef struct
 {
@@ -1080,8 +1080,8 @@ typedef struct
 }NV_THERMAL_TSENSOR_CONFIG_STRU;
 
 /*****************************************************************************
- 结构名    : NV_TUNER_MIPI_INIT_CONFIG_STRU
- 结构说明  : NV_TUNER_MIPI_INIT_CONFIG_STRU结构 ID=10046
+ ??????    : NV_TUNER_MIPI_INIT_CONFIG_STRU
+ ????????  : NV_TUNER_MIPI_INIT_CONFIG_STRU???? ID=10046
 *****************************************************************************/
 #define TUNER_USER_DATA_MAX_NUM (9)
 #define TUNER_MAX_NUM           (2)
@@ -1098,8 +1098,8 @@ typedef struct
     NV_TUNER_MIPI_FRAME_CONFIG_STRU RFInitReg[TUNER_MAX_NUM];
 }NV_GU_RF_FEND_MIPI_INIT_CONFIG_STRU;
 /*****************************************************************************
- 结构名    : WG_DRX_RESUME_TIME_STRU
- 结构说明  : WG_DRX_RESUME_TIME_STRU结构 ID=10031
+ ??????    : WG_DRX_RESUME_TIME_STRU
+ ????????  : WG_DRX_RESUME_TIME_STRU???? ID=10031
 *****************************************************************************/
 typedef struct
 {
@@ -1121,19 +1121,19 @@ typedef struct
 }WG_DRX_RESUME_TIME_STRU;
 
 /*****************************************************************************
- 结构名    : NV_NPNP_CONFIG_INFO
- 结构说明  : NV_NPNP_CONFIG_INFO
+ ??????    : NV_NPNP_CONFIG_INFO
+ ????????  : NV_NPNP_CONFIG_INFO
 *****************************************************************************/
 typedef struct
 {
-    BSP_U32 npnp_open_flag;                           /* NPNP 特性一级NV开关, 0为未开启不可以使用, 1为开启可以使用 */
-    BSP_U32 npnp_enable_flag;                         /* NPNP 特性二级NV项, 0为特性未使能, 1为特性使能             */
+    BSP_U32 npnp_open_flag;                           /* NPNP ????????NV????, 0??????????????????, 1?????????????? */
+    BSP_U32 npnp_enable_flag;                         /* NPNP ????????NV??, 0????????????, 1??????????             */
 }NV_NPNP_CONFIG_INFO;
 /*****************************************************************************
- 结构名    : NV_RF_GPIO_CFG_STRU
- 结构说明  : RF_GPIO中有若干可以复用为DRV_GPIO
-             在一些射频功能场景需要改变这些RF_GPIO引脚的复用功能及输出状态
-             通过该NV配置 ID=10047
+ ??????    : NV_RF_GPIO_CFG_STRU
+ ????????  : RF_GPIO??????????????????DRV_GPIO
+             ??????????????????????????????RF_GPIO????????????????????????
+             ??????NV???? ID=10047
 *****************************************************************************/
 typedef struct
 {
@@ -1151,9 +1151,9 @@ typedef struct
     RF_GPIO_CFG rf_switch_cfg[16];
 }NV_RF_SWITCH_CFG_STRU;
 /*****************************************************************************
- 结构名    : NV_RF_ANT_OTG_CFG_STRU
- 结构说明  : 主、副卡的天线热拔插功能需要根据不同的产品形态决定是否打开，能够
-             通过该NV配置，并且通过该NV配置使用哪一根GPIO引脚作为中断输入
+ ??????    : NV_RF_ANT_OTG_CFG_STRU
+ ????????  : ????????????????????????????????????????????????????????????????
+             ??????NV????????????????NV??????????????GPIO????????????????
              ID=10051
 *****************************************************************************/
 typedef struct
@@ -1163,8 +1163,8 @@ typedef struct
 }NV_RF_ANT_OTG_CFG_STRU;
 
 /*****************************************************************************
- 结构名    : NV_T1_CTRL_PARA_STRU
- 结构说明  : NV_T1_CTRL_PARA_STRU ID=71
+ ??????    : NV_T1_CTRL_PARA_STRU
+ ????????  : NV_T1_CTRL_PARA_STRU ID=71
 *****************************************************************************/
 typedef struct
 {
@@ -1174,8 +1174,8 @@ typedef struct
 }NV_T1_CTRL_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : NV_PRODUCT_TYPE_FOR_LOG_DIRECTORY
- 结构说明  : NV_PRODUCT_TYPE_FOR_LOG_DIRECTORY ID=148
+ ??????    : NV_PRODUCT_TYPE_FOR_LOG_DIRECTORY
+ ????????  : NV_PRODUCT_TYPE_FOR_LOG_DIRECTORY ID=148
 *****************************************************************************/
 typedef struct
 {
@@ -1184,15 +1184,15 @@ typedef struct
 }NV_PRODUCT_TYPE_FOR_LOG_DIRECTORY;
 
 /*****************************************************************************
- 结构名    : UCOM_NV_NV_ITEM_XO_DEFINE_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 单时钟类型定义 ID=10056
+ ??????    : UCOM_NV_NV_ITEM_XO_DEFINE_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ?????????????? ID=10056
 *****************************************************************************/
 typedef struct
 {
-    BSP_U16      enSingleXoType;                     /* 单时钟是否使能,0:不支持，1:单tcxo，2:单dcxo */
-    BSP_U16      en32kType;                          /* 0:32000,1:32764，2:32768*/
+    BSP_U16      enSingleXoType;                     /* ??????????????,0:????????1:??tcxo??2:??dcxo */
+    BSP_U16      en32kType;                          /* 0:32000,1:32764??2:32768*/
 }DRV_NV_SINGLE_XO_DEFINE_STRU;
 /*****************************************************************************
   6 UNION

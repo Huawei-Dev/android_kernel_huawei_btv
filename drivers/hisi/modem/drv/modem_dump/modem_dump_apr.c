@@ -46,8 +46,6 @@
  *
  */
 
-
-/*lint -save -e537*/
 #include <linux/sched.h>
 #include <linux/timer.h>
 #include <linux/thread_info.h>
@@ -99,29 +97,12 @@
 #include "modem_dump_area.h"
 #include "bsp_dump_mem.h"
 
-
-
-/*lint -restore*/
- /*存储cp中断信息 中断号 责任组件*/
 interupt_table_t *g_cp_interupt_table = NULL;
 
-/*存储cp任务 责任组件信息*/
 task_table_t *g_cp_task_table = NULL;
-/*存储modid范围 责任组件信息*/
+
 modid_info_t *g_p_modid_table = NULL;
 
-/*****************************************************************************
-* 函 数 名  : bsp_dump_parse_apr_dts_info
-*
-* 功能描述  : 读取dts初始化任务信息和中断信息 组件信息
-*
-* 输入参数  :
-*
-*
-* 输出参数  :无
-*
-* 返 回 值  : 无
-*****************************************************************************/
 u32 bsp_apr_init(void)
 {
     struct device_node *dev_node = NULL;
@@ -139,7 +120,7 @@ u32 bsp_apr_init(void)
     u32 int_sum = 0;
     u32 u = 0;
     u32 i = 0;
-    /*读取责任组件信息*/
+
     dev_node = of_find_compatible_node(NULL,NULL,"hisilicon,apr_config");
     if(!dev_node)
     {
@@ -195,13 +176,11 @@ u32 bsp_apr_init(void)
     child = NULL;
     for_each_child_of_node(dev_node,child)
     {
-        /*如果本次读取组件名称失败则不再读取其他信息*/
         if(of_property_read_string(child, (const char*)"module_name", (const char**)&module_name))
         {
             dump_fetal("get module_name fail\n");
             continue;
         }
-        /*读取modid信息*/
         if(of_property_read_u32(child, "modid_sum", &sum))
         {
             sum = 0;
@@ -223,7 +202,6 @@ u32 bsp_apr_init(void)
             }
             i++;
         }
-        /*读取task信息*/
         if(of_property_read_u32(child, "task_sum", &sum))
         {
             sum = 0;
@@ -243,7 +221,6 @@ u32 bsp_apr_init(void)
                 g_cp_task_table->task_sum++;
             }
         }
-        /*读取中断信息*/
         if(of_property_read_u32(child, "int_sum", &sum))
         {
             sum = 0;
@@ -267,19 +244,7 @@ u32 bsp_apr_init(void)
     dump_fetal("init apr dts success\n");
     return MDRV_OK;
 }
-/*****************************************************************************
-* 函 数 名  : bsp_dump_parse_reset_info
-*
-* 功能描述  : 将异常信息解析
-*
-* 输入参数  :  reset_info:存储解析后的异常信息的数据流
-               size
-*
-*
-* 输出参数  :无
-*
-* 返 回 值  : 无
-*****************************************************************************/
+
 void bsp_dump_parse_reset_info( dump_reset_log_t *dump_reset_info, dump_except_info_t dump_except_info)
 {
     bsp_dump_get_reset_ccore(dump_except_info.except_core, dump_reset_info->reboot_core);
@@ -297,18 +262,7 @@ void bsp_dump_parse_reset_info( dump_reset_log_t *dump_reset_info, dump_except_i
         snprintf(dump_reset_info->brieftype, sizeof(dump_reset_info->brieftype),"%s_VOICE", dump_reset_info->module_name);
     }
 }
-/*****************************************************************************
-* 函 数 名  : bsp_dump_get_reset_module
-*
-* 功能描述  : 解析复位的责任组件
-*
-* 输入参数  :
-*
-*
-* 输出参数  :无
-*
-* 返 回 值  : 无
-*****************************************************************************/
+
 void bsp_dump_get_reset_module(dump_except_info_t dump_except_info, u8* task_name,u8 * module)
 {
     u32 index = 0;
@@ -316,7 +270,7 @@ void bsp_dump_get_reset_module(dump_except_info_t dump_except_info, u8* task_nam
     u32 reboot_reason = 0;
 
     bsp_dump_get_reboot_contex(NULL, &reboot_reason);
-    /*主动复位根据modid确定责任组件*/
+
     if(DUMP_REASON_NORMAL == reboot_reason)
     {
         if(!g_p_modid_table)
@@ -332,7 +286,7 @@ void bsp_dump_get_reset_module(dump_except_info_t dump_except_info, u8* task_nam
                 return;
             }
         }
-        /*如果查找不到复位的责任组件则用复位任务和中断来判断责任组件*/
+
         if(index == g_p_modid_table->moudid_sum)
         {
             dump_fetal("can't find the modid in dts config\n");
@@ -340,8 +294,6 @@ void bsp_dump_get_reset_module(dump_except_info_t dump_except_info, u8* task_nam
         }
     }
 
-    /*wdg abort根据临终任务名或中断号确定责任组件*/
-    /*如果为中断复位*/
     if(DUMP_CTX_INT == dump_except_info.reboot_context)
     {
         if(!g_cp_interupt_table)
@@ -365,12 +317,10 @@ void bsp_dump_get_reset_module(dump_except_info_t dump_except_info, u8* task_nam
     }
     if(DUMP_CTX_TASK == dump_except_info.reboot_context)
     {
-        /*否则为任务复位*/
         if(!g_cp_task_table)
         {
             return;
         }
-        /*查找责任组件*/
         for(index = 0; index < g_cp_task_table->task_sum; index++ )
         {
             size = strlen(g_cp_task_table->task_info[index].task_name) > strlen(task_name)? \
@@ -381,8 +331,8 @@ void bsp_dump_get_reset_module(dump_except_info_t dump_except_info, u8* task_nam
                 break;
             }
         }
-        /*如果在已有任务中查找不到，则责任组件为空*/
-        if(index == g_cp_task_table->task_sum)
+
+       if(index == g_cp_task_table->task_sum)
         {
             dump_fetal("can't find the task in dts config\n");
             dump_fetal("reboot task name:%s\n", task_name);
@@ -390,18 +340,7 @@ void bsp_dump_get_reset_module(dump_except_info_t dump_except_info, u8* task_nam
         }
     }
 }
-/*****************************************************************************
-* 函 数 名  : bsp_dump_get_cp_reset_reason
-*
-* 功能描述  : 获取CP复位的原因
-*
-* 输入参数  :
-*
-*
-* 输出参数  :无
-*
-* 返 回 值  : 无
-*****************************************************************************/
+
 void bsp_dump_get_reset_task(dump_except_info_t dump_except_info,  u8 * task_name, u32 * reboot_int)
 {
     u8* task_name_table = NULL;
@@ -416,15 +355,13 @@ void bsp_dump_get_reset_task(dump_except_info_t dump_except_info,  u8 * task_nam
 
     bsp_dump_get_reboot_contex(&reboot_core, &reboot_reason);
 
-
-    /*中断处理*/
     if(DUMP_CTX_INT == dump_except_info.reboot_context)
     {
         dump_fetal("reboot reason int\n");
         *reboot_int = dump_except_info.reboot_int;
         return;
     }
-    /*任务处理*/
+
     if((DUMP_REASON_NORMAL == reboot_reason)||(DUMP_REASON_ARM == reboot_reason))
     {
         if(DUMP_CPU_COMM == reboot_core)
@@ -442,7 +379,7 @@ void bsp_dump_get_reset_task(dump_except_info_t dump_except_info,  u8 * task_nam
             dump_fetal("except core error value:0x%x\n", dump_except_info.except_core);
             return;
         }
-        /*获取基本信息和任务切换记录地址信息*/
+
         dump_base_info = bsp_dump_get_field_addr(task_info_filed);
         if(NULL == dump_base_info)
         {
@@ -454,7 +391,6 @@ void bsp_dump_get_reset_task(dump_except_info_t dump_except_info,  u8 * task_nam
     }
     else if(DUMP_REASON_WDT == reboot_reason)
     {
-        /*如果为wdg复位*/
         if(DUMP_CPU_COMM == reboot_core)
         {
             task_info_filed = DUMP_CP_ALLTASK_NAME;
@@ -463,7 +399,6 @@ void bsp_dump_get_reset_task(dump_except_info_t dump_except_info,  u8 * task_nam
         {
             task_info_filed = DUMP_MODEMAP_ALLTASK;
         }
-        /*CP存储任务名的区域*/
         task_name_table = bsp_dump_get_field_addr(task_info_filed);
         if(NULL == task_name_table)
         {
@@ -472,11 +407,9 @@ void bsp_dump_get_reset_task(dump_except_info_t dump_except_info,  u8 * task_nam
         }
 
         task_cnt = *((u32 *)task_name_table + 3)/4;
-        /* 偏移10字节，去掉队列头 */
         task_name_table += 0x10;
         temp_task_name = (dump_task_info_s *)task_name_table;
         dump_fetal("task_cnt:0x%x\n", task_cnt);
-        /*查找任务名*/
         for(task_index = 0;task_index < task_cnt; task_index++)
         {
             if(temp_task_name->task_id == dump_except_info.reboot_task)
@@ -488,7 +421,6 @@ void bsp_dump_get_reset_task(dump_except_info_t dump_except_info,  u8 * task_nam
             temp_task_name++;
         }
 
-        /*没有找到该任务*/
         if(task_index == task_cnt)
         {
             dump_fetal("can't find the task, task id:0x%x\n", dump_except_info.reboot_task);
@@ -536,18 +468,6 @@ u32 bsp_dump_search_taskid(dump_queue_t *Q)
     return MDRV_ERROR;
 }
 
-/*****************************************************************************
-* 函 数 名  : bsp_dump_get_reset_context_and_taskid
-*
-* 功能描述  :获取复位为中断复位还是任务复位,如果为任务复位,解析复位任务id，如果复位为中断，解析复位中断号
-*
-* 输入参数  :
-*
-*
-* 输出参数  :无
-*
-* 返 回 值  : 无
-*****************************************************************************/
 void bsp_dump_get_reset_context_and_id(u32 *reboot_context, u32 *reboot_task,u32 *reboot_int, struct dump_global_struct_s* dump_head)
 {
     dump_queue_t* task_switch = NULL;
@@ -620,8 +540,7 @@ void bsp_dump_get_reset_context_and_id(u32 *reboot_context, u32 *reboot_task,u32
             {
                 return;
             }
-            /*如果为wdg和abort复位*/
-            element = task_switch->data[((task_switch->rear+task_switch->maxNum)-2) % task_switch->maxNum];/* [false alarm]:fortify */
+            element = task_switch->data[((task_switch->rear+task_switch->maxNum)-2) % task_switch->maxNum];
 
             if(DUMP_INT_IN_FLAG == ((element>>16)&0xFFFF))
             {
@@ -641,18 +560,7 @@ void bsp_dump_get_reset_context_and_id(u32 *reboot_context, u32 *reboot_task,u32
 
 
 }
-/*****************************************************************************
-* 函 数 名  : bsp_dump_get_reset_voice
-*
-* 功能描述  : 解析复位时是否在语音下
-*
-* 输入参数  :
-*
-*
-* 输出参数  :无
-*
-* 返 回 值  : 无
-*****************************************************************************/
+
 void bsp_dump_get_reset_voice(u32 voice, u8 * reboot_voice)
 {
     if(DUMP_OUT_VOICE == voice)
@@ -665,18 +573,7 @@ void bsp_dump_get_reset_voice(u32 voice, u8 * reboot_voice)
     }
     return;
 }
-/*****************************************************************************
-* 函 数 名  : bsp_dump_get_reset_modid
-*
-* 功能描述  : 获取复位的modid
-*
-* 输入参数  :
-*
-*
-* 输出参数  :无
-*
-* 返 回 值  : 无
-*****************************************************************************/
+
 void bsp_dump_get_reset_modid(u32 reason, u32 reboot_modid, u32 * modId)
 {
     if(DUMP_REASON_WDT == reason)
@@ -688,18 +585,7 @@ void bsp_dump_get_reset_modid(u32 reason, u32 reboot_modid, u32 * modId)
         *modId = reboot_modid;
     }
 }
-/*****************************************************************************
-* 函 数 名  : bsp_dump_get_cp_reset_reason
-*
-* 功能描述  : 获取复位的原因
-*
-* 输入参数  :
-*
-*
-* 输出参数  :无
-*
-* 返 回 值  : 无
-*****************************************************************************/
+
 void bsp_dump_get_reset_reason(u32 reason, u8 * reboot_reason)
 {
     if(DUMP_REASON_NORMAL == reason)
@@ -740,18 +626,7 @@ void bsp_dump_get_reset_reason(u32 reason, u8 * reboot_reason)
     }
 
 }
-/*****************************************************************************
-* 函 数 名  : bsp_dump_get_reset_ccore
-*
-* 功能描述  : 获取CP复位的原因
-*
-* 输入参数  :
-*
-*
-* 输出参数  :无
-*
-* 返 回 值  : 无
-*****************************************************************************/
+
 void bsp_dump_get_reset_ccore(u32 core, char *reboot_core)
 {
     if(DUMP_CPU_COMM == core)
@@ -820,18 +695,7 @@ u32  bsp_dump_show_apr_cfg(u32 type)
     }
     return MDRV_OK;
 }
-/*****************************************************************************
-* 函 数 名  : om_get_reset_info
-*
-* 功能描述  : 获取复位信息
-*
-* 输入参数  :
-*
-*
-* 输出参数  :无
-*
-* 返 回 值  : 无
-*****************************************************************************/
+
 void om_get_reset_info(char * reset_info, u32 size)
 {
     struct dump_global_area_ctrl_s global_area = {0,};
@@ -864,7 +728,7 @@ void om_get_reset_info(char * reset_info, u32 size)
     }
 
     dump_head = &(global_area.virt_addr->base_info);
-    /*获取复位相关信息*/
+
     if(DUMP_CPU_COMM == reboot_core)
     {
         base_info_field = DUMP_CP_BASE_INFO;
@@ -903,9 +767,7 @@ void om_get_reset_info(char * reset_info, u32 size)
     dump_fetal("reboot_int = 0x%x\n", dump_except_info.reboot_int);
     dump_fetal("reboot_context = 0x%x\n", dump_except_info.reboot_context);
     dump_fetal("reboot_task = 0x%x\n", dump_except_info.reboot_task);
-    /*解析复位信息*/
     bsp_dump_parse_reset_info(&dump_reset_info, dump_except_info);
-    /*复位信息写入数据流*/
     snprintf(reset_info, size,"brief:%s\ncmpnt:%s\nreset_reason:%s\ntask_name:%s\nmodid:0x%x\nreboot_int:0x%x\nvoice:%s\nreset_core:%s\n",
                 dump_reset_info.brieftype,
                 dump_reset_info.module_name,

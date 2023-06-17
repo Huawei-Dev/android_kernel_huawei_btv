@@ -47,47 +47,47 @@
 */
 
 /*****************************************************************************
-  1 头文件包含
+  1 ??????????
 *****************************************************************************/
 #include "AtCmdCallProc.h"
 
-/* Added by j00174725 for V3R3C60_eCall项目, 2014-3-29, begin */
+/* Added by j00174725 for V3R3C60_eCall????, 2014-3-29, begin */
 #include "AtSndMsg.h"
 #include "ATCmdProc.h"
-/* Added by j00174725 for V3R3C60_eCall项目, 2014-3-29, end */
+/* Added by j00174725 for V3R3C60_eCall????, 2014-3-29, end */
 
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
 /*lint -save -e960 */
 #define    THIS_FILE_ID                 PS_FILE_ID_AT_CMD_CALL_PROC_C
 /*lint -restore */
 
 /*****************************************************************************
-  2 全局变量定义
+  2 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  3 函数实现
+  3 ????????
 *****************************************************************************/
-/* Added by n00269697 for V3R3C60_eCall项目, 2014-3-29, begin */
-/* Added by n00269697 for V3R3C60_eCall项目, 2014-3-29, end */
+/* Added by n00269697 for V3R3C60_eCall????, 2014-3-29, begin */
+/* Added by n00269697 for V3R3C60_eCall????, 2014-3-29, end */
 
 /*****************************************************************************
-函 数 名  : At_RcvVcMsgDtmfDecoderIndProc
-功能描述  : AT收到VC DTMF上报消息的处理函数
-输入参数  : MN_AT_IND_EVT_STRU   *pstData
-输出参数  : 无
-返 回 值  : VOS_UINT32
-调用函数  :
-被调函数  :
+?? ?? ??  : At_RcvVcMsgDtmfDecoderIndProc
+????????  : AT????VC DTMF??????????????????
+????????  : MN_AT_IND_EVT_STRU   *pstData
+????????  : ??
+?? ?? ??  : VOS_UINT32
+????????  :
+????????  :
 
-修订记录  :
-  1.日    期   : 2014年5月9日
-    作    者   : g00261581
-    修改内容   : 新增函数
+????????  :
+  1.??    ??   : 2014??5??9??
+    ??    ??   : g00261581
+    ????????   : ????????
 *****************************************************************************/
 VOS_UINT32 At_RcvVcMsgDtmfDecoderIndProc(
     MN_AT_IND_EVT_STRU                 *pstData
@@ -97,19 +97,19 @@ VOS_UINT32 At_RcvVcMsgDtmfDecoderIndProc(
     VOS_UINT8                           ucIndex;
     VOS_CHAR                            aucOutput[2];
 
-    /* 通过clientid获取index */
+    /* ????clientid????index */
     if (AT_FAILURE == At_ClientIdToUserId(pstData->clientId, &ucIndex))
     {
         AT_WARN_LOG("At_RcvVcMsgDtmfDecoderIndProc:WARNING:AT INDEX NOT FOUND!");
         return VOS_ERR;
     }
 
-    /* 初始化 */
+    /* ?????? */
     pstDtmfInd = (APP_VC_DTMF_DECODER_IND_STRU *)pstData->aucContent;
     aucOutput[0] = pstDtmfInd->ucDtmfCode;
     aucOutput[1] = '\0';
 
-    /* 输出查询结果 */
+    /* ???????????? */
     gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
@@ -125,21 +125,21 @@ VOS_UINT32 At_RcvVcMsgDtmfDecoderIndProc(
 
 /* Added by l60609 for CDMA 1X Iteration 2, 2014-9-5, begin */
 /*****************************************************************************
- 函 数 名  : AT_CheckCfshNumber
- 功能描述  : CFSH命令携带的number合法性检查，合法的字符仅包括：'0' - '9', '*', '#', '+'。
-             '+'只能出现在号码的最前面，号码的最大长度不能超过32（不包括"+"）
- 输入参数  : pucAtPara   --- <number>
-             usLen       ---  号码长度
- 输出参数  : 无
- 返 回 值  : VOS_OK      参数合法
-             VOS_ERR     参数非法
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_CheckCfshNumber
+ ????????  : CFSH??????????number??????????????????????????????'0' - '9', '*', '#', '+'??
+             '+'??????????????????????????????????????????????32????????"+"??
+ ????????  : pucAtPara   --- <number>
+             usLen       ---  ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK      ????????
+             VOS_ERR     ????????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年11月8日
-    作    者   : L00256032
-    修改内容   : 1X SS Project修改
+ ????????      :
+  1.??    ??   : 2014??11??8??
+    ??    ??   : L00256032
+    ????????   : 1X SS Project????
 *****************************************************************************/
 VOS_UINT32 AT_CheckCfshNumber(
     VOS_UINT8                          *pucAtPara,
@@ -148,7 +148,7 @@ VOS_UINT32 AT_CheckCfshNumber(
 {
     VOS_UINT16      ucLoop;
 
-    /* 号码长度有效性判断:+号开头的国际号码，最大长度不能大于33；否则不能大于32 */
+    /* ??????????????????:+??????????????????????????????????33??????????????32 */
     if ('+' == pucAtPara[0])
     {
         if (usLen > (TAF_CALL_MAX_FLASH_DIGIT_LEN + 1))
@@ -167,7 +167,7 @@ VOS_UINT32 AT_CheckCfshNumber(
         }
     }
 
-    /* 号码字符有效性判断(不包含国际号码的首字符'+') */
+    /* ??????????????????(??????????????????????'+') */
     for (ucLoop = 0; ucLoop < usLen; ucLoop++)
     {
         if (  ((pucAtPara[ucLoop] >= '0') && (pucAtPara[ucLoop] <= '9'))
@@ -186,33 +186,33 @@ VOS_UINT32 AT_CheckCfshNumber(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_SetCfshPara
- 功能描述  : AT^CFSH=<number> 的设置函数
+ ?? ?? ??  : AT_SetCfshPara
+ ????????  : AT^CFSH=<number> ??????????
 
              <CR><LF>OK<CR><LF>
-             有MS相关错误时：
+             ??MS????????????
              <CR><LF>+CME ERROR: <err><CR><LF>
 
-             本命令实现FLASH功能， 首先对命令参数进行合法性检查，包含：号码及长度。约束：合法的字符包括ASCII码数字，号码长度范围：0~32。
-             然后发送FLASH命令
+             ??????????FLASH?????? ????????????????????????????????????????????????????????????????????ASCII??????????????????????0~32??
+             ????????FLASH????
 
-             当没有处于通话状态时, 需上报一个错误。
-             当有呼叫等待的时候，发送不带电话号码的FLASH命令接听第三方呼叫。
-             当通话时，发送带电话号码的FLASH命令进行对第三方的呼叫。
-             其他情况报错。
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+             ????????????????????, ????????????????
+             ??????????????????????????????????????FLASH????????????????????
+             ??????????????????????????FLASH????????????????????????
+             ??????????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年9月5日
-    作    者   : l60609
-    修改内容   : 新生成函数
-  2.日    期   : 2014年11月7日
-    作    者   : L00256032
-    修改内容   : 1X SS Project修改
+ ????????      :
+  1.??    ??   : 2014??9??5??
+    ??    ??   : l60609
+    ????????   : ??????????
+  2.??    ??   : 2014??11??7??
+    ??    ??   : L00256032
+    ????????   : 1X SS Project????
 
 *****************************************************************************/
 VOS_UINT32 AT_SetCfshPara(VOS_UINT8 ucIndex)
@@ -220,13 +220,13 @@ VOS_UINT32 AT_SetCfshPara(VOS_UINT8 ucIndex)
     VOS_UINT32                          ulRst;
     TAF_CALL_FLASH_PARA_STRU            stFlashPara;
 
-    /* 参数过多 */
+    /* ???????? */
     if(gucAtParaIndex > 1)
     {
         return AT_CME_INCORRECT_PARAMETERS;
     }
 
-    /* 若携带了参数<number>，检查其有效性 */
+    /* ????????????<number>?????????????? */
     if (1 == gucAtParaIndex)
     {
         if (VOS_OK != AT_CheckCfshNumber(gastAtParaList[0].aucPara,
@@ -237,7 +237,7 @@ VOS_UINT32 AT_SetCfshPara(VOS_UINT8 ucIndex)
     }
     else
     {
-        /* 这种AT命令AT^CFSH= 返回参数错误 */
+        /* ????AT????AT^CFSH= ???????????? */
         if(AT_CMD_OPT_SET_PARA_CMD == g_stATParseCmd.ucCmdOptType)
         {
             return AT_CME_INCORRECT_PARAMETERS;
@@ -249,7 +249,7 @@ VOS_UINT32 AT_SetCfshPara(VOS_UINT8 ucIndex)
     stFlashPara.ucDigitNum = (VOS_UINT8)gastAtParaList[0].usParaLen;
     PS_MEM_CPY(stFlashPara.aucDigit, gastAtParaList[0].aucPara, gastAtParaList[0].usParaLen);
 
-    /* 发送TAF_CALL_APP_SEND_FLASH_REQ消息 */
+    /* ????TAF_CALL_APP_SEND_FLASH_REQ???? */
     ulRst = TAF_XCALL_SendFlashReq(gastAtClientTab[ucIndex].usClientId,
                                    gastAtClientTab[ucIndex].opId,
                                    &stFlashPara);
@@ -263,21 +263,21 @@ VOS_UINT32 AT_SetCfshPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvTafCallSndFlashRslt
- 功能描述  : 处理TAF_CALL_EVT_SEND_FLASH_RSLT事件
- 输入参数  : MN_AT_IND_EVT_STRU                 *pEvtInfo
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvTafCallSndFlashRslt
+ ????????  : ????TAF_CALL_EVT_SEND_FLASH_RSLT????
+ ????????  : MN_AT_IND_EVT_STRU                 *pEvtInfo
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年9月10日
-    作    者   : l60609
-    修改内容   : 新生成函数
-  2.日    期   : 2014年11月10日
-    作    者   : L00256032
-    修改内容   : 1X SS Project修改
+ ????????      :
+  1.??    ??   : 2014??9??10??
+    ??    ??   : l60609
+    ????????   : ??????????
+  2.??    ??   : 2014??11??10??
+    ??    ??   : L00256032
+    ????????   : 1X SS Project????
 *****************************************************************************/
 VOS_VOID AT_RcvTafCallSndFlashRslt(
     MN_AT_IND_EVT_STRU                 *pEvtInfo
@@ -286,24 +286,24 @@ VOS_VOID AT_RcvTafCallSndFlashRslt(
     VOS_UINT8                           ucIndex;
     TAF_CALL_EVT_SEND_FLASH_RSLT_STRU  *pstSndFlashRslt;
 
-    /* 根据ClientID获取通道索引 */
+    /* ????ClientID???????????? */
     if(AT_FAILURE == At_ClientIdToUserId(pEvtInfo->clientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvTafCallSndFlashRslt: Get Index Fail!");
         return;
     }
 
-    /* AT模块在等待^CFSH命令的操作结果事件上报 */
+    /* AT??????????^CFSH?????????????????????? */
     if (AT_CMD_CFSH_SET != gastAtClientTab[ucIndex].CmdCurrentOpt)
     {
         AT_WARN_LOG("AT_RcvTafCallSndFlashRslt: Error Option!");
         return;
     }
 
-    /* 使用AT_STOP_TIMER_CMD_READY恢复AT命令实体状态为READY状态 */
+    /* ????AT_STOP_TIMER_CMD_READY????AT??????????????READY???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 根据临时响应的错误码打印命令的结果 */
+    /* ?????????????????????????????????? */
     pstSndFlashRslt = (TAF_CALL_EVT_SEND_FLASH_RSLT_STRU *)(pEvtInfo->aucContent
                                               + sizeof(MN_CALL_EVENT_ENUM_U32));
     if (VOS_OK == pstSndFlashRslt->ucResult)
@@ -321,18 +321,18 @@ VOS_VOID AT_RcvTafCallSndFlashRslt(
 
 /* Added by f279542 for CDMA 1X Iteration 4, 2014-11-10, begin */
 /*****************************************************************************
- 函 数 名  : At_TestCBurstDTMFPara
- 功能描述  : CBurstDTMF测试函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : At_TestCBurstDTMFPara
+ ????????  : CBurstDTMF????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年11月25日
-    作    者   : f279542
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??11??25??
+    ??    ??   : f279542
+    ????????   : ??????????
 *****************************************************************************/
 VOS_UINT32 At_TestCBurstDTMFPara(VOS_UINT8 ucIndex)
 {
@@ -350,18 +350,18 @@ VOS_UINT32 At_TestCBurstDTMFPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_SetCBurstDTMFPara
- 功能描述  : DTMF指令处理
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : TAF_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_SetCBurstDTMFPara
+ ????????  : DTMF????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : TAF_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年11月10日
-    作    者   : f279542
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??11??10??
+    ??    ??   : f279542
+    ????????   : ??????????
 *****************************************************************************/
 VOS_UINT32 AT_SetCBurstDTMFPara(VOS_UINT8 ucIndex)
 {
@@ -369,7 +369,7 @@ VOS_UINT32 AT_SetCBurstDTMFPara(VOS_UINT8 ucIndex)
     TAF_CALL_BURST_DTMF_PARA_STRU       stBurstDtmfPara;
     VOS_UINT16                          ucLoop;
 
-    /*参数有效性检查*/
+    /*??????????????*/
     if(AT_CMD_OPT_SET_PARA_CMD != g_stATParseCmd.ucCmdOptType)
     {
         return AT_CME_INCORRECT_PARAMETERS;
@@ -384,13 +384,13 @@ VOS_UINT32 AT_SetCBurstDTMFPara(VOS_UINT8 ucIndex)
         return AT_CME_INCORRECT_PARAMETERS;
     }
 
-    /* DTMF Key长度有效性判断 */
+    /* DTMF Key?????????????? */
     if (gastAtParaList[1].usParaLen > TAF_CALL_MAX_BURST_DTMF_NUM)
     {
         return AT_CME_INCORRECT_PARAMETERS;
     }
 
-    /* DTMF Key有效性判断 */
+    /* DTMF Key?????????? */
     for (ucLoop = 0; ucLoop < gastAtParaList[1].usParaLen; ucLoop++)
     {
         if (  ((gastAtParaList[1].aucPara[ucLoop] >= '0') && (gastAtParaList[1].aucPara[ucLoop] <= '9'))
@@ -413,7 +413,7 @@ VOS_UINT32 AT_SetCBurstDTMFPara(VOS_UINT8 ucIndex)
     stBurstDtmfPara.ulOnLength   = gastAtParaList[2].ulParaValue;
     stBurstDtmfPara.ulOffLength  = gastAtParaList[3].ulParaValue;
 
-    /* 发送TAF_CALL_APP_SEND_BURST_DTMF_REQ消息 */
+    /* ????TAF_CALL_APP_SEND_BURST_DTMF_REQ???? */
     ulRst = TAF_XCALL_SendBurstDtmf(gastAtClientTab[ucIndex].usClientId,
                                     gastAtClientTab[ucIndex].opId,
                                    &stBurstDtmfPara);
@@ -421,25 +421,25 @@ VOS_UINT32 AT_SetCBurstDTMFPara(VOS_UINT8 ucIndex)
     {
         gastAtClientTab[ucIndex].CmdCurrentOpt = AT_CMD_CBURSTDTMF_SET;
 
-        /* 返回命令处理挂起状态 */
+        /* ???????????????????? */
         return AT_WAIT_ASYNC_RETURN;
     }
 
     return AT_ERROR;
 }
 /*****************************************************************************
- 函 数 名  : AT_RcvTafCallSndBurstDTMFCnf
- 功能描述  : 处理TAF_CALL_EVT_SEND_BURST_DTMF_CNF事件
- 输入参数  : MN_AT_IND_EVT_STRU                 *pEvtInfo
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvTafCallSndBurstDTMFCnf
+ ????????  : ????TAF_CALL_EVT_SEND_BURST_DTMF_CNF????
+ ????????  : MN_AT_IND_EVT_STRU                 *pEvtInfo
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年11月10日
-    作    者   : f279542
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??11??10??
+    ??    ??   : f279542
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvTafCallSndBurstDTMFCnf(
@@ -449,24 +449,24 @@ VOS_UINT32 AT_RcvTafCallSndBurstDTMFCnf(
     VOS_UINT8                                               ucIndex;
     TAF_CALL_EVT_SEND_BURST_DTMF_CNF_STRU                  *pstBurstDtmfCnf;
 
-    /* 根据ClientID获取通道索引 */
+    /* ????ClientID???????????? */
     if(AT_FAILURE == At_ClientIdToUserId(pEvtInfo->clientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvTafCallSndBurstDTMFCnf: Get Index Fail!");
         return VOS_ERR;
     }
 
-    /* AT模块在等待^CBURSTDTMF命令命令的操作结果事件上报 */
+    /* AT??????????^CBURSTDTMF?????????????????????????? */
     if ( AT_CMD_CBURSTDTMF_SET != gastAtClientTab[ucIndex].CmdCurrentOpt )
     {
         AT_WARN_LOG("AT_RcvTafCallSndBurstDTMFCnf: Error Option!");
         return VOS_ERR;
     }
 
-    /* 使用AT_STOP_TIMER_CMD_READY恢复AT命令实体状态为READY状态 */
+    /* ????AT_STOP_TIMER_CMD_READY????AT??????????????READY???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 根据临时响应的错误码打印命令的结果 */
+    /* ?????????????????????????????????? */
     pstBurstDtmfCnf = (TAF_CALL_EVT_SEND_BURST_DTMF_CNF_STRU *)(pEvtInfo->aucContent
                                               + sizeof(MN_CALL_EVENT_ENUM_U32));
     if (TAF_CALL_SEND_BURST_DTMF_CNF_RESULT_SUCCESS != pstBurstDtmfCnf->enResult)
@@ -482,18 +482,18 @@ VOS_UINT32 AT_RcvTafCallSndBurstDTMFCnf(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvTafCallSndBurstDTMFRslt
- 功能描述  : 处理TAF_CALL_EVT_SEND_BURST_DTMF_RSLT事件
- 输入参数  : MN_AT_IND_EVT_STRU                 *pEvtInfo
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvTafCallSndBurstDTMFRslt
+ ????????  : ????TAF_CALL_EVT_SEND_BURST_DTMF_RSLT????
+ ????????  : MN_AT_IND_EVT_STRU                 *pEvtInfo
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年11月10日
-    作    者   : f279542
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??11??10??
+    ??    ??   : f279542
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvTafCallSndBurstDTMFRslt(
@@ -506,18 +506,18 @@ VOS_UINT32 AT_RcvTafCallSndBurstDTMFRslt(
 /* Added by f279542 for CDMA 1X Iteration 4, 2014-11-10, end */
 
 /*****************************************************************************
- 函 数 名  : AT_RcvTafCallCalledNumInfoInd
- 功能描述  : 处理TAF_CALL_EVT_CALLED_NUM_INFO_IND事件
- 输入参数  : MN_AT_IND_EVT_STRU                 *pEvtInfo
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvTafCallCalledNumInfoInd
+ ????????  : ????TAF_CALL_EVT_CALLED_NUM_INFO_IND????
+ ????????  : MN_AT_IND_EVT_STRU                 *pEvtInfo
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年11月11日
-    作    者   : y00307564
-    修改内容   : 1X SS Project新生成函数
+ ????????      :
+  1.??    ??   : 2014??11??11??
+    ??    ??   : y00307564
+    ????????   : 1X SS Project??????????
 
 <CR><LF>^CCALLEDNUM: <number_type>,<number_plan>,<number><CR><LF>
 *****************************************************************************/
@@ -529,7 +529,7 @@ VOS_UINT32 AT_RcvTafCallCalledNumInfoInd(
     VOS_UINT8                                               ucIndex;
     VOS_UINT8                                               aucDigit[TAF_CALL_MAX_CALLED_NUMBER_CHARI_OCTET_NUM + 1];
 
-    /* 根据clientId获取通道索引 */
+    /* ????clientId???????????? */
     if(AT_FAILURE == At_ClientIdToUserId(pEvtInfo->clientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvTafCallCalledNumInfoInd: Get Index Fail!");
@@ -537,17 +537,17 @@ VOS_UINT32 AT_RcvTafCallCalledNumInfoInd(
     }
 
 
-    /* 初始化 */
+    /* ?????? */
     pstCalledNum = (TAF_CALL_EVT_CALLED_NUM_INFO_IND_STRU *)(pEvtInfo->aucContent
                                               + sizeof(MN_CALL_EVENT_ENUM_U32));
 
     PS_MEM_SET(aucDigit, 0, sizeof(aucDigit));
     PS_MEM_CPY(aucDigit, pstCalledNum->aucDigit, pstCalledNum->ucDigitNum);
 
-    /* 在pstCalledNum->aucDigit的最后一位加'\0',防止因pstCalledNum->aucDigit无结束符，导致AT多上报 */
+    /* ??pstCalledNum->aucDigit????????????'\0',??????pstCalledNum->aucDigit??????????????AT?????? */
     aucDigit[pstCalledNum->ucDigitNum] = '\0';
 
-    /* 输出查询结果 */
+    /* ???????????? */
     gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
@@ -565,18 +565,18 @@ VOS_UINT32 AT_RcvTafCallCalledNumInfoInd(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvTafCallCallingNumInfoInd
- 功能描述  : 处理TAF_CALL_EVT_CALLING_NUM_INFO_IND事件
- 输入参数  : MN_AT_IND_EVT_STRU                 *pEvtInfo
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvTafCallCallingNumInfoInd
+ ????????  : ????TAF_CALL_EVT_CALLING_NUM_INFO_IND????
+ ????????  : MN_AT_IND_EVT_STRU                 *pEvtInfo
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年11月11日
-    作    者   : y00307564
-    修改内容   : 1X SS Project新生成函数
+ ????????      :
+  1.??    ??   : 2014??11??11??
+    ??    ??   : y00307564
+    ????????   : 1X SS Project??????????
 
 <CR><LF>^CCALLINGNUM: <number_type>,<number_plan>,<pi>,<si>,<number><CR><LF>
 *****************************************************************************/
@@ -588,14 +588,14 @@ VOS_UINT32 AT_RcvTafCallCallingNumInfoInd(
     VOS_UINT8                                               ucIndex;
     VOS_UINT8                                               aucDigit[TAF_CALL_MAX_CALLING_NUMBER_CHARI_OCTET_NUM + 1];
 
-    /* 根据clientId获取通道索引 */
+    /* ????clientId???????????? */
     if(AT_FAILURE == At_ClientIdToUserId(pEvtInfo->clientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvTafCallCallingNumInfoInd: Get Index Fail!");
         return VOS_ERR;
     }
 
-    /* 初始化 */
+    /* ?????? */
     pstCallingNum = (TAF_CALL_EVT_CALLING_NUM_INFO_IND_STRU *)(pEvtInfo->aucContent
                                               + sizeof(MN_CALL_EVENT_ENUM_U32));
 
@@ -603,10 +603,10 @@ VOS_UINT32 AT_RcvTafCallCallingNumInfoInd(
 
     PS_MEM_CPY(aucDigit, pstCallingNum->aucDigit, pstCallingNum->ucDigitNum);
 
-    /* 在pstCallingNum->aucDigit的最后一位加'\0',防止因pstCallingNum->aucDigit无结束符，导致AT多上报 */
+    /* ??pstCallingNum->aucDigit????????????'\0',??????pstCallingNum->aucDigit??????????????AT?????? */
     aucDigit[pstCallingNum->ucDigitNum] = '\0';
 
-    /* 输出查询结果 */
+    /* ???????????? */
     gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
@@ -626,18 +626,18 @@ VOS_UINT32 AT_RcvTafCallCallingNumInfoInd(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvTafCallDispInfoInd
- 功能描述  : 处理TAF_CALL_EVT_DISPLAY_INFO_IND事件
- 输入参数  : MN_AT_IND_EVT_STRU                 *pEvtInfo
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvTafCallDispInfoInd
+ ????????  : ????TAF_CALL_EVT_DISPLAY_INFO_IND????
+ ????????  : MN_AT_IND_EVT_STRU                 *pEvtInfo
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年11月11日
-    作    者   : y00307564
-    修改内容   : 1X SS Project新生成函数
+ ????????      :
+  1.??    ??   : 2014??11??11??
+    ??    ??   : y00307564
+    ????????   : 1X SS Project??????????
 
 <CR><LF>^CDISP: <string>[,<ext_display>,<display_type>,<display_tag>]<CR><LF>
 *****************************************************************************/
@@ -649,24 +649,24 @@ VOS_UINT32 AT_RcvTafCallDispInfoInd(
     VOS_UINT8                            ucIndex;
     VOS_UINT8                            aucDigit[TAF_CALL_MAX_DISPALY_CHARI_OCTET_NUM + 1];
 
-    /* 根据clientId获取通道索引 */
+    /* ????clientId???????????? */
     if(AT_FAILURE == At_ClientIdToUserId(pEvtInfo->clientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvTafCallDispInfoInd: Get Index Fail!");
         return VOS_ERR;
     }
 
-    /* 初始化 */
+    /* ?????? */
     pstDisplayInfo = (TAF_CALL_EVT_DISPLAY_INFO_IND_STRU *)(pEvtInfo->aucContent
                                               + sizeof(MN_CALL_EVENT_ENUM_U32));
 
     PS_MEM_SET(aucDigit, 0, sizeof(aucDigit));
     PS_MEM_CPY(aucDigit, pstDisplayInfo->aucDigit, pstDisplayInfo->ucDigitNum);
 
-    /* 在pstDisplayInfo->aucDigit的最后一位加'\0',防止因pstDisplayInfo->aucDigit无结束符，导致AT多上报 */
+    /* ??pstDisplayInfo->aucDigit????????????'\0',??????pstDisplayInfo->aucDigit??????????????AT?????? */
     aucDigit[pstDisplayInfo->ucDigitNum] = '\0';
 
-    /* 输出查询结果 */
+    /* ???????????? */
     gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
@@ -682,18 +682,18 @@ VOS_UINT32 AT_RcvTafCallDispInfoInd(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvTafCallExtDispInfoInd
- 功能描述  : 处理TAF_CALL_EVT_EXT_DISPLAY_INFO_IND事件
- 输入参数  : MN_AT_IND_EVT_STRU                 *pEvtInfo
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvTafCallExtDispInfoInd
+ ????????  : ????TAF_CALL_EVT_EXT_DISPLAY_INFO_IND????
+ ????????  : MN_AT_IND_EVT_STRU                 *pEvtInfo
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年11月11日
-    作    者   : y00307564
-    修改内容   : 1X SS Project新生成函数
+ ????????      :
+  1.??    ??   : 2014??11??11??
+    ??    ??   : y00307564
+    ????????   : 1X SS Project??????????
 
 <CR><LF>^CDISP: <string>[,<ext_display>,<display_type>,<display_tag>]<CR><LF>
 *****************************************************************************/
@@ -707,27 +707,27 @@ VOS_UINT32 AT_RcvTafCallExtDispInfoInd(
     VOS_UINT32                                              ulDigitNum;
     VOS_UINT8                                               aucDigit[TAF_CALL_MAX_EXTENDED_DISPALY_CHARI_OCTET_NUM + 1];
 
-    /* 根据clientId获取通道索引 */
+    /* ????clientId???????????? */
     if(AT_FAILURE == At_ClientIdToUserId(pEvtInfo->clientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvTafCallExtDispInfoInd: Get Index Fail!");
         return VOS_ERR;
     }
 
-    /* 初始化 */
+    /* ?????? */
     pstExtDispInfo = (TAF_CALL_EVT_EXT_DISPLAY_INFO_IND_STRU *)(pEvtInfo->aucContent
                                               + sizeof(MN_CALL_EVENT_ENUM_U32));
 
     for (ulLoop = 0; ulLoop < pstExtDispInfo->ucInfoRecsDataNum; ulLoop++)
     {
-        /* 在pstExtDispInfo->aucInfoRecsData[ulLoop].aucDigit的最后一位加'\0',
-            防止因pstExtDispInfo->aucInfoRecsData[ulLoop].aucDigit无结束符，导致AT多上报 */
+        /* ??pstExtDispInfo->aucInfoRecsData[ulLoop].aucDigit????????????'\0',
+            ??????pstExtDispInfo->aucInfoRecsData[ulLoop].aucDigit??????????????AT?????? */
         ulDigitNum = pstExtDispInfo->aucInfoRecsData[ulLoop].ucDigitNum;
         PS_MEM_SET(aucDigit, 0, sizeof(aucDigit));
         PS_MEM_CPY(aucDigit, pstExtDispInfo->aucInfoRecsData[ulLoop].aucDigit, ulDigitNum);
         aucDigit[ulDigitNum] = '\0';
 
-        /* 输出查询结果 */
+        /* ???????????? */
         gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                                         (VOS_CHAR *)pgucAtSndCodeAddr,
                                                         (VOS_CHAR *)pgucAtSndCodeAddr,
@@ -749,18 +749,18 @@ VOS_UINT32 AT_RcvTafCallExtDispInfoInd(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvTafCallConnNumInfoInd
- 功能描述  : 处理TAF_CALL_EVT_CONN_NUM_INFO_IND事件
- 输入参数  : MN_AT_IND_EVT_STRU                 *pEvtInfo
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvTafCallConnNumInfoInd
+ ????????  : ????TAF_CALL_EVT_CONN_NUM_INFO_IND????
+ ????????  : MN_AT_IND_EVT_STRU                 *pEvtInfo
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年11月11日
-    作    者   : y00307564
-    修改内容   : 1X SS Project新生成函数
+ ????????      :
+  1.??    ??   : 2014??11??11??
+    ??    ??   : y00307564
+    ????????   : 1X SS Project??????????
 
 <CR><LF>^CCONNNUM: <number_type>,<number_plan>,<pi>,<si>,<number><CR><LF>
 *****************************************************************************/
@@ -773,24 +773,24 @@ VOS_UINT32 AT_RcvTafCallConnNumInfoInd(
     VOS_UINT8                            aucDigit[TAF_CALL_MAX_CONNECTED_NUMBER_CHARI_OCTET_NUM + 1];
 
 
-    /* 根据clientId获取通道索引 */
+    /* ????clientId???????????? */
     if(AT_FAILURE == At_ClientIdToUserId(pEvtInfo->clientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvTafCallConnNumInfoInd: Get Index Fail!");
         return VOS_ERR;
     }
 
-    /* 初始化 */
+    /* ?????? */
     pstConnNumInfo = (TAF_CALL_EVT_CONN_NUM_INFO_IND_STRU *)(pEvtInfo->aucContent
                                               + sizeof(MN_CALL_EVENT_ENUM_U32));
 
     PS_MEM_SET(aucDigit, 0, sizeof(aucDigit));
     PS_MEM_CPY(aucDigit, pstConnNumInfo->aucDigit, pstConnNumInfo->ucDigitNum);
 
-    /* 在pstConnNumInfo->aucDigit的最后一位加'\0',防止因pstConnNumInfo->aucDigit无结束符，导致AT多上报 */
+    /* ??pstConnNumInfo->aucDigit????????????'\0',??????pstConnNumInfo->aucDigit??????????????AT?????? */
     aucDigit[pstConnNumInfo->ucDigitNum] = '\0';
 
-    /* 输出查询结果 */
+    /* ???????????? */
     gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
@@ -810,18 +810,18 @@ VOS_UINT32 AT_RcvTafCallConnNumInfoInd(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvTafCallRedirNumInfoInd
- 功能描述  : 处理TAF_CALL_EVT_REDIR_NUM_INFO_IND事件
- 输入参数  : MN_AT_IND_EVT_STRU                 *pEvtInfo
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvTafCallRedirNumInfoInd
+ ????????  : ????TAF_CALL_EVT_REDIR_NUM_INFO_IND????
+ ????????  : MN_AT_IND_EVT_STRU                 *pEvtInfo
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年11月11日
-    作    者   : y00307564
-    修改内容   : 1X SS Project新生成函数
+ ????????      :
+  1.??    ??   : 2014??11??11??
+    ??    ??   : y00307564
+    ????????   : 1X SS Project??????????
 
 <CR><LF>^CREDIRNUM: <number_type>,<number_plan>,<number>[,<pi>,<si>[,<redir_reason>]]<CR><LF>
 *****************************************************************************/
@@ -837,24 +837,24 @@ VOS_UINT32 AT_RcvTafCallRedirNumInfoInd(
     usLength        = 0;
 
 
-    /* 根据clientId获取通道索引 */
+    /* ????clientId???????????? */
     if(AT_FAILURE == At_ClientIdToUserId(pEvtInfo->clientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvTafCallRedirNumInfoInd: Get Index Fail!");
         return VOS_ERR;
     }
 
-    /* 初始化 */
+    /* ?????? */
     pstRedirNumInfo = (TAF_CALL_EVT_REDIR_NUM_INFO_IND_STRU *)(pEvtInfo->aucContent
                                               + sizeof(MN_CALL_EVENT_ENUM_U32));
 
     PS_MEM_SET(aucDigit, 0, sizeof(aucDigit));
     PS_MEM_CPY(aucDigit, pstRedirNumInfo->aucDigitNum, pstRedirNumInfo->ucDigitNum);
 
-    /* 在pstRedirNumInfo->aucDigitNum的最后一位加'\0',防止因pstRedirNumInfo->aucDigitNum无结束符，导致AT多上报 */
+    /* ??pstRedirNumInfo->aucDigitNum????????????'\0',??????pstRedirNumInfo->aucDigitNum??????????????AT?????? */
     aucDigit[pstRedirNumInfo->ucDigitNum] = '\0';
 
-    /* 输出查询结果，根据EXTENSIONBIT1，EXTENSIONBIT2输出可选项 */
+    /* ??????????????????EXTENSIONBIT1??EXTENSIONBIT2?????????? */
     usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                        (VOS_CHAR *)pgucAtSndCodeAddr,
                                        (VOS_CHAR *)pgucAtSndCodeAddr + usLength,
@@ -925,18 +925,18 @@ VOS_UINT32 AT_RcvTafCallRedirNumInfoInd(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvTafCallSignalInfoInd
- 功能描述  : 处理TAF_CALL_EVT_SIGNAL_INFO_IND事件
- 输入参数  : MN_AT_IND_EVT_STRU                 *pEvtInfo
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvTafCallSignalInfoInd
+ ????????  : ????TAF_CALL_EVT_SIGNAL_INFO_IND????
+ ????????  : MN_AT_IND_EVT_STRU                 *pEvtInfo
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年11月11日
-    作    者   : y00307564
-    修改内容   : 1X SS Project新生成函数
+ ????????      :
+  1.??    ??   : 2014??11??11??
+    ??    ??   : y00307564
+    ????????   : 1X SS Project??????????
 
 <CR><LF>^CSIGTONE: <signal_type>,<alert_pitch>,<signal><CR><LF>
 *****************************************************************************/
@@ -947,18 +947,18 @@ VOS_UINT32 AT_RcvTafCallSignalInfoInd(
     TAF_CALL_EVT_SIGNAL_INFO_IND_STRU   *pstsignalInfo;
     VOS_UINT8                            ucIndex;
 
-    /* 根据clientId获取通道索引 */
+    /* ????clientId???????????? */
     if(AT_FAILURE == At_ClientIdToUserId(pEvtInfo->clientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvTafCallSignalInfoInd: Get Index Fail!");
         return VOS_ERR;
     }
 
-    /* 初始化 */
+    /* ?????? */
     pstsignalInfo = (TAF_CALL_EVT_SIGNAL_INFO_IND_STRU *)(pEvtInfo->aucContent
                                               + sizeof(MN_CALL_EVENT_ENUM_U32));
 
-    /* 输出查询结果 */
+    /* ???????????? */
     gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
@@ -976,18 +976,18 @@ VOS_UINT32 AT_RcvTafCallSignalInfoInd(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvTafCallLineCtrlInfoInd
- 功能描述  : 处理TAF_CALL_EVT_LINE_CTRL_INFO_IND事件
- 输入参数  : MN_AT_IND_EVT_STRU                 *pEvtInfo
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvTafCallLineCtrlInfoInd
+ ????????  : ????TAF_CALL_EVT_LINE_CTRL_INFO_IND????
+ ????????  : MN_AT_IND_EVT_STRU                 *pEvtInfo
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年11月11日
-    作    者   : y00307564
-    修改内容   : 1X SS Project新生成函数
+ ????????      :
+  1.??    ??   : 2014??11??11??
+    ??    ??   : y00307564
+    ????????   : 1X SS Project??????????
 
 <CR><LF>^CLCTR: <polarity_include>[,<toggle>][,<reverse_polarity>],<power_denial><CR><LF>
 *****************************************************************************/
@@ -1001,18 +1001,18 @@ VOS_UINT32 AT_RcvTafCallLineCtrlInfoInd(
 
     usLength = 0;
 
-    /* 根据clientId获取通道索引 */
+    /* ????clientId???????????? */
     if(AT_FAILURE == At_ClientIdToUserId(pEvtInfo->clientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvTafCallLineCtrlInfoInd: Get Index Fail!");
         return VOS_ERR;
     }
 
-    /* 初始化 */
+    /* ?????? */
     pstLineCtrlInfo = (TAF_CALL_EVT_LINE_CTRL_INFO_IND_STRU *)(pEvtInfo->aucContent
                                               + sizeof(MN_CALL_EVENT_ENUM_U32));
 
-    /* 输出查询结果 */
+    /* ???????????? */
     usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                     (VOS_CHAR *)pgucAtSndCodeAddr,
                                     (VOS_CHAR *)pgucAtSndCodeAddr + usLength,
@@ -1066,25 +1066,25 @@ VOS_UINT32 AT_RcvTafCallLineCtrlInfoInd(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvTafCallCCWACInd
- 功能描述  : 处理TAF_CALL_EVT_CCWAC_INFO_IND事件
- 输入参数  : MN_AT_IND_EVT_STRU                 *pEvtInfo
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvTafCallCCWACInd
+ ????????  : ????TAF_CALL_EVT_CCWAC_INFO_IND????
+ ????????  : MN_AT_IND_EVT_STRU                 *pEvtInfo
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年11月11日
-    作    者   : y00307564
-    修改内容   : 1X SS Project新生成函数
+ ????????      :
+  1.??    ??   : 2014??11??11??
+    ??    ??   : y00307564
+    ????????   : 1X SS Project??????????
 
 <CR><LF>^CCWAC: <digits>,<pi>,<si>,<number_type>,<number_plan>,<isPresent>[,<signalType>,
                 <alertPitch>,<signal>]<CR><LF>
 
-  2.日    期   : 2015年1月17日
-    作    者   : y00307564
-    修改内容   : 新增PI, SI字段
+  2.??    ??   : 2015??1??17??
+    ??    ??   : y00307564
+    ????????   : ????PI, SI????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvTafCallCCWACInd(
@@ -1098,25 +1098,25 @@ VOS_UINT32 AT_RcvTafCallCCWACInd(
 
     usLength = 0;
 
-    /* 根据clientId获取通道索引 */
+    /* ????clientId???????????? */
     if(AT_FAILURE == At_ClientIdToUserId(pEvtInfo->clientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvTafCallCCWACInd: Get Index Fail!");
         return VOS_ERR;
     }
 
-    /* 初始化 */
+    /* ?????? */
     pstCCWAC = (TAF_CALL_EVT_CCWAC_INFO_IND_STRU *)(pEvtInfo->aucContent
                                               + sizeof(MN_CALL_EVENT_ENUM_U32));
 
     PS_MEM_SET(aucDigit, 0, sizeof(aucDigit));
     PS_MEM_CPY(aucDigit, pstCCWAC->aucDigit, pstCCWAC->ucDigitNum);
 
-    /* 在pstCCWAC->aucDigit的最后一位加'\0',防止因pstCCWAC->aucDigit无结束符，导致AT多上报 */
+    /* ??pstCCWAC->aucDigit????????????'\0',??????pstCCWAC->aucDigit??????????????AT?????? */
     aucDigit[pstCCWAC->ucDigitNum] = '\0';
 
 
-    /* 输出查询结果 */
+    /* ???????????? */
     if (VOS_TRUE == pstCCWAC->ucSignalIsPresent)
     {
         usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
@@ -1201,7 +1201,7 @@ VOS_UINT32 AT_SetCContinuousDTMFPara(
     }
 
     /* If the <Switch> is Start and the number of parameter isn't equal to 3.
-       Or if the <Switch> is Stop and the number of parameter isn't equal to 2，both invalid */
+       Or if the <Switch> is Stop and the number of parameter isn't equal to 2??both invalid */
     if (((TAF_CALL_CONT_DTMF_STOP == gastAtParaList[1].ulParaValue)
       && (AT_CCONTDTMF_PARA_NUM_MIN != gucAtParaIndex))
      || ((TAF_CALL_CONT_DTMF_START == gastAtParaList[1].ulParaValue)
@@ -1409,18 +1409,18 @@ VOS_UINT32 AT_RcvTafCallRcvBurstDtmfInd(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvTafCallCclprCnf
- 功能描述  : AT收到TAF_CALL_EVT_CCLPR_SET_CNF事件处理函数
- 输入参数  : MN_AT_IND_EVT_STRU *pstData
- 输出参数  :
- 返 回 值  :
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvTafCallCclprCnf
+ ????????  : AT????TAF_CALL_EVT_CCLPR_SET_CNF????????????
+ ????????  : MN_AT_IND_EVT_STRU *pstData
+ ????????  :
+ ?? ?? ??  :
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年08月10日
-    作    者   : f00279542
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2015??08??10??
+    ??    ??   : f00279542
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_VOID AT_RcvTafCallCclprCnf(MN_AT_IND_EVT_STRU *pstData)
@@ -1429,36 +1429,36 @@ VOS_VOID AT_RcvTafCallCclprCnf(MN_AT_IND_EVT_STRU *pstData)
     VOS_UINT16                          usLength;
     VOS_UINT8                           ucIndex;
 
-    /* 初始化 */
+    /* ?????? */
     ucIndex = 0;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if(AT_FAILURE == At_ClientIdToUserId(pstData->clientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvTafCallCclprCnf: WARNING:AT INDEX NOT FOUND!");
         return;
     }
 
-    /* 如果为广播类型，则返回AT_ERROR */
+    /* ??????????????????????AT_ERROR */
     if (AT_IS_BROADCAST_CLIENT_INDEX(ucIndex))
     {
         AT_WARN_LOG("AT_RcvTafCallCclprCnf: WARNING:AT_BROADCAST_INDEX!");
         return;
     }
 
-    /* 判断当前操作类型是否为AT_CMD_CCLPR_GET */
+    /* ??????????????????????AT_CMD_CCLPR_GET */
     if (AT_CMD_CCLPR_SET != gastAtClientTab[ucIndex].CmdCurrentOpt )
     {
         AT_WARN_LOG("AT_RcvTafCallCclprCnf: WARNING:Not AT_CMD_CCLPR_GET!");
         return;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
     pstCClprGetCnf = (TAF_CALL_EVT_CCLPR_GET_CNF_STRU *)(pstData->aucContent
                                               + sizeof(MN_CALL_EVENT_ENUM_U32));
-    /* 判断查询操作是否成功 */
+    /* ???????????????????? */
     if (TAF_ERR_NO_ERROR != pstCClprGetCnf->ulRet)
     {
         At_FormatResultData(ucIndex, AT_ERROR);
@@ -1477,7 +1477,7 @@ VOS_VOID AT_RcvTafCallCclprCnf(MN_AT_IND_EVT_STRU *pstData)
                                           pstCClprGetCnf->enPI);
 
     }
-    /* 打印结果 */
+    /* ???????? */
     gstAtSendData.usBufLen  = usLength;
     At_FormatResultData(ucIndex, AT_OK);
 
@@ -1486,18 +1486,18 @@ VOS_VOID AT_RcvTafCallCclprCnf(MN_AT_IND_EVT_STRU *pstData)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestCclprPara
- 功能描述  : 设置命令处理函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestCclprPara
+ ????????  : ????????????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年08月10日
-    作    者   : f00279542
-    修改内容   : 新增
+ ????????      :
+  1.??    ??   : 2015??08??10??
+    ??    ??   : f00279542
+    ????????   : ????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestCclprPara( VOS_UINT8 ucIndex )
@@ -1512,37 +1512,37 @@ VOS_UINT32 AT_TestCclprPara( VOS_UINT8 ucIndex )
 }
 
 /*****************************************************************************
- 函 数 名  : AT_SetCclprPara
- 功能描述  : ^CCLPR=<call_id>设置命令处理函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_SetCclprPara
+ ????????  : ^CCLPR=<call_id>????????????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年08月10日
-    作    者   : f00279542
-    修改内容   : 新增
+ ????????      :
+  1.??    ??   : 2015??08??10??
+    ??    ??   : f00279542
+    ????????   : ????
 
 *****************************************************************************/
 VOS_UINT32 AT_SetCclprPara(VOS_UINT8 ucIndex)
 {
     VOS_UINT32                          ulResult;
 
-    /* 参数检查 */
+    /* ???????? */
     if (AT_CMD_OPT_SET_PARA_CMD != g_stATParseCmd.ucCmdOptType)
     {
         return AT_CME_INCORRECT_PARAMETERS;
     }
 
-    /* 参数个数检查 */
+    /* ???????????? */
     if (1 != gucAtParaIndex)
     {
         return AT_CME_INCORRECT_PARAMETERS;
     }
 
-    /* 发送跨核消息TAF_CALL_APP_SND_CCLPR_REQ到C核,  */
+    /* ????????????TAF_CALL_APP_SND_CCLPR_REQ??C??,  */
     ulResult = TAF_XCALL_SendCclpr(gastAtClientTab[ucIndex].usClientId,
                                    gastAtClientTab[ucIndex].opId,
                                   (MN_CALL_ID_T)gastAtParaList[0].ulParaValue);
@@ -1552,7 +1552,7 @@ VOS_UINT32 AT_SetCclprPara(VOS_UINT8 ucIndex)
         return AT_ERROR;
     }
 
-    /* 设置AT模块实体的状态为等待异步返回 */
+    /* ????AT???????????????????????????? */
     gastAtClientTab[ucIndex].CmdCurrentOpt = AT_CMD_CCLPR_SET;
 
     return AT_WAIT_ASYNC_RETURN;

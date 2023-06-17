@@ -50,6 +50,7 @@
 #include <osl_bio.h>
 #include <bsp_wdt.h>
 #include <hi_wdt.h>
+
 BSP_S32 BSP_WDT_Enable(BSP_U8 wdtId)
 {
 	return bsp_wdt_start();
@@ -64,7 +65,6 @@ int mdrv_wdt_feed(unsigned char wdtId)
 {
 	return bsp_wdt_keepalive();
 }
-
 
 wdt_timeout_cb g_wdt_rebootfunc = WDT_NULL;
 
@@ -96,11 +96,11 @@ void bsp_wdt_reboot(void)
 {
 	bsp_wdt_reboot_direct();
 }
-s32 bsp_wdt_set_timeout(u32 timeout)/*s*/
+s32 bsp_wdt_set_timeout(u32 timeout)
 {
 	return WDT_OK;
 }
- s32 bsp_wdt_get_timeleft(u32 *timeleft)/*s*/
+ s32 bsp_wdt_get_timeleft(u32 *timeleft)
 {
 	return WDT_OK;
 }
@@ -121,14 +121,11 @@ int bsp_wdt_unregister_hook(WDT_CORE_ID core_id)
 
 s32 bsp_wdt_reboot_register_hook(void *hook)
 {
-    /*参数判断，如果函数指针为空返回错误*/
     if(WDT_NULL == hook)
     {
 		 wdt_err("hook is NULL\n");
         return WDT_ERROR;
     }
-
-    /*通过全局变量注册上层MSP处理函数*/
 	g_wdt_rebootfunc = hook;
 
 	return WDT_OK;
@@ -136,10 +133,7 @@ s32 bsp_wdt_reboot_register_hook(void *hook)
 
 s32  bsp_wdt_reboot_unregister_hook(void)
 {
-	/*卸载上层超时处理函数*/
 	g_wdt_rebootfunc = WDT_NULL;
 	wdt_pinfo("wdt unregister_hook\n");
 	return WDT_OK;
 }
-
-

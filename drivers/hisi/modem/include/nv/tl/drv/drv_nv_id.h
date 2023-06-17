@@ -58,7 +58,7 @@ extern "C" {
 
 
 /*
- *  NV ID 的添加按从小到大排列
+ *  NV ID ????????????????????
  */
 
 typedef enum
@@ -66,13 +66,13 @@ typedef enum
     NV_ID_DRV_IMEI                         = 0,
     NV_ID_DRV_RESUME_FLAG                  = 4,
     NV_ID_DRV_LED_CONTROL                  = 7,
-    NV_ID_DRV_UE_POINT_CTRL                = 15,    /*保留未使用*/
+    NV_ID_DRV_UE_POINT_CTRL                = 15,    /*??????????*/
     NV_ID_DRV_EXCEPTION_RECORD             = 17,
     NV_ID_DRV_SYS_PRTTASK                  = 20,
     NV_ID_DRV_USB_ENUM_STATUS              = 21,
     NV_ID_DRV_LIVE_TIME_CONTROL            = 22,
     NV_ID_DRV_LIVE_TIME                    = 23,
-    NV_ID_DRV_CUSTOM_REWIND_DELAY_TIME_I   = 25,     /*保留未使用*/
+    NV_ID_DRV_CUSTOM_REWIND_DELAY_TIME_I   = 25,     /*??????????*/
     NV_ID_DRV_USBSN_NV_INFO                = 26,
     NV_ID_DRV_HW_VER                       = 30,
     NV_ID_DRV_PID_ENABLE_TYPE              = 31,
@@ -152,7 +152,7 @@ typedef enum
 	NV_ID_DRV_PAPOWER_UNIT  		   	   = 0xd13A,
 	NV_ID_DRV_FEM_SHARE_POWER              = 0xd13d,
 	NV_ID_DRV_DM_UART5_CFG				   = 0xd140,
-	/*0xd13b--0xd140nv id 在k3V3+中已使用，请勿再使用*/
+	/*0xd13b--0xd140nv id ??k3V3+????????????????????*/
 	NV_ID_DRV_MMC_FEATURE	               = 0xd141,
 	NV_ID_DRV_PA_RF_SWITCH                 = 0xd142,
 	NV_ID_DRV_DIALUP_ACSHELL			   = 0xd143,
@@ -171,7 +171,7 @@ typedef enum
 	NV_ID_DRV_DSPDVFS                      = 0xd150,
 	NV_ID_DRV_TEST_SUPPORT                 = 0Xd151,
 	NV_ID_DRV_DDR_AUTOREF                  = 0Xd152,
-    /*按大小顺序添加*/
+    /*??????????????*/
     NV_ID_DRV_ID_MAX                       = 0xd1ff
 
 }NV_ID_DRV_ENUM;

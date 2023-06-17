@@ -47,7 +47,7 @@
 */
 
 /*****************************************************************************
-  1 头文件包含
+  1 ??????????
 *****************************************************************************/
 #include "MnCommApi.h"
 #include "AtMnInterface.h"
@@ -58,12 +58,12 @@
 #define    THIS_FILE_ID        PS_FILE_ID_MN_COMM_API_C
 
 /*****************************************************************************
-  2 全局变量定义
+  2 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  3 函数实现
+  3 ????????
 *****************************************************************************/
 extern VOS_UINT32 AT_GetDestPid(
     MN_CLIENT_ID_T                      usClientId,
@@ -73,19 +73,19 @@ extern VOS_UINT32 AT_GetDestPid(
 /*lint -save -e958 */
 
 /*****************************************************************************
- 函 数 名  : MN_GetAppReqMsgLen
- 功能描述  :
- 输入参数  : VOS_UINT32 ulParaLen
+ ?? ?? ??  : MN_GetAppReqMsgLen
+ ????????  :
+ ????????  : VOS_UINT32 ulParaLen
              VOS_UINT32 *pulMsgLen
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : ??
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2008年7月22日
-    作    者   : luojian id:107747
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2008??7??22??
+    ??    ??   : luojian id:107747
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_VOID MN_GetAppReqMsgLen(
@@ -115,25 +115,25 @@ VOS_VOID MN_GetAppReqMsgLen(
 }
 
 /*****************************************************************************
- 函 数 名  : MN_FillAppReqMsgHeader
- 功能描述  :
- 输入参数  : MN_APP_REQ_MSG_STRU *pMsg
+ ?? ?? ??  : MN_FillAppReqMsgHeader
+ ????????  :
+ ????????  : MN_APP_REQ_MSG_STRU *pMsg
              TAF_CLIENT_ID      ClientId
              TAF_ID             OpId
              VOS_UINT16         usMsgType
              VOS_UINT32         ulReceiverPid
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : ??
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2008年7月22日
-    作    者   : luojian id:107747
-    修改内容   : 新生成函数
-  2.日    期   : 2012年12月22日
-    作    者   : l00227485
-    修改内容   : DSDA PhaseII
+ ????????      :
+  1.??    ??   : 2008??7??22??
+    ??    ??   : luojian id:107747
+    ????????   : ??????????
+  2.??    ??   : 2012??12??22??
+    ??    ??   : l00227485
+    ????????   : DSDA PhaseII
 *****************************************************************************/
 VOS_VOID  MN_FillAppReqMsgHeader(
     MN_APP_REQ_MSG_STRU                 *pMsg,
@@ -158,20 +158,20 @@ VOS_VOID  MN_FillAppReqMsgHeader(
 }
 
 /*****************************************************************************
- 函 数 名  : MN_FillAppReqMsgPara
- 功能描述  :
- 输入参数  : VOS_VOID *pSndMsgPara
+ ?? ?? ??  : MN_FillAppReqMsgPara
+ ????????  :
+ ????????  : VOS_VOID *pSndMsgPara
              VOS_VOID *pPara
              VOS_UINT32 ulLen
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : ??
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2008年7月22日
-    作    者   : luojian id:107747
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2008??7??22??
+    ??    ??   : luojian id:107747
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_VOID  MN_FillAppReqMsgPara(
@@ -195,23 +195,23 @@ VOS_VOID  MN_FillAppReqMsgPara(
 
 
 /*****************************************************************************
- 函 数 名  : MN_FillAndSndAppReqMsg
- 功能描述  :
- 输入参数  : MN_CLIENT_ID_T      ClientId
+ ?? ?? ??  : MN_FillAndSndAppReqMsg
+ ????????  :
+ ????????  : MN_CLIENT_ID_T      ClientId
              MN_OPERATION_ID_T             OpId
              VOS_UINT16   usMsgType
              VOS_VOID  *pPara
              VOS_UINT32 ulParaLen
              VOS_UINT32 ulReceiverPid
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2008年7月22日
-    作    者   : luojian id:107747
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2008??7??22??
+    ??    ??   : luojian id:107747
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32  MN_FillAndSndAppReqMsg(
@@ -235,10 +235,10 @@ VOS_UINT32  MN_FillAndSndAppReqMsg(
 
     pMsgPara = (VOS_UINT8 *)pPara;
 
-    /* 获取消息长度 */
+    /* ???????????? */
     MN_GetAppReqMsgLen( ulParaLen, &ulMsgLen);
 
-    /* 申请消息 */
+    /* ???????? */
     pMsg = (VOS_UINT8 *)PS_ALLOC_MSG(WUEPS_PID_AT, ulMsgLen - VOS_MSG_HEAD_LENGTH);
 
     if (VOS_NULL_PTR == pMsg)
@@ -248,10 +248,10 @@ VOS_UINT32  MN_FillAndSndAppReqMsg(
 
     PS_MEM_SET( (pMsg + VOS_MSG_HEAD_LENGTH), 0, (ulMsgLen - VOS_MSG_HEAD_LENGTH));
 
-    /* 填充消息头 */
+    /* ?????????? */
     MN_FillAppReqMsgHeader((MN_APP_REQ_MSG_STRU *)pMsg, ClientId, OpId, usMsgType, ulReceiverPid );
 
-    /* 填充消息参数 */
+    /* ???????????? */
     MN_FillAppReqMsgPara( &pMsg[sizeof(MN_APP_REQ_MSG_STRU) - 4], pMsgPara, ulParaLen );
 
     ulRet = PS_SEND_MSG(WUEPS_PID_AT, pMsg);

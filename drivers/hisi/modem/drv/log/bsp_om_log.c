@@ -46,12 +46,6 @@
  *
  */
 
-/*****************************************************************************
-  1 头文件包含
-*****************************************************************************/
-/*lint -save -e322 -e7 -e537 */
-
-
 #include <linux/kernel.h>
 #include <linux/string.h>
 #include <linux/slab.h>
@@ -69,12 +63,7 @@
 #include "bsp_hardtimer.h"
 #include <bsp_modem_log.h>
 #include "bsp_om_log.h"
-/*lint -restore*/
 
-
-/*****************************************************************************
-  2 全局变量定义
-*****************************************************************************/
 bsp_log_swt_cfg_s  g_mod_peint_level_info[BSP_MODU_MAX]    =
 {
     {BSP_LOG_LEVEL_ERROR}, {BSP_LOG_LEVEL_ERROR}, {BSP_LOG_LEVEL_ERROR}, {BSP_LOG_LEVEL_ERROR},
@@ -114,23 +103,6 @@ bsp_log_swt_cfg_s  g_mod_peint_level_info[BSP_MODU_MAX]    =
 u32 bsp_log_level_set(bsp_log_level_e log_level);
 void bsp_log_show(void);
 
-
-
-/*****************************************************************************
-  3 函数实现
-*****************************************************************************/
-/*****************************************************************************
-* 函 数 名  : bsp_log_module_cfg_get
-*
-* 功能描述  : 查询模块当前设置的打印级别
-*
-* 输入参数  : mod_id:被查询模块ID
-*
-* 输出参数  : 无
-*
-* 返 回 值  : 打印级别
-*****************************************************************************/
-
 u32 bsp_log_module_cfg_get(bsp_module_e mod_id)
 {
     if(mod_id >= BSP_MODU_MAX )
@@ -140,18 +112,6 @@ u32 bsp_log_module_cfg_get(bsp_module_e mod_id)
 
     return g_mod_peint_level_info[mod_id].print_level;
 }
-
-/*****************************************************************************
-* 函 数 名  : bsp_mod_level_set
-*
-* 功能描述  : 设置单个模块的打印级别
-*
-* 输入参数  : mod_id:模块ID
-*                         print_level: 打印级别
-* 输出参数  : 无
-*
-* 返 回 值  : BSP_OK 设置成功，其他  设置失败
-*****************************************************************************/
 
 u32 bsp_mod_level_set(bsp_module_e  mod_id ,u32 print_level)
 {
@@ -170,18 +130,6 @@ u32 bsp_mod_level_set(bsp_module_e  mod_id ,u32 print_level)
     return BSP_OK;
 }
 
-/*****************************************************************************
-* 函 数 名  : bsp_log_level_set
-*
-* 功能描述  : 设置所有模块的打印级别
-*
-* 输入参数  : print_level: 打印级别
-*
-* 输出参数  : 无
-*
-* 返 回 值  : BSP_OK 设置成功，其他  设置失败
-*****************************************************************************/
-
 u32 bsp_log_level_set(bsp_log_level_e log_level)
 {
     u32 mod_id = 0;
@@ -199,19 +147,6 @@ u32 bsp_log_level_set(bsp_log_level_e log_level)
     return BSP_OK;
 }
 
-
-/*****************************************************************************
-* 函 数 名  : bsp_log_level_reset
-*
-* 功能描述  : 将所有模块的打印级别设置为默认值
-*
-* 输入参数  : 无
-*
-* 输出参数  : 无
-*
-* 返 回 值  : 无
-*****************************************************************************/
-
 void bsp_log_level_reset(void)
 {
     u32 i;
@@ -223,26 +158,11 @@ void bsp_log_level_reset(void)
 
 }
 
-/*****************************************************************************
-* 函 数 名  : bsp_trace
-*
-* 功能描述  : 底软打印输出处理接口
-*
-* 输入参数  :  mod_id: 输出模块
-*                           print_level: 打印级别
-*                           fmt :打印输入参数
-*
-* 输出参数  : 无
-*
-* 返 回 值  : 无
-*****************************************************************************/
-
 void bsp_trace(bsp_log_level_e log_level,bsp_module_e mod_id,char *fmt,...)
 {
     char    bsp_print_buffer[BSP_PRINT_BUF_LEN] ;
     va_list arglist;
 
-    /*打印级别过滤*/
     if(mod_id >= BSP_MODU_MAX )
     {
         return ;
@@ -253,10 +173,8 @@ void bsp_trace(bsp_log_level_e log_level,bsp_module_e mod_id,char *fmt,...)
         return ;
     }
 
-    /*lint -save -e530*/
     va_start(arglist, fmt);
-    /*lint -restore +e530*/
-    vsnprintf(bsp_print_buffer, BSP_PRINT_BUF_LEN, fmt, arglist); /* [false alarm]:屏蔽Fortify错误 */
+    vsnprintf(bsp_print_buffer, BSP_PRINT_BUF_LEN, fmt, arglist);
     va_end(arglist);
 
     bsp_print_buffer[BSP_PRINT_BUF_LEN - 1] = '\0';
@@ -266,18 +184,6 @@ void bsp_trace(bsp_log_level_e log_level,bsp_module_e mod_id,char *fmt,...)
     return ;
 }
 EXPORT_SYMBOL_GPL(bsp_trace);
-
-/*****************************************************************************
-* 函 数 名  : bsp_log_module_cfg_set
-*
-* 功能描述  : HSO设置底软打印级别处理函数
-*
-* 输入参数  : log_swt_stru:各个模块的打印级别值
-*                         data_len:      参数log_swt_stru的长度
-* 输出参数  : 无
-*
-* 返 回 值  : BSP_OK 成功;其他 失败
-*****************************************************************************/
 
 u32 bsp_log_module_cfg_set(bsp_log_swt_cfg_s *log_swt_stru ,u32 data_len)
 {
@@ -313,14 +219,13 @@ u32 bsp_log_module_cfg_set(bsp_log_swt_cfg_s *log_swt_stru ,u32 data_len)
     return BSP_OK;
 }
 
-/*debug 接口*/
 void bsp_log_show(void)
 {
     pr_err("trace level              = %d\n",g_mod_peint_level_info[0].print_level);
 }
 
 #define modem_om_log_err(fmt, ...)        pr_err("[om log]: " fmt, ##__VA_ARGS__)
-#define modem_om_log_debug(fmt, ...)      //pr_err("[om log]: " fmt, ##__VA_ARGS__)
+#define modem_om_log_debug(fmt, ...)
 
 void log_buff_info(void)
 {
@@ -363,24 +268,10 @@ static inline u32 om_log_writable_size_get(u32 write, u32 read, u32 ring_buffer_
 	return (read > write)? (read - write): (ring_buffer_size - write + read);
 }
 
-/*****************************************************************************
-* 函 数 名  : do_read_data_to_user
-*
-* 功能描述  : 拷贝数据至用户态
-*
-* 输入参数  : char * src, 数据源buffer
-*             char * dst，数据目的buffer
-*             u32 len, 期望读取的数据长度
-*
-* 输出参数  : 无
-*
-* 返 回 值  : 实际读取的数据长度
-*****************************************************************************/
 int do_read_data_to_user(char * src, char * dst, u32 len)
 {
     u32 ret;
 
-    /* 返回未能拷贝的数据长度 */
     ret = (u32)copy_to_user(dst, src, len);
 
     return (int)(len - ret);
@@ -492,4 +383,3 @@ static int modem_om_log_init(void)
 
 EXPORT_SYMBOL_GPL(bsp_log_level_set);
 module_init(modem_om_log_init);
-

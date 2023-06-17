@@ -45,7 +45,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-/*lint -save -e537*/
+
 #include <linux/errno.h>
 #include <linux/spinlock.h>
 #include <linux/fs.h>
@@ -68,7 +68,6 @@
 #include "mdrv_temp_cfg.h"
 #include "bsp_hardtimer.h"
 #include "bsp_temperature.h"
-/*lint -restore */
 
 #define DEVICE_ID_TEMP                   10
 
@@ -118,7 +117,6 @@ s32 bsp_tem_data_receive(void)
 
     tem_print_info("temperature region = %d, status = %d.\n", region, status);
 
-    /*POWER_SUPPLY数据上报*/
     if(HKADC_BATTERY == region && (HIGH_TEMPERATURE == status) && (NULL != p_tem_fun))
     {
         (*p_tem_fun)(DEVICE_ID_TEMP, POWER_SUPPLY_HEALTH_DEAD);
@@ -132,21 +130,6 @@ s32 bsp_tem_data_receive(void)
     return TEMPERATURE_OK;
 }
 
-
-/*****************************************************************************
- * 函 数 名  :bsp_temperature_init
- *
- * 功能描述  : 温度保护核间通信，A核初始化函数
- *
- * 输入参数  : 无
- * 输出参数  : 无
- *
- * 返 回 值  : TEMPERATURE_OK:    操作成功
- *             TEMPERATURE_ERROR: 操作失败
- *
- * 其它说明  : 无
- *
- *****************************************************************************/
 static int __init bsp_temperature_init(void)
 {
     int ret = 0;
@@ -171,4 +154,3 @@ module_init(bsp_temperature_init);
 MODULE_AUTHOR("Hisilicon Drive Group");
 MODULE_DESCRIPTION("temperature driver for the Hisilicon");
 MODULE_LICENSE("GPL");
-

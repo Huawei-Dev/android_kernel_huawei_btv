@@ -37,16 +37,16 @@ extern "C" {
 
 /*****************************************************************************
   4 Enum
-    PS NV值使用范围：0xD200 ~ 0xD38F
+    PS NV????????????0xD200 ~ 0xD38F
 *****************************************************************************/
 enum NV_ITEM_ID_ENUM
 {
     EN_NV_ID_BEGIN                                  = 0,
     /*jiaguocai for IMS support flag,begin 2016-10-11*/
-    EN_NV_ID_IMS_CONTROL                            = 0xC546,/* IMS总开关 NV*/
+    EN_NV_ID_IMS_CONTROL                            = 0xC546,/* IMS?????? NV*/
     /*jiaguocai for IMS support flag,begin 2016-10-11*/
     EN_NV_ID_VISP_WAKEUP_COMPENS_TIMER_CTRL         = 0xC806,
-    EN_NV_ID_EMC_REG_NO_RSP_TO_ANONYMOUS_CTRL       = 0xC807,/* 紧急注册保护功能定制NV */
+    EN_NV_ID_EMC_REG_NO_RSP_TO_ANONYMOUS_CTRL       = 0xC807,/* ????????????????????NV */
 
     EN_NV_ID_PS_BEGIN                               = 0xD200,/*Modem begin D000*/
     EN_NV_ID_LTEAPT_TOTAL_FLG                       = 0xD201,
@@ -82,10 +82,10 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_LCS_COMMON_CONFIG                      = 0xD21f,
     EN_NV_ID_CELL_MEAS_THREDHOLD                    = 0xD220,
     EN_NV_ID_GET_SIB_THRESHOLD                      = 0xD221,
-    EN_NV_ID_UE_CAP_V9a0                            = 0xD222,/* R10 NV修改 begin */
+    EN_NV_ID_UE_CAP_V9a0                            = 0xD222,/* R10 NV???? begin */
     EN_NV_ID_UE_CAP_V1020                           = 0xD223,
     EN_NV_ID_UE_CAP_V1060                           = 0xD224,
-    EN_NV_ID_UE_CAP_RF_PARA_V1060                   = 0xD225,/* R10 NV修改 end */
+    EN_NV_ID_UE_CAP_RF_PARA_V1060                   = 0xD225,/* R10 NV???? end */
     EN_NV_ID_IRAT_REDIR_SWITCH                      = 0xD226,
     EN_NV_ID_LTE_SPAC_BAND_INFO                     = 0xD227,/* MTC add by k0228722 begin */
     EN_NV_ID_LTE_ABANDON_BAND_INFO                  = 0xD228,/* MTC add by k0228722 end */
@@ -102,8 +102,8 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_RRC_RESELECT_3DB_SWITCH                = 0xD233,
     EN_NV_ID_UE_RFRD_TYPE                           = 0xD234,
     EN_NV_ID_LTE_IRAT_TDS_CAPABILITY_INFO           = 0xD235,
-    EN_NV_ID_UE_EXTBAND_INFO                        = 0xD236,/*BEGIN DTS2014041603793 c00203521 modify for B28全频段特性*/
-    EN_NV_ID_EXTBAND_INFO_WITH_BANDWIDTH		    = 0xD237,/*END DTS2014041603793 c00203521 modify for B28全频段特性*/
+    EN_NV_ID_UE_EXTBAND_INFO                        = 0xD236,/*BEGIN DTS2014041603793 c00203521 modify for B28??????????*/
+    EN_NV_ID_EXTBAND_INFO_WITH_BANDWIDTH		    = 0xD237,/*END DTS2014041603793 c00203521 modify for B28??????????*/
     EN_NV_ID_DSDS_CFG_INFO                          = 0xD238,
     EN_NV_ID_FIX_MUTI_PLMNS_CAND_INFO               = 0xD239,
     EN_NV_ID_DYN_MUTI_PLMNS_CAND_INFO               = 0xD23A,
@@ -141,7 +141,7 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_UE_NAS_SECURITY_ALGORITHMS             = 0xD25f,
     EN_NV_ID_USIM_VISION                            = 0xD260,
     EN_NV_ID_ACC_CLASSMASK_FILE                     = 0xD261,
-    EN_NV_ID_HPLMN_ACT_FILE                         = 0xD262,/* 未使用 */
+    EN_NV_ID_HPLMN_ACT_FILE                         = 0xD262,/* ?????? */
     EN_NV_ID_SEQ_INFO                               = 0xD263,
     EN_NV_ID_LRPLMNSI_FILE                          = 0xD264,
     EN_NV_ID_USIM_END                               = 0xD269,
@@ -214,7 +214,7 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_BAND64_CAND_INFO                       = 0xD2d8,
     EN_NV_ID_FLOWCTRL_CONFIG                        = 0xD2d9,
     EN_NV_ID_BANDXX_CAND_INFO                       = 0xD2da,/* gaojishan-nv-bands-cfg-begin */
-    EN_NV_ID_BANDNon2_CAND_INFO                     = 0xD2DB,/* 非标频段的候补信息begin */
+    EN_NV_ID_BANDNon2_CAND_INFO                     = 0xD2DB,/* ??????????????????begin */
     EN_NV_ID_BANDNon3_CAND_INFO                     = 0xD2DC,
     EN_NV_ID_BANDNon4_CAND_INFO                     = 0xD2DD,
     EN_NV_ID_BANDNon5_CAND_INFO                     = 0xD2DE,
@@ -229,8 +229,8 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_BANDNon14_CAND_INFO                    = 0xD2E7,
     EN_NV_ID_BANDNon15_CAND_INFO                    = 0xD2E8,
     EN_NV_ID_BANDNon16_CAND_INFO                    = 0xD2E9,
-    EN_NV_ID_BANDNon1_CAND_INFO                     = 0xD2EA,/* 非标频段的候补信息end */
-    EN_NV_ID_BANDNon1_BAND_INFO                     = 0xD2ED,/* 非标频段的频段信息begin */
+    EN_NV_ID_BANDNon1_CAND_INFO                     = 0xD2EA,/* ??????????????????end */
+    EN_NV_ID_BANDNon1_BAND_INFO                     = 0xD2ED,/* ??????????????????begin */
     EN_NV_ID_BANDNon2_BAND_INFO                     = 0xD2EE,
     EN_NV_ID_BANDNon3_BAND_INFO                     = 0xD2EF,
     EN_NV_ID_BANDNon4_BAND_INFO                     = 0xD2F0,
@@ -245,7 +245,7 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_BANDNon13_BAND_INFO                    = 0xD2F9,
     EN_NV_ID_BANDNon14_BAND_INFO                    = 0xD2FA,
     EN_NV_ID_BANDNon15_BAND_INFO                    = 0xD2FB,
-    EN_NV_ID_BANDNon16_BAND_INFO                    = 0xD2FC,/* 非标频段的频段信息end */
+    EN_NV_ID_BANDNon16_BAND_INFO                    = 0xD2FC,/* ??????????????????end */
     EN_NV_ID_FLOWCTRL_LIMIT_CONFIG                  = 0xD2FD,
     EN_NV_ID_TDS_FREQ_CELL_LOCK_SWITCH              = 0xD2FE,
     EN_NV_ID_PS_END                                 = 0xD2ff,
@@ -307,7 +307,7 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_CELL_SEARCH_TIME                       = 0xD338,
     EN_NV_ID_CHR_ERROR_LOG_INFO                     = 0xD339,
     EN_NV_ID_L2_CHR_CTRL_CONFIG                     = 0xD33a,
-    EN_NV_ID_UE_CAP_V1090                           = 0xD340,/* R11 NV修改 begin */
+    EN_NV_ID_UE_CAP_V1090                           = 0xD340,/* R11 NV???? begin */
     EN_NV_ID_UE_CAP_V1130                           = 0xD341,
     EN_NV_ID_UE_CAP_V1170                           = 0xD342,
     EN_NV_ID_UE_CAP_V9c0                            = 0xD343,
@@ -318,7 +318,7 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_UE_CAP_V1180                           = 0xD348,
     EN_NV_ID_UE_CAP_V11A0                           = 0xD349,
     EN_NV_ID_UE_CAP_V1250                           = 0xD34a,
-    EN_NV_ID_UE_CAP_V10f0                           = 0xD34b,/* R11 NV修改 end */
+    EN_NV_ID_UE_CAP_V10f0                           = 0xD34b,/* R11 NV???? end */
     /* Begin: 2016/1/4 cr develop */
     EN_NV_ID_UE_CAP_V10i0                           = 0xD34c,
     EN_NV_ID_UE_CAP_V10d0                           = 0xD34D,
@@ -433,7 +433,7 @@ enum NV_ITEM_ID_ENUM
     EN_NV_ID_UE_CAP_V1020_RF_MEAS_PARA_BAND126      = 0xD3bd,
     EN_NV_ID_UE_CAP_V1020_RF_MEAS_PARA_BAND127      = 0xD3be,
     EN_NV_ID_UE_CAP_V1020_RF_MEAS_PARA_BAND128      = 0xD3bf,/* CA NV end,d310~d32f,d350~d37f,d390~d3bf */
-    EN_NV_ID_UE_CAP_V1180_BAND_COMB_PARAM1          = 0xD5a0,/* 以下是DSP的NV范围，PSNV不够用，暂时借用之 */
+    EN_NV_ID_UE_CAP_V1180_BAND_COMB_PARAM1          = 0xD5a0,/* ??????DSP??NV??????PSNV?????????????????? */
     EN_NV_ID_UE_CAP_V1180_BAND_COMB_PARAM2          = 0xD5a1,
     EN_NV_ID_UE_CAP_V1180_BAND_COMB_PARAM3          = 0xD5a2,
     EN_NV_ID_UE_CAP_V1180_BAND_COMB_PARAM4          = 0xD5a3,
@@ -473,8 +473,8 @@ enum NV_ITEM_ID_ENUM
 typedef unsigned long NV_ITEM_ID_ENUM_UINT32;
 
 /*****************************************************************************
-    PS NV值使用范围：0xD200 ~ 0xD38F
-    0xD390 ~ 0xD3bf已用作CA
+    PS NV????????????0xD200 ~ 0xD38F
+    0xD390 ~ 0xD3bf??????CA
 *****************************************************************************/
 
 

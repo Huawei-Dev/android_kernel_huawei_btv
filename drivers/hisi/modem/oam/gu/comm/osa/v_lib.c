@@ -46,47 +46,12 @@
  *
  */
 
-/*****************************************************************************/
-/*                                                                           */
-/*                Copyright 1999 - 2003, Huawei Tech. Co., Ltd.              */
-/*                           ALL RIGHTS RESERVED                             */
-/*                                                                           */
-/* FileName: v_lib.c                                                         */
-/*                                                                           */
-/* Author: Yang Xiangqian                                                    */
-/*                                                                           */
-/* Version: 1.0                                                              */
-/*                                                                           */
-/* Date: 2006-10                                                             */
-/*                                                                           */
-/* Description: implement general function                                   */
-/*                                                                           */
-/* Others:                                                                   */
-/*                                                                           */
-/* History:                                                                  */
-/* 1. Date:                                                                  */
-/*    Author:                                                                */
-/*    Modification: Create this file                                         */
-/*                                                                           */
-/* 2. Date: 2006-10                                                          */
-/*    Author: Xu Cheng                                                       */
-/*    Modification: Standardize code                                         */
-/*                                                                           */
-/*****************************************************************************/
-
-
 #include "v_lib.h"
 #include "v_blkMem.h"
 #include "v_IO.h"
 #include "v_timer.h"
 
-/*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
-*****************************************************************************/
-/*lint -e767 modify:x51137; review:h59254; cause:print log */
 #define    THIS_FILE_ID        PS_FILE_ID_V_LIB_C
-/*lint +e767 modify:x51137; review:h59254; */
-
 
 #define COPY_LONG_SIZE          ( sizeof(VOS_UINT32) )
 #define COPY_WORD_SIZE          ( sizeof(VOS_UINT16) )
@@ -110,7 +75,6 @@ typedef enum _bit64CompareResult
     BIT64_EQUAL,
     BIT64_LESS
 } bit64CompareResult;
-
 
 #define BIT64_COMPARE(argAHi, argALo, argBHi, argBLo, result) \
     do \
@@ -167,7 +131,7 @@ typedef enum _bit64CompareResult
 /* the seed of radom */
 static VOS_UINT32 g_ulVosRadomSeed = 0;
 
-VOS_UINT32        g_ulErrorNo = 0;                  /* 存放错误码 */
+VOS_UINT32        g_ulErrorNo = 0;
 
 
 int errnoSet(int errorValue)
@@ -186,10 +150,10 @@ VOS_UINT32 V_SetErrorNo( VOS_UINT32 ulErrorNo,
                          VOS_UINT32 ulFileID, VOS_INT32 usLineNo )
 {
     g_ulErrorNo = ulErrorNo;
-    /*lint -e534*/
+    
     LogPrint3("# VOS_SetErrorNo, F:%d, L:%d, ErrNo:%x.\r\n",
         (VOS_INT)ulFileID, usLineNo, (VOS_INT)ulErrorNo);
-    /*lint +e534*/
+    
     return VOS_OK;
 }
 
@@ -716,19 +680,19 @@ VOS_VOID * V_MemSet( VOS_VOID * ToSet, VOS_CHAR Char, VOS_SIZE_T Count,
 
     if ( VOS_OK != VOS_LocationMem( ToSet, &ulSize, ulFileID, usLineNo ) )
     {
-        /*lint -e534*/
+        
         Print2("# WARING:V_MemSet destination error.file %d l %d.\r\n",
             ulFileID, usLineNo);
-        /*lint +e534*/
+        
         return(VOS_NULL_PTR);
     }
 
     if ( Count > ulSize )
     {
-        /*lint -e534*/
+        
         Print4("# WARNING:V_MemSet big.file %d l %d.count %d real size %d.\r\n",
             ulFileID, usLineNo, Count, ulSize);
-        /*lint +e534*/
+        
         return(VOS_NULL_PTR);
     }
 
@@ -798,20 +762,20 @@ VOS_VOID * V_MemCpy( VOS_VOID * Dest, const VOS_VOID * Src, VOS_SIZE_T Count,
 
     if ( VOS_OK != VOS_LocationMem( Dest, &ulSize, ulFileID, usLineNo ) )
     {
-        /*lint -e534*/
+        
         Print2("WARING:VOS_MemCpy destination error.file %d l %d.\r\n",
             ulFileID, usLineNo);
-        /*lint +e534*/
+        
 
         return(VOS_NULL_PTR);
     }
 
     if ( Count > ulSize )
     {
-        /*lint -e534*/
+        
         Print4("WARNING:VOS_MemCpy big.file %d l %d.Count %d real size %d.\r\n",
             ulFileID, usLineNo, Count, ulSize);
-        /*lint +e534*/
+        
 
         return(VOS_NULL_PTR);
     }
@@ -876,7 +840,6 @@ VOS_VOID * V_MemMove( VOS_VOID * Dest, const VOS_VOID * Src, VOS_SIZE_T Count,
         return VOS_NULL_PTR;
     }
 
-    /* 如果目的为空，直接返回NULL */
     if (VOS_NULL_PTR == Src)
     {
         return VOS_NULL_PTR;
@@ -889,25 +852,25 @@ VOS_VOID * V_MemMove( VOS_VOID * Dest, const VOS_VOID * Src, VOS_SIZE_T Count,
 
     if ( VOS_OK != VOS_LocationMem( Dest, &ulSize, ulFileID, usLineNo ) )
     {
-        /*lint -e534*/
+        
         Print2("WARING:VOS_MemCpy destination error.file %d l %d.\r\n",
             ulFileID, usLineNo);
-        /*lint +e534*/
+        
 
         return(VOS_NULL_PTR);
     }
 
     if ( Count > ulSize )
     {
-        /*lint -e534*/
+        
         Print4("WARNING:VOS_MemCpy big.file %d l %d.Count %d real size %d.\r\n",
             ulFileID, usLineNo, Count, ulSize);
-        /*lint +e534*/
+        
 
         return(VOS_NULL_PTR);
     }
 
-    return memmove (Dest,Src,Count);/* [false alarm]:前边已有严谨的判断  */
+    return memmove (Dest,Src,Count);
 }
 
 /*****************************************************************************
@@ -1034,17 +997,14 @@ VOS_UINT32 VOS_64Div64( VOS_UINT32 ulDividendHigh,
     ulTmpDividendHi = ulDividendHigh;
     ulTmpDividendLo = ulDividendLow;
 
-    /* if divisor is larger than dividend, quotient equals to zero,
-     * remainder equals to dividends */
-    /*lint -e717 */
     BIT64_COMPARE(ulDividendHigh, ulDividendLow,
                   ulDivisorHigh, ulDivisorLow, tmpResult);
-    /*lint +e717 */
+    
     if (BIT64_LESS == tmpResult)
     {
-        /*lint -e801 */
+        
         goto returnHandle;
-        /*lint +e801 */
+        
     }
     else if (BIT64_EQUAL == tmpResult)
     {
@@ -1085,10 +1045,8 @@ VOS_UINT32 VOS_64Div64( VOS_UINT32 ulDividendHigh,
     if (ulDivisorHigh > 0)
     {
         /* divisor's high 32 bits doesn't equal to zero */
-        /*lint -save -e644*/
         for (; chShiftNumHi >= 0; chShiftNumHi--)
         {
-        /*lint -restore*/
             if (0 == chShiftNumHi)
             {
                 ulTmpDivisorHi = ulDivisorHigh;
@@ -1101,27 +1059,27 @@ VOS_UINT32 VOS_64Div64( VOS_UINT32 ulDividendHigh,
 
             ulTmpDivisorLo = ulDivisorLow << chShiftNumHi;
 
-            /*lint -e717 */
+            
             BIT64_COMPARE(ulTmpDividendHi, ulTmpDividendLo,
                           ulTmpDivisorHi, ulTmpDivisorLo, tmpResult);
-            /*lint +e717 */
+            
 
-            /*lint -e701 */
+            
             if (tmpResult != BIT64_LESS)
             {
-            /*lint +e701 */
-                /*lint -e717 */
+            
+                
                 BIT64_SUB(ulTmpDividendHi, ulTmpDividendLo,
                           ulTmpDivisorHi, ulTmpDivisorLo);
-                /*lint +e717 */
-                /*lint -e701 */
+                
+                
                 ulTmpQuoLo |= (1 << chShiftNumHi);
-                /*lint +e701 */
+                
                 if (0 == ulTmpDividendHi && 0 == ulTmpDividendLo)
                 {
-                    /*lint -e801 */
+                    
                     goto returnHandle;
-                    /*lint +e801 */
+                    
                 }
             }
         }
@@ -1130,34 +1088,29 @@ VOS_UINT32 VOS_64Div64( VOS_UINT32 ulDividendHigh,
     else
     {
         /* divisor's high 32 bits equals to zero */
-        /*lint -save -e644*/
         chShiftNumHi = chShiftNumLo;
-        /*lint -restore*/
         for (; chShiftNumHi >= 0; chShiftNumHi--)
         {
             ulTmpDivisorHi = ulDivisorLow << chShiftNumHi;
-            /*lint -e717 */
+            
             BIT64_COMPARE(ulTmpDividendHi, ulTmpDividendLo,
                           ulTmpDivisorHi, 0, tmpResult);
-            /*lint +e717 */
+            
 
-            /*lint -e701 */
+            
             if (tmpResult != BIT64_LESS)
-            /*lint +e701 */
-            {   /*lint -save -e568*/
-                /*lint -e717 -e685 */
+            
+            {  
                 BIT64_SUB(ulTmpDividendHi, ulTmpDividendLo,
                           ulTmpDivisorHi, 0);
-                /*lint +e717 +e685 */
-                /*lint -restore*/
-                /*lint -e701 */
+                
                 ulTmpQuoHi |= (1 << chShiftNumHi);
-                /*lint +e701 */
+                
                 if ((0 == ulTmpDividendHi) && (0 == ulTmpDividendLo))
                 {
-                    /*lint -e801 */
+                    
                     goto returnHandle;
-                    /*lint +e801 */
+                    
                 }
             }
         }
@@ -1175,26 +1128,26 @@ VOS_UINT32 VOS_64Div64( VOS_UINT32 ulDividendHigh,
 
             ulTmpDivisorLo = ulDivisorLow << chShiftNumHi;
 
-            /*lint -e717 */
+            
             BIT64_COMPARE(ulTmpDividendHi, ulTmpDividendLo,
                           ulTmpDivisorHi, ulTmpDivisorLo, tmpResult);
-            /*lint +e717 */
-            /*lint -e701 */
+            
+            
             if (tmpResult != BIT64_LESS)
-            /*lint +e701 */
+            
             {
-                /*lint -e717 */
+                
                 BIT64_SUB(ulTmpDividendHi, ulTmpDividendLo,
                           ulTmpDivisorHi, ulTmpDivisorLo);
-                /*lint +e717 */
-                /*lint -e701 */
+                
+                
                 ulTmpQuoLo |= (1 << chShiftNumHi);
-                /*lint +e701 */
+                
                 if ((0 == ulTmpDividendHi) && (0 == ulTmpDividendLo))
                 {
-                    /*lint -e801 */
+                    
                     goto returnHandle;
-                    /*lint +e801 */
+                    
                 }
             }
         }
@@ -1307,7 +1260,6 @@ VOS_UINT32 VOS_Rand( VOS_UINT32 ulRange )
     register VOS_UINT32 ulGenTempHigh, ulRangeHigh, ulRangeLow;
     register VOS_UINT32 ulRandomNumber;
 
-    /* 设置了种子用设置的种子，否则用系统时间做种子 */
     if (0 == g_ulVosRadomSeed )
     {
         ulGenTemp = VOS_GetSlice();
@@ -1317,12 +1269,10 @@ VOS_UINT32 VOS_Rand( VOS_UINT32 ulRange )
         ulGenTemp = g_ulVosRadomSeed;
     }
 
-    /* 网络搜索算法生成伪随机数 */
     ulGenTemp = (ulGenTemp * 1664525L + 1013904223L) ;
 
     g_ulVosRadomSeed = ulGenTemp;
 
-    /* 将伪随机匹配到范围内 */
     ulGenTempHigh = ulGenTemp >> 16;
     ulGenTemp &= 0xffff;
 
@@ -1407,9 +1357,9 @@ VOS_UINT32 VOS_64Multi32( VOS_UINT32 ulMultiplicandHigh,
         {
             if (0 != (ulMultiplicandHigh & MASK_HI_NBITS(count -1)))
             {
-                /*lint -e801 */
+                
                 goto overflowHandle;
-                /*lint +e801 */
+                
             }
             record = ulMultiplicandLow & MASK_HI_NBITS(count -1);
             record >>= (32 - (count -1));
@@ -1423,9 +1373,9 @@ VOS_UINT32 VOS_64Multi32( VOS_UINT32 ulMultiplicandHigh,
             /* If check failed, means overflow occurred */
             if (*pulProductHigh < tmpHigh)
             {
-                /*lint -e801 */
+                
                 goto overflowHandle;
-                /*lint +e801 */
+                
             }
         }
     }
@@ -1439,9 +1389,9 @@ VOS_UINT32 VOS_64Multi32( VOS_UINT32 ulMultiplicandHigh,
         /* If check failed, means overflow occurred */
         if (*pulProductHigh < ulMultiplicandHigh)
         {
-            /*lint -e801 */
+            
             goto overflowHandle;
-            /*lint +e801 */
+            
         }
     }
 
@@ -1451,9 +1401,9 @@ overflowHandle:
 
     *pulProductHigh = *pulProductLow = 0;
 
-    /*lint -e534*/
+    
     VOS_SetErrorNo( VOS_ERRNO_LIB_64MUL32_OVERFLOW );
-    /*lint +e534*/
+    
     return VOS_ERRNO_LIB_64MUL32_OVERFLOW;
 }
 
@@ -1588,7 +1538,3 @@ VOS_CHAR *VOS_StrTok_s(VOS_CHAR *Str1, const VOS_CHAR *Str2, VOS_CHAR** pPositio
 
     return (Str1);
 }
-
-
-
-

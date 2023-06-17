@@ -57,7 +57,7 @@
 
 #include "LPsNvInterface.h"
 
-/*lint -e767 原因:Log打印*/
+/*lint -e767 ????:Log????*/
 #define    THIS_FILE_ID        MSP_FILE_ID_AT_LTE_MS_PROC_C
 /*lint +e767 */
 
@@ -70,18 +70,18 @@ extern VOS_BOOL AT_IsNVWRAllowedNvId(VOS_UINT16 usNvId);
 
 
 // *****************************************************************************
-// oˉêy??3?: atSetNVRDLenPara
-// 1|?ü?èê?: ?áNV3¤?èY
+// o????y??3?: atSetNVRDLenPara
+// 1|?????????: ???NV3?????Y
 //
-// 2?êy?μ?÷:
-//   ulIndex [in] ó??§?÷òy
+// 2???y??????:
+//   ulIndex [in] ???????????y
 //
-// ·μ ?? ?μ:
+// ???? ?? ???:
 //    TODO: ...
 //
-// μ÷ó?òa?ó: TODO: ...
-// μ÷ó??ùày: TODO: ...
-// ×÷    ??: óú???1?/00193980 [2013-02-24]
+// ?????????a???: TODO: ...
+// ????????????y: TODO: ...
+// ????    ??: ???????1?/00193980 [2013-02-24]
 // *****************************************************************************
 VOS_UINT32 atSetNVRDLenPara(VOS_UINT8 ucClientId)
 {
@@ -389,18 +389,18 @@ VOS_UINT32 atSetNVWRExPara(VOS_UINT8 ucClientId)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_QryLwclashPara
- 功能描述  : ^LWCLASH命令查询处理
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_QryLwclashPara
+ ????????  : ^LWCLASH????????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年8月23日
-    作    者   : c64416
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2012??8??23??
+    ??    ??   : c64416
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_QryLwclashPara(VOS_UINT8 ucIndex)
@@ -423,18 +423,18 @@ VOS_UINT32 AT_QryLwclashPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_QryLcacellPara
- 功能描述  : ^LCACELL命令查询处理
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_QryLcacellPara
+ ????????  : ^LCACELL????????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年6月11日
-    作    者   : y00171698
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??6??11??
+    ??    ??   : y00171698
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_QryLcacellPara(VOS_UINT8 ucIndex)
@@ -508,14 +508,14 @@ VOS_UINT32 At_QryCnmrPara(VOS_UINT8 ucIndex)
     stCnmr.stCtrl.ulPid = WUEPS_PID_AT;
     stCnmr.n = gastAtParaList[0].ulParaValue;
 
-    /* 参数过多
+    /* ????????
  */
     if(gucAtParaIndex != 1)
     {
         return AT_CME_INCORRECT_PARAMETERS;
     }
 
-    /*L模调用如下接口转发*/
+    /*L??????????????????*/
     ulRet = atSendDataMsg(MSP_L4_L4A_PID, ID_MSG_L4A_CNMR_REQ, (VOS_VOID*)(&stCnmr), sizeof(L4A_READ_CNMR_REQ_STRU));
     if(ERR_MSP_SUCCESS == ulRet)
     {
@@ -551,7 +551,7 @@ VOS_UINT32 At_SetLFromConnToIdlePara(VOS_UINT8 ucIndex)
     stReq.stCtrl.ulOpId = 0;
     stReq.stCtrl.ulPid = WUEPS_PID_AT;
 
-    /* 参数检查 */
+    /* ???????? */
     if(AT_CMD_OPT_SET_CMD_NO_PARA != g_stATParseCmd.ucCmdOptType)
     {
         return AT_CME_INCORRECT_PARAMETERS;
@@ -567,7 +567,7 @@ VOS_UINT32 At_SetLFromConnToIdlePara(VOS_UINT8 ucIndex)
         return AT_OK;
     }
 
-    /*L模调用如下接口转发*/
+    /*L??????????????????*/
     ulRet = atSendDataMsg(MSP_L4_L4A_PID, ID_MSG_L4A_LTE_TO_IDLE_REQ, (VOS_VOID*)(&stReq), sizeof(L4A_SET_LTE_TO_IDLE_REQ_STRU));
     if(ERR_MSP_SUCCESS == ulRet)
     {
@@ -597,7 +597,7 @@ VOS_UINT32 At_SetLWThresholdCfgPara(VOS_UINT8 ucIndex)
         return AT_OK;
     }
 
-    /*L模调用如下接口转发*/
+    /*L??????????????????*/
     ulRet = atSendDataMsg(MSP_L4_L4A_PID, ID_MSG_L4A_LW_THRESHOLD_REQ, (VOS_VOID*)(&stReq), sizeof(L4A_LW_THREASHOLD_CFG_REQ_STRU));
     if(ERR_MSP_SUCCESS == ulRet)
     {
@@ -612,7 +612,7 @@ VOS_UINT32 AT_SetLFastDormPara(VOS_UINT8 ucIndex)
     L4A_SET_FAST_DORM_REQ_STRU stReq = {0};
     LPS_SWITCH_PARA_STRU stDrxControlFlag = {0};
 
-    /* 参数检查在AT入口已做
+    /* ??????????AT????????
  */
 
     stReq.stCtrl.ulClientId = gastAtClientTab[ucIndex].usClientId;
@@ -631,7 +631,7 @@ VOS_UINT32 AT_SetLFastDormPara(VOS_UINT8 ucIndex)
         return AT_OK;
     }
 
-    /*L模调用如下接口转发*/
+    /*L??????????????????*/
     ulRet = atSendDataMsg(MSP_L4_L4A_PID, ID_MSG_L4A_FAST_DORM_REQ, (VOS_VOID*)(&stReq), sizeof(L4A_SET_FAST_DORM_REQ_STRU));
     if(ERR_MSP_SUCCESS == ulRet)
     {
@@ -646,7 +646,7 @@ VOS_UINT32 At_SetLCellInfoPara(VOS_UINT8 ucIndex)
     L4A_READ_CELL_INFO_REQ_STRU         stCellInfo;
     VOS_UINT32                          ulRet = ERR_MSP_SUCCESS;
 
-    /* 参数过多 */
+    /* ???????? */
     if(gucAtParaIndex != 1)
     {
         return AT_CME_INCORRECT_PARAMETERS;

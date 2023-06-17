@@ -46,14 +46,10 @@
  *
  */
 
-
-
-
 #include <mdrv.h>
 #include "diag_msgapplog.h"
 #include "diag_debug.h"
 #include "msp_diag_comm.h"
-
 
 #define    THIS_FILE_ID        MSP_FILE_ID_DIAG_MSGAPPLOG_C
 
@@ -61,16 +57,7 @@ DIAG_APPLOG_PROC_FUN_STRU g_DiagAppLogFunc[] = {
   {diag_AppLogDataConfig       ,DIAG_CMD_APPLOG_CONFIG   ,0}};
 
  VOS_UINT32 diag_MspMsgProc(DIAG_FRAME_INFO_STRU *pData);
-  
-/*****************************************************************************
- Function Name   : diag_AppLogMsgProc
- Description     : APPLOG  消息处理
- Input           : None
- Output          : None
- Return          : None
- History         :
 
-*****************************************************************************/
 VOS_UINT32 diag_AppLogDataConfig(VOS_UINT8* pstReq)
 {
     VOS_UINT32 ulRet = ERR_MSP_SUCCESS;
@@ -88,7 +75,6 @@ VOS_UINT32 diag_AppLogDataConfig(VOS_UINT8* pstReq)
 
     stAppLog.ulRc  = mdrv_applog_cfg(plogcfg->enable,plogcfg->level);
 
-    /*组包给FW回复*/
     ulRet = DIAG_MsgReport(&stDiagInfo, &stAppLog, sizeof(stAppLog));
     if(ulRet)
     {
@@ -96,15 +82,7 @@ VOS_UINT32 diag_AppLogDataConfig(VOS_UINT8* pstReq)
     }
     return ulRet;
 }
-/*****************************************************************************
- Function Name   : diag_AppLogMsgProc
- Description     : APPLOG处理消息处理
- Input           : None
- Output          : None
- Return          : None
- History         :
 
-*****************************************************************************/
 VOS_UINT32 diag_AppLogMsgProc(DIAG_FRAME_INFO_STRU *pData)
 {
     VOS_UINT32 ulRet = ERR_MSP_INVALID_PARAMETER ;
@@ -128,21 +106,7 @@ VOS_UINT32 diag_AppLogMsgProc(DIAG_FRAME_INFO_STRU *pData)
     return ulRet;
 }
 
-/*****************************************************************************
- Function Name   : diag_AppLogMsgInit
- Description     : APP LOG初始化
- Input           : None
- Output          : None
- Return          : None
- History         :
-
-*****************************************************************************/
 VOS_VOID diag_AppLogMsgInit(VOS_VOID)
 {
-    /*注册message消息回调*/
     DIAG_MsgProcReg(DIAG_MSG_TYPE_APP,diag_AppLogMsgProc);
 }
-
-
-
-

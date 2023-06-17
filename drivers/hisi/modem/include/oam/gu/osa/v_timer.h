@@ -46,38 +46,6 @@
  *
  */
 
-/*****************************************************************************/
-/*                                                                           */
-/*                Copyright 1999 - 2003, Huawei Tech. Co., Ltd.              */
-/*                           ALL RIGHTS RESERVED                             */
-/*                                                                           */
-/* FileName: v_timer.h                                                       */
-/*                                                                           */
-/* Author: Yang Xiangqian                                                    */
-/*                                                                           */
-/* Version: 1.0                                                              */
-/*                                                                           */
-/* Date: 2006-10                                                             */
-/*                                                                           */
-/* Description: implement timer                                              */
-/*                                                                           */
-/* Others:                                                                   */
-/*                                                                           */
-/* History:                                                                  */
-/* 1. Date:                                                                  */
-/*    Author:                                                                */
-/*    Modification: Create this file                                         */
-/*                                                                           */
-/* 2. Date: 2006-10                                                          */
-/*    Author: Xu Cheng                                                       */
-/*    Modification: Standardize code                                         */
-/*                                                                           */
-/* 3. Date: 2007-03-10                                                       */
-/*    Author: Xu Cheng                                                       */
-/*    Modification: A32D07254                                                */
-/*                                                                           */
-/*****************************************************************************/
-
 #ifndef _VOS_TIMER_H
 #define _VOS_TIMER_H
 
@@ -107,7 +75,6 @@ extern "C" {
 #define VOS_26M_TIMER_ENABLE_SOC_TIMER  VOS_NO
 #endif
 
-/* errno definiens */
 #define VOS_ERRNO_RELTM_START_MSGNOTINSTALL                 0x20060004
 #define VOS_ERRNO_RELTM_START_INPUTMODEINVALID              0x20060005
 #define VOS_ERRNO_SYSTIME_VALIDTIME_INPUTISNULL             0x20060006
@@ -117,7 +84,6 @@ extern "C" {
 #define VOS_ERRNO_RELTM_STOP_TIMERNOTSTART                  0x2006000C
 #define VOS_ERRNO_RELTM_STOP_STATUSERROR                    0x2006000D
 #define VOS_ERRNO_RELTM_FREE_RECEPTION                      0x2006000E
-
 
 #define VOS_ERRNO_RELTM_RESTART_INPUTISNULL                 0x20060010
 #define VOS_ERRNO_RELTM_RESTART_TIMERINVALID                0x20060011
@@ -166,52 +132,47 @@ extern "C" {
 
 typedef struct
 {
-    VOS_UINT32      ulStartCount;                   /* 调底软接口起定时器次数 */
-    VOS_UINT32      ulStartSlice;                   /* 调底软接口起定时器时间 */
-    VOS_UINT32      ulStopCount;                    /* 调底软接口停定时器次数 */
-    VOS_UINT32      ulExpireCount;                  /* 收到定时器中断次数 */
-    VOS_UINT32      ulStartErrCount;                /* 调底软起定时器接口返回错误次数 */
-    VOS_UINT32      ulStopErrCount;                 /* 调底软停定时器接口返回错误次数 */
-    VOS_UINT32      ulElapsedErrCount;              /* 调底软获取剩余时间接口次数 */
-    VOS_UINT32      ulElapsedContentErrCount;       /* 调底软获取剩余时间接口返回错误次数 */
-    VOS_UINT32      ulElapsedContentErrSlice;       /* 调底软获取剩余时间接口返回错误时间 */
-    VOS_UINT32      ulExpiredShortErrCount;         /* SOC Timer超时时间小于配置时间次数 */
-    VOS_UINT32      ulExpiredShortErrSlice;         /* SOC Timer超时时间小于配置时间时间 */
-    VOS_UINT32      ulExpiredSendErrCount;          /* SOC Timer发送消息失败次数 */
-    VOS_UINT32      ulExpiredSendErrSlice;          /* SOC Timer发送消息失败时间 */
+    VOS_UINT32      ulStartCount;
+    VOS_UINT32      ulStartSlice;
+    VOS_UINT32      ulStopCount;
+    VOS_UINT32      ulExpireCount;
+    VOS_UINT32      ulStartErrCount;
+    VOS_UINT32      ulStopErrCount;
+    VOS_UINT32      ulElapsedErrCount;
+    VOS_UINT32      ulElapsedContentErrCount;
+    VOS_UINT32      ulElapsedContentErrSlice;
+    VOS_UINT32      ulExpiredShortErrCount;
+    VOS_UINT32      ulExpiredShortErrSlice;
+    VOS_UINT32      ulExpiredSendErrCount;
+    VOS_UINT32      ulExpiredSendErrSlice;
 }VOS_TIMER_SOC_TIMER_INFO_STRU;
 
 typedef struct
 {
-    VOS_UINT32      ulAction;/* the value of start;exp;0XFFFFFFFF->stop 0xFFFFFFFE->expire */
+    VOS_UINT32      ulAction;
     VOS_UINT32      ulSlice;
 }RTC_SOC_TIMER_DEBUG_INFO_STRU;
 
-/* the Max length of timer unit is ms -> 18 hours*/
 #define VOS_TIMER_MAX_LENGTH                                64800000
 
-/*当前版本单时钟方案暂不需要考虑32.000K时钟状态，默认使用原有32.768K时钟流程*/
-/*#define V8R1_SINGLECLOCK*/
-
-/* 32.768K */
 #define RTC_CYCLE_LENGTH                                    32.768
 
 #ifdef V8R1_SINGLECLOCK
-/* 32.000K */
+
 #define RTC_SINGLECLOCK_CYCLE_LENGTH                        32.000
 extern VOS_UINT16                                           g_usSingleXO;
 #endif
 
 struct TimerDrvStruct
 {
-    struct TimerDrvStruct *pNext;   /* double link                    */
-    struct TimerDrvStruct *pPrev;   /* double link                    */
-    VOS_UINT32    ulTimeLen;        /* expire time in ms              */
-    VOS_UINT32    ulTicks;          /* time passed,used in hash link  */
-    VOS_UINT8     ucMode;           /* timer mode                     */
-    VOS_UINT8     ucStatus;         /* status of timer                */
-    VOS_UINT8     ucType;           /* indicate DOPRA or vrpS timer   */
-    VOS_UINT8     ucLink;           /* which link the timer belong    */
+    struct TimerDrvStruct *pNext;
+    struct TimerDrvStruct *pPrev;
+    VOS_UINT32    ulTimeLen;
+    VOS_UINT32    ulTicks;
+    VOS_UINT8     ucMode;
+    VOS_UINT8     ucStatus;
+    VOS_UINT8     ucType;
+    VOS_UINT8     ucLink;
     VOS_UINT8     aucRsv[4];
 };
 
@@ -229,48 +190,43 @@ typedef struct RelTimerGrpCBType * HTIMERGRP;
 struct RelTimerType
 {
     struct TimerDrvStruct drv;
-    VOS_PID        Pid;               /* which module group belongs to */
-    VOS_UINT32     ulTmName;          /* timer name */
-    VOS_UINT32     ulParam;           /* parameter for timeout handling */
+    VOS_PID        Pid;
+    VOS_UINT32     ulTmName;
+    VOS_UINT32     ulParam;
     VOS_UINT8      aucRsv[4];
     HTIMER         *phTimer;
     union
     {
-        HTIMERGRP      hTimerGrp;     /* which timer group it belongs to */
-        REL_TIMER_FUNC TimeOutFunc;   /* timeout callback function */
+        HTIMERGRP      hTimerGrp;
+        REL_TIMER_FUNC TimeOutFunc;
     }grp_func;
-    struct REL_TIMER_MSG_STRU *pSend; /* msgs sent by this timer which in the msg queue */
+    struct REL_TIMER_MSG_STRU *pSend;
 };
 
 typedef struct RelTimerType TTIMER;
 
-
-/* timer group */
 typedef struct RelTimerGrpCBType
 {
-    VOS_UINT32      MaxTimers;   /* timer maximum number in group  */
-    VOS_UINT32      InitFlag;    /* Initialize flag */
-    VOS_PID         Pid;         /* which module group belongs to */
+    VOS_UINT32      MaxTimers;
+    VOS_UINT32      InitFlag;
+    VOS_PID         Pid;
     VOS_UINT8       aucRsv[4];
-    REL_TIMER_FUNC  TimeOutFunc; /* timeout callback function */
-    HTIMER          pTimer[1];   /* timer queue, it must be last field of this structure  */
+    REL_TIMER_FUNC  TimeOutFunc;
+    HTIMER          pTimer[1];
 } ReltimerGrpCB;
-
-/******************************************************************************/
 
 typedef struct REL_TIMER_MSG_STRU
 {
-    VOS_MSG_HEADER            /* Structure of message packet header, where ulSenderPid equals to VOS_PID_TIMER. */
-    VOS_UINT8  ucType;        /* Type of timing message packet, being VOS_RELATIVE_TIMER. */
-    VOS_UINT8  ucValid;       /* Whether the msg is valid, if invalid,*/
-                              /* The value is VOS_TM_INVALID_MSG */
-    VOS_UINT8  Reserved[2];   /* Reserved for align */
-    VOS_UINT32 ulName;        /* Timer name, input when the timer is started. */
-    VOS_UINT32 ulPara;        /* Timer parameter, input when the timer is started. */
-                              /* When a timer belongs to a timer group, this parameter indicates its serial number in this timer group.  */
-    HTIMER     hTm;           /* Which timer sends this message */
+    VOS_MSG_HEADER
+    VOS_UINT8  ucType;
+    VOS_UINT8  ucValid;
 
-    /* Double link, linking messages sent by the same timer */
+    VOS_UINT8  Reserved[2];
+    VOS_UINT32 ulName;
+    VOS_UINT32 ulPara;
+ 
+    HTIMER     hTm;
+
     struct REL_TIMER_MSG_STRU *pNext;
     struct REL_TIMER_MSG_STRU *pPrev;
 
@@ -284,15 +240,13 @@ enum
     VOS_TIMER_OM_BUTT
 };
 
-/******************************************************************************/
-
 #define VOS_MSG_TM_SECOND             0xFF
 #define VOS_MSG_TM_MINUTE             0xFE
 #define VOS_MSG_TM_CHECK_START        0xFD
 #define VOS_MSG_TM_CHECK_STOP         0xFC
 #define VOS_TM_INVALID_MSG            0xBD
-#define VOS_TM_CHECK_START            2          /* Start checking system at 2:00... */
-#define VOS_TM_CHECK_STOP             3          /* ...and stop it at 3:00           */
+#define VOS_TM_CHECK_START            2
+#define VOS_TM_CHECK_STOP             3
 
 #define VOS_TM_TYPE_DOPRA             0
 #define VOS_TM_TYPE_VRPS              1
@@ -340,18 +294,14 @@ typedef struct
     VOS_TIMER_PRECISION_ENUM_UINT32 enPrecision;
 }VOS_TIMER_OM_EVENT_STRU;
 
-/* the Max timer number supported by VOS */
-/* VOS_TIMER_MESSAGE_NUM must be equal VOS_MAX_TIMER_NUMBER */
 #define VOS_MAX_TIMER_NUMBER                          250
 
 #define VOS_UPPER_TIMER_NUMBER                        (VOS_MAX_TIMER_NUMBER/10)
 
-/* the Max RTC timer number supported by VOS */
 #define RTC_MAX_TIMER_NUMBER                          200
 
 #define RTC_UPPER_TIMER_NUMBER                        (RTC_MAX_TIMER_NUMBER/10)
 
-/* Added by g47350 for DRX timer Project, 2012/11/5, begin */
 #define DRX_TIMER_NOT_USED_FLAG                       (1)
 #define DRX_TIMER_USED_FLAG                           (2)
 
@@ -361,7 +311,6 @@ typedef struct
 #define DRX_TIMER_MAX_NUMBER                          (7)
 #endif
 #define DRX_TIMER_TIMEOUT_INTERVAL                    (10*32768)
-/* Added by g47350 for DRX timer Project, 2012/11/5, end */
 
 VOS_UINT32 VOS_TimerCtrlBlkInit(VOS_VOID);
 
@@ -399,7 +348,6 @@ VOS_UINT32 V_StopRelTimer( HTIMER *phTm, VOS_UINT32 ulFileID, VOS_INT32 usLineNo
     V_StopRelTimer( (phTm), VOS_FILE_ID, __LINE__ )
 #endif
 
-
 #if (VOS_WIN32 == VOS_OS_VER)
 
 #define VOS_StartDrxTimer( phTm, Pid, ulLength, ulName, ulParam)\
@@ -410,7 +358,6 @@ VOS_UINT32 V_StopRelTimer( HTIMER *phTm, VOS_UINT32 ulFileID, VOS_INT32 usLineNo
 
 #else
 
-/* Attention: DRX Timer is available just in CCPU. */
 VOS_UINT32 V_StartDrxTimer( HTIMER *phTm, VOS_PID Pid, VOS_UINT32 ulLength,
     VOS_UINT32 ulName, VOS_UINT32 ulParam, VOS_UINT32 ulFileID, VOS_INT32 usLineNo);
 
@@ -467,9 +414,6 @@ VOS_BOOL VOS_Is26MTimer( HTIMER *phTm );
 
 VOS_UINT32 VOS_Is26MTimerRunning( VOS_VOID );
 
-/* RTC timer begin */
-
-/* errno definiens */
 #define VOS_RTC_ERRNO_RELTM_START_MSGNOTINSTALL                 0x2fff0004
 #define VOS_RTC_ERRNO_RELTM_START_INPUTMODEINVALID              0x2fff0005
 #define VOS_RTC_ERRNO_SYSTIME_VALIDTIME_INPUTISNULL             0x2fff0006
@@ -539,16 +483,8 @@ VOS_BOOL RTC_CalcTimerInfo(VOS_VOID);
 VOS_VOID VOS_MagnifyTimerLength(VOS_UINT32 ulRatio );
 #endif
 
-
-/* RTC timer end */
-
-/* Added by g47350 for DRX timer Project, 2012/11/5, begin */
-
 VOS_UINT32 VOS_DrxTimerCtrlBlkInit(VOS_VOID);
 VOS_UINT32 VOS_DrxTimerTaskCreat(VOS_VOID);
-
-/* Added by g47350 for DRX timer Project, 2012/11/5, end */
-
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -557,4 +493,3 @@ VOS_UINT32 VOS_DrxTimerTaskCreat(VOS_VOID);
 #endif /* __cpluscplus */
 
 #endif /* _VOS_TIMER_H */
-

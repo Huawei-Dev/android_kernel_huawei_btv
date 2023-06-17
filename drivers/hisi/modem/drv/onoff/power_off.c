@@ -117,8 +117,8 @@ void bsp_reboot_callback_register(void (*hook)(void))
 *         None
 *  Return:
 *         None
-*  Note  : 底层调用关机接口，启用定时器，上报事件给应用。
-*          超时时间内应用不关机，由底层强制关机。
+*  Note  : ??????????????????????????????????????????????
+*          ??????????????????????????????????????
 ********************************************************************************/
 void drv_shut_down( DRV_SHUTDOWN_REASON_E enReason )
 {
@@ -140,7 +140,7 @@ void drv_shut_down( DRV_SHUTDOWN_REASON_E enReason )
 *         None
 *  Return:
 *         None
-*  Note  : 应用调用关机时调用，at+cfun=8
+*  Note  : ????????????????????at+cfun=8
 ********************************************************************************/
 void bsp_drv_power_off( void )
 {
@@ -156,7 +156,7 @@ void bsp_drv_power_off( void )
 *         None
 *  Return:
 *         None
-*  Note  : 应用调用重启时调用，at+cfun=6
+*  Note  : ????????????????????at+cfun=6
 ********************************************************************************/
 void bsp_drv_power_reboot( void )
 {
@@ -181,7 +181,7 @@ void mdrv_sysboot_restart(void)
 *         None
 *  Return:
 *         None
-*  Note  : 直接重启
+*  Note  : ????????
 ********************************************************************************/
 void bsp_drv_power_reboot_direct( void )
 {
@@ -192,7 +192,7 @@ void bsp_drv_power_reboot_direct( void )
 
 /******************************************************************************
 *  Function:  balong_power_restart
-*  Description: same as bsp_drv_power_reboot, 系统调用时使用
+*  Description: same as bsp_drv_power_reboot, ??????????????
 *  Input:
 *         None
 *  Output:
@@ -212,7 +212,7 @@ EXPORT_SYMBOL_GPL(balong_power_restart);
 
 /******************************************************************************
 *  Function:  balong_power_off
-*  Description: same as bsp_drv_power_off, 系统调用时使用
+*  Description: same as bsp_drv_power_off, ??????????????
 *  Input:
 *         None
 *  Output:

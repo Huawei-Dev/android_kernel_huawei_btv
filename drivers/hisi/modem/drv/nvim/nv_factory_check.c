@@ -46,8 +46,6 @@
  *
  */
 
-
-/*lint -save -e322 -e7 -e537*/
 #include <linux/vmalloc.h>
 #include <product_nv_id.h>
 #include <product_nv_def.h>
@@ -57,18 +55,7 @@
 #include "nv_crc.h"
 #include "nv_comm.h"
 #include "nv_factory_check.h"
-/*lint -restore +e322 +e7 +e537*/
 
-/*****************************************************************************
- 函 数 名  : nv_make_single_band_nv_crc
- 功能描述  : 计算单个band的校准nv的CRC校验码
- 输入参数  : singal_band_nvid_s* check_item_temp : 待计算的band的nvid列表的起始地址
-             u32 modem_num : 待计算的band所属的modem num
-             u32 valild_nvid_count : 该band中可用nvid的最大数量
-             u32 *last_crc_value : 上一次生成的CRC校验码
- 输出参数  : u32 *gen_crc_value : 生成的CRC校验码
- 返 回 值  : NV_OK 计算CRC校验码成功 其他:计算错误
-*****************************************************************************/
 u32 nv_make_single_band_nv_crc(singal_band_nvid_t* check_item_temp, u32 modem_num, u32 valild_nvid_count, u32 *last_crc_value, u32 *gen_crc_value)
 {
     u8 * temp_nv_data = NULL;
@@ -79,7 +66,6 @@ u32 nv_make_single_band_nv_crc(singal_band_nvid_t* check_item_temp, u32 modem_nu
     u32 nvid_index = 0;
     u32 crc_value = 0;
 
-    /*配置的可用nvid的数量不能大于可用nvid数量的最大值*/
     if(check_item_temp->uhwValidCount > valild_nvid_count)
     {
         nv_printf("nv list size is larger than stuct, uhwValidCount: 0x%x , struct support is:0x%x\n", check_item_temp->uhwValidCount, valild_nvid_count);
@@ -106,7 +92,6 @@ u32 nv_make_single_band_nv_crc(singal_band_nvid_t* check_item_temp, u32 modem_nu
     temp_nv_data = pdata + data_len;
     for(nvid_index = 0; nvid_index < check_item_temp->uhwValidCount; nvid_index++)
     {
-        /*读取待校验nv*/
         ret = bsp_nvm_get_len(check_item_temp->auhwNeedCheckID[nvid_index], &nv_len);
         if(ret)
         {
@@ -126,7 +111,6 @@ u32 nv_make_single_band_nv_crc(singal_band_nvid_t* check_item_temp, u32 modem_nu
 
         nv_debug_printf("to cal crc data len 0x%x\n", data_len);
         nv_debug_printf("to cal crc data content:0x%x 0x%x 0x%x 0x%x 0x%x\n", *(u32 *)pdata, *(u32 *)(pdata + 4), *(u32 *)(pdata + 8), *(u32 *)(pdata + 0xC), *(u32 *)(pdata + 0x10));
-        /*计算CRC校验码*/
         crc_value = nv_cal_crc32(pdata, data_len);
         nv_debug_printf("after cal nvid: 0x%x crc value 0x%x\n", check_item_temp->auhwNeedCheckID[nvid_index] ,crc_value);
 
@@ -140,7 +124,6 @@ u32 nv_make_single_band_nv_crc(singal_band_nvid_t* check_item_temp, u32 modem_nu
     return NV_OK;
 }
 
-
 u32 nv_check_mode_crc(factory_crc_check_info_t check_info)
 {
     u32 index = 0;
@@ -152,7 +135,6 @@ u32 nv_check_mode_crc(factory_crc_check_info_t check_info)
     u32 gen_crc_value = 0;
     u32 first_cal = 0;
 
-    /*获取存放nv列表的nv的长度*/
     ret = bsp_nvm_get_len(check_info.list_nvid, &nv_len);
     if(ret)
     {
@@ -181,7 +163,6 @@ u32 nv_check_mode_crc(factory_crc_check_info_t check_info)
 
         nv_debug_printf("next single band nv addr = %p\n", check_item_temp);
 
-        /*如未使能该band的检查 或者配置可用数量为0，则不做检查*/
         if((SINGAL_NV_ENABLE != check_item_temp->uhwEnable)||(0 == check_item_temp->uhwValidCount))
         {
             nv_printf("index:0x%x single nv is not invalid, enable:0x%x validcount:0x%x\n", index, check_item_temp->uhwEnable, check_item_temp->uhwValidCount);
@@ -222,15 +203,7 @@ u32 nv_check_mode_crc(factory_crc_check_info_t check_info)
         return BSP_ERR_NV_CRC_CODE_ERR;
     }
 }
-/*****************************************************************************
- 函 数 名  : nv_check_factory_nv_status
- 功能描述  : 校验校准NV的CRC校验码
- 输入参数  : u32 mode取值0: GU主卡 1:TL主卡 2:GU副卡
- 输出参数  : 无
- 返 回 值  : 0:校验通过
-             0xxxxx027:CRC校验出错
-             其他错误码执行过程中出错
-*****************************************************************************/
+
 u32 nv_check_factory_nv_status(u32 mode)
 {
     NV_CRC_CHECK_RESULT_STRU crc_result_stru = {};
@@ -280,5 +253,3 @@ u32 nv_check_factory_nv_status(u32 mode)
 }
 
 EXPORT_SYMBOL(nv_check_factory_nv_status);
-
-

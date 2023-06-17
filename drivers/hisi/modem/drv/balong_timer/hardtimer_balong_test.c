@@ -46,7 +46,6 @@
  *
  */
 
-/*lint --e{438,537}*/
 #include <bsp_hardtimer.h>
 #include <osl_sem.h>
 #include <bsp_om.h>
@@ -79,7 +78,7 @@ int func(int para);
 #endif
 
 struct bsp_hardtimer_control my_timer;
-osl_sem_id sem;/*lint !e129*//*lint !e19*/
+osl_sem_id sem;
 u32 cnt = 0;
 u32 slice_delta[6];
 
@@ -92,17 +91,16 @@ void print_count(void)
 
 int func(int para)
 {
-	osl_sem_up(&sem);/*lint !e129*//*lint !e40*/
+	osl_sem_up(&sem);
 	slice_delta[1]=bsp_get_slice_value();
 	(void)mdrv_timer_stop(TIMER_ACPU_OSA_ID);
 	return 0;
 }
-/*测试超时时间为1秒，TIMER_UNIT_NONE,能否准确超时*/
 
 s32 hardtimer_test_case01(void)
 {
 	s32 ret = 0;
-	osl_sem_init(SEM_EMPTY,&sem);/*lint !e40*/
+	osl_sem_init(SEM_EMPTY,&sem);
 	ret = mdrv_timer_start(TIMER_ACPU_OSA_ID,func,0,32768,0,TIMER_UNIT_NONE);
 	if(ret!=0)
 	{
@@ -110,8 +108,7 @@ s32 hardtimer_test_case01(void)
 		return ERROR;
 	}
 	slice_delta[0]=bsp_get_slice_value();
-	osl_sem_down(&sem);/*lint !e40*/
-	/*1s定时误差控制在18个slice，大于则认为有错*/
+	osl_sem_down(&sem);
 	if((slice_delta[1]-slice_delta[0]>32786)||(slice_delta[1]-slice_delta[0]<32763))
   	{
   		(void)mdrv_timer_stop(TIMER_ACPU_OSA_ID);
@@ -124,14 +121,14 @@ s32 hardtimer_test_case01(void)
 		bsp_trace(BSP_LOG_LEVEL_ERROR,BSP_MODU_HARDTIMER,"mdrv_timer_stop fail\n");
 		return ERROR;
 	}
-	osl_sema_delete(&sem);/*lint !e40*/
+	osl_sema_delete(&sem);
 	return OK;
 }
-/*测试超时时间为100毫秒，TIMER_UNIT_US,能否准确超时*/
+
 s32 hardtimer_test_case02(void)
 {
 	s32 ret = 0;
-	osl_sem_init(SEM_EMPTY,&sem);/*lint !e40*/
+	osl_sem_init(SEM_EMPTY,&sem);
 	ret = mdrv_timer_start(TIMER_ACPU_OSA_ID,func,0,100000,0,TIMER_UNIT_US);
 	if(ret!=0)
 	{
@@ -139,8 +136,7 @@ s32 hardtimer_test_case02(void)
 		return ERROR;
 	}
 	slice_delta[0]=bsp_get_slice_value();
-	osl_sem_down(&sem);/*lint !e40*/
-	/*linux 响应中断慢,定时误差控制在18个slice，大于则认为有错*/
+	osl_sem_down(&sem);
 	if((slice_delta[1]-slice_delta[0]>3294)||(slice_delta[1]-slice_delta[0]<3271))
   	{
   		(void)mdrv_timer_stop(TIMER_ACPU_OSA_ID);
@@ -153,15 +149,14 @@ s32 hardtimer_test_case02(void)
 		bsp_trace(BSP_LOG_LEVEL_ERROR,BSP_MODU_HARDTIMER,"mdrv_timer_start fail\n");
 		return ERROR;
 	}
-	osl_sema_delete(&sem);/*lint !e40*/
+	osl_sema_delete(&sem);
 	return OK;
 }
 
-/*测试超时时间为1S，TIMER_UNIT_MS,能否准确超时*/
 s32 hardtimer_test_case03(void)
 {
 	s32 ret = 0;
-	osl_sem_init(SEM_EMPTY,&sem);/*lint !e40*/
+	osl_sem_init(SEM_EMPTY,&sem);
 	ret = mdrv_timer_start(TIMER_ACPU_OSA_ID,func,0,1000,0,TIMER_UNIT_MS);
 	if(ret!=0)
 	{
@@ -169,8 +164,7 @@ s32 hardtimer_test_case03(void)
 		return ERROR;
 	}
 	slice_delta[0]=bsp_get_slice_value();
-	osl_sem_down(&sem);/*lint !e40*/
-	/*linux 响应中断慢,定时误差控制在18个slice，大于则认为有错*/
+	osl_sem_down(&sem);
 	if((slice_delta[1]-slice_delta[0]>32786)||(slice_delta[1]-slice_delta[0]<32763))
   	{
   		(void)mdrv_timer_stop(TIMER_ACPU_OSA_ID);
@@ -183,15 +177,14 @@ s32 hardtimer_test_case03(void)
 		bsp_trace(BSP_LOG_LEVEL_ERROR,BSP_MODU_HARDTIMER,"mdrv_timer_start fail\n");
 		return ERROR;
 	}
-	osl_sema_delete(&sem);/*lint !e40*/
+	osl_sema_delete(&sem);
 	return OK;
 }
-/*测试超时时间为0秒，TIMER_UNIT_NONE,能否准确超时*/
 
 s32 hardtimer_test_case04(void)
 {
 	s32 ret = 0;
-	osl_sem_init(SEM_EMPTY,&sem);/*lint !e40*/
+	osl_sem_init(SEM_EMPTY,&sem);
 	ret = mdrv_timer_start(TIMER_ACPU_OSA_ID,func,0,0,0,TIMER_UNIT_NONE);
 	if(ret!=0)
 	{
@@ -199,8 +192,7 @@ s32 hardtimer_test_case04(void)
 		return ERROR;
 	}
 	slice_delta[0]=bsp_get_slice_value();
-	osl_sem_down(&sem);/*lint !e40*/
-	/*1s定时误差控制在21个slice，大于则认为有错*/
+	osl_sem_down(&sem);
 	if(slice_delta[1]-slice_delta[0]>21)
   	{
   		(void)mdrv_timer_stop(TIMER_ACPU_OSA_ID);
@@ -213,14 +205,14 @@ s32 hardtimer_test_case04(void)
 		bsp_trace(BSP_LOG_LEVEL_ERROR,BSP_MODU_HARDTIMER,"mdrv_timer_start fail\n");
 		return ERROR;
 	}
-	osl_sema_delete(&sem);/*lint !e40*/
+	osl_sema_delete(&sem);
 	return OK;
 }
-/*测试超时时间为0秒，TIMER_UNIT_US,能否准确超时*/
+
 s32 hardtimer_test_case05(void)
 {
 	s32 ret = 0;
-	osl_sem_init(SEM_EMPTY,&sem);/*lint !e40*/
+	osl_sem_init(SEM_EMPTY,&sem);
 	ret = mdrv_timer_start(TIMER_ACPU_OSA_ID,func,0,0,0,TIMER_UNIT_US);
 	if(ret!=0)
 	{
@@ -228,8 +220,7 @@ s32 hardtimer_test_case05(void)
 		return ERROR;
 	}
 	slice_delta[0]=bsp_get_slice_value();
-	osl_sem_down(&sem);/*lint !e40*/
-	/*1s定时误差控制在21个slice，大于则认为有错*/
+	osl_sem_down(&sem);
 	if(slice_delta[1]-slice_delta[0]>21)
   	{
   		(void)mdrv_timer_stop(TIMER_ACPU_OSA_ID);
@@ -242,15 +233,14 @@ s32 hardtimer_test_case05(void)
 		bsp_trace(BSP_LOG_LEVEL_ERROR,BSP_MODU_HARDTIMER,"mdrv_timer_start fail\n");
 		return ERROR;
 	}
-	osl_sema_delete(&sem);/*lint !e40*/
+	osl_sema_delete(&sem);
 	return OK;
 }
 
-/*测试超时时间为0S，TIMER_UNIT_MS,能否准确超时*/
 s32 hardtimer_test_case06(void)
 {
 	s32 ret = 0;
-	osl_sem_init(SEM_EMPTY,&sem);/*lint !e40*/
+	osl_sem_init(SEM_EMPTY,&sem);
 	ret = mdrv_timer_start(TIMER_ACPU_OSA_ID,func,0,0,0,TIMER_UNIT_MS);
 	if(ret!=0)
 	{
@@ -258,8 +248,7 @@ s32 hardtimer_test_case06(void)
 		return ERROR;
 	}
 	slice_delta[0]=bsp_get_slice_value();
-	osl_sem_down(&sem);/*lint !e40*/
-	/*定时误差控制在21个slice，大于则认为有错*/
+	osl_sem_down(&sem);
 	if(slice_delta[1]-slice_delta[0]>21)
   	{
   		(void)mdrv_timer_stop(TIMER_ACPU_OSA_ID);
@@ -272,7 +261,7 @@ s32 hardtimer_test_case06(void)
 		bsp_trace(BSP_LOG_LEVEL_ERROR,BSP_MODU_HARDTIMER,"mdrv_timer_start fail\n");
 		return ERROR;
 	}
-	osl_sema_delete(&sem);/*lint !e40*/
+	osl_sema_delete(&sem);
 	return OK;
 }
 
@@ -280,7 +269,7 @@ s32 hardtimer_test_case06(void)
 s32 hardtimer_test_case07(void)
 {
 	s32 ret = 0;
-	osl_sem_init(SEM_EMPTY,&sem);/*lint !e40*/
+	osl_sem_init(SEM_EMPTY,&sem);
 	ret = mdrv_timer_start(TIMER_ACPU_OM_TCXO_ID,func,0,1000,0,TIMER_UNIT_MS);
 	if(ret!=0)
 	{
@@ -288,8 +277,7 @@ s32 hardtimer_test_case07(void)
 		return ERROR;
 	}
 	slice_delta[0]=bsp_get_slice_value();
-	osl_sem_down(&sem);/*lint !e40*/
-	/*linux 响应中断慢,定时误差控制在16个slice，大于则认为有错*/
+	osl_sem_down(&sem);
 	if((slice_delta[1]-slice_delta[0]>32785)||(slice_delta[1]-slice_delta[0]<32764))
   	{
   		(void)mdrv_timer_stop(TIMER_ACPU_OM_TCXO_ID);
@@ -302,7 +290,7 @@ s32 hardtimer_test_case07(void)
 		bsp_trace(BSP_LOG_LEVEL_ERROR,BSP_MODU_HARDTIMER,"mdrv_timer_start fail\n");
 		return ERROR;
 	}
-	osl_sema_delete(&sem);/*lint !e40*/
+	osl_sema_delete(&sem);
 	return OK;
 }
 
@@ -346,4 +334,3 @@ void hardtimer_test(void)
 		bsp_trace(BSP_LOG_LEVEL_ERROR,BSP_MODU_HARDTIMER,"hardtimer_test_case07 fail\n");
 	return ;
 }
-

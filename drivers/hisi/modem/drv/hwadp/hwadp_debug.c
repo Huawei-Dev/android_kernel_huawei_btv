@@ -124,13 +124,6 @@ int bsp_show_irq_num(void)
 }
 EXPORT_SYMBOL(bsp_show_irq_num);
 
-/*****************************************************************************
- 函 数 名  : BSP_DDR_ShowSectInfo
- 功能描述  : 打印DDR内存段信息
- 输入参数  : 无
- 输出参数  : 无
- 返回值    ：无
-*****************************************************************************/
 int BSP_DDR_ShowSectInfo(void)
 {
     BSP_DDR_SECT_TYPE_E     enSectTypeIndex = (BSP_DDR_SECT_TYPE_E)0;
@@ -149,13 +142,6 @@ int BSP_DDR_ShowSectInfo(void)
 }
 EXPORT_SYMBOL(BSP_DDR_ShowSectInfo);
 
-/*****************************************************************************
- 函 数 名  : show_global_ddr_status
- 功能描述  : DDR内存段信息打印
- 输入参数  : 无
- 输出参数  : 无
- 返回值    ：无
-*****************************************************************************/
 int show_global_ddr_status(void)
 {
     hwadp_printf("%-30s%10s%10s\t\n", "name", "phy addr", "size");
@@ -166,7 +152,6 @@ int show_global_ddr_status(void)
     hwadp_printf("%-30s%10x%10x\n", "DDR_MCORE_DTS_ADDR", DDR_MCORE_DTS_ADDR, DDR_MCORE_DTS_SIZE);
     hwadp_printf("%-30s%10p%10x\n", "DDR_SHARED_MEM_ADDR", g_mem_ctrl.sddr_phy_addr, g_mem_ctrl.sddr_mem_size);
     hwadp_printf("%-30s%10x%10x\n", "DDR_MNTN_ADDR", DDR_MNTN_ADDR, DDR_MNTN_SIZE);
-    //hwadp_printf("%-30s%10p%10x\n", "DDR_GU_ADDR", g_gu_ctrl.addr_phy, g_gu_ctrl.mem_size);
     hwadp_printf("%-30s%10x%10x\n", "DDR_TLPHY_IMAGE_ADDR", DDR_TLPHY_IMAGE_ADDR, DDR_TLPHY_IMAGE_SIZE);
     hwadp_printf("%-30s%10x%10x\n", "DDR_LPHY_SDR_ADDR", DDR_LPHY_SDR_ADDR, DDR_LPHY_SDR_SIZE);
     hwadp_printf("%-30s%10x%10x\n", "DDR_SOCP_ADDR", DDR_SOCP_ADDR, DDR_SOCP_SIZE);
@@ -178,20 +163,12 @@ int show_global_ddr_status(void)
 }
 EXPORT_SYMBOL(show_global_ddr_status);
 
-/*****************************************************************************
- 函 数 名  : show_sram_status
- 功能描述  : SRAM内存段信息打印
- 输入参数  : 无
- 输出参数  : 无
- 返回值    ：无
-*****************************************************************************/
 int show_sram_status(void)
 {
-    /*请依照先后顺序增加打印输出项*/
     int total_size = SRAM_SIZE_SMALL_SECTIONS + SRAM_SIZE_MCU_RESERVE + SRAM_SIZE_ICC + SRAM_SIZE_TLDSP_SHARED +
-                     SRAM_SIZE_GU_MAC_HEADER;/*lint !e569 */
+                     SRAM_SIZE_GU_MAC_HEADER;
     hwadp_printf("%-30s%10s%10s%10s\n", "name", "phy addr", "virt addr", "size");
-    hwadp_printf("%-30s%10p%10lx%10x\n", "SRAM_SMALL_SECTIONS_ADDR", SRAM_V2P((unsigned long)SRAM_BASE_ADDR + SRAM_OFFSET_SMALL_SECTIONS),(unsigned long)SRAM_BASE_ADDR + SRAM_OFFSET_SMALL_SECTIONS, SRAM_SIZE_SMALL_SECTIONS);/*lint !e778 */
+    hwadp_printf("%-30s%10p%10lx%10x\n", "SRAM_SMALL_SECTIONS_ADDR", SRAM_V2P((unsigned long)SRAM_BASE_ADDR + SRAM_OFFSET_SMALL_SECTIONS),(unsigned long)SRAM_BASE_ADDR + SRAM_OFFSET_SMALL_SECTIONS, SRAM_SIZE_SMALL_SECTIONS);
     hwadp_printf("%-30s%10p%10lx%10x\n", "SRAM_MCU_RESERVE_ADDR", SRAM_V2P((unsigned long)SRAM_BASE_ADDR + SRAM_OFFSET_MCU_RESERVE),(unsigned long)SRAM_BASE_ADDR + SRAM_OFFSET_MCU_RESERVE, SRAM_SIZE_MCU_RESERVE);
     hwadp_printf("%-30s%10p%10lx%10x\n", "SRAM_ADDR_ICC", SRAM_V2P((unsigned long)SRAM_BASE_ADDR + SRAM_OFFSET_ICC),(unsigned long)SRAM_BASE_ADDR + SRAM_OFFSET_ICC, SRAM_SIZE_ICC);
     hwadp_printf("%-30s%10p%10lx%10x\n", "SRAM_TLDSP_SHARED_ADDR", SRAM_V2P((unsigned long)SRAM_BASE_ADDR + SRAM_OFFSET_TLDSP_SHARED),(unsigned long)SRAM_BASE_ADDR + SRAM_OFFSET_TLDSP_SHARED, SRAM_SIZE_TLDSP_SHARED);
@@ -224,16 +201,8 @@ int show_sram_status(void)
 }
 EXPORT_SYMBOL(show_sram_status);
 
-/*****************************************************************************
- 函 数 名  : show_shared_ddr_status
- 功能描述  : 共享内存内存段信息打印
- 输入参数  : 无
- 输出参数  : 无
- 返回值    ：无
-*****************************************************************************/
 int show_shared_ddr_status(void)
 {
-    /*请依照先后顺序增加打印输出项*/
     int total_size = SHM_SIZE_HIFI_MBX + SHM_SIZE_HIFI + SHM_SIZE_TLPHY + SHM_SIZE_TEMPERATURE
                    + SHM_SIZE_DDM_LOAD + SHM_SIZE_MEM_APPA9_PM_BOOT + SHM_SIZE_MEM_MDMA9_PM_BOOT
                    + SHM_SIZE_TENCILICA_MULT_BAND + SHM_SIZE_ICC + SHM_SIZE_IPF + SHM_SIZE_PSAM + SHM_SIZE_WAN
@@ -271,7 +240,6 @@ int show_shared_ddr_status(void)
 	hwadp_printf("%-30s%10p%10lx%10x\n", "SHM_SIZE_M3RSRACC_BD", SHD_DDR_V2P((unsigned long)SHM_BASE_ADDR+SHM_OFFSET_M3RSRACC_BD), (unsigned long)SHM_BASE_ADDR+SHM_OFFSET_M3RSRACC_BD, SHM_SIZE_M3RSRACC_BD);
     hwadp_printf("%-30s%10p%10lx%10x\n", "SHM_SIZE_SIM_MEMORY", SHD_DDR_V2P((unsigned long)SHM_BASE_ADDR+SHM_OFFSET_SIM_MEMORY), (unsigned long)SHM_BASE_ADDR+SHM_OFFSET_SIM_MEMORY, SHM_SIZE_SIM_MEMORY);
     hwadp_printf("%-30s%10p%10lx%10x\n", "SHM_SIZE_MEMMGR", SHD_DDR_V2P((unsigned long)SHM_BASE_ADDR+SHM_OFFSET_MEMMGR), (unsigned long)SHM_BASE_ADDR+SHM_OFFSET_MEMMGR, SHM_SIZE_MEMMGR);
-    /*不满足KB对齐区，从SLICE_MEM中分配*/
     hwadp_printf("%-30s%10p%10lx%10x\n", "SHM_SIZE_MEMMGR_FLAG", SHD_DDR_V2P((unsigned long)SHM_BASE_ADDR+SHM_OFFSET_MEMMGR_FLAG), (unsigned long)SHM_BASE_ADDR+SHM_OFFSET_MEMMGR_FLAG, SHM_SIZE_MEMMGR_FLAG);
     hwadp_printf("%-30s%10p%10lx%10x\n", "SHM_SIZE_SYNC", SHD_DDR_V2P((unsigned long)SHM_BASE_ADDR+SHM_OFFSET_SYNC), (unsigned long)SHM_BASE_ADDR+SHM_OFFSET_SYNC, SHM_SIZE_SYNC);
     hwadp_printf("%-30s%10p%10lx%10x\n", "SHM_SIZE_AT_FLAG", SHD_DDR_V2P((unsigned long)SHM_BASE_ADDR+SHM_OFFSET_AT_FLAG), (unsigned long)SHM_BASE_ADDR+SHM_OFFSET_AT_FLAG, SHM_SIZE_AT_FLAG);

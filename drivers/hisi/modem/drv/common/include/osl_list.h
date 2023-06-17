@@ -149,7 +149,7 @@ extern void __list_add(struct list_head *new,
  */
 static OSL_INLINE void list_add(struct list_head *new, struct list_head *head)
 {
-	__list_add(new, head, head->next);/* [false alarm]:Îó±¨ */
+	__list_add(new, head, head->next);/* [false alarm]:???? */
 }
 
 
@@ -163,7 +163,7 @@ static OSL_INLINE void list_add(struct list_head *new, struct list_head *head)
  */
 static OSL_INLINE void list_add_tail(struct list_head *new, struct list_head *head)
 {
-	__list_add(new, head->prev, head);/* [false alarm]:Îó±¨ */
+	__list_add(new, head->prev, head);/* [false alarm]:???? */
 }
 
 /*

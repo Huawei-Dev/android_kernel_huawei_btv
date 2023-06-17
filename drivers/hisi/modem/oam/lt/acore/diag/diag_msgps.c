@@ -63,7 +63,7 @@ DIAG_TRANS_HEADER_STRU g_stPSTransHead = {{VOS_NULL, VOS_NULL}, 0};
 
 /*****************************************************************************
  Function Name   : diag_PsTransProcEntry
- Description     : 该函数用于处理从PS透传命令
+ Description     : ????????????????PS????????
  Input           : VOS_UINT8* pstReq
  Output          : None
  Return          : VOS_UINT32
@@ -80,7 +80,7 @@ VOS_UINT32 diagPsTransProcEntry(DIAG_FRAME_INFO_STRU* pstReq)
 
 /*****************************************************************************
  Function Name   : diag_PsMsgInit
- Description     : MSP ps部分初始化
+ Description     : MSP ps??????????
  Input           : None
  Output          : None
  Return          : None
@@ -91,24 +91,24 @@ VOS_VOID diag_PsMsgInit(VOS_VOID)
 {
     VOS_UINT32 ulRet;
 
-    /* 创建节点保护信号量 Diag Trans Ps */
+    /* ?????????????????? Diag Trans Ps */
     ulRet = VOS_SmBCreate("DTP", 1, VOS_SEMA4_FIFO,&g_stPSTransHead.TransSem);
     if(VOS_OK != ulRet)
     {
         diag_printf("diag_PsMsgInit VOS_SmBCreate failed.\n");
     }
 
-    /* 初始化请求链表 */
+    /* ?????????????? */
     blist_head_init(&g_stPSTransHead.TransHead);
 
-    /*注册message消息回调*/
+    /*????message????????*/
     DIAG_MsgProcReg(DIAG_MSG_TYPE_PS,diagPsTransProcEntry);
 }
 
 
 /*****************************************************************************
  Function Name   : DIAG_ShowTransList
- Description     : 调试接口，用于查看链表中是否有残留的节点
+ Description     : ????????????????????????????????????????
  Output          : None
  Return          : VOS_UINT32
 
@@ -122,10 +122,10 @@ VOS_VOID DIAG_ShowTransList(VOS_VOID)
 
     diag_printf("PS trans header 0x%p, 0x%p.\n", g_stPSTransHead.TransHead.next, g_stPSTransHead.TransHead.prev);
 
-    /*添加信号量保护*/
+    /*??????????????*/
     (VOS_VOID)VOS_SmP(g_stPSTransHead.TransSem,0);
 
-    /* 在链表中查找每个子命令结点*/
+    /* ??????????????????????????*/
     blist_for_each(me, &g_stPSTransHead.TransHead)
     {
         diag_printf("header 0x%p, 0x%p.\n", me->next, me->prev);

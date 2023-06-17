@@ -46,41 +46,9 @@
  *
  */
 
-/*****************************************************************************/
-/*                                                                           */
-/*                Copyright 1999 - 2003, Huawei Tech. Co., Ltd.              */
-/*                           ALL RIGHTS RESERVED                             */
-/*                                                                           */
-/* FileName: v_sprintf.c                                                     */
-/*                                                                           */
-/* Author:                                                                   */
-/*                                                                           */
-/* Version: 1.0                                                              */
-/*                                                                           */
-/* Date:                                                                     */
-/*                                                                           */
-/* Description: copy this file from Dopra                                    */
-/*                                                                           */
-/*                                                                           */
-/* Others:                                                                   */
-/*                                                                           */
-/* History:                                                                  */
-/* 1. Date:                                                                  */
-/*    Author:                                                                */
-/*    Modification:                                                          */
-/*                                                                           */
-/*****************************************************************************/
-
-
 #include "v_IO.h"
 
-/*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
-*****************************************************************************/
-/*lint -e767 modify:x51137; review:h59254; cause:print log */
 #define    THIS_FILE_ID        PS_FILE_ID_V_SPRINTF_C
-/*lint +e767 modify:x51137; review:h59254; */
-
 
 /*****************************************************************************
  Function   : _Second2DateTime
@@ -186,8 +154,8 @@ VOS_INT32 _C_formatter(const VOS_CHAR *format,
     VOS_CHAR               *ptr, *hex;
     VOS_CHAR                zeropad;
     VOS_CHAR                buf[FRMWRI_BUFSIZE];
-    VOS_UINT32              ulDate = 0;/* added by wuxiaoqian 2k/09/20 for "%t"*/
-    VOS_UINT32              ulTime = 0;/* added by wuxiaoqian 2k/09/20 for "%t"*/
+    VOS_UINT32              ulDate = 0;
+    VOS_UINT32              ulTime = 0;
 
     for (;;)    /* Until full format string read */
     {
@@ -196,7 +164,6 @@ VOS_INT32 _C_formatter(const VOS_CHAR *format,
             if (!format_flag)
             {
                 *(str+*((VOS_INT32 *)secret_pointer))='\0';
-                /*nr_of_chars计数有错,当\n时,实际是2个字符,nr_of_chars只记了一次*/
                 return *((VOS_INT32 *)secret_pointer);
             }
             put_one_char ((VOS_UINT8)format_flag, secret_pointer,str);
@@ -252,9 +219,7 @@ VOS_INT32 _C_formatter(const VOS_CHAR *format,
         /*===================================*/
         if (*format == '*')
         {
-            /*lint -e147 -e586*/
             field_width = va_arg(ap, VOS_INT32);
-            /*lint +e147 +e586*/
             if (field_width < 0)
             {
                 field_width = (VOS_CHAR)(-field_width);
@@ -278,9 +243,7 @@ VOS_INT32 _C_formatter(const VOS_CHAR *format,
         {
             if (*++format == '*')
             {
-                /*lint -e147 -e586*/
                 precision = va_arg(ap, VOS_INT32);
-                /*lint +e147 +e586*/
                 format++;
             }
             else
@@ -335,9 +298,7 @@ VOS_INT32 _C_formatter(const VOS_CHAR *format,
         switch (format_flag = *format++)
         {
         case 'c':
-            /*lint -e147 -e586*/
             buf[0] = (VOS_CHAR)va_arg(ap, VOS_INT32);
-            /*lint +e147 +e586*/
             ptr = buf_pointer = &buf[0];
             if (buf[0])
             {
@@ -346,11 +307,9 @@ VOS_INT32 _C_formatter(const VOS_CHAR *format,
             break;
 
         case 's':
-            /*lint -e147 -e586*/
             if ((buf_pointer = va_arg(ap,VOS_CHAR *)) == NULL_PTR)
             {
-                /*lint +e147 +e586*/
-                buf_pointer = "(null pointer)";
+                 buf_pointer = "(null pointer)";
             }
             if (precision < 0)
             {
@@ -369,32 +328,24 @@ VOS_INT32 _C_formatter(const VOS_CHAR *format,
         case 'X':
         case 'x':
             if (format_flag == 'p')
-            { /* huyong ??? ---- %p和标准的输出不同 */
+            {
                 if (length)
                 {
-                    /*lint -e147 -e586*/
                     u_address = (VOS_UINT_PTR)va_arg(ap,VOS_CHAR *);
-                    /*lint +e147 +e586*/
                 }
                 else
                 {
-                    /*lint -e147 -e586*/
                     u_address = (VOS_UINT_PTR)va_arg(ap,VOS_CHAR *);
-                    /*lint +e147 +e586*/
                 }
             }
             else if (length)
             {
-                /*lint -e147 -e586*/
                 u_address = va_arg(ap,VOS_UINT32);
-                /*lint +e147 +e586*/
             }
             else
             {
-                /*lint -e147 -e586*/
-                u_address = (VOS_UINT_PTR)va_arg(ap,VOS_INT32);
-                /*lint +e147 +e586*/
-            }
+                 u_address = (VOS_UINT_PTR)va_arg(ap,VOS_INT32);
+             }
 
             ptr = buf_pointer = &buf[FRMWRI_BUFSIZE - 1];
             hex = "0123456789ABCDEF";
@@ -437,15 +388,11 @@ VOS_INT32 _C_formatter(const VOS_CHAR *format,
         case 'u':
             if (length)
             {
-                /*lint -e147 -e586*/
                 num = va_arg(ap,VOS_INT32);
-                /*lint +e147 +e586*/
             }
             else
             {
-                /*lint -e147 -e586*/
                 n = va_arg(ap,VOS_INT32);
-                /*lint +e147 +e586*/
                 num = (VOS_INT32) n;
             }   /* if () */
             if ( format_flag != 'u' && num < 0  )
@@ -500,9 +447,7 @@ VOS_INT32 _C_formatter(const VOS_CHAR *format,
         * output Datetime, the input is a VOS_UINT32 (sec from 1970/1/1)*
         ******************************************************************/
         case 'T':
-            /*lint -e147 -e586*/
             num = va_arg(ap,VOS_INT32);
-            /*lint +e147 +e586*/
             _Second2DateTime((VOS_UINT32)num, &ulDate, &ulTime);
 
             ptr = buf_pointer = &buf[FRMWRI_BUFSIZE - 1];
@@ -563,9 +508,7 @@ VOS_INT32 _C_formatter(const VOS_CHAR *format,
             break;
 
         case 't':
-            /*lint -e147 -e586*/
             num = va_arg(ap,VOS_INT32);
-            /*lint +e147 +e586*/
             _Second2DateTime((VOS_UINT32)num, &ulDate, &ulTime);
 
             ptr = buf_pointer = &buf[FRMWRI_BUFSIZE - 1];
@@ -600,15 +543,11 @@ VOS_INT32 _C_formatter(const VOS_CHAR *format,
 
         case '\0':              /* Really bad place to find NUL in */
         format--;
-        /*lint -e616 */
         default:
-        /*lint +e616 */
         /*=======================*/
         /* Undefined conversion! */
         /*=======================*/
-        /*lint -e585 */
         ptr = buf_pointer = "???";
-        /*lint +e585 */
         ptr += 4;
         break;
         }   /* switch () */
@@ -681,16 +620,6 @@ VOS_INT32 _C_formatter(const VOS_CHAR *format,
  *****************************************************************************/
 VOS_VOID comio(VOS_UINT8 output, VOS_VOID *number,VOS_CHAR * strbuf)
 {
-    /* (*((VOS_INT32 *) number))++;*/
-
-    /* Modified by Zym 2000/8/4 */
-    /*if (output == '\n')
-    {
-        *(strbuf+*((VOS_INT32 *)number))=('\r');
-        (*((VOS_INT32*)number))++;
-        if( (*((VOS_INT32 *)number)) == (Str_Length-1))  *((VOS_INT32 *)number)-=1;
-    }*/
-
     *(strbuf+*((VOS_INT32 *)number))=(VOS_INT8)output;
     (*((VOS_INT32 *)number))++;
     if( (*((VOS_INT32 *)number)) == (Str_Length-1))  *((VOS_INT32 *)number)-=1;
@@ -705,11 +634,8 @@ VOS_VOID comio(VOS_UINT8 output, VOS_VOID *number,VOS_CHAR * strbuf)
  Return     :
  Other      :
  *****************************************************************************/
-/*lint -e578 */
 char *exponent(char *p,int exp, unsigned char fmtch)
 {
-/*lint +e578 */
-
      register char *t;
      char expbuf[MAXEXP];
 
@@ -726,9 +652,7 @@ char *exponent(char *p,int exp, unsigned char fmtch)
              *--t = (char)(tochar(exp % 10));
          } while ((exp /= 10) > 9);
          *--t = (char)(tochar(exp));
-         /*lint -e722 */
          for (; t < expbuf + MAXEXP; *p++ = *t++)
-         /*lint +e722 */
          {
 
          }
@@ -773,12 +697,11 @@ VOS_INT32 ANSI_vsprintf(VOS_CHAR *out_buf, const VOS_CHAR *fmt0, va_list argp)
 
     VOS_CHAR               *buf_pointer;
 
-    VOS_UINT32              ulDate = 0;             /* added by wuxiaoqian 2k/09/20 for "%t"*/
-    VOS_UINT32              ulTime = 0;             /* added by wuxiaoqian 2k/09/20 for "%t"*/
+    VOS_UINT32              ulDate = 0;
+    VOS_UINT32              ulTime = 0;
 
     pucFmt = (VOS_UCHAR *)fmt0;
     pucDigs = "0123456789abcdef";
-    /*lint -e801 -e445 */
     for (;; ++pucFmt)
     {
             for (; ((lChar = *pucFmt)!=0) && lChar != '%'; ++pucFmt)
@@ -805,16 +728,12 @@ rflag:  switch (*++pucFmt) {
             lFlags |= ALT;
             goto rflag;
         case '*':
-            /*lint -e147 -e586*/
             if ((lFormatWidth = va_arg(argp, VOS_INT)) >= 0)
             {
-                /*lint +e147 +e586*/
                 goto rflag;
             }
             lFormatWidth = -lFormatWidth;
-        /*lint -e616 */
         case '-':
-        /*lint +e616 */
             lFlags |= LADJUST;
             goto rflag;
         case '+':
@@ -823,9 +742,7 @@ rflag:  switch (*++pucFmt) {
         case '.':
             if (*++pucFmt == '*')
             {
-                /*lint -e147 -e586*/
                 ltemp = va_arg(argp, VOS_INT);
-                /*lint +e147 +e586*/
             }
             else
             {
@@ -867,21 +784,15 @@ rflag:  switch (*++pucFmt) {
             lFlags |= LONGINT;
             goto rflag;
         case 'c':
-            /*lint -e147 -e586*/
             *(pcBuf = ucBuf) = (VOS_CHAR)va_arg(argp, VOS_INT);
-            /*lint +e147 +e586*/
             lConverSize = 1;
             ucPrefixSign = '\0';
             goto pforw;
         case 'D':
             lFlags |= LONGINT;
-        /*lint -e616 */
         case 'd':
-        /*lint +e616 */
         case 'i':
-            /*lint -e147 -e586*/
             ARG(int);
-            /*lint +e147 +e586*/
             if ((VOS_INT32)ulLong < 0)
             {
                 ulLong = (VOS_UINT32)(-(VOS_INT32)ulLong);
@@ -892,44 +803,30 @@ rflag:  switch (*++pucFmt) {
         case 'n':
             if (lFlags & LONGINT)
             {
-                /*lint -e147 -e586*/
                 *va_arg(argp, VOS_INT32 *) = (VOS_INT32)(pucOutBuf-out_buf);
-                /*lint +e147 +e586*/
             }
             else if (lFlags & SHORTINT)
             {
-                /*lint -e147 -e586*/
-                *va_arg(argp, VOS_INT16 *) = (VOS_INT16)(pucOutBuf-out_buf);
-                /*lint +e147 +e586*/
+               *va_arg(argp, VOS_INT16 *) = (VOS_INT16)(pucOutBuf-out_buf);
             }
             else
             {
-                /*lint -e147 -e586*/
                 *va_arg(argp, VOS_INT *) = (VOS_INT)(pucOutBuf-out_buf);
-                /*lint +e147 +e586*/
             }
             break;
         case 'O':
             lFlags |= LONGINT;
-        /*lint -e616 */
         case 'o':
-        /*lint +e616 */
-            /*lint -e147 -e586*/
             ARG(unsigned);
-            /*lint +e147 +e586*/
             lBase = 8;
             goto nosign;
         case 'p':
-            /*lint -e147 -e586*/
             ulLong = (VOS_UINT_PTR)va_arg(argp, VOS_VOID *);
-            /*lint +e147 +e586*/
             lBase = 16;
             goto nosign;
         case 's':
-            /*lint -e147 -e586*/
             if ( (pcBuf = va_arg(argp, VOS_CHAR *))==0 )
             {
-                /*lint +e147 +e586*/
                 pcBuf = "(null)";
             }
             if (lPrec >= 0)
@@ -957,22 +854,14 @@ rflag:  switch (*++pucFmt) {
             goto pforw;
         case 'U':
             lFlags |= LONGINT;
-        /*lint -e616 */
         case 'u':
-        /*lint +e616 */
-            /*lint -e147 -e586*/
             ARG(unsigned);
-            /*lint +e147 +e586*/
             lBase = 10;
             goto nosign;
         case 'X':
             pucDigs = "0123456789ABCDEF";
-        /*lint -e616 */
         case 'x':
-        /*lint +e616 */
-            /*lint -e147 -e586*/
             ARG(unsigned);
-            /*lint +e147 +e586*/
             lBase = 16;
             if (lFlags & ALT && ulLong != 0)
             {
@@ -1065,9 +954,7 @@ pforw:
         case '\0':
                         goto    lvspret;
         case 'T':
-            /*lint -e147 -e586*/
             num = va_arg(argp,VOS_INT32);
-            /*lint +e147 +e586*/
             _Second2DateTime((VOS_UINT32)num, &ulDate, &ulTime);
 
             buf_pointer = &ucBuf[BUF- 1];
@@ -1121,16 +1008,12 @@ pforw:
             *--buf_pointer = (VOS_CHAR)(( ulTimelong % 10) + '0');
             ulTimelong /= 10;
             *--buf_pointer = (VOS_CHAR)(( ulTimelong % 10) + '0');
-            /*lint -e534*/
             VOS_StrNCpy(pucOutBuf, buf_pointer, 19);
-            /*lint +e534*/
             pucOutBuf += 19 ;
             continue ;
 
         case 't':
-            /*lint -e147 -e586*/
             num = va_arg(argp,VOS_INT32);
-            /*lint +e147 +e586*/
             _Second2DateTime((VOS_UINT32)num, &ulDate, &ulTime);
 
             buf_pointer = &ucBuf[BUF- 1];
@@ -1161,9 +1044,7 @@ pforw:
             ulTimelong /= 10;
             *--buf_pointer = (VOS_CHAR)(( ulTimelong % 10) + '0');
 
-            /*lint -e534*/
             VOS_StrNCpy(pucOutBuf, buf_pointer, 10);
-            /*lint +e534*/
             pucOutBuf += 10 ;
 
             continue ;
@@ -1172,7 +1053,6 @@ pforw:
 
         }
     }
-    /*lint +e801 +e445 */
 lvspret:
         *pucOutBuf=0;
         return (VOS_INT)(pucOutBuf-out_buf);
@@ -1233,7 +1113,6 @@ VOS_INT VOS_vsprintf_s(VOS_CHAR * str, VOS_SIZE_T ulDestSize, const VOS_CHAR *fo
 VOS_INT32 VOS_sprintf(VOS_CHAR *str, const VOS_CHAR *fmt, ...)
 {
 
-    /*lint -e530 -e830 */
     va_list arg;
     register VOS_INT32 nc;
 
@@ -1243,15 +1122,10 @@ VOS_INT32 VOS_sprintf(VOS_CHAR *str, const VOS_CHAR *fmt, ...)
         return -1;
     }
 
-    /*lint -e586*/
     va_start(arg, fmt);
-    /*lint +e586*/
     nc = ANSI_vsprintf(str, (const VOS_CHAR *) fmt, arg);
-    /*lint -e586*/
     va_end(arg);
-    /*lint +e586*/
     return (nc);
-    /*lint +e530 +e830 */
 }
 
 /*****************************************************************************
@@ -1264,7 +1138,6 @@ VOS_INT32 VOS_sprintf(VOS_CHAR *str, const VOS_CHAR *fmt, ...)
  *****************************************************************************/
 VOS_INT VOS_sprintf_s(VOS_CHAR *str, VOS_SIZE_T ulDestSize, const VOS_CHAR *fmt, ...)
 {
-    /*lint -e530 -e830 */
     va_list arg;
     register VOS_INT nc;
 
@@ -1279,15 +1152,10 @@ VOS_INT VOS_sprintf_s(VOS_CHAR *str, VOS_SIZE_T ulDestSize, const VOS_CHAR *fmt,
         return -1;
     }
 
-    /*lint -e586*/
     va_start(arg, fmt);
-    /*lint +e586*/
     nc = (VOS_INT)ANSI_vsprintf(str, (const VOS_CHAR *) fmt, arg);
-    /*lint -e586*/
     va_end(arg);
-    /*lint +e586*/
     return (nc);
-    /*lint +e530 +e830 */   
 }
 
 #define LENGTH_OF_PRINT_LINE_BUF        1024
@@ -1302,18 +1170,11 @@ VOS_INT VOS_sprintf_s(VOS_CHAR *str, VOS_SIZE_T ulDestSize, const VOS_CHAR *fmt,
  *****************************************************************************/
 VOS_VOID vos_assert( VOS_UINT32 ulFileID, VOS_INT LineNo)
 {
-    /*lint -e813 */
     VOS_CHAR vos_PrintBuf[LENGTH_OF_PRINT_LINE_BUF];
-    /*lint +e813 */
-
     VOS_CHAR *String = "Assert";
-
-    /*lint -e534*/
     VOS_sprintf( vos_PrintBuf, "%s File: %d, Line: %d", String, ulFileID, LineNo );
 
     vos_printf("\n %s.\r\n",vos_PrintBuf);
-    /*lint +e534*/
-
     return;
 }
 
@@ -1371,26 +1232,11 @@ VOS_VOID PrintHexBuf(char *PrintBuf, char *MemBuf, int Length)
  *****************************************************************************/
 VOS_VOID PrintMemBuf(char *String ,char *Buf, int Length)
 {
-    /*lint -e813 */
     char vos_PrintBuf[LENGTH_OF_PRINT_LINE_BUF];
-    /*lint +e813 */
     int iNumber;
-
-    /* lint -e534 */
-    /* iNumber = sprintf( vos_PrintBuf, "\n%s",String); */
-
     iNumber = VOS_sprintf( vos_PrintBuf, "\n%s",String);
     
     PrintHexBuf(&vos_PrintBuf[iNumber], Buf, Length);
-
-    /*lint -e534*/
     vos_printf("\n%s.\r\n", vos_PrintBuf);
-    /*lint +e534*/
-
     return;
 }
-
-
-
-
-

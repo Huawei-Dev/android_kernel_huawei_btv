@@ -46,7 +46,6 @@
  *
  */
 
-/*lint --e{537,648 }*/
 #include <linux/syscore_ops.h>
 #include <linux/of.h>
 #include <linux/of_address.h>
@@ -62,7 +61,6 @@
 
 #include <bsp_hardtimer.h>
 #include <bsp_om.h>
-
 
 /* begin: add for timer debug*/
 #define ADP_TIMER_ENABLE_TIMES 30
@@ -99,7 +97,6 @@ struct adp_timer_control{
 	FUNCPTR_1 debug_routine;
 	int       debug_args;
 };
-
 
 struct adp_timer_control  adp_timer_ctrl[TIMER_ID_MAX];
 
@@ -161,15 +158,6 @@ OSL_IRQ_FUNC(static irqreturn_t,adp_timer_handler,irq,para)
 	return IRQ_HANDLED;
 }
 
-/*****************************************************************************
-* 函数  : mdrv_timer_get_accuracy_timestamp
-* 功能  : 获取BBP定时器的值。用于OAM 时戳
-* 输入  : void
-* 输出  :
-			pulLow32bitValue指针参数不能为空，否则会返回失败。
-			pulHigh32bitValue如果为空， 则只返回低32bit的值。
-* 返回  : int
-*****************************************************************************/
 int mdrv_timer_get_accuracy_timestamp(unsigned int  *pulHigh32bitValue,  unsigned int  *pulLow32bitValue)
 {
 	BSP_U64 CurTime = 0;
@@ -202,7 +190,6 @@ unsigned int mdrv_timer_get_hrt_timestamp(void)
 	 return bsp_get_slice_value_hrt();
 }
 
-
 int mdrv_timer_start(unsigned int usrClkId,FUNCPTR_1 routine,int arg,unsigned int timerValue,unsigned int mode,unsigned int unitType)
 {
     s32 ret = 0;
@@ -232,7 +219,6 @@ int mdrv_timer_get_rest_time(unsigned int usrClkId,unsigned int unitType,unsigne
     return ret;
 
 }
-
 
 BSP_VOID mdrv_timer_debug_register(unsigned int usrClkId,FUNCPTR_1 routine, int arg)
 {
@@ -307,8 +293,8 @@ static int connect_timer_isr(void){
 				hardtimer_print_error("timer %d need_adp_connect_isr get failed.\n",request_id);
 				return BSP_ERROR;
 			}
-		}/*for_each_available_child_of_node*/
-	}/*if(node)*/
+		}
+	}
 	return BSP_OK;
 }
 int set_adp_timer_isr_and_pm(void)
@@ -328,6 +314,3 @@ void adp_timer_show(void){
 	for(i=0;i<TIMER_ID_MAX;i++)
 		hardtimer_print_error("%s\n",adp_timer_ctrl[i].name);
 }
-
-/*lint -restore +e19*/
-

@@ -1,19 +1,19 @@
 /******************************************************************************
 
-                  版权所有 (C), 2001-2020, 华为技术有限公司
+                  ???????? (C), 2001-2020, ????????????????
 
  ******************************************************************************
-  文 件 名   : RfNvId.h
-  版 本 号   :
-  作    者   : 徐骥 x00217286
-  生成日期   : 2012年9月28日
-  最近修改   :
-  功能描述   : 定义了RF HI6361 NV项ID枚举定义
-  函数列表   :
-  修改历史   :
-  1.日    期   : 2012年9月28日
-    作    者   : 徐骥 x00217286
-    修改内容   : 创建文件
+  ?? ?? ??   : RfNvId.h
+  ?? ?? ??   :
+  ??    ??   : ???? x00217286
+  ????????   : 2012??9??28??
+  ????????   :
+  ????????   : ??????RF HI6361 NV??ID????????
+  ????????   :
+  ????????   :
+  1.??    ??   : 2012??9??28??
+    ??    ??   : ???? x00217286
+    ????????   : ????????
 
 ******************************************************************************/
 
@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "NvIddef.h"
 
@@ -2313,7 +2313,7 @@ enum RF_NV_ID_ENUM
     en_NV_Item_W_IDLE_ANT2_CTRL                                  = 16001,
 
     en_NV_Item_FEATURE_XPASS_EN                                  = 16029,
-    /* G模优化特性开关 */
+    /* G?????????????? */
     en_NV_Item_GSM_OPTIMIZE_FEATURE_EN                           = 16030,
     en_NV_Item_TCXO_AGING_THRESHOLD                              = 16031,
     en_NV_Item_GSM_NCELL_SCHEDULE_CFG_PARA                       = 16035,
@@ -2330,19 +2330,19 @@ enum RF_NV_ID_ENUM
     en_NV_Item_CDMA_CF_GAP_LENGTH                                = 16053,
     en_NV_Item_GSM_MEA_RSSI_THD                                  = 16069,
     en_NV_Item_XO_SELF_CAL_PARA                                  = 16070,
-    /* 发射功率抬升功能 */
+    /* ???????????????? */
     en_NV_Item_GSM850_UPRAISE_POWER                              = 16071,
     en_NV_Item_GSM900_UPRAISE_POWER                              = 16072,
     en_NV_Item_DCS1800_UPRAISE_POWER                             = 16073,
     en_NV_Item_PCS1900_UPRAISE_POWER                             = 16074,
 
-    /* TX PCL 异常场景优化功能 */
+    /* TX PCL ???????????????? */
     en_NV_Item_GSM850_CS_TX_PCL_OPTI_CTRL                        = 16078,
     en_NV_Item_GSM900_CS_TX_PCL_OPTI_CTRL                        = 16079,
     en_NV_Item_GSM1800_CS_TX_PCL_OPTI_CTRL                       = 16080,
     en_NV_Item_GSM1900_CS_TX_PCL_OPTI_CTRL                       = 16081,
 
-    /* 时间平均SAR功能NV */
+    /* ????????SAR????NV */
     en_NV_Item_TIME_AVG_SAR_FUNC_CONFIG                          = 16054,
 
     en_NV_Item_W_SAR_TIEM_AVG_PARA_B1                            = 16059,
@@ -2468,15 +2468,15 @@ enum RF_NV_ID_ENUM
     en_NV_Item_CMCC1800_RF_TRX_CONFIG                            = 20420,
     en_NV_Item_CMCC1800_RF_CTRL_PORT_SEL                         = 20441,
 
-    /* 上行调制数字滤波使能 */
+    /* ???????????????????? */
     en_NV_Item_GSM_TX_LPF_EN                                     = 9264,
 
-    /* C模 */
+    /* C?? */
     en_NV_Item_CDMA_RF_MAIN_BAND                                 = 20500,
     en_NV_Item_CDMA_RF_DIV_BAND                                  = 20501,
     en_NV_Item_CDMA_RF_BAND_CONFIG                               = 20502,
-    en_NV_Item_CDMA_PA_CONTROL_MODE                              = 20503,       /* PA控制方式 */
-    en_NV_Item_CDMA_ANT_SWITCH_CONTROL_MODE                      = 20504,       /*天线开关配置方式*/
+    en_NV_Item_CDMA_PA_CONTROL_MODE                              = 20503,       /* PA???????? */
+    en_NV_Item_CDMA_ANT_SWITCH_CONTROL_MODE                      = 20504,       /*????????????????*/
     en_NV_Item_CDMA_TX_PA_APT_ENABLE                             = 20509,
     en_NV_Item_CDMA_TX_RF_GAIN_CTRL                              = 20510,
     en_NV_Item_CDMA_TX_RF_BIAS                                   = 20512,
@@ -2504,9 +2504,9 @@ enum RF_NV_ID_ENUM
     en_NV_Item_CDMA_FEM_CHAN_CONNECT_BC0                         = 20614,
     en_NV_Item_CDMA_RF_TRX_CONFIG_BC0                            = 20617,
     en_NV_Item_CDMA_RF_CTRL_PORT_SEL_BC0                         = 20618,
-    en_NV_Item_CDMA_RX_RFIC_BIAS_CTRL_BC0                        = 20619,       /* BIAS控制字 */
+    en_NV_Item_CDMA_RX_RFIC_BIAS_CTRL_BC0                        = 20619,       /* BIAS?????? */
     en_NV_Item_CDMA_RX_AGC_CTRL_EXT_LNA_BC0                      = 20620,
-    en_NV_Item_CDMA_EXT_LNA_COMMON_INFO_BC0                      = 20621,       /* 外置LNA配置 */
+    en_NV_Item_CDMA_EXT_LNA_COMMON_INFO_BC0                      = 20621,       /* ????LNA???? */
     en_NV_Item_CDMA_PA_GAIN_CTRL_WORD_BC0                        = 20700,
     en_NV_Item_CDMA_PA_GAIN_SWITCH_TIMING_BC0                    = 20701,
     en_NV_Item_CDMA_PA_GAIN_SWITCH_THRESHOLD_BC0                 = 20702,
@@ -2551,9 +2551,9 @@ enum RF_NV_ID_ENUM
     en_NV_Item_CDMA_TX_LOW_GAIN_TEMP_COMP_HC_BC0                 = 20744,
     en_NV_Item_CDMA_TX_LOW_GAIN_TEMP_COMP_LC_BC0                 = 20745,
     en_NV_Item_CDMA_TX_GAIN_COMP_VS_PA_CH_BC0                    = 20746,
-    en_NV_Item_CDMA_RFFE_MIPI_PA_CTRL_BC0                        = 20749,       /* PA MIPI控制字 */
-    en_NV_Item_CDMA_ANT_SWITCH_MIPI_BC0                          = 20750,       /* 天线开关 MIPI控制字 */
-    /* APT相关nv */
+    en_NV_Item_CDMA_RFFE_MIPI_PA_CTRL_BC0                        = 20749,       /* PA MIPI?????? */
+    en_NV_Item_CDMA_ANT_SWITCH_MIPI_BC0                          = 20750,       /* ???????? MIPI?????? */
+    /* APT????nv */
     en_NV_Item_CDMA_TX_PA_APT_HIGH_GAIN_TEMP_COMP_BC0            = 20752,
     en_NV_Item_CDMA_TX_PA_APT_MID_GAIN_TEMP_COMP_BC0             = 20753,
     en_NV_Item_CDMA_TX_PA_APT_LOW_GAIN_TEMP_COMP_BC0             = 20754,
@@ -2564,7 +2564,7 @@ enum RF_NV_ID_ENUM
     en_NV_Item_CDMA_TX_APT_COMP_BC0                              = 20761,
     en_NV_Item_CDMA_TX_PA_APT_TABLE_BC0                          = 20762,
 
-    /* 降SAR相关NV */
+    /* ??SAR????NV */
     en_NV_Item_CDMA_TX_SAR_BACKOFF_BC0                           = 20766,
     en_NV_Item_CDMA_TX_SAR_BACKOFF_DPDT_SWAP_BC0                 = 20767,
 

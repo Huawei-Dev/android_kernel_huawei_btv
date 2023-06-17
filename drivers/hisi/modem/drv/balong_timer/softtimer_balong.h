@@ -52,8 +52,7 @@
 #include <bsp_memmap.h>
 #include <bsp_hardtimer.h>
 #include <osl_irq.h>
-/*lint -e{652,760}*/
-/*∫Í∂®“Â*/
+
 #ifndef OK
 #define OK 0
 #endif
@@ -89,5 +88,3 @@ typedef u32 SOFTTIMER_TASK_ID;
 
 #define  TIMER_TASK_STK_SIZE            (0x1000)
 #define ELAPESD_TIME_INVAILD             0xFFFFFFFF
-
-

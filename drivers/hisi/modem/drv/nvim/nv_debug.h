@@ -49,7 +49,6 @@
 #ifndef _NV_DEBUG_H_
 #define _NV_DEBUG_H_
 
-
 #ifdef __cplusplus
 #if __cplusplus
 extern "C" {
@@ -58,12 +57,10 @@ extern "C" {
 
 #define NV_DUMP_SIZE     (4*1024)
 
-
-
 enum nv_debug_delta_e
 {
-    NV_DEBUG_DELTA_WRITE_FILE   = 0,    /*写文件系统最大时长*/
-    NV_DEBUG_DELTA_GET_IPC      = 1,    /*获取IPC锁最大时长*/
+    NV_DEBUG_DELTA_WRITE_FILE   = 0,
+    NV_DEBUG_DELTA_GET_IPC      = 1,
     NV_DEBUG_DELTA_BUTT
 };
 enum nv_debug_state{
@@ -122,8 +119,8 @@ typedef struct
 
 typedef struct
 {
-    u32 state;                  /*取值取自enum nv_debug_state*/
-    char *info;                 /*对应state的状态*/
+    u32 state;
+    char *info;
 }debug_table_t;
 
 union debug_ctrl_union
@@ -131,8 +128,8 @@ union debug_ctrl_union
     u32 value;
     struct ctrl_bits_stru
     {
-        u32 write_print_ctrl    :1;     /*写NV过程是否打印,1 打印 0 不打印*/
-        u32 write_dump_ctrl     :1;     /*写NV过程是否记录到dump中,1 记录 0 不记录*/
+        u32 write_print_ctrl    :1;
+        u32 write_dump_ctrl     :1;
         u32 reserved            :29;
     }ctrl_bits;
 };
@@ -181,6 +178,3 @@ void nv_mntn_record(char* fmt,...);
 #endif
 
 #endif /*_NV_DEBUG_H_*/
-
-
-

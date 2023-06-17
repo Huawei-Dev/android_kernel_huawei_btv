@@ -55,7 +55,7 @@ extern "C" {
 #endif
 
 /*****************************************************************************
-  1 常量定义
+  1 ????????
 *****************************************************************************/
 
 /* Class of error */
@@ -78,7 +78,7 @@ extern "C" {
 #define    MN_ERR_INVALID_BCD                               (MN_ERR_CLASS_COMMON + 6)
 #define    MN_ERR_INVALID_ASCII                             (MN_ERR_CLASS_COMMON + 7)
 #define    MN_ERR_SEND_MSG_ERROR                            (MN_ERR_CLASS_COMMON + 8)
-#define    MN_ERR_USIM_SIM_NOT_EXIST                        (MN_ERR_CLASS_COMMON + 9)               /*USIM卡不存在*/
+#define    MN_ERR_USIM_SIM_NOT_EXIST                        (MN_ERR_CLASS_COMMON + 9)               /*USIM????????*/
 #define    MN_ERR_CLIENTID_NO_FREE                          (MN_ERR_CLASS_COMMON + 10)
 #define    MN_ERR_CLIENTID_NOT_EXIST                        (MN_ERR_CLASS_COMMON + 11)
 #define    MN_ERR_CALLBACK_FUNC_ERROR                       (MN_ERR_CLASS_COMMON + 12)
@@ -154,18 +154,18 @@ extern "C" {
 #define    MN_ERR_CLASS_FDN_CHECK_SC_FAILURE                (MN_ERR_CLASS_MSG + 105)
 /* Added by f62575 for C50_IPC Project, 2012/02/23, end   */
 /* Modified by s46746 for SS FDN&Call Control, 2013-05-17, end */
-/* Added by f62575 for V9R1 STK升级, 2013-6-26, begin */
+/* Added by f62575 for V9R1 STK????, 2013-6-26, begin */
 #define    MN_ERR_CLASS_INVALID_TP_ADDRESS                  (MN_ERR_CLASS_MSG + 106)
 #define    MN_ERR_CLASS_INVALID_TP_UD                       (MN_ERR_CLASS_MSG + 107)
-/* Added by f62575 for V9R1 STK升级, 2013-6-26, end */
+/* Added by f62575 for V9R1 STK????, 2013-6-26, end */
 
-/* Added by y00245242 for VoLTE_PhaseII 项目, 2013-10-17, begin */
-#define    MN_ERR_CLASS_SMS_DOMAIN_SELECTION_FAILURE        (MN_ERR_CLASS_MSG + 108)  /* 业务域选择失败 */
-#define    MN_ERR_CLASS_SMS_DOMAIN_SELECTION_TIMER_EXPIRED  (MN_ERR_CLASS_MSG + 109)  /* 业务域选择缓存定时器超时 */
-#define    MN_ERR_CLASS_SMS_POWER_OFF                       (MN_ERR_CLASS_MSG + 110)  /* 业务域选择收到关机指示触发缓存处理 */
-/* Added by y00245242 for VoLTE_PhaseII 项目, 2013-10-17, end */
+/* Added by y00245242 for VoLTE_PhaseII ????, 2013-10-17, begin */
+#define    MN_ERR_CLASS_SMS_DOMAIN_SELECTION_FAILURE        (MN_ERR_CLASS_MSG + 108)  /* ?????????????? */
+#define    MN_ERR_CLASS_SMS_DOMAIN_SELECTION_TIMER_EXPIRED  (MN_ERR_CLASS_MSG + 109)  /* ???????????????????????? */
+#define    MN_ERR_CLASS_SMS_POWER_OFF                       (MN_ERR_CLASS_MSG + 110)  /* ?????????????????????????????????? */
+/* Added by y00245242 for VoLTE_PhaseII ????, 2013-10-17, end */
 
-#define    MN_ERR_CLASS_SMS_REDIAL_BUFFER_FULL              (MN_ERR_CLASS_MSG + 111)  /* 短信重拨缓存满 */
+#define    MN_ERR_CLASS_SMS_REDIAL_BUFFER_FULL              (MN_ERR_CLASS_MSG + 111)  /* ?????????????? */
 
 /* Error codes of SS API */
 
@@ -175,7 +175,7 @@ extern "C" {
 
 /* Error codes of SAT API */
 
-#define    MN_ERR_CLASS_SPM_BEYOND_CONCURRENCY_CAPABILITY                                 (MN_ERR_CLASS_SPM + 0)            /* SPM状态机运行达最大个数 */
+#define    MN_ERR_CLASS_SPM_BEYOND_CONCURRENCY_CAPABILITY                                 (MN_ERR_CLASS_SPM + 0)            /* SPM???????????????????? */
 
 #ifdef __cplusplus
 #if __cplusplus

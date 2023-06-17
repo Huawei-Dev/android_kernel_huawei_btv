@@ -55,11 +55,6 @@ extern "C" {
 #endif
 #endif
 
-
-/*****************************************************************************
-  1 其他头文件包含
-*****************************************************************************/
-
 #ifdef __KERNEL__
 
 #include <linux/kernel.h>
@@ -111,15 +106,11 @@ extern "C" {
 
 #pragma pack(4)
 
-
-/*****************************************************************************
-  2 宏定义
-*****************************************************************************/
 #define DELAY_TIME 1
-#define RFILE_TIMEOUT_MAX           (2000)           /* 最长等待2s */
+#define RFILE_TIMEOUT_MAX           (2000)
 #define RFILE_WAIT_FOREVER          (-1)
 
-#define RFILE_MAX_SEND_TIMES        (10)                /* 发送失败时，最大尝试次数 */
+#define RFILE_MAX_SEND_TIMES        (10)
 
 #define RFILE_CCORE_ICC_RD_CHAN     (ICC_CHN_RFILE<<16 | RFILE_RECV_FUNC_ID)
 #define RFILE_CCORE_ICC_WR_CHAN     (ICC_CHN_RFILE<<16 | RFILE_RECV_FUNC_ID)
@@ -131,16 +122,14 @@ extern "C" {
 
 #define RFILE_LEN_MAX               (0x00001000 - RFILE_ICC_PACKET_HEAD_LEN)
 
-/* RFILE模块写操作依赖于ICC的最大长度 */
 #define RFILE_WR_LEN_MAX            (0x00001000 - RFILE_ICC_PACKET_HEAD_LEN - sizeof(struct bsp_rfile_write_req))
 
-/* RFILE模块读操作依赖于ICC的最大长度 */
 #define RFILE_RD_LEN_MAX            (0x00001000 - RFILE_ICC_PACKET_HEAD_LEN - sizeof(struct bsp_rfile_read_cnf))
 
 
-#define RFILE_MNTN_DOT_NUM          (100)           /* A核记录100个打点信息 */
+#define RFILE_MNTN_DOT_NUM          (100)
 
-#define RFILE_MNTN_DATA_LEN         (32)            /* 可维可测信息数据的最大长度 */
+#define RFILE_MNTN_DATA_LEN         (32)
 
 
 typedef  osl_sem_id             rfile_sem_id;
@@ -166,10 +155,6 @@ typedef  osl_sem_id             rfile_sem_id;
 
 #endif /* end of __KERNEL__ */
 
-/*****************************************************************************
-  3 枚举定义
-*****************************************************************************/
-/* 操作类型 */
 enum _BSP_RFILE_OP_EN
 {
     EN_RFILE_OP_OPEN = 0,
@@ -193,50 +178,26 @@ enum _BSP_RFILE_OP_EN
     EN_RFILE_OP_BUTT
 };
 
-/* 处理状态 */
 enum bsp_rfile_state_en
 {
-    EN_RFILE_IDLE = 0,      /* 待处理 */
-    EN_RFILE_DOING,         /* 正在处理 */
-    EN_RFILE_DONE           /* 处理结束 */
+    EN_RFILE_IDLE = 0,
+    EN_RFILE_DOING,
+    EN_RFILE_DONE
 };
 
-/* 处理状态 */
 enum bsp_rfile_init_en
 {
-    EN_RFILE_INIT_INVALID = 0,  /* 未初始化 */
-    EN_RFILE_INIT_SUSPEND,      /* C核重启过程中 */
-    EN_RFILE_INIT_SUSPEND_WAIT,      /* C核重启等待文件关闭完成 */
-    EN_RFILE_INIT_FINISH        /* 初始化结束 */
+    EN_RFILE_INIT_INVALID = 0,
+    EN_RFILE_INIT_SUSPEND,
+    EN_RFILE_INIT_SUSPEND_WAIT,
+    EN_RFILE_INIT_FINISH
 };
 
-
-/*睡眠唤醒状态*/
 enum bsp_rfile_pm_state_en
 {
     EN_RFILE_WAKEUP_STATE = 0,
     EN_RFILE_SLEEP_STATE
 };
-
-
-/*****************************************************************************
-  4 全局变量声明
-*****************************************************************************/
-
-
-/*****************************************************************************
-  5 消息头定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  6 消息定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  7 STRUCT定义
-*****************************************************************************/
 
 struct fp_list
 {
@@ -251,22 +212,20 @@ struct dir_list
     struct list_head stlist;
 };
 
-
-/* 主控信息 */
 struct bsp_rfile_main_stru
 {
     enum bsp_rfile_init_en  eInitFlag;
     struct task_struct      *taskid;
-    rfile_sem_id            semTask;                /* 任务信号量 */
-    rfile_sem_id            semCloseFps;                /* 关闭文件句柄完成信号量 */
-    struct list_head        fplist;               /* C核打开文件链表头 */
-    struct list_head        dplist;               /* C核打开目录链表头 */
-    u8                      data[RFILE_LEN_MAX];    /* 缓存ICC通道读取的数据 */
+    rfile_sem_id            semTask;
+    rfile_sem_id            semCloseFps;
+    struct list_head        fplist;
+    struct list_head        dplist;
+    u8                      data[RFILE_LEN_MAX];
     struct wake_lock        wake_lock;
-    u32                     pmState;                /*低功耗状态*/
-    u32                     opState;                /*操作状态*/
+    u32                     pmState;
+    u32                     opState;
 
-    u32                     lpmstate;               /* 低功耗唤醒状态，由低功耗状态唤醒时设置为1 */
+    u32                     lpmstate;
 };
 
 
@@ -307,7 +266,7 @@ struct bsp_rfile_open_cnf
     u32                     opType;
     u32                     pstlist;    /*struct list_head        *pstlist;*/
     s32                     errorno;
-    s32                     ret;    /* 打开文件的描述符或错误码 */
+    s32                     ret;
 };
 
 /* seek====================================================================*/
@@ -506,21 +465,6 @@ struct bsp_rfile_rename_cnf
     s32                     ret;
 };
 
-
-/*****************************************************************************
-  8 UNION定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  9 OTHERS定义
-*****************************************************************************/
-
-
-
-/*****************************************************************************
-  10 函数声明
-*****************************************************************************/
 s32 rfile_AcoreOpenReq(struct bsp_rfile_open_req  *pstRfileReq, u32 ulId);
 s32 rfile_AcoreCloseReq(struct bsp_rfile_close_req *pstRfileReq, u32 ulId);
 s32 rfile_AcoreWriteReq(struct bsp_rfile_write_req *pstRfileReq, u32 ulId);
@@ -541,9 +485,7 @@ s32 rfile_AcoreMasswrReq(struct bsp_rfile_masswrite_req *pstRfileReq, u32 ulId);
 s32 rfile_AcoreRenameReq(struct bsp_rfile_rename_req *pstRfileReq, u32 ulId);
 void rfile_TransStat(struct rfile_stat_stru *pstRfileStat, struct kstat *pRfileKstat);
 
-
 #pragma pack(0)
-
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -551,6 +493,4 @@ void rfile_TransStat(struct rfile_stat_stru *pstRfileStat, struct kstat *pRfileK
 #endif
 #endif
 
-
 #endif /* end of rfile_balong.h */
-

@@ -48,15 +48,15 @@
 #define    PHASE_AUTHENTICATE      2    /* Being authenticated */
 #define    PHASE_NETWORK           3    /* We're alive ! */
 #define    PHASE_TERMINATE         4    /* Terminating link */
-#define    PHASE_PDP_ACT_PENDING   5    /* 等待PDP被激活*/
-#define    PHASE_TERMINATE_PENDING 6    /* 等待PC和UE完成PPP断链*/
+#define    PHASE_PDP_ACT_PENDING   5    /* ????PDP??????*/
+#define    PHASE_TERMINATE_PENDING 6    /* ????PC??UE????PPP????*/
 
 
 #define PHYSICAL_LINK    1
 #define LOGICAL_LINK     2
 
-#define PPP_HDLC_BY_SOFTWARE                            (0)         /* 使用软件实现PPP封装 解封装 */
-#define PPP_HDLC_BY_HARDWARE                            (1)         /* 使用硬件实现PPP封装 解封装 */
+#define PPP_HDLC_BY_SOFTWARE                            (0)         /* ????????????PPP???? ?????? */
+#define PPP_HDLC_BY_HARDWARE                            (1)         /* ????????????PPP???? ?????? */
 
 extern struct  fsm_parent           parent;
 

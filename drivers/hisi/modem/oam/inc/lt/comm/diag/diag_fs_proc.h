@@ -46,7 +46,6 @@
  *
  */
 
-
 #ifndef __DIAG_FS_PROC_H__
 #define __DIAG_FS_PROC_H__
 
@@ -56,14 +55,9 @@ extern "C" {
 #endif
 #endif
 
-
-/*****************************************************************************
-  1 Include Headfile
-*****************************************************************************/
 #include  "mdrv.h"
 #include  "vos.h"
 #include  "diag_common.h"
-
 
 #if (VOS_OS_VER == VOS_LINUX)
 #include <linux/kernel.h>
@@ -82,10 +76,6 @@ extern "C" {
 #include <linux/stat.h>
 
 #pragma pack(4)
-
-/*****************************************************************************
-  2 macro
-*****************************************************************************/
 
 #define diag_fs_log()\
         vos_printf("diag_fs_log: %d\n", __LINE__)
@@ -141,7 +131,6 @@ enum DIAG_FOLDER_TYPE_ENUM
     DIAG_FS_FOLDER_BUTT
 };
 
-/*目录中各项的类型*/
 typedef enum
 {
     DIAG_FS_ITEM_FOLDER = 0,
@@ -154,7 +143,6 @@ typedef enum
    5 STRUCT
 *****************************************************************************/
 
-/*保存操作文件的信息*/
 typedef struct
 {
     VOS_INT     lFile;
@@ -186,34 +174,20 @@ typedef struct
 }DIAG_STAT_STRU;*/
 typedef struct kstat DIAG_STAT_STRU;
 
-
-/*****************************************************************************
- 描述 : 该命令用来查询根目录
-ID   : DIAG_CMD_FS_QUERY_DIR
-REQ : DIAG_CMD_FS_QUERY_REQ
-CNF : DIAG_CMD_FS_QUERY_CNF
-*****************************************************************************/
 typedef struct
 {
-    VOS_UINT32  ulFolderType;                   /*查询的是根目录还是其他LOG目录*/
+    VOS_UINT32  ulFolderType;
 }DIAG_CMD_FS_QUERY_REQ;
 
 typedef struct
 {
-    VOS_UINT32  ulAuid;                         /* 原AUID*/
-    VOS_UINT32  ulSn;                           /* HSO分发，插件命令管理*/
-    VOS_UINT32  ulRet;                          /*结果码*/
-    VOS_UINT32  ulLength;                       /*目录长度*/
-    VOS_UINT8   aucDirPath[DIAG_CMD_FILE_NAME_LEN];                  /*目录名*/
+    VOS_UINT32  ulAuid;
+    VOS_UINT32  ulSn;
+    VOS_UINT32  ulRet;
+    VOS_UINT32  ulLength;
+    VOS_UINT8   aucDirPath[DIAG_CMD_FILE_NAME_LEN];
 }DIAG_CMD_FS_QUERY_CNF;
 
-
-/*****************************************************************************
- 描述 : 该命令用来遍历每个文件或文件夹信息
-ID   : DIAG_CMD_FS_SCAN_DIR
-REQ : DIAG_CMD_FS_SCAN_DIR_REQ
-CNF : DIAG_CMD_FS_SCAN_DIR_CNF
-*****************************************************************************/
 typedef struct
 {
     VOS_CHAR   aucDirName[DIAG_CMD_FILE_NAME_LEN];  /* dir or file name*/
@@ -227,151 +201,93 @@ typedef struct
 
 typedef struct
 {
-    VOS_CHAR szDirectory[MSP_DF_DIR_MAX_LEN];/*扫描文件夹名*/
+    VOS_CHAR szDirectory[MSP_DF_DIR_MAX_LEN];
 }DIAG_CMD_FS_SCAN_DIR_REQ;
 
 typedef struct
 {
-    VOS_UINT32  ulAuid;                     /* 原AUID*/
-    VOS_UINT32  ulSn;                       /* HSO分发，插件命令管理*/
-    VOS_UINT32  ulRet;                      /*结果码*/
-    VOS_UINT32  ulDirNum;                   /*指定目录下文件/文件夹数*/
-    VOS_UINT32  ulDirInfoLen;               /*指定目录下文件/文件夹长度*/
-    DIAG_DIR_FILE_INFO_STRU stDirInfo[0];   /*指定目录下文件/文件夹属性*/
+    VOS_UINT32  ulAuid;
+    VOS_UINT32  ulSn;
+    VOS_UINT32  ulRet;
+    VOS_UINT32  ulDirNum;
+    VOS_UINT32  ulDirInfoLen;
+    DIAG_DIR_FILE_INFO_STRU stDirInfo[0];
 }DIAG_CMD_FS_SCAN_DIR_CNF;
 
-
-/*****************************************************************************
- 描述 : 该命令用来遍历每个文件或文件夹信息
-ID   : DIAG_CMD_FS_MAKE_DIR
-REQ : DIAG_CMD_FS_MAKE_DIR_REQ
-CNF : DIAG_CMD_FS_MAKE_DIR_CNF
-*****************************************************************************/
 typedef struct
 {
-    VOS_CHAR szDirectory[MSP_DF_DIR_MAX_LEN];  /*创建文件夹名*/
+    VOS_CHAR szDirectory[MSP_DF_DIR_MAX_LEN];
 }DIAG_CMD_FS_MAKE_DIR_REQ;
 
 typedef struct
 {
-    VOS_UINT32  ulAuid;             /* 原AUID*/
-    VOS_UINT32  ulSn;               /* HSO分发，插件命令管理*/
-    VOS_UINT32  ulRet;              /*结果码*/
+    VOS_UINT32  ulAuid;
+    VOS_UINT32  ulSn;
+    VOS_UINT32  ulRet;
 }DIAG_CMD_FS_MAKE_DIR_CNF;
 
-/*****************************************************************************
- 描述 : 该命令用来遍历每个文件或文件夹信息
-ID   : DIAG_CMD_FS_DELETE
-REQ : DIAG_CMD_FS_DELETE_REQ
-CNF : DIAG_CMD_FS_DELETE_CNF
-*****************************************************************************/
 typedef struct
 {
-    VOS_UINT32  ulItemType;                   /*删除文件还是文件夹*/
-    VOS_CHAR szDirectory[MSP_DF_DIR_MAX_LEN]; /*删除文件/文件夹名*/
+    VOS_UINT32  ulItemType;
+    VOS_CHAR szDirectory[MSP_DF_DIR_MAX_LEN];
 }DIAG_CMD_FS_DELETE_REQ;
 
 typedef struct
 {
-    VOS_UINT32  ulAuid;                 /* 原AUID*/
-    VOS_UINT32  ulSn;                   /* HSO分发，插件命令管理*/
-    VOS_UINT32  ulRet;                  /*结果码*/
+    VOS_UINT32  ulAuid;
+    VOS_UINT32  ulSn;
+    VOS_UINT32  ulRet;
 }DIAG_CMD_FS_DELETE_CNF;
 
-/*****************************************************************************
- 描述 : 该命令用来打开或创建文件
-ID   : DIAG_CMD_FS_OPEN
-REQ : DIAG_CMD_FS_OPEN_REQ
-CNF : DIAG_CMD_FS_OPEN_CNF
-*****************************************************************************/
 typedef struct
 {
-    VOS_UINT32  ulMode;                         /*打开方式*/
-    VOS_CHAR   szDirectory[MSP_DF_DIR_MAX_LEN]; /*打开路径*/
+    VOS_UINT32  ulMode;
+    VOS_CHAR   szDirectory[MSP_DF_DIR_MAX_LEN];
 }DIAG_CMD_FS_OPEN_REQ;
 
 typedef struct
 {
-    VOS_UINT32  ulAuid;                 /* 原AUID*/
-    VOS_UINT32  ulSn;                   /* HSO分发，插件命令管理*/
-    VOS_UINT32  ulRet;                  /*结果码*/
+    VOS_UINT32  ulAuid;
+    VOS_UINT32  ulSn;
+    VOS_UINT32  ulRet;
 }DIAG_CMD_FS_OPEN_CNF;
 
-/*****************************************************************************
- 描述 : 该命令用来导出文件
-ID   : DIAG_CMD_FS_EXPORT
-REQ : DIAG_CMD_FS_EXPORT_REQ
-CNF : DIAG_CMD_FS_EXPORT_CNF
-*****************************************************************************/
-
-
 typedef struct
 {
-    VOS_UINT32  ulAuid;                 /* 原AUID*/
-    VOS_UINT32  ulSn;                   /* HSO分发，插件命令管理*/
-    VOS_UINT32  ulRet;                  /*结果码*/
-    VOS_UINT32  ulSize;                 /* 返回的实际大小, 不超过 DIAG_TRANSFER_BLOCK_MAX_SIZE*/
-    VOS_UINT8   aucData[0];             /*导出内容*/
+    VOS_UINT32  ulAuid;
+    VOS_UINT32  ulSn;
+    VOS_UINT32  ulRet;
+    VOS_UINT32  ulSize;
+    VOS_UINT8   aucData[0];
 }DIAG_CMD_FS_EXPORT_CNF;
 
-/*****************************************************************************
- 描述 : 该命令用来导入文件
-ID   : DIAG_CMD_FS_IMPORT
-REQ : DIAG_CMD_FS_IMPORT_REQ
-CNF : DIAG_CMD_FS_IMPORT_CNF
-*****************************************************************************/
 typedef struct
 {
-    VOS_UINT32  ulSize;                         /*待导入长度*/
-    VOS_CHAR    acContent[0];                   /*导入内容*/
+    VOS_UINT32  ulSize;
+    VOS_CHAR    acContent[0];
 }DIAG_CMD_FS_IMPORT_REQ;
 
 typedef struct
 {
-    VOS_UINT32  ulAuid;                 /* 原AUID*/
-    VOS_UINT32  ulSn;                   /* HSO分发，插件命令管理*/
+    VOS_UINT32  ulAuid;
+    VOS_UINT32  ulSn;
     VOS_UINT32  ulRet;
 }DIAG_CMD_FS_IMPORT_CNF;
 
-/*****************************************************************************
- 描述 : 该命令用来查询剩余及使用空间
-ID   : DIAG_CMD_FS_SPACE
-REQ : DIAG_CMD_FS_SPACE_REQ
-CNF : DIAG_CMD_FS_SPACE_CNF
-*****************************************************************************/
 typedef struct
 {
-    VOS_CHAR    szDirectory[MSP_DF_DIR_MAX_LEN];  /*导入内容*/
+    VOS_CHAR    szDirectory[MSP_DF_DIR_MAX_LEN];
 }DIAG_CMD_FS_SPACE_REQ;
 
 typedef struct
 {
-    VOS_UINT32  ulAuid;                 /* 原AUID*/
-    VOS_UINT32  ulSn;                   /* HSO分发，插件命令管理*/
-    VOS_UINT32  ulRet;                  /*Result of operation*/
+    VOS_UINT32  ulAuid;
+    VOS_UINT32  ulSn;
+    VOS_UINT32  ulRet;
     VOS_UINT32  ulDiskSpace;
     VOS_UINT32  ulUsedSpace;
     VOS_UINT32  ulValidSpace;
 }DIAG_CMD_FS_SPACE_CNF;
-
-
-/*****************************************************************************
-  6 UNION
-*****************************************************************************/
-
-
-/*****************************************************************************
-  7 Extern Global Variable
-*****************************************************************************/
-
-
-/*****************************************************************************
-  8 Fuction Extern
-*****************************************************************************/
-
-/*****************************************************************************
-  9 OTHERS
-*****************************************************************************/
 
 extern VOS_VOID diag_FsClose(VOS_VOID);
 extern VOS_INT32  diag_FsOpen(const VOS_CHAR *pcFileName, VOS_INT lFlag);
@@ -386,7 +302,6 @@ extern VOS_UINT32 diag_FsSpaceProc(VOS_UINT8* pstReq);
 extern VOS_UINT32 diag_FsScanProc(VOS_UINT8* pstReq);
 extern VOS_UINT32 diag_FsMkdirProc(VOS_UINT8* pstReq);
 
-
 #if (VOS_OS_VER == VOS_WIN32)
 #pragma pack()
 #else
@@ -395,7 +310,6 @@ extern VOS_UINT32 diag_FsMkdirProc(VOS_UINT8* pstReq);
 
 #endif
 
-
 #ifdef __cplusplus
     #if __cplusplus
         }
@@ -403,4 +317,3 @@ extern VOS_UINT32 diag_FsMkdirProc(VOS_UINT8* pstReq);
 #endif
 
 #endif /* end of diag_fs_op.h */
-

@@ -79,7 +79,7 @@ typedef struct
 typedef struct
 {
     DIAG_SERVICE_HEAD_STRU  stHead;
-    VOS_UINT32              ulSlice;        /* 创建节点的时间戳，用于检测超时 */
+    VOS_UINT32              ulSlice;        /* ?????????????????????????????? */
     LIST_S                  FrameList;
     DIAG_FRAME_INFO_STRU    *pFrame;
 } DIAG_SRVC_FRAME_NODE_STRU;
@@ -93,7 +93,7 @@ DIAG_SRVC_MAIN_STRU  g_stDiagSrvc;
 
 /*****************************************************************************
  Function Name   : diag_PktTimeoutClear
- Description     : 查看链表中是否有超时的节点，如果有则删除
+ Description     : ????????????????????????????????????????
 
  History         :
     1.c00326366         2015-08-27  Draft Enact
@@ -113,7 +113,7 @@ VOS_VOID diag_PktTimeoutClear(VOS_VOID)
 
         if((ulCurSlice > pTempNode->ulSlice) && ((ulCurSlice - pTempNode->ulSlice) > DIAG_PKT_TIMEOUT_LEN))
         {
-            /*删除节点*/
+            /*????????*/
             if((VOS_NULL_PTR != pTempNode->FrameList.next) && (VOS_NULL_PTR != pTempNode->FrameList.prev))
             {
                 blist_del(&pTempNode->FrameList);
@@ -135,7 +135,7 @@ VOS_VOID diag_PktTimeoutClear(VOS_VOID)
 
 /*****************************************************************************
  Function Name   : diag_SrvcCreatePkt
- Description     : 收到第一个分包时创建缓存和节点
+ Description     : ??????????????????????????????
 
  History         :
     1.c64416         2015-03-18  Draft Enact
@@ -146,7 +146,7 @@ VOS_VOID diag_SrvcCreatePkt(DIAG_FRAME_INFO_STRU *pFrame)
     LIST_S* me = NULL;
     DIAG_SRVC_FRAME_NODE_STRU *pTempNode;
 
-    /* 如果链表中已经有相同transid的节点则直接退出 */
+    /* ????????????????????transid???????????????? */
     (VOS_VOID)VOS_SmP(g_stDiagSrvc.ListSem,0);
 
     blist_for_each(me, &g_stDiagSrvc.ListHeader)
@@ -166,7 +166,7 @@ VOS_VOID diag_SrvcCreatePkt(DIAG_FRAME_INFO_STRU *pFrame)
     }
     (VOS_VOID)VOS_SmV(g_stDiagSrvc.ListSem);
 
-    /* 创建节点，申请内存 */
+    /* ?????????????????? */
     pTempNode = (DIAG_SRVC_FRAME_NODE_STRU *)VOS_MemAlloc(MSP_PID_DIAG_APP_AGENT, DYNAMIC_MEM_PT,
                                                             sizeof(DIAG_SRVC_FRAME_NODE_STRU));
     if(VOS_NULL_PTR == pTempNode)
@@ -198,7 +198,7 @@ VOS_VOID diag_SrvcCreatePkt(DIAG_FRAME_INFO_STRU *pFrame)
 
 /*****************************************************************************
  Function Name   : diag_SrvcSavePkt
- Description     : 收到分包时把分包内容拷贝到缓存中
+ Description     : ????????????????????????????????
 
  History         :
     1.c64416         2015-03-18  Draft Enact
@@ -229,16 +229,16 @@ DIAG_FRAME_INFO_STRU * diag_SrvcSavePkt(DIAG_FRAME_INFO_STRU *pFrame)
         pTempNode->stHead.ff1b    = pFrame->stService.ff1b;
         if(0 == VOS_MemCmp(&pTempNode->stHead, &pFrame->stService, sizeof(DIAG_SERVICE_HEAD_STRU)))
         {
-            if(0 == pFrame->stService.index4b)  /* 第0帧 */
+            if(0 == pFrame->stService.index4b)  /* ??0?? */
             {
-                /* 第0帧需要拷贝header, cmdid, meglen and data */
+                /* ??0??????????header, cmdid, meglen and data */
                 (VOS_VOID)VOS_MemCpy(pTempNode->pFrame, pFrame, DIAG_FRAME_MAX_LEN);
 
                 diag_SaveDFR(&g_stDFRreq, (VOS_UINT8*)pFrame, DIAG_FRAME_MAX_LEN);
             }
-            else if(pFrame->stService.eof1b)  /* 最后1帧 */
+            else if(pFrame->stService.eof1b)  /* ????1?? */
             {
-                /* 除最后一帧外，已存储的数据长度 */
+                /* ?????????????????????????????? */
                 ulLen = (pFrame->stService.index4b * (DIAG_FRAME_MAX_LEN - sizeof(DIAG_SERVICE_HEAD_STRU)))
                         - sizeof(pFrame->ulCmdId) - sizeof(pFrame->ulMsgLen);
 
@@ -250,13 +250,13 @@ DIAG_FRAME_INFO_STRU * diag_SrvcSavePkt(DIAG_FRAME_INFO_STRU *pFrame)
                     return VOS_NULL_PTR;
                 }
 
-                /* 未缓存的数据长度 */
+                /* ???????????????? */
                 ulLen = pTempNode->pFrame->ulMsgLen - ulLen;
 
-                /* 当前缓存区的偏移 */
+                /* ???????????????? */
                 uloffset = sizeof(DIAG_SERVICE_HEAD_STRU) + (pFrame->stService.index4b * (DIAG_FRAME_MAX_LEN - sizeof(DIAG_SERVICE_HEAD_STRU)));
 
-                /* 最后一帧只需要拷贝剩余data */
+                /* ??????????????????????data */
                 (VOS_VOID)VOS_MemCpy( ((VOS_UINT8*)pTempNode->pFrame) + uloffset,
                             ((VOS_UINT8*)pFrame) + sizeof(DIAG_SERVICE_HEAD_STRU),
                             ulLen);
@@ -265,7 +265,7 @@ DIAG_FRAME_INFO_STRU * diag_SrvcSavePkt(DIAG_FRAME_INFO_STRU *pFrame)
             }
             else
             {
-                /* 当前缓存区的偏移 */
+                /* ???????????????? */
                 uloffset = sizeof(DIAG_SERVICE_HEAD_STRU) + (pFrame->stService.index4b * (DIAG_FRAME_MAX_LEN - sizeof(DIAG_SERVICE_HEAD_STRU)));
 
                 if(     (VOS_NULL_PTR == pTempNode->pFrame)
@@ -279,7 +279,7 @@ DIAG_FRAME_INFO_STRU * diag_SrvcSavePkt(DIAG_FRAME_INFO_STRU *pFrame)
                     return VOS_NULL_PTR;
                 }
 
-                /* 中间的帧不拷贝cmdid和长度，只需要拷贝data */
+                /* ??????????????cmdid??????????????????data */
                 (VOS_VOID)VOS_MemCpy( ((VOS_UINT8*)pTempNode->pFrame) + uloffset,
                             ((VOS_UINT8*)pFrame) + sizeof(DIAG_SERVICE_HEAD_STRU),
                             DIAG_FRAME_MAX_LEN - sizeof(DIAG_SERVICE_HEAD_STRU));
@@ -299,7 +299,7 @@ DIAG_FRAME_INFO_STRU * diag_SrvcSavePkt(DIAG_FRAME_INFO_STRU *pFrame)
 
 /*****************************************************************************
  Function Name   : diag_SrvcDestroyPkt
- Description     : 删除缓存和节点
+ Description     : ??????????????
 
  History         :
     1.c64416         2015-03-18  Draft Enact
@@ -327,7 +327,7 @@ VOS_VOID diag_SrvcDestroyPkt(DIAG_FRAME_INFO_STRU *pFrame)
         pTempNode->stHead.ff1b    = pFrame->stService.ff1b;
         if(0 == VOS_MemCmp(&pTempNode->stHead, &pFrame->stService, sizeof(DIAG_SERVICE_HEAD_STRU)))
         {
-            /*删除节点*/
+            /*????????*/
             if((VOS_NULL_PTR != pTempNode->FrameList.next) && (VOS_NULL_PTR != pTempNode->FrameList.prev))
             {
                 blist_del(&pTempNode->FrameList);
@@ -351,7 +351,7 @@ VOS_VOID diag_SrvcDestroyPkt(DIAG_FRAME_INFO_STRU *pFrame)
 
 /*****************************************************************************
  Function Name   : diag_ServiceProc
- Description     : DIAG service 处理函数
+ Description     : DIAG service ????????
 
  History         :
     1.c64416         2014-11-18  Draft Enact
@@ -372,16 +372,16 @@ VOS_UINT32 diag_ServiceProc(MSP_SERVICE_HEAD_STRU *pData)
 
     pHeader = (DIAG_FRAME_INFO_STRU*)pData;
 
-    /* 只处理DIAG服务 */
+    /* ??????DIAG???? */
     if(MSP_SID_DIAG_SERVICE == pData->sid8b)
     {
         diag_PTR(EN_DIAG_PTR_SERVICE_1);
 
-        /* 开始处理，不允许睡眠 */
+        /* ???????????????????? */
         wake_lock(&diag_wakelock);
         if(pHeader->stService.ff1b)
         {
-            /* 每次有分包时检测是否有超时的节点 */
+            /* ???????????????????????????????? */
             diag_PktTimeoutClear();
 
             if(0 == pHeader->stService.index4b)
@@ -409,7 +409,7 @@ VOS_UINT32 diag_ServiceProc(MSP_SERVICE_HEAD_STRU *pData)
 
         if(g_fnService && pProcHead)
         {
-            /* 记录最近的N条cmdid */
+            /* ??????????N??cmdid */
             diag_LNR(EN_DIAG_LNR_CMDID, pHeader->ulCmdId, VOS_GetTick());
             diag_DumpDFInfo(pProcHead);
             ulRet = g_fnService(pProcHead);
@@ -425,7 +425,7 @@ VOS_UINT32 diag_ServiceProc(MSP_SERVICE_HEAD_STRU *pData)
             diag_SrvcDestroyPkt(pHeader);
         }
 
-        /* 处理结束，允许睡眠 */
+        /* ?????????????????? */
         wake_unlock(&diag_wakelock);
     }
     else
@@ -440,7 +440,7 @@ VOS_UINT32 diag_ServiceProc(MSP_SERVICE_HEAD_STRU *pData)
 
 /*****************************************************************************
  Function Name   : diag_ServiceProcReg
- Description     : DIAG service服务注册接口
+ Description     : DIAG service????????????
 
  History         :
     1.c64416         2014-11-18  Draft Enact
@@ -458,14 +458,14 @@ VOS_VOID diag_ServiceInit(VOS_VOID)
     VOS_UINT32 ret;
 
 
-    /* 创建节点保护信号量*/
+    /* ??????????????????*/
     ret = VOS_SmBCreate("SRVC", 1, VOS_SEMA4_FIFO, &g_stDiagSrvc.ListSem);
     if(VOS_OK != ret)
     {
         diag_printf("diag_ServiceInit VOS_SmBCreate failed.\n");
     }
 
-    /* 初始化请求链表 */
+    /* ?????????????? */
     blist_head_init(&g_stDiagSrvc.ListHeader);
 
     msp_ServiceProcReg(MSP_SID_DIAG_SERVICE, diag_ServiceProc);
@@ -489,7 +489,7 @@ VOS_VOID diag_ServiceInit(VOS_VOID)
 
 /*****************************************************************************
  Function Name   : diag_SrvcPackFirst
- Description     : 不分包时的封装，或分包时，第一包的封装
+ Description     : ??????????????????????????????????????
 
  History         :
     1.c64416         2015-03-12  Draft Enact
@@ -591,7 +591,7 @@ VOS_UINT32 diag_SrvcPackFirst(DIAG_MSG_REPORT_HEAD_STRU *pData, VOS_UINT8 *pucti
 
 /*****************************************************************************
  Function Name   : diag_SrvcPackOther
- Description     : 分包时，除第一包外其他包的封装
+ Description     : ??????????????????????????????
 
  History         :
     1.c64416         2015-03-12  Draft Enact
@@ -644,14 +644,14 @@ VOS_UINT32 diag_SrvcPackOther(DIAG_PACKET_INFO_STRU *pPacket, DIAG_MSG_REPORT_HE
         return ERR_MSP_FAILURE;
     }
 
-    /* 只拷贝service头 */
+    /* ??????service?? */
     stCpy.pHeader   = pstCoderSrc;
     stCpy.pSrc      = &stFrame.stService;
     stCpy.uloffset  = SCM_HISI_HEADER_LENGTH;
     stCpy.ulLen     = sizeof(stFrame.stService);
     SCM_CoderSrcMemcpy(pstMsg->ulChanId, &stCpy, &stSocpBuf);
 
-    /* 非第一个分包，从service头往后都是数据，不再有cmdid */
+    /* ????????????????service??????????????????????cmdid */
     stCpy.pSrc      = pPacket->pData;
     stCpy.uloffset  = SCM_HISI_HEADER_LENGTH + sizeof(stFrame.stService);
     stCpy.ulLen     = pPacket->ulLen;
@@ -679,23 +679,23 @@ VOS_UINT32 diag_SrvcPackOther(DIAG_PACKET_INFO_STRU *pPacket, DIAG_MSG_REPORT_HE
 
 /*****************************************************************************
  Function Name   : diag_ServicePackData
- Description     : DIAG service层封包上报数据接口
+ Description     : DIAG service??????????????????
 
  History         :
     1.c64416         2014-11-18  Draft Enact
-    2.c64416         2015-03-14  新增分包组包处理
-                    受帧结构限制，分包组包有如下约束:
-                    A. 第一包有ulCmdId和ulMsgLen，其余包直接跟数据
-                    B. 除最后一包外，其他每包都必须保证按最大长度填充
-                    C. transid和timestamp作为区分一组分包的标志
+    2.c64416         2015-03-14  ????????????????
+                    ????????????????????????????????:
+                    A. ????????ulCmdId??ulMsgLen??????????????????
+                    B. ??????????????????????????????????????????????
+                    C. transid??timestamp??????????????????????
 
 *****************************************************************************/
 VOS_UINT32 diag_ServicePackData(DIAG_MSG_REPORT_HEAD_STRU *pData)
 {
     VOS_UINT32 ret = ERR_MSP_FAILURE;
-    VOS_INT32  lDataLen =0;         /* 总长度 */
-    VOS_UINT32 ulCurlen = 0;        /* 当前已封包的数据长度 */
-    VOS_UINT32 ulEnd = 0;           /* 分包结束标记 */
+    VOS_INT32  lDataLen =0;         /* ?????? */
+    VOS_UINT32 ulCurlen = 0;        /* ???????????????????? */
+    VOS_UINT32 ulEnd = 0;           /* ???????????? */
     DIAG_PACKET_INFO_STRU stPacket = {0};
 
     if(SCM_CODER_SRC_LOM_CNF == pData->ulChanId)
@@ -703,7 +703,7 @@ VOS_UINT32 diag_ServicePackData(DIAG_MSG_REPORT_HEAD_STRU *pData)
         diag_PTR(EN_DIAG_PTR_SERVICE_PACKETDATA);
     }
 
-    /* 所要发送数据的总长度 */
+    /* ???????????????????? */
     lDataLen = (VOS_INT32)(pData->ulHeaderSize + pData->ulDataSize + sizeof(DIAG_FRAME_INFO_STRU));
 
     if(lDataLen > (VOS_INT32)(DIAG_FRAME_SUM_LEN - 15*sizeof(DIAG_FRAME_INFO_STRU)))
@@ -712,27 +712,27 @@ VOS_UINT32 diag_ServicePackData(DIAG_MSG_REPORT_HEAD_STRU *pData)
         return ERR_MSP_FAILURE;
     }
 
-    /* 统计数据通道的吞吐率 */
+    /* ???????????????????? */
     if(SCM_CODER_SRC_LOM_IND == pData->ulChanId)
     {
         diag_ThroughputSave(EN_DIAG_THRPUT_DATA_CHN_ENC, \
             (sizeof(DIAG_FRAME_INFO_STRU) + pData->ulHeaderSize + pData->ulDataSize));
     }
 
-    /* 分包时，各分包需要用同一个时间戳 */
+    /* ???????????????????????????????? */
     (VOS_VOID)mdrv_timer_get_accuracy_timestamp((VOS_UINT32*)&(stPacket.auctime[4]), (VOS_UINT32*)&(stPacket.auctime[0]));
 
-    /* 由于分包时第一包中有cmdid需要填充，其他包没有，所以第一包单独处理 */
+    /* ????????????????????cmdid???????????????????????????????????????? */
     ret = diag_SrvcPackFirst(pData, stPacket.auctime);
     if(ret)
     {
         return ERR_MSP_FAILURE;
     }
 
-    /* 需要分包 */
+    /* ???????? */
     if(lDataLen > (VOS_INT32)DIAG_FRAME_MAX_LEN)
     {
-        /* 剩余的没有发送的数据的长度 */
+        /* ?????????????????????????? */
         lDataLen = lDataLen - (VOS_INT32)DIAG_FRAME_MAX_LEN;
 
         while(lDataLen > 0)
@@ -744,7 +744,7 @@ VOS_UINT32 diag_ServicePackData(DIAG_MSG_REPORT_HEAD_STRU *pData)
             else
             {
                 ulCurlen = (VOS_UINT32)lDataLen;
-                ulEnd = 1;    /* 记录分包结束标记 */
+                ulEnd = 1;    /* ???????????????? */
             }
 
             stPacket.ulIndex++;

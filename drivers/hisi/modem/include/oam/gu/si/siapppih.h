@@ -52,12 +52,12 @@ File name   : SiAppSim.h
 Author      : H59254
 Version     : V200R001
 Date        : 2008-10-13
-Description : SIM卡事件的头文件
+Description : SIM??????????????
 History     :
 History     :
-1.日    期  : 2008年10月13日
-  作    者  : H59254
-  修改内容  : Create
+1.??    ??  : 2008??10??13??
+  ??    ??  : H59254
+  ????????  : Create
 ************************************************************************/
 
 #ifndef __SI_APP_PIH_H__
@@ -70,7 +70,7 @@ extern "C"{
 #endif
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "vos.h"
 #include "product_config.h"
@@ -80,7 +80,7 @@ extern "C"{
 #include "omnvinterface.h"
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
 
 #define SI_PIH_POLL_TIMER_LEN           28000
@@ -92,27 +92,27 @@ extern "C"{
 #define SI_PH_PINCODELENMAX             8
 #define SI_MAX_IMSI_LEN                 9
 
-#define SI_MAX_PLMN_ID_LEN              3       /* PLMN ID长度 */
-#define SI_MAX_PLMN_ID_NUM              4       /* 锁网时支持的PLMN ID数 */
+#define SI_MAX_PLMN_ID_LEN              3       /* PLMN ID???? */
+#define SI_MAX_PLMN_ID_NUM              4       /* ????????????PLMN ID?? */
 
-#define SI_APDU_MAX_LEN                 260     /* APDU数据的最大长度 */
+#define SI_APDU_MAX_LEN                 260     /* APDU?????????????? */
 
-#define SI_ATR_MAX_LEN                  (80)    /* ATR的最大长度 */
+#define SI_ATR_MAX_LEN                  (80)    /* ATR?????????? */
 
 typedef VOS_UINT32 SI_PIH_ERROR;
 
-#define SI_RSFW_MAX_INDEX               (255)   /* 支持RSFWX分包的最大个数 */
-#define SI_PIH_HPLMN_MAX_NUM            (32)    /* 支持HPLMN/EHPLMN的最大个数 */
-#define SI_PIH_EHPLMN_BYTE_NUM          (3)     /* EHPLMN文件中每个EHPLMN单元占用3个字节 */
+#define SI_RSFW_MAX_INDEX               (255)   /* ????RSFWX?????????????? */
+#define SI_PIH_HPLMN_MAX_NUM            (32)    /* ????HPLMN/EHPLMN?????????? */
+#define SI_PIH_EHPLMN_BYTE_NUM          (3)     /* EHPLMN??????????EHPLMN????????3?????? */
 
-#define SI_AUTH_DATA_MAX                (256)   /* 支持鉴权数据的最大长度 */
+#define SI_AUTH_DATA_MAX                (256)   /* ?????????????????????? */
 
 #define SI_PIH_SEND_PAPA(ClientId, EventType)   (ClientId | (EventType << 16))
 #define SI_PIH_CLIENT_ID(Para)                  (Para & 0xFFFF)
 #define SI_PIH_EVENT_TYPE(Para)                 ((Para & 0xFFFF0000) >> 16)
 
 /*******************************************************************************
-  3 枚举定义
+  3 ????????
 *******************************************************************************/
 
 enum SI_PIH_PIN_TYPE_ENUM
@@ -123,7 +123,7 @@ enum SI_PIH_PIN_TYPE_ENUM
     SI_PUK2                         = 7,      /* PUK2 */
     SI_PHNET_PIN                    = 8,      /* PH-NET PIN*/
     SI_PHSIM_PIN                    = 9,      /* PH-SIM PIN*/
-    SI_SIM_NON                      = 255,    /* 不确定操作PIN的类型时填入此值*/
+    SI_SIM_NON                      = 255,    /* ??????????PIN????????????????*/
     SI_PIN_BUTT
 };
 typedef VOS_UINT32 SI_PIH_PIN_TYPE;
@@ -142,31 +142,31 @@ typedef VOS_UINT32 SI_PIH_RESTRIC_CMD;
 
 enum SI_PIH_EVENT_ENUM
 {
-    SI_PIH_EVENT_PIN_OPER_CNF       = 1,      /* 操作PIN码返回结果        */
-    SI_PIH_EVENT_PIN_QUERY_CNF      = 2,      /* 查询PIN码返回结果        */
-    SI_PIH_EVENT_PIN_INFO_IND       = 3,      /* 开机PIN码主动上报        */
-    SI_PIH_EVENT_SIM_INFO_IND       = 4,      /* SIM卡信息上报            */
-    SI_PIH_EVENT_GENERIC_ACCESS_CNF = 5,      /* +CSIM 回复               */
-    SI_PIH_EVENT_RESTRIC_ACCESS_CNF = 6,      /* +CRSM 回复               */
-    SI_PIH_EVENT_FDN_CNF            = 7,      /* FDN回复                  */
-    SI_PIH_EVENT_BDN_CNF            = 8,      /* BDN回复                  */
-    SI_PIH_EVENT_PERO_LOCK_CNF      = 9,      /* 锁卡回复                 */
+    SI_PIH_EVENT_PIN_OPER_CNF       = 1,      /* ????PIN??????????        */
+    SI_PIH_EVENT_PIN_QUERY_CNF      = 2,      /* ????PIN??????????        */
+    SI_PIH_EVENT_PIN_INFO_IND       = 3,      /* ????PIN??????????        */
+    SI_PIH_EVENT_SIM_INFO_IND       = 4,      /* SIM??????????            */
+    SI_PIH_EVENT_GENERIC_ACCESS_CNF = 5,      /* +CSIM ????               */
+    SI_PIH_EVENT_RESTRIC_ACCESS_CNF = 6,      /* +CRSM ????               */
+    SI_PIH_EVENT_FDN_CNF            = 7,      /* FDN????                  */
+    SI_PIH_EVENT_BDN_CNF            = 8,      /* BDN????                  */
+    SI_PIH_EVENT_PERO_LOCK_CNF      = 9,      /* ????????                 */
 /* Added by h59254 for V7R1C50 ISDB Project,  2012-8-27 begin */
-    SI_PIH_EVENT_ISDB_ACCESS_CNF    = 10,     /* ISDB透传回复             */
+    SI_PIH_EVENT_ISDB_ACCESS_CNF    = 10,     /* ISDB????????             */
 /* Added by h59254 for V7R1C50 ISDB Project,  2012-8-27 end */
-    SI_PIH_EVENT_HVSST_QUERY_CNF    = 11,       /* ^HVSST查询命令返回       */
-    SI_PIH_EVENT_HVSST_SET_CNF      = 12,       /* ^HVSST设置命令返回       */
-    SI_PIH_EVENT_HVSDH_SET_CNF      = 13,       /* ^HVSDH设置命令返回       */
-    SI_PIH_EVENT_HVSDH_QRY_CNF      = 14,       /* ^HVSDH查询命令返回       */
-    SI_PIH_EVENT_HVSCONT_QUERY_CNF  = 15,       /* ^HVSCONT查询命令返回     */
-    SI_PIH_EVENT_FILE_WRITE_CNF     = 16,       /* ^RSFW设置命令返回        */
-    SI_PIH_EVENT_CCHO_SET_CNF       = 17,       /* +CCHO设置命令返回        */
-    SI_PIH_EVENT_CCHC_SET_CNF       = 18,       /* +CCHC设置命令返回        */
-    SI_PIH_EVENT_CGLA_SET_CNF       = 19,       /* +CGLA设置命令返回        */
-    SI_PIH_EVENT_CARD_ATR_QRY_CNF   = 20,       /* ^CARDATR查询命令返回     */
-    SI_PIH_EVENT_HVRDH_IND          = 21,       /* ^HVRDH指示上报           */
-    SI_PIH_EVENT_UICCAUTH_CNF       = 22,       /* ^UICCAUTH设置命令返回    */
-    SI_PIH_EVENT_URSM_CNF           = 23,       /* ^URSM设置命令返回        */
+    SI_PIH_EVENT_HVSST_QUERY_CNF    = 11,       /* ^HVSST????????????       */
+    SI_PIH_EVENT_HVSST_SET_CNF      = 12,       /* ^HVSST????????????       */
+    SI_PIH_EVENT_HVSDH_SET_CNF      = 13,       /* ^HVSDH????????????       */
+    SI_PIH_EVENT_HVSDH_QRY_CNF      = 14,       /* ^HVSDH????????????       */
+    SI_PIH_EVENT_HVSCONT_QUERY_CNF  = 15,       /* ^HVSCONT????????????     */
+    SI_PIH_EVENT_FILE_WRITE_CNF     = 16,       /* ^RSFW????????????        */
+    SI_PIH_EVENT_CCHO_SET_CNF       = 17,       /* +CCHO????????????        */
+    SI_PIH_EVENT_CCHC_SET_CNF       = 18,       /* +CCHC????????????        */
+    SI_PIH_EVENT_CGLA_SET_CNF       = 19,       /* +CGLA????????????        */
+    SI_PIH_EVENT_CARD_ATR_QRY_CNF   = 20,       /* ^CARDATR????????????     */
+    SI_PIH_EVENT_HVRDH_IND          = 21,       /* ^HVRDH????????           */
+    SI_PIH_EVENT_UICCAUTH_CNF       = 22,       /* ^UICCAUTH????????????    */
+    SI_PIH_EVENT_URSM_CNF           = 23,       /* ^URSM????????????        */
     SI_PIH_EVENT_CARDTYPE_QUERY_CNF = 24,
     SI_PIH_EVENT_CRSM_SET_CNF       = 25,
     SI_PIH_EVENT_CRLA_SET_CNF       = 26,
@@ -179,13 +179,13 @@ enum SI_PIH_EVENT_ENUM
     SI_PIH_EVENT_HVCHECKCARD_CNF    = 32,
     SI_PIH_EVENT_CIMI_QRY_CNF       = 33,
     SI_PIH_EVENT_CCIMI_QRY_CNF      = 34,
-    SI_PIH_EVENT_SIM_ERROR_IND      = 35,     /* SIM卡Error信息上报       */
+    SI_PIH_EVENT_SIM_ERROR_IND      = 35,     /* SIM??Error????????       */
 
     SI_PIH_EVENT_SIM_ICCID_IND      = 36,
 
     SI_PIH_EVENT_SIM_HOTPLUG_IND    = 38,
 
-    /*从500开始作为PIH内部可维可测消息的勾包*/
+    /*??500????????PIH??????????????????????*/
     SI_PIH_USIMREG_PID_HOOK         = 500,
     SI_PIH_REFRESHREG_PID_HOOK      = 501,
     SI_PIH_ISIMREG_PID_HOOK         = 502,
@@ -223,8 +223,8 @@ typedef VOS_UINT32      SI_PIH_QUERY_TYPE_ENUM_UINT32;
 
 enum SI_PIH_FDN_BDN_STATE_ENUM
 {
-    SI_PIH_STATE_FDN_BDN_DISABLE    = 0,     /*FDN/BDN功能未使能*/
-    SI_PIH_STATE_FDN_BDN_ENABLE     = 1,     /*FDN/BDN功能使能*/
+    SI_PIH_STATE_FDN_BDN_DISABLE    = 0,     /*FDN/BDN??????????*/
+    SI_PIH_STATE_FDN_BDN_ENABLE     = 1,     /*FDN/BDN????????*/
     SI_PIH_STATE_FDN_BDN_BUTT
 };
 typedef VOS_UINT32   SI_PIH_FDN_BDN_STATE;
@@ -232,9 +232,9 @@ typedef VOS_UINT32   SI_PIH_FDN_BDN_STATE;
 
 enum SI_PIH_FDN_BDN_CMD_ENUM
 {
-    SI_PIH_FDN_BDN_DISABLE          = 0,     /*去激活FDN/BDN功能*/
-    SI_PIH_FDN_BDN_ENABLE           = 1,     /*激活FDN/BDN功能*/
-    SI_PIH_FDN_BDN_QUERY            = 2,     /*去激活FDN/BDN状态查询*/
+    SI_PIH_FDN_BDN_DISABLE          = 0,     /*??????FDN/BDN????*/
+    SI_PIH_FDN_BDN_ENABLE           = 1,     /*????FDN/BDN????*/
+    SI_PIH_FDN_BDN_QUERY            = 2,     /*??????FDN/BDN????????*/
     SI_PIH_FDN_BDN_CMD_BUTT
 };
 typedef VOS_UINT32   SI_PIH_FDN_BDN_CMD;
@@ -380,89 +380,89 @@ enum SI_PIH_CHANGEPOLLTIMER_ENUM
 typedef VOS_UINT32  SI_PIH_CHANGEPOLLTIMER_ENUM_UINT32;
 
 /*****************************************************************************
-  4 数据结构定义
+  4 ????????????
 *****************************************************************************/
 
 /*****************************************************************************
- 结构名    : SI_PIH_ISDB_ACCESS_COMMAND_STRU
- 结构说明  : ISDB透传APDU的数据结构
- 1.日    期   : 2012年08月28日
-   作    者   : h59254
-   修改内容   : 新建
+ ??????    : SI_PIH_ISDB_ACCESS_COMMAND_STRU
+ ????????  : ISDB????APDU??????????
+ 1.??    ??   : 2012??08??28??
+   ??    ??   : h59254
+   ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulLen;                                  /* 输入APDU数据长度 */
-    VOS_UINT8                           aucCommand[SI_APDU_MAX_LEN];            /* 输入APDU数据内容 */
+    VOS_UINT32                          ulLen;                                  /* ????APDU???????? */
+    VOS_UINT8                           aucCommand[SI_APDU_MAX_LEN];            /* ????APDU???????? */
 }SI_PIH_ISDB_ACCESS_COMMAND_STRU;
 
 
 /*****************************************************************************
- 结构名    : SI_PIH_CCHO_COMMAND_STRU
- 结构说明  : 打开逻辑通道的数据结构
- 1.日    期   : 2013年05月14日
-   作    者   : g47350
-   修改内容   : 新建
+ ??????    : SI_PIH_CCHO_COMMAND_STRU
+ ????????  : ??????????????????????
+ 1.??    ??   : 2013??05??14??
+   ??    ??   : g47350
+   ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulAIDLen;                               /* AID的长度 */
+    VOS_UINT32                          ulAIDLen;                               /* AID?????? */
     VOS_UINT32                          ulRsv;
-    VOS_UINT8                           *pucADFName;                             /* 保存ADF的名字 */
+    VOS_UINT8                           *pucADFName;                             /* ????ADF?????? */
 }SI_PIH_CCHO_COMMAND_STRU;
 
 /*****************************************************************************
- 结构名    : SI_PIH_CGLA_COMMAND_STRU
- 结构说明  : 透传给逻辑通道APDU的数据结构
- 1.日    期   : 2013年05月14日
-   作    者   : g47350
-   修改内容   : 新建
+ ??????    : SI_PIH_CGLA_COMMAND_STRU
+ ????????  : ??????????????APDU??????????
+ 1.??    ??   : 2013??05??14??
+   ??    ??   : g47350
+   ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulSessionID;                            /* 通道号 */
-    VOS_UINT32                          ulLen;                                  /* 输入APDU数据长度 */
-    VOS_UINT8                           *pucCommand;                             /* 输入APDU数据内容 */
+    VOS_UINT32                          ulSessionID;                            /* ?????? */
+    VOS_UINT32                          ulLen;                                  /* ????APDU???????? */
+    VOS_UINT8                           *pucCommand;                             /* ????APDU???????? */
 }SI_PIH_CGLA_COMMAND_STRU;
 
 /*****************************************************************************
- 结构名    : SI_PIH_CGLA_COMMAND_CNF_STRU
- 结构说明  : 访问逻辑通道数据回复结果
-1.日    期   : 2013年05月14日
-  作    者   : g47350
-  修改内容   : 新建
+ ??????    : SI_PIH_CGLA_COMMAND_CNF_STRU
+ ????????  : ????????????????????????
+1.??    ??   : 2013??05??14??
+  ??    ??   : g47350
+  ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usLen;                                    /* 输出APDU数据长度 */
-    VOS_UINT8                           ucSW1;                                    /* 返回状态字1      */
-    VOS_UINT8                           ucSW2;                                    /* 返回状态字2      */
-    VOS_UINT8                           aucCommand[SI_APDU_MAX_LEN];              /* 输出APDU数据内容 */
+    VOS_UINT16                          usLen;                                    /* ????APDU???????? */
+    VOS_UINT8                           ucSW1;                                    /* ??????????1      */
+    VOS_UINT8                           ucSW2;                                    /* ??????????2      */
+    VOS_UINT8                           aucCommand[SI_APDU_MAX_LEN];              /* ????APDU???????? */
 }SI_PIH_CGLA_COMMAND_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : SI_PIH_ATR_QRY_CNF_STRU
- 结构说明  : 查询ATR数据回复结果
-1.日    期   : 2013年08月22日
-  作    者   : g47350
-  修改内容   : 新建
+ ??????    : SI_PIH_ATR_QRY_CNF_STRU
+ ????????  : ????ATR????????????
+1.??    ??   : 2013??08??22??
+  ??    ??   : g47350
+  ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulLen;                                    /* 输出APDU数据长度 */
-    VOS_UINT8                           aucCommand[SI_ATR_MAX_LEN];            /* 输出APDU数据内容 */
+    VOS_UINT32                          ulLen;                                    /* ????APDU???????? */
+    VOS_UINT8                           aucCommand[SI_ATR_MAX_LEN];            /* ????APDU???????? */
 }SI_PIH_ATR_QRY_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : SI_PIH_ISDB_ACCESS_COMMAND_CNF_STRU
- 结构说明  : ISDB透传APDU的数据回复结果
+ ??????    : SI_PIH_ISDB_ACCESS_COMMAND_CNF_STRU
+ ????????  : ISDB????APDU??????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usLen;                                    /* 输出APDU数据长度 */
-    VOS_UINT8                           ucSW1;                                    /* 返回状态字1      */
-    VOS_UINT8                           ucSW2;                                    /* 返回状态字2      */
-    VOS_UINT8                           aucCommand[SI_APDU_MAX_LEN];               /* 输出APDU数据内容 */
+    VOS_UINT16                          usLen;                                    /* ????APDU???????? */
+    VOS_UINT8                           ucSW1;                                    /* ??????????1      */
+    VOS_UINT8                           ucSW2;                                    /* ??????????2      */
+    VOS_UINT8                           aucCommand[SI_APDU_MAX_LEN];               /* ????APDU???????? */
 }SI_PIH_ISDB_ACCESS_COMMAND_CNF_STRU;
 
 typedef struct
@@ -504,8 +504,8 @@ typedef struct
 
 typedef struct
 {
-    SI_PIH_SIM_STATE_ENUM_UINT8         enVSimState;    /*vSIM卡状态，和硬卡状态互斥*/
-    SI_PIH_CARD_USE_ENUM_UINT8          enCardUse;      /*卡能否使用*/
+    SI_PIH_SIM_STATE_ENUM_UINT8         enVSimState;    /*vSIM??????????????????????*/
+    SI_PIH_CARD_USE_ENUM_UINT8          enCardUse;      /*??????????*/
     VOS_UINT8                           aucRsv[2];
 }SI_PIH_EVENT_HVSST_QUERY_CNF_STRU;
 
@@ -533,17 +533,17 @@ typedef struct
 typedef struct
 {
     VOS_UINT8                           ucIndex;
-    VOS_UINT8                           ucCardCap;  /* 按BIT位进行存放，BIT1:SIM,BIT2:USIM */
-    VOS_UINT8                           ucCardType; /* 按BIT位进行存放，BIT1:SIM,BIT2:USIM */
+    VOS_UINT8                           ucCardCap;  /* ??BIT????????????BIT1:SIM,BIT2:USIM */
+    VOS_UINT8                           ucCardType; /* ??BIT????????????BIT1:SIM,BIT2:USIM */
     VOS_UINT8                           ucRsv;
-    VOS_UINT8                           aucImsi[USIMM_EF_IMSI_LEN*2];   /* IMSI,需要传送ASCII码长度增大一倍 */
-    VOS_UINT16                          usPlmnNum;  /* PLMN个数 */
-    SI_PIH_PLMN_STRU                    astPlmn[SI_PIH_HPLMN_MAX_NUM]; /* PLMN内容 */
+    VOS_UINT8                           aucImsi[USIMM_EF_IMSI_LEN*2];   /* IMSI,????????ASCII?????????????? */
+    VOS_UINT16                          usPlmnNum;  /* PLMN???? */
+    SI_PIH_PLMN_STRU                    astPlmn[SI_PIH_HPLMN_MAX_NUM]; /* PLMN???? */
 }SI_PIH_CARD_CONTENT_STRU;
 
 typedef struct
 {
-    SI_PIH_CARD_CONTENT_STRU            astSimCard[SI_PIH_CARD_BUTT];   /* 支持卡的最大个数包括硬卡和虚拟卡 */
+    SI_PIH_CARD_CONTENT_STRU            astSimCard[SI_PIH_CARD_BUTT];   /* ???????????????????????????????? */
 }SI_PIH_HVSCONT_QUERY_CNF_STRU;
 
 typedef struct
@@ -568,8 +568,8 @@ typedef struct
 typedef struct
 {
     SI_PIH_AUTHSTATUS_ENUM_UINT32       enStatus;
-    SI_PIH_UICCAPP_ENUM_UINT32          enAppType;      /* 应用类型 */
-    SI_PIH_UICCAUTH_ENUM_UINT32         enAuthType;     /* 鉴权类型 */
+    SI_PIH_UICCAPP_ENUM_UINT32          enAppType;      /* ???????? */
+    SI_PIH_UICCAUTH_ENUM_UINT32         enAuthType;     /* ???????? */
     SI_PIH_UICCAKA_DATA_STRU            stAkaData;
     SI_PIH_UICCNAF_DATA_STRU            stNAFData;
 }SI_PIH_UICCAUTH_CNF_STRU;
@@ -644,11 +644,11 @@ typedef struct
 }SI_PIH_ACCESSFILE_STRU;
 
 /*****************************************************************************
- 结构名    : SI_PIH_CRSM_STRU
- 结构说明  : CRSM命令
- 1.日    期   : 2015年04月09日
-   作    者   : g00256031
-   修改内容   : 新建
+ ??????    : SI_PIH_CRSM_STRU
+ ????????  : CRSM????
+ 1.??    ??   : 2015??04??09??
+   ??    ??   : g00256031
+   ????????   : ????
 *****************************************************************************/
 typedef struct
 {
@@ -665,11 +665,11 @@ typedef struct
 }SI_PIH_CRSM_STRU;
 
 /*****************************************************************************
- 结构名    : SI_PIH_CRLA_STRU
- 结构说明  : CRLA命令
- 1.日    期   : 2015年04月09日
-   作    者   : g00256031
-   修改内容   : 新建
+ ??????    : SI_PIH_CRLA_STRU
+ ????????  : CRLA????
+ 1.??    ??   : 2015??04??09??
+   ??    ??   : g00256031
+   ????????   : ????
 *****************************************************************************/
 typedef struct
 {
@@ -703,18 +703,18 @@ typedef struct
 } SI_PIH_EVENT_CARDTYPE_QUERY_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : SI_PIH_RACCESS_CNF_STRU
- 结构说明  :  CRSM&CRLA命令回复
- 1.日    期   : 2015年04月08日
-   作    者   : g00256031
-   修改内容   : 新建
+ ??????    : SI_PIH_RACCESS_CNF_STRU
+ ????????  :  CRSM&CRLA????????
+ 1.??    ??   : 2015??04??08??
+   ??    ??   : g00256031
+   ????????   : ????
 *****************************************************************************/
 typedef struct
 {
     VOS_UINT8                           ucSW1;                                      /* Status Word 1*/
     VOS_UINT8                           ucSW2;                                      /* Status Word 2 */
-    VOS_UINT16                          usLen;                                      /* 返回数据长度,不包含SW1和SW2       */
-    VOS_UINT8                           aucContent[USIMM_APDU_RSP_MAX_LEN];         /* 返回Data*/
+    VOS_UINT16                          usLen;                                      /* ????????????,??????SW1??SW2       */
+    VOS_UINT8                           aucContent[USIMM_APDU_RSP_MAX_LEN];         /* ????Data*/
 }SI_PIH_RACCESS_CNF_STRU;
 
 typedef struct
@@ -743,14 +743,14 @@ typedef struct
     SI_PIH_HVCHECKCARD_STATUS_ENUM_UINT32   enData;
 }SI_PIH_HVCHECKCARD_CNF_STRU;
 
-/*+CIMI - 获取IMSI*/
+/*+CIMI - ????IMSI*/
 typedef struct
 {
     VOS_UINT8  aucImsi[15 + 1];
 }SI_PIH_EVENT_IMSI_STRU;
 
 /*****************************************************************************
-  5 回调函数数据结构定义
+  5 ????????????????????
 *****************************************************************************/
 
 typedef struct
@@ -793,11 +793,11 @@ typedef struct
 typedef struct
 {
     VOS_MSG_HEADER
-    SI_PIH_CHANGEPOLLTIMER_ENUM_UINT32  enMsgName;       /* 消息名 */
+    SI_PIH_CHANGEPOLLTIMER_ENUM_UINT32  enMsgName;       /* ?????? */
     VOS_UINT32                          ulTimerLen;
 }SI_PIH_CHANGEPOLLTIMER_REQ_STRU;
 
-/*外部接口*/
+/*????????*/
 #if (FEATURE_ON == FEATURE_VSIM)
 #ifdef CONFIG_TZDRIVER
 typedef struct
@@ -818,7 +818,7 @@ extern VOS_VOID SI_PIH_TEETimeOutCB (
 #endif/*(FEATURE_ON == FEATURE_VSIM)*/
 
 /*****************************************************************************
-  6 函数声明
+  6 ????????
 *****************************************************************************/
 #if  ((OSA_CPU_ACPU == VOS_OSA_CPU) || (defined(DMT))) || (defined(__PC_UT__))
 extern VOS_UINT32 SI_PIH_IsSvlte(VOS_VOID);
@@ -985,62 +985,62 @@ extern VOS_UINT32 PIH_DeregCardRefreshIndMsg(
     VOS_UINT32                          ulRegPID);
 
 
-/*单编译接口的声明*/
+/*????????????????*/
 /*****************************************************************************
-函 数 名  : PIH_RegUsimCardStatusIndMsg_Instance
-功能描述  : 卡状态注册接口
-输入参数  : enModemID:Modem ID
-            ulRegPID:注册PID
-输出参数  : 无
-修订记录  :
-1. 日    期   : 2013年5月27日
-   作    者   : h59254
-   修改内容   : Creat
+?? ?? ??  : PIH_RegUsimCardStatusIndMsg_Instance
+????????  : ??????????????
+????????  : enModemID:Modem ID
+            ulRegPID:????PID
+????????  : ??
+????????  :
+1. ??    ??   : 2013??5??27??
+   ??    ??   : h59254
+   ????????   : Creat
 *****************************************************************************/
 extern VOS_UINT32 PIH_RegUsimCardStatusIndMsg_Instance(
     MODEM_ID_ENUM_UINT16                enModemID,
     VOS_UINT32                          ulRegPID);
 
 /*****************************************************************************
-函 数 名  : PIH_DeregUsimCardStatusIndMsg_Instance
-功能描述  : 卡状态去注册接口
-输入参数  : enModemID:Modem ID
-            ulRegPID:去注册PID
-输出参数  : 无
-修订记录  :
-1. 日    期   : 2013年5月27日
-   作    者   : h59254
-   修改内容   : Creat
+?? ?? ??  : PIH_DeregUsimCardStatusIndMsg_Instance
+????????  : ????????????????
+????????  : enModemID:Modem ID
+            ulRegPID:??????PID
+????????  : ??
+????????  :
+1. ??    ??   : 2013??5??27??
+   ??    ??   : h59254
+   ????????   : Creat
 *****************************************************************************/
 extern VOS_UINT32 PIH_DeregUsimCardStatusIndMsg_Instance(
     MODEM_ID_ENUM_UINT16                enModemID,
     VOS_UINT32                          ulRegPID);
 
 /*****************************************************************************
-函 数 名  : PIH_RegCardRefreshIndMsg_Instance
-功能描述  : Refresh注册接口
-输入参数  : enModemID:Modem ID
-            ulRegPID:注册PID
-输出参数  : 无
-修订记录  :
-1. 日    期   : 2013年5月27日
-   作    者   : h59254
-   修改内容   : Creat
+?? ?? ??  : PIH_RegCardRefreshIndMsg_Instance
+????????  : Refresh????????
+????????  : enModemID:Modem ID
+            ulRegPID:????PID
+????????  : ??
+????????  :
+1. ??    ??   : 2013??5??27??
+   ??    ??   : h59254
+   ????????   : Creat
 *****************************************************************************/
 extern VOS_UINT32 PIH_RegCardRefreshIndMsg_Instance(
     MODEM_ID_ENUM_UINT16                enModemID,
     VOS_UINT32                          ulRegPID);
 
 /*****************************************************************************
-函 数 名  : PIH_DeregCardRefreshIndMsg_Instance
-功能描述  : Refresh去注册接口
-输入参数  : enModemID:Modem ID
-            ulRegPID:去注册PID
-输出参数  : 无
-修订记录  :
-1. 日    期   : 2013年5月27日
-   作    者   : h59254
-   修改内容   : Creat
+?? ?? ??  : PIH_DeregCardRefreshIndMsg_Instance
+????????  : Refresh??????????
+????????  : enModemID:Modem ID
+            ulRegPID:??????PID
+????????  : ??
+????????  :
+1. ??    ??   : 2013??5??27??
+   ??    ??   : h59254
+   ????????   : Creat
 *****************************************************************************/
 extern VOS_UINT32 PIH_DeregCardRefreshIndMsg_Instance(
     MODEM_ID_ENUM_UINT16                enModemID,

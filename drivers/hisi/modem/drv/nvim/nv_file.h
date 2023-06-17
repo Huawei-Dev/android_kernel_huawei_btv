@@ -49,24 +49,21 @@
 #ifndef _NV_FILE_H_
 #define _NV_FILE_H_
 
-
 #ifdef __cplusplus
 #if __cplusplus
 extern "C" {
 #endif
 #endif
 
-/*lint -save -e537*/
 #include <linux/kernel.h>
 #include <mdrv.h>
 #include <osl_types.h>
 #include "nv_comm.h"
 #include "bsp_nvim.h"
-/*lint -restore +e537*/
+
 #ifndef NAND_OK
 #define NAND_OK    0
 #endif
-
 
 enum
 {
@@ -88,8 +85,6 @@ enum
 
 #define   NV_FILE_EXIST              NV_FILE_USING   /*nv*/
 #define   NV_DLOAD_INVALID_FLAG      0xe601cdba
-
-
 
 /*API ENUM*/
 enum
@@ -114,15 +109,13 @@ enum
     NV_BAD_SECTION
 };
 
-
-
 #define NV_FLASH_NULL                        (0xffffffff)
 #define NV_FLASH_VALID_DATA                  (0x0)
 #define NV_FLASH_FILL                        (0xff)    /*mtd write one page,need to fill invality data*/
 
 /*8bit nand,blocksize = 128k*/
-#define NV_BIN_FILE_BLOCK_NUM         32           /*分区最大有4M,32块*/
-#define NV_DLOAD_FILE_BLOCK_NUM       24           /*dload 分区长度3M,块数最多24块*/
+#define NV_BIN_FILE_BLOCK_NUM         32
+#define NV_DLOAD_FILE_BLOCK_NUM       24
 
 struct nv_sec_file_block_info
 {
@@ -131,7 +124,6 @@ struct nv_sec_file_block_info
     u32 nv_bak[NV_BIN_FILE_BLOCK_NUM];
     u32 nv_default[NV_BIN_FILE_BLOCK_NUM];
 };
-
 
 #if defined(FEATURE_NV_FLASH_ON)
 
@@ -145,12 +137,11 @@ struct nv_nand_info_stru
 struct nv_flash_global_ctrl_stru
 {
     struct nv_dload_packet_head_stru nv_dload;  /*data info in dload flag*/
-    STRU_XNV_MAP_FILE_INFO *other_card_info;  /*除卡1 2外的其他卡的NV信息*/
+    STRU_XNV_MAP_FILE_INFO *other_card_info;
     struct nv_file_info_stru  sys_nv;
     struct nv_file_info_stru  bak_sec;
     struct nv_file_info_stru  def_sec;
 };
-
 
 struct nv_flash_file_header_stru
 {
@@ -211,7 +202,7 @@ s32   nv_rfile_seek(FILE * fp, s32 offset, s32 whence);
 
 extern char g_emmc_area_name[NV_FILE_BUTT][64];
 
-#define NV_IMG_SEC_NAME                NULL /*不使用，不获取*/
+#define NV_IMG_SEC_NAME                NULL
 #define NV_BACK_SEC_NAME               g_emmc_area_name[NV_FILE_BACKUP]
 #define NV_DLOAD_SEC_NAME              g_emmc_area_name[NV_FILE_DLOAD]
 #define NV_DEF_SEC_NAME                g_emmc_area_name[NV_FILE_DEFAULT]
@@ -227,7 +218,7 @@ struct nv_emmc_info_stru
 struct nv_emmc_global_ctrl_stru
 {
     struct nv_dload_packet_head_stru nv_dload;  /*data info in dload flag*/
-    STRU_XNV_MAP_FILE_INFO *other_card_info;  /*除卡1 2外的其他卡的NV信息*/
+    STRU_XNV_MAP_FILE_INFO *other_card_info;
     struct nv_file_info_stru  sys_nv; /*img all section info*/
     struct nv_file_info_stru  bak_sec;
     struct nv_file_info_stru  def_sec;
@@ -273,6 +264,4 @@ u32 nv_read_dload_file(u8* ptr, u32 size, u32 count,u32 offset);
 #endif
 #endif
 
-
 #endif /*_NV_FILE_H_*/
-

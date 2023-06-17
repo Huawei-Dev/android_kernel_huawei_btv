@@ -121,7 +121,6 @@ s32 drv_hkadc_get_temp(HKADC_TEMP_PROTECT_E enMode, unsigned short* pusVolt, sho
     volt   = p_area->chan_out[phy_chan].volt_l;
     //volt_r = p_area->chan_out[phy_chan].volt_r;
 
-    /*取反校验暂时不判断*/
     if(NULL != pusVolt)
     {
         *pusVolt = volt;
@@ -134,11 +133,8 @@ s32 drv_hkadc_get_temp(HKADC_TEMP_PROTECT_E enMode, unsigned short* pusVolt, sho
     return TEMPERATURE_OK;
 }
 
-
 int mdrv_hkadc_get_temp (HKADC_TEMP_PROTECT_E enMode, unsigned short* pusVolt, short* psTemp, HKADC_CONV_MODE_E ulMode)
 {
     return drv_hkadc_get_temp(enMode, pusVolt, psTemp,ulMode);
 }
 EXPORT_SYMBOL(mdrv_hkadc_get_temp);
-
-

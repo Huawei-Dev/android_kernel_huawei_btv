@@ -48,7 +48,7 @@
 
 
 /*****************************************************************************
-   1 头文件包含
+   1 ??????????
 *****************************************************************************/
 #include "vos.h"
 #include "Taf_Tafm_Remote.h"
@@ -65,15 +65,15 @@
 /*lint -e958*/
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
 
-/*lint -e767 修改人:罗建 107747;检视人:孙少华65952;原因:Log打印*/
+/*lint -e767 ??????:???? 107747;??????:??????65952;????:Log????*/
 #define    THIS_FILE_ID PS_FILE_ID_TAF_MMA_API_C
-/*lint +e767 修改人:罗建 107747;检视人:sunshaohua*/
+/*lint +e767 ??????:???? 107747;??????:sunshaohua*/
 
 /*****************************************************************************
-   2 全局变量定义
+   2 ????????????
 *****************************************************************************/
     extern VOS_UINT32 AT_GetDestPid(
         MN_CLIENT_ID_T                      usClientId,
@@ -81,32 +81,32 @@
     );
 
 /*****************************************************************************
-   3 函数实现
+   3 ????????
 *****************************************************************************/
 
 
 
 /*****************************************************************************
- 函 数 名  : Taf_PhonePinHandle
- 功能描述  : +CPIN USIM提供的PIN操做的API
+ ?? ?? ??  : Taf_PhonePinHandle
+ ????????  : +CPIN USIM??????PIN??????API
              void Api_PIN_Handle(VOS_UINT8 ucClientId,VOS_UINT8 ucCmdType, VOS_UINT8
              ucPINType,\
-             VOS_UINT8 *pucOldPIN, VOS_UINT8 *pucNewPIN)；
- 输入参数  : ClientId - APP/AT标识
-                 OpId - 操作标识
-*pPinData - 手机PIN码操作数据结构
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+             VOS_UINT8 *pucOldPIN, VOS_UINT8 *pucNewPIN)??
+ ????????  : ClientId - APP/AT????
+                 OpId - ????????
+*pPinData - ????PIN??????????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2005年8月25日
-    作    者   : liuyang
-    修改内容   : V200R001版本生成函数
-  2.日    期   : 2007年10月16日
-    作    者   : F62575
-    修改内容   : 问题单A32D13062(文档校对发现问题)
+ ????????      :
+  1.??    ??   : 2005??8??25??
+    ??    ??   : liuyang
+    ????????   : V200R001????????????
+  2.??    ??   : 2007??10??16??
+    ??    ??   : F62575
+    ????????   : ??????A32D13062(????????????????)
 *****************************************************************************/
 TAF_UINT32 Taf_PhonePinHandle ( MN_CLIENT_ID_T          ClientId,
                                 MN_OPERATION_ID_T       OpId,
@@ -122,16 +122,16 @@ TAF_UINT32 Taf_PhonePinHandle ( MN_CLIENT_ID_T          ClientId,
 
 
 /*****************************************************************************
- 函 数 名  : Taf_MePersonalisationHandle
- 功能描述  : 锁卡状态查询
- 输入参数  : pMsg  消息块
- 输出参数  : ClientId - APP/AT标识
-             OpId - 操作标识
- 返 回 值  : 成功，失败
- 修改历史      :
-  1.日    期   : 2007年9月28日
-    作    者   : h44270
-    修改内容   : 新生成函数
+ ?? ?? ??  : Taf_MePersonalisationHandle
+ ????????  : ????????????
+ ????????  : pMsg  ??????
+ ????????  : ClientId - APP/AT????
+             OpId - ????????
+ ?? ?? ??  : ??????????
+ ????????      :
+  1.??    ??   : 2007??9??28??
+    ??    ??   : h44270
+    ????????   : ??????????
 *****************************************************************************/
 VOS_UINT32 Taf_MePersonalisationHandle(MN_CLIENT_ID_T          ClientId,
                                        MN_OPERATION_ID_T                 OpId,
@@ -150,23 +150,23 @@ VOS_UINT32 Taf_MePersonalisationHandle(MN_CLIENT_ID_T          ClientId,
 
 /**********************************************************
  Function:       Taf_PhonePlmnList
- Description:    可用PLMN搜索
+ Description:    ????PLMN????
  Calls:          APP/AT
  Data Accessed:  2005-09-16
  Data Updated:
- Input:          ClientId - APP/AT标识
-                 OpId     - 操作标识
-                 ListType - 搜索类型
+ Input:          ClientId - APP/AT????
+                 OpId     - ????????
+                 ListType - ????????
  Output:
- Return:         TAF_SUCCESS - 成功
-                 TAF_FAILURE - 失败
+ Return:         TAF_SUCCESS - ????
+                 TAF_FAILURE - ????
  Others:
     1.Date        : 2007-10-16
     Author      : F62575
-    Modification: 问题单A32D13062(文档校对发现问题)
+    Modification: ??????A32D13062(????????????????)
     2.Date        : 2015-3-4
     Author      : b00269685
-    Modification: 使用新接口改为分段上报
+    Modification: ??????????????????????
 **********************************************************/
 TAF_UINT32 Taf_PhonePlmnList (
     VOS_UINT32                          ulModuleId,
@@ -182,18 +182,18 @@ TAF_UINT32 Taf_PhonePlmnList (
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (VOS_NULL_PTR == pstPlmnListPara)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_DETACH_REQ_STRU */
+    /* ??????????TAF_MMA_DETACH_REQ_STRU */
     pstMsg = (TAF_MMA_PLMN_LIST_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                            ulSenderPid,
                                            sizeof(TAF_MMA_PLMN_LIST_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -202,8 +202,8 @@ TAF_UINT32 Taf_PhonePlmnList (
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_PLMN_LIST_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 根据输入参数填充TAF_PLMN_LIST_REQ_STRU */
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????????????????TAF_PLMN_LIST_REQ_STRU */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_PLMN_LIST_REQ;
@@ -212,7 +212,7 @@ TAF_UINT32 Taf_PhonePlmnList (
     pstMsg->stCtrl.ucOpId     = ucOpId;
     PS_MEM_CPY(&(pstMsg->stPlmnListPara), pstPlmnListPara, sizeof(TAF_MMA_PLMN_LIST_PARA_STRU));
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -222,20 +222,20 @@ TAF_UINT32 Taf_PhonePlmnList (
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_PlmnAutoReselReq
- 功能描述  : 自动搜网
- 输入参数  : ulModuleId             ---  外部模块PID
-             usCliendId             ---  外部模块CliendId
-             ucOpId                 ---  外部模块OpId
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_PlmnAutoReselReq
+ ????????  : ????????
+ ????????  : ulModuleId             ---  ????????PID
+             usCliendId             ---  ????????CliendId
+             ucOpId                 ---  ????????OpId
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月23日
-    作    者   : f00279542
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??23??
+    ??    ??   : f00279542
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_PlmnAutoReselReq(
@@ -251,12 +251,12 @@ VOS_UINT32 TAF_MMA_PlmnAutoReselReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_PLMN_AUTO_RESEL_REQ_STRU */
+    /* ??????????TAF_MMA_PLMN_AUTO_RESEL_REQ_STRU */
     pstMsg = (TAF_MMA_PLMN_AUTO_RESEL_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                             ulSenderPid,
                                             sizeof(TAF_MMA_PLMN_AUTO_RESEL_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -266,7 +266,7 @@ VOS_UINT32 TAF_MMA_PlmnAutoReselReq(
                 0x00,
                 sizeof(TAF_MMA_PLMN_AUTO_RESEL_REQ_STRU) - VOS_MSG_HEAD_LENGTH);
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_PLMN_AUTO_RESEL_REQ;
@@ -274,28 +274,28 @@ VOS_UINT32 TAF_MMA_PlmnAutoReselReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_PlmnSpecialSelReq
- 功能描述  : 自动搜网
- 输入参数  : ulModuleId             ---  外部模块PID
-             usCliendId             ---  外部模块CliendId
-             ucOpId                 ---  外部模块OpId
-             ucPlmnReselModeType    ---  fplmn resel设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_PlmnSpecialSelReq
+ ????????  : ????????
+ ????????  : ulModuleId             ---  ????????PID
+             usCliendId             ---  ????????CliendId
+             ucOpId                 ---  ????????OpId
+             ucPlmnReselModeType    ---  fplmn resel????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月23日
-    作    者   : f00279542
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??23??
+    ??    ??   : f00279542
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_PlmnSpecialSelReq(
@@ -312,12 +312,12 @@ VOS_UINT32 TAF_MMA_PlmnSpecialSelReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_PLMN_SPECIAL_SEL_REQ_STRU */
+    /* ??????????TAF_MMA_PLMN_SPECIAL_SEL_REQ_STRU */
     pstMsg = (TAF_MMA_PLMN_SPECIAL_SEL_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                             ulSenderPid,
                                             sizeof(TAF_MMA_PLMN_SPECIAL_SEL_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -327,7 +327,7 @@ VOS_UINT32 TAF_MMA_PlmnSpecialSelReq(
                 0x00,
                 sizeof(TAF_MMA_PLMN_SPECIAL_SEL_REQ_STRU) - VOS_MSG_HEAD_LENGTH);
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_PLMN_SPECIAL_SEL_REQ;
@@ -336,27 +336,27 @@ VOS_UINT32 TAF_MMA_PlmnSpecialSelReq(
     pstMsg->stCtrl.ucOpId               = ucOpId;
     PS_MEM_CPY(&(pstMsg->stPlmnUserSel), pstPlmnUserSel, sizeof(TAF_PLMN_USER_SEL_STRU));
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 /*****************************************************************************
- 函 数 名  : TAF_MMA_AbortPlmnListReq
- 功能描述  : AbortReq
- 输入参数  : ulModuleId             ---  外部模块PID
-             usCliendId             ---  外部模块CliendId
-             ucOpId                 ---  外部模块OpId
-             ucPlmnReselModeType    ---  fplmn resel设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_AbortPlmnListReq
+ ????????  : AbortReq
+ ????????  : ulModuleId             ---  ????????PID
+             usCliendId             ---  ????????CliendId
+             ucOpId                 ---  ????????OpId
+             ucPlmnReselModeType    ---  fplmn resel????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月23日
-    作    者   : f00279542
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??23??
+    ??    ??   : f00279542
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_AbortPlmnListReq(
@@ -372,12 +372,12 @@ VOS_UINT32 TAF_MMA_AbortPlmnListReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_PLMN_LIST_ABORT_REQ_STRU */
+    /* ??????????TAF_MMA_PLMN_LIST_ABORT_REQ_STRU */
     pstMsg = (TAF_MMA_PLMN_LIST_ABORT_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                             ulSenderPid,
                                             sizeof(TAF_MMA_PLMN_LIST_ABORT_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -387,34 +387,34 @@ VOS_UINT32 TAF_MMA_AbortPlmnListReq(
                 0x00,
                 sizeof(TAF_MMA_PLMN_LIST_ABORT_REQ_STRU) - VOS_MSG_HEAD_LENGTH);
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_PLMN_LIST_ABORT_REQ;
     pstMsg->stCtrl.ulModuleId           = ulModuleId;
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryLocInfoReq
- 功能描述  : query loc info
- 输入参数  : ulModuleId             ---  外部模块PID
-             usCliendId             ---  外部模块CliendId
-             ucOpId                 ---  外部模块OpId
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_QryLocInfoReq
+ ????????  : query loc info
+ ????????  : ulModuleId             ---  ????????PID
+             usCliendId             ---  ????????CliendId
+             ucOpId                 ---  ????????OpId
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月23日
-    作    者   : f00279542
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??23??
+    ??    ??   : f00279542
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryLocInfoReq(
@@ -430,12 +430,12 @@ VOS_UINT32 TAF_MMA_QryLocInfoReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包ID_TAF_MMA_LOCINFO_QRY_REQ */
+    /* ??????????ID_TAF_MMA_LOCINFO_QRY_REQ */
     pstMsg = (TAF_MMA_LOCATION_INFO_QRY_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                                    ulSenderPid,
                                                    sizeof(TAF_MMA_LOCATION_INFO_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -445,33 +445,33 @@ VOS_UINT32 TAF_MMA_QryLocInfoReq(
                 0x00,
                 sizeof(TAF_MMA_LOCATION_INFO_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH);
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_LOCATION_INFO_QRY_REQ;
     pstMsg->stCtrl.ulModuleId           = ulModuleId;
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryCipherReq
- 功能描述  : query cipher info
- 输入参数  : ulModuleId             ---  外部模块PID
-             usCliendId             ---  外部模块CliendId
-             ucOpId                 ---  外部模块OpId
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_QryCipherReq
+ ????????  : query cipher info
+ ????????  : ulModuleId             ---  ????????PID
+             usCliendId             ---  ????????CliendId
+             ucOpId                 ---  ????????OpId
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月23日
-    作    者   : f00279542
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??23??
+    ??    ??   : f00279542
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryCipherReq(
@@ -487,12 +487,12 @@ VOS_UINT32 TAF_MMA_QryCipherReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包ID_TAF_MMA_LOCINFO_QRY_REQ */
+    /* ??????????ID_TAF_MMA_LOCINFO_QRY_REQ */
     pstMsg = (TAF_MMA_CIPHER_QRY_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                             ulSenderPid,
                                             sizeof(TAF_MMA_CIPHER_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -502,34 +502,34 @@ VOS_UINT32 TAF_MMA_QryCipherReq(
                 0x00,
                 sizeof(TAF_MMA_CIPHER_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH);
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_CIPHER_QRY_REQ;
     pstMsg->stCtrl.ulModuleId           = ulModuleId;
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SetPrefPlmnTypeReq
- 功能描述  : set prefer plmn type
- 输入参数  : ulModuleId             ---  外部模块PID
-             usCliendId             ---  外部模块CliendId
-             ucOpId                 ---  外部模块OpId
-             ucPlmnReselModeType    ---  fplmn resel设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_SetPrefPlmnTypeReq
+ ????????  : set prefer plmn type
+ ????????  : ulModuleId             ---  ????????PID
+             usCliendId             ---  ????????CliendId
+             ucOpId                 ---  ????????OpId
+             ucPlmnReselModeType    ---  fplmn resel????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月23日
-    作    者   : f00279542
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??23??
+    ??    ??   : f00279542
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_SetPrefPlmnTypeReq(
@@ -546,12 +546,12 @@ VOS_UINT32 TAF_MMA_SetPrefPlmnTypeReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_PREF_PLMN_TYPE_SET_REQ_STRU */
+    /* ??????????TAF_MMA_PREF_PLMN_TYPE_SET_REQ_STRU */
     pstMsg = (TAF_MMA_PREF_PLMN_TYPE_SET_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                                     ulSenderPid,
                                                     sizeof(TAF_MMA_PREF_PLMN_TYPE_SET_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -561,7 +561,7 @@ VOS_UINT32 TAF_MMA_SetPrefPlmnTypeReq(
                 0x00,
                 sizeof(TAF_MMA_PREF_PLMN_TYPE_SET_REQ_STRU) - VOS_MSG_HEAD_LENGTH);
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_PREF_PLMN_TYPE_SET_REQ;
@@ -569,27 +569,27 @@ VOS_UINT32 TAF_MMA_SetPrefPlmnTypeReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
     pstMsg->enPrefPlmnType              = *penPrefPlmnType;
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 /*****************************************************************************
- 函 数 名  : TAF_MMA_MtPowerDownReq
- 功能描述  : 自动搜网
- 输入参数  : ulModuleId             ---  外部模块PID
-             usCliendId             ---  外部模块CliendId
-             ucOpId                 ---  外部模块OpId
-             ucPlmnReselModeType    ---  fplmn resel设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_MtPowerDownReq
+ ????????  : ????????
+ ????????  : ulModuleId             ---  ????????PID
+             usCliendId             ---  ????????CliendId
+             ucOpId                 ---  ????????OpId
+             ucPlmnReselModeType    ---  fplmn resel????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月23日
-    作    者   : f00279542
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??23??
+    ??    ??   : f00279542
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_MtPowerDownReq(
@@ -605,12 +605,12 @@ VOS_UINT32 TAF_MMA_MtPowerDownReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_MT_POWER_DOWN_REQ_STRU */
+    /* ??????????TAF_MMA_MT_POWER_DOWN_REQ_STRU */
     pstMsg = (TAF_MMA_MT_POWER_DOWN_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                             ulSenderPid,
                                             sizeof(TAF_MMA_MT_POWER_DOWN_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -620,14 +620,14 @@ VOS_UINT32 TAF_MMA_MtPowerDownReq(
                 0x00,
                 sizeof(TAF_MMA_MT_POWER_DOWN_REQ_STRU) - VOS_MSG_HEAD_LENGTH);
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_MT_POWER_DOWN_REQ;
     pstMsg->stCtrl.ulModuleId           = ulModuleId;
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
@@ -635,18 +635,18 @@ VOS_UINT32 TAF_MMA_MtPowerDownReq(
 
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SetQuickStartReq
- 功能描述  : AT^CQST=功能
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_SetQuickStartReq
+ ????????  : AT^CQST=????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月24日
-    作    者   : y00322978
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??24??
+    ??    ??   : y00322978
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_SetQuickStartReq(
@@ -663,12 +663,12 @@ VOS_UINT32 TAF_MMA_SetQuickStartReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_QUICKSTART_SET_REQ_STRU */
+    /* ??????????TAF_MMA_QUICKSTART_SET_REQ_STRU */
     pstMsg = (TAF_MMA_QUICKSTART_SET_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                               ulSenderPid,
                                               sizeof(TAF_MMA_QUICKSTART_SET_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -677,7 +677,7 @@ VOS_UINT32 TAF_MMA_SetQuickStartReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_QUICKSTART_SET_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_QUICKSTART_SET_REQ;
@@ -686,25 +686,25 @@ VOS_UINT32 TAF_MMA_SetQuickStartReq(
     pstMsg->stCtrl.ucOpId               = ucOpId;
     pstMsg->ulQuickStartMode            = ulSetValue;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryQuickStartReq
- 功能描述  : CQST QRY命令
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_QryQuickStartReq
+ ????????  : CQST QRY????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月27日
-    作    者   : y00322978
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??27??
+    ??    ??   : y00322978
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryQuickStartReq(
@@ -720,12 +720,12 @@ VOS_UINT32 TAF_MMA_QryQuickStartReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_QUICKSTART_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_QUICKSTART_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_QUICKSTART_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                        ulSenderPid,
                                        sizeof(TAF_MMA_QUICKSTART_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -734,7 +734,7 @@ VOS_UINT32 TAF_MMA_QryQuickStartReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_QUICKSTART_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_QUICKSTART_QRY_REQ;
@@ -742,7 +742,7 @@ VOS_UINT32 TAF_MMA_QryQuickStartReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
@@ -751,18 +751,18 @@ VOS_UINT32 TAF_MMA_QryQuickStartReq(
 
 
 /*****************************************************************************
- 函 数 名  : Taf_UsimRestrictedAccessCommand
- 功能描述  : 用于支持受限制的卡操作命令
- 输入参数  :
- 输出参数  :
- 返 回 值  :
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : Taf_UsimRestrictedAccessCommand
+ ????????  : ??????????????????????????
+ ????????  :
+ ????????  :
+ ?? ?? ??  :
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2006年10月25日
-    作    者   : h59254
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2006??10??25??
+    ??    ??   : h59254
+    ????????   : ??????????
 *****************************************************************************/
 TAF_UINT32 Taf_UsimRestrictedAccessCommand(MN_CLIENT_ID_T               ClientId,
                                            MN_OPERATION_ID_T            OpId,
@@ -779,20 +779,20 @@ TAF_UINT32 Taf_UsimRestrictedAccessCommand(MN_CLIENT_ID_T               ClientId
 
 
 /*****************************************************************************
- 函 数 名  : Taf_IndPhFreq
- 功能描述  : 指定频点搜网
- 输入参数  : MN_CLIENT_ID_T ClientId
+ ?? ?? ??  : Taf_IndPhFreq
+ ????????  : ????????????
+ ????????  : MN_CLIENT_ID_T ClientId
              MN_OPERATION_ID_T   OpId
              TAF_IND_FREQ_STRU Freq
- 输出参数  : TAF_SUCCESS or TAF_FAILURE
- 返 回 值  :
- 调用函数  :
- 被调函数  :
+ ????????  : TAF_SUCCESS or TAF_FAILURE
+ ?? ?? ??  :
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2006年10月24日
-    作    者   : x51137
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2006??10??24??
+    ??    ??   : x51137
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 Taf_IndPhFreq(MN_CLIENT_ID_T     ClientId,
@@ -840,20 +840,20 @@ VOS_UINT32 Taf_IndPhFreq(MN_CLIENT_ID_T     ClientId,
 
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QrySyscfgReq
- 功能描述  : AT+SYSCFG QRY逻辑
- 输入参数  : VOS_UINT32                          ulModuleId,
+ ?? ?? ??  : TAF_MMA_QrySyscfgReq
+ ????????  : AT+SYSCFG QRY????
+ ????????  : VOS_UINT32                          ulModuleId,
              VOS_UINT16                          usClientId,
              VOS_UINT8                           ucOpId
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月26日
-    作    者   : y00322978
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??26??
+    ??    ??   : y00322978
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QrySyscfgReq(
@@ -869,12 +869,12 @@ VOS_UINT32 TAF_MMA_QrySyscfgReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_SYSCFG_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_SYSCFG_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_SYSCFG_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                            ulSenderPid,
                                            sizeof(TAF_MMA_SYSCFG_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
        return VOS_FALSE;
@@ -883,14 +883,14 @@ VOS_UINT32 TAF_MMA_QrySyscfgReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
                 (VOS_SIZE_T)(sizeof(TAF_MMA_SYSCFG_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_SYSCFG_QRY_REQ;
     pstMsg->stCtrl.ulModuleId           = ulModuleId;
     pstMsg->stCtrl.usClientId           = usClientId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
@@ -898,20 +898,20 @@ VOS_UINT32 TAF_MMA_QrySyscfgReq(
 
 
 /*****************************************************************************
- 函 数 名  : Taf_SetCopsFormatTypeReq
- 功能描述  : 处理cops设置显示类型的请求
- 输入参数  : TAF_CLIENT_ID        ClientId
+ ?? ?? ??  : Taf_SetCopsFormatTypeReq
+ ????????  : ????cops??????????????????
+ ????????  : TAF_CLIENT_ID        ClientId
              TAF_ID OpId
              TAF_MMA_NET_SCAN_REQ_STRU    pstNetScan
- 输出参数  : 无
- 返 回 值  : TAF_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : TAF_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月9日
-    作    者   : z00161729
-    修改内容   : AT&T 支持EONS特性修改
+ ????????      :
+  1.??    ??   : 2015??3??9??
+    ??    ??   : z00161729
+    ????????   : AT&T ????EONS????????
 *****************************************************************************/
 VOS_UINT32 Taf_SetCopsFormatTypeReq(
     MN_CLIENT_ID_T                                          usClientId,
@@ -929,20 +929,20 @@ VOS_UINT32 Taf_SetCopsFormatTypeReq(
 
 
 /*****************************************************************************
- 函 数 名  : TAF_SetUsimStub
- 功能描述  : 处理模拟usim回复读文件回复给mma
- 输入参数  : TAF_CLIENT_ID        ClientId
+ ?? ?? ??  : TAF_SetUsimStub
+ ????????  : ????????usim????????????????mma
+ ????????  : TAF_CLIENT_ID        ClientId
              TAF_ID OpId
              TAF_MMA_USIM_STUB_SET_REQ_STRU     *pstUsimStub
- 输出参数  : 无
- 返 回 值  : TAF_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : TAF_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月31日
-    作    者   : z00161729
-    修改内容   : AT&T 支持EONS特性修改
+ ????????      :
+  1.??    ??   : 2015??3??31??
+    ??    ??   : z00161729
+    ????????   : AT&T ????EONS????????
 *****************************************************************************/
 VOS_UINT32 TAF_SetUsimStub(
     MN_CLIENT_ID_T                      usClientId,
@@ -960,20 +960,20 @@ VOS_UINT32 TAF_SetUsimStub(
 
 
 /*****************************************************************************
- 函 数 名  : TAF_SetRefreshStub
- 功能描述  : 模拟pih给指定模块发送refresh消息
- 输入参数  : TAF_CLIENT_ID        ClientId
+ ?? ?? ??  : TAF_SetRefreshStub
+ ????????  : ????pih??????????????refresh????
+ ????????  : TAF_CLIENT_ID        ClientId
              TAF_ID OpId
              TAF_MMA_REFRESH_STUB_SET_REQ_STRU  *pstRefreshStub
- 输出参数  : 无
- 返 回 值  : TAF_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : TAF_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月31日
-    作    者   : z00161729
-    修改内容   : AT&T 支持EONS特性修改
+ ????????      :
+  1.??    ??   : 2015??3??31??
+    ??    ??   : z00161729
+    ????????   : AT&T ????EONS????????
 *****************************************************************************/
 VOS_UINT32 TAF_SetRefreshStub(
     MN_CLIENT_ID_T                      usClientId,
@@ -991,20 +991,20 @@ VOS_UINT32 TAF_SetRefreshStub(
 
 
 /*****************************************************************************
- 函 数 名  : TAF_SetAutoReselStub
- 功能描述  : auto resel
- 输入参数  : TAF_CLIENT_ID        ClientId
+ ?? ?? ??  : TAF_SetAutoReselStub
+ ????????  : auto resel
+ ????????  : TAF_CLIENT_ID        ClientId
              TAF_ID OpId
              TAF_MMA_AUTO_RESEL_STUB_SET_REQ_STRU       *pstAutoReselStub
- 输出参数  : 无
- 返 回 值  : TAF_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : TAF_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年5月29日
-    作    者   : b00269685
-    修改内容   : 新增
+ ????????      :
+  1.??    ??   : 2015??5??29??
+    ??    ??   : b00269685
+    ????????   : ????
 *****************************************************************************/
 VOS_UINT32 TAF_SetAutoReselStub(
     MN_CLIENT_ID_T                                          usClientId,
@@ -1025,18 +1025,18 @@ VOS_UINT32 TAF_SetAutoReselStub(
 /* Deleted by k902809 for Iteration 11, Iteration 11 2015-3-25, end */
 
 /*****************************************************************************
- 函 数 名  : TAF_QryUsimInfo
- 功能描述  :
- 输入参数  :
- 输出参数  : Icctype
- 返 回 值  : TAF_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_QryUsimInfo
+ ????????  :
+ ????????  :
+ ????????  : Icctype
+ ?? ?? ??  : TAF_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2009年9月19日
-    作    者   : z40661
-    修改内容   : 新增函数,查询USIM卡的相关信息
+ ????????      :
+  1.??    ??   : 2009??9??19??
+    ??    ??   : z40661
+    ????????   : ????????,????USIM????????????
 
 *****************************************************************************/
 TAF_UINT32 TAF_QryUsimInfo(
@@ -1065,18 +1065,18 @@ TAF_UINT32 TAF_QryUsimInfo(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_QryCpnnInfo
- 功能描述  :
- 输入参数  :
- 输出参数  :
- 返 回 值  : TAF_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_QryCpnnInfo
+ ????????  :
+ ????????  :
+ ????????  :
+ ?? ?? ??  : TAF_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2009年9月19日
-    作    者   : z40661
-    修改内容   : 新增函数,查询USIM卡的相关信息
+ ????????      :
+  1.??    ??   : 2009??9??19??
+    ??    ??   : z40661
+    ????????   : ????????,????USIM????????????
 
 *****************************************************************************/
 TAF_UINT32 TAF_QryCpnnInfo(
@@ -1104,23 +1104,23 @@ TAF_UINT32 TAF_QryCpnnInfo(
 /* Deleted by k902809 for Iteration 11, Iteration 11 2015-3-24, end */
 
 
-/* Added by s00246516 for L-C互操作项目, 2014-01-29, Begin */
+/* Added by s00246516 for L-C??????????, 2014-01-29, Begin */
 /*****************************************************************************
- 函 数 名  : TAF_MMA_PhoneModeSetReq
- 功能描述  : 手机模式设置接口
- 输入参数  : ulModuleId       ---  外部模块PID
-             usCliendId       ---  外部模块CliendId
-             ucOpId           ---  外部模块OpId
-             pstPhoneModePara ---  Phone mode设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_PhoneModeSetReq
+ ????????  : ????????????????
+ ????????  : ulModuleId       ---  ????????PID
+             usCliendId       ---  ????????CliendId
+             ucOpId           ---  ????????OpId
+             pstPhoneModePara ---  Phone mode????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年1月27日
-    作    者   : s00246516
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??1??27??
+    ??    ??   : s00246516
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_PhoneModeSetReq(
@@ -1137,18 +1137,18 @@ VOS_UINT32 TAF_MMA_PhoneModeSetReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (VOS_NULL_PTR == pstPhoneModePara)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_PHONE_MODE_SET_REQ_STRU */
+    /* ??????????TAF_MMA_PHONE_MODE_SET_REQ_STRU */
     pstMsg = (TAF_MMA_PHONE_MODE_SET_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                        ulSenderPid,
                                        sizeof(TAF_MMA_PHONE_MODE_SET_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -1157,7 +1157,7 @@ VOS_UINT32 TAF_MMA_PhoneModeSetReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_PHONE_MODE_SET_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_PHONE_MODE_SET_REQ;
@@ -1166,7 +1166,7 @@ VOS_UINT32 TAF_MMA_PhoneModeSetReq(
     pstMsg->stCtrl.ucOpId               = ucOpId;
     PS_MEM_CPY(&(pstMsg->stPhoneModePara), pstPhoneModePara, sizeof(TAF_MMA_PHONE_MODE_PARA_STRU));
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -1177,20 +1177,20 @@ VOS_UINT32 TAF_MMA_PhoneModeSetReq(
 
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryPhoneModeReq
- 功能描述  : 手机模式查询接口
- 输入参数  : ulModuleId       ---  外部模块PID
-             usCliendId       ---  外部模块CliendId
-             ucOpId           ---  外部模块OpId
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_QryPhoneModeReq
+ ????????  : ????????????????
+ ????????  : ulModuleId       ---  ????????PID
+             usCliendId       ---  ????????CliendId
+             ucOpId           ---  ????????OpId
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月23日
-    作    者   : y00322978
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??23??
+    ??    ??   : y00322978
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryPhoneModeReq(
@@ -1206,12 +1206,12 @@ VOS_UINT32 TAF_MMA_QryPhoneModeReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_PHONE_MODE_SET_REQ_STRU */
+    /* ??????????TAF_MMA_PHONE_MODE_SET_REQ_STRU */
     pstMsg = (TAF_MMA_PHONE_MODE_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                        ulSenderPid,
                                        sizeof(TAF_MMA_PHONE_MODE_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -1220,7 +1220,7 @@ VOS_UINT32 TAF_MMA_QryPhoneModeReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_PHONE_MODE_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_PHONE_MODE_QRY_REQ;
@@ -1228,28 +1228,28 @@ VOS_UINT32 TAF_MMA_QryPhoneModeReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_CsgListSearchReq
- 功能描述  : CSG列表查询接口
- 输入参数  : ulModuleId      -  外部模块PID
-             usCliendId      -  外部模块CliendId
-             ucOpId          -  外部模块OpId
-             pstPlmnListPara -  csg list分段查询参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_CsgListSearchReq
+ ????????  : CSG????????????
+ ????????  : ulModuleId      -  ????????PID
+             usCliendId      -  ????????CliendId
+             ucOpId          -  ????????OpId
+             pstPlmnListPara -  csg list????????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年9月28日
-    作    者   : z00161729
-    修改内容   : 支持LTE CSG功能新增
+ ????????      :
+  1.??    ??   : 2015??9??28??
+    ??    ??   : z00161729
+    ????????   : ????LTE CSG????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_CsgListSearchReq(
@@ -1266,18 +1266,18 @@ VOS_UINT32 TAF_MMA_CsgListSearchReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (VOS_NULL_PTR == pstPlmnListPara)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包 */
+    /* ?????????? */
     pstMsg = (TAF_MMA_CSG_LIST_SEARCH_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                              ulSenderPid,
                                              sizeof(TAF_MMA_CSG_LIST_SEARCH_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -1286,7 +1286,7 @@ VOS_UINT32 TAF_MMA_CsgListSearchReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_CSG_LIST_SEARCH_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->enMsgName         = ID_TAF_MMA_CSG_LIST_SEARCH_REQ;
@@ -1296,7 +1296,7 @@ VOS_UINT32 TAF_MMA_CsgListSearchReq(
 
     PS_MEM_CPY(&pstMsg->stPlmnListPara, pstPlmnListPara, sizeof(TAF_MMA_PLMN_LIST_PARA_STRU));
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -1306,20 +1306,20 @@ VOS_UINT32 TAF_MMA_CsgListSearchReq(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_AbortCsgListSearchReq
- 功能描述  : 终止csg list搜网接口
- 输入参数  : ulModuleId             ---  外部模块PID
-             usCliendId             ---  外部模块CliendId
-             ucOpId                 ---  外部模块OpId
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_AbortCsgListSearchReq
+ ????????  : ????csg list????????
+ ????????  : ulModuleId             ---  ????????PID
+             usCliendId             ---  ????????CliendId
+             ucOpId                 ---  ????????OpId
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年9月28日
-    作    者   : z00161729
-    修改内容   : 支持LTE CSG功能新增
+ ????????      :
+  1.??    ??   : 2015??9??28??
+    ??    ??   : z00161729
+    ????????   : ????LTE CSG????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_AbortCsgListSearchReq(
@@ -1335,12 +1335,12 @@ VOS_UINT32 TAF_MMA_AbortCsgListSearchReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包 */
+    /* ?????????? */
     pstMsg = (TAF_MMA_CSG_LIST_ABORT_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                             ulSenderPid,
                                             sizeof(TAF_MMA_CSG_LIST_ABORT_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -1350,7 +1350,7 @@ VOS_UINT32 TAF_MMA_AbortCsgListSearchReq(
                 0x00,
                 sizeof(TAF_MMA_CSG_LIST_ABORT_REQ_STRU) - VOS_MSG_HEAD_LENGTH);
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->enMsgName                   = ID_TAF_MMA_CSG_LIST_ABORT_REQ;
@@ -1358,7 +1358,7 @@ VOS_UINT32 TAF_MMA_AbortCsgListSearchReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -1368,21 +1368,21 @@ VOS_UINT32 TAF_MMA_AbortCsgListSearchReq(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SetCsgIdSearch
- 功能描述  : 设置CSG ID接口
- 输入参数  : ulModuleId       ---  外部模块PID
-           : usCliendId       ---  外部模块CliendId
-             ucOpId           ---  外部模块OpId
-             pstUserSelCsgId  ---  USER设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_SetCsgIdSearch
+ ????????  : ????CSG ID????
+ ????????  : ulModuleId       ---  ????????PID
+           : usCliendId       ---  ????????CliendId
+             ucOpId           ---  ????????OpId
+             pstUserSelCsgId  ---  USER????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年11月23日
-    作    者   : s00193151
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??11??23??
+    ??    ??   : s00193151
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_SetCsgIdSearch(
@@ -1399,18 +1399,18 @@ VOS_UINT32 TAF_MMA_SetCsgIdSearch(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (VOS_NULL_PTR == pstUserSelCsgId)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_CSG_SPEC_SEARCH_REQ_STRU */
+    /* ??????????TAF_MMA_CSG_SPEC_SEARCH_REQ_STRU */
     pstMsg = (TAF_MMA_CSG_SPEC_SEARCH_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                              ulSenderPid,
                                              sizeof(TAF_MMA_CSG_SPEC_SEARCH_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -1419,7 +1419,7 @@ VOS_UINT32 TAF_MMA_SetCsgIdSearch(
     PS_MEM_SET((VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_CSG_SPEC_SEARCH_REQ_STRU) - VOS_MSG_HEAD_LENGTH));
 
-    /* 根据输入参数填充TAF_MMA_CSG_SPEC_SEARCH_REQ_STRU, 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????????????????TAF_MMA_CSG_SPEC_SEARCH_REQ_STRU, ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_CSG_SPEC_SEARCH_REQ;
@@ -1429,7 +1429,7 @@ VOS_UINT32 TAF_MMA_SetCsgIdSearch(
 
     PS_MEM_CPY(&pstMsg->stCsgSpecSearchInfo, pstUserSelCsgId, sizeof(pstMsg->stCsgSpecSearchInfo));
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -1439,20 +1439,20 @@ VOS_UINT32 TAF_MMA_SetCsgIdSearch(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryCampCsgIdInfoReq
- 功能描述  : Csg Id Info qry req
- 输入参数  : VOS_UINT32                          ulModuleId
+ ?? ?? ??  : TAF_MMA_QryCampCsgIdInfoReq
+ ????????  : Csg Id Info qry req
+ ????????  : VOS_UINT32                          ulModuleId
              VOS_UINT16                          usClientId
              VOS_UINT8                           ucOpId
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年11月24日
-    作    者   : s00193151
-    修改内容   : 支持LTE CSG新增
+ ????????      :
+  1.??    ??   : 2015??11??24??
+    ??    ??   : s00193151
+    ????????   : ????LTE CSG????
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryCampCsgIdInfoReq(
     VOS_UINT32                          ulModuleId,
@@ -1467,12 +1467,12 @@ VOS_UINT32 TAF_MMA_QryCampCsgIdInfoReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_QRY_CAMP_CSG_ID_INFO_REQ_STRU */
+    /* ??????????TAF_MMA_QRY_CAMP_CSG_ID_INFO_REQ_STRU */
     pstMsg = (TAF_MMA_QRY_CAMP_CSG_ID_INFO_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                         ulSenderPid,
                                         sizeof(TAF_MMA_QRY_CAMP_CSG_ID_INFO_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -1481,7 +1481,7 @@ VOS_UINT32 TAF_MMA_QryCampCsgIdInfoReq(
     PS_MEM_SET((VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
                (VOS_SIZE_T)(sizeof(TAF_MMA_QRY_CAMP_CSG_ID_INFO_REQ_STRU) - VOS_MSG_HEAD_LENGTH));
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_QRY_CAMP_CSG_ID_INFO_REQ;
@@ -1489,7 +1489,7 @@ VOS_UINT32 TAF_MMA_QryCampCsgIdInfoReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
@@ -1497,21 +1497,21 @@ VOS_UINT32 TAF_MMA_QryCampCsgIdInfoReq(
 
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SetSysCfgReq
- 功能描述  : 手机系统配置接口
- 输入参数  : ulModuleId      ---  外部模块PID
-            : usCliendId     ---  外部模块CliendId
-            ucOpId           ---  外部模块OpId
-            pstSysCfgPara    ---  Sys Cfg设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_SetSysCfgReq
+ ????????  : ????????????????
+ ????????  : ulModuleId      ---  ????????PID
+            : usCliendId     ---  ????????CliendId
+            ucOpId           ---  ????????OpId
+            pstSysCfgPara    ---  Sys Cfg????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年1月27日
-    作    者   : s00246516
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??1??27??
+    ??    ??   : s00246516
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_SetSysCfgReq(
@@ -1528,18 +1528,18 @@ VOS_UINT32 TAF_MMA_SetSysCfgReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (VOS_NULL_PTR == pstSysCfgPara)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_SYS_CFG_REQ_STRU */
+    /* ??????????TAF_MMA_SYS_CFG_REQ_STRU */
     pstMsg = (TAF_MMA_SYS_CFG_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                              ulSenderPid,
                                              sizeof(TAF_MMA_SYS_CFG_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -1548,8 +1548,8 @@ VOS_UINT32 TAF_MMA_SetSysCfgReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_SYS_CFG_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 根据输入参数填充TAF_MMA_SYS_CFG_REQ_STRU */
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????????????????TAF_MMA_SYS_CFG_REQ_STRU */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_SYS_CFG_SET_REQ;
@@ -1559,7 +1559,7 @@ VOS_UINT32 TAF_MMA_SetSysCfgReq(
 
     PS_MEM_CPY(&(pstMsg->stSysCfgPara), pstSysCfgPara, sizeof(TAF_MMA_SYS_CFG_PARA_STRU));
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -1569,20 +1569,20 @@ VOS_UINT32 TAF_MMA_SetSysCfgReq(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryEonsUcs2Req
- 功能描述  : 手机系统配置接口
- 输入参数  : ulModuleId       ---  外部模块PID
-             usCliendId       ---  外部模块CliendId
-             ucOpId           ---  外部模块OpId
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_QryEonsUcs2Req
+ ????????  : ????????????????
+ ????????  : ulModuleId       ---  ????????PID
+             usCliendId       ---  ????????CliendId
+             ucOpId           ---  ????????OpId
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年03月12日
-    作    者   : c00318887
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??03??12??
+    ??    ??   : c00318887
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryEonsUcs2Req(
@@ -1598,12 +1598,12 @@ VOS_UINT32 TAF_MMA_QryEonsUcs2Req(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_EONS_UCS2_REQ_STRU */
+    /* ??????????TAF_MMA_EONS_UCS2_REQ_STRU */
     pstMsg = (TAF_MMA_EONS_UCS2_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                         ulSenderPid,
                                         sizeof(TAF_MMA_EONS_UCS2_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -1612,7 +1612,7 @@ VOS_UINT32 TAF_MMA_QryEonsUcs2Req(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_EONS_UCS2_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 根据输入参数填充TAF_MMA_EONS_UCS2_REQ_STRU */
+    /* ????????????????TAF_MMA_EONS_UCS2_REQ_STRU */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MSG_MMA_EONS_UCS2_REQ;
@@ -1620,7 +1620,7 @@ VOS_UINT32 TAF_MMA_QryEonsUcs2Req(
     pstMsg->stCtrl.usClientId = usClientId;
     pstMsg->stCtrl.ucOpId     = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -1630,21 +1630,21 @@ VOS_UINT32 TAF_MMA_QryEonsUcs2Req(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_AcqBestNetworkReq
- 功能描述  : 获取网络接口
- 输入参数  : ulModuleId      ---  外部模块PID
-            : usCliendId     ---  外部模块CliendId
-            ucOpId           ---  外部模块OpId
-            pstAcqPara       ---  Acq设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_AcqBestNetworkReq
+ ????????  : ????????????
+ ????????  : ulModuleId      ---  ????????PID
+            : usCliendId     ---  ????????CliendId
+            ucOpId           ---  ????????OpId
+            pstAcqPara       ---  Acq????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年1月27日
-    作    者   : s00246516
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??1??27??
+    ??    ??   : s00246516
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_AcqBestNetworkReq(
@@ -1661,18 +1661,18 @@ VOS_UINT32 TAF_MMA_AcqBestNetworkReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (VOS_NULL_PTR == pstAcqPara)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_ACQ_REQ_STRU */
+    /* ??????????TAF_MMA_ACQ_REQ_STRU */
     pstMsg = (TAF_MMA_ACQ_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                              ulSenderPid,
                                              sizeof(TAF_MMA_ACQ_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -1681,7 +1681,7 @@ VOS_UINT32 TAF_MMA_AcqBestNetworkReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_ACQ_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_ACQ_BEST_NETWORK_REQ;
@@ -1690,7 +1690,7 @@ VOS_UINT32 TAF_MMA_AcqBestNetworkReq(
     pstMsg->stCtrl.ucOpId     = ucOpId;
     PS_MEM_CPY(&(pstMsg->stAcqPara), pstAcqPara, sizeof(TAF_MMA_ACQ_PARA_STRU));
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -1700,21 +1700,21 @@ VOS_UINT32 TAF_MMA_AcqBestNetworkReq(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_RegReq
- 功能描述  : 注册网络接口
- 输入参数  : ulModuleId      ---  外部模块PID
-            : usCliendId     ---  外部模块CliendId
-            ucOpId           ---  外部模块OpId
-            pstRegPara       ---  REG设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_RegReq
+ ????????  : ????????????
+ ????????  : ulModuleId      ---  ????????PID
+            : usCliendId     ---  ????????CliendId
+            ucOpId           ---  ????????OpId
+            pstRegPara       ---  REG????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年1月27日
-    作    者   : s00246516
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??1??27??
+    ??    ??   : s00246516
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_RegReq(
@@ -1731,18 +1731,18 @@ VOS_UINT32 TAF_MMA_RegReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (VOS_NULL_PTR == pstRegPara)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_REG_REQ_STRU */
+    /* ??????????TAF_MMA_REG_REQ_STRU */
     pstMsg = (TAF_MMA_REG_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                              ulSenderPid,
                                              sizeof(TAF_MMA_REG_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -1751,8 +1751,8 @@ VOS_UINT32 TAF_MMA_RegReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_REG_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 根据输入参数填充TAF_MMA_REG_REQ_STRU */
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????????????????TAF_MMA_REG_REQ_STRU */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_REG_REQ;
@@ -1761,7 +1761,7 @@ VOS_UINT32 TAF_MMA_RegReq(
     pstMsg->stCtrl.ucOpId     = ucOpId;
     PS_MEM_CPY(&(pstMsg->stRegPara), pstRegPara, sizeof(TAF_MMA_REG_PARA_STRU));
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -1771,21 +1771,21 @@ VOS_UINT32 TAF_MMA_RegReq(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_PowerSaveReq
- 功能描述  : Power Save接口
- 输入参数  : ulModuleId      ---  外部模块PID
-            : usCliendId     ---  外部模块CliendId
-            ucOpId           ---  外部模块OpId
-            pstPowerSavePara ---  Power Save设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_PowerSaveReq
+ ????????  : Power Save????
+ ????????  : ulModuleId      ---  ????????PID
+            : usCliendId     ---  ????????CliendId
+            ucOpId           ---  ????????OpId
+            pstPowerSavePara ---  Power Save????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年1月27日
-    作    者   : s00246516
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??1??27??
+    ??    ??   : s00246516
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_PowerSaveReq(
@@ -1803,18 +1803,18 @@ VOS_UINT32 TAF_MMA_PowerSaveReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (VOS_NULL_PTR == pstPowerSavePara)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_POWER_SAVE_REQ_STRU */
+    /* ??????????TAF_MMA_POWER_SAVE_REQ_STRU */
     pstMsg = (TAF_MMA_POWER_SAVE_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                            ulSenderPid,
                                            sizeof(TAF_MMA_POWER_SAVE_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -1823,7 +1823,7 @@ VOS_UINT32 TAF_MMA_PowerSaveReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_POWER_SAVE_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_POWER_SAVE_REQ;
@@ -1832,7 +1832,7 @@ VOS_UINT32 TAF_MMA_PowerSaveReq(
     pstMsg->stCtrl.ucOpId     = ucOpId;
     PS_MEM_CPY(&(pstMsg->stPowerSavePara), pstPowerSavePara, sizeof(TAF_MMA_POWER_SAVE_PARA_STRU));
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -1842,21 +1842,21 @@ VOS_UINT32 TAF_MMA_PowerSaveReq(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_DetachReq
- 功能描述  : Detach接口
- 输入参数  : ulModuleId      ---  外部模块PID
-            : usCliendId     ---  外部模块CliendId
-            ucOpId           ---  外部模块OpId
-            pstDetachPara    ---  Detach设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_DetachReq
+ ????????  : Detach????
+ ????????  : ulModuleId      ---  ????????PID
+            : usCliendId     ---  ????????CliendId
+            ucOpId           ---  ????????OpId
+            pstDetachPara    ---  Detach????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年1月27日
-    作    者   : s00246516
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??1??27??
+    ??    ??   : s00246516
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_DetachReq(
@@ -1873,18 +1873,18 @@ VOS_UINT32 TAF_MMA_DetachReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (VOS_NULL_PTR == pstDetachPara)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_DETACH_REQ_STRU */
+    /* ??????????TAF_MMA_DETACH_REQ_STRU */
     pstMsg = (TAF_MMA_DETACH_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                            ulSenderPid,
                                            sizeof(TAF_MMA_DETACH_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -1893,8 +1893,8 @@ VOS_UINT32 TAF_MMA_DetachReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_DETACH_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 根据输入参数填充TAF_MMA_DETACH_REQ_STRU */
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????????????????TAF_MMA_DETACH_REQ_STRU */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_DETACH_REQ;
@@ -1903,7 +1903,7 @@ VOS_UINT32 TAF_MMA_DetachReq(
     pstMsg->stCtrl.ucOpId     = ucOpId;
     PS_MEM_CPY(&(pstMsg->stDetachPara), pstDetachPara, sizeof(TAF_MMA_DETACH_PARA_STRU));
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -1911,24 +1911,24 @@ VOS_UINT32 TAF_MMA_DetachReq(
 
     return VOS_TRUE;
 }
-/* Added by s00246516 for L-C互操作项目, 2014-01-29, End */
+/* Added by s00246516 for L-C??????????, 2014-01-29, End */
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SetImsSwitchReq
- 功能描述  : IMSSwitch接口
- 输入参数  : ulModuleId     ---  外部模块PID
-             usCliendId     ---  外部模块CliendId
-             ucOpId         ---  外部模块OpId
-             ucImsSwitch    ---  IMS 状态设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_SetImsSwitchReq
+ ????????  : IMSSwitch????
+ ????????  : ulModuleId     ---  ????????PID
+             usCliendId     ---  ????????CliendId
+             ucOpId         ---  ????????OpId
+             ucImsSwitch    ---  IMS ????????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年02月02日
-    作    者   : zwx247453
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??02??02??
+    ??    ??   : zwx247453
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_SetImsSwitchReq(
@@ -1945,19 +1945,19 @@ VOS_UINT32 TAF_MMA_SetImsSwitchReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if ((TAF_MMA_IMS_SWITCH_SET_OFF != enLteImsSwitch)
      && (TAF_MMA_IMS_SWITCH_SET_ON  != enLteImsSwitch))
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_IMS_SWITCH_SET_REQ_STRU */
+    /* ??????????TAF_MMA_IMS_SWITCH_SET_REQ_STRU */
     pstMsg = (TAF_MMA_IMS_SWITCH_SET_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                            ulSenderPid,
                                            sizeof(TAF_MMA_IMS_SWITCH_SET_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -1966,7 +1966,7 @@ VOS_UINT32 TAF_MMA_SetImsSwitchReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_IMS_SWITCH_SET_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 根据输入参数填充TAF_MMA_IMS_SWITCH_SET_REQ_STRU */
+    /* ????????????????TAF_MMA_IMS_SWITCH_SET_REQ_STRU */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_IMS_SWITCH_SET_REQ;
@@ -1975,7 +1975,7 @@ VOS_UINT32 TAF_MMA_SetImsSwitchReq(
     pstMsg->stCtrl.ucOpId     = ucOpId;
     pstMsg->enLteImsSwitch    = enLteImsSwitch;
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -1985,20 +1985,20 @@ VOS_UINT32 TAF_MMA_SetImsSwitchReq(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryImsSwitchReq
- 功能描述  : IMSSwitch接口
- 输入参数  : ulModuleId     ---  外部模块PID
-             usCliendId     ---  外部模块CliendId
-             ucOpId         ---  外部模块OpId
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_QryImsSwitchReq
+ ????????  : IMSSwitch????
+ ????????  : ulModuleId     ---  ????????PID
+             usCliendId     ---  ????????CliendId
+             ucOpId         ---  ????????OpId
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年02月02日
-    作    者   : zwx247453
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??02??02??
+    ??    ??   : zwx247453
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryImsSwitchReq(
@@ -2015,12 +2015,12 @@ VOS_UINT32 TAF_MMA_QryImsSwitchReq(
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
 
-    /* 申请消息包TAF_MMA_IMS_SWITCH_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_IMS_SWITCH_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_IMS_SWITCH_QRY_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                            ulSenderPid,
                                            sizeof(TAF_MMA_IMS_SWITCH_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -2029,7 +2029,7 @@ VOS_UINT32 TAF_MMA_QryImsSwitchReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_IMS_SWITCH_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 根据输入参数填充TAF_MMA_IMS_SWITCH_QRY_REQ_STRU */
+    /* ????????????????TAF_MMA_IMS_SWITCH_QRY_REQ_STRU */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_IMS_SWITCH_QRY_REQ;
@@ -2037,7 +2037,7 @@ VOS_UINT32 TAF_MMA_QryImsSwitchReq(
     pstMsg->stCtrl.usClientId = usClientId;
     pstMsg->stCtrl.ucOpId     = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -2047,21 +2047,21 @@ VOS_UINT32 TAF_MMA_QryImsSwitchReq(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SetVoiceDomainReq
- 功能描述  : VoiceDomain接口
- 输入参数  : ulModuleId       ---  外部模块PID
-             usCliendId       ---  外部模块CliendId
-             ucOpId           ---  外部模块OpId
-             enVoiceDomain    ---  优先域设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_SetVoiceDomainReq
+ ????????  : VoiceDomain????
+ ????????  : ulModuleId       ---  ????????PID
+             usCliendId       ---  ????????CliendId
+             ucOpId           ---  ????????OpId
+             enVoiceDomain    ---  ??????????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年02月02日
-    作    者   : zwx247453
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??02??02??
+    ??    ??   : zwx247453
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_SetVoiceDomainReq(
@@ -2078,18 +2078,18 @@ VOS_UINT32 TAF_MMA_SetVoiceDomainReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (enVoiceDomain >= TAF_MMA_VOICE_DOMAIN_BUTT)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_VOICE_DOMAIN_SET_REQ_STRU */
+    /* ??????????TAF_MMA_VOICE_DOMAIN_SET_REQ_STRU */
     pstMsg = (TAF_MMA_VOICE_DOMAIN_SET_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                            ulSenderPid,
                                            sizeof(TAF_MMA_VOICE_DOMAIN_SET_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -2098,7 +2098,7 @@ VOS_UINT32 TAF_MMA_SetVoiceDomainReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_VOICE_DOMAIN_SET_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 根据输入参数填充TAF_MMA_VOICE_DOMAIN_SET_REQ_STRU */
+    /* ????????????????TAF_MMA_VOICE_DOMAIN_SET_REQ_STRU */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_VOICE_DOMAIN_SET_REQ;
@@ -2107,7 +2107,7 @@ VOS_UINT32 TAF_MMA_SetVoiceDomainReq(
     pstMsg->stCtrl.ucOpId     = ucOpId;
     pstMsg->enVoiceDomain     = enVoiceDomain;
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -2117,20 +2117,20 @@ VOS_UINT32 TAF_MMA_SetVoiceDomainReq(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryVoiceDomainReq
- 功能描述  : VoiceDomain接口
- 输入参数  : ulModuleId      ---  外部模块PID
-             usCliendId      ---  外部模块CliendId
-             ucOpId          ---  外部模块OpId
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_QryVoiceDomainReq
+ ????????  : VoiceDomain????
+ ????????  : ulModuleId      ---  ????????PID
+             usCliendId      ---  ????????CliendId
+             ucOpId          ---  ????????OpId
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年02月02日
-    作    者   : zwx247453
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??02??02??
+    ??    ??   : zwx247453
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryVoiceDomainReq(
@@ -2146,12 +2146,12 @@ VOS_UINT32 TAF_MMA_QryVoiceDomainReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_VOICE_DOMAIN_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_VOICE_DOMAIN_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_VOICE_DOMAIN_QRY_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                            ulSenderPid,
                                            sizeof(TAF_MMA_VOICE_DOMAIN_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -2160,7 +2160,7 @@ VOS_UINT32 TAF_MMA_QryVoiceDomainReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_VOICE_DOMAIN_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 根据输入参数填充TAF_MMA_VOICE_DOMAIN_QRY_REQ_STRU */
+    /* ????????????????TAF_MMA_VOICE_DOMAIN_QRY_REQ_STRU */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_VOICE_DOMAIN_QRY_REQ;
@@ -2168,7 +2168,7 @@ VOS_UINT32 TAF_MMA_QryVoiceDomainReq(
     pstMsg->stCtrl.usClientId = usClientId;
     pstMsg->stCtrl.ucOpId     = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -2178,21 +2178,21 @@ VOS_UINT32 TAF_MMA_QryVoiceDomainReq(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SetRoamImsSupportReq
- 功能描述  : RoamImsSupport接口
- 输入参数  : ulModuleId      ---  外部模块PID
-             usCliendId      ---  外部模块CliendId
-             ucOpId          ---  外部模块OpId
-             pstRoamImsSupport    ---  RoamImsSupport设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_SetRoamImsSupportReq
+ ????????  : RoamImsSupport????
+ ????????  : ulModuleId      ---  ????????PID
+             usCliendId      ---  ????????CliendId
+             ucOpId          ---  ????????OpId
+             pstRoamImsSupport    ---  RoamImsSupport????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2016年3月9日
-    作    者   : w00316404
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2016??3??9??
+    ??    ??   : w00316404
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_SetRoamImsSupportReq(
@@ -2209,18 +2209,18 @@ VOS_UINT32 TAF_MMA_SetRoamImsSupportReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (TAF_MMA_ROAM_IMS_BUTT <= enRoamImsSupport)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_ROAM_IMS_SUPPORT_SET_REQ_STRU */
+    /* ??????????TAF_MMA_ROAM_IMS_SUPPORT_SET_REQ_STRU */
     pstMsg = (TAF_MMA_ROAM_IMS_SUPPORT_SET_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                            ulSenderPid,
                                            sizeof(TAF_MMA_ROAM_IMS_SUPPORT_SET_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -2229,8 +2229,8 @@ VOS_UINT32 TAF_MMA_SetRoamImsSupportReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_ROAM_IMS_SUPPORT_SET_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 根据输入参数填充TAF_MMA_ROAM_IMS_SUPPORT_SET_REQ_STRU */
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????????????????TAF_MMA_ROAM_IMS_SUPPORT_SET_REQ_STRU */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_ROAM_IMS_SUPPORT_SET_REQ;
@@ -2239,7 +2239,7 @@ VOS_UINT32 TAF_MMA_SetRoamImsSupportReq(
     pstMsg->stCtrl.ucOpId     = ucOpId;
     PS_MEM_CPY(&(pstMsg->enRoamingImsSupportFlag), &enRoamImsSupport, sizeof(TAF_MMA_ROAM_IMS_SUPPORT_ENUM_UINT32));
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -2252,22 +2252,22 @@ VOS_UINT32 TAF_MMA_SetRoamImsSupportReq(
 
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SetImsDomainCfgReq
- 功能描述  : AT向MMA发送Ims域选择偏好设置请求消息函数
- 输入参数  : ulModuleId       ---  外部模块PID
-             usCliendId       ---  外部模块CliendId
-             ucOpId           ---  外部模块OpId
-             enImsDomainCfg   ---  IMS域选择偏好参数
+ ?? ?? ??  : TAF_MMA_SetImsDomainCfgReq
+ ????????  : AT??MMA????Ims??????????????????????????
+ ????????  : ulModuleId       ---  ????????PID
+             usCliendId       ---  ????????CliendId
+             ucOpId           ---  ????????OpId
+             enImsDomainCfg   ---  IMS??????????????
 
- 输出参数  : VOS_TRUE:成功,VOS_FALSE:失败
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : VOS_TRUE:????,VOS_FALSE:????
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年10月26日
-    作    者   : h00360002
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??10??26??
+    ??    ??   : h00360002
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_SetImsDomainCfgReq(
@@ -2289,12 +2289,12 @@ VOS_UINT32 TAF_MMA_SetImsDomainCfgReq(
         return VOS_FALSE;
     }
 
-    /* 内存申请 */
+    /* ???????? */
     pstMsg = (TAF_MMA_IMS_DOMAIN_CFG_SET_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                            ulSenderPid,
                                            sizeof(TAF_MMA_IMS_DOMAIN_CFG_SET_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -2303,7 +2303,7 @@ VOS_UINT32 TAF_MMA_SetImsDomainCfgReq(
     PS_MEM_SET((VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
           (VOS_SIZE_T)(sizeof(TAF_MMA_IMS_DOMAIN_CFG_SET_REQ_STRU) - VOS_MSG_HEAD_LENGTH));
 
-    /* 根据输入参数填充TAF_MMA_IMS_DOMAIN_CFG_SET_REQ_STRU */
+    /* ????????????????TAF_MMA_IMS_DOMAIN_CFG_SET_REQ_STRU */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_IMS_DOMAIN_CFG_SET_REQ;
@@ -2312,7 +2312,7 @@ VOS_UINT32 TAF_MMA_SetImsDomainCfgReq(
     pstMsg->stCtrl.ucOpId     = ucOpId;
     pstMsg->enImsDoaminCfg    = enImsDomainCfg;
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -2322,21 +2322,21 @@ VOS_UINT32 TAF_MMA_SetImsDomainCfgReq(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryImsDomainCfgReq
- 功能描述  : AT向MMA发送Ims域选择偏好查询请求函数
- 输入参数  : ulModuleId       ---  外部模块PID
-             usCliendId       ---  外部模块CliendId
-             ucOpId           ---  外部模块OpId
+ ?? ?? ??  : TAF_MMA_QryImsDomainCfgReq
+ ????????  : AT??MMA????Ims??????????????????????
+ ????????  : ulModuleId       ---  ????????PID
+             usCliendId       ---  ????????CliendId
+             ucOpId           ---  ????????OpId
 
- 输出参数  : VOS_TRUE:成功,VOS_FALSE:失败
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : VOS_TRUE:????,VOS_FALSE:????
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年10月26日
-    作    者   : h00360002
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??10??26??
+    ??    ??   : h00360002
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryImsDomainCfgReq(
@@ -2352,12 +2352,12 @@ VOS_UINT32 TAF_MMA_QryImsDomainCfgReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 内存申请*/
+    /* ????????*/
     pstMsg = (TAF_MMA_IMS_DOMAIN_CFG_QRY_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                            ulSenderPid,
                                            sizeof(TAF_MMA_IMS_DOMAIN_CFG_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -2366,7 +2366,7 @@ VOS_UINT32 TAF_MMA_QryImsDomainCfgReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
           (VOS_SIZE_T)(sizeof(TAF_MMA_IMS_DOMAIN_CFG_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH));
 
-    /* 根据输入参数填充TAF_MMA_IMS_DOMAIN_CFG_QRY_REQ_STRU */
+    /* ????????????????TAF_MMA_IMS_DOMAIN_CFG_QRY_REQ_STRU */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_IMS_DOMAIN_CFG_QRY_REQ;
@@ -2374,7 +2374,7 @@ VOS_UINT32 TAF_MMA_QryImsDomainCfgReq(
     pstMsg->stCtrl.usClientId = usClientId;
     pstMsg->stCtrl.ucOpId     = ucOpId;
 
-     /* 发送消息 */
+     /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -2386,22 +2386,22 @@ VOS_UINT32 TAF_MMA_QryImsDomainCfgReq(
 
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_AttachReq
- 功能描述  : AT向MMA发送ATTACH请求消息函数
- 输入参数  : ulModuleId       ---  外部模块PID
-             usCliendId       ---  外部模块CliendId
-             ucOpId           ---  外部模块OpId
-             ucAttachType     ---  Attach设置参数
+ ?? ?? ??  : TAF_MMA_AttachReq
+ ????????  : AT??MMA????ATTACH????????????
+ ????????  : ulModuleId       ---  ????????PID
+             usCliendId       ---  ????????CliendId
+             ucOpId           ---  ????????OpId
+             ucAttachType     ---  Attach????????
 
- 输出参数  : VOS_TRUE:成功,VOS_FALSE:失败
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : VOS_TRUE:????,VOS_FALSE:????
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年4月9日
-    作    者   : h00313353
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??4??9??
+    ??    ??   : h00313353
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_AttachReq(
@@ -2418,12 +2418,12 @@ VOS_UINT32 TAF_MMA_AttachReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请内存消息并初始化 */
+    /* ???????????????????? */
     pstMsg = (TAF_MMA_ATTACH_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                            ulSenderPid,
                                            sizeof(TAF_MMA_ATTACH_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -2432,8 +2432,8 @@ VOS_UINT32 TAF_MMA_AttachReq(
     PS_MEM_SET((VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
                (VOS_SIZE_T)(sizeof(TAF_MMA_ATTACH_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 根据输入参数填充TAF_MMA_ATTACH_REQ_STRU */
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????????????????TAF_MMA_ATTACH_REQ_STRU */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->enMsgName         = ID_TAF_MMA_ATTACH_REQ;
@@ -2442,28 +2442,28 @@ VOS_UINT32 TAF_MMA_AttachReq(
     pstMsg->stCtrl.ucOpId     = ucOpId;
     pstMsg->enAttachType      = enAttachType;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_AttachStatusQryReq
- 功能描述  : AT向MMA发送域状态查询消息的消息发送函数
- 输入参数  : ulModuleId       ---  外部模块PID
-             usCliendId       ---  外部模块CliendId
-             ucOpId           ---  外部模块OpId
-             enDomainType     ---  查询的服务域的类型
- 输出参数  : VOS_TRUE:成功,VOS_FALSE:失败
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_AttachStatusQryReq
+ ????????  : AT??MMA????????????????????????????????
+ ????????  : ulModuleId       ---  ????????PID
+             usCliendId       ---  ????????CliendId
+             ucOpId           ---  ????????OpId
+             enDomainType     ---  ??????????????????
+ ????????  : VOS_TRUE:????,VOS_FALSE:????
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年4月9日
-    作    者   : h00313353
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??4??9??
+    ??    ??   : h00313353
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_AttachStatusQryReq(
@@ -2480,12 +2480,12 @@ VOS_UINT32 TAF_MMA_AttachStatusQryReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请内存消息并初始化 */
+    /* ???????????????????? */
     pstMsg = (TAF_MMA_ATTACH_STATUS_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                            ulSenderPid,
                                            sizeof(TAF_MMA_ATTACH_STATUS_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -2494,8 +2494,8 @@ VOS_UINT32 TAF_MMA_AttachStatusQryReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_ATTACH_STATUS_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 根据输入参数填充TAF_MMA_ATTACH_REQ_STRU */
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????????????????TAF_MMA_ATTACH_REQ_STRU */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->enMsgName         = ID_TAF_MMA_ATTACH_STATUS_QRY_REQ;
@@ -2504,7 +2504,7 @@ VOS_UINT32 TAF_MMA_AttachStatusQryReq(
     pstMsg->stCtrl.ucOpId     = ucOpId;
     pstMsg->enDomainType      = enDomainType;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
@@ -2513,19 +2513,19 @@ VOS_UINT32 TAF_MMA_AttachStatusQryReq(
 
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SrvAcqReq
- 功能描述  : SPM模块给MMA模块发送搜网指示
- 输入参数  : enSrvType:服务类型
-            pstRatList:需要搜网的RAT列表
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_SrvAcqReq
+ ????????  : SPM??????MMA????????????????
+ ????????  : enSrvType:????????
+            pstRatList:??????????RAT????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年6月17日
-    作    者   : w00242748
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??6??17??
+    ??    ??   : w00242748
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_VOID TAF_MMA_SrvAcqReq(
@@ -2535,12 +2535,12 @@ VOS_VOID TAF_MMA_SrvAcqReq(
 {
     TAF_MMA_SRV_ACQ_REQ_STRU           *pstMsg  = VOS_NULL_PTR;
 
-    /* 申请消息包TAF_MMA_SRV_ACQ_REQ_STRU */
+    /* ??????????TAF_MMA_SRV_ACQ_REQ_STRU */
     pstMsg = (TAF_MMA_SRV_ACQ_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                              WUEPS_PID_TAF,
                                              sizeof(TAF_MMA_SRV_ACQ_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return;
@@ -2549,14 +2549,14 @@ VOS_VOID TAF_MMA_SrvAcqReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_SRV_ACQ_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid       = WUEPS_PID_TAF;
     pstMsg->ulReceiverPid     = WUEPS_PID_MMA;
     pstMsg->ulMsgName         = ID_TAF_MMA_SRV_ACQ_REQ;
     pstMsg->enSrvType         = enSrvType;
     pstMsg->stRatList         = *pstRatList;
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(WUEPS_PID_TAF, pstMsg))
     {
         return;
@@ -2567,21 +2567,21 @@ VOS_VOID TAF_MMA_SrvAcqReq(
 
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SetFPlmnInfo
- 功能描述  : 下发CFPLMN设置请求
- 输入参数  : ulModuleId       ---  外部模块PID
-             usCliendId       ---  外部模块CliendId
-             ucOpId           ---  外部模块OpId
-             pstCFPlmnPara    ---  fplmn mode设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_SetFPlmnInfo
+ ????????  : ????CFPLMN????????
+ ????????  : ulModuleId       ---  ????????PID
+             usCliendId       ---  ????????CliendId
+             ucOpId           ---  ????????OpId
+             pstCFPlmnPara    ---  fplmn mode????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年2月9日
-    作    者   : f00279542
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??2??9??
+    ??    ??   : f00279542
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_SetFPlmnInfo(
@@ -2598,18 +2598,18 @@ VOS_UINT32 TAF_MMA_SetFPlmnInfo(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (VOS_NULL_PTR == pstCFPlmnPara)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_CDMA_CSQ_SET_REQ_STRU */
+    /* ??????????TAF_MMA_CDMA_CSQ_SET_REQ_STRU */
     pstMsg = (TAF_MMA_CFPLMN_SET_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                             ulSenderPid,
                                             sizeof(TAF_MMA_CFPLMN_SET_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -2619,7 +2619,7 @@ VOS_UINT32 TAF_MMA_SetFPlmnInfo(
                 0x00,
                 sizeof(TAF_MMA_CFPLMN_SET_REQ_STRU) - VOS_MSG_HEAD_LENGTH);
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_CFPLMN_SET_REQ;
@@ -2628,27 +2628,27 @@ VOS_UINT32 TAF_MMA_SetFPlmnInfo(
     pstMsg->stCtrl.ucOpId               = ucOpId;
     PS_MEM_CPY(&(pstMsg->stCFPlmnPara), pstCFPlmnPara, sizeof(TAF_PH_FPLMN_OPERATE_STRU));
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryFPlmnInfo
- 功能描述  : fplmn 查询功能
- 输入参数  : ulModuleId       ---  外部模块PID
-             usCliendId       ---  外部模块CliendId
-             ucOpId           ---  外部模块OpId
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_QryFPlmnInfo
+ ????????  : fplmn ????????
+ ????????  : ulModuleId       ---  ????????PID
+             usCliendId       ---  ????????CliendId
+             ucOpId           ---  ????????OpId
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年2月9日
-    作    者   : f00279542
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??2??9??
+    ??    ??   : f00279542
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryFPlmnInfo(
@@ -2664,12 +2664,12 @@ VOS_UINT32 TAF_MMA_QryFPlmnInfo(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_CDMACSQ_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_CDMACSQ_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_CFPLMN_QUERY_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                               ulSenderPid,
                                               sizeof(TAF_MMA_CFPLMN_QUERY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -2679,7 +2679,7 @@ VOS_UINT32 TAF_MMA_QryFPlmnInfo(
                 0x00,
                 sizeof(TAF_MMA_CFPLMN_QUERY_REQ_STRU) - VOS_MSG_HEAD_LENGTH);
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_CFPLMN_QUERY_REQ;
@@ -2687,27 +2687,27 @@ VOS_UINT32 TAF_MMA_QryFPlmnInfo(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SetCpolReq
- 功能描述  : prefplmn设置命令请求接口
- 输入参数  : ulModuleId       ---  外部模块PID
-             usCliendId       ---  外部模块CliendId
-             ucOpId           ---  外部模块OpId
-             pstPrefPlmn      ---  prefplmn 设置参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_SetCpolReq
+ ????????  : prefplmn????????????????
+ ????????  : ulModuleId       ---  ????????PID
+             usCliendId       ---  ????????CliendId
+             ucOpId           ---  ????????OpId
+             pstPrefPlmn      ---  prefplmn ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年2月3日
-    作    者   : y00307564
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??2??3??
+    ??    ??   : y00307564
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_SetCpolReq(
@@ -2724,13 +2724,13 @@ VOS_UINT32 TAF_MMA_SetCpolReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (VOS_NULL_PTR == pstPrefPlmn)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_PREF_PLMN_SET_REQ_STRU */
+    /* ??????????TAF_MMA_PREF_PLMN_SET_REQ_STRU */
     pstMsg = (TAF_MMA_PREF_PLMN_SET_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                        ulSenderPid,
                                        sizeof(TAF_MMA_PREF_PLMN_SET_REQ_STRU));
@@ -2742,7 +2742,7 @@ VOS_UINT32 TAF_MMA_SetCpolReq(
     PS_MEM_SET((VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0x00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_PREF_PLMN_SET_REQ_STRU) - VOS_MSG_HEAD_LENGTH));
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_PREF_PLMN_SET_REQ;
@@ -2751,28 +2751,28 @@ VOS_UINT32 TAF_MMA_SetCpolReq(
     pstMsg->stCtrl.ucOpId     = ucOpId;
     PS_MEM_CPY(&pstMsg->stPrefPlmn, pstPrefPlmn, sizeof(TAF_PH_SET_PREFPLMN_STRU));
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QueryCpolReq
- 功能描述  : prefplmn查询命令请求接口
- 输入参数  : ulModuleId       ---  外部模块PID
-             usCliendId       ---  外部模块CliendId
-             ucOpId           ---  外部模块OpId
-             pstCpolInfo      ---  pstCpolInfo查询cpol消息参数
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_QueryCpolReq
+ ????????  : prefplmn????????????????
+ ????????  : ulModuleId       ---  ????????PID
+             usCliendId       ---  ????????CliendId
+             ucOpId           ---  ????????OpId
+             pstCpolInfo      ---  pstCpolInfo????cpol????????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年2月3日
-    作    者   : y00307564
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??2??3??
+    ??    ??   : y00307564
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QueryCpolReq(
@@ -2789,13 +2789,13 @@ VOS_UINT32 TAF_MMA_QueryCpolReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (VOS_NULL_PTR == pstCpolInfo)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_PREF_PLMN_QUERY_REQ_STRU */
+    /* ??????????TAF_MMA_PREF_PLMN_QUERY_REQ_STRU */
     pstMsg = (TAF_MMA_PREF_PLMN_QUERY_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                        ulSenderPid,
                                        sizeof(TAF_MMA_PREF_PLMN_QUERY_REQ_STRU));
@@ -2807,7 +2807,7 @@ VOS_UINT32 TAF_MMA_QueryCpolReq(
     PS_MEM_SET((VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0x00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_PREF_PLMN_QUERY_REQ_STRU) - VOS_MSG_HEAD_LENGTH));
 
-    /* 填写消息头 */
+    /* ?????????? */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_PREF_PLMN_QUERY_REQ;
@@ -2817,28 +2817,28 @@ VOS_UINT32 TAF_MMA_QueryCpolReq(
 
     PS_MEM_CPY(&pstMsg->stCpolInfo, pstCpolInfo, sizeof(TAF_MMA_CPOL_INFO_QUERY_REQ_STRU));
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_TestCpolReq
- 功能描述  : prefplmn测试命令请求接口
- 输入参数  : ulModuleId       ---  外部模块PID
-             usCliendId       ---  外部模块CliendId
-             ucOpId           ---  外部模块OpId
-             enPrefPlmnType   ---  测试prefplmn类型
- 输出参数  : 无
- 返 回 值  : VOS_TRUE:成功,VOS_FALSE:失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_TestCpolReq
+ ????????  : prefplmn????????????????
+ ????????  : ulModuleId       ---  ????????PID
+             usCliendId       ---  ????????CliendId
+             ucOpId           ---  ????????OpId
+             enPrefPlmnType   ---  ????prefplmn????
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE:????,VOS_FALSE:????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年2月3日
-    作    者   : y00307564
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??2??3??
+    ??    ??   : y00307564
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_TestCpolReq(
@@ -2855,13 +2855,13 @@ VOS_UINT32 TAF_MMA_TestCpolReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (MN_PH_PREF_PLMN_HPLMN < enPrefPlmnType)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_PREF_PLMN_TEST_REQ_STRU */
+    /* ??????????TAF_MMA_PREF_PLMN_TEST_REQ_STRU */
     pstMsg = (TAF_MMA_PREF_PLMN_TEST_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                        ulSenderPid,
                                        sizeof(TAF_MMA_PREF_PLMN_TEST_REQ_STRU));
@@ -2873,7 +2873,7 @@ VOS_UINT32 TAF_MMA_TestCpolReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0x00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_PREF_PLMN_TEST_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid       = ulSenderPid;
     pstMsg->ulReceiverPid     = ulReceiverPid;
     pstMsg->ulMsgName         = ID_TAF_MMA_PREF_PLMN_TEST_REQ;
@@ -2882,28 +2882,28 @@ VOS_UINT32 TAF_MMA_TestCpolReq(
     pstMsg->stCtrl.ucOpId     = ucOpId;
     pstMsg->enPrefPlmnType    = enPrefPlmnType;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SetCerssiReq
- 功能描述  : Set Cerssi Cfg Req
- 输入参数  : VOS_UINT32                          ulModuleId
+ ?? ?? ??  : TAF_MMA_SetCerssiReq
+ ????????  : Set Cerssi Cfg Req
+ ????????  : VOS_UINT32                          ulModuleId
              VOS_UINT16                          usClientId
              VOS_UINT8                           ucOpId
              TAF_START_INFO_IND_STRU            *pstStartInfoInd
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月23日
-    作    者   : g00261581
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??23??
+    ??    ??   : g00261581
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_SetCerssiReq(
@@ -2920,18 +2920,18 @@ VOS_UINT32 TAF_MMA_SetCerssiReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 参数检查 */
+    /* ???????? */
     if (VOS_NULL_PTR == pstStartInfoInd)
     {
         return VOS_FALSE;
     }
 
-    /* 申请消息包TAF_MMA_CDMA_CSQ_SET_REQ_STRU */
+    /* ??????????TAF_MMA_CDMA_CSQ_SET_REQ_STRU */
     pstCerssiCfg = (TAF_MMA_CERSSI_SET_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                             ulSenderPid,
                                             sizeof(TAF_MMA_CERSSI_SET_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstCerssiCfg)
     {
         return VOS_FALSE;
@@ -2941,7 +2941,7 @@ VOS_UINT32 TAF_MMA_SetCerssiReq(
                 0x00,
                 sizeof(TAF_MMA_CERSSI_SET_REQ_STRU) - VOS_MSG_HEAD_LENGTH);
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstCerssiCfg->ulSenderPid                 = ulSenderPid;
     pstCerssiCfg->ulReceiverPid               = ulReceiverPid;
     pstCerssiCfg->ulMsgName                   = ID_TAF_MMA_CERSSI_SET_REQ;
@@ -2954,27 +2954,27 @@ VOS_UINT32 TAF_MMA_SetCerssiReq(
     pstCerssiCfg->ucMinRptTimerInterval       = pstStartInfoInd->ucMinRptTimerInterval;
     pstCerssiCfg->ucSignThreshold             = pstStartInfoInd->ucSignThreshold;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstCerssiCfg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryCerssiReq
- 功能描述  : Mma Proc Cerssi Qry Req
- 输入参数  : VOS_UINT32                          ulModuleId
+ ?? ?? ??  : TAF_MMA_QryCerssiReq
+ ????????  : Mma Proc Cerssi Qry Req
+ ????????  : VOS_UINT32                          ulModuleId
              VOS_UINT16                          usClientId
              VOS_UINT8                           ucOpId
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月24日
-    作    者   : g00261581
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??24??
+    ??    ??   : g00261581
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryCerssiReq(
@@ -2990,12 +2990,12 @@ VOS_UINT32 TAF_MMA_QryCerssiReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_PHONE_MODE_SET_REQ_STRU */
+    /* ??????????TAF_MMA_PHONE_MODE_SET_REQ_STRU */
     pstMsg = (TAF_MMA_CERSSI_INFO_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                                 ulSenderPid,
                                                 sizeof(TAF_MMA_CERSSI_INFO_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -3004,7 +3004,7 @@ VOS_UINT32 TAF_MMA_QryCerssiReq(
     PS_MEM_SET((VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
                 sizeof(TAF_MMA_CERSSI_INFO_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH);
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_CERSSI_QRY_REQ;
@@ -3012,7 +3012,7 @@ VOS_UINT32 TAF_MMA_QryCerssiReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
@@ -3021,18 +3021,18 @@ VOS_UINT32 TAF_MMA_QryCerssiReq(
 /*lint +e958*/
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryCrpnReq
- 功能描述  : AT^CRPN
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_QryCrpnReq
+ ????????  : AT^CRPN
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月24日
-    作    者   : y00322978
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??24??
+    ??    ??   : y00322978
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryCrpnReq(
@@ -3049,12 +3049,12 @@ VOS_UINT32 TAF_MMA_QryCrpnReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_CRPN_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_CRPN_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_CRPN_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                        ulSenderPid,
                                        sizeof(TAF_MMA_CRPN_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
        return VOS_FALSE;
@@ -3063,7 +3063,7 @@ VOS_UINT32 TAF_MMA_QryCrpnReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_CRPN_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_CRPN_QRY_REQ;
@@ -3076,25 +3076,25 @@ VOS_UINT32 TAF_MMA_QryCrpnReq(
         PS_MEM_CPY(&pstMsg->stCrpnQryPara, pstCrpnQryReq, sizeof(TAF_MMA_CRPN_QRY_PARA_STRU));
     }
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SetCmmReq
- 功能描述  : AT^CMM 设置
- 输入参数  : ulModuleId usClientId ucOpId *pstCrpnQryReq
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_SetCmmReq
+ ????????  : AT^CMM ????
+ ????????  : ulModuleId usClientId ucOpId *pstCrpnQryReq
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月24日
-    作    者   : y00322978
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??24??
+    ??    ??   : y00322978
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_SetCmmReq(
@@ -3111,12 +3111,12 @@ VOS_UINT32 TAF_MMA_SetCmmReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_CMM_SET_REQ_STRU */
+    /* ??????????TAF_MMA_CMM_SET_REQ_STRU */
     pstMsg = (TAF_MMA_CMM_SET_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                        ulSenderPid,
                                        sizeof(TAF_MMA_CMM_SET_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
        return VOS_FALSE;
@@ -3125,7 +3125,7 @@ VOS_UINT32 TAF_MMA_SetCmmReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_CMM_SET_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_CMM_SET_REQ;
@@ -3138,7 +3138,7 @@ VOS_UINT32 TAF_MMA_SetCmmReq(
         PS_MEM_CPY(&pstMsg->stCmmSetReq, pstTestAtCmd, sizeof(MM_TEST_AT_CMD_STRU));
     }
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
@@ -3231,9 +3231,9 @@ VOS_UINT32 TAF_MMA_QryCopnInfoReq(
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
     /*
-    AT向MMA请求运营商信息:
-    因为核间消息限制，不能一次获取所有运营商信息，这里定义为一次获取50条运营商信息
-    第一条请求消息，从索引0开始要求连续的50条运营商信息
+    AT??MMA??????????????:
+    ????????????????????????????????????????????????????????????????50????????????
+    ??????????????????????0??????????????50????????????
     */
 
     /* Allocating memory for message */
@@ -3878,18 +3878,18 @@ VOS_UINT32 TAF_MMA_QryApPwrOnAndRegTimeReq(
 /* Added by k902809 for Iteration 11, Iteration 11 2015-3-23, end */
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SetAutoAttachReq
- 功能描述  : AT^CAATT命令处理
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  :
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_SetAutoAttachReq
+ ????????  : AT^CAATT????????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  :
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月25日
-    作    者   : y00322978
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??25??
+    ??    ??   : y00322978
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32  TAF_MMA_SetAutoAttachReq(
@@ -3906,12 +3906,12 @@ VOS_UINT32  TAF_MMA_SetAutoAttachReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_AUTO_ATTACH_SET_REQ_STRU */
+    /* ??????????TAF_MMA_AUTO_ATTACH_SET_REQ_STRU */
     pstMsg = (TAF_MMA_AUTO_ATTACH_SET_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                        ulSenderPid,
                                        sizeof(TAF_MMA_AUTO_ATTACH_SET_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -3920,7 +3920,7 @@ VOS_UINT32  TAF_MMA_SetAutoAttachReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_AUTO_ATTACH_SET_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_AUTO_ATTACH_SET_REQ;
@@ -3929,27 +3929,27 @@ VOS_UINT32  TAF_MMA_SetAutoAttachReq(
     pstMsg->stCtrl.ucOpId               = ucOpId;
     pstMsg->ulAutoAttachEnable          = ulSetValue;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_TestSysCfgReq
- 功能描述  : TEST SYSCFG
- 输入参数  : VOS_UINT32                          ulModuleId,
+ ?? ?? ??  : TAF_MMA_TestSysCfgReq
+ ????????  : TEST SYSCFG
+ ????????  : VOS_UINT32                          ulModuleId,
              VOS_UINT16                          usClientId,
              VOS_UINT8                           ucOpId
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月26日
-    作    者   : y00322978
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??26??
+    ??    ??   : y00322978
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_TestSysCfgReq(
@@ -3965,12 +3965,12 @@ VOS_UINT32 TAF_MMA_TestSysCfgReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_SYSCFG_TEST_REQ_STRU */
+    /* ??????????TAF_MMA_SYSCFG_TEST_REQ_STRU */
     pstMsg = (TAF_MMA_SYSCFG_TEST_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                        ulSenderPid,
                                        sizeof(TAF_MMA_SYSCFG_TEST_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -3979,7 +3979,7 @@ VOS_UINT32 TAF_MMA_TestSysCfgReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_SYSCFG_TEST_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_SYSCFG_TEST_REQ;
@@ -3987,27 +3987,27 @@ VOS_UINT32 TAF_MMA_TestSysCfgReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
     return VOS_TRUE;
 }
 
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryAccessModeReq
- 功能描述  : Phone mode qry req
- 输入参数  : VOS_UINT32                          ulModuleId
+ ?? ?? ??  : TAF_MMA_QryAccessModeReq
+ ????????  : Phone mode qry req
+ ????????  : VOS_UINT32                          ulModuleId
              VOS_UINT16                          usClientId
              VOS_UINT8                           ucOpId
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月27日
-    作    者   : g00261581
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??27??
+    ??    ??   : g00261581
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryAccessModeReq(
@@ -4023,12 +4023,12 @@ VOS_UINT32 TAF_MMA_QryAccessModeReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_ACCESS_MODE_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_ACCESS_MODE_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_ACCESS_MODE_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                        ulSenderPid,
                                        sizeof(TAF_MMA_ACCESS_MODE_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -4037,7 +4037,7 @@ VOS_UINT32 TAF_MMA_QryAccessModeReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
                 (VOS_SIZE_T)(sizeof(TAF_MMA_ACCESS_MODE_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_ACCESS_MODE_QRY_REQ;
@@ -4045,27 +4045,27 @@ VOS_UINT32 TAF_MMA_QryAccessModeReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryCopsInfoReq
- 功能描述  : Cops Info qry req
- 输入参数  : VOS_UINT32                          ulModuleId
+ ?? ?? ??  : TAF_MMA_QryCopsInfoReq
+ ????????  : Cops Info qry req
+ ????????  : VOS_UINT32                          ulModuleId
              VOS_UINT16                          usClientId
              VOS_UINT8                           ucOpId
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月27日
-    作    者   : g00261581
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??27??
+    ??    ??   : g00261581
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryCopsInfoReq(
@@ -4081,12 +4081,12 @@ VOS_UINT32 TAF_MMA_QryCopsInfoReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_COPS_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_COPS_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_COPS_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                         ulSenderPid,
                                         sizeof(TAF_MMA_COPS_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -4095,7 +4095,7 @@ VOS_UINT32 TAF_MMA_QryCopsInfoReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
                 (VOS_SIZE_T)(sizeof(TAF_MMA_COPS_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_COPS_QRY_REQ;
@@ -4103,24 +4103,24 @@ VOS_UINT32 TAF_MMA_QryCopsInfoReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryDplmnListReq
- 功能描述  : TAF给MMA发送 消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_MMA_QryDplmnListReq
+ ????????  : TAF??MMA???? ????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年10月16日
-    作    者   : n00355355
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??10??16??
+    ??    ??   : n00355355
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryDplmnListReq(
@@ -4136,10 +4136,10 @@ VOS_UINT32 TAF_MMA_QryDplmnListReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包 */
+    /* ?????????? */
     pstMsg = (TAF_MMA_DPLMN_QRY_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(ulSenderPid, sizeof(TAF_MMA_DPLMN_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -4149,7 +4149,7 @@ VOS_UINT32 TAF_MMA_QryDplmnListReq(
                 0x00,
                 (VOS_SIZE_T)(sizeof(TAF_MMA_DPLMN_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 填写消息头 */
+    /* ?????????? */
     pstMsg->ulSenderCpuId               = VOS_LOCAL_CPUID;
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverCpuId             = VOS_LOCAL_CPUID;
@@ -4159,29 +4159,29 @@ VOS_UINT32 TAF_MMA_QryDplmnListReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 消息发送*/
+    /* ????????*/
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_SetDplmnListReq
- 功能描述  : AT给MMA发送SET DPLMN LIST REQ 消息
- 输入参数  : VOS_UINT32                          ulModuleId,
+ ?? ?? ??  : TAF_MMA_SetDplmnListReq
+ ????????  : AT??MMA????SET DPLMN LIST REQ ????
+ ????????  : VOS_UINT32                          ulModuleId,
              VOS_UINT16                          usClientId,
              VOS_UINT8                           ucSeq,
              VOS_UINT8                          *pucVersionId,
              VOS_UINT16                          usParaLen
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年10月13日
-    作    者   : n00355355
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??10??13??
+    ??    ??   : n00355355
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_SetDplmnListReq(
@@ -4199,7 +4199,7 @@ VOS_UINT32 TAF_MMA_SetDplmnListReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包 */
+    /* ?????????? */
     pstMsg = (TAF_MMA_DPLMN_SET_REQ_STRU *)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                         WUEPS_PID_TAF,
                                         sizeof(TAF_MMA_DPLMN_SET_REQ_STRU));
@@ -4209,12 +4209,12 @@ VOS_UINT32 TAF_MMA_SetDplmnListReq(
         return VOS_FALSE;
     }
 
-    /* 清空消息内容 */
+    /* ???????????? */
     PS_MEM_SET((VOS_UINT8 *)pstMsg + VOS_MSG_HEAD_LENGTH,
                 0x00,
                (VOS_SIZE_T)sizeof(TAF_MMA_DPLMN_SET_REQ_STRU) - VOS_MSG_HEAD_LENGTH);
 
-    /* 填充消息头 */
+    /* ?????????? */
     pstMsg->ulSenderCpuId               = VOS_LOCAL_CPUID;
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverCpuId             = VOS_LOCAL_CPUID;
@@ -4224,7 +4224,7 @@ VOS_UINT32 TAF_MMA_SetDplmnListReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = 0;
 
-    /* 填充流水号、版本号*/
+    /* ??????????????????*/
     pstMsg->ucSeq                       = ucSeq;
     PS_MEM_CPY( pstMsg->aucVersionId,
                 pucVersion,
@@ -4240,7 +4240,7 @@ VOS_UINT32 TAF_MMA_SetDplmnListReq(
         pstDplmnInfo->usDplmnNum = TAF_MMA_MAX_DPLMN_NUM;
     }
 
-    /* 填充HPLMN个数、HPLMN列表、预制DPLMN个数、DPLMN列表 */
+    /* ????HPLMN??????HPLMN??????????DPLMN??????DPLMN???? */
     pstMsg->stDplmnInfo.ucEhPlmnNum     = pstDplmnInfo->ucEhPlmnNum;
     pstMsg->stDplmnInfo.usDplmnNum      = pstDplmnInfo->usDplmnNum;
     PS_MEM_CPY(pstMsg->stDplmnInfo.astEhPlmnInfo,
@@ -4250,7 +4250,7 @@ VOS_UINT32 TAF_MMA_SetDplmnListReq(
                pstDplmnInfo->astDplmnList,
                sizeof(TAF_MMA_SIM_PLMN_WITH_RAT_STRU) * pstDplmnInfo->usDplmnNum );
 
-    /* 发送消息 */
+    /* ???????? */
     if (VOS_OK != PS_SEND_MSG(ulSenderPid, pstMsg))
     {
         return VOS_FALSE;
@@ -4260,23 +4260,23 @@ VOS_UINT32 TAF_MMA_SetDplmnListReq(
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryRegStateReq
- 功能描述  : Qry reg state info
- 输入参数  : VOS_UINT32                          ulModuleId
+ ?? ?? ??  : TAF_MMA_QryRegStateReq
+ ????????  : Qry reg state info
+ ????????  : VOS_UINT32                          ulModuleId
              VOS_UINT16                          usClientId
              VOS_UINT8                           ucOpId
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月27日
-    作    者   : g00261581
-    修改内容   : 新生成函数
-  2.日    期   : 2015年8月21日
-    作    者   : w00176964
-    修改内容   : DTS2015081907463
+ ????????      :
+  1.??    ??   : 2015??3??27??
+    ??    ??   : g00261581
+    ????????   : ??????????
+  2.??    ??   : 2015??8??21??
+    ??    ??   : w00176964
+    ????????   : DTS2015081907463
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryRegStateReq(
     VOS_UINT32                                              ulModuleId,
@@ -4292,12 +4292,12 @@ VOS_UINT32 TAF_MMA_QryRegStateReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_REG_STATE_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_REG_STATE_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_REG_STATE_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                               ulSenderPid,
                                               sizeof(TAF_MMA_REG_STATE_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -4306,7 +4306,7 @@ VOS_UINT32 TAF_MMA_QryRegStateReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
                 (VOS_SIZE_T)(sizeof(TAF_MMA_REG_STATE_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_REG_STATE_QRY_REQ;
@@ -4316,27 +4316,27 @@ VOS_UINT32 TAF_MMA_QryRegStateReq(
 
     pstMsg->enQryRegStaType = enRegStaType;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryAutoAttachInfoReq
- 功能描述  : Mma Qry Auto Attach Info
- 输入参数  : VOS_UINT32                          ulModuleId
+ ?? ?? ??  : TAF_MMA_QryAutoAttachInfoReq
+ ????????  : Mma Qry Auto Attach Info
+ ????????  : VOS_UINT32                          ulModuleId
              VOS_UINT16                          usClientId
              VOS_UINT8                           ucOpId
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月28日
-    作    者   : g00261581
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??28??
+    ??    ??   : g00261581
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryAutoAttachInfoReq(
@@ -4352,12 +4352,12 @@ VOS_UINT32 TAF_MMA_QryAutoAttachInfoReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_AUTOATTACH_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_AUTOATTACH_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_AUTO_ATTACH_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                                ulSenderPid,
                                                sizeof(TAF_MMA_AUTO_ATTACH_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -4366,7 +4366,7 @@ VOS_UINT32 TAF_MMA_QryAutoAttachInfoReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
                 (VOS_SIZE_T)(sizeof(TAF_MMA_AUTO_ATTACH_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_AUTO_ATTACH_QRY_REQ;
@@ -4374,28 +4374,28 @@ VOS_UINT32 TAF_MMA_QryAutoAttachInfoReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QrySystemInfoReq
- 功能描述  : Mma Qry System Info
- 输入参数  : VOS_UINT32                          ulModuleId
+ ?? ?? ??  : TAF_MMA_QrySystemInfoReq
+ ????????  : Mma Qry System Info
+ ????????  : VOS_UINT32                          ulModuleId
              VOS_UINT16                          usClientId
              VOS_UINT8                           ucOpId
              VOS_UINT32                          ulSysInfoExFlag
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月28日
-    作    者   : g00261581
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??28??
+    ??    ??   : g00261581
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QrySystemInfoReq(
@@ -4412,12 +4412,12 @@ VOS_UINT32 TAF_MMA_QrySystemInfoReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_SYSINFO_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_SYSINFO_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_SYSINFO_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                             ulSenderPid,
                                             sizeof(TAF_MMA_SYSINFO_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -4426,7 +4426,7 @@ VOS_UINT32 TAF_MMA_QrySystemInfoReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
                 (VOS_SIZE_T)(sizeof(TAF_MMA_SYSINFO_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_SYSINFO_QRY_REQ;
@@ -4435,28 +4435,28 @@ VOS_UINT32 TAF_MMA_QrySystemInfoReq(
     pstMsg->stCtrl.ucOpId               = ucOpId;
     pstMsg->ulSysInfoExFlag             = ulSysInfoExFlag;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
-/* QryAntennaInfoReq 移至MTA处理 */
+/* QryAntennaInfoReq ????MTA???? */
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryApHplmnInfoReq
- 功能描述  : Mma Qry ApHplmn Info
- 输入参数  : VOS_UINT32                          ulModuleId
+ ?? ?? ??  : TAF_MMA_QryApHplmnInfoReq
+ ????????  : Mma Qry ApHplmn Info
+ ????????  : VOS_UINT32                          ulModuleId
              VOS_UINT16                          usClientId
              VOS_UINT8                           ucOpId
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月30日
-    作    者   : g00261581
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??30??
+    ??    ??   : g00261581
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryApHplmnInfoReq(
@@ -4472,12 +4472,12 @@ VOS_UINT32 TAF_MMA_QryApHplmnInfoReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_APHPLMN_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_APHPLMN_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_HOME_PLMN_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                               ulSenderPid,
                                               sizeof(TAF_MMA_HOME_PLMN_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -4486,7 +4486,7 @@ VOS_UINT32 TAF_MMA_QryApHplmnInfoReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
                 (VOS_SIZE_T)(sizeof(TAF_MMA_HOME_PLMN_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderCpuId               = VOS_LOCAL_CPUID;
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverCpuId             = VOS_LOCAL_CPUID;
@@ -4496,29 +4496,29 @@ VOS_UINT32 TAF_MMA_QryApHplmnInfoReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 }
 
-/* QryCsnrReq移至MTA处理 */
+/* QryCsnrReq????MTA???? */
 
 /*****************************************************************************
- 函 数 名  : TAF_MMA_QryCsqReq
- 功能描述  : CSQ QRY查询消息下发接口
- 输入参数  : VOS_UINT32                          ulModuleId,
+ ?? ?? ??  : TAF_MMA_QryCsqReq
+ ????????  : CSQ QRY????????????????
+ ????????  : VOS_UINT32                          ulModuleId,
              VOS_UINT16                          usClientId,
              VOS_UINT8                           ucOpId
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年3月28日
-    作    者   : y00322978
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??3??28??
+    ??    ??   : y00322978
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 TAF_MMA_QryCsqReq(
@@ -4534,12 +4534,12 @@ VOS_UINT32 TAF_MMA_QryCsqReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_CSQ_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_CSQ_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_CSQ_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                        ulSenderPid,
                                        sizeof(TAF_MMA_CSQ_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -4548,7 +4548,7 @@ VOS_UINT32 TAF_MMA_QryCsqReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
             (VOS_SIZE_T)(sizeof(TAF_MMA_CSQ_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_CSQ_QRY_REQ;
@@ -4556,14 +4556,14 @@ VOS_UINT32 TAF_MMA_QryCsqReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
 
 }
 
-/* QryCsqlvlReq移至MTA处理 */
+/* QryCsqlvlReq????MTA???? */
 
 
 
@@ -4580,12 +4580,12 @@ VOS_UINT32 TAF_MMA_QryBatteryCapacityReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_CBC_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_CBC_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_BATTERY_CAPACITY_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                         ulSenderPid,
                                         sizeof(TAF_MMA_BATTERY_CAPACITY_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -4594,7 +4594,7 @@ VOS_UINT32 TAF_MMA_QryBatteryCapacityReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
                 (VOS_SIZE_T)(sizeof(TAF_MMA_BATTERY_CAPACITY_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_BATTERY_CAPACITY_QRY_REQ;
@@ -4602,7 +4602,7 @@ VOS_UINT32 TAF_MMA_QryBatteryCapacityReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;
@@ -4622,12 +4622,12 @@ VOS_UINT32 TAF_MMA_QryHandShakeReq(
     ulReceiverPid = AT_GetDestPid(usClientId, WUEPS_PID_MMA);
     ulSenderPid   = AT_GetDestPid(usClientId, WUEPS_PID_TAF);
 
-    /* 申请消息包TAF_MMA_HS_QRY_REQ_STRU */
+    /* ??????????TAF_MMA_HS_QRY_REQ_STRU */
     pstMsg = (TAF_MMA_HAND_SHAKE_QRY_REQ_STRU*)PS_ALLOC_MSG_WITH_HEADER_LEN(
                                        ulSenderPid,
                                        sizeof(TAF_MMA_HAND_SHAKE_QRY_REQ_STRU));
 
-    /* 内存申请失败，返回 */
+    /* ?????????????????? */
     if (VOS_NULL_PTR == pstMsg)
     {
         return VOS_FALSE;
@@ -4636,7 +4636,7 @@ VOS_UINT32 TAF_MMA_QryHandShakeReq(
     PS_MEM_SET( (VOS_INT8 *)pstMsg + VOS_MSG_HEAD_LENGTH, 0X00,
                 (VOS_SIZE_T)(sizeof(TAF_MMA_HAND_SHAKE_QRY_REQ_STRU) - VOS_MSG_HEAD_LENGTH) );
 
-    /* 发送PID统一填写为WUEPS_PID_TAF */
+    /* ????PID??????????WUEPS_PID_TAF */
     pstMsg->ulSenderPid                 = ulSenderPid;
     pstMsg->ulReceiverPid               = ulReceiverPid;
     pstMsg->ulMsgName                   = ID_TAF_MMA_HAND_SHAKE_QRY_REQ;
@@ -4644,7 +4644,7 @@ VOS_UINT32 TAF_MMA_QryHandShakeReq(
     pstMsg->stCtrl.usClientId           = usClientId;
     pstMsg->stCtrl.ucOpId               = ucOpId;
 
-    /* 发送消息 */
+    /* ???????? */
     (VOS_VOID)PS_SEND_MSG(ulSenderPid, pstMsg);
 
     return VOS_TRUE;

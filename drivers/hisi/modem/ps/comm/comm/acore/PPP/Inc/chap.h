@@ -55,19 +55,12 @@ struct chap {
   } challenge;    /* used in Authentication phase follow CHAP, RFC1994 */
   struct
   {
-    /*
-        这个结构是为了保留发送到GGSN完整的config req报文而设的,
-        把发送的challenge报文和接收到的response报文发给AT,
-        需要注意这部分内容需要提交给TAF使用, 根据PPP与TAF的接口设计,
-        BufChallenge和BufResponse的长度都不能超过253Bytes
-    */
     VOS_UINT16 LenOfChallenge;
     VOS_UINT16 LenOfResponse;
     VOS_UINT8  BufChallenge[1+1+2+1+CHAPCHALLENGELEN + AUTHLEN];    /* code(1B)+id(1B)+length(2B)+challenge_size(1B)+challenge+name */
     VOS_UINT8  BufResponse[1+1+2+1+PASSWORDLEN + AUTHLEN];    /* code(1B)+id(1B)+length(2B)+response_size(1B)+response+name */
   } RecordData;
 };
-
 
 void chap_Init(struct chap *);
 void chap_ReInit(struct chap *);
@@ -79,7 +72,4 @@ PPP_ZC_STRU *chap_Input(struct link *, PPP_ZC_STRU *);
 #pragma pack(0)
 #endif
 
-
 #endif    /* end of chap.h */
-
-

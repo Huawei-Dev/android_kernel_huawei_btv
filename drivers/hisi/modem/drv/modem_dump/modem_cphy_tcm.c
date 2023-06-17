@@ -46,8 +46,6 @@
  *
  */
 
-
-
 #include <product_config.h>
 #include "osl_types.h"
 #include "osl_bio.h"
@@ -58,22 +56,8 @@
 #include "bsp_dsp.h"
 #include "modem_dump_base.h"
 #include "bsp_dump_drv.h"
-/*****************************************************************************
-* 函 数 名  : om_save_cphy_tcm
-* 功能描述  : 保存xdsp的镜像
-*
-* 输入参数  :
-* 输出参数  :
 
-* 返 回 值  :
-
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_save_cphy_tcm(char *  dst_path)
 {
     return;
 }
-
-

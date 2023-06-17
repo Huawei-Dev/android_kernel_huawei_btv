@@ -55,23 +55,12 @@ extern "C" {
 #endif
 #endif
 
-/*****************************************************************************
-  1 其他头文件包含
-*****************************************************************************/
-
 #include "vos.h"
 #include "pamappom.h"
-
-/*****************************************************************************
-  2 宏定义
-*****************************************************************************/
 
 #define USIMM_CARDSTATUS_IND                    100
 #define SI_PIH_PCSC_DATA_CNF                    0xA5
 
-/*******************************************************************************
-  3 枚举定义
-*******************************************************************************/
 enum USIMM_PHYCARD_TYPE_ENUM
 {
     USIMM_PHYCARD_TYPE_ICC              = 0x00,
@@ -114,15 +103,15 @@ typedef VOS_UINT32      USIMM_CARD_SERVIC_ENUM_UINT32;
 
 enum SI_PIH_EVENT_ENUM
 {
-    SI_PIH_EVENT_PIN_OPER_CNF       = 1,      /* 操作PIN码返回结果        */
-    SI_PIH_EVENT_PIN_QUERY_CNF      = 2,      /* 查询PIN码返回结果        */
-    SI_PIH_EVENT_PIN_INFO_IND       = 3,      /* 开机PIN码主动上报        */
-    SI_PIH_EVENT_SIM_INFO_IND       = 4,      /* SIM卡信息上报            */
-    SI_PIH_EVENT_GENERIC_ACCESS_CNF = 5,      /* +CSIM 回复               */
-    SI_PIH_EVENT_RESTRIC_ACCESS_CNF = 6,      /* +CRSM 回复               */
-    SI_PIH_EVENT_FDN_CNF            = 7,      /* FDN回复                  */
-    SI_PIH_EVENT_BDN_CNF            = 8,      /* BDN回复                  */
-    SI_PIH_EVENT_PERO_LOCK_CNF      = 9,      /* 锁卡回复                 */
+    SI_PIH_EVENT_PIN_OPER_CNF       = 1,
+    SI_PIH_EVENT_PIN_QUERY_CNF      = 2,
+    SI_PIH_EVENT_PIN_INFO_IND       = 3,
+    SI_PIH_EVENT_SIM_INFO_IND       = 4,
+    SI_PIH_EVENT_GENERIC_ACCESS_CNF = 5,
+    SI_PIH_EVENT_RESTRIC_ACCESS_CNF = 6,
+    SI_PIH_EVENT_FDN_CNF            = 7,
+    SI_PIH_EVENT_BDN_CNF            = 8,
+    SI_PIH_EVENT_PERO_LOCK_CNF      = 9,
     SI_PIH_EVENT_BUTT
 };
 typedef VOS_UINT32  SI_PIH_EVENT;
@@ -156,14 +145,11 @@ enum USIMM_REALISIM_STATE_ENUM
 };
 typedef VOS_UINT32 USIMM_REALISIM_STATE_ENUM_UINT32;
 
-/*****************************************************************************
-  4 STRUCT定义
-*****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    VOS_UINT32                          ulMsgName;       /* 消息名 */
-    VOS_UINT16                          usClient;        /* 客户端ID */
+    VOS_UINT32                          ulMsgName;
+    VOS_UINT16                          usClient;
     VOS_UINT8                           ucOpID;
     VOS_UINT8                           ucRsv;
     SI_PIH_EVENT                        ulEventType;
@@ -204,15 +190,12 @@ typedef struct
 typedef struct
 {
     VOS_MSG_HEADER
-    VOS_UINT32                      ulMsgName;          /* 消息类型 */
-    VOS_UINT32                      ulResult;           /* PC/SC命令执行结果 */
-    VOS_UINT32                      ulCmdType;          /* 命令类型 */
-    VOS_UINT32                      ulRspLen;           /* 命令执行得到的数据长度 */
-    VOS_UINT8                       aucContent[4];      /* 数据内容 */
+    VOS_UINT32                      ulMsgName;
+    VOS_UINT32                      ulResult;
+    VOS_UINT32                      ulCmdType;
+    VOS_UINT32                      ulRspLen;
+    VOS_UINT8                       aucContent[4];
 }SI_PIH_PCSC_CNF_STRU;
-
-
-
 
 #ifdef __cplusplus
 #if __cplusplus

@@ -20,7 +20,6 @@
 
 #define FIQ_TRIGGER_TAG                     		 (0xFFFFFFF0)
 
-/*优先级高的先处理，优先级数字越小越高*/
 typedef enum __fiq_num
 {
 	FIQ_RESET = 0,
@@ -30,69 +29,22 @@ typedef enum __fiq_num
 
 enum fiq_handler_return_value
 {
-	FIQ_RETURN_RUNNING = 0,                       /*FIQ钩子退出后，系统继续运行*/
-	FIQ_ENTER_LOOP_1_NO_RETRUN = 1      , /*FIQ钩子退出后，系统进行死循环，不响应FIQ*/
-	FIQ_ENTER_WFE_NO_RETRUN =  2            /*FIQ钩子退出后，系统进入WFE循环，响应FIQ*/
+	FIQ_RETURN_RUNNING = 0,
+	FIQ_ENTER_LOOP_1_NO_RETRUN = 1,
+	FIQ_ENTER_WFE_NO_RETRUN =  2
 };
 
 typedef int (* FIQ_PROC_FUNC)(void *);
 
 #ifdef   __OS_RTOSCK__
-/**
- * @brief 创建FIQ
- *
- * @par 描述:
- * 注册FIQ处理函数
- *
- * @attention
- * </ul>允许多次调用，以最后一次注册为准
-  * </ul>FIQ只连接给了A9，不具备唤醒能力，A9下电场景下发送FIQ会发生异常
- *用户注册的钩子返回值定义见enum fiq_handler_return_value
- * 
- **/ 
 
 int request_fiq(fiq_num fiq_num_t, FIQ_PROC_FUNC pfnHandler,void * uwArg);
 
-/**
- * @brief 删除创建FIQ
- *
- * @par 描述:
- *去 注册FIQ处理函数
- *
- * @attention
- * </ul>调用一次即删除
- *
- * 
- **/ 
 int free_fiq(fiq_num fiq_num_t);
-
-/**
- * @brief 处理FIQ
- *
- * @par 描述:
- * FIQ处理函数
- *
- * @attention
- * </ul>由异常处理钩子在FIQ场景下调用
- *
- * 
- **/ 
 
  UINT32 fiq_handler(EXC_INFO_S *pstExcInfo);
 #elif defined __KERNEL__
-/**
- * @brief 触发FIQ
- *
- * @par 描述:
- * 触发FIQ中断
- *
- * @attention
- * </ul>
-  * </ul>FIQ只连接给了A9，不具备唤醒能力，A9下电场景下发送FIQ会发生异常
- * 
- **/
 
 int bsp_send_cp_fiq(fiq_num fiq_num_t);
 #endif
 #endif
-

@@ -58,7 +58,7 @@
 #define MODEMID_M_BITS(n)      ((n >> 8) & MODEMID_MASK_BITS)
 #define MODEMID_L_BITS(n)      (n & MODEMID_MASK_BITS)
 
-/* 需要mask掉射频扣板ID号或modemid的bit[9:0] */
+/* ????mask??????????ID????modemid??bit[9:0] */
 #define MODEMID_VENDOR_MASK		(~(uint32_t)0x3FF)
 
 typedef struct modem_dt_table_t {

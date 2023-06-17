@@ -46,8 +46,6 @@
  *
  */
 
-/*lint -save -e537*/
-
 #include "osl_sem.h"
 #include "osl_malloc.h"
 #include "osl_thread.h"
@@ -58,28 +56,11 @@
 #include <of.h>
 #include "soc_socp_adapter.h"
 
-
-/*lint -restore*/
-/*lint -save -e506 -e40 -e63 -e516 */
-
-
-
-
 extern void* socp_malloc(u32 u32Size);
 extern s32 socp_free(void* pMem);
 
-
 #define SOCP_TEST_CODE_SRC SOCP_CODER_SRC_BSP_ACORE
 
-
-
-
-/*
-    mdrv_socp_coder_set_dest_chan_attr
-    mdrv_socp_start
-    DRV_SOCP_GET_READ_BUFF
-    DRV_SOCP_READ_DATA_DONE
-    */
 int mdrv_socp_test_001(void)
 {
     int ret;
@@ -134,13 +115,6 @@ int mdrv_socp_test_001(void)
     return 0;
 }
 
-/*
-    mdrv_socp_corder_set_src_chan
-    mdrv_socp_start
-    DRV_SOCP_FREE_CHANNEL
-    mdrv_socp_stop
-    DRV_SOCP_CLEAN_ENCSRC_CHAN
-    */
 int mdrv_socp_test_002(void)
 {
     SOCP_CODER_SRC_CHAN_S EncSrcAttr;
@@ -230,11 +204,6 @@ int mdrv_socp_test_002(void)
     return 0;
 }
 
-
-/*
-    DRV_SOCP_DECODER_SET_SRC_CHAN_ATTR
-    DRV_SOCP_DECODER_SET_DEST_CHAN
-    */
 int mdrv_socp_test_003(void)
 {
     unsigned int u32ChanId;
@@ -285,11 +254,6 @@ int mdrv_socp_test_003(void)
     return 0;
 }
 
-/*
-    DRV_SOCP_REGISTER_EVENT_CB
-    DRV_SOCP_REGISTER_RD_CB
-    DRV_SOCP_REGISTER_READ_CB
-    */
 int mdrv_socp_test_004(void)
 {
     int ret;
@@ -314,14 +278,6 @@ int mdrv_socp_test_004(void)
     return 0;
 }
 
-
-/*
-    mdrv_socp_set_log_int_timeout
-    mdrv_socp_set_log_int_default_timeout
-    mdrv_socp_enc_dst_buf_flush
-    mdrv_socp_get_sd_logcfg
-    DRV_SOCP_SET_TIMEOUT
-    */
 int mdrv_socp_test_006(void)
 {
     int ret;
@@ -338,7 +294,6 @@ int mdrv_socp_test_006(void)
         return -1;
     }
 
-    /* ¶ÁÈ¡ÅäÖÃ */
     cfg = bsp_socp_get_log_cfg();
     if(cfg->logOnFlag == TRUE)
     {
@@ -355,14 +310,6 @@ int mdrv_socp_test_006(void)
 
     return 0;
 }
-
-
-
-/*
-    DRV_SOCP_VOTE
-    DRV_SOCP_VOTE_TO_MCORE
-    DRV_SOCP_GET_STATE
-    */
 
 int mdrv_socp_test_007(void)
 {
@@ -382,12 +329,3 @@ int mdrv_socp_test_007(void)
     }
     return 0;
 }
-
-
-
-
-
-
-
-
-

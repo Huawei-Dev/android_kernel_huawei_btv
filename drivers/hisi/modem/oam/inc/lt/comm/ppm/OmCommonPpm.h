@@ -51,7 +51,7 @@
 #define __OM_COMMON_PPM_H__
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "omnvinterface.h"
 #include "mdrv.h"
@@ -68,9 +68,9 @@ extern "C" {
 extern VOS_UINT32                          g_ulOmAcpuDbgFlag ;
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
-#define USB_MAX_DATA_LEN            (60*1024)   /*USB发送的最大数据长度*/
+#define USB_MAX_DATA_LEN            (60*1024)   /*USB??????????????????*/
 
 #define BIT_N(num)          (0x01 << (num))
 
@@ -108,9 +108,9 @@ extern VOS_UINT32                          g_ulOmAcpuDbgFlag ;
         }
 
 /*******************************************************************************
-  3 枚举定义
+  3 ????????
 *******************************************************************************/
-/* UDI设备句柄 */
+/* UDI???????? */
 enum OM_PROT_HANDLE_ENUM
 {
     OM_USB_IND_PORT_HANDLE      =   0,
@@ -135,36 +135,36 @@ typedef VOS_UINT32     OM_LOGIC_CHANNEL_ENUM_UINT32;
 
 
 /*****************************************************************************
-  4 结构体定义
+  4 ??????????
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : OM_PSEUDO_SYNC_STRU
- 协议表格  : 无
- 结构说明  : OM调用底软DRV_UDI_IOCTL异步接口发送数据，为与调用DRV_UDI_WRITE同步接口
-             处处理逻辑一致，将异步接口调用伪造为同步接口
+ ??????    : OM_PSEUDO_SYNC_STRU
+ ????????  : ??
+ ????????  : OM????????DRV_UDI_IOCTL??????????????????????????DRV_UDI_WRITE????????
+             ????????????????????????????????????????????
 
- 修改历史      :
-  1.日    期   : 2014年5月25日
-    作    者   : L00256032
-    修改内容   : V8R1 OM_Optimize项目新增
+ ????????      :
+  1.??    ??   : 2014??5??25??
+    ??    ??   : L00256032
+    ????????   : V8R1 OM_Optimize????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_SEM                             ulPseudoSyncSemId;   /* 伪造为同步接口需使用的信号量 */
-    VOS_UINT8                          *pucAsyncCBData;      /* DRV_UDI_IOCTL接口异步返回后传入的数据指针 */
-    VOS_UINT32                          ulLen;               /* DRV_UDI_IOCTL接口异步返回后返回的实际处理数据长度 */
+    VOS_SEM                             ulPseudoSyncSemId;   /* ???????????????????????????? */
+    VOS_UINT8                          *pucAsyncCBData;      /* DRV_UDI_IOCTL???????????????????????????? */
+    VOS_UINT32                          ulLen;               /* DRV_UDI_IOCTL???????????????????????????????????? */
     VOS_UINT32                          ulRsv;               /* Reserve */
 }OM_PSEUDO_SYNC_STRU;
 
 /*****************************************************************************
- 结构名    : PPM_PORT_CFG_INFO_STRU
- 协议表格  : 无
- 结构说明  : PPM端口切换统计信息
+ ??????    : PPM_PORT_CFG_INFO_STRU
+ ????????  : ??
+ ????????  : PPM????????????????
 
- 修改历史      :
-  1.日    期   : 2014年5月25日
-    作    者   : h59254
-    修改内容   : V8R1 OM_Optimize项目新增
+ ????????      :
+  1.??    ??   : 2014??5??25??
+    ??    ??   : h59254
+    ????????   : V8R1 OM_Optimize????????
 *****************************************************************************/
 typedef struct
 {
@@ -176,7 +176,7 @@ typedef struct
 }PPM_PORT_CFG_INFO_STRU;
 
 
-/* 用于记录VCOM发送信息 */
+/* ????????VCOM???????? */
 typedef struct
 {
     VOS_UINT32                          ulVCOMSendSn;
@@ -184,7 +184,7 @@ typedef struct
     VOS_UINT32                          ulVCOMSendLen;
     VOS_UINT32                          ulVCOMSendErrNum;
     VOS_UINT32                          ulVCOMSendErrLen;
-    VOS_UINT32                          ulMaxTimeLen;           /* 调用写接口花费的最大时长 */
+    VOS_UINT32                          ulMaxTimeLen;           /* ???????????????????????? */
 
     VOS_UINT32                          ulVCOMRcvSn;
     VOS_UINT32                          ulVCOMRcvNum;
@@ -255,7 +255,7 @@ typedef struct
     VOS_UINT32                          ulSocpReadDoneErrLen;
 }OM_SOCP_CHANNEL_DEBUG_INFO;
 
-/*用于记录当前OM通道的信息*/
+/*????????????OM??????????*/
 typedef struct
 {
     OM_SOCP_CHANNEL_DEBUG_INFO          stIndDebugInfo;
@@ -265,7 +265,7 @@ typedef struct
 }OM_ACPU_DEBUG_INFO;
 
 /*****************************************************************************
-  4 函数声明
+  4 ????????
 *****************************************************************************/
 #if((VOS_OS_VER == VOS_LINUX) || (VOS_OSA_CPU == OSA_CPU_ACPU))
 extern VOS_UINT32 PPM_DisconnectGUPort(OM_LOGIC_CHANNEL_ENUM_UINT32 enChannel);
@@ -313,18 +313,18 @@ extern OM_PSEUDO_SYNC_STRU * PPM_ComPpmGetSyncInfo(VOS_VOID);
 extern OM_ACPU_DEBUG_INFO * PPM_ComPpmGetDebugInfo(VOS_VOID);
 
 /*****************************************************************************
-  5 全局变量声明
+  5 ????????????
 *****************************************************************************/
 extern UDI_HANDLE                              g_astOMPortUDIHandle[OM_PORT_HANDLE_BUTT];
 
-/* USB承载的OM IND端口中，伪造为同步接口使用的数据结构体 */
+/* USB??????OM IND?????????????????????????????????????? */
 extern OM_PSEUDO_SYNC_STRU                     g_stUsbIndPseudoSync;
 
-/* USB承载的OM CNF端口中，伪造为同步接口使用的数据结构体 */
+/* USB??????OM CNF?????????????????????????????????????? */
 extern OM_PSEUDO_SYNC_STRU                     g_stUsbCfgPseudoSync;
 
 /*****************************************************************************
-  6 OTHERS定义
+  6 OTHERS????
 *****************************************************************************/
 
 

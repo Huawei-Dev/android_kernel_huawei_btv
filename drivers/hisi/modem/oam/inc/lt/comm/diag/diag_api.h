@@ -46,7 +46,6 @@
  *
  */
 
-
 #ifndef __DIAG_API_H__
 #define __DIAG_API_H__
 
@@ -68,16 +67,12 @@ extern "C" {
   2 macro
 *****************************************************************************/
 
-/* diag初始化成功且HSO连接上 */
 #define  DIAG_IS_CONN_ON            ((g_ulDiagCfgInfo & (DIAG_CFG_INIT | DIAG_CFG_CONN )) == (DIAG_CFG_INIT | DIAG_CFG_CONN ))
 
-/* 允许LT 空口上报 */
 #define  DIAG_IS_LT_AIR_ON          ((g_ulDiagCfgInfo & (DIAG_CFG_INIT | DIAG_CFG_CONN | DIAG_CFG_LT_AIR)) == (DIAG_CFG_INIT | DIAG_CFG_CONN | DIAG_CFG_LT_AIR))
 
-/* 允许GU 空口上报 */
 #define  DIAG_IS_GU_AIR_ON          ((g_ulDiagCfgInfo & (DIAG_CFG_INIT | DIAG_CFG_CONN | DIAG_CFG_GU_AIR)) == (DIAG_CFG_INIT | DIAG_CFG_CONN | DIAG_CFG_GU_AIR))
 
-/* 允许事件上报 */
 #define  DIAG_IS_EVENT_ON           ((g_ulDiagCfgInfo & (DIAG_CFG_INIT | DIAG_CFG_CONN | DIAG_CFG_EVT)) == (DIAG_CFG_INIT | DIAG_CFG_CONN | DIAG_CFG_EVT))
 
 
@@ -87,7 +82,6 @@ extern "C" {
 #define DIAG_GET_GROUP_ID(id)               ((id & 0x00000F00)>>8)
 #define DIAG_GET_MODULE_ID(id)              ( id & 0x00000FFF)
 
-/* 日志类型定义*/
 #define DIAG_CMD_LOG_CATETORY_PRINT_ID              (1<<15)
 #define DIAG_CMD_LOG_CATETORY_EVENT_ID              (1<<14)
 #define DIAG_CMD_LOG_CATETORY_AIR_ID                (1<<13)
@@ -162,4 +156,3 @@ extern VOS_UINT32 diag_FailedCmdCnf(DIAG_FRAME_INFO_STRU *pData, VOS_UINT32 ulEr
 #endif
 
 #endif /* end of diag_api.h */
-

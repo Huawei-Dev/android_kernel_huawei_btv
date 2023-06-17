@@ -149,7 +149,7 @@ static __inline__ unsigned readb(unsigned addr)
 #ifdef __OS_VXWORKS__
 #ifndef __ASSEMBLY__
 
-/* device: strongly-ordered 寄存器都要使用该接口 */
+/* device: strongly-ordered ???????????????????? */
 static __inline__ void *ioremap(unsigned phy_addr, unsigned int len)
 {
     return (void *)0;
@@ -253,7 +253,7 @@ enum MMU_MAP_E
 #define MMU_STATE_RWX (OS_MMU_STATE_READ|OS_MMU_STATE_WRITE|OS_MMU_STATE_EXE)
 #define MMU_STATE_RW (OS_MMU_STATE_READ | OS_MMU_STATE_WRITE)
 #define MMU_STATE_ROX (OS_MMU_STATE_READ|OS_MMU_STATE_EXE)
-/* device: strongly-ordered 寄存器都要使用该接口 */
+/* device: strongly-ordered ???????????????????? */
 void *ioremap(MMU_VA_T phy_addr, unsigned int len);
 
 /* device: non-cacheable normal */

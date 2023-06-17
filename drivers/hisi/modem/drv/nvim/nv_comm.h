@@ -46,10 +46,8 @@
  *
  */
 
-
 #ifndef _NV_COMM_H_
 #define _NV_COMM_H_
-
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -57,8 +55,6 @@ extern "C" {
 #endif
 #endif
 
-
-/*lint -save -e537*/
 #include <asm/io.h>
 #include <linux/gfp.h>
 #include <linux/mm.h>
@@ -87,8 +83,6 @@ extern "C" {
 #include "drv_nv_def.h"
 #include "nv_debug.h"
 
-/*lint -restore +e537*/
-
 #ifdef __KERNEL__
 
 #define nv_malloc(a)     kmalloc(a,GFP_KERNEL)
@@ -113,7 +107,6 @@ do{\
 #undef printf
 #define printf(fmt,...)     bsp_trace(BSP_LOG_LEVEL_ERROR,BSP_MODU_NV,fmt,##__VA_ARGS__)
 
-
 #endif
 
 #define nv_flush_cache(ptr, size) mb()
@@ -131,8 +124,6 @@ extern struct nv_global_ctrl_info_stru g_nv_ctrl;
     bsp_trace(BSP_LOG_LEVEL_ERROR,BSP_MODU_NV,"[nv]: <%s> line = %d  "fmt, __FUNCTION__,__LINE__, ##__VA_ARGS__)
 #define nv_printf_info(fmt, ...) \
         bsp_trace(BSP_LOG_LEVEL_ERROR,BSP_MODU_NV, fmt, ##__VA_ARGS__)
-
-
 
 #define nv_debug_trace(pdata,len)\
     if(g_nv_ctrl.debug_sw == true)\
@@ -154,10 +145,8 @@ extern struct nv_global_ctrl_info_stru g_nv_ctrl;
         g_nv_ctrl.pmSw = false;\
     };
 
-
 #define NV_ID_SYS_MAX_ID          0xd1ff
 #define NV_ID_SYS_MIN_ID          0xd100
-
 
 #define nv_spin_lock(nvflag,lock) \
 do{\
@@ -173,15 +162,12 @@ do{\
 
 #define IPC_SME_TIME_OUT   (1000)
 
-
-/*睡眠唤醒状态*/
 enum
 {
     NV_WAKEUP_STATE         =0,
     NV_SLEEP_STATE          =1
 };
 
-/*操作进行与空闲状态*/
 enum
 {
     NV_IDLE_STATE           =0,
@@ -189,7 +175,6 @@ enum
 };
 
 #define NV_MAX_WAIT_TICK             (50000)
-
 
 #define NV_ICC_BUF_LEN               64
 #define NV_ICC_SEND_COUNT            5
@@ -207,9 +192,6 @@ enum
     NV_PRODUCT_MBB      = 1,
     NV_PRODUCT_BUTT
 };
-
-
-
 
 typedef struct nv_flush_list_node_stru
 {
@@ -249,7 +231,7 @@ typedef struct _nv_revert_file_s
 struct nv_global_ctrl_info_stru
 {
     u8 nv_icc_buf[NV_ICC_BUF_LEN];
-    osl_sem_id rw_sem;      /*与IPC锁同时使用保证本核访问的互斥*/
+    osl_sem_id rw_sem;
     osl_sem_id cc_sem;      /*lock the core comm*/
     osl_sem_id task_sem;
     osl_sem_id suspend_sem;
@@ -275,8 +257,8 @@ struct nv_global_ctrl_info_stru
     u32 acore_flush_req;
     u32 acore_flush_count;
 
-    osl_sem_id nv_list_sem;         /*用于保护nv_list的信号量*/
-    struct list_head  nv_list;      /*存储待写入的list的buf*/
+    osl_sem_id nv_list_sem;
+    struct list_head  nv_list;
 
 };
 
@@ -327,14 +309,10 @@ u32  nv_check_item_len(u32 start, u32 end);
 u32  nv_test_for_local_list(u32 min_priority, u32 max_priority, u32 max_num);
 u32  nv_flushItem(nv_flush_item_s *flush_item);
 
-
 #ifdef __cplusplus
 #if __cplusplus
 }
 #endif
 #endif
 
-
-
 #endif /*_NV_COMM_H_*/
-

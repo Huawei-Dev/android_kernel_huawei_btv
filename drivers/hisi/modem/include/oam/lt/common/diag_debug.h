@@ -46,8 +46,6 @@
  *
  */
 
-
-
 #ifndef __DIAG_DEBUG_H__
 #define __DIAG_DEBUG_H__
 
@@ -57,10 +55,6 @@ extern "C" {
 #endif
 #endif
 
-
-/*****************************************************************************
-  1 Include Headfile
-*****************************************************************************/
 #include  "product_config.h"
 #include  "mdrv.h"
 #include  "vos.h"
@@ -82,9 +76,6 @@ typedef enum
    DIAG_DEBUG_API_TRANS,
    DIAG_DEBUG_API_DEFAULT
 }DIAG_DEBUG_API_ENUM;
-
-
-/* CBT ***********************************************************************/
 
 #define DIAG_DEBUG_SDM_FUN(enType,ulRserved1,ulRserved2,ulRserved3)  \
             diag_CBT(enType,ulRserved1,ulRserved2,ulRserved3)
@@ -163,16 +154,13 @@ typedef enum
 
     EN_DIAG_DEBUG_BBP_AGENT_TIME_OUT_ENTRY,
 #if(FEATURE_SOCP_ON_DEMAND == FEATURE_ON)
-    /* DIAG APP SOCP投票 */
     EN_DIAG_APP_SOCP_VOTE,
     EN_DIAG_APP_SOCP_VOTE_ERR,
 #endif
-    /* DIAG AGENT与LDSP邮箱交互 */
     EN_DIAG_AGENT_LDSP_MB_MSG,
     EN_DIAG_DEBUG_INFO_MAX
 } DIAG_CBT_ID_ENUM;
 
-/*发起主动复位时MSP传入的参数ID最小值为:0xB000000*/
 #define DIAG_BASE_ERROR_NUMBER          (0xB0000000)
 
 enum MSP_SYSTEMERROR_MODID_ENUM
@@ -185,7 +173,7 @@ enum MSP_SYSTEMERROR_MODID_ENUM
 
 typedef struct
 {
-    VOS_UINT32 ulCalledNum;  /* 调用次数或者消息次数,或者表明该函数是否被调用*/
+    VOS_UINT32 ulCalledNum;
     VOS_UINT32 ulRserved1;
     VOS_UINT32 ulRserved2;
     VOS_UINT32 ulRserved3;
@@ -202,28 +190,24 @@ typedef struct
     VOS_UINT32              ulErrNum;
 }DIAG_DEBUG_API_INFO_STRU;
 
-
 extern VOS_VOID diag_CBT(DIAG_CBT_ID_ENUM ulType, VOS_UINT32 ulRserved1,
                         VOS_UINT32 ulRserved2, VOS_UINT32 ulRserved3);
-
-
-/* LNR ***********************************************************************/
 
 #define DIAG_LNR_NUMBER             (100)
 
 typedef enum
 {
-    EN_DIAG_LNR_CMDID = 0,  /* 最后N条接收到的诊断命令 */
+    EN_DIAG_LNR_CMDID = 0,
 
-    EN_DIAG_LNR_LOG_LOST,   /* 最后N条log丢失的记录 */
+    EN_DIAG_LNR_LOG_LOST,
 
-    EN_DIAG_LNR_PS_TRANS,   /* 最后N条PS透传命令的记录 */
+    EN_DIAG_LNR_PS_TRANS,
 
-    EN_DIAG_LNR_CCORE_MSG,  /* 最后N条C核从A核收到的消息ID的记录 */
+    EN_DIAG_LNR_CCORE_MSG,
 
-    EN_DIAG_LNR_MESSAGE_RPT,/* 最后N条通过message模块report上报的cmdid的记录 */
+    EN_DIAG_LNR_MESSAGE_RPT,
 
-    EN_DIAG_LNR_TRANS_IND,  /* 最后N条透传上报的记录 */
+    EN_DIAG_LNR_TRANS_IND,
 
     EN_DIAG_LNR_INFO_MAX
 } DIAG_LNR_ID_ENUM;
@@ -235,15 +219,11 @@ typedef struct
     VOS_UINT32 ulRserved2[DIAG_LNR_NUMBER];
 } DIAG_LNR_INFO_TBL_STRU;
 
-
 extern VOS_VOID diag_LNR(DIAG_LNR_ID_ENUM ulType, VOS_UINT32 ulRserved1, VOS_UINT32 ulRserved2);
-
-
-/* DFR (Data Flow Record，码流录制)*******************************************/
 
 #define     DIAG_DFR_NAME_MAX       (8)
 #define     DIAG_DFR_BUFFER_MAX     (8*1024)
-#define     DIAG_DFR_MAGIC_NUM      (0x44494147)    /* DIAG */
+#define     DIAG_DFR_MAGIC_NUM      (0x44494147)
 
 #define     DIAG_DFR_START_NUM      (0xabcd4321)
 
@@ -251,12 +231,12 @@ extern VOS_VOID diag_LNR(DIAG_LNR_ID_ENUM ulType, VOS_UINT32 ulRserved1, VOS_UIN
 
 typedef struct
 {
-    VOS_UINT32  ulMagicNum;                 /* 魔术字 */
-    VOS_SEM     semid;                      /* 存储空间访问的互斥信号量 */
-    VOS_CHAR    name[DIAG_DFR_NAME_MAX];    /* 存储码流的名字 */
-    VOS_UINT32  ulCur;                      /* 存储空间的当前地址 */
-    VOS_UINT32  ulLen;                      /* 存储空间的总长度 */
-    VOS_UINT8   *pData;                     /* 存储空间的首地址 */
+    VOS_UINT32  ulMagicNum;
+    VOS_SEM     semid;
+    VOS_CHAR    name[DIAG_DFR_NAME_MAX];
+    VOS_UINT32  ulCur;
+    VOS_UINT32  ulLen;
+    VOS_UINT8   *pData;
 } DIAG_DFR_INFO_STRU;
 
 
@@ -266,19 +246,17 @@ typedef struct
     VOS_UINT32      ulTime;
 }DIAG_DFR_HEADER_STRU;
 
-/* throughput 吞吐率信息*******************************************/
+#define     DIAG_THRPUT_DEBUG_NUM       (100)
 
-#define     DIAG_THRPUT_DEBUG_NUM       (100)       /* 缓存100个点 */
-
-#define     DIAG_THRPUT_DEBUG_LEN       (5*32768)   /* 每次统计吞吐率最少间隔5秒以上 */
+#define     DIAG_THRPUT_DEBUG_LEN       (5*32768)
 
 typedef enum
 {
-    EN_DIAG_THRPUT_DATA_CHN_ENC = 0,    /* 数据通道编码输入端 */
+    EN_DIAG_THRPUT_DATA_CHN_ENC = 0,
 #if (VOS_OS_VER == VOS_LINUX)
-    EN_DIAG_THRPUT_DATA_CHN_PHY,        /* 数据通道写入物理通道 */
+    EN_DIAG_THRPUT_DATA_CHN_PHY,
 
-    EN_DIAG_THRPUT_DATA_CHN_CB,         /* 数据物理通道回调 */
+    EN_DIAG_THRPUT_DATA_CHN_CB,
 #endif
     EN_DIAG_THRPUT_MAX
 } DIAG_THRPUT_ID_ENUM;
@@ -286,20 +264,18 @@ typedef enum
 
 typedef struct
 {
-    VOS_UINT32      ulSlice;            /* 当前时间戳时间戳 */
-    VOS_UINT32      ulThroughput;       /* 吞吐率(Bytes/s) */
+    VOS_UINT32      ulSlice;
+    VOS_UINT32      ulThroughput;
 }DIAG_THRPUT_NODE_STRU;
 
 typedef struct
 {
-    VOS_UINT32              ulSlice;            /* 最近一次统计的时间戳 */
-    VOS_UINT32              ulBytes;            /* 当前已累计的字节数 */
-    VOS_UINT32              ulMax;              /* 吞吐率峰值 */
-    VOS_UINT32              ulPtr;              /* 当前指针 */
+    VOS_UINT32              ulSlice;
+    VOS_UINT32              ulBytes;
+    VOS_UINT32              ulMax;
+    VOS_UINT32              ulPtr;
     DIAG_THRPUT_NODE_STRU   stNode[DIAG_THRPUT_DEBUG_NUM];
 }DIAG_THRPUT_INFO_STRU;
-
-/* DIAG MNTN *******************************************/
 
 #define DIAG_DEBUG_LOST_LEN             (5*32768)
 
@@ -316,38 +292,38 @@ typedef struct
 typedef struct
 {
     VOS_UINT32      ulModuleId;
-    VOS_UINT32      ulNo;               /* 序号 */
+    VOS_UINT32      ulNo;
 }DIAG_MNTN_HEAD_STRU;
 
 typedef struct
 {
-    VOS_UINT32      ulTraceNum;         /* 层间消息成功上报次数 */
-    VOS_UINT32      ulEventNum;         /* event成功上报次数 */
-    VOS_UINT32      ulLogNum;           /* Log成功上报次数 */
-    VOS_UINT32      ulAirNum;           /* 空口成功上报次数 */
-    VOS_UINT32      ulTransNum;         /* 透传成功上报次数 */
+    VOS_UINT32      ulTraceNum;
+    VOS_UINT32      ulEventNum;
+    VOS_UINT32      ulLogNum;
+    VOS_UINT32      ulAirNum;
+    VOS_UINT32      ulTransNum;
     
-    VOS_UINT32      ulThrputEnc;        /* 编码源吞吐率 */
+    VOS_UINT32      ulThrputEnc;
     
-    VOS_UINT32      ulThrputPhy;        /* 物理通道吞吐率 */
-    VOS_UINT32      ulThrputCb;         /* 回调吞吐率 */
+    VOS_UINT32      ulThrputPhy;
+    VOS_UINT32      ulThrputCb;
 
-    VOS_UINT32      ulSrcChnSize;       /* 编码源通道剩余字节数 */
-    VOS_UINT32      ulDstChnSize;       /* 编码目的通道剩余字节数 */
+    VOS_UINT32      ulSrcChnSize;
+    VOS_UINT32      ulDstChnSize;
     
-    VOS_UINT32      ulTotalLostTimes;   /* 丢包次数 */
+    VOS_UINT32      ulTotalLostTimes;
 
-    VOS_UINT32      ulTotalUSBLen;      /* 向USB写入的总字节数 */
-    VOS_UINT32      ulTotalUSBFreeLen;  /* USB回调释放的总字节数 */
-    VOS_UINT32      ulTotalVCOMLen;     /* 向VCOM写入的总字节数 */
-    VOS_UINT32      ulTotalVCOMErrLen;  /* 向VCOM写入失败的总字节数 */
-    VOS_UINT32      ulVCOMMaxTimeLen;   /* 调用VCOM写接口话费的最大时长 */
+    VOS_UINT32      ulTotalUSBLen;
+    VOS_UINT32      ulTotalUSBFreeLen;
+    VOS_UINT32      ulTotalVCOMLen;
+    VOS_UINT32      ulTotalVCOMErrLen;
+    VOS_UINT32      ulVCOMMaxTimeLen;
     
-    VOS_UINT32      ulTotalSOCKETLen;   /* 向SOCKET写入的总字节数 */
+    VOS_UINT32      ulTotalSOCKETLen;
     
-    VOS_UINT32      aulReserve[4];      /* 预留 */
+    VOS_UINT32      aulReserve[4];
 
-    VOS_UINT32      aulToolreserve[12]; /* 给工具预留的64个字节，用于在工具上显示工具的维测信息 */
+    VOS_UINT32      aulToolreserve[12];
 }DIAG_MNTN_INFO_STRU;
 
 typedef struct
@@ -357,22 +333,19 @@ typedef struct
     DIAG_MNTN_INFO_STRU                 pstMntnInfo;
 }DIAG_DEBUG_MNTN_STRU;
 
-
-/* DIAG LOST *******************************************/
-
 typedef enum
 {
-    EN_DIAG_LOST_ALLOC = 0,         /* 当前时间段内存申请失败次数 */
+    EN_DIAG_LOST_ALLOC = 0,
 
-    EN_DIAG_LOST_SEND,              /* 当前时间段写源buffer失败次数 */
+    EN_DIAG_LOST_SEND,
 
-    EN_DIAG_LOST_BRANCH,            /* 当前时间段分支失败次数 */
+    EN_DIAG_LOST_BRANCH,
 
-    EN_DIAG_LOST_CPMWR,             /* 当前时间段CPM写失败次数 */
+    EN_DIAG_LOST_CPMWR,
 
-    EN_DIAG_LOST_CPMCB,             /* 当前时间段CPM写回调失败次数 */
+    EN_DIAG_LOST_CPMCB,
     
-    EN_DIAG_LOST_OVERFLOW,          /* 当前SOCP buffer溢出次数 */
+    EN_DIAG_LOST_OVERFLOW,
 
     EN_DIAG_LOST_MAX
 } DIAG_LOST_ID_ENUM;
@@ -381,38 +354,38 @@ typedef enum
 typedef struct
 {
     VOS_UINT32      ulModuleId;
-    VOS_UINT32      ulNo;                   /* 序号 */
+    VOS_UINT32      ulNo;
 }DIAG_LOST_HEAD_STRU;
 
 typedef struct
 {
     VOS_UINT32      ulModuleId;
-    VOS_UINT32      ulNo;                   /* 序号 */
+    VOS_UINT32      ulNo;
     
-    VOS_UINT32      ulLostTotalNum;         /* 丢包总次数 */
+    VOS_UINT32      ulLostTotalNum;
 
-    VOS_UINT32      aulCurFailNum[EN_DIAG_LOST_MAX];    /* 当前时间段内丢包的各类次数 */
+    VOS_UINT32      aulCurFailNum[EN_DIAG_LOST_MAX];
     
-    VOS_UINT32      ulSrcChnSize;       /* 编码源通道剩余字节数 */
-    VOS_UINT32      ulDstChnSize;       /* 编码目的通道剩余字节数 */
-    VOS_UINT32      ulDSPChnSize;       /* DSP编码源通道剩余字节数 */
+    VOS_UINT32      ulSrcChnSize;
+    VOS_UINT32      ulDstChnSize;
+    VOS_UINT32      ulDSPChnSize;
     
-    VOS_UINT32      ulThrputPhy;        /* 物理通道吞吐率 */
-    VOS_UINT32      ulThrputCb;         /* 回调吞吐率 */
+    VOS_UINT32      ulThrputPhy;
+    VOS_UINT32      ulThrputCb;
 
-    VOS_UINT32      ulTotalSocpDstLen;  /* 从SOCP编码目的buffer中读取的总字节数 */
+    VOS_UINT32      ulTotalSocpDstLen;
 
-    VOS_UINT32      ulTotalUSBLen;      /* 向USB写入的总字节数 */
-    VOS_UINT32      ulTotalUSBFreeLen;  /* USB回调释放的总字节数 */
-    VOS_UINT32      ulTotalVCOMLen;     /* 向VCOM写入的总字节数 */
-    VOS_UINT32      ulTotalVCOMErrLen;  /* 向VCOM写入失败的总字节数 */
-    VOS_UINT32      ulVCOMMaxTimeLen;   /* 调用VCOM写接口话费的最大时长 */
+    VOS_UINT32      ulTotalUSBLen;
+    VOS_UINT32      ulTotalUSBFreeLen;
+    VOS_UINT32      ulTotalVCOMLen;
+    VOS_UINT32      ulTotalVCOMErrLen;
+    VOS_UINT32      ulVCOMMaxTimeLen;
     
-    VOS_UINT32      ulTotalSOCKETLen;   /* 向SOCKET写入的总字节数 */
+    VOS_UINT32      ulTotalSOCKETLen;
 
-    VOS_UINT32      aulRreserve[4];     /* 预留 */
+    VOS_UINT32      aulRreserve[4];
 
-    VOS_UINT32      aulToolreserve[4];  /* 给工具预留的16个字节，用于在工具上显示工具的维测信息 */
+    VOS_UINT32      aulToolreserve[4];
 }DIAG_LOST_INFO_STRU;
 
 typedef struct
@@ -422,10 +395,7 @@ typedef struct
     DIAG_LOST_INFO_STRU                 pstLostInfo;
 }DIAG_DEBUG_LOST_STRU;
 
-
 extern DIAG_DEBUG_LOST_STRU g_stLostInfo;
-
-/* DIAG_TRACE *******************************************/
 
 #define DIAG_DEBUG_TRACE_DELAY          (1*32768)
 #define DIAG_DEBUG_TXT_LOG_DELAY        (10*32768)
@@ -444,10 +414,8 @@ typedef struct
     DIAG_DEBUG_INFO_STRU                pstInfo;
 }DIAG_DEBUG_FRAME_STRU;
 
-/* A核向C核发送的debug消息 *******************************************/
-
-#define DIAG_DEBUG_DFR_BIT          0x00000001      /* 保存码流 */
-#define DIAG_DEBUG_NIL_BIT          0x00000002      /* 保存log不上报的定位信息 */
+#define DIAG_DEBUG_DFR_BIT          0x00000001
+#define DIAG_DEBUG_NIL_BIT          0x00000002
 
 typedef struct
 {
@@ -457,14 +425,8 @@ typedef struct
     VOS_UINT32    ulReceiverPid;
     VOS_UINT32    ulLength;
     VOS_UINT32    ulMsgId;
-
-    /* bit0 : DFR */
-    /* bit1 : no ind log */
     VOS_UINT32      ulFlag;
 } DIAG_A_DEBUG_C_REQ_STRU;
-
-
-/* 对外函数接口 *******************************************/
 
 extern VOS_UINT32 diag_CreateDFR(VOS_CHAR *name, VOS_UINT32 ulLen, DIAG_DFR_INFO_STRU *pDfr);
 extern VOS_VOID diag_SaveDFR(DIAG_DFR_INFO_STRU *pDfr, VOS_UINT8 *pData, VOS_UINT32 ulLen);
@@ -498,7 +460,6 @@ extern VOS_VOID DIAG_Throughput(VOS_VOID);
 #pragma pack(0)
 #endif
 
-
 #ifdef __cplusplus
     #if __cplusplus
         }
@@ -506,4 +467,3 @@ extern VOS_VOID DIAG_Throughput(VOS_VOID);
 #endif
 
 #endif /* end of diag_Debug.h */
-

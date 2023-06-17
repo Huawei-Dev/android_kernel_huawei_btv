@@ -48,20 +48,20 @@
 
 /******************************************************************************
 
-                  版权所有 (C), 2001-2012, 华为技术有限公司
+                  ???????? (C), 2001-2012, ????????????????
 
  ******************************************************************************
-  文 件 名   : ScComm.h
-  版 本 号   : 初稿
-  作    者   : 王笑非
-  生成日期   : 2012年4月16日
-  最近修改   :
-  功能描述   : SC模块
-  函数列表   :
-  修改历史   :
-  1.日    期   : 2012年4月16日
-    作    者   : w00184875
-    修改内容   : V7R1C51 锁网锁卡项目新增
+  ?? ?? ??   : ScComm.h
+  ?? ?? ??   : ????
+  ??    ??   : ??????
+  ????????   : 2012??4??16??
+  ????????   :
+  ????????   : SC????
+  ????????   :
+  ????????   :
+  1.??    ??   : 2012??4??16??
+    ??    ??   : w00184875
+    ????????   : V7R1C51 ????????????????
 
 ******************************************************************************/
 
@@ -77,44 +77,44 @@ extern "C" {
 #pragma pack(4)
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "vos.h"
 #include "ScInterface.h"
 #include "UsimPsInterface.h"
 #include "msp_diag_comm.h"
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
-#define   SC_KEY_LEN                (32)                                        /* 密钥的长度 */
+#define   SC_KEY_LEN                (32)                                        /* ?????????? */
 
-#define   SC_HASH_LEN               (32)                                        /* HASH的码流长度 */
+#define   SC_HASH_LEN               (32)                                        /* HASH?????????? */
 
 #define   SC_FILE_PATH_LEN          (128)
 
-#define   SC_SSK_STRING             "Secure Storage Key"                        /* 生成SSK的字符串 */
+#define   SC_SSK_STRING             "Secure Storage Key"                        /* ????SSK???????? */
 
-#define   SC_SSK_STRLEN             (VOS_StrLen(SC_SSK_STRING))                 /* 生成SSK的字符串长度 */
+#define   SC_SSK_STRLEN             (VOS_StrLen(SC_SSK_STRING))                 /* ????SSK???????????? */
 
-#define   SC_DSSK_STRING            "Debug port protect Secure Storage Key"     /* 生成DSSK的字符串 */
+#define   SC_DSSK_STRING            "Debug port protect Secure Storage Key"     /* ????DSSK???????? */
 
-#define   SC_DSSK_STRLEN            (VOS_StrLen(SC_DSSK_STRING))                /* 生成DSSK的字符串长度 */
+#define   SC_DSSK_STRLEN            (VOS_StrLen(SC_DSSK_STRING))                /* ????DSSK???????????? */
 
-#define   SC_IPK_STRING             "Integrity Protection Key"                  /* 生成IPK的字符串 */
+#define   SC_IPK_STRING             "Integrity Protection Key"                  /* ????IPK???????? */
 
-#define   SC_IPK_STRLEN             (VOS_StrLen(SC_IPK_STRING))                 /* 生成IPK的字符串长度 */
+#define   SC_IPK_STRLEN             (VOS_StrLen(SC_IPK_STRING))                 /* ????IPK???????????? */
 
-#define   SC_ASSK_STRING            "AT Secure Storage Key"                     /* 生成ASSK的字符串 */
+#define   SC_ASSK_STRING            "AT Secure Storage Key"                     /* ????ASSK???????? */
 
-#define   SC_ASSK_STRLEN            (VOS_StrLen(SC_ASSK_STRING))                /* 生成ASSK的字符串长度 */
+#define   SC_ASSK_STRLEN            (VOS_StrLen(SC_ASSK_STRING))                /* ????ASSK???????????? */
 
-#define   SC_SATK_STRING            "Secure AT Key"                             /* 生成SATK的字符串 */
+#define   SC_SATK_STRING            "Secure AT Key"                             /* ????SATK???????? */
 
-#define   SC_SATK_STRLEN            (VOS_StrLen(SC_SATK_STRING))                /* 生成SATK的字符串长度 */
+#define   SC_SATK_STRLEN            (VOS_StrLen(SC_SATK_STRING))                /* ????SATK???????????? */
 
-#define   SC_FILE_EXIST_MAGIC       (0x37ab65cd)                                /* SC备份文件存在标记 */
+#define   SC_FILE_EXIST_MAGIC       (0x37ab65cd)                                /* SC???????????????? */
 
-#define   SC_FILE_PACKET_MAGIC      (0xdeacb589)                                /* SC备份区存在标记 */
+#define   SC_FILE_PACKET_MAGIC      (0xdeacb589)                                /* SC?????????????? */
 
 #define   SC_LOG_MAX_LEN            (512)
 
@@ -126,11 +126,11 @@ extern "C" {
 
 #define   SC_FILE_EXIST_OK          (0)
 
-#define   SC_MAX_RECORD_SLICE_INFO  (500)           /* 读写文件最大记录次数 */
+#define   SC_MAX_RECORD_SLICE_INFO  (500)           /* ???????????????????? */
 
 #define   SC_NV_IMEI_LENTH          (16)
 
-#define   SC_RECORD_IMEI_MAGIC      (0x5a5a5a5a)                                /* SC存放校验过IMEI标记 */
+#define   SC_RECORD_IMEI_MAGIC      (0x5a5a5a5a)                                /* SC??????????IMEI???? */
 
 #if ((OSA_CPU_CCPU == VOS_OSA_CPU))
 #define SC_GEN_LOG_MODULE(Level) (/*lint -e1011 -e778*/DIAG_GEN_LOG_MODULE(VOS_GetModemIDFromPid(MAPS_PB_PID), DIAG_MODE_COMM, Level)/*lint +e1011 +e778*/)
@@ -167,15 +167,15 @@ extern "C" {
 #endif
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 /*****************************************************************************
- 枚举名    : SC_KEY_TYPE_ENUM
- 枚举说明  : 指定KEY的类型
+ ??????    : SC_KEY_TYPE_ENUM
+ ????????  : ????KEY??????
 
-  1.日    期   : 2012年04月07日
-    作    者   : w00184875
-    修改内容   : AP-Modem锁网锁卡项目新增枚举
+  1.??    ??   : 2012??04??07??
+    ??    ??   : w00184875
+    ????????   : AP-Modem????????????????????
 *****************************************************************************/
 enum SC_KEY_TYPE_ENUM
 {
@@ -187,28 +187,28 @@ enum SC_KEY_TYPE_ENUM
 typedef VOS_UINT8 SC_KEY_TYPE_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : SC_CRYPTO_PASSWORD_TYPE_ENUM
- 枚举说明  : 指定密文的类型
+ ??????    : SC_CRYPTO_PASSWORD_TYPE_ENUM
+ ????????  : ??????????????
 
-  1.日    期   : 2012年04月07日
-    作    者   : w00184875
-    修改内容   : AP-Modem锁网锁卡项目新增枚举
+  1.??    ??   : 2012??04??07??
+    ??    ??   : w00184875
+    ????????   : AP-Modem????????????????????
 *****************************************************************************/
 enum SC_CRYPTO_PASSWORD_TYPE_ENUM
 {
-    SC_CRYPTO_PASSWORD_TYPE_CK          = 0x00,             /* CK的密文 */
-    SC_CRYPTO_PASSWORD_TYPE_DK          = 0x01,             /* DK的密文 */
+    SC_CRYPTO_PASSWORD_TYPE_CK          = 0x00,             /* CK?????? */
+    SC_CRYPTO_PASSWORD_TYPE_DK          = 0x01,             /* DK?????? */
     SC_CRYPTO_PASSWORD_TYPE_BUTT
 };
 typedef VOS_UINT8 SC_CRYPTO_PASSWORD_TYPE_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : SC_RECORD_FUNC_ENUM
- 结构说明  : 可维可测函数名枚举
+ ??????    : SC_RECORD_FUNC_ENUM
+ ????????  : ??????????????????
 
-  1.日    期   : 2016年03月01日
-    作    者   : d00212987
-    修改内容   :
+  1.??    ??   : 2016??03??01??
+    ??    ??   : d00212987
+    ????????   :
 *****************************************************************************/
 enum SC_RECORD_FUNC_ENUM
 {
@@ -227,12 +227,12 @@ enum SC_RECORD_FUNC_ENUM
 typedef VOS_UINT16 SC_RECORD_FUNC_ENUM_UINT16;
 
 /*****************************************************************************
- 枚举名    : SC_SECRET_FILE_TYPE_ENUM
- 结构说明  : 指定安全文件的类型
+ ??????    : SC_SECRET_FILE_TYPE_ENUM
+ ????????  : ??????????????????
 
-  1.日    期   : 2012年04月07日
-    作    者   : w00184875
-    修改内容   : AP-Modem锁网锁卡项目新增枚举
+  1.??    ??   : 2012??04??07??
+    ??    ??   : w00184875
+    ????????   : AP-Modem????????????????????
 
 *****************************************************************************/
 enum SC_SECRET_FILE_TYPE_ENUM
@@ -243,15 +243,15 @@ enum SC_SECRET_FILE_TYPE_ENUM
     SC_SECRET_FILE_TYPE_PI              = 0x03,             /* PI-FILE */
 #if  ( FEATURE_MULTI_MODEM == FEATURE_ON )
 #if (3 == MULTI_MODEM_NUMBER)
-    SC_SECRET_FILE_TYPE_IMEI_I0         = 0x04,             /* IMEI-FILE 卡0 */
-    SC_SECRET_FILE_TYPE_IMEI_I1         = 0x05,             /* IMEI-FILE 卡1 */
-    SC_SECRET_FILE_TYPE_IMEI_I2         = 0x06,             /* IMEI-FILE 卡2 */
+    SC_SECRET_FILE_TYPE_IMEI_I0         = 0x04,             /* IMEI-FILE ??0 */
+    SC_SECRET_FILE_TYPE_IMEI_I1         = 0x05,             /* IMEI-FILE ??1 */
+    SC_SECRET_FILE_TYPE_IMEI_I2         = 0x06,             /* IMEI-FILE ??2 */
 #else
-    SC_SECRET_FILE_TYPE_IMEI_I0         = 0x04,             /* IMEI-FILE 卡0 */
-    SC_SECRET_FILE_TYPE_IMEI_I1         = 0x05,             /* IMEI-FILE 卡1 */
+    SC_SECRET_FILE_TYPE_IMEI_I0         = 0x04,             /* IMEI-FILE ??0 */
+    SC_SECRET_FILE_TYPE_IMEI_I1         = 0x05,             /* IMEI-FILE ??1 */
 #endif
 #else
-    SC_SECRET_FILE_TYPE_IMEI_I0         = 0x04,             /* IMEI-FILE 卡0 */
+    SC_SECRET_FILE_TYPE_IMEI_I0         = 0x04,             /* IMEI-FILE ??0 */
 #endif
 
     SC_SECRET_FILE_TYPE_BUTT
@@ -259,24 +259,24 @@ enum SC_SECRET_FILE_TYPE_ENUM
 typedef VOS_UINT8 SC_SECRET_FILE_TYPE_ENUM_UINT8;
 
 /*****************************************************************************
-  4 全局变量声明
+  4 ????????????
 *****************************************************************************/
 /*****************************************************************************
-  5 消息头定义
+  5 ??????????
 *****************************************************************************/
 /*****************************************************************************
-  6 消息定义
+  6 ????????
 *****************************************************************************/
 /*****************************************************************************
-  7 STRUCT定义
+  7 STRUCT????
 *****************************************************************************/
 
 /*****************************************************************************
- 结构名    : SC_BACKUP_EACH_FILE_INFO_STRU
- 结构说明  : SC每个备份文件的明细
- 1.日    期   : 2014年07月29日
-   作    者   : d00212987
-   修改内容   : 新建
+ ??????    : SC_BACKUP_EACH_FILE_INFO_STRU
+ ????????  : SC??????????????????
+ 1.??    ??   : 2014??07??29??
+   ??    ??   : d00212987
+   ????????   : ????
 *****************************************************************************/
 typedef struct
 {
@@ -287,11 +287,11 @@ typedef struct
 }SC_BACKUP_EACH_FILE_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : SC_BACKUP_FILE_INFO_STRU
- 结构说明  : SC所以文件拼接成一块，统一刷入FLASH
- 1.日    期   : 2014年06月10日
-   作    者   : d00212987
-   修改内容   : 新建
+ ??????    : SC_BACKUP_FILE_INFO_STRU
+ ????????  : SC????????????????????????????FLASH
+ 1.??    ??   : 2014??06??10??
+   ??    ??   : d00212987
+   ????????   : ????
 *****************************************************************************/
 typedef struct
 {
@@ -302,31 +302,31 @@ typedef struct
 }SC_BACKUP_FILE_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : SC_RECORD_INFO_STRU
- 结构说明  : 操作流程记录
+ ??????    : SC_RECORD_INFO_STRU
+ ????????  : ????????????
 
-  1.日    期   : 2016年04月01日
-    作    者   : d00212987
-    修改内容   :
+  1.??    ??   : 2016??04??01??
+    ??    ??   : d00212987
+    ????????   :
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                       ulTaskId;      /* 任务ID */
-    SC_RECORD_FUNC_ENUM_UINT16       enFuncID;      /* 函数ID */
-    MODEM_ID_ENUM_UINT16             enModemID;     /* 操作modemID */
-    VOS_UINT32                       ulOperateSn;   /* 操作SN */
-    VOS_UINT32                       ulSliceStart;  /* 起止时间 */
-    VOS_UINT32                       ulSliceEnd;    /* 结束时间 */
+    VOS_UINT32                       ulTaskId;      /* ????ID */
+    SC_RECORD_FUNC_ENUM_UINT16       enFuncID;      /* ????ID */
+    MODEM_ID_ENUM_UINT16             enModemID;     /* ????modemID */
+    VOS_UINT32                       ulOperateSn;   /* ????SN */
+    VOS_UINT32                       ulSliceStart;  /* ???????? */
+    VOS_UINT32                       ulSliceEnd;    /* ???????? */
 
 }SC_RECORD_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : SC_RECORD_INFO_CTX_STRU
- 结构说明  : 操作流程记录
+ ??????    : SC_RECORD_INFO_CTX_STRU
+ ????????  : ????????????
 
-  1.日    期   : 2016年04月01日
-    作    者   : d00212987
-    修改内容   :
+  1.??    ??   : 2016??04??01??
+    ??    ??   : d00212987
+    ????????   :
 *****************************************************************************/
 typedef struct
 {
@@ -335,68 +335,68 @@ typedef struct
 }SC_RECORD_INFO_CTX_STRU;
 
 /*****************************************************************************
- 结构名    : SC_RECORD_VERIFY_IMEI_INFO_CTX_STRU
- 结构说明  : 存放校验过的IMEI
+ ??????    : SC_RECORD_VERIFY_IMEI_INFO_CTX_STRU
+ ????????  : ????????????IMEI
 
-  1.日    期   : 2016年04月01日
-    作    者   : d00212987
-    修改内容   :
+  1.??    ??   : 2016??04??01??
+    ??    ??   : d00212987
+    ????????   :
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                       ulStartFalg;   /* 起始Flag */
+    VOS_UINT32                       ulStartFalg;   /* ????Flag */
     VOS_UINT8                        ucImeiInfo[SC_NV_IMEI_LENTH];
-    VOS_UINT32                       ulEndFalg;     /* 结束Flag  */
+    VOS_UINT32                       ulEndFalg;     /* ????Flag  */
 
 }SC_RECORD_VERIFY_IMEI_INFO_CTX_STRU;
 
 /*****************************************************************************
-  8 UNION定义
+  8 UNION????
 *****************************************************************************/
 /*****************************************************************************
-  9 OTHERS定义
+  9 OTHERS????
 *****************************************************************************/
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 #if ((OSA_CPU_CCPU == VOS_OSA_CPU))
 
 /*****************************************************************************
- 函 数 名  : SC_COMM_AllocRecImeiMem
- 功能描述  : 为存放IMIE申请空间
- 输入参数  :
+ ?? ?? ??  : SC_COMM_AllocRecImeiMem
+ ????????  : ??????IMIE????????
+ ????????  :
 
- 输出参数  :
+ ????????  :
 
- 返 回 值  :
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  :
+ ????????  :
+ ????????  :
 *****************************************************************************/
 VOS_UINT32 SC_COMM_AllocRecImeiMem(MODEM_ID_ENUM_UINT16     enModemID);
 
 /*****************************************************************************
- 函 数 名  : SC_COMM_CeckImeiRecordMem
- 功能描述  : 检查存放IMIE空间合法性
- 输入参数  :
+ ?? ?? ??  : SC_COMM_CeckImeiRecordMem
+ ????????  : ????????IMIE??????????
+ ????????  :
 
- 输出参数  :
+ ????????  :
 
- 返 回 值  : VOS_BOOL
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : VOS_BOOL
+ ????????  :
+ ????????  :
 *****************************************************************************/
 VOS_BOOL SC_COMM_CeckImeiRecordMemFlag(MODEM_ID_ENUM_UINT16   enModemID);
 
 /*****************************************************************************
- 函 数 名  : SC_COMM_SetVerifyImeiValue
- 功能描述  : 更新校验通过IMEI
- 输入参数  :
+ ?? ?? ??  : SC_COMM_SetVerifyImeiValue
+ ????????  : ????????????IMEI
+ ????????  :
 
- 输出参数  :
+ ????????  :
 
- 返 回 值  :
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  :
+ ????????  :
+ ????????  :
 *****************************************************************************/
 VOS_VOID SC_COMM_SetVerifyImeiValue(
     MODEM_ID_ENUM_UINT16                    enModemID,
@@ -404,15 +404,15 @@ VOS_VOID SC_COMM_SetVerifyImeiValue(
 );
 
 /*****************************************************************************
- 函 数 名  : SC_COMM_CeckImeiRecordMem
- 功能描述  : 检查存放IMIE空间合法性
- 输入参数  :
+ ?? ?? ??  : SC_COMM_CeckImeiRecordMem
+ ????????  : ????????IMIE??????????
+ ????????  :
 
- 输出参数  :
+ ????????  :
 
- 返 回 值  : SC_RECORD_IMEI_INFO_CTX_STRU*
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : SC_RECORD_IMEI_INFO_CTX_STRU*
+ ????????  :
+ ????????  :
 *****************************************************************************/
 SC_RECORD_VERIFY_IMEI_INFO_CTX_STRU* SC_COMM_GetVerifyImeiValue(MODEM_ID_ENUM_UINT16   enModemID);
 
@@ -468,22 +468,22 @@ extern SC_ERROR_CODE_ENUM_UINT32 SC_COMM_RsaDecrypt(
 );
 
 /*****************************************************************************
- 函 数 名  : SC_COMM_GenerateSignCode
- 功能描述  : 文件签名的计算
- 输入参数  : pucContent: 文件内容
-             ucContentLen: 文件内容长度
-             ucSignCodeLen: 文件签名长度
+ ?? ?? ??  : SC_COMM_GenerateSignCode
+ ????????  : ??????????????
+ ????????  : pucContent: ????????
+             ucContentLen: ????????????
+             ucSignCodeLen: ????????????
 
- 输出参数  : pucSignCode: 文件签名码流
+ ????????  : pucSignCode: ????????????
 
- 返 回 值  : SC_ERROR_CODE_ENUM_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : SC_ERROR_CODE_ENUM_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年04月07日
-    作    者   : w00184875
-    修改内容   : AP-Modem锁网锁卡项目新增函数
+ ????????      :
+  1.??    ??   : 2012??04??07??
+    ??    ??   : w00184875
+    ????????   : AP-Modem????????????????????
 
 *****************************************************************************/
 SC_ERROR_CODE_ENUM_UINT32 SC_COMM_GenerateSignCode(
@@ -494,21 +494,21 @@ SC_ERROR_CODE_ENUM_UINT32 SC_COMM_GenerateSignCode(
 );
 
 /*****************************************************************************
- 函 数 名  : SC_COMM_WriteFile
- 功能描述  : 读取文件接口
- 输入参数  : pcFilePath: 文件路径
-             ulContentLen: 文件长度
+ ?? ?? ??  : SC_COMM_WriteFile
+ ????????  : ????????????
+ ????????  : pcFilePath: ????????
+             ulContentLen: ????????
 
- 输出参数  : pucContent: 文件内容
+ ????????  : pucContent: ????????
 
- 返 回 值  : SC_ERROR_CODE_ENUM_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : SC_ERROR_CODE_ENUM_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年04月18日
-    作    者   : w00184875
-    修改内容   : AP-Modem锁网锁卡项目新增函数
+ ????????      :
+  1.??    ??   : 2012??04??18??
+    ??    ??   : w00184875
+    ????????   : AP-Modem????????????????????
 
 *****************************************************************************/
 extern SC_ERROR_CODE_ENUM_UINT32 SC_COMM_WriteFile(
@@ -518,21 +518,21 @@ extern SC_ERROR_CODE_ENUM_UINT32 SC_COMM_WriteFile(
 );
 
 /*****************************************************************************
- 函 数 名  : SC_COMM_ReadFile
- 功能描述  : 读取文件接口
- 输入参数  : pcFilePath: 文件路径
-             ulContentLen: 文件长度
+ ?? ?? ??  : SC_COMM_ReadFile
+ ????????  : ????????????
+ ????????  : pcFilePath: ????????
+             ulContentLen: ????????
 
- 输出参数  : pucContent: 文件内容
+ ????????  : pucContent: ????????
 
- 返 回 值  : SC_ERROR_CODE_ENUM_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : SC_ERROR_CODE_ENUM_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年04月18日
-    作    者   : w00184875
-    修改内容   : AP-Modem锁网锁卡项目新增函数
+ ????????      :
+  1.??    ??   : 2012??04??18??
+    ??    ??   : w00184875
+    ????????   : AP-Modem????????????????????
 
 *****************************************************************************/
 extern SC_ERROR_CODE_ENUM_UINT32 SC_COMM_ReadFile(
@@ -542,18 +542,18 @@ extern SC_ERROR_CODE_ENUM_UINT32 SC_COMM_ReadFile(
 );
 
 /*****************************************************************************
- 函 数 名  : SC_COMM_GetUsimmCachedFile
- 功能描述  : SC模块读取USIMM模块缓存文件封装接口
- 输入参数  :enModemID:Modem ID
- 输出参数  :pucFilePath:读取的文件ID及路径
-            pulDataLen:返回文件的内容长度
-            ppucData:返回文件内容的地址
-            enAppType:应用类型
- 返 回 值  : VOS_OK/VOS_ERR
- 修改历史      :
-  1.日    期   : 2013年8月15日
-    作    者   : h59254
-    修改内容   : 初始生成
+ ?? ?? ??  : SC_COMM_GetUsimmCachedFile
+ ????????  : SC????????USIMM????????????????????
+ ????????  :enModemID:Modem ID
+ ????????  :pucFilePath:??????????ID??????
+            pulDataLen:??????????????????
+            ppucData:??????????????????
+            enAppType:????????
+ ?? ?? ??  : VOS_OK/VOS_ERR
+ ????????      :
+  1.??    ??   : 2013??8??15??
+    ??    ??   : h59254
+    ????????   : ????????
 *****************************************************************************/
 extern VOS_UINT32 SC_COMM_GetUsimmCachedFile(
     VOS_CHAR                           *pucFilePath,
@@ -563,36 +563,36 @@ extern VOS_UINT32 SC_COMM_GetUsimmCachedFile(
     MODEM_ID_ENUM_UINT16                enModemID);
 
 /*****************************************************************************
-函 数 名  :SC_COMM_IsUsimServiceAvailable
-功能描述  :获取卡服务状态　
-输入参数  :enModemID:Modem ID
-           enService:服务ID
-输出参数  :无
-返 回 值  :PS_USIM_SERVICE_NOT_AVAILIABLE
+?? ?? ??  :SC_COMM_IsUsimServiceAvailable
+????????  :????????????????
+????????  :enModemID:Modem ID
+           enService:????ID
+????????  :??
+?? ?? ??  :PS_USIM_SERVICE_NOT_AVAILIABLE
            PS_USIM_SERVICE_NOT_AVAILIABLE
-被调函数  :
-修订记录  :
-1.日    期   : 2013年8月15日
-  作    者   : h59254
-  修改内容   : 初始生成
+????????  :
+????????  :
+1.??    ??   : 2013??8??15??
+  ??    ??   : h59254
+  ????????   : ????????
 *****************************************************************************/
 extern VOS_UINT32 SC_COMM_IsUsimServiceAvailable(
     UICC_SERVICES_TYPE_ENUM_UINT32  enService,
     MODEM_ID_ENUM_UINT16            enModemID);
 
 /*****************************************************************************
-函 数 名  : SC_COMM_GetCurrentTaskID
-功能描述  : SC获取当前task id
-输入参数  :
+?? ?? ??  : SC_COMM_GetCurrentTaskID
+????????  : SC????????task id
+????????  :
 
-输出参数  : 无
-返 回 值  : VOS_UINT32
+????????  : ??
+?? ?? ??  : VOS_UINT32
 
-被调函数  :
-修订记录  :
-1.日    期   : 2016年5月27日
-  作    者   : d00212987
-  修改内容   :
+????????  :
+????????  :
+1.??    ??   : 2016??5??27??
+  ??    ??   : d00212987
+  ????????   :
 *****************************************************************************/
 VOS_UINT32 SC_COMM_GetCurrentTaskID(VOS_VOID);
 #endif
@@ -600,18 +600,18 @@ VOS_UINT32 SC_COMM_GetCurrentTaskID(VOS_VOID);
 #if ((OSA_CPU_ACPU == VOS_OSA_CPU))
 
 /*****************************************************************************
-函 数 名  : SC_COMM_Restore
-功能描述  : SC文件恢复
-输入参数  : 无
+?? ?? ??  : SC_COMM_Restore
+????????  : SC????????
+????????  : ??
 
-输出参数  : 无
-返 回 值  : VOS_UINT32
+????????  : ??
+?? ?? ??  : VOS_UINT32
 
-被调函数  :
-修订记录  :
-1.日    期   : 2015年8月10日
-  作    者   : d00212987
-  修改内容   : SC备份到底软NV备份的扩展分区
+????????  :
+????????  :
+1.??    ??   : 2015??8??10??
+  ??    ??   : d00212987
+  ????????   : SC??????????NV??????????????
 *****************************************************************************/
 VOS_UINT32 SC_COMM_Restore(VOS_VOID);
 

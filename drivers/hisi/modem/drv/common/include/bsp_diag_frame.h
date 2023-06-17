@@ -77,7 +77,7 @@ typedef enum _diag_frame_ssid_type
 
 
 /* DIAG_SERVICE_HEAD_STRU:sessionid8b */
-#define DIAG_FRAME_MSP_SERVICE_SESSION_ID        (0x1) /* 标识Service与Client之间的连接,固定为1*/
+#define DIAG_FRAME_MSP_SERVICE_SESSION_ID        (0x1)
 
 /* DIAG_SERVICE_HEAD_STRU:mt2b */
 typedef enum _diag_frame_msgtype_type
@@ -147,8 +147,6 @@ typedef enum _diag_frame_modem_id
     DIAG_FRAME_MODEM_2 = 0x2
 }diag_frame_modem_id;
 
-
-
 /* DIAG_SERVICE_HEAD_STRU:sid8b */
 typedef enum _diag_frame_sid_type
 {
@@ -165,12 +163,11 @@ typedef enum _diag_frame_sid_type
 
 typedef struct
 {
-    u32 u32module;                        /* 打印信息所在的模块ID */
-    u32 u32level;                         /* 输出级别 */
-    u32 u32no;                            /* IND标号 */
-    //u8  sztext[APPLOG_MAX_USER_BUFF_LEN];   /* 所有打印文本内容，可能包括文件和行号,以'\0'结尾 */
+    u32 u32module;
+    u32 u32level;
+    u32 u32no;
 } diag_print_head_stru;
-/* 描述 :一级头: service头 */
+
 typedef struct
 {
     u32    sid8b       :8;
@@ -186,7 +183,6 @@ typedef struct
     u8     aucTimeStamp[8];
 }diag_service_head_stru;
 
-/* 描述 :二级头: DIAG消息头 */
 typedef struct
 {
     u32    cmdid19b:19;
@@ -195,15 +191,13 @@ typedef struct
     u32    pri4b   :4;
 } diag_stid_stru;
 
-
-/* 描述 :整体帧结构 */
 typedef struct
 {
     diag_service_head_stru  stService;
 
     union
     {
-        u32                 u32CmdId;           /* 结构化ID */
+        u32                 u32CmdId;
         diag_stid_stru      stID;
     };
 
@@ -214,17 +208,16 @@ typedef struct
 
 typedef struct
 {
-    u32                  u32HisiMagic;   /*"HISI"*/
-    u32                  u32DataLen;      /*数据长度*/
+    u32                  u32HisiMagic;
+    u32                  u32DataLen;
     u8                   aucData[0];
 }diag_socp_head_stru;
 
-#define DIAG_SOCP_HEAD_MAGIC               (0x48495349) /*HISI*/
+#define DIAG_SOCP_HEAD_MAGIC               (0x48495349)
 
 #define DIAG_SOCP_HEAD_SIZE         (sizeof(diag_socp_head_stru))
 #define DIAG_FRAME_HEAD_SIZE        (sizeof(diag_frame_head_stru))
 #define DIAG_PRINT_HEAD_SIZE        (sizeof(diag_print_head_stru))
-
 
 //#ifdef CONFIG_DIAG_FRAME
 void bsp_diag_fill_socp_head(diag_socp_head_stru * socp_packet, u32 len);
@@ -235,5 +228,3 @@ void bsp_diag_frame_head_init(diag_frame_head_stru* diag_frame);
 #endif
 
 #endif /* end of _BSP_DIAG_FRAME_H*/
-
-

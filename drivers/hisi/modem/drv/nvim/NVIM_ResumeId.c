@@ -97,9 +97,9 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     en_NV_Item_TCXO_AFC_SLOPE,
     en_NV_Item_XO_SELF_CAL_DONE,
     en_NV_Item_XO_TEMP_COMP_CAL_RESULT,
-/* Deleted by c00318887 for DPlmn扩容和优先接入HPLMN, 2015-5-18, begin */
+/* Deleted by c00318887 for DPlmn??????????????HPLMN, 2015-5-18, begin */
 
-/* Deleted by c00318887 for DPlmn扩容和优先接入HPLMN, 2015-5-18, end */
+/* Deleted by c00318887 for DPlmn??????????????HPLMN, 2015-5-18, end */
 
     /* Gsm 850 */
     en_NV_Item_GSM850_RX_DCOFFSET,
@@ -742,7 +742,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     en_NV_Item_W_ET_PWR_VCC_LUT_B19,
     en_NV_Item_W_ET_DELAY_FREQ_COMP_B19,
 
-    /* CDMA nv项， */
+    /* CDMA nv???? */
 
 
 
@@ -1867,7 +1867,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
 	 EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B128,
      EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B128,
 
-     /*band27生产NV*/
+     /*band27????NV*/
      EN_NV_ID_ANT_MODEM_LOSS_B27,
      EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_B27,
      EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT2_B27,
@@ -1895,7 +1895,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
 	 EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B27,
      EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B27,
 
-     /*band29 生产NV*/
+     /*band29 ????NV*/
      EN_NV_ID_ANT_MODEM_LOSS_B29,
      EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_B29,
      EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT2_B29,
@@ -1923,7 +1923,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
 	 EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B29,
      EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B29,
 
-     /*band30 生产NV*/
+     /*band30 ????NV*/
      EN_NV_ID_ANT_MODEM_LOSS_B30,
      EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_B30,
      EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT2_B30,
@@ -1951,7 +1951,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
 	 EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B30,
      EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B30,
 
-     /*band44 生产NV*/
+     /*band44 ????NV*/
      EN_NV_ID_ANT_MODEM_LOSS_B44,
      EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_B44,
      EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT2_B44,
@@ -2005,7 +2005,7 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
      EN_NV_ID_LTE_AGC_SCC_NOBLK_FREQ_COMP_ANT2_B32,
 	 EN_NV_ID_LTE_ETM_ET_APT_FAC_STRU_B32,
      EN_NV_ID_LTE_ET_DPD_COMP_FAC_STRU_B32,
-/*BAND28 生产NV*/
+/*BAND28 ????NV*/
 	EN_NV_ID_ANT_MODEM_LOSS_B28				/* 0xf440*/,
 	EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT1_B28			/* 0xf44D*/,
 	EN_NV_ID_LTE_AGC_BLK_FREQ_COMP_ANT2_B28			/* 0xf44E*/,
@@ -2052,28 +2052,28 @@ unsigned short  g_ausNvResumeManufactureIdList[] =
     EN_NV_ID_RX_AGC_FREQ_COMP_2                      /*0xF8fe*/,
 
     /*TDS*/
-    /*Band34 工厂nv*/
+    /*Band34 ????nv*/
     EN_NV_ID_TDS_TX_RF_FREQ_COMP_STRU_B34                    /*0xf8a0*/,
     EN_NV_ID_TDS_NV_TX_CAL_RESULT_TABLE_STRU_B34                     /*0xf8a2*/,
     EN_NV_ID_TDS_AGC_FREQ_COMP_B34                     /*0xf8a3*/,
     EN_NV_ID_TDS_DCOC_CAL_B34                         /*0xf8a4*/,
     EN_NV_ID_TDS_RF_TXIQ_CAL_B34                     /*0xf8a5*/,
     //EN_NV_ID_TDS_APC_TABLE_STRU_B34                     /*0xf8a6*/,
-    /*Band39 工厂nv*/
+    /*Band39 ????nv*/
     EN_NV_ID_TDS_TX_RF_FREQ_COMP_STRU_B39                     /*0xf8b0*/,
     EN_NV_ID_TDS_NV_TX_CAL_RESULT_TABLE_STRU_B39             /*0xf8b1*/,
     EN_NV_ID_TDS_AGC_FREQ_COMP_B39                     /*0xf8b3*/,
     EN_NV_ID_TDS_DCOC_CAL_B39                         /*0xf8b4*/,
     EN_NV_ID_TDS_RF_TXIQ_CAL_B39                     /*0xf8b5*/,
     //EN_NV_ID_TDS_APC_TABLE_STRU_B39                    /*0xf8b6*/,
-    /*Band40 工厂nv*/
+    /*Band40 ????nv*/
     EN_NV_ID_TDS_TX_RF_FREQ_COMP_STRU_B40                     /*0xf8c0*/,
 	EN_NV_ID_TDS_NV_TX_CAL_RESULT_TABLE_STRU_B40             /*0xf8b1*/,
     EN_NV_ID_TDS_AGC_FREQ_COMP_B40                     /*0xf8c3*/,
     EN_NV_ID_TDS_DCOC_CAL_B40                         /*0xf8c4*/,
     EN_NV_ID_TDS_RF_TXIQ_CAL_B40                     /*0xf8c5*/,
     //EN_NV_ID_TDS_APC_TABLE_STRU_B40                     /*0xf8c6*/,
-    /*Band_Reserved 工厂nv*/
+    /*Band_Reserved ????nv*/
      EN_NV_ID_TDS_TX_RF_FREQ_COMP_STRU_BRESERVED             /*0xf8d0*/,
 	 EN_NV_ID_TDS_NV_TX_CAL_RESULT_TABLE_STRU_BRESERVED       ,
     EN_NV_ID_TDS_AGC_FREQ_COMP_BRESERVED             /*0xf8d3*/,
@@ -2103,7 +2103,7 @@ unsigned short  g_ausNvResumeUserIdList[] =
 };
 
 
-/* 非加密版本需要进行恢复的机要数据NV项 */
+/* ????????????????????????????????NV?? */
 unsigned short  g_ausNvResumeSecureIdList[] =
 {
     en_NV_Item_CustomizeSimLockPlmnInfo,

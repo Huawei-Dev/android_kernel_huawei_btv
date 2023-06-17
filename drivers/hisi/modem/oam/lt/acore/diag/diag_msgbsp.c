@@ -103,15 +103,15 @@ VOS_UINT32 g_aulNvAuthIdList[] =
 
 /*****************************************************************************
  Function Name   : NvRdProc
- Description     : 该函数用于处理从NvProcEntry传进来的读NV命令
- Input           : pstReq 待处理数据
+ Description     : ????????????????NvProcEntry??????????NV????
+ Input           : pstReq ??????????
  Output          : None
  Return          : VOS_UINT32
 
  History         :
     1.y00228784      2012-11-22  Draft Enact
-    2.c64416         2014-11-18  适配新的诊断架构
-    2.c00326366      2015-06-10  新增多条NV的读取处理
+    2.c64416         2014-11-18  ????????????????
+    2.c00326366      2015-06-10  ????????NV??????????
 
 *****************************************************************************/
 VOS_UINT32 diag_NvRdProc(VOS_UINT8* pstReq)
@@ -133,7 +133,7 @@ VOS_UINT32 diag_NvRdProc(VOS_UINT8* pstReq)
 
     for(i = 0; i < pstNVQryReq->ulCount; i++)
     {
-        /*根据请求ID获取NV项长度*/
+        /*????????ID????NV??????*/
         ret = NV_GetLength(pstNVQryReq->ulNVId[i], &ulNVLen);
         if(ERR_MSP_SUCCESS != ret)
         {
@@ -141,10 +141,10 @@ VOS_UINT32 diag_NvRdProc(VOS_UINT8* pstReq)
             return ERR_MSP_FAILURE;
         }
 
-        ulTotalSize += ulNVLen + sizeof(VOS_UINT32) + sizeof(VOS_UINT32); /* NV内容的长度加上(NVID和len各占用四字节) */
+        ulTotalSize += ulNVLen + sizeof(VOS_UINT32) + sizeof(VOS_UINT32); /* NV??????????????(NVID??len????????????) */
     }
 
-    /* DIAG_CMD_NV_QRY_CNF_STRU的实际长度 */
+    /* DIAG_CMD_NV_QRY_CNF_STRU?????????? */
     ulTotalSize += (sizeof(DIAG_CMD_NV_QRY_CNF_STRU) - sizeof(VOS_UINT32) - sizeof(VOS_UINT32));
 
     pstNVQryCnf = VOS_MemAlloc(MSP_PID_DIAG_APP_AGENT, DYNAMIC_MEM_PT, ulTotalSize );
@@ -163,7 +163,7 @@ VOS_UINT32 diag_NvRdProc(VOS_UINT8* pstReq)
 
     for(i = 0; i < pstNVQryReq->ulCount; i++)
     {
-        /*根据请求ID获取NV项长度*/
+        /*????????ID????NV??????*/
         ret = NV_GetLength(pstNVQryReq->ulNVId[i], &ulNVLen);
         if(ERR_MSP_SUCCESS != ret)
         {
@@ -171,10 +171,10 @@ VOS_UINT32 diag_NvRdProc(VOS_UINT8* pstReq)
             goto DIAG_ERROR;
         }
 
-        *(VOS_UINT32*)(pData + ulOffset) = pstNVQryReq->ulNVId[i]; /* [false alarm]:屏蔽Fortify */
+        *(VOS_UINT32*)(pData + ulOffset) = pstNVQryReq->ulNVId[i]; /* [false alarm]:????Fortify */
         ulOffset += sizeof(VOS_UINT32);
 
-        *(VOS_UINT32*)(pData + ulOffset) = ulNVLen; /* [false alarm]:屏蔽Fortify */
+        *(VOS_UINT32*)(pData + ulOffset) = ulNVLen; /* [false alarm]:????Fortify */
         ulOffset += sizeof(VOS_UINT32);
 
         ret = NV_ReadEx(pstNVQryReq->ulModemid, pstNVQryReq->ulNVId[i], (pData + ulOffset), ulNVLen);
@@ -213,8 +213,8 @@ DIAG_ERROR:
 
 /*****************************************************************************
  Function Name   : diag_GetNvListProc
- Description     : HIMS获取NV list命令的处理接口
- Input           : pstReq 待处理数据
+ Description     : HIMS????NV list??????????????
+ Input           : pstReq ??????????
  Output          : None
  Return          : VOS_UINT32
 
@@ -252,7 +252,7 @@ VOS_UINT32 diag_GetNvListProc(VOS_UINT8* pstReq)
         goto DIAG_ERROR;
     }
 
-    /*获取每个NV项的ID和长度*/
+    /*????????NV????ID??????*/
     ret = NV_GetNVIdList(pstNVCnf->astNvList);
     if (NV_OK != ret)
     {
@@ -285,7 +285,7 @@ DIAG_ERROR:
 
 /*****************************************************************************
  Function Name   : diag_NvAuthProc
- Description     : 初始化鉴权全局变量
+ Description     : ??????????????????
  Input           : None
  Output          : None
  Return          : VOS_VOID
@@ -299,7 +299,7 @@ VOS_VOID diag_InitAuthVariable(VOS_VOID)
     IMEI_STRU stIMEI;
     VOS_UINT8 aucDefaultIMEI[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
-    /*假如IMEI为默认值，则不需要鉴权*/
+    /*????IMEI??????????????????????*/
     if (NV_OK == NV_Read(en_NV_Item_IMEI, (VOS_VOID*)&stIMEI, sizeof(stIMEI)))
     {
         if (0 == VOS_MemCmp((VOS_CHAR*)aucDefaultIMEI, &stIMEI, sizeof(stIMEI)))
@@ -313,7 +313,7 @@ VOS_VOID diag_InitAuthVariable(VOS_VOID)
 
 /*****************************************************************************
  Function Name   : diag_NvAuthProc
- Description     : 判断此NV项是否可以进行修改
+ Description     : ??????NV??????????????????
  Input           : ulNvId
  Output          : None
  Return          : VOS_UINT32
@@ -350,17 +350,17 @@ VOS_VOID diag_AuthNvCfg(MsgBlock* pMsgBlock)
 
 /*****************************************************************************
  Function Name   : diag_NvWrProc
- Description     : 该函数用于处理从NvProcEntry传进来的写NV命令
- Input           : pstReq 待处理数据
+ Description     : ????????????????NvProcEntry??????????NV????
+ Input           : pstReq ??????????
  Output          : None
  Return          : VOS_UINT32
 
  History         :
     1.y00228784      2012-11-22  Draft Enact
-    2.c64416         2014-11-18  适配新的诊断架构
-    2.c00326366      2015-06-10  新增多条NV的写处理，并把写操作转到C核处理
-                     转到C核处理的原因: 1. 避免NV写接口阻塞导致其他DIAG命令处理延迟
-                                        2. NV鉴权的操作在C核，鉴权状态在C核记录
+    2.c64416         2014-11-18  ????????????????
+    2.c00326366      2015-06-10  ????????NV????????????????????????C??????
+                     ????C????????????: 1. ????NV??????????????????DIAG????????????
+                                        2. NV????????????C??????????????C??????
 
 *****************************************************************************/
 VOS_UINT32 diag_NvWrProc(VOS_UINT8* pstReq)
@@ -398,7 +398,7 @@ VOS_UINT32 diag_NvWrProc(VOS_UINT8* pstReq)
 
         printk(KERN_ERR "NV Write ulNVId=0x%x\n", ulNvid);
 
-        /*写入NV项*/
+        /*????NV??*/
         ret = NV_WriteEx(pstNVWRReq->ulModemid, ulNvid, (pData + ulOffset), ulLen);
         if(ret != ERR_MSP_SUCCESS)
         {
@@ -432,8 +432,8 @@ DIAG_ERROR2:
 
 /*****************************************************************************
  Function Name   : diag_NvAuthProc
- Description     : HIMS获取NV鉴权命令的处理接口
- Input           : pstReq 待处理数据
+ Description     : HIMS????NV??????????????????
+ Input           : pstReq ??????????
  Output          : None
  Return          : VOS_UINT32
 
@@ -472,9 +472,9 @@ DIAG_ERROR:
 
 /*****************************************************************************
  Function Name   : diag_BspAxiMonDataConfig
- Description     : 该函数为处理AXI Monitor采集配置命令接口
- Input           : pstReq 待处理数据
-                   		ulCmdId 命令ID
+ Description     : ????????????AXI Monitor????????????????
+ Input           : pstReq ??????????
+                   		ulCmdId ????ID
  Output          : None
  Return          : VOS_UINT32
 
@@ -512,9 +512,9 @@ DIAG_ERROR:
 
 /*****************************************************************************
  Function Name   : diag_BspAxiMonConfig
- Description     : 该函数为处理AXI Monitor监控配置命令接口
- Input           : pstReq 待处理数据
-                   ulCmdId 命令ID
+ Description     : ????????????AXI Monitor????????????????
+ Input           : pstReq ??????????
+                   ulCmdId ????ID
  Output          : None
  Return          : VOS_UINT32
 
@@ -549,9 +549,9 @@ DIAG_ERROR:
 
 /*****************************************************************************
  Function Name   : diag_BspAxiMonTerminate
- Description     : 该函数为处理AXI Monitor监控终止命令接口
- Input           : pstReq 待处理数据
-                   ulCmdId 命令ID
+ Description     : ????????????AXI Monitor????????????????
+ Input           : pstReq ??????????
+                   ulCmdId ????ID
  Output          : None
  Return          : VOS_UINT32
 
@@ -586,9 +586,9 @@ DIAG_ERROR:
 
 /*****************************************************************************
  Function Name   : diag_BspAxiMonRegConfig
- Description     : AXI Monitor采集寄存器配置接口
- Input           : pstReq 待处理数据
-                   ulCmdId 命令ID
+ Description     : AXI Monitor??????????????????
+ Input           : pstReq ??????????
+                   ulCmdId ????ID
  Output          : None
  Return          : VOS_UINT32
 
@@ -624,9 +624,9 @@ DIAG_ERROR:
 
 /*****************************************************************************
  Function Name   : diag_BspAxiMonDataCtrl
- Description     : AXI Monitor采集控制命令接口:启动、停止、导出
- Input           : pstReq 待处理数据
-                   ulCmdId 命令ID
+ Description     : AXI Monitor????????????????:????????????????
+ Input           : pstReq ??????????
+                   ulCmdId ????ID
  Output          : None
  Return          : VOS_UINT32
 
@@ -662,9 +662,9 @@ DIAG_ERROR:
 
 /*****************************************************************************
  Function Name   : diag_BspAxiMonStart
- Description     : AXI Monitor监控启动接口
- Input           : pstReq 待处理数据
-                   ulCmdId 命令ID
+ Description     : AXI Monitor????????????
+ Input           : pstReq ??????????
+                   ulCmdId ????ID
  Output          : None
  Return          : VOS_UINT32
 
@@ -698,7 +698,7 @@ DIAG_ERROR:
 
 /*****************************************************************************
  Function Name   : diag_BspUtraceStart
- Description     : USB Trace命令处理入口
+ Description     : USB Trace????????????
  Input           :VOS_UINT8* pstReq
                 VOS_UINT32 ulCmdId
  Output          : None
@@ -729,7 +729,7 @@ VOS_UINT32 diag_BspUtraceStart(VOS_UINT8* pstReq)
 
 /*****************************************************************************
  Function Name   : diag_BspUtraceStop
- Description     : USB Trace命令处理入口
+ Description     : USB Trace????????????
  Input           :VOS_UINT8* pstReq
                 VOS_UINT32 ulCmdId
  Output          : None
@@ -759,9 +759,9 @@ VOS_UINT32 diag_BspUtraceStop(VOS_UINT8* pstReq)
 
 /*****************************************************************************
  Function Name   : diag_BspLogProcEntry
- Description     : 该函数为处理DIAG FW发过来的BSP配置命令的处理入口
- Input           : pstReq 待处理数据
-                   		ulCmdId 命令ID
+ Description     : ????????????DIAG FW????????BSP??????????????????
+ Input           : pstReq ??????????
+                   		ulCmdId ????ID
  Output          : None
  Return          : VOS_UINT32
 
@@ -799,8 +799,8 @@ DIAG_ERROR:
 /*****************************************************************************
  Function Name   : diag_BspSysviewProc
  Description     :
- Input           : pstReq 待处理数据
-                   		ulCmdId 命令ID
+ Input           : pstReq ??????????
+                   		ulCmdId ????ID
  Output          : None
  Return          : VOS_UINT32
 
@@ -828,7 +828,7 @@ DIAG_ERROR:
 
 /*****************************************************************************
  Function Name   : diag_BspMsgProc
- Description     : bsp处理消息处理包括连接断开
+ Description     : bsp????????????????????????
  Input           : None
  Output          : None
  Return          : None
@@ -870,7 +870,7 @@ VOS_VOID diag_BspShowDebugInfo(VOS_VOID)
 
 /*****************************************************************************
  Function Name   : diag_BspMsgInit
- Description     : MSP dsp部分初始化
+ Description     : MSP dsp??????????
  Input           : None
  Output          : None
  Return          : None
@@ -879,7 +879,7 @@ VOS_VOID diag_BspShowDebugInfo(VOS_VOID)
 *****************************************************************************/
 VOS_VOID diag_BspMsgInit(VOS_VOID)
 {
-    /*注册message消息回调*/
+    /*????message????????*/
     DIAG_MsgProcReg(DIAG_MSG_TYPE_BSP,diag_BspMsgProc);
 }
 

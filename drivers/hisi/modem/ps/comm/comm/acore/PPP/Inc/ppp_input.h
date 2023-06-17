@@ -39,37 +39,30 @@ extern "C" {
 #endif
 #endif
 
-
-/*****************************************************************************
-  1 其他头文件包含
-*****************************************************************************/
 #include "PPP/Inc/ppp_public.h"
 
 #pragma pack(4)
 
-/*****************************************************************************
-  2 消息类型定义
-*****************************************************************************/
 enum PPP_MSG_TYPE_ENUM
 {
 #if (PPP_FEATURE == PPP_FEATURE_PPP)
-    PPP_DATA_PROC_NOTIFY = 1,       /*PPP数据处理指示*/
-    PPP_AT_CTRL_OPERATION,          /* _H2ASN_MsgChoice PPP_AT_CTRL_OPERATION_MSG */
-    PPP_PACKET_FROM_GGSN,           /*为了加快传输速度，从GGSN来的报文改为直接调用，非消息机制*/
-    PPP_RECV_PROTO_PACKET_TYPE,     /*PPP模块接收到协商包*/
-    PPP_SEND_PROTO_PACKET_TYPE,     /*PPP模块发送协商包*/
-    AT_PPP_CREATE_PPP_REQ,          /*PPP模块收到AT的CREATE PPP指示*/
-    AT_PPP_RELEASE_PPP_REQ,         /*PPP模块收到AT的RELEASE PPP指示*/
-    AT_PPP_CREATE_RAW_PPP_REQ,      /*PPP模块收到AT的CREATE RAW PPP指示*/
-    AT_PPP_RELEASE_RAW_PPP_REQ,     /*PPP模块收到AT的RELEASE RAW PPP指示*/
-    AT_PPP_RECV_RELEASE_IND,        /*PPP模块收到AT的RELEASE PPP IND指示*/
-    AT_PPP_RECV_CONFIG_INFO_IND,    /*PPP模块收到AT的CONFIG INFO IND指示*/
-    PPP_AT_RECV_CONFIG_INFO_REQ,    /*PPP模块向AT发送CONFIG INFO REQ指示*/
-    PPP_CONFIG_INFO_PROC_NOTIFY,    /*PPP模块处理PDP激活指示消息*/
-    PPP_PROTOCOL_RELEASED_IND,      /*PPP模块协议终止消息*/
-    PPP_RECV_PCO_IPCP_REJ_IND,      /*PPP模块收到的PCO中包含IPCP Reject*/
-    PPP_RECV_PCO_IPCP_ACK_IND,      /*PPP模块收到的PCO中包含IPCP ACK*/
-    PPP_RECV_PCO_IPCP_NAK_IND,       /*PPP模块收到的PCO中包含IPCP NAK*/
+    PPP_DATA_PROC_NOTIFY = 1,
+    PPP_AT_CTRL_OPERATION,
+    PPP_PACKET_FROM_GGSN,
+    PPP_RECV_PROTO_PACKET_TYPE,
+    PPP_SEND_PROTO_PACKET_TYPE,
+    AT_PPP_CREATE_PPP_REQ,
+    AT_PPP_RELEASE_PPP_REQ,
+    AT_PPP_CREATE_RAW_PPP_REQ,
+    AT_PPP_RELEASE_RAW_PPP_REQ,
+    AT_PPP_RECV_RELEASE_IND,
+    AT_PPP_RECV_CONFIG_INFO_IND,
+    PPP_AT_RECV_CONFIG_INFO_REQ,
+    PPP_CONFIG_INFO_PROC_NOTIFY,
+    PPP_PROTOCOL_RELEASED_IND,
+    PPP_RECV_PCO_IPCP_REJ_IND,
+    PPP_RECV_PCO_IPCP_ACK_IND,
+    PPP_RECV_PCO_IPCP_NAK_IND,
 #endif
 #ifdef WTTF_PC_ST_SWITCH
     AT_PPP_UL_DATA_REQ,
@@ -79,33 +72,14 @@ enum PPP_MSG_TYPE_ENUM
 };
 typedef VOS_UINT32  PPP_MSG_TYPE_ENUM_UINT32;
 
-
-/*****************************************************************************
-  3 宏定义
-*****************************************************************************/
-/* PPP 协议包处理方向: 接收或发送*/
 #define PPP_SEND_OUT_PROTOCOL_FRAME 0
 #define PPP_RECV_IN_PROTOCOL_FRAME  1
 
 #define PPP_RECV_QUEUE_MAX_LEN      (2000)
-/*****************************************************************************
-  4 枚举定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  5 消息头定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  6 消息定义
-*****************************************************************************/
-
 
 typedef struct
 {
-    VOS_MSG_HEADER        /* 消息头 */        /* _H2ASN_Skip */
+    VOS_MSG_HEADER
     VOS_UINT32  ulMsgname;
     VOS_UINT32  ulPppPhase;
     VOS_INT32   ulLcpState;
@@ -114,10 +88,9 @@ typedef struct
     VOS_UINT16  ulDataLen;
 } PPP_FRAME_MNTN_INFO_STRU;
 
-
 typedef struct
 {
-    VOS_MSG_HEADER        /* 消息头 */        /* _H2ASN_Skip */
+    VOS_MSG_HEADER
     VOS_UINT32  ulMsgname;
     VOS_UINT16  usPppId;
     VOS_UINT16  usReserved;
@@ -125,7 +98,6 @@ typedef struct
     VOS_INT32   ulLcpState;
     VOS_INT32   ulIpcpState;
 } PPP_EVENT_MNTN_INFO_STRU;
-
 
 typedef struct
 {
@@ -140,24 +112,19 @@ typedef struct
 
 typedef struct
 {
-    VOS_MSG_HEADER                              /* 消息头 */        /*_H2ASN_Skip*/
-    PPP_MSG_TYPE_ENUM_UINT32    ulMsgType;      /* 消息类型 */      /*_H2ASN_Skip*/
+    VOS_MSG_HEADER
+    PPP_MSG_TYPE_ENUM_UINT32    ulMsgType;
 }PPP_DATA_PROC_NOTIFY_MSG;
-
 
 typedef struct
 {
-    VOS_MSG_HEADER                                      /* 消息头 */        /*_H2ASN_Skip*/
-    PPP_MSG_TYPE_ENUM_UINT32            ulMsgType;      /* 消息类型 */      /*_H2ASN_Skip*/
+    VOS_MSG_HEADER
+    PPP_MSG_TYPE_ENUM_UINT32            ulMsgType;
     PPP_ID                              usPppId;
     VOS_UINT8                           aucRsv[2];
-    PPP_AT_CTRL_OPER_TYPE_ENUM_UINT32   ulCtrlOpType;   /* AT向PPP发送的控制操作的类型 */
+    PPP_AT_CTRL_OPER_TYPE_ENUM_UINT32   ulCtrlOpType;
 } PPP_AT_CTRL_OPERATION_MSG;
 
-
-/*****************************************************************************
-  7 STRUCT定义
-*****************************************************************************/
 #ifdef WTTF_PC_ST_SWITCH
 
 typedef struct
@@ -167,7 +134,6 @@ typedef struct
     VOS_UINT32  ulAcfComp;
 } PPP_HDLC_CTRL_STRU;
 
-/* 零拷贝结构桩，下行数据最大1502字节，上行数据最大1536字节 */
 typedef struct
 {
     VOS_UINT16                          usDataLen;
@@ -182,47 +148,25 @@ typedef struct
 
 typedef struct
 {
-    VOS_MSG_HEADER                                                      /* _H2ASN_Skip */
-    PPP_MSG_TYPE_ENUM_UINT32      ulMsgType;          /* _H2ASN_IeChoice_Export PPP_ZC_DATA_MSG_TYPE_ENUM_UINT16 */
-    union                                                               /* _H2ASN_Skip */
-    {                                                                   /* _H2ASN_Skip */
-        PPP_STUB_ZC_UL_DATA_REQ_STRU    stUlDataReq;                    /* _H2ASN_Skip */
+    VOS_MSG_HEADER
+    PPP_MSG_TYPE_ENUM_UINT32      ulMsgType;
+    union
+    {
+        PPP_STUB_ZC_UL_DATA_REQ_STRU    stUlDataReq;
         PPP_STUB_ZC_DL_DATA_IND_STRU    stDlDataInd;
-        /******************************************************************************************************
-            _H2ASN_IeChoice_When        PPP_ZC_DATA_MSG_TYPE_ENUM_UINT16
-        ******************************************************************************************************/
-    }u; /* _H2ASN_Skip */
+    }u;
 }PPP_STUB_ZC_DATA_MSG_STRU;
 
 #endif
 
-/*****************************************************************************
-  8 UNION定义
-*****************************************************************************/
-
-
-/* *****************************************************************************
-  9 全局变量声明
-***************************************************************************** */
 extern PPP_DATA_Q_CTRL_ST       g_PppDataQCtrl;
 
-
-/*****************************************************************************
-  9 OTHERS定义
-*****************************************************************************/
-/*****************************************************************************
-  H2ASN顶级消息结构定义
-*****************************************************************************/
 typedef struct
 {
-    PPP_MSG_TYPE_ENUM_UINT32            enMsgID;    /*_H2ASN_MsgChoice_Export PPP_MSG_TYPE_ENUM_UINT32*/
+    PPP_MSG_TYPE_ENUM_UINT32            enMsgID;
 
     VOS_UINT8                           aucMsgBlock[4];
-    /***************************************************************************
-        _H2ASN_MsgChoice_When_Comment          PPP_MSG_TYPE_ENUM_UINT32
-    ****************************************************************************/
 }PPP_MSG_DATA;
-/*_H2ASN_Length UINT32*/
 
 typedef struct
 {
@@ -230,10 +174,6 @@ typedef struct
     PPP_MSG_DATA                    stMsgData;
 }PppInterface_MSG;
 
-
-/*****************************************************************************
-  10 函数声明
-*****************************************************************************/
 extern VOS_UINT32 PPP_ProcAtCtrlOper(struct MsgCB * pMsg);
 
 extern VOS_VOID Ppp_MBufFrameMntnInfo(struct ppp_mbuf *bp, VOS_UINT16 usProto, VOS_UINT32 ulDir);
@@ -254,11 +194,9 @@ extern VOS_VOID PPP_InitSpinLock(VOS_VOID);
 #pragma pack(0)
 #endif
 
-
 #ifdef __cplusplus
     #if __cplusplus
         }
     #endif
 #endif
 #endif /*end of __PPP_INPUT_H__*/
-

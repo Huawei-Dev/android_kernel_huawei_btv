@@ -63,15 +63,15 @@ extern PRODUCT_INFO_NV_STRU huawei_product_info;
 
 /*****************************************************************************
 *                                                                                                                               *
-*            以下接口为对上层提供的mdrv接口                                                                       *
+*            ??????????????????????mdrv????                                                                       *
 *                                                                                                                               *
 ******************************************************************************/
 
 
 
 /*****************************************************************************
- 函 数 名  : mdrv_ver_get_info
- 功能描述  : 返回modem版本信息，对上层提供
+ ?? ?? ??  : mdrv_ver_get_info
+ ????????  : ????modem????????????????????
 ****************************************************************************/
 const MODEM_VER_INFO_S * mdrv_ver_get_info(void)
 {
@@ -79,8 +79,8 @@ const MODEM_VER_INFO_S * mdrv_ver_get_info(void)
 }
 
 /*****************************************************************************
- 函 数 名  : mdrv_ver_init
- 功能描述  :  ver_info初始化
+ ?? ?? ??  : mdrv_ver_init
+ ????????  :  ver_info??????
 ****************************************************************************/
 void mdrv_ver_init(void)
 {
@@ -107,10 +107,10 @@ void mdrv_ver_init(void)
 /*lint -save -e64 -e437 -e233 -e713*/
 
 /*****************************************************************************
- 函 数 名  : mdrv_misc_support_check
- 功能描述  : 查询模块是否支持，对上层提供
- 输入参数  : enModuleType: 需要查询的模块类型
- 返回值    ：BSP_MODULE_SUPPORT或BSP_MODULE_UNSUPPORT
+ ?? ?? ??  : mdrv_misc_support_check
+ ????????  : ????????????????????????????
+ ????????  : enModuleType: ??????????????????
+ ??????    ??BSP_MODULE_SUPPORT??BSP_MODULE_UNSUPPORT
 *****************************************************************************/
 BSP_MODULE_SUPPORT_E mdrv_misc_support_check (BSP_MODULE_TYPE_E module_type)
 {
@@ -174,7 +174,7 @@ BSP_MODULE_SUPPORT_E mdrv_misc_support_check (BSP_MODULE_TYPE_E module_type)
         return BSP_MODULE_SUPPORT;
     else
         return BSP_MODULE_UNSUPPORT;
-}/* [false alarm]:误报 */
+}/* [false alarm]:???? */
 
 /*lint -restore +e64 +e437 +e233 +e713*/
 

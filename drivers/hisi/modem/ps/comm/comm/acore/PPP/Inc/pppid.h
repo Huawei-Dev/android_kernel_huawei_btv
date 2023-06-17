@@ -41,22 +41,18 @@ extern "C" {
 #include "PppInterface.h"
 #include "vos.h"
 
-
 #pragma pack(4)
 #if 0
 typedef VOS_UINT16 PPP_ID;
 #endif
 
-/*某PPP ID被分配出去的标志*/
 #define PPP_ID_ALLO_fLAG 0xffff
 
-/*最后一个空闲PPP ID的标志*/
 #define PPP_ID_TAIL_FLAG 0
 
 extern PPP_ID*    pgPppId;
 
 #define PPP_ID_ALLOCED(i) (pgPppId[i] == PPP_ID_ALLO_fLAG)
-
 
 extern VOS_VOID   PppIdInit(VOS_VOID);
 extern PPP_ID     PppGetId(VOS_VOID);

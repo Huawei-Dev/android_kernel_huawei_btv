@@ -46,41 +46,11 @@
  *
  */
 
-/*****************************************************************************/
-/*                                                                           */
-/*                Copyright 1999 - 2003, Huawei Tech. Co., Ltd.              */
-/*                           ALL RIGHTS RESERVED                             */
-/*                                                                           */
-/* FileName: vos_main.c                                                      */
-/*                                                                           */
-/* Author: Yang Xiangqian                                                    */
-/*                                                                           */
-/* Version: 1.0                                                              */
-/*                                                                           */
-/* Date: 2006-10                                                             */
-/*                                                                           */
-/* Description: implement root function                                      */
-/*                                                                           */
-/* Others:                                                                   */
-/*                                                                           */
-/* History:                                                                  */
-/* 1. Date:                                                                  */
-/*    Author:                                                                */
-/*    Modification: Create this file                                         */
-/*                                                                           */
-/*****************************************************************************/
-
 #include "vos.h"
 #include "mdrv.h"
 #include <product_config.h>
 
-
-/*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
-*****************************************************************************/
-/*lint -e767 modify:x51137; review:h59254; cause:print log */
 #define    THIS_FILE_ID        PS_FILE_ID_VOS_MAIN_C
-/*lint +e767 modify:x51137; review:h59254; */
 
 extern VOS_UINT32 SCM_ChannelInit(VOS_VOID);
 extern VOS_UINT32 SCM_ChannelMemInit(VOS_VOID);
@@ -88,7 +58,6 @@ extern VOS_UINT32 VOS_ICC_Init(VOS_VOID);
 extern VOS_UINT32 APM_InitSystemAddr(VOS_VOID);
 
 extern VOS_UINT32 VOS_Hifi_ICC_Init(VOS_VOID);
-
 
 VOS_UINT32 g_ulVosOutsideStep = 0;
 
@@ -119,7 +88,7 @@ VOS_UINT32 VOS_OutsideInit(VOS_VOID)
 
     g_ulVosOutsideStep = 0x00100000;
 
-    if (VOS_OK != SCM_ChannelMemInit())/* 通道内存初始化 */
+    if (VOS_OK != SCM_ChannelMemInit())
     {
         ulResult |= 0x00100000;
     }
@@ -148,11 +117,7 @@ VOS_UINT32 VOS_OutsideInit(VOS_VOID)
 
 VOS_VOID OM_OutsideShow(VOS_VOID)
 {
-    /*lint -e534*/
     vos_printf("OM_OutsideShow:g_ulVosOutsideStep = %d\n", g_ulVosOutsideStep);
-    /*lint +e534*/
 
     return;
 }
-
-

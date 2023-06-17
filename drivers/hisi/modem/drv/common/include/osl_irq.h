@@ -81,7 +81,7 @@ static void inline int_unlock_hook(void)
 }
 
 
-/*该宏传参不准传入__specific_flags名字*/
+/*????????????????__specific_flags????*/
 #define local_irq_save(__specific_flags)	    \
 	do \
     {                           \
@@ -123,7 +123,7 @@ static __inline__ void free_irq(unsigned int irq, void *dev_id)
 		logMsg("intDisable irq %d error\n", irq, 0, 0, 0, 0, 0);
 		return;
 	}
-	ret = intDisconnect((VOIDFUNCPTR*)(irq), (VOIDFUNCPTR)NULL, (int)dev_id);/* [false alarm]:误报 */
+	ret = intDisconnect((VOIDFUNCPTR*)(irq), (VOIDFUNCPTR)NULL, (int)dev_id);/* [false alarm]:???? */
 	if(ret != OK)
 	{
 		logMsg("intDisconnect irq %d error\n", irq, 0, 0, 0, 0, 0);
@@ -207,9 +207,9 @@ typedef irqreturn_t (*irq_handler_t)(void *);
 #endif
 
 
-/*该宏传参不准传入__specific_flags名字*/
+/*????????????????__specific_flags????*/
 /*
-*参数类型
+*????????
 *unsigned long __specific_flags
 */
 #define local_irq_save(__specific_flags)	    \
@@ -218,7 +218,7 @@ typedef irqreturn_t (*irq_handler_t)(void *);
 		__specific_flags = (unsigned long)SRE_IntLock();			\
 	} while (0)
 /*
-*参数类型
+*????????
 *unsigned long __specific_flags
 */
 #define local_irq_restore(__specific_flags)   \
@@ -255,7 +255,7 @@ static inline void free_irq(unsigned int irq, void *arg)
         SRE_Printf("SRE_HwiDisable irq %d errorNO 0x%x\n", irq, ret);
         return;
     }
-    ret = SRE_HwiDelete((HWI_HANDLE_T)irq);/* [false alarm]:误报 */
+    ret = SRE_HwiDelete((HWI_HANDLE_T)irq);/* [false alarm]:???? */
     if(ret != OK)
     {
         SRE_Printf("SRE_HwiDelete irq %d errorNO 0x%x\n", irq, ret);
@@ -271,7 +271,7 @@ static inline void osl_free_irq(unsigned int irq, irq_handler_t routine,int para
         SRE_Printf("SRE_HwiDisable irq %d error\n", irq);
         return;
     }
-    ret = SRE_HwiDelete((HWI_HANDLE_T)irq);/* [false alarm]:误报 */
+    ret = SRE_HwiDelete((HWI_HANDLE_T)irq);/* [false alarm]:???? */
     if(ret != OK)
     {
         SRE_Printf("SRE_HwiDelete irq %d error\n", irq);

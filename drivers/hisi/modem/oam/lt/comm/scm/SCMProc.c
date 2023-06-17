@@ -48,7 +48,7 @@
 
 
 /*****************************************************************************
-  1 头文件包含
+  1 ??????????
 **************************************************************************** */
 #include "diag_mem.h"
 #include "diag_debug.h"
@@ -67,14 +67,14 @@
 /*lint +e767 */
 
 /* ****************************************************************************
-  2 全局变量定义
+  2 ????????????
 **************************************************************************** */
 extern SCM_SOFTDECODE_INFO_STRU   g_stScmSoftDecodeInfo;
 extern OM_ACPU_DEBUG_INFO         g_stAcpuDebugInfo;
 
 
 
-/* 解码目的通道回调函数 */
+/* ???????????????????? */
 SCM_DECODERDESTFUCN         g_astSCMDecoderCbFunc[SOCP_DECODER_DST_CB_BUTT]={VOS_NULL_PTR, VOS_NULL_PTR, VOS_NULL_PTR};
 
 SCM_CODER_SRC_CFG_STRU      g_astSCMCoderSrcCfg[SCM_CODER_SRC_NUM]=
@@ -101,38 +101,38 @@ SCM_DECODER_DEST_CFG_STRU   g_astSCMDecoderDstCfg[SCM_DECODER_DST_NUM]=
 
 
 
-SCM_INFODATA_STRU           g_stSCMInfoData;    /* 用于保存log信息 */
+SCM_INFODATA_STRU           g_stSCMInfoData;    /* ????????log???? */
 
 
-/* 自旋锁，用来作编码源buff的临界资源保护 */
+/* ????????????????????buff?????????????? */
 VOS_SPINLOCK             g_stScmGetCoderSrcBuffSpinLock;
 
 
 SCM_CODER_SRC_DEBUG_STRU g_astScmCoderSrcDebugInfo[SCM_CODER_SRC_NUM] = {{0}};
 
 /*****************************************************************************
-  3 外部引用声明
+  3 ????????????
 *****************************************************************************/
-/* BBP可维可测项目增加,j00174725 2012-11-26 */
+/* BBP????????????????,j00174725 2012-11-26 */
 
 /*****************************************************************************
-  4 函数实现
+  4 ????????
 *****************************************************************************/
 
 /*****************************************************************************
- 函 数 名  : SCM_FindChannelCfg
- 功能描述  : 根据通道ID查询通道配置表的位置
- 输入参数  : ulChannelID: 需要查询的通道ID
-             ulChNax:     通道配置表最大值
-             pstCfg:      通道配置表
- 输出参数  : pulNum:      通道配置表的位置
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_FindChannelCfg
+ ????????  : ????????ID????????????????????
+ ????????  : ulChannelID: ??????????????ID
+             ulChNax:     ????????????????
+             pstCfg:      ??????????
+ ????????  : pulNum:      ????????????????
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_UINT32  SCM_FindChannelCfg(VOS_UINT32           ulChannelID,
                                     VOS_UINT32              ulChMax,
@@ -150,72 +150,72 @@ VOS_UINT32  SCM_FindChannelCfg(VOS_UINT32           ulChannelID,
         {
             *pulNum = i;
 
-            return VOS_OK;/* 返回成功 */
+            return VOS_OK;/* ???????? */
         }
 
         pstTmpCfg = (SCM_CHANNEL_CFG_HEAD *)((VOS_UINT8 *)pstTmpCfg + ulStruLen);
     }
 
-    return VOS_ERR;/* 返回失败 */
+    return VOS_ERR;/* ???????? */
 }
 
 /*****************************************************************************
- 函 数 名  : SCM_CoderSrcChannelCfg
- 功能描述  : 将ACPU/CCPU的编码源通道的配置调用SOCP接口配置到IP
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_CoderSrcChannelCfg
+ ????????  : ??ACPU/CCPU??????????????????????SOCP??????????IP
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_UINT32 SCM_CoderSrcChannelCfg(SCM_CODER_SRC_CFG_STRU *pstCfg)
 {
-    SOCP_CODER_SRC_CHAN_S               stChannle;          /* 当前通道的属性信息 */
+    SOCP_CODER_SRC_CHAN_S               stChannle;          /* ?????????????????? */
 
-    stChannle.u32DestChanID = pstCfg->enDstCHID;            /*  目标通道ID */
-    stChannle.eDataType     = pstCfg->enDataType;           /*  数据类型，指明数据封装协议，用于复用多平台 */
-    stChannle.eMode         = pstCfg->enCHMode;             /*  通道数据模式 */
-    stChannle.ePriority     = pstCfg->enCHLevel;            /*  通道优先级 */
-    stChannle.u32BypassEn   = SOCP_HDLC_ENABLE;             /*  通道bypass使能 */
-    stChannle.eDataTypeEn   = SOCP_DATA_TYPE_EN;            /*  数据类型使能位 */
-    stChannle.eDebugEn      = SOCP_ENC_DEBUG_DIS;           /*  调试位使能 */
+    stChannle.u32DestChanID = pstCfg->enDstCHID;            /*  ????????ID */
+    stChannle.eDataType     = pstCfg->enDataType;           /*  ?????????????????????????????????????????? */
+    stChannle.eMode         = pstCfg->enCHMode;             /*  ???????????? */
+    stChannle.ePriority     = pstCfg->enCHLevel;            /*  ?????????? */
+    stChannle.u32BypassEn   = SOCP_HDLC_ENABLE;             /*  ????bypass???? */
+    stChannle.eDataTypeEn   = SOCP_DATA_TYPE_EN;            /*  ?????????????? */
+    stChannle.eDebugEn      = SOCP_ENC_DEBUG_DIS;           /*  ?????????? */
 
-    stChannle.sCoderSetSrcBuf.pucInputStart  = pstCfg->pucSrcPHY;                             /*  输入通道起始地址 */
-    stChannle.sCoderSetSrcBuf.pucInputEnd    = (pstCfg->pucSrcPHY + pstCfg->ulSrcBufLen)-1;   /*  输入通道结束地址 */
-    stChannle.sCoderSetSrcBuf.pucRDStart     = pstCfg->pucRDPHY;                              /* RD buffer起始地址 */
-    stChannle.sCoderSetSrcBuf.pucRDEnd       = (pstCfg->pucRDPHY + pstCfg->ulRDBufLen)-1;     /*  RD buffer结束地址 */
-    stChannle.sCoderSetSrcBuf.u32RDThreshold = SCM_CODER_SRC_RD_THRESHOLD;                    /* RD buffer数据上报阈值 */
+    stChannle.sCoderSetSrcBuf.pucInputStart  = pstCfg->pucSrcPHY;                             /*  ???????????????? */
+    stChannle.sCoderSetSrcBuf.pucInputEnd    = (pstCfg->pucSrcPHY + pstCfg->ulSrcBufLen)-1;   /*  ???????????????? */
+    stChannle.sCoderSetSrcBuf.pucRDStart     = pstCfg->pucRDPHY;                              /* RD buffer???????? */
+    stChannle.sCoderSetSrcBuf.pucRDEnd       = (pstCfg->pucRDPHY + pstCfg->ulRDBufLen)-1;     /*  RD buffer???????? */
+    stChannle.sCoderSetSrcBuf.u32RDThreshold = SCM_CODER_SRC_RD_THRESHOLD;                    /* RD buffer???????????? */
 
     if (VOS_OK != mdrv_socp_corder_set_src_chan(pstCfg->enChannelID, &stChannle))
     {
         /*lint -e534*/
-        SCM_CODER_SRC_ERR("SCM_CoderSrcChannelCfg: Search Channel ID Error", pstCfg->enChannelID, 0);/* 打印失败 */
+        SCM_CODER_SRC_ERR("SCM_CoderSrcChannelCfg: Search Channel ID Error", pstCfg->enChannelID, 0);/* ???????? */
         /*lint +e534*/
 
-        return VOS_ERR;/* 返回错误 */
+        return VOS_ERR;/* ???????? */
     }
 
-    pstCfg->enInitState = SCM_CHANNEL_INIT_SUCC; /* 记录通道初始化配置错误 */
+    pstCfg->enInitState = SCM_CHANNEL_INIT_SUCC; /* ?????????????????????? */
 
-    return VOS_OK;/* 返回成功 */
+    return VOS_OK;/* ???????? */
 }
 
 /* ****************************************************************************
- 函 数 名  : SCM_CoderSrcChannelInit
- 功能描述  : 将ACPU/CCPU的编码源通道的配置初始化
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_CoderSrcChannelInit
+ ????????  : ??ACPU/CCPU????????????????????????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_UINT32 SCM_CoderSrcChannelInit(VOS_VOID)
 {
@@ -234,37 +234,37 @@ VOS_UINT32 SCM_CoderSrcChannelInit(VOS_VOID)
 
         if (VOS_OK != SCM_CoderSrcChannelCfg(&g_astSCMCoderSrcCfg[i]))
         {
-            g_astSCMCoderSrcCfg[i].enInitState = SCM_CHANNEL_CFG_FAIL;  /* 记录通道初始化配置错误 */
+            g_astSCMCoderSrcCfg[i].enInitState = SCM_CHANNEL_CFG_FAIL;  /* ?????????????????????? */
 
-            return VOS_ERR;/* 返回失败 */
+            return VOS_ERR;/* ???????? */
         }
 
         if(VOS_OK != mdrv_socp_start(g_astSCMCoderSrcCfg[i].enChannelID))
         {
-            g_astSCMCoderSrcCfg[i].enInitState = SCM_CHANNEL_START_FAIL;  /* 记录通道开启配置错误 */
+            g_astSCMCoderSrcCfg[i].enInitState = SCM_CHANNEL_START_FAIL;  /* ???????????????????? */
 
-            return VOS_ERR;/* 返回失败 */
+            return VOS_ERR;/* ???????? */
         }
 
-        g_astSCMCoderSrcCfg[i].enInitState = SCM_CHANNEL_INIT_SUCC;     /* 记录通道初始化配置错误 */
+        g_astSCMCoderSrcCfg[i].enInitState = SCM_CHANNEL_INIT_SUCC;     /* ?????????????????????? */
     }
 
-    return VOS_OK;/* 返回成功 */
+    return VOS_OK;/* ???????? */
 }
 
 /* ****************************************************************************
- 函 数 名  : SCM_RlsSrcRDAll
- 功能描述  : 将编码源通道的所有RD内存进行释放
- 输入参数  : enChanlID: 编码源通道ID
- 输出参数  : pulDataPhyAddr: 编码源通道待释放数据实地址值
-             pulDataLen: 编码源通道待释放数据长度
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_RlsSrcRDAll
+ ????????  : ??????????????????RD????????????
+ ????????  : enChanlID: ??????????ID
+ ????????  : pulDataPhyAddr: ????????????????????????????
+             pulDataLen: ????????????????????????
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_UINT32 SCM_RlsSrcRDAll(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT_PTR *pDataPhyAddr, VOS_UINT32 *pulDataLen)
 {
@@ -276,7 +276,7 @@ VOS_UINT32 SCM_RlsSrcRDAll(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT_PTR *pDat
     VOS_UINT32                          ulFirstAddr = 0;
     VOS_UINT32                          ulCfgNum;
     VOS_UINT32                          i;
-    SCM_CHANNEL_ENUM_U32                enLteMark   = SCM_CHANNEL_BUTT;/*标志通道类型*/
+    SCM_CHANNEL_ENUM_U32                enLteMark   = SCM_CHANNEL_BUTT;/*????????????*/
     VOS_UINT32                          ulen = 0;
 
     if((SOCP_CODER_SRC_LOM_CNF1 == enChanlID)||(SOCP_CODER_SRC_LOM_CNF2 == enChanlID)
@@ -293,12 +293,12 @@ VOS_UINT32 SCM_RlsSrcRDAll(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT_PTR *pDat
                                         SCM_CODER_SRC_NUM,
                                         (SCM_CHANNEL_CFG_HEAD *)g_astSCMCoderSrcCfg,
                                         sizeof(SCM_CODER_SRC_CFG_STRU),
-                                        &ulCfgNum))/* 判断通道参数 */
+                                        &ulCfgNum))/* ???????????? */
     {
         /*lint -e534*/
-        SCM_CODER_SRC_ERR("SCM_RlsSrcRDAll: Find Channel Error", enChanlID, 0);/* 记录Log */
+        SCM_CODER_SRC_ERR("SCM_RlsSrcRDAll: Find Channel Error", enChanlID, 0);/* ????Log */
         /*lint +e534*/
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
     SCM_CODER_SRC_LOG("SCM_RlsSrcRDAll: Release Channel Data", enChanlID, 0);
@@ -306,39 +306,39 @@ VOS_UINT32 SCM_RlsSrcRDAll(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT_PTR *pDat
     if (VOS_OK != mdrv_socp_get_rd_buffer(enChanlID, &stSrcChanRD))
     {
         /*lint -e534*/
-        SCM_CODER_SRC_ERR("SCM_RlsSrcRDAll: Get RD Info Error", enChanlID, 0);/* 记录Log */
+        SCM_CODER_SRC_ERR("SCM_RlsSrcRDAll: Get RD Info Error", enChanlID, 0);/* ????Log */
         /*lint +e534*/
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
-    if (VOS_NULL_PTR == stSrcChanRD.pBuffer)        /* 参数错误 */
+    if (VOS_NULL_PTR == stSrcChanRD.pBuffer)        /* ???????? */
     {
         /*lint -e534*/
-        SCM_CODER_SRC_ERR("SCM_RlsSrcRDAll: RD Info is Error", enChanlID, 0);/* 记录Log */
+        SCM_CODER_SRC_ERR("SCM_RlsSrcRDAll: RD Info is Error", enChanlID, 0);/* ????Log */
         /*lint +e534*/
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
-    if ((0 == stSrcChanRD.u32Size) && (0 == stSrcChanRD.u32RbSize)) /* 无数据需要释放 */
+    if ((0 == stSrcChanRD.u32Size) && (0 == stSrcChanRD.u32RbSize)) /* ?????????????? */
     {
         *pDataPhyAddr   = 0;
         *pulDataLen     = 0;
 
-        return VOS_OK;/* 返回成功 */
+        return VOS_OK;/* ???????? */
     }
 
-    /* RD个数获取非法 */
+    /* RD???????????? */
     if(((stSrcChanRD.u32Size + stSrcChanRD.u32RbSize) / sizeof(SOCP_RD_DATA_STRU)) > SCM_CODE_SRC_RD_NUM)
     {
         /*lint -e534*/
-        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: Get RD Data Error", enChanlID, 0);/* 记录Log */
-        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: Get RD PTR Error", stSrcChanRD.u32Size, stSrcChanRD.u32RbSize);/* 记录Log */
+        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: Get RD Data Error", enChanlID, 0);/* ????Log */
+        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: Get RD PTR Error", stSrcChanRD.u32Size, stSrcChanRD.u32RbSize);/* ????Log */
         /*lint +e534*/
 
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
-    /* 计算RD个数 */
+    /* ????RD???? */
     ulRDNum = stSrcChanRD.u32Size / sizeof(SOCP_RD_DATA_STRU);
 
     if (0 != ulRDNum)
@@ -352,17 +352,17 @@ VOS_UINT32 SCM_RlsSrcRDAll(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT_PTR *pDat
 
         ulRDTotalNum = ulRDNum;
 
-        /* 获取RD数据的地址和长度 */
+        /* ????RD???????????????? */
         pstRDData   = (SOCP_RD_DATA_STRU*)stSrcChanRD.pBuffer;
 
-        /* 记录当前第一个释放的数据地址,后面需要返回给上层 */
+        /* ????????????????????????????,?????????????????? */
         ulFirstAddr = pstRDData->ulDataAddr;
 
         for (i = 0; i < ulRDNum; i++)
         {
             ulen    = 0;
 
-            /* 累计RD数据长度 */
+            /* ????RD???????? */
             if(SCM_LTE_CHANNEL == enLteMark)
             {
                 ulen = ALIGN_DDR_WITH_4BYTE(pstRDData->usMsgLen);
@@ -376,7 +376,7 @@ VOS_UINT32 SCM_RlsSrcRDAll(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT_PTR *pDat
         }
     }
 
-    /* 计算回卷RD个数 */
+    /* ????????RD???? */
     ulRDNum = stSrcChanRD.u32RbSize / sizeof(SOCP_RD_DATA_STRU);
 
     if (0 != ulRDNum)
@@ -390,10 +390,10 @@ VOS_UINT32 SCM_RlsSrcRDAll(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT_PTR *pDat
 
         ulRDTotalNum += ulRDNum;
 
-        /* 获取RD数据回卷的地址和长度 */
+        /* ????RD???????????????????? */
         pstRDData   = (SOCP_RD_DATA_STRU*)stSrcChanRD.pRbBuffer;
 
-        if (0 == ulFirstAddr)/* 记录当前第一个释放的数据地址,后面需要返回给上层 */
+        if (0 == ulFirstAddr)/* ????????????????????????????,?????????????????? */
         {
             ulFirstAddr = pstRDData->ulDataAddr;
         }
@@ -402,7 +402,7 @@ VOS_UINT32 SCM_RlsSrcRDAll(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT_PTR *pDat
         {
             ulen    = 0;
 
-            /* 累计RD数据长度 */
+            /* ????RD???????? */
             if(SCM_LTE_CHANNEL == enLteMark)
             {
                 ulen = ALIGN_DDR_WITH_4BYTE((pstRDData->usMsgLen));
@@ -420,12 +420,12 @@ VOS_UINT32 SCM_RlsSrcRDAll(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT_PTR *pDat
     if (VOS_OK != mdrv_socp_read_rd_done(enChanlID, (stSrcChanRD.u32Size+stSrcChanRD.u32RbSize)))
     {
         /*lint -e534*/
-        SCM_CODER_SRC_ERR("SCM_RlsSrcRDAll: Write RD Done is Error", enChanlID, (stSrcChanRD.u32Size+stSrcChanRD.u32RbSize));/* 记录Log */
+        SCM_CODER_SRC_ERR("SCM_RlsSrcRDAll: Write RD Done is Error", enChanlID, (stSrcChanRD.u32Size+stSrcChanRD.u32RbSize));/* ????Log */
         /*lint +e534*/
-        return VOS_ERR;/* 返回错误 */
+        return VOS_ERR;/* ???????? */
     }
 
-    /* 获取的RD最大值记录到全局变量中 */
+    /* ??????RD?????????????????????? */
     if (ulRDTotalNum > g_stSCMInfoData.aulRDUsedMax[ulCfgNum])
     {
         g_stSCMInfoData.aulRDUsedMax[ulCfgNum] = ulRDTotalNum;
@@ -435,22 +435,22 @@ VOS_UINT32 SCM_RlsSrcRDAll(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT_PTR *pDat
 
     *pulDataLen     = ulTotalLen;
 
-    return VOS_OK;/* 返回结果OK */
+    return VOS_OK;/* ????????OK */
 }
 
 /* ****************************************************************************
- 函 数 名  : SCM_RlsSrcRDFirst
- 功能描述  : 获取编码源通道的RD第一包数据
- 输入参数  : enChanlID:通道ID
- 输出参数  : pulDataPhyAddr:待释放数据实地址值
-             pulDataLen: 待释放数据长度
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_RlsSrcRDFirst
+ ????????  : ????????????????RD??????????
+ ????????  : enChanlID:????ID
+ ????????  : pulDataPhyAddr:??????????????????
+             pulDataLen: ??????????????
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_UINT32 SCM_RlsSrcRDFirst(SOCP_CODER_SRC_ENUM_U32 enChanlID,
                                     VOS_UINT_PTR *pDataPhyAddr,
@@ -469,12 +469,12 @@ VOS_UINT32 SCM_RlsSrcRDFirst(SOCP_CODER_SRC_ENUM_U32 enChanlID,
     if (VOS_OK != SCM_FindChannelCfg(enChanlID, SCM_CODER_SRC_NUM,
                                 (SCM_CHANNEL_CFG_HEAD *)g_astSCMCoderSrcCfg,
                                 sizeof(SCM_CODER_SRC_CFG_STRU),
-                                &ulCfgNum))/* 判断通道参数 */
+                                &ulCfgNum))/* ???????????? */
     {
         /*lint -e534*/
-        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: Find Channel Error", enChanlID, 0);/* 记录Log */
+        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: Find Channel Error", enChanlID, 0);/* ????Log */
         /*lint +e534*/
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
     SCM_CODER_SRC_LOG("SCM_RlsSrcRDFirst: Release Channel Data", enChanlID, 0);
@@ -482,31 +482,31 @@ VOS_UINT32 SCM_RlsSrcRDFirst(SOCP_CODER_SRC_ENUM_U32 enChanlID,
     if (VOS_OK != mdrv_socp_get_rd_buffer(enChanlID, &stSrcChanRD))
     {
         /*lint -e534*/
-        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: Get RD Buffer Error", enChanlID, 0);/* 记录Log */
+        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: Get RD Buffer Error", enChanlID, 0);/* ????Log */
         /*lint +e534*/
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
-    if (VOS_NULL_PTR == stSrcChanRD.pBuffer)        /* 参数错误 */
+    if (VOS_NULL_PTR == stSrcChanRD.pBuffer)        /* ???????? */
     {
         /*lint -e534*/
-        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: RD Buffer is  Error", enChanlID, 0);/* 记录Log */
+        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: RD Buffer is  Error", enChanlID, 0);/* ????Log */
         /*lint +e534*/
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
-    /* RD个数获取非法 */
+    /* RD???????????? */
     if(((stSrcChanRD.u32Size + stSrcChanRD.u32RbSize) / sizeof(SOCP_RD_DATA_STRU)) > SCM_CODE_SRC_RD_NUM)
     {
         /*lint -e534*/
-        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: Get RD Data Error", enChanlID, 0);/* 记录Log */
-        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: Get RD PTR Error", stSrcChanRD.u32Size, stSrcChanRD.u32RbSize);/* 记录Log */
+        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: Get RD Data Error", enChanlID, 0);/* ????Log */
+        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: Get RD PTR Error", stSrcChanRD.u32Size, stSrcChanRD.u32RbSize);/* ????Log */
         /*lint +e534*/
 
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
-    if (0 != stSrcChanRD.u32Size)      /* RD有数据 */
+    if (0 != stSrcChanRD.u32Size)      /* RD?????? */
     {
         /*lint -e64 */
         stSrcChanRD.pBuffer = (VOS_CHAR*)VOS_UncacheMemPhyToVirt((VOS_UINT8*)stSrcChanRD.pBuffer,
@@ -515,17 +515,17 @@ VOS_UINT32 SCM_RlsSrcRDFirst(SOCP_CODER_SRC_ENUM_U32 enChanlID,
                                     g_astSCMCoderSrcCfg[ulCfgNum].ulRDBufLen);
         /*lint +e64 */
 
-        /* 获取RD第一包数据首地址和长度 */
+        /* ????RD?????????????????????? */
         pstRDData = (SOCP_RD_DATA_STRU *)stSrcChanRD.pBuffer;
 
         *pDataPhyAddr   = (VOS_UINT_PTR)(pstRDData->ulDataAddr);
         *pulDataLen     = (VOS_UINT32)pstRDData->usMsgLen;
 
         /*lint -e732 */
-        ulResult = mdrv_socp_read_rd_done(enChanlID, (VOS_UINT32)sizeof(SOCP_RD_DATA_STRU));  /* 释放一包数据 */
+        ulResult = mdrv_socp_read_rd_done(enChanlID, (VOS_UINT32)sizeof(SOCP_RD_DATA_STRU));  /* ???????????? */
         /*lint +e732 */
     }
-    else if (0 != stSrcChanRD.u32RbSize)/* RD回卷有数据 */
+    else if (0 != stSrcChanRD.u32RbSize)/* RD?????????? */
     {
         /*lint -e64 */
         stSrcChanRD.pRbBuffer = (VOS_CHAR*)VOS_UncacheMemPhyToVirt((VOS_UINT8*)stSrcChanRD.pRbBuffer,
@@ -534,17 +534,17 @@ VOS_UINT32 SCM_RlsSrcRDFirst(SOCP_CODER_SRC_ENUM_U32 enChanlID,
                                     g_astSCMCoderSrcCfg[ulCfgNum].ulRDBufLen);
         /*lint +e64 */
 
-        /* 获取回卷RD第一包数据首地址和长度 */
+        /* ????????RD?????????????????????? */
         pstRDData = (SOCP_RD_DATA_STRU *)stSrcChanRD.pRbBuffer;
 
         *pDataPhyAddr   = (VOS_UINT_PTR)(pstRDData->ulDataAddr);
         *pulDataLen     = (VOS_UINT32)pstRDData->usMsgLen;
 
         /*lint -e732 */
-        ulResult = mdrv_socp_read_rd_done(enChanlID, (VOS_UINT32)sizeof(SOCP_RD_DATA_STRU));  /* 释放一包数据 */
+        ulResult = mdrv_socp_read_rd_done(enChanlID, (VOS_UINT32)sizeof(SOCP_RD_DATA_STRU));  /* ???????????? */
         /*lint +e732 */
     }
-    else         /* 无数据需要释放 */
+    else         /* ?????????????? */
     {
         *pDataPhyAddr   = 0;
         *pulDataLen     = 0;
@@ -554,12 +554,12 @@ VOS_UINT32 SCM_RlsSrcRDFirst(SOCP_CODER_SRC_ENUM_U32 enChanlID,
     if (VOS_OK != ulResult)
     {
         /*lint -e534*/
-        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: Read RD Done is  Error", enChanlID, 0);/* 记录Log */
+        SCM_CODER_SRC_ERR("SCM_RlsSrcRDFirst: Read RD Done is  Error", enChanlID, 0);/* ????Log */
         /*lint +e534*/
-        return VOS_ERR;/* 返回错误 */
+        return VOS_ERR;/* ???????? */
     }
 
-    /* 计算RD总大小，记录全局变量中 */
+    /* ????RD?????????????????????? */
     ulRDTotalNum = (stSrcChanRD.u32Size + stSrcChanRD.u32RbSize) / sizeof(SOCP_RD_DATA_STRU);
 
     if (ulRDTotalNum > g_stSCMInfoData.aulRDUsedMax[ulCfgNum])
@@ -567,22 +567,22 @@ VOS_UINT32 SCM_RlsSrcRDFirst(SOCP_CODER_SRC_ENUM_U32 enChanlID,
         g_stSCMInfoData.aulRDUsedMax[ulCfgNum] = ulRDTotalNum;
     }
 
-    return VOS_OK;/* 返回成功 */
+    return VOS_OK;/* ???????? */
 }
 
 
 /* ****************************************************************************
- 函 数 名  : SCM_GetBDFreeNum
- 功能描述  : 查询BD剩余空间
- 输入参数  : enChanlID: 通道ID
- 输出参数  : pulBDNum:BD剩余个数
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_GetBDFreeNum
+ ????????  : ????BD????????
+ ????????  : enChanlID: ????ID
+ ????????  : pulBDNum:BD????????
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_UINT32 SCM_GetBDFreeNum(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT32 *pulBDNum)
 {
@@ -591,19 +591,19 @@ VOS_UINT32 SCM_GetBDFreeNum(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT32 *pulBD
     VOS_UINT32                          ulBDTotal;
     VOS_UINT32                          ulCfgNum;
 
-    /* 判断指针的正确 */
+    /* ?????????????? */
     if (VOS_NULL_PTR == pulBDNum)
     {
         return VOS_ERR;
     }
 
     if (VOS_OK != SCM_FindChannelCfg(enChanlID, SCM_CODER_SRC_NUM,
-                                (SCM_CHANNEL_CFG_HEAD *)g_astSCMCoderSrcCfg, sizeof(SCM_CODER_SRC_CFG_STRU), &ulCfgNum))/* 判断通道参数 */
+                                (SCM_CHANNEL_CFG_HEAD *)g_astSCMCoderSrcCfg, sizeof(SCM_CODER_SRC_CFG_STRU), &ulCfgNum))/* ???????????? */
     {
         /*lint -e534*/
-        SCM_CODER_SRC_ERR("SCM_GetBDFreeNum: Find Channel Error", enChanlID, 0);/* 记录Log */
+        SCM_CODER_SRC_ERR("SCM_GetBDFreeNum: Find Channel Error", enChanlID, 0);/* ????Log */
         /*lint +e534*/
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
     SCM_CODER_SRC_LOG("SCM_GetBDFreeNum: Get BD Number", enChanlID, 0);
@@ -611,26 +611,26 @@ VOS_UINT32 SCM_GetBDFreeNum(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT32 *pulBD
     if (VOS_OK != mdrv_socp_get_write_buff(enChanlID, &stRwBuf))
     {
         /*lint -e534*/
-        SCM_CODER_SRC_ERR("SCM_GetBDFreeNum: Get Write Buffer Error", enChanlID, 0);/* 记录Log */
+        SCM_CODER_SRC_ERR("SCM_GetBDFreeNum: Get Write Buffer Error", enChanlID, 0);/* ????Log */
         /*lint +e534*/
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
-    /* 计算BD的值 */
+    /* ????BD???? */
     ulBDNum = (stRwBuf.u32Size + stRwBuf.u32RbSize) / sizeof(SOCP_BD_DATA_STRU);
 
-    /* BD个数获取非法 */
+    /* BD???????????? */
     if(ulBDNum > SCM_CODE_SRC_BD_NUM)
     {
         /*lint -e534*/
-        SCM_CODER_SRC_ERR("SCM_GetBDFreeNum: Get BD Data Error", enChanlID, 0);/* 记录Log */
-        SCM_CODER_SRC_ERR("SCM_GetBDFreeNum: Get BD PTR Error", stRwBuf.u32Size, stRwBuf.u32RbSize);/* 记录Log */
+        SCM_CODER_SRC_ERR("SCM_GetBDFreeNum: Get BD Data Error", enChanlID, 0);/* ????Log */
+        SCM_CODER_SRC_ERR("SCM_GetBDFreeNum: Get BD PTR Error", stRwBuf.u32Size, stRwBuf.u32RbSize);/* ????Log */
         /*lint +e534*/
 
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
-    /* 至少要保留一个空闲BD，保证通道不会被写满而异常 */
+    /* ??????????????????BD?????????????????????????? */
     if (ulBDNum <= 1)
     {
         *pulBDNum = 0;
@@ -640,10 +640,10 @@ VOS_UINT32 SCM_GetBDFreeNum(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT32 *pulBD
         *pulBDNum = (ulBDNum - 1);
     }
 
-    /* 计算通道全部BD的个数 */
+    /* ????????????BD?????? */
     ulBDTotal = g_astSCMCoderSrcCfg[ulCfgNum].ulSrcBufLen / sizeof(SOCP_BD_DATA_STRU);
 
-    /* 和全局变量中比较记录最大值 */
+    /* ?????????????????????????? */
     if ((ulBDTotal- ulBDNum) > g_stSCMInfoData.aulBDUsedMax[ulCfgNum])
     {
         g_stSCMInfoData.aulBDUsedMax[ulCfgNum] = (ulBDTotal- ulBDNum);
@@ -654,15 +654,15 @@ VOS_UINT32 SCM_GetBDFreeNum(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT32 *pulBD
 
 
 /*****************************************************************************
- 函 数 名  : SCM_CoderSrcMemcpy
- 功能描述  : 编码源通道的memcpy
- 输入参数  : pInfo:         拷贝信息
-             pstSocpBuf:    之前获取的socp buffer信息
- 输出参数  : 无
- 修改历史  :
-   1.日    期  : 2015年7月12日
-     作    者  : c00326366
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_CoderSrcMemcpy
+ ????????  : ????????????memcpy
+ ????????  : pInfo:         ????????
+             pstSocpBuf:    ??????????socp buffer????
+ ????????  : ??
+ ????????  :
+   1.??    ??  : 2015??7??12??
+     ??    ??  : c00326366
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_VOID SCM_CoderSrcMemcpy(SOCP_CODER_SRC_ENUM_U32 enChanlID, SCM_CODER_SRC_MEMCPY_STRU *pInfo, SOCP_BUFFER_RW_STRU *pstSocpBuf)
 {
@@ -671,12 +671,12 @@ VOS_VOID SCM_CoderSrcMemcpy(SOCP_CODER_SRC_ENUM_U32 enChanlID, SCM_CODER_SRC_MEM
 
     if (VOS_OK != SCM_FindChannelCfg(enChanlID, SCM_CODER_SRC_NUM,
                                      (SCM_CHANNEL_CFG_HEAD *)g_astSCMCoderSrcCfg,
-                                     sizeof(SCM_CODER_SRC_CFG_STRU), &ulCfgNum))/* 判断通道参数 */
+                                     sizeof(SCM_CODER_SRC_CFG_STRU), &ulCfgNum))/* ???????????? */
     {
         return ;
     }
 
-    /* 本函数的拷贝处理流程不检查越界情况，由调用的地方保证 */
+    /* ???????????????????????????????????????????????????? */
     if(pInfo->uloffset < pstSocpBuf->u32Size)
     {
         if((pInfo->uloffset + pInfo->ulLen) <= pstSocpBuf->u32Size)
@@ -706,23 +706,23 @@ VOS_VOID SCM_CoderSrcMemcpy(SOCP_CODER_SRC_ENUM_U32 enChanlID, SCM_CODER_SRC_MEM
 
 
 /*****************************************************************************
- 函 数 名  : SCM_GetCoderChnSrcBuff
- 功能描述  : 获取编码源通道的buffer
- 输入参数  : enChanlID: 通道ID
-             ulDataLen: 要获取的buffer长度
-             pstCoderHeader:buffer信息
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2015年3月22日
-     作    者  : yuyangyang
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_GetCoderChnSrcBuff
+ ????????  : ????????????????buffer
+ ????????  : enChanlID: ????ID
+             ulDataLen: ????????buffer????
+             pstCoderHeader:buffer????
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2015??3??22??
+     ??    ??  : yuyangyang
+     ????????  : Creat Function
 
-   2.日    期  : 2015年7月12日
-     作    者  : c00326366
-     修改内容  : 只要总的剩余空间够就返回buffer指针
+   2.??    ??  : 2015??7??12??
+     ??    ??  : c00326366
+     ????????  : ????????????????????????buffer????
 **************************************************************************** */
 VOS_UINT32 SCM_GetCoderChnSrcBuff(SOCP_CODER_SRC_ENUM_U32 enChanlID,
                                             VOS_UINT32 ulDataLen,
@@ -735,7 +735,7 @@ VOS_UINT32 SCM_GetCoderChnSrcBuff(SOCP_CODER_SRC_ENUM_U32 enChanlID,
     VOS_UINT32                          *pstBuftmp;
     VOS_UINT32                          ulTrueLen;
 
-    /* 判断数据不能大于4K */
+    /* ????????????????4K */
     if ((0 == ulDataLen) || (ulDataLen > SCM_CODER_SRC_MAX_LEN))
     {
         (VOS_VOID)vos_printf("%s : ulDataLen %d.\n", __FUNCTION__, ulDataLen);
@@ -744,26 +744,26 @@ VOS_UINT32 SCM_GetCoderChnSrcBuff(SOCP_CODER_SRC_ENUM_U32 enChanlID,
 
     if (VOS_OK != SCM_FindChannelCfg(enChanlID, SCM_CODER_SRC_NUM,
                                      (SCM_CHANNEL_CFG_HEAD *)g_astSCMCoderSrcCfg,
-                                     sizeof(SCM_CODER_SRC_CFG_STRU), &ulCfgNum))/* 判断通道参数 */
+                                     sizeof(SCM_CODER_SRC_CFG_STRU), &ulCfgNum))/* ???????????? */
     {
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
     if(SOCP_ENCSRC_CHNMODE_LIST == g_astSCMCoderSrcCfg[ulCfgNum].enCHMode)
     {
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
     if(VOS_OK != mdrv_socp_get_write_buff(enChanlID, &stRwBuf))
     {
         g_astScmCoderSrcDebugInfo[ulCfgNum].ulGetWriteBufErr ++;
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
     ulTrueLen = ALIGN_DDR_WITH_8BYTE(ulDataLen);
     if((stRwBuf.u32Size + stRwBuf.u32RbSize) >= (ulTrueLen + SCM_HISI_HEADER_LENGTH))
     {
-        /*需要返回虚拟地址给上层*/
+        /*??????????????????????*/
         pstBuff = (SCM_CODER_SRC_PACKET_HEADER_STRU*)VOS_UncacheMemPhyToVirt((VOS_UINT8*)stRwBuf.pBuffer,
                                     g_astSCMCoderSrcCfg[ulCfgNum].pucSrcPHY,
                                     g_astSCMCoderSrcCfg[ulCfgNum].pucSrcBuf,
@@ -781,7 +781,7 @@ VOS_UINT32 SCM_GetCoderChnSrcBuff(SOCP_CODER_SRC_ENUM_U32 enChanlID,
             pstBuftmp = (VOS_UINT32*)g_astSCMCoderSrcCfg[ulCfgNum].pucSrcBuf;
             *pstBuftmp      = ulDataLen;
         }
-        else    /* TODO: 应该没有stRwBuf.u32Size为0的场景 */
+        else    /* TODO: ????????stRwBuf.u32Size??0?????? */
         {
             pstBuftmp = (VOS_UINT32*)g_astSCMCoderSrcCfg[ulCfgNum].pucSrcBuf;
 
@@ -804,19 +804,19 @@ VOS_UINT32 SCM_GetCoderChnSrcBuff(SOCP_CODER_SRC_ENUM_U32 enChanlID,
 }
 
 /* ****************************************************************************
- 函 数 名  : SCM_SendCoderSrc
- 功能描述  : 通过SOCP的编码源通道发送数据
- 输入参数  : enChanlID: 通道ID
-             pucSendDataAddr:发送数据地址，块式传虚拟地址，链式传物理地址
-             ulSendLen: 发送数据长度
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_SendCoderSrc
+ ????????  : ????SOCP????????????????????
+ ????????  : enChanlID: ????ID
+             pucSendDataAddr:????????????????????????????????????????????
+             ulSendLen: ????????????
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_UINT32 SCM_SendCoderSrc(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT8 *pucSendDataAddr, VOS_UINT32 ulSendLen)
 {
@@ -826,7 +826,7 @@ VOS_UINT32 SCM_SendCoderSrc(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT8 *pucSen
     SOCP_BD_DATA_STRU                   stBDData;
     SCM_CODER_SRC_PACKET_HEADER_STRU*   pstCoderHeader;
 
-    /* 判断数据指针和长度的正确，长度不能大于4K */
+    /* ??????????????????????????????????????4K */
     if ((VOS_NULL_PTR == pucSendDataAddr)
         ||(0 == ulSendLen)
         /*||(SCM_CODER_SRC_MAX_LEN < ulSendLen)*/)
@@ -836,24 +836,24 @@ VOS_UINT32 SCM_SendCoderSrc(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT8 *pucSen
 
     if (VOS_OK != SCM_FindChannelCfg(enChanlID, SCM_CODER_SRC_NUM,
                                      (SCM_CHANNEL_CFG_HEAD *)g_astSCMCoderSrcCfg,
-                                     sizeof(SCM_CODER_SRC_CFG_STRU), &ulCfgNum))/* 判断通道参数 */
+                                     sizeof(SCM_CODER_SRC_CFG_STRU), &ulCfgNum))/* ???????????? */
     {
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
     if (VOS_OK != mdrv_socp_get_write_buff(g_astSCMCoderSrcCfg[ulCfgNum].enChannelID, &stRwBuf))
     {
         g_astScmCoderSrcDebugInfo[ulCfgNum].ulGetWriteBufErr ++;
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
 
     if(SOCP_ENCSRC_CHNMODE_LIST == g_astSCMCoderSrcCfg[ulCfgNum].enCHMode)
     {
-        /* 计算空闲BD的值 */
+        /* ????????BD???? */
         ulBDNum = (stRwBuf.u32Size + stRwBuf.u32RbSize) / sizeof(SOCP_BD_DATA_STRU);
 
-        /* 判断是否还有空间 */
+        /* ???????????????? */
         if (1 >= ulBDNum)
         {
             return VOS_ERR;
@@ -871,14 +871,14 @@ VOS_UINT32 SCM_SendCoderSrc(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT8 *pucSen
         stBDData.enDataType = SOCP_BD_DATA;
 
         /*lint -e534*/
-        (VOS_VOID)VOS_MemCpy(stRwBuf.pBuffer, &stBDData, sizeof(stBDData));    /* 复制数据到指定的地址 */
+        (VOS_VOID)VOS_MemCpy(stRwBuf.pBuffer, &stBDData, sizeof(stBDData));    /* ???????????????????? */
         /*lint +e534*/
         VOS_FlushCpuWriteBuf();
 
-        if (VOS_OK != mdrv_socp_write_done(enChanlID, sizeof(stBDData)))   /* 当前数据写入完毕 */
+        if (VOS_OK != mdrv_socp_write_done(enChanlID, sizeof(stBDData)))   /* ???????????????? */
         {
-            SCM_CODER_SRC_ERR("SCM_SendCoderSrc: Write Buffer is Error", enChanlID, 0);/* 记录Log */
-            return VOS_ERR;/* 返回失败 */
+            SCM_CODER_SRC_ERR("SCM_SendCoderSrc: Write Buffer is Error", enChanlID, 0);/* ????Log */
+            return VOS_ERR;/* ???????? */
         }
     }
     else if(SOCP_ENCSRC_CHNMODE_CTSPACKET == g_astSCMCoderSrcCfg[ulCfgNum].enCHMode)
@@ -907,7 +907,7 @@ VOS_UINT32 SCM_SendCoderSrc(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT8 *pucSen
             return VOS_ERR;
         }
         VOS_FlushCpuWriteBuf();
-        /*第一段连续空间不足HISI包头长度*/
+        /*??????????????????HISI????????*/
         ulSendLen = ALIGN_DDR_WITH_8BYTE(ulSendLen);
         if(VOS_OK != mdrv_socp_write_done(enChanlID, (ulSendLen + SCM_HISI_HEADER_LENGTH)))
         {
@@ -925,17 +925,17 @@ VOS_UINT32 SCM_SendCoderSrc(SOCP_CODER_SRC_ENUM_U32 enChanlID, VOS_UINT8 *pucSen
 }
 
 /* ****************************************************************************
- 函 数 名  : SCM_CoderDstChanMemAlloc
- 功能描述  : 编码目的通道memory申请
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2013年8月20日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_CoderDstChanMemAlloc
+ ????????  : ????????????memory????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2013??8??20??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_UINT32 SCM_CoderDstChanMemAlloc(VOS_VOID)
 {
@@ -944,16 +944,16 @@ VOS_UINT32 SCM_CoderDstChanMemAlloc(VOS_VOID)
 
     for (i = 0; i < SCM_CODER_DST_NUM; i++)
     {
-        /* 申请编码目的空间 */
+        /* ???????????????? */
         g_astSCMCoderDstCfg[i].pucBuf = (VOS_UINT8*)VOS_UnCacheMemAlloc(g_astSCMCoderDstCfg[i].ulBufLen, &ulPHYAddr);
 
-        /* 申请空间错误 */
+        /* ???????????? */
         if (VOS_NULL_PTR == g_astSCMCoderDstCfg[i].pucBuf)
         {
-            /* 记录通道初始化标记为内存申请异常 */
+            /* ???????????????????????????????? */
             g_astSCMCoderDstCfg[i].enInitState = SCM_CHANNEL_MEM_FAIL;
 
-            return VOS_ERR;/* 返回错误 */
+            return VOS_ERR;/* ???????? */
         }
 
         g_astSCMCoderDstCfg[i].pucBufPHY = (VOS_UINT8*)ulPHYAddr;
@@ -963,17 +963,17 @@ VOS_UINT32 SCM_CoderDstChanMemAlloc(VOS_VOID)
 }
 
 /* ****************************************************************************
- 函 数 名  : SCM_CoderDstChanMemInit
- 功能描述  : 编码目的通道memory初始化
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2013年8月20日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_CoderDstChanMemInit
+ ????????  : ????????????memory??????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2013??8??20??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_UINT32 SCM_CoderDstChanMemInit(VOS_VOID)
 {
@@ -989,7 +989,7 @@ VOS_UINT32 SCM_CoderDstChanMemInit(VOS_VOID)
         return SCM_CoderDstChanMemAlloc();
     }
 
-    /* 未打开log buffer下的处理 */
+    /* ??????log buffer???????? */
     if ((VOS_FALSE == stLogCfg.logOnFlag)
         || (VOS_NULL == stLogCfg.ulPhyBufferAddr))
     {
@@ -999,22 +999,22 @@ VOS_UINT32 SCM_CoderDstChanMemInit(VOS_VOID)
         return SCM_CoderDstChanMemAlloc();
     }
 
-    /* IND通道需要做延迟写入，BUFFER大小50M(默认值)，水线设置为水线设置为75%，内存在初始化已经申请过 */
+    /* IND????????????????????BUFFER????50M(??????)??????????????????????75%???????????????????????? */
     g_astSCMCoderDstCfg[SCM_CODER_DST_IND_CHANNEL].pucBufPHY    = (VOS_UINT8*)(stLogCfg.ulPhyBufferAddr);
     g_astSCMCoderDstCfg[SCM_CODER_DST_IND_CHANNEL].ulBufLen     = stLogCfg.BufferSize;
     g_astSCMCoderDstCfg[SCM_CODER_DST_IND_CHANNEL].pucBuf       = stLogCfg.pVirBuffer;
-    /* 因为旧版本的SOCP的单位是KB新的版本是B,为了兼容SOCP代码中乘了1024,所以这里需要除以1024 */
+    /* ????????????SOCP????????KB??????????B,????????SOCP??????????1024,????????????????1024 */
     g_astSCMCoderDstCfg[SCM_CODER_DST_IND_CHANNEL].ulThreshold  = ((stLogCfg.BufferSize>>2)*3)>>10;
 
-    /* CNF通道不需要做延迟写入 */
+    /* CNF???????????????????? */
     ulBufLen = g_astSCMCoderDstCfg[SCM_CODER_DST_CNF_CHANNEL].ulBufLen;
 
     g_astSCMCoderDstCfg[SCM_CODER_DST_CNF_CHANNEL].pucBuf = (VOS_UINT8*)VOS_UnCacheMemAlloc(ulBufLen, &ulPHYAddr);
 
-    /* 申请空间错误 */
+    /* ???????????? */
     if (VOS_NULL_PTR == g_astSCMCoderDstCfg[SCM_CODER_DST_CNF_CHANNEL].pucBuf)
     {
-        /* 记录通道初始化标记为内存申请异常 */
+        /* ???????????????????????????????? */
         g_astSCMCoderDstCfg[SCM_CODER_DST_CNF_CHANNEL].enInitState = SCM_CHANNEL_MEM_FAIL;
 
         return VOS_ERR;
@@ -1026,29 +1026,29 @@ VOS_UINT32 SCM_CoderDstChanMemInit(VOS_VOID)
 }
 
 /* ****************************************************************************
- 函 数 名  : SCM_RlsDestBuf
- 功能描述  : 处理目的通道的数据释放
- 输入参数  : ulChanlID 目的通道ID
-             ulReadSize 数据大小
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_RlsDestBuf
+ ????????  : ??????????????????????
+ ????????  : ulChanlID ????????ID
+             ulReadSize ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_UINT32 SCM_RlsDestBuf(VOS_UINT32 ulChanlID, VOS_UINT32 ulReadSize)
 {
     VOS_UINT32                          ulDataLen;
     SOCP_BUFFER_RW_STRU                 stBuffer;
 
-    if(0 == ulReadSize) /*释放通道所有数据*/
+    if(0 == ulReadSize) /*????????????????*/
     {
         if (VOS_OK != BSP_SOCP_GetReadBuff(ulChanlID, &stBuffer))
         {
-            SCM_CODER_DST_ERR("SCM_RlsDestBuf: Get Read Buffer is Error", ulChanlID, 0);/* 记录Log */
+            SCM_CODER_DST_ERR("SCM_RlsDestBuf: Get Read Buffer is Error", ulChanlID, 0);/* ????Log */
             return VOS_ERR;
         }
 
@@ -1063,7 +1063,7 @@ VOS_UINT32 SCM_RlsDestBuf(VOS_UINT32 ulChanlID, VOS_UINT32 ulReadSize)
     }
     else
     {
-        /* 记录调用时间 */
+        /* ???????????? */
         SCM_CODER_DST_LOG("SCM_RlsDestBuf: Relese Read Data", ulChanlID, ulReadSize);
 
         ulDataLen = ulReadSize;
@@ -1071,7 +1071,7 @@ VOS_UINT32 SCM_RlsDestBuf(VOS_UINT32 ulChanlID, VOS_UINT32 ulReadSize)
 
     if (VOS_OK != BSP_SOCP_ReadDataDone(ulChanlID, ulDataLen))
     {
-        SCM_CODER_DST_ERR("SCM_RlsDestBuf: Read Data Done is Error", ulChanlID, ulDataLen);/* 记录Log */
+        SCM_CODER_DST_ERR("SCM_RlsDestBuf: Read Data Done is Error", ulChanlID, ulDataLen);/* ????Log */
 
         return VOS_ERR;
     }
@@ -1080,17 +1080,17 @@ VOS_UINT32 SCM_RlsDestBuf(VOS_UINT32 ulChanlID, VOS_UINT32 ulReadSize)
 }
 
 /* ****************************************************************************
- 函 数 名  : SCM_CoderDestReadCB
- 功能描述  : 处理编码目的通道的数据
- 输入参数  : ulDstChID 目的通道ID
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_CoderDestReadCB
+ ????????  : ??????????????????????
+ ????????  : ulDstChID ????????ID
+ ????????  : ??
+ ?? ?? ??  : ??
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_VOID SCM_CoderDestReadCB(VOS_UINT32 ulDstChID)
 {
@@ -1110,27 +1110,27 @@ VOS_VOID SCM_CoderDestReadCB(VOS_UINT32 ulDstChID)
 
     if (SOCP_CODER_DEST_CHAN != ulChType)
     {
-        SCM_CODER_DST_ERR("SCM_CoderDestReadCB: Channel Type is Error", ulDstChID, ulChType);/* 记录Log */
+        SCM_CODER_DST_ERR("SCM_CoderDestReadCB: Channel Type is Error", ulDstChID, ulChType);/* ????Log */
         return;
     }
 
     if (VOS_OK != BSP_SOCP_GetReadBuff(ulDstChID, &stBuffer))
     {
-        SCM_CODER_DST_ERR("SCM_CoderDestReadCB: Get Read Buffer is Error", ulDstChID, 0);/* 记录Log */
+        SCM_CODER_DST_ERR("SCM_CoderDestReadCB: Get Read Buffer is Error", ulDstChID, 0);/* ????Log */
         return;
     }
 
     if (VOS_OK != SCM_FindChannelCfg(ulDstChID, SCM_CODER_DST_NUM,
                                 (SCM_CHANNEL_CFG_HEAD *)g_astSCMCoderDstCfg, sizeof(SCM_CODER_DEST_CFG_STRU), &ulCfgNum))
     {
-        BSP_SOCP_ReadDataDone(ulDstChID, stBuffer.u32Size + stBuffer.u32RbSize);  /* 清空数据 */
+        BSP_SOCP_ReadDataDone(ulDstChID, stBuffer.u32Size + stBuffer.u32RbSize);  /* ???????? */
 
         if(SOCP_CODER_DST_OM_IND == ulDstChID)
         {
             diag_ReportLost(EN_DIAG_LOST_BRANCH);
         }
 
-        SCM_CODER_DST_ERR("SCM_CoderDestReadCB: Find Channel is Error", ulDstChID, 0);/* 记录Log */
+        SCM_CODER_DST_ERR("SCM_CoderDestReadCB: Find Channel is Error", ulDstChID, 0);/* ????Log */
 
         return;
     }
@@ -1139,14 +1139,14 @@ VOS_VOID SCM_CoderDestReadCB(VOS_UINT32 ulDstChID)
     if((0 == (stBuffer.u32Size + stBuffer.u32RbSize))||(VOS_NULL_PTR == stBuffer.pBuffer))
     /*lint -restore*/
     {
-        BSP_SOCP_ReadDataDone(ulDstChID, stBuffer.u32Size + stBuffer.u32RbSize);  /* 清空数据 */
+        BSP_SOCP_ReadDataDone(ulDstChID, stBuffer.u32Size + stBuffer.u32RbSize);  /* ???????? */
 
         if(SOCP_CODER_DST_OM_IND == ulDstChID)
         {
             diag_ReportLost(EN_DIAG_LOST_BRANCH);
         }
 
-        SCM_CODER_DST_ERR("SCM_CoderDestReadCB: Get RD error ", ulDstChID,0);/* 记录Log */
+        SCM_CODER_DST_ERR("SCM_CoderDestReadCB: Get RD error ", ulDstChID,0);/* ????Log */
         return;
     }
 
@@ -1155,21 +1155,21 @@ VOS_VOID SCM_CoderDestReadCB(VOS_UINT32 ulDstChID)
         return;
     }
 
-     /*如果函数为空*/
+     /*????????????*/
     if(VOS_NULL_PTR == g_astSCMCoderDstCfg[ulCfgNum].pfunc)
     {
-        BSP_SOCP_ReadDataDone(ulDstChID, stBuffer.u32Size + stBuffer.u32RbSize);  /* 清空数据 */
+        BSP_SOCP_ReadDataDone(ulDstChID, stBuffer.u32Size + stBuffer.u32RbSize);  /* ???????? */
 
         if(SOCP_CODER_DST_OM_IND == ulDstChID)
         {
             diag_ReportLost(EN_DIAG_LOST_BRANCH);
         }
 
-        SCM_CODER_DST_ERR("SCM_CoderDestReadCB: Channel Callback Fucn is NULL", ulDstChID,0);/* 记录Log */
+        SCM_CODER_DST_ERR("SCM_CoderDestReadCB: Channel Callback Fucn is NULL", ulDstChID,0);/* ????Log */
         return;
     }
 
-    /* 发送数据 */
+    /* ???????? */
     /*lint -save -e539*/
     ulVirtAddr = VOS_UncacheMemPhyToVirt(stBuffer.pBuffer,
                                 g_astSCMCoderDstCfg[ulCfgNum].pucBufPHY,
@@ -1178,14 +1178,14 @@ VOS_VOID SCM_CoderDestReadCB(VOS_UINT32 ulDstChID)
     /*lint -restore*/
     if(VOS_NULL_PTR == ulVirtAddr)
     {
-        BSP_SOCP_ReadDataDone(ulDstChID, stBuffer.u32Size + stBuffer.u32RbSize);  /* 清空数据 */
+        BSP_SOCP_ReadDataDone(ulDstChID, stBuffer.u32Size + stBuffer.u32RbSize);  /* ???????? */
 
         if(SOCP_CODER_DST_OM_IND == ulDstChID)
         {
             diag_ReportLost(EN_DIAG_LOST_BRANCH);
         }
 
-        SCM_CODER_DST_ERR("SCM_CoderDestReadCB:  stBuffer.pBuffer == VOS_NULL", ulDstChID, 0);/* 记录Log */
+        SCM_CODER_DST_ERR("SCM_CoderDestReadCB:  stBuffer.pBuffer == VOS_NULL", ulDstChID, 0);/* ????Log */
         return;
     }
     /*lint -e539 */
@@ -1194,20 +1194,20 @@ VOS_VOID SCM_CoderDestReadCB(VOS_UINT32 ulDstChID)
 
     g_astSCMCoderDstCfg[ulCfgNum].pfunc(ulDstChID, (VOS_UINT8*)ulVirtAddr, (VOS_UINT8*)stBuffer.pBuffer,(VOS_UINT32)stBuffer.u32Size);
     ulTimerOut = mdrv_timer_get_normal_timestamp();
-    /* 记录回调函数的执行时间 */
+    /* ?????????????????????? */
     SCM_CODER_DST_LOG("SCM_CoderDestReadCB: Call channel Func Proc time", ulDstChID, (ulTimerIn-ulTimerOut));
     return;
 }
 
 /* ****************************************************************************
- 函 数 名  : SCM_CoderDestEventCB
- 功能描述  : 处理编码目的通道的Event事件回调
- 输入参数  : ulDstChID 目的通道ID
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
- 修改历史  :
+ ?? ?? ??  : SCM_CoderDestEventCB
+ ????????  : ??????????????????Event????????
+ ????????  : ulDstChID ????????ID
+ ????????  : ??
+ ?? ?? ??  : ??
+ ????????  :
+ ????????  :
+ ????????  :
 
 **************************************************************************** */
 VOS_VOID SCM_CoderDestEventCB(VOS_UINT32 ulDstChID,SOCP_EVENT_ENUM_UIN32 u32Event, VOS_UINT32 u32Param)
@@ -1223,17 +1223,17 @@ VOS_VOID SCM_CoderDestEventCB(VOS_UINT32 ulDstChID,SOCP_EVENT_ENUM_UIN32 u32Even
 }
 
 /*****************************************************************************
- 函 数 名  : SCM_CoderDstChannelInit
- 功能描述  : 将ACPU的编码目的通道的配置重置
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_CoderDstChannelInit
+ ????????  : ??ACPU????????????????????????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_UINT32 SCM_CoderDstChannelInit(VOS_VOID)
 {
@@ -1248,7 +1248,7 @@ VOS_UINT32 SCM_CoderDstChannelInit(VOS_VOID)
         }
         else
         {
-            /* 扩大编码目的通道1阈值门限 */
+            /* ????????????????1???????? */
             stChannel.u32EncDstThrh = 2 * SCM_CODER_DST_GTHRESHOLD;
         }
 
@@ -1261,12 +1261,12 @@ VOS_UINT32 SCM_CoderDstChannelInit(VOS_VOID)
 
         if (VOS_OK != mdrv_socp_coder_set_dest_chan_attr(g_astSCMCoderDstCfg[i].enChannelID, &stChannel))
         {
-            g_astSCMCoderDstCfg[i].enInitState = SCM_CHANNEL_CFG_FAIL;  /* 记录通道初始化配置错误 */
+            g_astSCMCoderDstCfg[i].enInitState = SCM_CHANNEL_CFG_FAIL;  /* ?????????????????????? */
 
-            return VOS_ERR;/* 返回失败 */
+            return VOS_ERR;/* ???????? */
         }
 
-        g_astSCMCoderDstCfg[i].enInitState = SCM_CHANNEL_INIT_SUCC;     /* 记录通道初始化配置错误 */
+        g_astSCMCoderDstCfg[i].enInitState = SCM_CHANNEL_INIT_SUCC;     /* ?????????????????????? */
 
         BSP_SOCP_RegisterReadCB(g_astSCMCoderDstCfg[i].enChannelID, (socp_read_cb)SCM_CoderDestReadCB);
 
@@ -1278,18 +1278,18 @@ VOS_UINT32 SCM_CoderDstChannelInit(VOS_VOID)
 
 
 /*****************************************************************************
- 函 数 名  : SCM_RegCoderDestProc
- 功能描述  : ACPU的编码目的通道的回调函数注册接口
- 输入参数  : enChanlID: 解码目的通道ID
-             func: 回调函数指针
- 输出参数  :
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_RegCoderDestProc
+ ????????  : ACPU????????????????????????????????
+ ????????  : enChanlID: ????????????ID
+             func: ????????????
+ ????????  :
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 *****************************************************************************/
 
 VOS_UINT32 SCM_RegCoderDestProc(SOCP_CODER_DST_ENUM_U32 enChanlID, SCM_CODERDESTFUCN func)
@@ -1302,27 +1302,27 @@ VOS_UINT32 SCM_RegCoderDestProc(SOCP_CODER_DST_ENUM_U32 enChanlID, SCM_CODERDEST
                                 sizeof(SCM_CODER_DEST_CFG_STRU),
                                 &ulCgfNum))
     {
-        return VOS_ERR;/* 返回失败 */
+        return VOS_ERR;/* ???????? */
     }
 
     g_astSCMCoderDstCfg[ulCgfNum].pfunc = func;
 
-    return VOS_OK;/* 返回成功 */
+    return VOS_OK;/* ???????? */
 }
 
 /* ****************************************************************************
- 函 数 名  : SCM_RegDecoderDestProc
- 功能描述  : ACPU的解码目的通道的回调函数注册接口
- 输入参数  : enChanlID: 解码目的通道ID
-             func: 回调函数指针
- 输出参数  :
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_RegDecoderDestProc
+ ????????  : ACPU????????????????????????????????
+ ????????  : enChanlID: ????????????ID
+             func: ????????????
+ ????????  :
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 
 VOS_UINT32 SCM_RegDecoderDestProc(SOCP_DECODER_DST_ENUM_U32 enChanlID, SCM_DECODERDESTFUCN func)
@@ -1376,27 +1376,27 @@ VOS_UINT32 SCM_CoderDstCompressCfg(VOS_BOOL enable)
 
 
 /* ****************************************************************************
- 函 数 名  : SCM_CreateSrcBuffer
- 功能描述  : 申请编码源buffer空间
- 修改历史  :
-   1.日    期  : 2015年7月13日
-     作    者  : c00326366
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_CreateSrcBuffer
+ ????????  : ??????????buffer????
+ ????????  :
+   1.??    ??  : 2015??7??13??
+     ??    ??  : c00326366
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_UINT32 SCM_CreateSrcBuffer(VOS_UINT8 **pBufVir, VOS_UINT8 **pBufPhy, VOS_UINT32 ulLen)
 {
     VOS_UINT_PTR ulRealAddr;
 
-    /*申请uncache的动态内存区*/
+    /*????uncache????????????*/
     *pBufVir = (VOS_UINT8*)VOS_UnCacheMemAlloc(ulLen, &ulRealAddr);
 
-    /* 分配内存失败 */
+    /* ???????????? */
     if (VOS_NULL_PTR == *pBufVir)
     {
         return VOS_ERR;
     }
 
-    /* 保存buf实地址 */
+    /* ????buf?????? */
     *pBufPhy = (VOS_UINT8*)ulRealAddr;
 
     return VOS_OK;
@@ -1404,17 +1404,17 @@ VOS_UINT32 SCM_CreateSrcBuffer(VOS_UINT8 **pBufVir, VOS_UINT8 **pBufPhy, VOS_UIN
 
 
 /* ****************************************************************************
- 函 数 名  : SCM_CoderDstChanMemInit
- 功能描述  : 编码源通道memory初始化
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2013年8月20日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_CoderDstChanMemInit
+ ????????  : ??????????memory??????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2013??8??20??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_UINT32 SCM_CoderSrcChanMemInit(VOS_VOID)
 {
@@ -1448,7 +1448,7 @@ VOS_UINT32 SCM_CoderSrcChanMemInit(VOS_VOID)
         else
         {
             /* TODO: CJQ */
-            /* SOCP_CODER_SRC_LOM_IND3 通道暂未使用，暂不申请内存 */
+            /* SOCP_CODER_SRC_LOM_IND3 ?????????????????????????? */
         }
     }
 
@@ -1457,18 +1457,18 @@ VOS_UINT32 SCM_CoderSrcChanMemInit(VOS_VOID)
 }
 
 /* ****************************************************************************
- 函 数 名  : SCM_AcpuChannelMemInit
- 功能描述  : 将ACPU的编码源、编码目的、解码源、解码目的通道的内存初始化，
-             函数失败会复位单板，不需要释放内存
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_AcpuChannelMemInit
+ ????????  : ??ACPU??????????????????????????????????????????????????????
+             ??????????????????????????????????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_UINT32 SCM_ChannelMemInit(VOS_VOID)
 {
@@ -1482,24 +1482,24 @@ VOS_UINT32 SCM_ChannelMemInit(VOS_VOID)
 }
 
 /* ****************************************************************************
- 函 数 名  : SCM_ErrorChInfoSave
- 功能描述  : 将SOCP通道的通道配置数据保存到Exc文件中
- 输入参数  : 无
- 输出参数  : pstData : 保存数据的信息
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_ErrorChInfoSave
+ ????????  : ??SOCP????????????????????????Exc??????
+ ????????  : ??
+ ????????  : pstData : ??????????????
+ ?? ?? ??  : ??
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_VOID SCM_ErrorChInfoSave(cb_buf_t *pstData)
 {
     VOS_UINT32                          ulDataLen;
     VOS_UINT8                          *pucData;
 
-    /* 计算需要保存的通道配置信息大小 */
+    /* ?????????????????????????????? */
 
 
     ulDataLen = sizeof(g_astSCMCoderDstCfg)
@@ -1507,21 +1507,21 @@ VOS_VOID SCM_ErrorChInfoSave(cb_buf_t *pstData)
                 + sizeof(g_astSCMDecoderDstCfg)
                 + sizeof(g_astSCMDecoderSrcCfg)
                 + sizeof(g_stSCMInfoData)
-                + (5*sizeof(VOS_UINT32));        /* 需要多申请5个标志位 */
+                + (5*sizeof(VOS_UINT32));        /* ??????????5???????? */
 
 
-    /* 填写数据信息 */
+    /* ???????????? */
     /*lint -e534*/
     VOS_StrNCpy(pstData->aucName, "SCM CHCfg Info", EXCH_CB_NAME_SIZE);
     /*lint +e534*/
 
-    /* 申请内存 */
-    /*lint -e438 屏蔽pucData没有使用的错误*/
+    /* ???????? */
+    /*lint -e438 ????pucData??????????????*/
     pucData = (VOS_UINT8 *)VOS_CacheMemAlloc(ulDataLen);
 
     if (VOS_NULL_PTR == pucData)
     {
-        /* 内存申请失败，只保留部分信息 */
+        /* ???????????????????????????? */
         pstData->pucData    = (VOS_UINT8 *)g_astSCMCoderSrcCfg;
 
         pstData->ulDataLen  = sizeof(g_astSCMCoderSrcCfg);
@@ -1532,7 +1532,7 @@ VOS_VOID SCM_ErrorChInfoSave(cb_buf_t *pstData)
 
         pstData->ulDataLen = ulDataLen;
 
-        /* 保存通道的LOG信息 */
+        /* ??????????LOG???? */
         /*lint -e534*/
         VOS_MemSet(pucData, SCM_DATA_SAVE_TAG, sizeof(VOS_UINT32));
         /*lint +e534*/
@@ -1545,7 +1545,7 @@ VOS_VOID SCM_ErrorChInfoSave(cb_buf_t *pstData)
 
         pucData += sizeof(g_stSCMInfoData);
 
-        /* 保存编码源通道的配置信息 */
+        /* ???????????????????????? */
         /*lint -e534*/
         VOS_MemSet(pucData, SCM_DATA_SAVE_TAG, sizeof(VOS_UINT32));
         /*lint +e534*/
@@ -1558,7 +1558,7 @@ VOS_VOID SCM_ErrorChInfoSave(cb_buf_t *pstData)
 
         pucData += sizeof(g_astSCMCoderSrcCfg);
 
-        /* 保存编码目的通道的配置信息 */
+        /* ?????????????????????????? */
         /*lint -e534*/
         VOS_MemSet(pucData, SCM_DATA_SAVE_TAG, sizeof(VOS_UINT32));
         /*lint +e534*/
@@ -1571,7 +1571,7 @@ VOS_VOID SCM_ErrorChInfoSave(cb_buf_t *pstData)
 
         pucData += sizeof(g_astSCMCoderDstCfg);
 
-        /* 保存解码目的通道的配置信息 */
+        /* ?????????????????????????? */
         /*lint -e534*/
         VOS_MemSet(pucData, SCM_DATA_SAVE_TAG, sizeof(VOS_UINT32));
         /*lint +e534*/
@@ -1584,7 +1584,7 @@ VOS_VOID SCM_ErrorChInfoSave(cb_buf_t *pstData)
 
         pucData += sizeof(g_astSCMDecoderDstCfg);
 
-        /* 保存解码解码源通道的配置信息 */
+        /* ???????????????????????????? */
         /*lint -e534*/
         VOS_MemSet(pucData, SCM_DATA_SAVE_TAG, sizeof(VOS_UINT32));
         /*lint +e534*/
@@ -1596,24 +1596,24 @@ VOS_VOID SCM_ErrorChInfoSave(cb_buf_t *pstData)
         /*lint +e534*/
 
     }
-    /*lint -e438 屏蔽pucData没有使用的错误*/
+    /*lint -e438 ????pucData??????????????*/
 
-    return;    /* 返回，单板马上重启不需要释放内存 */
+    return;    /* ???????????????????????????????? */
 }
 
 
 /* ****************************************************************************
- 函 数 名  : SCM_ChannelInit
- 功能描述  : 将SOCP通道的初始化
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_ChannelInit
+ ????????  : ??SOCP????????????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_UINT32 SCM_ChannelInit(VOS_VOID)
 {
@@ -1621,32 +1621,32 @@ VOS_UINT32 SCM_ChannelInit(VOS_VOID)
     VOS_MemSet(&g_stSCMInfoData, 0, sizeof(g_stSCMInfoData));
     /*lint +e534*/
 
-    /* 注册异常信息保存回调 */
+    /* ???????????????????? */
     /*DRV_EXCH_CUST_FUNC_REG((exchCBReg)SCM_ErrorChInfoSave);*/
 
 
-    if (VOS_OK != SCM_CoderSrcChannelInit()) /* 编码源通道初始化 */
+    if (VOS_OK != SCM_CoderSrcChannelInit()) /* ???????????????? */
     {
-        return VOS_ERR;/* 返回错误 */
+        return VOS_ERR;/* ???????? */
     }
 
-/* BBP可维可测项目增加,j00174725 2012-11-26 初始化BBP可维可测使用的通道 */
+/* BBP????????????????,j00174725 2012-11-26 ??????BBP?????????????????? */
 
     return VOS_OK;
 }
 
 /*****************************************************************************
- 函 数 名  : SCM_ChannelInfoShow
- 功能描述  : 将SOCP通道的信息打印到串口
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_ChannelInfoShow
+ ????????  : ??SOCP????????????????????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : ??
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_VOID SCM_ChannelInfoShow(VOS_VOID)
 {
@@ -1667,17 +1667,17 @@ VOS_VOID SCM_ChannelInfoShow(VOS_VOID)
 }
 
 /*****************************************************************************
- 函 数 名  : SCM_CoderSrcCHShow
- 功能描述  : 将SOCP 编码源通道的信息打印到串口
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_CoderSrcCHShow
+ ????????  : ??SOCP ??????????????????????????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : ??
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_VOID SCM_CoderSrcCHShow(VOS_UINT32 ulCfgNum)
 {
@@ -1716,17 +1716,17 @@ VOS_VOID SCM_CoderSrcCHShow(VOS_UINT32 ulCfgNum)
 
 
 /*****************************************************************************
- 函 数 名  : SCM_CoderDstCHShow
- 功能描述  : 将SOCP 编码源通道的信息打印到串口
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2012年8月8日
-     作    者  : zhuli
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_CoderDstCHShow
+ ????????  : ??SOCP ??????????????????????????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : ??
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2012??8??8??
+     ??    ??  : zhuli
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_VOID SCM_CoderDstCHShow(VOS_UINT32 ulCfgNum)
 {
@@ -1744,20 +1744,20 @@ VOS_VOID SCM_CoderDstCHShow(VOS_UINT32 ulCfgNum)
 }
 
 /*****************************************************************************
- 函 数 名  : SCM_SOCPDBRegShow
- 功能描述  :
- 输入参数  : ulCfgNum 通道num
+ ?? ?? ??  : SCM_SOCPDBRegShow
+ ????????  :
+ ????????  : ulCfgNum ????num
 
- 输出参数  : 无
+ ????????  : ??
 
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年07月31日
-    作    者   : g47350
-    修改内容   : V900R001项目新增函数
+ ????????      :
+  1.??    ??   : 2012??07??31??
+    ??    ??   : g47350
+    ????????   : V900R001????????????
 
 *****************************************************************************/
 VOS_VOID SCM_SOCPBDRegShow(VOS_UINT32 ulCfgNum)
@@ -1766,20 +1766,20 @@ VOS_VOID SCM_SOCPBDRegShow(VOS_UINT32 ulCfgNum)
 }
 
 /*****************************************************************************
- 函 数 名  : SCM_SOCPRDRegShow
- 功能描述  :
- 输入参数  : ulCfgNum 通道num
+ ?? ?? ??  : SCM_SOCPRDRegShow
+ ????????  :
+ ????????  : ulCfgNum ????num
 
- 输出参数  : 无
+ ????????  : ??
 
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年07月31日
-    作    者   : g47350
-    修改内容   : V900R001项目新增函数
+ ????????      :
+  1.??    ??   : 2012??07??31??
+    ??    ??   : g47350
+    ????????   : V900R001????????????
 
 *****************************************************************************/
 VOS_VOID SCM_SOCPRDRegShow(VOS_UINT32 ulCfgNum)
@@ -1787,17 +1787,17 @@ VOS_VOID SCM_SOCPRDRegShow(VOS_UINT32 ulCfgNum)
 }
 
 /*****************************************************************************
- 函 数 名  : SCM_GetDebugLogInfo
- 功能描述  : 获取调测信息结构体地址
- 输入参数  :
- 输出参数  : 无
- 返 回 值  : VOS_UINT8*
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2013年7月19日
-     作    者  : d00212987
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_GetDebugLogInfo
+ ????????  : ??????????????????????
+ ????????  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT8*
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2013??7??19??
+     ??    ??  : d00212987
+     ????????  : Creat Function
 *****************************************************************************/
 SCM_INFODATA_STRU* SCM_GetDebugLogInfo(VOS_VOID)
 {
@@ -1805,17 +1805,17 @@ SCM_INFODATA_STRU* SCM_GetDebugLogInfo(VOS_VOID)
 }
 
 /*****************************************************************************
- 函 数 名  : SCM_GetDebugLogInfoLen
- 功能描述  : 获取调测信息结构体长度
- 输入参数  :
- 输出参数  : 无
- 返 回 值  : VOS_UINT8*
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2013年7月19日
-     作    者  : d00212987
-     修改内容  : Creat Function
+ ?? ?? ??  : SCM_GetDebugLogInfoLen
+ ????????  : ??????????????????????
+ ????????  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT8*
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2013??7??19??
+     ??    ??  : d00212987
+     ????????  : Creat Function
 *****************************************************************************/
 VOS_UINT32 SCM_GetDebugLogInfoLen(VOS_VOID)
 {
@@ -1824,19 +1824,19 @@ VOS_UINT32 SCM_GetDebugLogInfoLen(VOS_VOID)
 
 
 /*****************************************************************************
- 函 数 名  : SCM_SocpSendDataToUDISucc
- 功能描述  : 把数据从SOCP通道的缓冲中发送到指定的端口执行成功
- 输入参数  : enChanID       目的通道号
-             enPhyport      物理端口号
-             pstDebugInfo   可维可测信息结构指针
-             pulSendDataLen 预期发送的长度
- 输出参数  : pulSendDataLen 实际发送的长度
- 返 回 值  : VOS_VOID
+ ?? ?? ??  : SCM_SocpSendDataToUDISucc
+ ????????  : ????????SOCP????????????????????????????????????
+ ????????  : enChanID       ??????????
+             enPhyport      ??????????
+             pstDebugInfo   ????????????????????
+             pulSendDataLen ??????????????
+ ????????  : pulSendDataLen ??????????????
+ ?? ?? ??  : VOS_VOID
 
- 修改历史      :
-  1.日    期   : 2014年5月25日
-    作    者   : h59254
-    修改内容   : V8R1 OM_Optimize项目新增
+ ????????      :
+  1.??    ??   : 2014??5??25??
+    ??    ??   : h59254
+    ????????   : V8R1 OM_Optimize????????
 *****************************************************************************/
 VOS_VOID SCM_SocpSendDataToUDISucc(
     SOCP_CODER_DST_ENUM_U32             enChanID,
@@ -1874,19 +1874,19 @@ VOS_VOID SCM_SocpSendDataToUDISucc(
 }
 
 /*****************************************************************************
- 函 数 名  : SCM_SocpSendDataToUDI
- 功能描述  : 用于把数据从SOCP通道的缓冲中发送到指定的端口
- 输入参数  : enChanID:  目的通道号
-             pucVirData:SOCP通道传递的数据虚拟地址
-             pucPHYData:SOCP通道传递的数据物理地址
-             ulDataLen: SOCP通道的数据长度
- 输出参数  : 无
- 返 回 值  : VOS_VOID
+ ?? ?? ??  : SCM_SocpSendDataToUDI
+ ????????  : ????????????SOCP????????????????????????????
+ ????????  : enChanID:  ??????????
+             pucVirData:SOCP??????????????????????
+             pucPHYData:SOCP??????????????????????
+             ulDataLen: SOCP??????????????
+ ????????  : ??
+ ?? ?? ??  : VOS_VOID
 
- 修改历史      :
-  1.日    期   : 2014年5月25日
-    作    者   : h59254
-    修改内容   : V8R1 OM_Optimize项目新增
+ ????????      :
+  1.??    ??   : 2014??5??25??
+    ??    ??   : h59254
+    ????????   : V8R1 OM_Optimize????????
 *****************************************************************************/
 VOS_VOID SCM_SocpSendDataToUDI(SOCP_CODER_DST_ENUM_U32 enChanID, VOS_UINT8 *pucVirData, VOS_UINT8 *pucPHYData, VOS_UINT32 ulDataLen)
 {
@@ -1921,7 +1921,7 @@ VOS_VOID SCM_SocpSendDataToUDI(SOCP_CODER_DST_ENUM_U32 enChanID, VOS_UINT8 *pucV
         return;
     }
 
-    /*参数检查*/
+    /*????????*/
     SOCP_SEND_DATA_PARA_CHECK(pstDebugInfo, ulDataLen, pucVirData);
 
     PPM_GetSendDataLen(enChanID, ulDataLen, &ulSendDataLen, &enPhyport);
@@ -1939,14 +1939,14 @@ VOS_VOID SCM_SocpSendDataToUDI(SOCP_CODER_DST_ENUM_U32 enChanID, VOS_UINT8 *pucV
         /*lint +e40*/
     }
 
-    /* 统计数据通道的吞吐率 */
+    /* ???????????????????? */
     if(CPM_OM_IND_COMM == enLogicPort)
     {
         diag_ThroughputSave(EN_DIAG_THRPUT_DATA_CHN_PHY, ulSendDataLen);
     }
     ulResult = CPM_ComSend(enLogicPort, pucVirData, pucPHYData, ulSendDataLen);
 
-    if(CPM_SEND_ERR == ulResult)  /*当前通道已经发送失败，调用SOCP通道无数据搬运*/
+    if(CPM_SEND_ERR == ulResult)  /*??????????????????????????SOCP??????????????*/
     {
         pstDebugInfo->ulUSBSendErrNum++;
         pstDebugInfo->ulUSBSendErrLen += ulSendDataLen;
@@ -1956,7 +1956,7 @@ VOS_VOID SCM_SocpSendDataToUDI(SOCP_CODER_DST_ENUM_U32 enChanID, VOS_UINT8 *pucV
             diag_ReportLost(EN_DIAG_LOST_CPMWR);
         }
     }
-    else if(CPM_SEND_FUNC_NULL == ulResult)   /*当前通道异常，扔掉所有数据*/
+    else if(CPM_SEND_FUNC_NULL == ulResult)   /*??????????????????????????*/
     {
         pstDebugInfo->ulOmDiscardNum++;
         pstDebugInfo->ulOmDiscardLen += ulDataLen;
@@ -1966,7 +1966,7 @@ VOS_VOID SCM_SocpSendDataToUDI(SOCP_CODER_DST_ENUM_U32 enChanID, VOS_UINT8 *pucV
             diag_ReportLost(EN_DIAG_LOST_CPMWR);
         }
     }
-    else if(CPM_SEND_PARA_ERR == ulResult)   /* 发送数据获取实地址异常 */
+    else if(CPM_SEND_PARA_ERR == ulResult)   /* ?????????????????????? */
     {
         pstDebugInfo->ulOmGetVirtErr++;
         pstDebugInfo->ulOmGetVirtSendLen += ulDataLen;
@@ -1976,7 +1976,7 @@ VOS_VOID SCM_SocpSendDataToUDI(SOCP_CODER_DST_ENUM_U32 enChanID, VOS_UINT8 *pucV
             diag_ReportLost(EN_DIAG_LOST_CPMWR);
         }
     }
-    else if(CPM_SEND_AYNC == ulResult) //增加cpm错误码
+    else if(CPM_SEND_AYNC == ulResult) //????cpm??????
     {
         bUsbSendSucFlag = VOS_TRUE;
         bUsbSendFlag    = VOS_TRUE;
@@ -2016,20 +2016,20 @@ VOS_VOID SCM_SocpSendDataToUDI(SOCP_CODER_DST_ENUM_U32 enChanID, VOS_UINT8 *pucV
 }
 
 /*****************************************************************************
- 函 数 名  : SCM_Init
- 功能描述  : SCM模块相关初始化
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
+ ?? ?? ??  : SCM_Init
+ ????????  : SCM??????????????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
 
- 修改历史      :
-  1.日    期   : 2014年5月25日
-    作    者   : h59254
-    修改内容   : V8R1 OM_Optimize项目新增
+ ????????      :
+  1.??    ??   : 2014??5??25??
+    ??    ??   : h59254
+    ????????   : V8R1 OM_Optimize????????
 *****************************************************************************/
 VOS_UINT32 SCM_Init(VOS_VOID)
 {
-    /* 将OM SOCP目的通道处理函数注册给SCM */
+    /* ??OM SOCP??????????????????????SCM */
     if (VOS_OK != SCM_RegCoderDestProc(SOCP_CODER_DST_OM_CNF, (SCM_CODERDESTFUCN)SCM_SocpSendDataToUDI))
     {
         vos_printf("SCM_Init:SCM_RegCoderDestProc Reg OM CNF Fail.\n");
@@ -2037,7 +2037,7 @@ VOS_UINT32 SCM_Init(VOS_VOID)
         return VOS_ERR;
     }
 
-    /* 将OM SOCP目的通道处理函数注册给SCM */
+    /* ??OM SOCP??????????????????????SCM */
     if (VOS_OK != SCM_RegCoderDestProc(SOCP_CODER_DST_OM_IND, (SCM_CODERDESTFUCN)SCM_SocpSendDataToUDI))
     {
         vos_printf("SCM_Init:SCM_RegCoderDestProc Reg OM IND Fail.\n");
@@ -2054,16 +2054,16 @@ VOS_UINT32 SCM_Init(VOS_VOID)
 }
 
 /*****************************************************************************
- 函 数 名  : COMM_Init
- 功能描述  : 公共仓的初始化，封装为一个统一的接口，在OM PID初始化阶段调用
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
+ ?? ?? ??  : COMM_Init
+ ????????  : ????????????????????????????????????????OM PID??????????????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
 
- 修改历史      :
-  1.日    期   : 2014年5月25日
-    作    者   : h59254
-    修改内容   : V8R1 OM_Optimize项目新增
+ ????????      :
+  1.??    ??   : 2014??5??25??
+    ??    ??   : h59254
+    ????????   : V8R1 OM_Optimize????????
 *****************************************************************************/
 VOS_UINT32 COMM_Init(VOS_VOID)
 {
@@ -2072,7 +2072,7 @@ VOS_UINT32 COMM_Init(VOS_VOID)
         return VOS_ERR;
     }
 
-    /* 初始化物理通道 */
+    /* ?????????????? */
     if (VOS_OK != PPM_InitPhyPort())
     {
         return VOS_ERR;
@@ -2085,18 +2085,18 @@ VOS_UINT32 COMM_Init(VOS_VOID)
 unsigned long long g_scm_dma_mask = (unsigned long long)(-1);
 
 /*****************************************************************************
- 函 数 名  : SCM_FlushCpuCache
- 功能描述  : 刷CPU Cache
- 输入参数  : VOS_VOID *pAddress
+ ?? ?? ??  : SCM_FlushCpuCache
+ ????????  : ??CPU Cache
+ ????????  : VOS_VOID *pAddress
              VOS_INT lSize
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2014年9月16日
-     作    者  : s00207770
-     修改内容  : Creat Function
+ ????????  : ??
+ ?? ?? ??  : ??
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2014??9??16??
+     ??    ??  : s00207770
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_VOID SCM_FlushCpuCache( VOS_VOID *pAddress, VOS_INT lSize )
 {
@@ -2108,18 +2108,18 @@ VOS_VOID SCM_FlushCpuCache( VOS_VOID *pAddress, VOS_INT lSize )
 
 
 /*****************************************************************************
- 函 数 名  : SCM_InvalidCpuCache
- 功能描述  : 刷CPU Cache
- 输入参数  : VOS_VOID *pAddress
+ ?? ?? ??  : SCM_InvalidCpuCache
+ ????????  : ??CPU Cache
+ ????????  : VOS_VOID *pAddress
              VOS_INT lSize
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
- 修改历史  :
-   1.日    期  : 2014年9月16日
-     作    者  : s00207770
-     修改内容  : Creat Function
+ ????????  : ??
+ ?? ?? ??  : ??
+ ????????  :
+ ????????  :
+ ????????  :
+   1.??    ??  : 2014??9??16??
+     ??    ??  : s00207770
+     ????????  : Creat Function
 **************************************************************************** */
 VOS_VOID SCM_InvalidCpuCache( VOS_VOID *pAddress, VOS_INT lSize )
 {

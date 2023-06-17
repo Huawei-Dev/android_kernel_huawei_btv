@@ -49,7 +49,7 @@
 #define _AT_INTERNAL_MSG_H_
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "vos.h"
 
@@ -60,35 +60,35 @@
 #endif
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
-/* 为PC工程回放定义的消息 : 相同版本回放或数据查看用*/
+/* ??PC?????????????????? : ????????????????????????*/
 #define AT_PC_REPLAY_MSG                (0xff)
 
-/* 为PC工程回放定义的消息 : 新版本回放时恢复端口用*/
+/* ??PC?????????????????? : ??????????????????????*/
 #define AT_PC_REPLAY_MSG_CLIENT_TAB     (0xfe)
 
-/* 端口发送的普通at命令消息类型 */
+/* ??????????????at???????????? */
 #define AT_NORMAL_TYPE_MSG              (0x00)
 
-/* 组合命令或缓存命令驱动消息接口 */
+/* ?????????????????????????????? */
 #define AT_COMBIN_BLOCK_MSG             (0xfd)
 
-/* 端口模式切换命令, UART端口检测到"+++"时使用 */
+/* ????????????????, UART??????????"+++"?????? */
 #define AT_SWITCH_CMD_MODE_MSG          (0x31)
 
-/* 端口发送缓存达到低水线 */
+/* ?????????????????????? */
 #define AT_WATER_LOW_MSG                (0x32)
 
 #define AT_NCM_CONN_STATUS_MSG          (0x33)
 
-/* AT命令消息ID起始值 */
+/* AT????????ID?????? */
 #define ID_AT_CMD_BASE_ID               (0x0000)
 
-/* AT普通道消息ID起始值 */
+/* AT??????????ID?????? */
 #define ID_AT_COMM_BASE_ID              (0x1000)
 
-/* AT可维可测消息ID起始值 */
+/* AT????????????ID?????? */
 #define ID_AT_MNTN_RESULT_BASE_ID       (0x2000)
 
 #define ID_AT_MNTN_REPLAY_BASE_ID       (0x2100)
@@ -98,19 +98,19 @@
 #define ID_AT_MNTN_PORT_BASE_ID         (0x2300)
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 /*****************************************************************************
- 枚举名    : AT_INTER_MSG_ID_ENUM
- 枚举说明  : 定义AT到AT内部消息ID
+ ??????    : AT_INTER_MSG_ID_ENUM
+ ????????  : ????AT??AT????????ID
 
-  1.日    期   : 2013年11月06日
-    作    者   : j00174725
-    修改内容   : 定义AT到AT内部消息ID
+  1.??    ??   : 2013??11??06??
+    ??    ??   : j00174725
+    ????????   : ????AT??AT????????ID
 *****************************************************************************/
 enum AT_INTER_MSG_ID_ENUM
 {
-    /* AT命令消息ID定义 [0x0000, 0x0FFF]*/
+    /* AT????????ID???? [0x0000, 0x0FFF]*/
     ID_AT_CMD_PCUI                      = ID_AT_CMD_BASE_ID + 0x01,             /* _H2ASN_MsgChoice AT_MSG_STRU */
     ID_AT_CMD_CTRL                      = ID_AT_CMD_BASE_ID + 0x02,             /* _H2ASN_MsgChoice AT_MSG_STRU */
     ID_AT_CMD_PCUI2                     = ID_AT_CMD_BASE_ID + 0x03,             /* _H2ASN_MsgChoice AT_MSG_STRU */
@@ -172,13 +172,13 @@ enum AT_INTER_MSG_ID_ENUM
     ID_AT_SWITCH_CMD_MODE               = ID_AT_CMD_BASE_ID + 0xFE,             /* _H2ASN_MsgChoice AT_MSG_STRU */
     ID_AT_COMBIN_BLOCK_CMD              = ID_AT_CMD_BASE_ID + 0xFF,             /* _H2ASN_MsgChoice AT_MSG_STRU */
 
-    /* 普通消息 [0x1000, 0x1FFF] */
+    /* ???????? [0x1000, 0x1FFF] */
     ID_AT_COMM_CCPU_RESET_START         = ID_AT_COMM_BASE_ID + 0x01,            /* _H2ASN_MsgChoice AT_MSG_STRU */
     ID_AT_COMM_CCPU_RESET_END           = ID_AT_COMM_BASE_ID + 0x02,            /* _H2ASN_MsgChoice AT_MSG_STRU */
     ID_AT_COMM_HIFI_RESET_START         = ID_AT_COMM_BASE_ID + 0x03,            /* _H2ASN_MsgChoice AT_MSG_STRU */
     ID_AT_COMM_HIFI_RESET_END           = ID_AT_COMM_BASE_ID + 0x04,            /* _H2ASN_MsgChoice AT_MSG_STRU */
 
-    /* AT可维可测消息ID定义 [0x2000, 0x20FF]*/
+    /* AT????????????ID???? [0x2000, 0x20FF]*/
     ID_AT_MNTN_RESULT_PCUI              = ID_AT_MNTN_RESULT_BASE_ID + 0x01,     /* _H2ASN_MsgChoice AT_MSG_STRU */
     ID_AT_MNTN_RESULT_CTRL              = ID_AT_MNTN_RESULT_BASE_ID + 0x02,     /* _H2ASN_MsgChoice AT_MSG_STRU */
     ID_AT_MNTN_RESULT_PCUI2             = ID_AT_MNTN_RESULT_BASE_ID + 0x03,     /* _H2ASN_MsgChoice AT_MSG_STRU */
@@ -239,11 +239,11 @@ enum AT_INTER_MSG_ID_ENUM
     ID_AT_MNTN_RESULT_BROADCAST_MODEM_1 = ID_AT_MNTN_RESULT_BASE_ID + 0xFE,     /* _H2ASN_MsgChoice AT_MSG_STRU */
     ID_AT_MNTN_RESULT_BROADCAST_MODEM_0 = ID_AT_MNTN_RESULT_BASE_ID + 0xFF,     /* _H2ASN_MsgChoice AT_MSG_STRU */
 
-    /* 回放相关可维可测 [0x2100, 0x21FF] */
+    /* ???????????????? [0x2100, 0x21FF] */
     ID_AT_MNTN_PC_REPLAY_CLIENT_TAB     = ID_AT_MNTN_REPLAY_BASE_ID + 0x01,     /* _H2ASN_MsgChoice NAS_AT_SDT_AT_CLIENT_TABLE_STRU */
     ID_AT_MNTN_PC_REPLAY_MSG            = ID_AT_MNTN_REPLAY_BASE_ID + 0x02,     /* _H2ASN_MsgChoice NAS_AT_SDT_AT_PART_ST */
 
-    /* 流控相关可维可测 [0x2201, 0x22FF] */
+    /* ???????????????? [0x2201, 0x22FF] */
     ID_AT_MNTN_INPUT_MSC                = ID_AT_MNTN_FC_BASE_ID + 0x01,         /* _H2ASN_MsgChoice AT_MNTN_MSC_STRU */
     ID_AT_MNTN_OUTPUT_MSC               = ID_AT_MNTN_FC_BASE_ID + 0x02,         /* _H2ASN_MsgChoice AT_MNTN_MSC_STRU */
     ID_AT_MNTN_START_FLOW_CTRL          = ID_AT_MNTN_FC_BASE_ID + 0x03,         /* _H2ASN_MsgChoice AT_MNTN_FLOW_CTRL_STRU */
@@ -251,41 +251,41 @@ enum AT_INTER_MSG_ID_ENUM
     ID_AT_MNTN_REG_FC_POINT             = ID_AT_MNTN_FC_BASE_ID + 0x05,         /* _H2ASN_MsgChoice AT_MNTN_FC_POINT_STRU */
     ID_AT_MNTN_DEREG_FC_POINT           = ID_AT_MNTN_FC_BASE_ID + 0x06,         /* _H2ASN_MsgChoice AT_MNTN_FC_POINT_STRU */
 
-    /* 端口信息相关可维可测 [0x2301, 0x23FF] */
+    /* ???????????????????? [0x2301, 0x23FF] */
     ID_AT_MNTN_RPT_PORT                 = ID_AT_MNTN_PORT_BASE_ID + 0x01,       /* _H2ASN_MsgChoice AT_MNTN_RPTPORT_STRU */
 
 };
 typedef VOS_UINT32 AT_INTER_MSG_ID_ENUM_UINT32;
 
 /*****************************************************************************
-  4 全局变量声明
+  4 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  5 消息头定义
+  5 ??????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 消息定义
+  6 ????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  7 STRUCT定义
+  7 STRUCT????
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : AT_MSG_STRU
- 结构说明  : AT消息结构体
- 1.日    期   : 2013年11月13日
-   作    者   : j00174725
-   修改内容   :
+ ??????    : AT_MSG_STRU
+ ????????  : AT??????????
+ 1.??    ??   : 2013??11??13??
+   ??    ??   : j00174725
+   ????????   :
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
-    AT_INTER_MSG_ID_ENUM_UINT32         enMsgId;            /* 消息类型     */  /* _H2ASN_Skip */
+    AT_INTER_MSG_ID_ENUM_UINT32         enMsgId;            /* ????????     */  /* _H2ASN_Skip */
     VOS_UINT8                           ucType;
     VOS_UINT8                           ucIndex;
     VOS_UINT8                           ucUserType;
@@ -295,15 +295,15 @@ typedef struct
 }AT_MSG_STRU;
 
 /*****************************************************************************
-  8 UNION定义
+  8 UNION????
 *****************************************************************************/
 
 /*****************************************************************************
-  9 OTHERS定义
+  9 OTHERS????
 *****************************************************************************/
 
 /*****************************************************************************
-  H2ASN顶级消息结构定义
+  H2ASN????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -323,7 +323,7 @@ typedef struct
 
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 
 

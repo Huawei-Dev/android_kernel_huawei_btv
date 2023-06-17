@@ -46,12 +46,9 @@
  *
  */
 
-
-/*lint --e{537} */
 #include <bsp_pm_om.h>
 #include "icc_core.h"
 #include "icc_platform.h"
-
 
 struct icc_pm_om
 {
@@ -74,7 +71,7 @@ s32 bsp_icc_debug_register(u32 channel_id, FUNCPTR_1 debug_routine, int param)
 		icc_print_error("invalide parameter! channel_id=0x%x\n", channel_id);
 		return ICC_INVALID_PARA;
 	}
-	/*lint --e{409} */
+
 	vector = &(g_icc_ctrl.channels[GET_CHN_ID(channel_id)]->vector[GET_FUNC_ID(channel_id)]);
 	vector->pm_debug.debug_routine = debug_routine;
 	vector->pm_debug.para = param;
@@ -97,7 +94,7 @@ void run_icc_pm_debug_callback(void)
 		for (j = 0; j < channel->func_size; j++)
 		{
 			vector =  &(channel->vector[j]);
-			if(vector && vector->pm_debug.debug_routine) /*lint !e774 */
+			if(vector && vector->pm_debug.debug_routine)
 			{
 				(void)vector->pm_debug.debug_routine(vector->pm_debug.para);
 			}
@@ -198,7 +195,7 @@ void icc_channel_vector_dump(u32 channel_id, u32 func_id)
 	func_id    %= g_icc_ctrl.channels[channel_id]->func_size;
 	vector = &(g_icc_ctrl.channels[channel_id]->vector[func_id]);
 
-	if(!vector) /*lint !e774 */
+	if(!vector)
 	{
 		icc_print_error("vector pointer is NULL!\n");
 		return;
@@ -292,10 +289,9 @@ void icc_dbg_info_print(const char *fifo_name, u32 channel_id, u8 *data, u32 dat
 	}
 }
 
-/* 如果在中断中，则返回0 */
 u32 icc_taskid_get(void)
 {
-	if (in_interrupt()) /*lint !e737 */
+	if (in_interrupt())
 	{
 		return 0;
 	}
@@ -356,7 +352,6 @@ void icc_msg_dump(struct icc_msg_fifo *queue, u32 start, u32 end)
 
 }
 
-
 /* msg_type: 0, recv; 1, send */
 void icc_channel_info_show(u32 msg_type, u32 real_channel_id)
 {
@@ -405,13 +400,11 @@ void icc_sub_channel_info_show_all(u32 msg_type, u32 real_channel_id)
 
 void icc_recv_ipc_int_show(void)
 {
-	icc_print_info("*******icc收到的ipc中断统计*******\n");
 	icc_print_info("ipc_int_cnt: %d\n", g_icc_dbg.ipc_int_cnt);
 }
 
 void icc_errno_show(void)
 {
-	icc_print_info("******************icc错误码信息******************\n");
 	icc_print_info("0x%x: channel init error\n",ICC_CHN_INIT_FAIL);
 	icc_print_info("0x%x: malloc channel memory fail\n",ICC_MALLOC_CHANNEL_FAIL);
 	icc_print_info("0x%x: malloc rector memory fail\n",ICC_MALLOC_VECTOR_FAIL);
@@ -438,32 +431,15 @@ void icc_print_level_set(u32 level)
 
 void icc_struct_dump(void)
 {
-	icc_print_info("***************************icc结构体信息***************************\n");
-	icc_print_info("icc初始化信息            : icc_init_info_dump channel_id\n");
-	icc_print_info("icc_control结构体        : icc_control_dump\n");
-	icc_print_info("icc_channel结构体        : icc_channel_dump channel_id\n");
-	icc_print_info("icc_channel_fifo结构体   : icc_channel_fifo_dump channel_id\n");
-	icc_print_info("icc_channel_vector结构体 : icc_channel_vector_dump channel_id func_id\n");
-	icc_print_info("结构体显示函数参数说明   : channel_id, 主通道号; fucn_id,子通道号\n");
 }
 
 void icc_help(void)
 {
-	icc_print_info("***************************************icc调试帮助信息***************************************\n");
-	icc_print_info("结构体信息dump          : icc_struct_dump\n");
-	icc_print_info("调试打印开关            : icc_dbg_print_sw 0|1\n");
-	icc_print_info("错误码说明              : icc_errno_show\n");
-	icc_print_info("收到ipc中断统计         : icc_recv_ipc_int_show\n");
-	icc_print_info("最近n条收发消息显示     : icc_msg_record_show msg_type msg_num\n");
-	icc_print_info("单个通道统计信息        : icc_channel_info_show msg_type channel_id\n");
-	icc_print_info("所有子通道统计信息      : icc_sub_channel_info_show_all msg_type channel_id\n");
-	icc_print_info("单个子通道统计信息      : icc_sub_channel_info_show msg_type channel_id func_id\n");
-	icc_print_info("收发消息显示函数参数说明: msg_type, 消息类型(0: 接收; 1: 发送); msg_num, 显示消息个数(<=10)\n");
-	icc_print_info("通道统计信息函数参数说明: msg_type, 同上; channel_id, 主通道号; fucn_id, 子通道号\n");
+
 }
 
 void icc_dump_hook(void)
-{/*lint --e{539}*/
+{
     char *dump_buf = g_icc_dbg.dump_buf_addr;
     u32  dump_size = g_icc_dbg.dump_buf_size;
 
@@ -484,13 +460,13 @@ void icc_dump_init(void)
     /* reg the dump callback to om */
 	if(BSP_ERROR == bsp_dump_register_hook("ICC",(dump_hook)icc_dump_hook))
 	{
-	    goto err_ret; /*lint !e801 */
+	    goto err_ret;
 	}
 
     g_icc_dbg.dump_buf_addr = (char *)bsp_dump_register_field(ICC_DUMP_SAVE_MOD, "ICC", 0, 0, ICC_DUMP_EXT_SIZE, 0x0001);
     if(g_icc_dbg.dump_buf_addr == NULL)
     {
-        goto err_ret; /*lint !e801 */
+        goto err_ret;
     }
     g_icc_dbg.dump_buf_size = ICC_DUMP_EXT_SIZE;
 
@@ -514,7 +490,6 @@ s32  icc_debug_init(u32 channel_num)
 
 	for(i = 0; i < channel_num; i++)
 	{
-		/* 使用g_icc_ctrl而不是g_icc_init_info，因为测试编进去以后，统计通道不需要再处理 */
 		if (!g_icc_ctrl.channels[i])
 		{
 		    continue ;
@@ -528,7 +503,6 @@ s32  icc_debug_init(u32 channel_num)
 			return (s32)ICC_ERR;
 		}
 
-		/* 收发子通道一同分配 */
 		sub_channel = (struct icc_channel_stat_info *)osl_malloc(sizeof(struct icc_channel_stat_info) * icc_channel->func_size * 2);
 		if (!sub_channel)
 		{
@@ -544,12 +518,12 @@ s32  icc_debug_init(u32 channel_num)
 		channel->send.func_size= icc_channel->func_size;
 
 		/* sub channel init */
-		(void)memset_s((void *)sub_channel, sizeof(struct icc_channel_stat_info) * icc_channel->func_size * 2,/* [false alarm]:屏蔽Fortify误报 */
-			0, sizeof(struct icc_channel_stat_info) * icc_channel->func_size * 2); /*lint !e665 */
+		(void)memset_s((void *)sub_channel, sizeof(struct icc_channel_stat_info) * icc_channel->func_size * 2,
+			0, sizeof(struct icc_channel_stat_info) * icc_channel->func_size * 2);
 		channel->send.sub_chn  = sub_channel;
 		channel->recv.sub_chn  = &(sub_channel[icc_channel->func_size]);
 		
-		g_icc_dbg.channel_stat[channel->id] = channel;/* [false alarm]:屏蔽Fortify误报 */
+		g_icc_dbg.channel_stat[channel->id] = channel;
 	}
 
 	icc_dump_init();
@@ -579,7 +553,6 @@ void icc_debug_before_send(struct icc_channel_packet *packet)
 {
 	msg_tx.duration_prev = bsp_get_slice_value();
 	msg_tx.send_task_id = icc_taskid_get();
-	/* 发送数据包的任务ID及时间戳 */	
 	packet->timestamp = msg_tx.duration_prev;
 	packet->task_id = msg_tx.send_task_id;
 }
@@ -653,5 +626,3 @@ void icc_debug_after_recv(struct icc_channel_packet *pkg_header)
 	icc_channel_msg_stat(&(g_icc_dbg.channel_stat[GET_CHN_ID(channel_id)]->recv.sub_chn[GET_FUNC_ID(channel_id)]), \
 		msg_rx.len, msg_rx.recv_task_id);
 }
-
-

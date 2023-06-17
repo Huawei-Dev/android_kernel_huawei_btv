@@ -38,7 +38,7 @@ extern "C" {
 #define BASTET_HPRTODCH_SUPPORT             (0x01)
 #define BASTET_CHNL_LPM_SUPPORT             (0x02)
 
-#define NV_PLATFORM_MAX_RAT_NUM             (7)               /* 接入技术最大值 */
+#define NV_PLATFORM_MAX_RAT_NUM             (7)               /* ?????????????? */
 
 #define NV_PLATFORM_MAX_MODEM_NUM           (8)
 
@@ -90,104 +90,104 @@ typedef VOS_UINT32  RATIO_RESET_TYPE_ENUM_UINT32;
 *****************************************************************************/
 /*****************************************************************************
 *                                                                            *
-*                           参数设置消息结构                                 *
+*                           ????????????????                                 *
 *                                                                            *
 ******************************************************************************/
 
 /*****************************************************************************
- 结构名    : TTF_MEM_POOL_CFG_NV_STRU
- 结构说明  : TTF_MEM_POOL_CFG_NV结构
+ ??????    : TTF_MEM_POOL_CFG_NV_STRU
+ ????????  : TTF_MEM_POOL_CFG_NV????
 *****************************************************************************/
 typedef struct
 {
     VOS_UINT8                      ucClusterCnt;
     VOS_UINT8                      aucReserved[1];
-    VOS_UINT16                     ausBlkSize[TTF_MEM_MAX_CLUSTER_NUM];         /* 本级数的大小 */
-    VOS_UINT16                     ausBlkCnt[TTF_MEM_MAX_CLUSTER_NUM];          /* 本级个数 */
+    VOS_UINT16                     ausBlkSize[TTF_MEM_MAX_CLUSTER_NUM];         /* ???????????? */
+    VOS_UINT16                     ausBlkCnt[TTF_MEM_MAX_CLUSTER_NUM];          /* ???????? */
 }TTF_MEM_POOL_CFG_NV_STRU;
 
 /*****************************************************************************
- 结构名    : TTF_MEM_SOLUTION_CFG_NV_STRU
- 结构说明  : TTF_MEM_SOLUTION_CFG对应的NV结构
+ ??????    : TTF_MEM_SOLUTION_CFG_NV_STRU
+ ????????  : TTF_MEM_SOLUTION_CFG??????NV????
 *****************************************************************************/
 typedef struct
 {
     VOS_UINT8                           ucPoolCnt;
-    VOS_UINT8                           ucPoolMask;                             /* 对应内存池是否生效掩码位，bit来标示，1- 生效， 0- 不生效*/
+    VOS_UINT8                           ucPoolMask;                             /* ??????????????????????????bit????????1- ?????? 0- ??????*/
     TTF_MEM_POOL_CFG_NV_STRU            astTtfMemPoolCfgInfo[TTF_MEM_POOL_NV_NUM];
     VOS_UINT8                           aucReserve[2];
 }TTF_MEM_SOLUTION_CFG_NV_STRU;
 
 /*****************************************************************************
- 结构名    : FC_CFG_CPU_STRU
- 结构说明  : FC_CFG_CPU结构,CPU流控的门限和配置值
+ ??????    : FC_CFG_CPU_STRU
+ ????????  : FC_CFG_CPU????,CPU??????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulCpuOverLoadVal;                       /*Range:[0,100]*//* CPU流控门限 */
-    VOS_UINT32                          ulCpuUnderLoadVal;                      /*Range:[0,100]*//* CPU解除流控门限 */
-    VOS_UINT32                          ulSmoothTimerLen;                       /*Range:[2,1000]*//* CPU流控平滑次数，单位:CPU监控周期 */
-    VOS_UINT32                          ulStopAttemptTimerLen;                  /* CPU引发R接口流控后，数传中断时间较长，启动定时器，尝试提前解除，单位: 毫秒，0表示不使用 */
-    VOS_UINT32                          ulUmUlRateThreshold;                    /* 空口上行速率门限，高于此门限，认为是数传引起的CPU负载高，需要流控 */
-    VOS_UINT32                          ulUmDlRateThreshold;                    /* 空口下行速率门限，高于此门限，认为是数传引起的CPU负载高，需要流控 */
-    VOS_UINT32                          ulRmRateThreshold;                      /* E5形态下， WIFI/USB入口处速率门限， 高于此门限，认为是数传引起的CPU负载高，需要流控，单位bps */
+    VOS_UINT32                          ulCpuOverLoadVal;                       /*Range:[0,100]*//* CPU???????? */
+    VOS_UINT32                          ulCpuUnderLoadVal;                      /*Range:[0,100]*//* CPU???????????? */
+    VOS_UINT32                          ulSmoothTimerLen;                       /*Range:[2,1000]*//* CPU??????????????????:CPU???????? */
+    VOS_UINT32                          ulStopAttemptTimerLen;                  /* CPU????R????????????????????????????????????????????????????????????: ??????0?????????? */
+    VOS_UINT32                          ulUmUlRateThreshold;                    /* ??????????????????????????????????????????????CPU???????????????? */
+    VOS_UINT32                          ulUmDlRateThreshold;                    /* ??????????????????????????????????????????????CPU???????????????? */
+    VOS_UINT32                          ulRmRateThreshold;                      /* E5???????? WIFI/USB???????????????? ????????????????????????????CPU??????????????????????bps */
 } FC_CFG_CPU_STRU;
 
 /*****************************************************************************
- 结构名    : FC_CFG_MEM_THRESHOLD_STRU
- 结构说明  : FC_CFG_MEM_THRESHOLD结构,MEM流控的门限和配置值
+ ??????    : FC_CFG_MEM_THRESHOLD_STRU
+ ????????  : FC_CFG_MEM_THRESHOLD????,MEM??????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulSetThreshold;                         /* 启动流控门限 单位字节 */
-    VOS_UINT32                          ulStopThreshold;                        /* 停止流控门限 单位字节 */
+    VOS_UINT32                          ulSetThreshold;                         /* ???????????? ???????? */
+    VOS_UINT32                          ulStopThreshold;                        /* ???????????? ???????? */
 } FC_CFG_MEM_THRESHOLD_STRU;
 
 /*****************************************************************************
- 结构名    : FC_CFG_MEM_THRESHOLD_CST_STRU
- 结构说明  : FC_CFG_MEM_THRESHOLD_CST结构,MEM流控的门限和配置值
+ ??????    : FC_CFG_MEM_THRESHOLD_CST_STRU
+ ????????  : FC_CFG_MEM_THRESHOLD_CST????,MEM??????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulSetThreshold;                         /*Range:[0,4096]*//* 启动流控门限 单位字节 */
-    VOS_UINT32                          ulStopThreshold;                        /*Range:[0,4096]*//* 停止流控门限 单位字节 */
+    VOS_UINT32                          ulSetThreshold;                         /*Range:[0,4096]*//* ???????????? ???????? */
+    VOS_UINT32                          ulStopThreshold;                        /*Range:[0,4096]*//* ???????????? ???????? */
 } FC_CFG_MEM_THRESHOLD_CST_STRU;
 
 
 /*****************************************************************************
- 结构名    : FC_CFG_UM_UL_RATE_STRU
- 结构说明  : FC_CFG_UM_UL_RATE结构,空口上行速率档位
+ ??????    : FC_CFG_UM_UL_RATE_STRU
+ ????????  : FC_CFG_UM_UL_RATE????,????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucRateCnt;                              /*Range:[0,11]*//* 上行速率档位个数，最多支持11个档位设置，但是优先级最高为FC_PRI_9，所以使用档位时只有前9档生效 */
+    VOS_UINT8                           ucRateCnt;                              /*Range:[0,11]*//* ??????????????????????????11????????????????????????????FC_PRI_9??????????????????????9?????? */
     VOS_UINT8                           aucRsv[1];
-    VOS_UINT16                          ausRate[FC_UL_RATE_MAX_LEV];            /* 上行速率限制，取值范围[0,65535]，单位bps */
+    VOS_UINT16                          ausRate[FC_UL_RATE_MAX_LEV];            /* ??????????????????????[0,65535]??????bps */
 } FC_CFG_UM_UL_RATE_STRU;
 
 /*****************************************************************************
- 结构名    : FC_CFG_NV_STRU
- 结构说明  : FC_CFG_NV对应的NV结构
+ ??????    : FC_CFG_NV_STRU
+ ????????  : FC_CFG_NV??????NV????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulFcEnbaleMask;                         /* 流控使能标识 */
-    FC_CFG_CPU_STRU                     stFcCfgCpuA;                            /* A核CPU流控门限 */
+    VOS_UINT32                          ulFcEnbaleMask;                         /* ???????????? */
+    FC_CFG_CPU_STRU                     stFcCfgCpuA;                            /* A??CPU???????? */
     VOS_UINT32                          ulFcCfgMemThresholdCnt;                 /*Range:[0,8]*/
-    FC_CFG_MEM_THRESHOLD_STRU           stFcCfgMem[FC_MEM_THRESHOLD_LEV_BUTT];  /* A核内存流控门限 */
-    FC_CFG_MEM_THRESHOLD_CST_STRU       stFcCfgCst;                             /* CSD业务流控门限 */
-    FC_CFG_MEM_THRESHOLD_STRU           stFcCfgGprsMemSize;                     /* G模内存总量流控门限 */
-    FC_CFG_MEM_THRESHOLD_STRU           stFcCfgGprsMemCnt;                      /* G模内存块数流控门限 */
-    FC_CFG_CPU_STRU                     stFcCfgCpuC;                            /* C核CPU流控门限 */
-    FC_CFG_UM_UL_RATE_STRU              stFcCfgUmUlRateForCpu;                  /* C核CPU流控上行速率档位配置 */
-    FC_CFG_UM_UL_RATE_STRU              stFcCfgUmUlRateForTmp;                  /* C核温度流控上行行速率档位配置 */
-    FC_CFG_MEM_THRESHOLD_STRU           stFcCfgCdmaMemSize;                     /* X模内存总量流控门限 */
-    FC_CFG_MEM_THRESHOLD_STRU           stFcCfgCdmaMemCnt;                      /* X模内存块数流控门限 */
+    FC_CFG_MEM_THRESHOLD_STRU           stFcCfgMem[FC_MEM_THRESHOLD_LEV_BUTT];  /* A?????????????? */
+    FC_CFG_MEM_THRESHOLD_CST_STRU       stFcCfgCst;                             /* CSD???????????? */
+    FC_CFG_MEM_THRESHOLD_STRU           stFcCfgGprsMemSize;                     /* G?????????????????? */
+    FC_CFG_MEM_THRESHOLD_STRU           stFcCfgGprsMemCnt;                      /* G?????????????????? */
+    FC_CFG_CPU_STRU                     stFcCfgCpuC;                            /* C??CPU???????? */
+    FC_CFG_UM_UL_RATE_STRU              stFcCfgUmUlRateForCpu;                  /* C??CPU???????????????????? */
+    FC_CFG_UM_UL_RATE_STRU              stFcCfgUmUlRateForTmp;                  /* C???????????????????????????? */
+    FC_CFG_MEM_THRESHOLD_STRU           stFcCfgCdmaMemSize;                     /* X?????????????????? */
+    FC_CFG_MEM_THRESHOLD_STRU           stFcCfgCdmaMemCnt;                      /* X?????????????????? */
 } FC_CFG_NV_STRU;
 
 /*****************************************************************************
- 结构名    : CPULOAD_CFG_STRU
- 结构说明  : CPULOAD_CFG对应的NV结构,CPU流控的门限和配置值
+ ??????    : CPULOAD_CFG_STRU
+ ????????  : CPULOAD_CFG??????NV????,CPU??????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -196,11 +196,11 @@ typedef struct
 
 typedef struct
 {
-    VOS_UINT8                          ucHostOutTimeout;    /* PC驱动组包时延 */
-    VOS_UINT8                          ucEthTxMinNum;       /* UE驱动下行组包个数 */
-    VOS_UINT8                          ucEthTxTimeout;      /* UE驱动下行组包时延 */
-    VOS_UINT8                          ucEthRxMinNum;       /* UE驱动上行组包个数 */
-    VOS_UINT8                          ucEthRxTimeout;      /* UE驱动上行组包时延 */
+    VOS_UINT8                          ucHostOutTimeout;    /* PC???????????? */
+    VOS_UINT8                          ucEthTxMinNum;       /* UE???????????????? */
+    VOS_UINT8                          ucEthTxTimeout;      /* UE???????????????? */
+    VOS_UINT8                          ucEthRxMinNum;       /* UE???????????????? */
+    VOS_UINT8                          ucEthRxTimeout;      /* UE???????????????? */
     VOS_UINT8                          ucCdsGuDlThres;
     VOS_UINT8                          aucRsv[2];
 }FC_DRV_ASSEM_PARA_STRU;
@@ -212,8 +212,8 @@ typedef struct
 }FC_CPU_DRV_ASSEM_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : FC_CPU_DRV_ASSEM_PARA_NV_STRU
- 结构说明  : FC_CPU_DRV_ASSEM对应的NV结构
+ ??????    : FC_CPU_DRV_ASSEM_PARA_NV_STRU
+ ????????  : FC_CPU_DRV_ASSEM??????NV????
 *****************************************************************************/
 typedef struct
 {
@@ -225,42 +225,42 @@ typedef struct
 }FC_CPU_DRV_ASSEM_PARA_NV_STRU;
 
 /*****************************************************************************
- 结构名    : WTTF_MACDL_WATERMARK_LEVEL_STRU
- 结构说明  : WTTF_MACDL_BBMST_WATER_LEVEL对应的NV结构,BBP译码中断水线等级结构
+ ??????    : WTTF_MACDL_WATERMARK_LEVEL_STRU
+ ????????  : WTTF_MACDL_BBMST_WATER_LEVEL??????NV????,BBP????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulWaterLevelOne;                        /* 水线界别1 */
-    VOS_UINT32                          ulWaterLevelTwo;                        /* 水线界别2 */
-    VOS_UINT32                          ulWaterLevelThree;                      /* 水线界别3 */
-    VOS_UINT32                          ulWaterLevelFour;                       /* 水线界别4,预留 */
+    VOS_UINT32                          ulWaterLevelOne;                        /* ????????1 */
+    VOS_UINT32                          ulWaterLevelTwo;                        /* ????????2 */
+    VOS_UINT32                          ulWaterLevelThree;                      /* ????????3 */
+    VOS_UINT32                          ulWaterLevelFour;                       /* ????????4,???? */
 } WTTF_MACDL_WATERMARK_LEVEL_STRU;
 
 /*****************************************************************************
- 结构名    : WTTF_MACDL_BBPMST_TB_HEAD_STRU
- 结构说明  : WTTF_MACDL_BBMST_TB_HEAD对应的NV结构,BBP译码中断水线等级结构
+ ??????    : WTTF_MACDL_BBPMST_TB_HEAD_STRU
+ ????????  : WTTF_MACDL_BBMST_TB_HEAD??????NV????,BBP????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulTBHeadNum;                /* TB头部块个数 */
-    VOS_UINT32                          ulTBHeadReserved;           /* TB头部块预留的TB块数，预留3帧，V9R1 30块，V3R3 15块  */
+    VOS_UINT32                          ulTBHeadNum;                /* TB?????????? */
+    VOS_UINT32                          ulTBHeadReserved;           /* TB????????????TB??????????3????V9R1 30????V3R3 15??  */
 } WTTF_MACDL_BBPMST_TB_HEAD_STRU;
 
 /*****************************************************************************
- 结构名    : WTTF_SRB_NOT_SEND_THRESHOLD_STRU
- 结构说明  : WTTF_SRB_NOT_SEND_THRESHOLD_STRU对应的NV结构
+ ??????    : WTTF_SRB_NOT_SEND_THRESHOLD_STRU
+ ????????  : WTTF_SRB_NOT_SEND_THRESHOLD_STRU??????NV????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulWttfSrbNotSendThreshold;                /* SRB不发送测量报告的门限 */
+    VOS_UINT32                          ulWttfSrbNotSendThreshold;                /* SRB???????????????????? */
 } WTTF_SRB_NOT_SEND_THRESHOLD_STRU;
 
 
 /*****************************************************************************
- 结构名    : NF_EXT_NV_STRU
- 结构说明  : NETFILTER_HOOK_MASK对应的NV结构,设置勾包点的NV项，预留5种掩码组合:
-             ulNvValue1~ulNvValue5, 每个掩码取值范围为0-FFFFFFFF,
-             其中掩码位为1则代表该掩码位对应的钩子函数可能会被注册到内核中
+ ??????    : NF_EXT_NV_STRU
+ ????????  : NETFILTER_HOOK_MASK??????NV????,????????????NV????????5??????????:
+             ulNvValue1~ulNvValue5, ??????????????????0-FFFFFFFF,
+             ????????????1????????????????????????????????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -272,8 +272,8 @@ typedef struct
 }NF_EXT_NV_STRU;
 
 /*****************************************************************************
- 结构名    : EXT_TEBS_FLAG_NV_STRU
- 结构说明  : NV_Ext_Tebs_Flag对应的NV结构
+ ??????    : EXT_TEBS_FLAG_NV_STRU
+ ????????  : NV_Ext_Tebs_Flag??????NV????
 *****************************************************************************/
 typedef struct
 {
@@ -281,8 +281,8 @@ typedef struct
 }EXT_TEBS_FLAG_NV_STRU;
 
 /*****************************************************************************
- 结构名    : TCP_ACK_DELETE_FLG_NV_STRU
- 结构说明  : NV_TCP_ACK_Delete_Flg对应的NV结构
+ ??????    : TCP_ACK_DELETE_FLG_NV_STRU
+ ????????  : NV_TCP_ACK_Delete_Flg??????NV????
 *****************************************************************************/
 typedef struct
 {
@@ -290,8 +290,8 @@ typedef struct
 }TCP_ACK_DELETE_FLG_NV_STRU;
 
 /*****************************************************************************
- 结构名    : HUAWEI_IRAN_OPEN_PAGE_I_NV_STRU
- 结构说明  : HUAWEI_IRAN_OPEN_PAGE_I_NV结构
+ ??????    : HUAWEI_IRAN_OPEN_PAGE_I_NV_STRU
+ ????????  : HUAWEI_IRAN_OPEN_PAGE_I_NV????
 *****************************************************************************/
 typedef struct
 {
@@ -300,8 +300,8 @@ typedef struct
 }HUAWEI_IRAN_OPEN_PAGE_I_NV_STRU;
 
 /*****************************************************************************
- 结构名    : GCF_TYPE_CONTENT_NV_STRU
- 结构说明  : GCFTypeContent对应的NV结构
+ ??????    : GCF_TYPE_CONTENT_NV_STRU
+ ????????  : GCFTypeContent??????NV????
 *****************************************************************************/
 typedef struct
 {
@@ -309,8 +309,8 @@ typedef struct
 }GCF_TYPE_CONTENT_NV_STRU;
 
 /*****************************************************************************
- 结构名    : W_RF8960_BER_TEST_NV_STRU
- 结构说明  : W_RF8960_BER_Test对应的NV结构
+ ??????    : W_RF8960_BER_TEST_NV_STRU
+ ????????  : W_RF8960_BER_Test??????NV????
 *****************************************************************************/
 typedef struct
 {
@@ -318,8 +318,8 @@ typedef struct
 }W_RF8960_BER_TEST_NV_STRU;
 
 /*****************************************************************************
- 结构名    : LAPDM_RAND_BIT_NV_STRU
- 结构说明  : LAPDM_RAND_BIT对应的NV结构
+ ??????    : LAPDM_RAND_BIT_NV_STRU
+ ????????  : LAPDM_RAND_BIT??????NV????
 *****************************************************************************/
 typedef struct
 {
@@ -328,8 +328,8 @@ typedef struct
 }LAPDM_RAND_BIT_NV_STRU;
 
 /*****************************************************************************
- 结构名    : CBS_W_DRX_SWITCH_NV_STRU
- 结构说明  : CBS_W_DRX_Switch对应的NV结构
+ ??????    : CBS_W_DRX_SWITCH_NV_STRU
+ ????????  : CBS_W_DRX_Switch??????NV????
 *****************************************************************************/
 typedef struct
 {
@@ -337,8 +337,8 @@ typedef struct
 }CBS_W_DRX_SWITCH_NV_STRU;
 
 /*****************************************************************************
- 结构名    : CBS_W_WAIT_NEW_CBS_MSG_TIMER_NV_STRU
- 结构说明  : CBS_W_WaitNewCBSMsgTimer对应的NV结构
+ ??????    : CBS_W_WAIT_NEW_CBS_MSG_TIMER_NV_STRU
+ ????????  : CBS_W_WaitNewCBSMsgTimer??????NV????
 *****************************************************************************/
 typedef struct
 {
@@ -346,8 +346,8 @@ typedef struct
 }CBS_W_WAIT_NEW_CBS_MSG_TIMER_NV_STRU;
 
 /*****************************************************************************
- 结构名    : CBS_W_WAIT_SHED_MSG_TIMER_NV_STRU
- 结构说明  : CBS_W_WaitShedMsgTimer对应的NV结构
+ ??????    : CBS_W_WAIT_SHED_MSG_TIMER_NV_STRU
+ ????????  : CBS_W_WaitShedMsgTimer??????NV????
 *****************************************************************************/
 typedef struct
 {
@@ -355,8 +355,8 @@ typedef struct
 }CBS_W_WAIT_SHED_MSG_TIMER_NV_STRU;
 
 /*****************************************************************************
- 结构名    : FC_QOS_STRU
- 结构说明  : FC_QOS_STRU 打桩使用结构,目前代码中已经不使用，为了保持NV结构不变化
+ ??????    : FC_QOS_STRU
+ ????????  : FC_QOS_STRU ????????????,??????????????????????????????NV??????????
 *****************************************************************************/
 
 typedef struct
@@ -366,8 +366,8 @@ typedef struct
 }FC_QOS_STRU;
 
 /*****************************************************************************
- 结构名    : CPU_FLOW_CTRL_CONFIG_NV_STRU
- 结构说明  : CPU_FLOW_CTRL_CONFIG_STRU对应的NV结构，已废弃，打桩提供
+ ??????    : CPU_FLOW_CTRL_CONFIG_NV_STRU
+ ????????  : CPU_FLOW_CTRL_CONFIG_STRU??????NV??????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -389,8 +389,8 @@ typedef struct
 }CPU_FLOW_CTRL_CONFIG_NV_STRU;
 
 /*****************************************************************************
- 结构名    : R_ITF_FLOW_CTRL_CONFIG_STRU
- 结构说明  : R_ITF_FLOW_CTRL_CONFIG_STRU对应的NV结构
+ ??????    : R_ITF_FLOW_CTRL_CONFIG_STRU
+ ????????  : R_ITF_FLOW_CTRL_CONFIG_STRU??????NV????
 *****************************************************************************/
 typedef struct
 {
@@ -399,8 +399,8 @@ typedef struct
 } R_ITF_FLOW_CTRL_CONFIG_STRU;
 
 /*****************************************************************************
- 结构名    : TFC_POWER_FUN_ENABLE_NV_STRU
- 结构说明  : TFC_POWER_FUN_ENABLE对应的NV结构
+ ??????    : TFC_POWER_FUN_ENABLE_NV_STRU
+ ????????  : TFC_POWER_FUN_ENABLE??????NV????
 *****************************************************************************/
 typedef struct
 {
@@ -408,8 +408,8 @@ typedef struct
 }TFC_POWER_FUN_ENABLE_NV_STRU;
 
 /*****************************************************************************
-结构名    : PPP_CONFIG_MRU_TYPE_NV_STRU
-结构说明  : PPP_CONFIG_MRU_Type对应的NV结构
+??????    : PPP_CONFIG_MRU_TYPE_NV_STRU
+????????  : PPP_CONFIG_MRU_Type??????NV????
 *****************************************************************************/
 typedef struct
 {
@@ -418,192 +418,192 @@ typedef struct
 }PPP_CONFIG_MRU_TYPE_NV_STRU;
 
 /*****************************************************************************
- 结构名    : FC_CDS_DL_CONFIG_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 定义CDS下行丢包流控配置结构
+ ??????    : FC_CDS_DL_CONFIG_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????CDS????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32          ulDiscardThres;         /* CDS下行队列丢包门限 */
-    VOS_UINT32          ulDiscardRate;          /* 丢包率 */
+    VOS_UINT32          ulDiscardThres;         /* CDS???????????????? */
+    VOS_UINT32          ulDiscardRate;          /* ?????? */
 } FC_CDS_DL_CONFIG_STRU;
 
 /*****************************************************************************
- 结构名    : QOS_FC_CONFIG_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 定义QOS流控配置结构
+ ??????    : QOS_FC_CONFIG_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????QOS????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32          ulPktCntLimit;              /* 触发QoS流控包数 */
-    VOS_UINT32          ulTimerLen;                 /* 触发QoS流控时长 */
-    VOS_UINT32          ulRandomDiscardRate;        /* 随机丢包率 */
-    VOS_UINT32          ulDiscardRate;              /* 丢包率 */
-    VOS_UINT32          ulWarningThres;             /* 警告阈值，除必须保留的承载外全部置为丢包状态 */
-    VOS_UINT32          ulDiscardThres;             /* 丢包阈值，从低优先级承载开始置承载为丢包状态 */
-    VOS_UINT32          ulRandomDiscardThres;       /* 随机丢包阈值，从低优先级承载开始置承载为随机丢包状态 */
-    VOS_UINT32          ulRestoreThres;             /* 恢复阈值，从高优先级承载开始逐渐恢复承载数传 */
+    VOS_UINT32          ulPktCntLimit;              /* ????QoS???????? */
+    VOS_UINT32          ulTimerLen;                 /* ????QoS???????? */
+    VOS_UINT32          ulRandomDiscardRate;        /* ?????????? */
+    VOS_UINT32          ulDiscardRate;              /* ?????? */
+    VOS_UINT32          ulWarningThres;             /* ???????????????????????????????????????????? */
+    VOS_UINT32          ulDiscardThres;             /* ???????????????????????????????????????????? */
+    VOS_UINT32          ulRandomDiscardThres;       /* ???????????????????????????????????????????????????? */
+    VOS_UINT32          ulRestoreThres;             /* ???????????????????????????????????????????? */
 } QOS_FC_CONFIG_STRU;
 
 typedef struct
 {
-    VOS_UINT32              ulFcEnableMask;         /* 流控开关 */
-                                                    /* bit0 QoS流控是否使能 */
-                                                    /* bit1 最高优先级承载是否流控 */
-                                                    /* bit2 CDS下行流控是否使能 */
-                                                    /* bit3 最高优先级承载是否不丢包 */
+    VOS_UINT32              ulFcEnableMask;         /* ???????? */
+                                                    /* bit0 QoS???????????? */
+                                                    /* bit1 ?????????????????????? */
+                                                    /* bit2 CDS???????????????? */
+                                                    /* bit3 ???????????????????????? */
     QOS_FC_CONFIG_STRU      stQosFcConfig;
     FC_CDS_DL_CONFIG_STRU   stFcCdsDlConfig;
 }FLOWCTRL_CDS_CONFIG_STRU;
 
 /*****************************************************************************
-结构名    : BMC_CBS_MSG_READ_NV_STRU
-结构说明  : BMC_CBS_MSG_READ_NV_STRU对应的NV结构
+??????    : BMC_CBS_MSG_READ_NV_STRU
+????????  : BMC_CBS_MSG_READ_NV_STRU??????NV????
 *****************************************************************************/
 
 typedef struct
 {
-    VOS_UINT8               ucDisableReadAdvised;       /*Range:[0,1]*//*当调度消息中消息描述类型为advised时，对应DRX周期内消息是否接受； PS_FALSE为不接受，PS_TRUE为接受*/
-    VOS_UINT8               ucDisableReadOptional;      /*Range:[0,1]*//*当调度消息中消息描述类型为optional时，对应DRX周期内消息是否接受；PS_FALSE为不接受，PS_TRUE为接受*/
-    VOS_UINT8               ucDisableRepetitionMsg;     /*Range:[0,1]*//*当调度消息中消息描述类型为Repetition msg时，对应DRX周期内消息是否接受；PS_FALSE为不接受，PS_TRUE为接受*/
-    VOS_UINT8               ucDisableOldMsg;            /*Range:[0,1]*//*当调度消息中消息描述类型为old msg时，对应DRX周期内消息是否接受；PS_FALSE为不接受，PS_TRUE为接受*/
+    VOS_UINT8               ucDisableReadAdvised;       /*Range:[0,1]*//*??????????????????????????advised????????DRX???????????????????? PS_FALSE??????????PS_TRUE??????*/
+    VOS_UINT8               ucDisableReadOptional;      /*Range:[0,1]*//*??????????????????????????optional????????DRX????????????????????PS_FALSE??????????PS_TRUE??????*/
+    VOS_UINT8               ucDisableRepetitionMsg;     /*Range:[0,1]*//*??????????????????????????Repetition msg????????DRX????????????????????PS_FALSE??????????PS_TRUE??????*/
+    VOS_UINT8               ucDisableOldMsg;            /*Range:[0,1]*//*??????????????????????????old msg????????DRX????????????????????PS_FALSE??????????PS_TRUE??????*/
 }BMC_CBS_MSG_READ_NV_STRU;
 
 
 /*****************************************************************************
-结构名    : NV_MODEM_RF_SHARE_CFG_STRU
-结构说明  : NV_MODEM_RF_SHARE_CFG对应的NV结构
+??????    : NV_MODEM_RF_SHARE_CFG_STRU
+????????  : NV_MODEM_RF_SHARE_CFG??????NV????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usSupportFlag;      /*Range:[0,2]*//* 分别表示不支持DSDS,支持DSDS1.0,支持DSDS2.0 */
-    VOS_UINT16                          usGSMRFID;          /* GSM接入模式RFID信息 */
-    VOS_UINT16                          usWCDMARFID;        /* WCDMA接入模式RFID信息 */
-    VOS_UINT16                          usTDSRFID;          /* TD-SCDMA接入模式RFID信息 */
-    VOS_UINT16                          usLTERFID;          /* LTE接入模式RFID信息 */
-    VOS_UINT16                          usCDMARFID;         /* CMDA接入模式RFID信息 */
-    VOS_UINT16                          usEVDORFID;         /* CDMA EVDO接入模式RFID信息 */
+    VOS_UINT16                          usSupportFlag;      /*Range:[0,2]*//* ??????????????DSDS,????DSDS1.0,????DSDS2.0 */
+    VOS_UINT16                          usGSMRFID;          /* GSM????????RFID???? */
+    VOS_UINT16                          usWCDMARFID;        /* WCDMA????????RFID???? */
+    VOS_UINT16                          usTDSRFID;          /* TD-SCDMA????????RFID???? */
+    VOS_UINT16                          usLTERFID;          /* LTE????????RFID???? */
+    VOS_UINT16                          usCDMARFID;         /* CMDA????????RFID???? */
+    VOS_UINT16                          usEVDORFID;         /* CDMA EVDO????????RFID???? */
     VOS_UINT16                          usReserved;
 } NV_MODEM_RF_SHARE_CFG_STRU;
 
 
 /*****************************************************************************
-结构名    : NV_MODEM_RF_SHARE_CFG_EX_STRU
-结构说明  : NV_MODEM_RF_SHARE_CFG_EX_STRU对应的NV结构
+??????    : NV_MODEM_RF_SHARE_CFG_EX_STRU
+????????  : NV_MODEM_RF_SHARE_CFG_EX_STRU??????NV????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulProfileTypeId;     /* 读取en_NV_Item_TRI_MODE_FEM_PROFILE_ID获取ulProfileId,
-                                                               对应于取下面组数中哪一套配置 */
+    VOS_UINT32                          ulProfileTypeId;     /* ????en_NV_Item_TRI_MODE_FEM_PROFILE_ID????ulProfileId,
+                                                               ???????????????????????????? */
     NV_MODEM_RF_SHARE_CFG_STRU          astNvModemRfShareCfg[8];
 }NV_MODEM_RF_SHARE_CFG_EX_STRU;
 
 /*****************************************************************************
-结构名    : PLATFORM_RAT_TYPE_ENUM
-结构说明  : 接入技术
+??????    : PLATFORM_RAT_TYPE_ENUM
+????????  : ????????
 
-  1.日    期   : 2015年4月27日
-    作    者   : g00260269
-    修改内容   : 创建
+  1.??    ??   : 2015??4??27??
+    ??    ??   : g00260269
+    ????????   : ????
 *******************************************************************************/
 enum NV_PLATFORM_RAT_TYPE_ENUM
 {
-    NV_PLATFORM_RAT_GSM,                                                       /*GSM接入技术 */
-    NV_PLATFORM_RAT_WCDMA,                                                     /* WCDMA接入技术 */
-    NV_PLATFORM_RAT_LTE,                                                       /* LTE接入技术 */
-    NV_PLATFORM_RAT_TDS,                                                       /* TDS接入技术 */
-    NV_PLATFORM_RAT_1X,                                                        /* CDMA-1X接入技术 */
-    NV_PLATFORM_RAT_EVDO,                                                      /* CDMA-EV_DO接入技术 */
+    NV_PLATFORM_RAT_GSM,                                                       /*GSM???????? */
+    NV_PLATFORM_RAT_WCDMA,                                                     /* WCDMA???????? */
+    NV_PLATFORM_RAT_LTE,                                                       /* LTE???????? */
+    NV_PLATFORM_RAT_TDS,                                                       /* TDS???????? */
+    NV_PLATFORM_RAT_1X,                                                        /* CDMA-1X???????? */
+    NV_PLATFORM_RAT_EVDO,                                                      /* CDMA-EV_DO???????? */
 
     NV_PLATFORM_RAT_BUTT
 };
 typedef VOS_UINT16 NV_PLATFORM_RAT_TYPE_ENUM_UINT16;
 
 /*****************************************************************************
-结构名    : NV_PLATAFORM_RAT_CAPABILITY_STRU
-结构说明  : 平台支持的接入技术
+??????    : NV_PLATAFORM_RAT_CAPABILITY_STRU
+????????  : ??????????????????
 
-  1.日    期   : 2015年4月27日
-    作    者   : g00260269
-    修改内容   : 创建
+  1.??    ??   : 2015??4??27??
+    ??    ??   : g00260269
+    ????????   : ????
 *******************************************************************************/
 typedef struct
 {
-    VOS_UINT16                           usRatNum;                          /* 接入技术的数目*/
-    NV_PLATFORM_RAT_TYPE_ENUM_UINT16     aenRatList[NV_PLATFORM_MAX_RAT_NUM];  /* 接入技术 */
+    VOS_UINT16                           usRatNum;                          /* ??????????????*/
+    NV_PLATFORM_RAT_TYPE_ENUM_UINT16     aenRatList[NV_PLATFORM_MAX_RAT_NUM];  /* ???????? */
 }NV_PLATAFORM_RAT_CAPABILITY_STRU;
 
 /*****************************************************************************
-结构名    : BASTET_SUPPORT_FLG_STRU
-结构说明  : BASTET_SUPPORT_FLG_STRU结构
-  1.日    期   : 2014年11月22日
-    作    者   : z00128442
-    修改内容   : 新增bastet配置nv
+??????    : BASTET_SUPPORT_FLG_STRU
+????????  : BASTET_SUPPORT_FLG_STRU????
+  1.??    ??   : 2014??11??22??
+    ??    ??   : z00128442
+    ????????   : ????bastet????nv
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucActiveFlg;        /* 是否激活功能 */
-    VOS_UINT8                           ucHookFlg;          /* Bastet钩包模式 */
+    VOS_UINT8                           ucActiveFlg;        /* ???????????? */
+    VOS_UINT8                           ucHookFlg;          /* Bastet???????? */
     VOS_UINT8                           aucSubFun[2];
 }BASTET_SUPPORT_FLG_STRU;
 
 /*****************************************************************************
-结构名    : NV_CTTF_BOOL_ENUM_UINT8
-结构说明  :
+??????    : NV_CTTF_BOOL_ENUM_UINT8
+????????  :
 
-  1.日    期   : 2015年9月9日
-    作    者   : c00309867
-    修改内容   : 创建
+  1.??    ??   : 2015??9??9??
+    ??    ??   : c00309867
+    ????????   : ????
 *******************************************************************************/
 enum NV_CTTF_BOOL_ENUM
 {
-    NV_CTTF_BOOL_FALSE,                /* 条件为真 */
-    NV_CTTF_BOOL_TRUE,               /* 条件为假 */
+    NV_CTTF_BOOL_FALSE,                /* ???????? */
+    NV_CTTF_BOOL_TRUE,               /* ???????? */
     NV_CTTF_BOOL_BUTT
 };
 typedef VOS_UINT8 NV_CTTF_BOOL_ENUM_UINT8;
 
 /*****************************************************************************
-结构名    : NV_SUPPORT_PROBE_INIT_ADJ_CFG_STRU
-结构说明  : NV_SUPPORT_PROBE_INIT_ADJ_CFG_STRU结构
-  1.日    期   : 2015年9月0日
-    作    者   : c00309867
-    修改内容   : 新增nv
+??????    : NV_SUPPORT_PROBE_INIT_ADJ_CFG_STRU
+????????  : NV_SUPPORT_PROBE_INIT_ADJ_CFG_STRU????
+  1.??    ??   : 2015??9??0??
+    ??    ??   : c00309867
+    ????????   : ????nv
 *****************************************************************************/
 typedef struct
 {
-    NV_CTTF_BOOL_ENUM_UINT8             enSupportFlg;                   /* 是否支持通过NV项配置cProbeInitialAdjust。NV_CTTF_BOOL_TRUE:不支持；NV_CTTF_BOOL_TRUE支持*/
-    VOS_INT8                            cProbeInitialAdjust;            /* cProbeInitialAdjust的值 */
+    NV_CTTF_BOOL_ENUM_UINT8             enSupportFlg;                   /* ????????????NV??????cProbeInitialAdjust??NV_CTTF_BOOL_TRUE:????????NV_CTTF_BOOL_TRUE????*/
+    VOS_INT8                            cProbeInitialAdjust;            /* cProbeInitialAdjust???? */
     VOS_UINT8                           aucSubFun[2];
 }NV_CTTF_PROBE_INIT_POWER_CTRL_STRU;
 
 
 /*****************************************************************************
-结构名    : TTF_PPPC_NVIM_CONFIG_OPTIONS_STRU
-结构说明  : TTF_PPPC_NVIM_CONFIG_OPTIONS_STRU结构
-  1.日    期   : 2015年08月29日
-    作    者   : w00316385
-    修改内容   : 新增配置nv
+??????    : TTF_PPPC_NVIM_CONFIG_OPTIONS_STRU
+????????  : TTF_PPPC_NVIM_CONFIG_OPTIONS_STRU????
+  1.??    ??   : 2015??08??29??
+    ??    ??   : w00316385
+    ????????   : ????????nv
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usMru;                  /* PPP帧最大接收单元长度 */
+    VOS_UINT16                          usMru;                  /* PPP?????????????????? */
     VOS_UINT8                           ucReserved;
-    VOS_UINT8                           ucCaveEnable;           /* PPP接入鉴权CAVE算法开关，0不支持，1支持 */
-    VOS_UINT32                          ulPppInactTimerLen;     /* MAX PPP Inactive Timer时长，单位s */
+    VOS_UINT8                           ucCaveEnable;           /* PPP????????CAVE??????????0????????1???? */
+    VOS_UINT32                          ulPppInactTimerLen;     /* MAX PPP Inactive Timer??????????s */
 }TTF_PPPC_NVIM_CONFIG_OPTIONS_STRU;
 
 /*****************************************************************************
-结构名    : NV_HRPD_RF_ALLOC_SWITCH_MASK_STRU
-结构说明  : NV_HRPD_RF_ALLOC_SWITCH_MASK_STRU结构
-            ulHrpdRfAllocSwitchMask 每个bit为1表示使能，0表示不使能
+??????    : NV_HRPD_RF_ALLOC_SWITCH_MASK_STRU
+????????  : NV_HRPD_RF_ALLOC_SWITCH_MASK_STRU????
+            ulHrpdRfAllocSwitchMask ????bit??1??????????0??????????
             bit 0:signaling alloc rf
             bit 1:ppp in access auth alloc rf
-  1.日    期   : 2016年3月14日
-    作    者   : t00359887
-    修改内容   : 新增nv
+  1.??    ??   : 2016??3??14??
+    ??    ??   : t00359887
+    ????????   : ????nv
 *****************************************************************************/
 typedef struct
 {
@@ -612,25 +612,25 @@ typedef struct
 
 
 /*****************************************************************************
-结构名    : NV_TTF_NODE_RESET_CTRL_STRU
-结构说明  : NV_TTF_NODE_RESET_CTRL_STRU结构
-  1.日    期   : 2016年01月26日
-    作    者   : m00314743
-    修改内容   : 新增nv
+??????    : NV_TTF_NODE_RESET_CTRL_STRU
+????????  : NV_TTF_NODE_RESET_CTRL_STRU????
+  1.??    ??   : 2016??01??26??
+    ??    ??   : m00314743
+    ????????   : ????nv
 *****************************************************************************/
 typedef struct
 {
-    NV_CTTF_BOOL_ENUM_UINT8             enResetEnable;                  /* TTF_Node主动复位时能 */
-    VOS_UINT8                           ucFailPercent;             /* 申请失败比例门限，达到时主动复位 */
-    VOS_UINT16                          usTotalStat;               /* 节点申请统计总次数 */
+    NV_CTTF_BOOL_ENUM_UINT8             enResetEnable;                  /* TTF_Node???????????? */
+    VOS_UINT8                           ucFailPercent;             /* ???????????????????????????????? */
+    VOS_UINT16                          usTotalStat;               /* ?????????????????? */
 }NV_RATIO_RESET_CTRL_STRU;
 
 /*****************************************************************************
-结构名    : NV_NODE_RESET_CTRL_STRU
-结构说明  : NV_NODE_RESET_CTRL_STRU结构
-  1.日    期   : 2016年01月26日
-    作    者   : m00314743
-    修改内容   : 新增nv
+??????    : NV_NODE_RESET_CTRL_STRU
+????????  : NV_NODE_RESET_CTRL_STRU????
+  1.??    ??   : 2016??01??26??
+    ??    ??   : m00314743
+    ????????   : ????nv
 *****************************************************************************/
 typedef struct
 {
@@ -638,28 +638,28 @@ typedef struct
 }NV_NODE_RESET_CTRL_STRU;
 
 /*****************************************************************************
- 结构名    : TTF_CICOM_IP_ENT_NVIM_STRU
- 结构说明  : TTF_CICOM_IP_ENT_NVIM_STRU对应的NV结构,CIOCM个数
+ ??????    : TTF_CICOM_IP_ENT_NVIM_STRU
+ ????????  : TTF_CICOM_IP_ENT_NVIM_STRU??????NV????,CIOCM????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                          ucCicomIPNumber;         /* CIOCM个数 */
+    VOS_UINT8                          ucCicomIPNumber;         /* CIOCM???? */
     VOS_UINT8                          aucRsv[3];
 
-    VOS_UINT8                          aucModemIdToCicomIndex[NV_PLATFORM_MAX_MODEM_NUM];   /* 数组下标为Modem id,数值代表对应使用的CIOCM Index，0~ucCicomIPNumber-1 */
+    VOS_UINT8                          aucModemIdToCicomIndex[NV_PLATFORM_MAX_MODEM_NUM];   /* ??????????Modem id,??????????????????CIOCM Index??0~ucCicomIPNumber-1 */
 }TTF_CICOM_IP_ENT_NVIM_STRU;
 
 /*****************************************************************************
-结构名    : NV_NODE_RESET_CTRL_STRU
-结构说明  : NV_NODE_RESET_CTRL_STRU结构
-  1.日    期   : 2016年02月20日
-    作    者   : m00314743
-    修改内容   : 新增nv
+??????    : NV_NODE_RESET_CTRL_STRU
+????????  : NV_NODE_RESET_CTRL_STRU????
+  1.??    ??   : 2016??02??20??
+    ??    ??   : m00314743
+    ????????   : ????nv
 *****************************************************************************/
 typedef struct
 {
-    NV_CTTF_BOOL_ENUM_UINT8             enTpeEnable;             /* TPE使能 */
-    VOS_UINT8                           ucCorrectPercent;        /* 修正因子:若超时，再等百分比的时间 */
+    NV_CTTF_BOOL_ENUM_UINT8             enTpeEnable;             /* TPE???? */
+    VOS_UINT8                           ucCorrectPercent;        /* ????????:???????????????????????? */
     VOS_UINT8                           aucReserved[2];
 }NV_TTF_TPE_CTRL_STRU;
 

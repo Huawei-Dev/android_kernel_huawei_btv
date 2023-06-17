@@ -47,7 +47,7 @@
 */
 
 /*****************************************************************************
-  1 头文件包含
+  1 ??????????
 *****************************************************************************/
 #include "AtCmdFtmProc.h"
 #include "ATCmdProc.h"
@@ -61,49 +61,49 @@
 
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
 /*lint -e767 -e960*/
 #define    THIS_FILE_ID                 PS_FILE_ID_AT_CMD_FTM_PROC_C
 /*lint +e767 +e960*/
 
 /*****************************************************************************
-  2 全局变量定义
+  2 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  3 函数实现
+  3 ????????
 *****************************************************************************/
 /*****************************************************************************
- 函 数 名  : At_SetLogPortPara
- 功能描述  : ^LOGPORT的设置函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : At_SetLogPortPara
+ ????????  : ^LOGPORT??????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2013年6月20日
-    作    者   : l60609
-    修改内容   : 新生成函数
-  2.日    期   : 2013年8月9日
-    作    者   : z60575
-    修改内容   : LOG35_TL调用TL接口
+ ????????      :
+  1.??    ??   : 2013??6??20??
+    ??    ??   : l60609
+    ????????   : ??????????
+  2.??    ??   : 2013??8??9??
+    ??    ??   : z60575
+    ????????   : LOG35_TL????TL????
 *****************************************************************************/
 VOS_UINT32 At_SetLogPortPara(VOS_UINT8 ucIndex)
 {
     VOS_UINT32                          ulRslt;
     VOS_UINT32                          ulOmLogPort;
     
-    /* 参数检查 */
+    /* ???????? */
     if (AT_CMD_OPT_SET_PARA_CMD != g_stATParseCmd.ucCmdOptType)
     {
         return AT_ERROR;
     }
 
-    /* 参数过多或没有 */
+    /* ?????????????? */
     if ((2 < gucAtParaIndex) || (0 == gucAtParaIndex))
     {
         return AT_ERROR;
@@ -118,7 +118,7 @@ VOS_UINT32 At_SetLogPortPara(VOS_UINT8 ucIndex)
         ulOmLogPort = CPM_OM_PORT_TYPE_VCOM;
     }
 
-    /* 参数只有一个，默认永久生效 */
+    /* ?????????????????????????? */
     if (1 == gucAtParaIndex)
     {
         gastAtParaList[1].ulParaValue = VOS_TRUE;
@@ -128,7 +128,7 @@ VOS_UINT32 At_SetLogPortPara(VOS_UINT8 ucIndex)
     vos_printf("[socp set timer] : at port %d, log port %d, param %d.\n", 
         ucIndex, ulOmLogPort, gastAtParaList[1].ulParaValue);
 
-    /* 调用OM的接口 */
+    /* ????OM?????? */
     ulRslt = PPM_LogPortSwitch(ulOmLogPort, gastAtParaList[1].ulParaValue);
 
     if (VOS_OK == ulRslt)
@@ -142,21 +142,21 @@ VOS_UINT32 At_SetLogPortPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : At_QryLogPortPara
- 功能描述  : ^LOGPORT的查询函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : At_QryLogPortPara
+ ????????  : ^LOGPORT??????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2013年6月20日
-    作    者   : l60609
-    修改内容   : 新生成函数
-  2.日    期   : 2013年8月9日
-    作    者   : z60575
-    修改内容   : LOG35_TL调用TL接口
+ ????????      :
+  1.??    ??   : 2013??6??20??
+    ??    ??   : l60609
+    ????????   : ??????????
+  2.??    ??   : 2013??8??9??
+    ??    ??   : z60575
+    ????????   : LOG35_TL????TL????
 *****************************************************************************/
 VOS_UINT32 At_QryLogPortPara(VOS_UINT8 ucIndex)
 {
@@ -202,19 +202,19 @@ VOS_UINT32 At_QryLogPortPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : At_SetDpdtTestFlagPara
- 功能描述  : 支持^DPDTTEST设置，
-             命令格式:^DPDTTEST=<RatMode>,<Flag>
- 输入参数  : ucIndex - 用户索引
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : At_SetDpdtTestFlagPara
+ ????????  : ????^DPDTTEST??????
+             ????????:^DPDTTEST=<RatMode>,<Flag>
+ ????????  : ucIndex - ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年04月04日
-    作    者   : g00261581
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??04??04??
+    ??    ??   : g00261581
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 At_SetDpdtTestFlagPara(VOS_UINT8 ucIndex)
@@ -222,18 +222,18 @@ VOS_UINT32 At_SetDpdtTestFlagPara(VOS_UINT8 ucIndex)
     AT_MTA_SET_DPDTTEST_FLAG_REQ_STRU   stAtCmd;
     VOS_UINT32                          ulRst;
 
-    /* 参数检查 */
+    /* ???????? */
     if (2 != gucAtParaIndex)
     {
         return AT_CME_INCORRECT_PARAMETERS;
     }
 
-    /* AT发送至MTA的消息结构赋值 */
+    /* AT??????MTA?????????????? */
     PS_MEM_SET(&stAtCmd, 0, sizeof(AT_MTA_SET_DPDTTEST_FLAG_REQ_STRU));
     stAtCmd.enRatMode = (AT_MTA_CMD_RATMODE_ENUM_UINT8)gastAtParaList[0].ulParaValue;
     stAtCmd.ucFlag    = (VOS_UINT8)gastAtParaList[1].ulParaValue;
 
-    /* 发送消息给C核处理 */
+    /* ??????????C?????? */
     ulRst = AT_FillAndSndAppReqMsg(gastAtClientTab[ucIndex].usClientId,
                                    0,
                                    ID_AT_MTA_SET_DPDTTEST_FLAG_REQ,
@@ -253,19 +253,19 @@ VOS_UINT32 At_SetDpdtTestFlagPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : At_SetDpdtPara
- 功能描述  : 支持^DPDT设置，
-             命令格式:^DPDT=<RatMode>,<DpdtValue>
- 输入参数  : ucIndex - 用户索引
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : At_SetDpdtPara
+ ????????  : ????^DPDT??????
+             ????????:^DPDT=<RatMode>,<DpdtValue>
+ ????????  : ucIndex - ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年04月04日
-    作    者   : g00261581
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??04??04??
+    ??    ??   : g00261581
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 At_SetDpdtPara(VOS_UINT8 ucIndex)
@@ -273,18 +273,18 @@ VOS_UINT32 At_SetDpdtPara(VOS_UINT8 ucIndex)
     AT_MTA_SET_DPDT_VALUE_REQ_STRU      stAtCmd;
     VOS_UINT32                          ulRst;
 
-    /* 参数检查 */
+    /* ???????? */
     if (2 != gucAtParaIndex)
     {
         return AT_CME_INCORRECT_PARAMETERS;
     }
 
-    /* AT发送至MTA的消息结构赋值 */
+    /* AT??????MTA?????????????? */
     PS_MEM_SET(&stAtCmd, 0, sizeof(AT_MTA_SET_DPDT_VALUE_REQ_STRU));
     stAtCmd.enRatMode   = (AT_MTA_CMD_RATMODE_ENUM_UINT8)gastAtParaList[0].ulParaValue;
     stAtCmd.ulDpdtValue = gastAtParaList[1].ulParaValue;
 
-    /* 发送消息给C核处理 */
+    /* ??????????C?????? */
     ulRst = AT_FillAndSndAppReqMsg(gastAtClientTab[ucIndex].usClientId,
                                    0,
                                    ID_AT_MTA_SET_DPDT_VALUE_REQ,
@@ -305,19 +305,19 @@ VOS_UINT32 At_SetDpdtPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : At_SetQryDpdtPara
- 功能描述  : 支持^DPDTQRY设置，
-             命令格式:^DPDTQRY=<RatMode>
- 输入参数  : ucIndex - 用户索引
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : At_SetQryDpdtPara
+ ????????  : ????^DPDTQRY??????
+             ????????:^DPDTQRY=<RatMode>
+ ????????  : ucIndex - ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年04月04日
-    作    者   : g00261581
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??04??04??
+    ??    ??   : g00261581
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 At_SetQryDpdtPara(VOS_UINT8 ucIndex)
@@ -325,17 +325,17 @@ VOS_UINT32 At_SetQryDpdtPara(VOS_UINT8 ucIndex)
     AT_MTA_QRY_DPDT_VALUE_REQ_STRU      stAtCmd;
     VOS_UINT32                          ulRst;
 
-    /* 参数检查 */
+    /* ???????? */
     if (1 != gucAtParaIndex)
     {
         return AT_CME_INCORRECT_PARAMETERS;
     }
 
-    /* AT发送至MTA的消息结构赋值 */
+    /* AT??????MTA?????????????? */
     PS_MEM_SET(&stAtCmd, 0, sizeof(AT_MTA_QRY_DPDT_VALUE_REQ_STRU));
     stAtCmd.enRatMode = (AT_MTA_CMD_RATMODE_ENUM_UINT8)gastAtParaList[0].ulParaValue;
 
-    /* 发送消息给C核处理 */
+    /* ??????????C?????? */
     ulRst = AT_FillAndSndAppReqMsg(gastAtClientTab[ucIndex].usClientId,
                                    0,
                                    ID_AT_MTA_QRY_DPDT_VALUE_REQ,
@@ -355,33 +355,33 @@ VOS_UINT32 At_SetQryDpdtPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvMtaSetDpdtTestFlagCnf
- 功能描述  : AT模块收到MTA回复的Set Dpdt Flag回复消息的处理函数
- 输入参数  : pstMsg -- 消息内容
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvMtaSetDpdtTestFlagCnf
+ ????????  : AT????????MTA??????Set Dpdt Flag??????????????????
+ ????????  : pstMsg -- ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年04月09日
-    作    者   : g00261581
-    修改内容   : 新建
+ ????????      :
+  1.??    ??   : 2014??04??09??
+    ??    ??   : g00261581
+    ????????   : ????
 *****************************************************************************/
 VOS_UINT32 AT_RcvMtaSetDpdtTestFlagCnf(VOS_VOID *pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     AT_MTA_MSG_STRU                    *pstMtaMsg         = VOS_NULL_PTR;
     MTA_AT_SET_DPDTTEST_FLAG_CNF_STRU  *pstSetDpdtFlagCnf = VOS_NULL_PTR;
     VOS_UINT8                           ucIndex;
     VOS_UINT32                          ulResult;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex   = 0;
     pstMtaMsg = (AT_MTA_MSG_STRU *)pMsg;
     pstSetDpdtFlagCnf = (MTA_AT_SET_DPDTTEST_FLAG_CNF_STRU *)pstMtaMsg->aucContent;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if (AT_FAILURE == At_ClientIdToUserId(pstMtaMsg->stAppCtrl.usClientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvMtaSetDpdtTestFlagCnf: WARNING:AT INDEX NOT FOUND!");
@@ -394,17 +394,17 @@ VOS_UINT32 AT_RcvMtaSetDpdtTestFlagCnf(VOS_VOID *pMsg)
         return VOS_ERR;
     }
 
-    /* 判断当前操作类型是否为AT_CMD_DPDTTEST_SET */
+    /* ??????????????????????AT_CMD_DPDTTEST_SET */
     if (AT_CMD_DPDTTEST_SET != gastAtClientTab[ucIndex].CmdCurrentOpt)
     {
         AT_WARN_LOG("AT_RcvMtaSetDpdtTestFlagCnf: WARNING:Not AT_CMD_DPDTTEST_SET!");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 判断查询操作是否成功 */
+    /* ???????????????????? */
     if (MTA_AT_RESULT_NO_ERROR == pstSetDpdtFlagCnf->enResult)
     {
         ulResult    = AT_OK;
@@ -416,40 +416,40 @@ VOS_UINT32 AT_RcvMtaSetDpdtTestFlagCnf(VOS_VOID *pMsg)
 
     gstAtSendData.usBufLen = 0;
 
-    /* 调用At_FormatResultData发送命令结果 */
+    /* ????At_FormatResultData???????????? */
     At_FormatResultData(ucIndex, ulResult);
 
     return VOS_OK;
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvMtaSetDpdtValueCnf
- 功能描述  : AT模块收到MTA回复的Set Dpdt Value回复消息的处理函数
- 输入参数  : pstMsg -- 消息内容
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvMtaSetDpdtValueCnf
+ ????????  : AT????????MTA??????Set Dpdt Value??????????????????
+ ????????  : pstMsg -- ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年04月09日
-    作    者   : g00261581
-    修改内容   : 新建
+ ????????      :
+  1.??    ??   : 2014??04??09??
+    ??    ??   : g00261581
+    ????????   : ????
 *****************************************************************************/
 VOS_UINT32 AT_RcvMtaSetDpdtValueCnf(VOS_VOID *pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     AT_MTA_MSG_STRU                    *pstMtaMsg          = VOS_NULL_PTR;
     MTA_AT_SET_DPDT_VALUE_CNF_STRU     *pstSetDpdtValueCnf = VOS_NULL_PTR;
     VOS_UINT8                           ucIndex;
     VOS_UINT32                          ulResult;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex            = 0;
     pstMtaMsg          = (AT_MTA_MSG_STRU *)pMsg;
     pstSetDpdtValueCnf = (MTA_AT_SET_DPDT_VALUE_CNF_STRU *)pstMtaMsg->aucContent;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if (AT_FAILURE == At_ClientIdToUserId(pstMtaMsg->stAppCtrl.usClientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvMtaSetDpdtValueCnf: WARNING:AT INDEX NOT FOUND!");
@@ -462,17 +462,17 @@ VOS_UINT32 AT_RcvMtaSetDpdtValueCnf(VOS_VOID *pMsg)
         return VOS_ERR;
     }
 
-    /* 判断当前操作类型是否为AT_CMD_DPDT_SET */
+    /* ??????????????????????AT_CMD_DPDT_SET */
     if (AT_CMD_DPDT_SET != gastAtClientTab[ucIndex].CmdCurrentOpt)
     {
         AT_WARN_LOG("AT_RcvMtaSetDpdtValueCnf: WARNING:Not AT_CMD_DPDT_SET!");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 判断查询操作是否成功 */
+    /* ???????????????????? */
     if (MTA_AT_RESULT_NO_ERROR == pstSetDpdtValueCnf->enResult)
     {
         ulResult    = AT_OK;
@@ -484,40 +484,40 @@ VOS_UINT32 AT_RcvMtaSetDpdtValueCnf(VOS_VOID *pMsg)
 
     gstAtSendData.usBufLen = 0;
 
-    /* 调用At_FormatResultData发送命令结果 */
+    /* ????At_FormatResultData???????????? */
     At_FormatResultData(ucIndex, ulResult);
 
     return VOS_OK;
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvMtaQryDpdtValueCnf
- 功能描述  : AT模块收到MTA回复的Qry Dpdt Value回复消息的处理函数
- 输入参数  : pstMsg -- 消息内容
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvMtaQryDpdtValueCnf
+ ????????  : AT????????MTA??????Qry Dpdt Value??????????????????
+ ????????  : pstMsg -- ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年04月09日
-    作    者   : g00261581
-    修改内容   : 新建
+ ????????      :
+  1.??    ??   : 2014??04??09??
+    ??    ??   : g00261581
+    ????????   : ????
 *****************************************************************************/
 VOS_UINT32 AT_RcvMtaQryDpdtValueCnf(VOS_VOID *pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     AT_MTA_MSG_STRU                    *pstMtaMsg          = VOS_NULL_PTR;
     MTA_AT_QRY_DPDT_VALUE_CNF_STRU     *pstQryDpdtValueCnf = VOS_NULL_PTR;
     VOS_UINT8                           ucIndex;
     VOS_UINT32                          ulResult;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex            = 0;
     pstMtaMsg          = (AT_MTA_MSG_STRU *)pMsg;
     pstQryDpdtValueCnf = (MTA_AT_QRY_DPDT_VALUE_CNF_STRU *)pstMtaMsg->aucContent;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if (AT_FAILURE == At_ClientIdToUserId(pstMtaMsg->stAppCtrl.usClientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvMtaQryDpdtValueCnf: WARNING:AT INDEX NOT FOUND!");
@@ -530,17 +530,17 @@ VOS_UINT32 AT_RcvMtaQryDpdtValueCnf(VOS_VOID *pMsg)
         return VOS_ERR;
     }
 
-    /* 判断当前操作类型是否为AT_CMD_DPDTQRY_SET */
+    /* ??????????????????????AT_CMD_DPDTQRY_SET */
     if (AT_CMD_DPDTQRY_SET != gastAtClientTab[ucIndex].CmdCurrentOpt)
     {
         AT_WARN_LOG("AT_RcvMtaQryDpdtValueCnf: WARNING:Not AT_CMD_DPDTQRY_SET!");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 判断查询操作是否成功 */
+    /* ???????????????????? */
     if (MTA_AT_RESULT_NO_ERROR == pstQryDpdtValueCnf->enResult)
     {
         ulResult = AT_OK;
@@ -556,26 +556,26 @@ VOS_UINT32 AT_RcvMtaQryDpdtValueCnf(VOS_VOID *pMsg)
         gstAtSendData.usBufLen = 0;
     }
 
-    /* 调用At_FormatResultData发送命令结果 */
+    /* ????At_FormatResultData???????????? */
     At_FormatResultData(ucIndex, ulResult);
 
     return VOS_OK;
 }
 
 /*****************************************************************************
- 函 数 名  : At_SetJamDetectPara
- 功能描述  : 支持^JDETEX设置
-             命令格式:^JDETEX=<mode>[,<METHOD>,<NPT>,<UCN>]
- 输入参数  : ucIndex - 用户索引
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : At_SetJamDetectPara
+ ????????  : ????^JDETEX????
+             ????????:^JDETEX=<mode>[,<METHOD>,<NPT>,<UCN>]
+ ????????  : ucIndex - ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年05月05日
-    作    者   : g00261581
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??05??05??
+    ??    ??   : g00261581
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 At_SetJamDetectPara(VOS_UINT8 ucIndex)
@@ -584,13 +584,13 @@ VOS_UINT32 At_SetJamDetectPara(VOS_UINT8 ucIndex)
     NV_NAS_JAM_DETECT_CFG_STRU          stNvJamCfg;
     VOS_UINT32                          ulRst;
 
-    /* 参数检查 */
+    /* ???????? */
     if ((gucAtParaIndex < 1) || (gucAtParaIndex > 4))
     {
         return AT_CME_INCORRECT_PARAMETERS;
     }
 
-    /* AT发送至MTA的消息结构赋值 */
+    /* AT??????MTA?????????????? */
     PS_MEM_SET(&stAtCmd, 0, sizeof(AT_MTA_SET_JAM_DETECT_REQ_STRU));
 
     stAtCmd.ucFlag         = (VOS_UINT8)gastAtParaList[0].ulParaValue;
@@ -620,7 +620,7 @@ VOS_UINT32 At_SetJamDetectPara(VOS_UINT8 ucIndex)
         return AT_ERROR;
     }
 
-    /* 配置参数保存在NV消息结构中 */
+    /* ??????????????NV?????????? */
     stNvJamCfg.ucMode      = stAtCmd.ucFlag;
     stNvJamCfg.ucMethod    = stAtCmd.ucMethod;
     stNvJamCfg.ucThreshold = stAtCmd.ucThreshold;
@@ -632,7 +632,7 @@ VOS_UINT32 At_SetJamDetectPara(VOS_UINT8 ucIndex)
         return AT_ERROR;
     }
 
-    /* 发送消息给C核处理 */
+    /* ??????????C?????? */
     ulRst = AT_FillAndSndAppReqMsg(gastAtClientTab[ucIndex].usClientId,
                                    0,
                                    ID_AT_MTA_SET_JAM_DETECT_REQ,
@@ -652,18 +652,18 @@ VOS_UINT32 At_SetJamDetectPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : At_QryJamDetectPara
- 功能描述  : ^JDETEX查询Jam Detect设置值
- 输入参数  : ucIndex - 用户索引
- 输出参数  : 无
- 返 回 值  : 执行结果
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : At_QryJamDetectPara
+ ????????  : ^JDETEX????Jam Detect??????
+ ????????  : ucIndex - ????????
+ ????????  : ??
+ ?? ?? ??  : ????????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年5月9日
-    作    者   : g00261581
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??5??9??
+    ??    ??   : g00261581
+    ????????   : ??????????
 *****************************************************************************/
 VOS_UINT32 At_QryJamDetectPara(VOS_UINT8 ucIndex)
 {
@@ -671,7 +671,7 @@ VOS_UINT32 At_QryJamDetectPara(VOS_UINT8 ucIndex)
 
     PS_MEM_SET(&stNvJamDetect, 0x0, sizeof(stNvJamDetect));
 
-    /* 通过读取NV来获取Jam Detect当前配置值 */
+    /* ????????NV??????Jam Detect?????????? */
     if (NV_OK != NV_ReadEx(MODEM_ID_0,
                            en_NV_Item_JAM_DETECT_CFG,
                            &stNvJamDetect,
@@ -695,18 +695,18 @@ VOS_UINT32 At_QryJamDetectPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvMtaSetJamDetectCnf
- 功能描述  : AT模块收到MTA回复的Jam Detect设置结果处理函数
- 输入参数  : pstMsg -- 消息内容
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvMtaSetJamDetectCnf
+ ????????  : AT????????MTA??????Jam Detect????????????????
+ ????????  : pstMsg -- ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年5月6日
-    作    者   : g00261581
-    修改内容   : 新增
+ ????????      :
+  1.??    ??   : 2014??5??6??
+    ??    ??   : g00261581
+    ????????   : ????
 *****************************************************************************/
 VOS_UINT32 AT_RcvMtaSetJamDetectCnf(
     VOS_VOID                           *pMsg
@@ -717,13 +717,13 @@ VOS_UINT32 AT_RcvMtaSetJamDetectCnf(
     VOS_UINT32                              ulResult;
     VOS_UINT8                               ucIndex;
 
-    /* 初始化 */
+    /* ?????? */
     pstRcvMsg    = (AT_MTA_MSG_STRU *)pMsg;
     pstSetCnf    = (MTA_AT_SET_JAM_DETECT_CNF_STRU *)pstRcvMsg->aucContent;
     ulResult     = AT_OK;
     ucIndex      = 0;
 
-    /* 通过clientid获取index */
+    /* ????clientid????index */
     if (AT_FAILURE == At_ClientIdToUserId(pstRcvMsg->stAppCtrl.usClientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvMtaSetJamDetectCnf : WARNING:AT INDEX NOT FOUND!");
@@ -736,17 +736,17 @@ VOS_UINT32 AT_RcvMtaSetJamDetectCnf(
         return VOS_ERR;
     }
 
-    /* 当前AT是否在等待该命令返回 */
+    /* ????AT???????????????????? */
     if (AT_CMD_JDETEX_SET != gastAtClientTab[ucIndex].CmdCurrentOpt)
     {
         AT_WARN_LOG("AT_RcvMtaSetJamDetectCnf : Current Option is not AT_CMD_JDETEX_SET.");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 格式化命令返回 */
+    /* ?????????????? */
     gstAtSendData.usBufLen = 0;
 
     if (MTA_AT_RESULT_NO_ERROR != pstSetCnf->enResult)
@@ -754,25 +754,25 @@ VOS_UINT32 AT_RcvMtaSetJamDetectCnf(
         ulResult = AT_ERROR;
     }
 
-    /* 输出结果 */
+    /* ???????? */
     At_FormatResultData(ucIndex, ulResult);
 
     return VOS_OK;
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvMtaJamDetectInd
- 功能描述  : AT模块收到MTA回复的Jam Ind上报消息处理函数
- 输入参数  : pstMsg -- 消息内容
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvMtaJamDetectInd
+ ????????  : AT????????MTA??????Jam Ind????????????????
+ ????????  : pstMsg -- ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年5月6日
-    作    者   : g00261581
-    修改内容   : 新增
+ ????????      :
+  1.??    ??   : 2014??5??6??
+    ??    ??   : g00261581
+    ????????   : ????
 *****************************************************************************/
 VOS_UINT32 AT_RcvMtaJamDetectInd(
     VOS_VOID                           *pMsg
@@ -782,12 +782,12 @@ VOS_UINT32 AT_RcvMtaJamDetectInd(
     AT_MTA_MSG_STRU                    *pstMtaMsg;
     MTA_AT_JAM_DETECT_IND_STRU         *pstJamDetectInd;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex             = 0;
     pstMtaMsg           = (AT_MTA_MSG_STRU*)pMsg;
     pstJamDetectInd     = (MTA_AT_JAM_DETECT_IND_STRU*)pstMtaMsg->aucContent;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if (AT_FAILURE == At_ClientIdToUserId(pstMtaMsg->stAppCtrl.usClientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvMtaJamDetectInd: WARNING:AT INDEX NOT FOUND!");
@@ -796,7 +796,7 @@ VOS_UINT32 AT_RcvMtaJamDetectInd(
 
     gstAtSendData.usBufLen = 0;
 
-    /* 上报干扰检测结果 */
+    /* ???????????????? */
     if (MTA_AT_JAM_RESULT_JAM_DISCOVERED == pstJamDetectInd->enJamResult)
     {
         gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
@@ -824,19 +824,19 @@ VOS_UINT32 AT_RcvMtaJamDetectInd(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_SetRatFreqLock
- 功能描述  : 支持^FREQLOCK设置
-             命令格式:^FREQLOCK=<enable>[,<freq>[,<ratMode>[,<band>]]]
- 输入参数  : ucIndex - 用户索引
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_SetRatFreqLock
+ ????????  : ????^FREQLOCK????
+             ????????:^FREQLOCK=<enable>[,<freq>[,<ratMode>[,<band>]]]
+ ????????  : ucIndex - ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年06月11日
-    作    者   : g00261581
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??06??11??
+    ??    ??   : g00261581
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_SetRatFreqLock(VOS_UINT8 ucIndex)
@@ -844,7 +844,7 @@ VOS_UINT32 AT_SetRatFreqLock(VOS_UINT8 ucIndex)
     AT_MTA_SET_FREQ_LOCK_REQ_STRU       stAtCmd;
     VOS_UINT32                          ulRst;
 
-    /* 参数个数检查 */
+    /* ???????????? */
     if ((gucAtParaIndex < 1) || (gucAtParaIndex > 4))
     {
         return AT_CME_INCORRECT_PARAMETERS;
@@ -853,7 +853,7 @@ VOS_UINT32 AT_SetRatFreqLock(VOS_UINT8 ucIndex)
     PS_MEM_SET(&stAtCmd, 0, sizeof(AT_MTA_SET_FREQ_LOCK_REQ_STRU));
     stAtCmd.ucEnableFlg = (VOS_UINT8)gastAtParaList[0].ulParaValue;
 
-    /* 如果锁频功能关闭，直接写Nv, 返回AT_OK */
+    /* ????????????????????????Nv, ????AT_OK */
     if (VOS_FALSE == stAtCmd.ucEnableFlg)
     {
         if (NV_OK != NV_WriteEx(MODEM_ID_0, en_NV_Item_FREQ_LOCK_CFG, &stAtCmd, sizeof(stAtCmd)))
@@ -867,7 +867,7 @@ VOS_UINT32 AT_SetRatFreqLock(VOS_UINT8 ucIndex)
 
     stAtCmd.usLockedFreq = (VOS_UINT16)gastAtParaList[1].ulParaValue;
 
-    /* 解析命令中的接入模式 */
+    /* ???????????????????? */
     if (0 == gastAtParaList[2].usParaLen)
     {
         stAtCmd.enRatMode = AT_MTA_FREQLOCK_RATMODE_WCDMA;
@@ -877,7 +877,7 @@ VOS_UINT32 AT_SetRatFreqLock(VOS_UINT8 ucIndex)
         stAtCmd.enRatMode = (AT_MTA_FREQLOCK_RATMODE_ENUM_UINT8)gastAtParaList[2].ulParaValue;
     }
 
-    /* 解析命令中的BAND信息 */
+    /* ????????????BAND???? */
     if (0 == gastAtParaList[3].usParaLen)
     {
         if (AT_MTA_FREQLOCK_RATMODE_GSM == stAtCmd.enRatMode)
@@ -891,7 +891,7 @@ VOS_UINT32 AT_SetRatFreqLock(VOS_UINT8 ucIndex)
         stAtCmd.enBand = (AT_MTA_GSM_BAND_ENUM_UINT16)gastAtParaList[3].ulParaValue;
     }
 
-    /* 发送消息给C核处理 */
+    /* ??????????C?????? */
     ulRst = AT_FillAndSndAppReqMsg(gastAtClientTab[ucIndex].usClientId,
                                    0,
                                    ID_AT_MTA_SET_FREQ_LOCK_REQ,
@@ -911,18 +911,18 @@ VOS_UINT32 AT_SetRatFreqLock(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvMtaSetRatFreqLockCnf
- 功能描述  : AT模块收到MTA回复的频点检查结果处理函数
- 输入参数  : pstMsg -- 消息内容
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvMtaSetRatFreqLockCnf
+ ????????  : AT????????MTA??????????????????????????
+ ????????  : pstMsg -- ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年6月12日
-    作    者   : g00261581
-    修改内容   : 新增
+ ????????      :
+  1.??    ??   : 2014??6??12??
+    ??    ??   : g00261581
+    ????????   : ????
 *****************************************************************************/
 VOS_UINT32 AT_RcvMtaSetRatFreqLockCnf(
     VOS_VOID                           *pMsg
@@ -933,13 +933,13 @@ VOS_UINT32 AT_RcvMtaSetRatFreqLockCnf(
     VOS_UINT8                           ucIndex;
     VOS_UINT32                          ulResult;
 
-    /* 初始化 */
+    /* ?????? */
     pstRcvMsg    = (AT_MTA_MSG_STRU *)pMsg;
     pstSetCnf    = (MTA_AT_SET_FREQ_LOCK_CNF_STRU *)pstRcvMsg->aucContent;
     ucIndex      = 0;
     ulResult     = AT_ERROR;
 
-    /* 通过clientid获取index */
+    /* ????clientid????index */
     if (AT_FAILURE == At_ClientIdToUserId(pstRcvMsg->stAppCtrl.usClientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvMtaSetRatFreqLockCnf : WARNING:AT INDEX NOT FOUND!");
@@ -952,17 +952,17 @@ VOS_UINT32 AT_RcvMtaSetRatFreqLockCnf(
         return VOS_ERR;
     }
 
-    /* 当前AT是否在等待该命令返回 */
+    /* ????AT???????????????????? */
     if (AT_CMD_RATFREQLOCK_SET != gastAtClientTab[ucIndex].CmdCurrentOpt)
     {
         AT_WARN_LOG("AT_RcvMtaSetRatFreqLockCnf : Current Option is not AT_CMD_RATFREQLOCK_SET.");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 格式化命令返回 */
+    /* ?????????????? */
     gstAtSendData.usBufLen = 0;
 
     if (MTA_AT_RESULT_NO_ERROR == pstSetCnf->enResult)
@@ -975,18 +975,18 @@ VOS_UINT32 AT_RcvMtaSetRatFreqLockCnf(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_QryRatFreqLock
- 功能描述  : ^FREQLOCK查询锁频命令设置值
- 输入参数  : ucIndex - 用户索引
- 输出参数  : 无
- 返 回 值  : 执行结果
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_QryRatFreqLock
+ ????????  : ^FREQLOCK??????????????????
+ ????????  : ucIndex - ????????
+ ????????  : ??
+ ?? ?? ??  : ????????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年6月12日
-    作    者   : g00261581
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??6??12??
+    ??    ??   : g00261581
+    ????????   : ??????????
 *****************************************************************************/
 VOS_UINT32 AT_QryRatFreqLock(VOS_UINT8 ucIndex)
 {
@@ -994,7 +994,7 @@ VOS_UINT32 AT_QryRatFreqLock(VOS_UINT8 ucIndex)
 
     PS_MEM_SET(&stNvFreqLockCfg, 0x0, sizeof(stNvFreqLockCfg));
 
-    /* 通过读取NV来获取Freq Lock当前配置值 */
+    /* ????????NV??????Freq Lock?????????? */
     if (NV_OK != NV_ReadEx(MODEM_ID_0,
                            en_NV_Item_FREQ_LOCK_CFG,
                            &stNvFreqLockCfg,
@@ -1004,10 +1004,10 @@ VOS_UINT32 AT_QryRatFreqLock(VOS_UINT8 ucIndex)
         return AT_ERROR;
     }
 
-    /* 锁频功能关闭情况下只上报开关值:0 */
+    /* ??????????????????????????????:0 */
     if (VOS_FALSE == stNvFreqLockCfg.ucEnableFlg)
     {
-        /* 查询结果上报 */
+        /* ???????????? */
         gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                                         (VOS_CHAR *)pgucAtSndCodeAddr,
                                                         (VOS_CHAR *)pgucAtSndCodeAddr,
@@ -1018,10 +1018,10 @@ VOS_UINT32 AT_QryRatFreqLock(VOS_UINT8 ucIndex)
         return AT_OK;
     }
 
-    /* 锁频功能设置在G模上，查询需要上报BAND信息 */
+    /* ??????????????G??????????????????BAND???? */
     if (TAF_NVIM_RAT_MODE_GSM == stNvFreqLockCfg.enRatMode)
     {
-        /* 查询结果上报 */
+        /* ???????????? */
         gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                                         (VOS_CHAR *)pgucAtSndCodeAddr,
                                                         (VOS_CHAR *)pgucAtSndCodeAddr,
@@ -1034,7 +1034,7 @@ VOS_UINT32 AT_QryRatFreqLock(VOS_UINT8 ucIndex)
     }
     else
     {
-        /* 查询结果上报 */
+        /* ???????????? */
         gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                                         (VOS_CHAR *)pgucAtSndCodeAddr,
                                                         (VOS_CHAR *)pgucAtSndCodeAddr,
@@ -1049,36 +1049,36 @@ VOS_UINT32 AT_QryRatFreqLock(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_SetGFreqLock
- 功能描述  : 支持^GFREQLOCK设置
-             命令格式:^GFREQLOCK =<enable>[,<freq>,<band>]
- 输入参数  : ucIndex - 用户索引
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_SetGFreqLock
+ ????????  : ????^GFREQLOCK????
+             ????????:^GFREQLOCK =<enable>[,<freq>,<band>]
+ ????????  : ucIndex - ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年08月05日
-    作    者   : j00174725
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??08??05??
+    ??    ??   : j00174725
+    ????????   : ??????????
 *****************************************************************************/
 VOS_UINT32 AT_SetGFreqLock(VOS_UINT8 ucIndex)
 {
     AT_MTA_SET_GSM_FREQLOCK_REQ_STRU    stGFreqLockInfo;
     VOS_UINT32                          ulRst;
 
-    /* 参数个数检查 */
+    /* ???????????? */
     if ((gucAtParaIndex != 1) && (gucAtParaIndex != 3))
     {
         return AT_CME_INCORRECT_PARAMETERS;
     }
 
-    /* 初始化 */
+    /* ?????? */
     PS_MEM_SET(&stGFreqLockInfo, 0, sizeof(AT_MTA_SET_GSM_FREQLOCK_REQ_STRU));
 
-    /* 参数有效性检查 */
-    /* 第一个参数必须带 */
+    /* ?????????????? */
+    /* ???????????????? */
     if (0 == gastAtParaList[0].usParaLen)
     {
         return AT_CME_INCORRECT_PARAMETERS;
@@ -1086,7 +1086,7 @@ VOS_UINT32 AT_SetGFreqLock(VOS_UINT8 ucIndex)
 
     stGFreqLockInfo.enableFlag = (PS_BOOL_ENUM_UINT8)gastAtParaList[0].ulParaValue;
 
-    /* 若启动锁频，则必须带第二个参数和第三个参数 */
+    /* ?????????????????????????????????????????? */
     if (PS_TRUE == stGFreqLockInfo.enableFlag)
     {
         if ( (0 == gastAtParaList[1].usParaLen)
@@ -1101,7 +1101,7 @@ VOS_UINT32 AT_SetGFreqLock(VOS_UINT8 ucIndex)
         }
     }
 
-    /* 发送消息给C核处理 */
+    /* ??????????C?????? */
     ulRst = AT_FillAndSndAppReqMsg(gastAtClientTab[ucIndex].usClientId,
                                    0,
                                    ID_AT_MTA_SET_GSM_FREQLOCK_REQ,
@@ -1121,18 +1121,18 @@ VOS_UINT32 AT_SetGFreqLock(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvMtaSetGFreqLockCnf
- 功能描述  : AT模块收到MTA回复的G模频点设置结果处理函数
- 输入参数  : pstMsg -- 消息内容
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvMtaSetGFreqLockCnf
+ ????????  : AT????????MTA??????G??????????????????????
+ ????????  : pstMsg -- ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年08月05日
-    作    者   : j00174725
-    修改内容   : 新增
+ ????????      :
+  1.??    ??   : 2014??08??05??
+    ??    ??   : j00174725
+    ????????   : ????
 *****************************************************************************/
 VOS_UINT32 AT_RcvMtaSetGFreqLockCnf(
     VOS_VOID                           *pMsg
@@ -1143,13 +1143,13 @@ VOS_UINT32 AT_RcvMtaSetGFreqLockCnf(
     VOS_UINT8                           ucIndex;
     VOS_UINT32                          ulResult;
 
-    /* 初始化 */
+    /* ?????? */
     pstRcvMsg    = (AT_MTA_MSG_STRU *)pMsg;
     pstSetCnf    = (MTA_AT_SET_GSM_FREQLOCK_CNF_STRU *)pstRcvMsg->aucContent;
     ucIndex      = 0;
     ulResult     = AT_ERROR;
 
-    /* 通过clientid获取index */
+    /* ????clientid????index */
     if (AT_FAILURE == At_ClientIdToUserId(pstRcvMsg->stAppCtrl.usClientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvMtaSetGFreqLockCnf : WARNING:AT INDEX NOT FOUND!");
@@ -1162,17 +1162,17 @@ VOS_UINT32 AT_RcvMtaSetGFreqLockCnf(
         return VOS_ERR;
     }
 
-    /* 当前AT是否在等待该命令返回 */
+    /* ????AT???????????????????? */
     if (AT_CMD_GSM_FREQLOCK_SET != gastAtClientTab[ucIndex].CmdCurrentOpt)
     {
         AT_WARN_LOG("AT_RcvMtaSetGFreqLockCnf : Current Option is not AT_CMD_GSM_FREQLOCK_SET.");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 格式化命令返回 */
+    /* ?????????????? */
     gstAtSendData.usBufLen = 0;
 
     if (MTA_AT_RESULT_NO_ERROR == pstSetCnf->enResult)
@@ -1186,20 +1186,20 @@ VOS_UINT32 AT_RcvMtaSetGFreqLockCnf(
 
 
 /*****************************************************************************
- 函 数 名  : AT_NetMonFmtPlmnId
- 功能描述  : PLMN ID 字符串化处理函数
- 输入参数  : ulMcc -- Mcc
+ ?? ?? ??  : AT_NetMonFmtPlmnId
+ ????????  : PLMN ID ????????????????
+ ????????  : ulMcc -- Mcc
              ulMnc -- Mnc
- 输出参数  : pstrPlmn  -- 字符串化后的PLMN
-             pusLength --字符串化后的PLMN长度
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ????????  : pstrPlmn  -- ????????????PLMN
+             pusLength --????????????PLMN????
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
-  修改历史      :
-  1.日    期   : 2015年10月19日
-    作    者   : wx270776
-    修改内容   : 新生成函数
+  ????????      :
+  1.??    ??   : 2015??10??19??
+    ??    ??   : wx270776
+    ????????   : ??????????
 *****************************************************************************/
 VOS_VOID AT_NetMonFmtPlmnId(
     VOS_UINT32                          ulMcc,
@@ -1214,7 +1214,7 @@ VOS_VOID AT_NetMonFmtPlmnId(
     ulLength                          = 0;
     ulMaxLength                       = AT_NETMON_PLMN_STRING_MAX_LENGTH;
 
-    /* 格式输出MCC */
+    /* ????????MCC */
     ulLength += VOS_nsprintf( (VOS_CHAR *)pstrPlmn,
                               (VOS_UINT32)ulMaxLength,
                               "%X%X%X",
@@ -1223,7 +1223,7 @@ VOS_VOID AT_NetMonFmtPlmnId(
                               (ulMcc & 0x0f0000)>>16 );
 
 
-    /* 格式输出MNC */
+    /* ????????MNC */
     if (0x0f0000 == (ulMnc & 0x0f0000))
     {
         ulLength += VOS_nsprintf( (VOS_CHAR *)(pstrPlmn + ulLength),
@@ -1248,18 +1248,18 @@ VOS_VOID AT_NetMonFmtPlmnId(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_NetMonFmtGsmSCellData
- 功能描述  : GSM 服务小区输出 字符串化处理函数
- 输入参数  : pstSCellInfo -- 服务小区数据结构
- 输出参数  : pusLength  --  GSM 服务小区输出 字符串化长度
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_NetMonFmtGsmSCellData
+ ????????  : GSM ???????????? ????????????????
+ ????????  : pstSCellInfo -- ????????????????
+ ????????  : pusLength  --  GSM ???????????? ????????????
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
-  修改历史      :
-  1.日    期   : 2015年10月19日
-    作    者   : wx270776
-    修改内容   : 新生成函数
+  ????????      :
+  1.??    ??   : 2015??10??19??
+    ??    ??   : wx270776
+    ????????   : ??????????
 *****************************************************************************/
 VOS_VOID AT_NetMonFmtGsmSCellData(
     MTA_AT_NETMON_CELL_INFO_STRU       *pstSCellInfo,
@@ -1281,7 +1281,7 @@ VOS_VOID AT_NetMonFmtGsmSCellData(
 
     AT_NetMonFmtPlmnId(ulMcc, ulMnc, (VOS_CHAR *)pucPlmnstr, &ulPlmnStrLen);
 
-    /* 格式输出PLMN */
+    /* ????????PLMN */
     usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
                                         (VOS_CHAR *)pgucAtSndCodeAddr,
                                         (VOS_CHAR *)pgucAtSndCodeAddr + usLength,
@@ -1293,7 +1293,7 @@ VOS_VOID AT_NetMonFmtGsmSCellData(
                                         pstSCellInfo->unSCellInfo.stGsmSCellInfo.stSCellInfo.ulCellID,
                                         pstSCellInfo->unSCellInfo.stGsmSCellInfo.stSCellInfo.usLac );
 
-    /* RSSI无效值，不显示 */
+    /* RSSI?????????????? */
     if (AT_NETMON_GSM_RSSI_INVALID_VALUE == pstSCellInfo->unSCellInfo.stGsmSCellInfo.stSCellInfo.sRssi)
     {
         usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -1310,7 +1310,7 @@ VOS_VOID AT_NetMonFmtGsmSCellData(
                                             pstSCellInfo->unSCellInfo.stGsmSCellInfo.stSCellInfo.sRssi );
     }
 
-    /* 无效值，不显示 */
+    /* ?????????????? */
     if (AT_NETMON_GSM_RX_QUALITY_INVALID_VALUE == pstSCellInfo->unSCellInfo.stGsmSCellInfo.stSCellInfo.ucRxQuality)
     {
         usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -1327,7 +1327,7 @@ VOS_VOID AT_NetMonFmtGsmSCellData(
                                             pstSCellInfo->unSCellInfo.stGsmSCellInfo.stSCellInfo.ucRxQuality );
     }
 
-    /*输出TA*/
+    /*????TA*/
     if (PS_IE_PRESENT == pstSCellInfo->unSCellInfo.stGsmSCellInfo.bitOpTa)
     {
         usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -1350,18 +1350,18 @@ VOS_VOID AT_NetMonFmtGsmSCellData(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_NetMonFmtUtranFddSCellData
- 功能描述  : WCDMA 服务小区输出 字符串化处理函数
- 输入参数  : pstSCellInfo -- 服务小区数据结构
- 输出参数  : pusLength  --  WCDMA 服务小区输出 字符串化长度
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_NetMonFmtUtranFddSCellData
+ ????????  : WCDMA ???????????? ????????????????
+ ????????  : pstSCellInfo -- ????????????????
+ ????????  : pusLength  --  WCDMA ???????????? ????????????
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
-  修改历史      :
-  1.日    期   : 2015年10月19日
-    作    者   : wx270776
-    修改内容   : 新生成函数
+  ????????      :
+  1.??    ??   : 2015??10??19??
+    ??    ??   : wx270776
+    ????????   : ??????????
 *****************************************************************************/
 VOS_VOID AT_NetMonFmtUtranFddSCellData(
     MTA_AT_NETMON_CELL_INFO_STRU       *pstSCellInfo,
@@ -1383,21 +1383,21 @@ VOS_VOID AT_NetMonFmtUtranFddSCellData(
 
     AT_NetMonFmtPlmnId(ulMcc, ulMnc, (VOS_CHAR *)pucPlmnstr, &ulPlmnStrLen);
 
-    /* 格式输出PLMN */
+    /* ????????PLMN */
     usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
                                         (VOS_CHAR *)pgucAtSndCodeAddr,
                                         (VOS_CHAR *)pgucAtSndCodeAddr + usLength,
                                         "^MONSC: WCDMA,%s",
                                         pucPlmnstr );
 
-    /*输出频点*/
+    /*????????*/
     usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
                                         (VOS_CHAR *)pgucAtSndCodeAddr,
                                         (VOS_CHAR *)pgucAtSndCodeAddr + usLength,
                                         ",%d",
                                         pstSCellInfo->unSCellInfo.stUtranSCellInfo.usArfcn );
 
-    /* PSC无效值，不显示 */
+    /* PSC?????????????? */
     if ((AT_NETMON_UTRAN_FDD_RSCP_INVALID_VALUE == pstSCellInfo->unSCellInfo.stUtranSCellInfo.u.stCellMeasResultsFDD.sRSCP)
         && (AT_NETMON_UTRAN_FDD_ECN0_INVALID_VALUE == pstSCellInfo->unSCellInfo.stUtranSCellInfo.u.stCellMeasResultsFDD.sECN0))
     {
@@ -1415,7 +1415,7 @@ VOS_VOID AT_NetMonFmtUtranFddSCellData(
                                             pstSCellInfo->unSCellInfo.stUtranSCellInfo.u.stCellMeasResultsFDD.usPSC );
     }
 
-    /*输出Cell ID*/
+    /*????Cell ID*/
     if (PS_IE_PRESENT == pstSCellInfo->unSCellInfo.stUtranSCellInfo.bitOpCellID)
     {
         usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -1432,7 +1432,7 @@ VOS_VOID AT_NetMonFmtUtranFddSCellData(
                                             "," );
     }
 
-    /*输出LAC*/
+    /*????LAC*/
     if (PS_IE_PRESENT == pstSCellInfo->unSCellInfo.stUtranSCellInfo.bitOpLAC)
     {
         usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -1449,7 +1449,7 @@ VOS_VOID AT_NetMonFmtUtranFddSCellData(
                                             "," );
     }
 
-    /* RSCP无效值，不显示 */
+    /* RSCP?????????????? */
     if (AT_NETMON_UTRAN_FDD_RSCP_INVALID_VALUE == pstSCellInfo->unSCellInfo.stUtranSCellInfo.u.stCellMeasResultsFDD.sRSCP)
     {
         usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -1466,7 +1466,7 @@ VOS_VOID AT_NetMonFmtUtranFddSCellData(
                                             pstSCellInfo->unSCellInfo.stUtranSCellInfo.u.stCellMeasResultsFDD.sRSCP );
     }
 
-    /* RSSI无效值，不显示 */
+    /* RSSI?????????????? */
     if (AT_NETMON_UTRAN_FDD_RSSI_INVALID_VALUE == pstSCellInfo->unSCellInfo.stUtranSCellInfo.u.stCellMeasResultsFDD.sRSSI)
     {
         usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -1483,7 +1483,7 @@ VOS_VOID AT_NetMonFmtUtranFddSCellData(
                                             pstSCellInfo->unSCellInfo.stUtranSCellInfo.u.stCellMeasResultsFDD.sRSSI );
     }
 
-    /* ECN0无效值，不显示 */
+    /* ECN0?????????????? */
     if (AT_NETMON_UTRAN_FDD_ECN0_INVALID_VALUE == pstSCellInfo->unSCellInfo.stUtranSCellInfo.u.stCellMeasResultsFDD.sECN0)
     {
         usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -1500,7 +1500,7 @@ VOS_VOID AT_NetMonFmtUtranFddSCellData(
                                             pstSCellInfo->unSCellInfo.stUtranSCellInfo.u.stCellMeasResultsFDD.sECN0 );
     }
 
-    /*输出DRX*/
+    /*????DRX*/
     if (PS_IE_PRESENT == pstSCellInfo->unSCellInfo.stUtranSCellInfo.u.stCellMeasResultsFDD.bitOpDRX)
     {
         usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -1517,7 +1517,7 @@ VOS_VOID AT_NetMonFmtUtranFddSCellData(
                                             "," );
     }
 
-    /*输出URA Id*/
+    /*????URA Id*/
     if (PS_IE_PRESENT == pstSCellInfo->unSCellInfo.stUtranSCellInfo.u.stCellMeasResultsFDD.bitOpURA)
     {
         usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -1540,19 +1540,19 @@ VOS_VOID AT_NetMonFmtUtranFddSCellData(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_NetMonFmtGsmNCellData
- 功能描述  : GSM 临区输出 字符串化处理函数
- 输入参数  : pstNCellInfo -- 临区数据结构
-             usInLen      -- 输入长度
- 输出参数  : pusOutLen    --  GSM 临区输出 字符串化处理函数
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_NetMonFmtGsmNCellData
+ ????????  : GSM ???????? ????????????????
+ ????????  : pstNCellInfo -- ????????????
+             usInLen      -- ????????
+ ????????  : pusOutLen    --  GSM ???????? ????????????????
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
-  修改历史      :
-  1.日    期   : 2015年10月19日
-    作    者   : wx270776
-    修改内容   : 新生成函数
+  ????????      :
+  1.??    ??   : 2015??10??19??
+    ??    ??   : wx270776
+    ????????   : ??????????
 *****************************************************************************/
 VOS_VOID AT_NetMonFmtGsmNCellData(
     MTA_AT_NETMON_CELL_INFO_STRU       *pstNCellInfo,
@@ -1570,10 +1570,10 @@ VOS_VOID AT_NetMonFmtGsmNCellData(
         pstNCellInfo->stNCellInfo.ucGsmNCellCnt = NETMON_MAX_GSM_NCELL_NUM;
     }
 
-    /* GSM邻区显示 */
+    /* GSM???????? */
     for (ulLoop = 0; ulLoop < pstNCellInfo->stNCellInfo.ucGsmNCellCnt; ulLoop++)
     {
-        /* 如果输出的不是第一个邻区，先打印回车换行 */
+        /* ???????????????????????????????????????? */
         if (0 != usLength)
         {
             usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -1590,7 +1590,7 @@ VOS_VOID AT_NetMonFmtGsmNCellData(
                                             pstNCellInfo->stNCellInfo.astGsmNCellInfo[ulLoop].enBand,
                                             pstNCellInfo->stNCellInfo.astGsmNCellInfo[ulLoop].usAfrcn );
 
-        /*输出Bsic*/
+        /*????Bsic*/
         if (PS_IE_PRESENT == pstNCellInfo->stNCellInfo.astGsmNCellInfo[ulLoop].bitOpBsic)
         {
             usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -1607,7 +1607,7 @@ VOS_VOID AT_NetMonFmtGsmNCellData(
                                                 "," );
         }
 
-        /*输出Cell ID*/
+        /*????Cell ID*/
         if (PS_IE_PRESENT == pstNCellInfo->stNCellInfo.astGsmNCellInfo[ulLoop].bitOpCellID)
         {
             usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -1624,7 +1624,7 @@ VOS_VOID AT_NetMonFmtGsmNCellData(
                                                 "," );
         }
 
-         /*输出LAC*/
+         /*????LAC*/
         if (PS_IE_PRESENT == pstNCellInfo->stNCellInfo.astGsmNCellInfo[ulLoop].bitOpLAC)
         {
             usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -1641,7 +1641,7 @@ VOS_VOID AT_NetMonFmtGsmNCellData(
                                                "," );
         }
 
-        /*输出RSSI*/
+        /*????RSSI*/
         usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
                                             (VOS_CHAR *)pgucAtSndCodeAddr,
                                             (VOS_CHAR *)pgucAtSndCodeAddr + usLength,
@@ -1654,19 +1654,19 @@ VOS_VOID AT_NetMonFmtGsmNCellData(
     return;
 }
 /*****************************************************************************
- 函 数 名  : AT_NetMonFmtUtranFddNCellData
- 功能描述  : WCDMA 临区输出 字符串化处理函数
- 输入参数  : pstNCellInfo -- 临区数据结构
-             usInLen      -- 输入长度
- 输出参数  : pusOutLen    --  WCDMA临区输出 字符串化处理函数
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_NetMonFmtUtranFddNCellData
+ ????????  : WCDMA ???????? ????????????????
+ ????????  : pstNCellInfo -- ????????????
+             usInLen      -- ????????
+ ????????  : pusOutLen    --  WCDMA???????? ????????????????
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
-  修改历史      :
-  1.日    期   : 2015年10月19日
-    作    者   : wx270776
-    修改内容   : 新生成函数
+  ????????      :
+  1.??    ??   : 2015??10??19??
+    ??    ??   : wx270776
+    ????????   : ??????????
 *****************************************************************************/
 VOS_VOID AT_NetMonFmtUtranFddNCellData(
     MTA_AT_NETMON_CELL_INFO_STRU       *pstNCellInfo,
@@ -1684,10 +1684,10 @@ VOS_VOID AT_NetMonFmtUtranFddNCellData(
         pstNCellInfo->stNCellInfo.ucUtranNCellCnt = NETMON_MAX_UTRAN_NCELL_NUM;
     }
 
-    /*WCDMA 临区显示*/
+    /*WCDMA ????????*/
     for (ulLoop = 0; ulLoop < pstNCellInfo->stNCellInfo.ucUtranNCellCnt; ulLoop++)
     {
-        /* 如果不是第一次打印邻区，打印回车换行 */
+        /* ???????????????????????????????????? */
         if (0 != usLength)
         {
             usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
@@ -1713,18 +1713,18 @@ VOS_VOID AT_NetMonFmtUtranFddNCellData(
 }
 
 /*****************************************************************************
- 函 数 名  : At_SetNetMonSCellPara
- 功能描述  : ^MONSC查询服务小区消息
- 输入参数  : ucIndex - 用户索引
- 输出参数  : 无
- 返 回 值  : 执行结果
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : At_SetNetMonSCellPara
+ ????????  : ^MONSC????????????????
+ ????????  : ucIndex - ????????
+ ????????  : ??
+ ?? ?? ??  : ????????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年10月19日
-    作    者   : wx270776
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??10??19??
+    ??    ??   : wx270776
+    ????????   : ??????????
 *****************************************************************************/
 VOS_UINT32 At_SetNetMonSCellPara(
     VOS_UINT8                           ucIndex
@@ -1755,18 +1755,18 @@ VOS_UINT32 At_SetNetMonSCellPara(
     }
 }
 /*****************************************************************************
- 函 数 名  : At_SetNetMonNCellPara
- 功能描述  : ^MONNC查询邻区信息
- 输入参数  : ucIndex - 用户索引
- 输出参数  : 无
- 返 回 值  : 执行结果
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : At_SetNetMonNCellPara
+ ????????  : ^MONNC????????????
+ ????????  : ucIndex - ????????
+ ????????  : ??
+ ?? ?? ??  : ????????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年10月19日
-    作    者   : wx270776
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??10??19??
+    ??    ??   : wx270776
+    ????????   : ??????????
 *****************************************************************************/
 VOS_UINT32 At_SetNetMonNCellPara(
     VOS_UINT8                           ucIndex
@@ -1798,18 +1798,18 @@ VOS_UINT32 At_SetNetMonNCellPara(
 
 }
 /*****************************************************************************
- 函 数 名  : AT_RcvMtaSetNetMonSCellCnf
- 功能描述  : AT模块收到MTA回复的MONSC设置结果处理函数
- 输入参数  : pstMsg -- 消息内容
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvMtaSetNetMonSCellCnf
+ ????????  : AT????????MTA??????MONSC????????????????
+ ????????  : pstMsg -- ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年10月19日
-    作    者   : wx270776
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??10??19??
+    ??    ??   : wx270776
+    ????????   : ??????????
 *****************************************************************************/
 VOS_UINT32 AT_RcvMtaSetNetMonSCellCnf(
     VOS_VOID                           *pMsg
@@ -1820,14 +1820,14 @@ VOS_UINT32 AT_RcvMtaSetNetMonSCellCnf(
     VOS_UINT8                           ucIndex;
     VOS_UINT16                          usLength;
 
-    /* 初始化 */
+    /* ?????? */
     pstRcvMsg                         = (AT_MTA_MSG_STRU *)pMsg;
     pstSetCnf                         = (MTA_AT_NETMON_CELL_INFO_STRU *)pstRcvMsg->aucContent;
 
     usLength                          = 0;
     ucIndex                           = 0;
 
-    /* 通过clientid获取index */
+    /* ????clientid????index */
     if (AT_FAILURE == At_ClientIdToUserId(pstRcvMsg->stAppCtrl.usClientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvMtaSetMonitServingCellCnf : WARNING:AT INDEX NOT FOUND!");
@@ -1840,14 +1840,14 @@ VOS_UINT32 AT_RcvMtaSetNetMonSCellCnf(
         return VOS_ERR;
     }
 
-    /* 当前AT是否在等待该命令返回 */
+    /* ????AT???????????????????? */
     if (AT_CMD_MONSC_SET != gastAtClientTab[ucIndex].CmdCurrentOpt)
     {
         AT_WARN_LOG("AT_RcvMtaSetMonitServingCellCnf : Current Option is not AT_CMD_JDETEX_SET.");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
     if ( (MTA_AT_RESULT_ERROR   == pstSetCnf->enResult)
@@ -1890,7 +1890,7 @@ VOS_UINT32 AT_RcvMtaSetNetMonSCellCnf(
     }
 
 
-    /* 输出结果 */
+    /* ???????? */
     gstAtSendData.usBufLen = usLength;
     At_FormatResultData(ucIndex, AT_OK);
 
@@ -1898,18 +1898,18 @@ VOS_UINT32 AT_RcvMtaSetNetMonSCellCnf(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvMtaSetNetMonNCellCnf
- 功能描述  : AT模块收到MTA回复的MONNC设置结果处理函数
- 输入参数  : pstMsg -- 消息内容
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvMtaSetNetMonNCellCnf
+ ????????  : AT????????MTA??????MONNC????????????????
+ ????????  : pstMsg -- ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年10月19日
-    作    者   : wx270776
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??10??19??
+    ??    ??   : wx270776
+    ????????   : ??????????
 *****************************************************************************/
 VOS_UINT32 AT_RcvMtaSetNetMonNCellCnf(
     VOS_VOID                           *pMsg
@@ -1921,14 +1921,14 @@ VOS_UINT32 AT_RcvMtaSetNetMonNCellCnf(
     VOS_UINT16                          usLength;
     VOS_UINT16                          usLengthTemp;
 
-    /* 初始化 */
+    /* ?????? */
     pstRcvMsg                         = (AT_MTA_MSG_STRU *)pMsg;
     pstSetCnf                         = (MTA_AT_NETMON_CELL_INFO_STRU *)pstRcvMsg->aucContent;
 
     ucIndex                           = 0;
     usLength                          = 0;
 
-    /* 通过clientid获取index */
+    /* ????clientid????index */
     if (AT_FAILURE == At_ClientIdToUserId(pstRcvMsg->stAppCtrl.usClientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvMtaSetMonitNeighCellCnf : WARNING:AT INDEX NOT FOUND!");
@@ -1941,14 +1941,14 @@ VOS_UINT32 AT_RcvMtaSetNetMonNCellCnf(
         return VOS_ERR;
     }
 
-    /* 当前AT是否在等待该命令返回 */
+    /* ????AT???????????????????? */
     if (AT_CMD_MONNC_SET != gastAtClientTab[ucIndex].CmdCurrentOpt)
     {
         AT_WARN_LOG("AT_RcvMtaSetMonitNeighCellCnf : Current Option is not AT_CMD_JDETEX_SET.");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
     if ( (MTA_AT_RESULT_ERROR   == pstSetCnf->enResult)
@@ -1963,10 +1963,10 @@ VOS_UINT32 AT_RcvMtaSetNetMonNCellCnf(
     usLengthTemp   = 0;
     usLength       = 0;
 
-    /* GSM邻区显示 */
+    /* GSM???????? */
     AT_NetMonFmtGsmNCellData(pstSetCnf, usLengthTemp, &usLength);
 
-    /* UTRAN邻区显示 */
+    /* UTRAN???????? */
     usLengthTemp = usLength;
 
     if (MTA_NETMON_UTRAN_FDD_TYPE == pstSetCnf->stNCellInfo.enCellMeasTypeChoice)
@@ -1979,16 +1979,16 @@ VOS_UINT32 AT_RcvMtaSetNetMonNCellCnf(
     }
     else
     {
-        /*类型不对，不进行任何处理*/
+        /*????????????????????????*/
         ;
     }
 
-    /* LTE邻区显示 */
+    /* LTE???????? */
     usLengthTemp = usLength;
 
     AT_NetMonFmtEutranNCellData(pstSetCnf, usLengthTemp, &usLength);
 
-    /* 无邻区，返回NONE */
+    /* ????????????NONE */
     if ( 0 == ( pstSetCnf->stNCellInfo.ucGsmNCellCnt +
                 pstSetCnf->stNCellInfo.ucUtranNCellCnt + pstSetCnf->stNCellInfo.ucLteNCellCnt ) )
     {
@@ -1998,7 +1998,7 @@ VOS_UINT32 AT_RcvMtaSetNetMonNCellCnf(
                                             "^MONNC: NONE" );
     }
 
-    /* 输出结果 */
+    /* ???????? */
     gstAtSendData.usBufLen = usLength;
     At_FormatResultData(ucIndex, AT_OK);
 
@@ -2006,18 +2006,18 @@ VOS_UINT32 AT_RcvMtaSetNetMonNCellCnf(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_NetMonFmtUtranTddSCellData
- 功能描述  : TD-SCDMA 服务小区输出 字符串化处理函数
- 输入参数  : pstSCellInfo -- 服务小区数据结构
- 输出参数  : pusLength  --  TD-SCDMA 服务小区输出 字符串化长度
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_NetMonFmtUtranTddSCellData
+ ????????  : TD-SCDMA ???????????? ????????????????
+ ????????  : pstSCellInfo -- ????????????????
+ ????????  : pusLength  --  TD-SCDMA ???????????? ????????????
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
-  修改历史      :
-  1.日    期   : 2015年10月19日
-    作    者   : wx270776
-    修改内容   : 新生成函数
+  ????????      :
+  1.??    ??   : 2015??10??19??
+    ??    ??   : wx270776
+    ????????   : ??????????
 *****************************************************************************/
 VOS_VOID AT_NetMonFmtUtranTddSCellData(
     MTA_AT_NETMON_CELL_INFO_STRU       *pstSCellInfo,
@@ -2039,7 +2039,7 @@ VOS_VOID AT_NetMonFmtUtranTddSCellData(
 
     AT_NetMonFmtPlmnId(ulMcc, ulMnc, (VOS_CHAR *)pucPlmnstr, &ulPlmnStrLen);
 
-    /* 格式输出PLMN */
+    /* ????????PLMN */
     usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
                                         (VOS_CHAR *)pgucAtSndCodeAddr,
                                         (VOS_CHAR *)pgucAtSndCodeAddr + usLength,
@@ -2064,19 +2064,19 @@ VOS_VOID AT_NetMonFmtUtranTddSCellData(
     return;
 }
 /*****************************************************************************
- 函 数 名  : AT_NetMonFmtUtranFddNCellData
- 功能描述  : TD-SCDMA 临区输出 字符串化处理函数
- 输入参数  : pstNCellInfo -- 临区数据结构
-             usInLen      -- 输入长度
- 输出参数  : pusOutLen    --  TD-SCDMA临区输出 字符串化处理函数
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_NetMonFmtUtranFddNCellData
+ ????????  : TD-SCDMA ???????? ????????????????
+ ????????  : pstNCellInfo -- ????????????
+             usInLen      -- ????????
+ ????????  : pusOutLen    --  TD-SCDMA???????? ????????????????
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
-  修改历史      :
-  1.日    期   : 2015年10月19日
-    作    者   : wx270776
-    修改内容   : 新生成函数
+  ????????      :
+  1.??    ??   : 2015??10??19??
+    ??    ??   : wx270776
+    ????????   : ??????????
 *****************************************************************************/
 VOS_VOID AT_NetMonFmtUtranTddNCellData(
     MTA_AT_NETMON_CELL_INFO_STRU       *pstNCellInfo,
@@ -2094,10 +2094,10 @@ VOS_VOID AT_NetMonFmtUtranTddNCellData(
         pstNCellInfo->stNCellInfo.ucUtranNCellCnt = NETMON_MAX_UTRAN_NCELL_NUM;
     }
 
-    /*WCDMA 临区显示*/
+    /*WCDMA ????????*/
     for (ulLoop = 0; ulLoop < pstNCellInfo->stNCellInfo.ucUtranNCellCnt; ulLoop++)
     {
-        /* 如果不是第一次打印邻区，打印回车换行 */
+        /* ???????????????????????????????????? */
         if (0 != usLength)
         {
             usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
@@ -2123,18 +2123,18 @@ VOS_VOID AT_NetMonFmtUtranTddNCellData(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_NetMonFmtEutranSCellData
- 功能描述  : LTE 服务小区输出 字符串化处理函数
- 输入参数  : pstSCellInfo -- 服务小区数据结构
- 输出参数  : pusLength  --  LTE 服务小区输出 字符串化长度
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_NetMonFmtEutranSCellData
+ ????????  : LTE ???????????? ????????????????
+ ????????  : pstSCellInfo -- ????????????????
+ ????????  : pusLength  --  LTE ???????????? ????????????
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
-  修改历史      :
-  1.日    期   : 2015年10月19日
-    作    者   : wx270776
-    修改内容   : 新生成函数
+  ????????      :
+  1.??    ??   : 2015??10??19??
+    ??    ??   : wx270776
+    ????????   : ??????????
 *****************************************************************************/
 VOS_VOID AT_NetMonFmtEutranSCellData(
     MTA_AT_NETMON_CELL_INFO_STRU       *pstSCellInfo,
@@ -2156,7 +2156,7 @@ VOS_VOID AT_NetMonFmtEutranSCellData(
 
     AT_NetMonFmtPlmnId(ulMcc, ulMnc, (VOS_CHAR *)pucPlmnstr, &ulPlmnStrLen);
 
-    /* 格式输出PLMN */
+    /* ????????PLMN */
     usLength += (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
                                         (VOS_CHAR *)pgucAtSndCodeAddr,
                                         (VOS_CHAR *)pgucAtSndCodeAddr + usLength,
@@ -2180,19 +2180,19 @@ VOS_VOID AT_NetMonFmtEutranSCellData(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_NetMonFmtEutranNCellData
- 功能描述  : LTE 临区输出 字符串化处理函数
- 输入参数  : pstNCellInfo -- 临区数据结构
-             usInLen   -- 输入长度
- 输出参数  : pusOutLen  --  LTE临区输出 字符串化处理函数
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_NetMonFmtEutranNCellData
+ ????????  : LTE ???????? ????????????????
+ ????????  : pstNCellInfo -- ????????????
+             usInLen   -- ????????
+ ????????  : pusOutLen  --  LTE???????? ????????????????
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
-  修改历史      :
-  1.日    期   : 2015年10月19日
-    作    者   : wx270776
-    修改内容   : 新生成函数
+  ????????      :
+  1.??    ??   : 2015??10??19??
+    ??    ??   : wx270776
+    ????????   : ??????????
 *****************************************************************************/
 VOS_VOID AT_NetMonFmtEutranNCellData(
     MTA_AT_NETMON_CELL_INFO_STRU       *pstNCellInfo,
@@ -2210,10 +2210,10 @@ VOS_VOID AT_NetMonFmtEutranNCellData(
         pstNCellInfo->stNCellInfo.ucLteNCellCnt = NETMON_MAX_LTE_NCELL_NUM;
     }
 
-     /* LTE邻区显示 */
+     /* LTE???????? */
     for (ulLoop = 0; ulLoop < pstNCellInfo->stNCellInfo.ucLteNCellCnt; ulLoop++)
     {
-        /* 如果不是第一次打印邻区，打印回车换行 */
+        /* ???????????????????????????????????? */
         if (0 != usLength)
         {
             usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,

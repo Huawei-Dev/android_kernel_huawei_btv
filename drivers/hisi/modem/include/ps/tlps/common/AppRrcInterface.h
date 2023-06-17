@@ -7,7 +7,7 @@
   Description     : AppRrcInterface.h header file
   History         :
      1.XiaoJun 58160       2009-4-29     Draft Enact
-	 2.lishangfeng  55206 2011-09-11 DTS2011091100356:候补信息维护策略改进，并且能够支持多Band时的维护
+	 2.lishangfeng  55206 2011-09-11 DTS2011091100356:????????????????????????????????????Band????????
 ******************************************************************************/
 
 #ifndef __APPRRCINTERFACE_H__
@@ -43,46 +43,46 @@ extern "C" {
 /*typedef DT_CMD_ENUM_UINT8 APP_CMD_ENUM_UINT8;*/
 /*typedef DT_RESULT_ENUM_UINT32 APP_RESULT_ENUM_UINT32;*/
 
-/* RRC发起随机接入到MAC收到rar */
+/* RRC??????????????MAC????rar */
 #define PS_OM_EST_PTL_SND_MACRA_TO_RCV_RAR_TIME      (11)           /* 11ms T4-T1 */
-/* 从mac收到rar到发送消息3时间 */
+/* ??mac????rar??????????3???? */
 #define PS_OM_EST_PTL_RCV_RAR_TO_SND_MSG3_TIME       (3)            /* 2.5ms T5-T4*/
-/* 发送消息3到收到setup消息 */
+/* ????????3??????setup???? */
 #define PS_OM_EST_PTL_SND_MSG3_TO_RCV_SETUP_TIME     (73)           /* 28.5ms+2*Ts1c  T6-T5*/
-/* 处理setup消息协议时间 */
+/* ????setup???????????? */
 #define PS_OM_EST_PTL_SETUP_TO_CMPL_TIME             (3)             /* 3ms T7-T6*/
-/* 发起随机接入到发送setup cmpl协议时间 */
+/* ??????????????????setup cmpl???????? */
 #define PS_OM_EST_PTL_RRC_SND_MACRA_TO_CMPL_TIME     (92)            /* 47.5ms+2*Ts1c--(50.5~92.5ms) T7-T1*/
-/* 建链用户面时延协议值 */
+/* ???????????????????? */
 #define PS_OM_EST_PTL_USER_PLANE_TIME                (106)            /* 61ms+2*Ts1c+Ts1u--66~106ms T13-T1*/
 
-/* 小区搜索协议时间 */
+/* ???????????????? */
 #define PS_OM_REEST_PTL_SEARCH_CELL_TIME             (100)            /* <100ms */
-/* 系统消息更新协议时间 */
+/* ???????????????????? */
 #define PS_OM_REEST_PTL_RCV_SI_TIME                  (1280)           /* <1280ms */
-/* 检测到链路失败到在新小区上发起随机接入协议时间 */
+/* ?????????????????????????????????????????????? */
 #define PS_OM_REEST_PTL_RCV_REEST_IND_TO_MACRA       (1500)           /* <1500ms */
 
-/*  物理层切换开始到结束协议时间 */
+/*  ???????????????????????????? */
 #define PS_OM_HO_PTL_HO_REQ_TO_CNF                   (1)              /* <1ms T6-T5*/
 
-/* 随机接入请求到收到Cnf的协议时间 */
+/* ??????????????????Cnf?????????? */
 #define PS_OM_HO_PTL_RRC_MACRA_REQ_TO_MACRA_CNF      (11)             /* 2.5 + 1+ 7.5ms T8-T7*/
 
-/* 发送切换完成消息到收到确认消息协议时间 */
+/* ?????????????????????????????????????? */
 #define PS_OM_HO_PTL_SND_CMPL_TO_CMPL_CNF            (13)             /* 13ms T10-T9*/
 
-/* 收到切换重配消息到发起随机接入协议时间 */
+/* ?????????????????????????????????????? */
 #define PS_OM_HO_PTL_RCV_RBCFG_TO_MACRA_REQ          (50)             /* 50ms T7-T4*/
 
-/* 收到切换重配置消息到回复数传用户面时延协议时间 */
+/* ?????????????????????????????????????????????? */
 #define PS_OM_HO_PTL_USER_PLANE_TIME                 (100)            /* 100ms T11-T4*/
 
 /* add for AT&T LRRC DAM begin */
-/* 受限列表中保存最大的条目数 */
+/* ?????????????????????????? */
 #define RRC_APP_MAX_LIMITED_ITEM_COUNT         (32)
 /* add for AT&T LRRC DAM end */
-/*f00295098新增测量消息中上报小区最大个数*/
+/*f00295098??????????????????????????????*/
 #define LRRC_LCSEL_INTRA_CELL_REPORT_NUM 4
 #define LRRC_LCSEL_INTER_CELL_REPORT_NUM 4
 #define LRRC_LCSEL_UTRAN_CELL_REPORT_NUM 4
@@ -94,7 +94,7 @@ extern "C" {
 #define LRRC_UTRAN_CELL_MAX_NUM 16
 #define LRRC_GERAN_CELL_MAX_NUM 16
 
-/* UE支持的UTRAN频点的最大测量数目 */
+/* UE??????UTRAN?????????????????? */
 #define LRRC_TRRC_PHY_MAX_SUPPORT_CARRIER_NUM               9
 
 #define LRRC_GURRC_GERAN_ARFCN_MAX_NUM                      32
@@ -102,14 +102,14 @@ extern "C" {
   3 Massage Declare
 *****************************************************************************/
 /*****************************************************************************
- 枚举名    : APP_RRC_MSG_ID_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : RRC <-> APP 接口消息ID
+ ??????    : APP_RRC_MSG_ID_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : RRC <-> APP ????????ID
 *****************************************************************************/
 enum APP_RRC_MSG_ID_ENUM
 {
-    /* RRC发给APP的原语 */
+    /* RRC????APP?????? */
     ID_APP_RRC_TRANSPARENT_CMD_REQ      = (PS_MSG_ID_APP_TO_RRC_BASE + 0x00),   /* _H2ASN_MsgChoice APP_RRC_TRANSPARENT_CMD_REQ_STRU */
     ID_APP_RRC_CELL_MEAS_RPT_REQ        = (PS_MSG_ID_APP_TO_RRC_BASE + 0x01),   /* _H2ASN_MsgChoice APP_RRC_CELL_MEAS_RPT_REQ_STRU */
     ID_APP_RRC_TIME_DELAY_RPT_REQ       = (PS_MSG_ID_APP_TO_RRC_BASE + 0x02),   /* _H2ASN_MsgChoice APP_RRC_TIME_DELAY_RPT_REQ_STRU */
@@ -137,23 +137,23 @@ enum APP_RRC_MSG_ID_ENUM
     ID_APP_LRRC_FAST_DORM_CFG_NTF          = (PS_MSG_ID_APP_TO_RRC_BASE + 0x12),   /* _H2ASN_MsgChoice APP_LRRC_FAST_DORM_CFG_NTF_STRU  */
     ID_APP_LRRC_GET_NCELL_INFO_REQ      = (PS_MSG_ID_APP_TO_RRC_BASE + 0x13),   /* _H2ASN_MsgChoice APP_LRRC_GET_NCELL_INFO_REQ_STRU  */
 
-    /* begin:V7R2-DT 移植强制切换，重选和禁止限制小区接入等功能,c00134407,2014/3/26 */
+    /* begin:V7R2-DT ??????????????????????????????????????????,c00134407,2014/3/26 */
     /* yangfan Prob Begin */
     ID_APP_LRRC_INQ_TCFG_TXPOWER_REQ    = (PS_MSG_ID_APP_TO_RRC_BASE + 0x14),   /* _H2ASN_MsgChoice APP_RRC_INQ_TCFG_TXPOWER_REQ_STRU */
     /* yangfan Prob End */
     ID_APP_RRC_FORCE_HOANDCSEL_REQ        = (PS_MSG_ID_APP_TO_RRC_BASE + 0x15),/*_H2ASN_MsgChoice APP_RRC_FORCE_HOANDCSEL_REQ_STRU*/
     ID_APP_RRC_BARCELL_ACCESS_REQ        = (PS_MSG_ID_APP_TO_RRC_BASE + 0x16),/*_H2ASN_MsgChoice APP_RRC_BARCELL_ACCESS_REQ_STRU*/
-    /* end:V7R2-DT 移植强制切换，重选和禁止限制小区接入等功能,c00134407,2014/3/26 */
+    /* end:V7R2-DT ??????????????????????????????????????????,c00134407,2014/3/26 */
     ID_APP_LRRC_SET_UE_REL_VERSION_REQ      = (PS_MSG_ID_APP_TO_RRC_BASE + 0x17), /* _H2ASN_MsgChoice APP_LRRC_SET_UE_REL_VERSION_REQ_STRU  */
 
-    /* begin:add for 路测融合 */
+    /* begin:add for ???????? */
     ID_DT_LRRC_MEAS_REPORT_REQ         = (PS_MSG_ID_APP_TO_RRC_BASE + 0x18),
     ID_DT_LRRC_SYNC_REPORT_REQ         = (PS_MSG_ID_APP_TO_RRC_BASE + 0x19),
-    /* end:add for 路测融合 */
+    /* end:add for ???????? */
 
     ID_APP_LRRC_SET_TLPS_PRINT2LAYER_REQ    = (PS_MSG_ID_RRC_TO_APP_BASE + 0x18),
 
-    /* APP发给RRC的原语 */
+    /* APP????RRC?????? */
     ID_RRC_APP_TRANSPARENT_CMD_CNF      = (PS_MSG_ID_RRC_TO_APP_BASE + 0x00),   /* _H2ASN_MsgChoice RRC_APP_TRANSPARENT_CMD_CNF_STRU */
     ID_RRC_APP_TRANSPARENT_CMD_IND      = (PS_MSG_ID_RRC_TO_APP_BASE + 0x01),   /* _H2ASN_MsgChoice NULL */
     ID_RRC_APP_CELL_MEAS_RPT_CNF        = (PS_MSG_ID_RRC_TO_APP_BASE + 0x02),   /* _H2ASN_MsgChoice RRC_APP_CELL_MEAS_RPT_CNF_STRU */
@@ -197,13 +197,13 @@ enum APP_RRC_MSG_ID_ENUM
 
     ID_LRRC_APP_SET_TLPS_PRINT2LAYER_CNF = (PS_MSG_ID_RRC_TO_APP_BASE + 0x23),
 
-    /* begin:add for 路测融合 */
+    /* begin:add for ???????? */
     ID_LRRC_DT_MEAS_REPORT_CNF   = (PS_MSG_ID_RRC_TO_APP_BASE + 0x24),
     ID_LRRC_DT_SYNC_REPORT_CNF   = (PS_MSG_ID_RRC_TO_APP_BASE + 0x25),
-    ID_LRRC_DT_MEAS_INFO_IND     = (0x988),/* 根据对外接口，路测测量Ind消息id为0x988，等于id_lrrc_lphy_conn_meas_ind */
-    ID_LRRC_DT_SYNC_INFO_IND     = (0x904),/* 根据对外接口，路测测量Ind消息id为0x904，等于id_lrrc_lphy_sync_info_ind */
-    ID_LRRC_DT_OUT_OF_SYNC_INFO_IND = (0x90f),/* 根据对外接口，路测测量Ind消息id为0x90f，等于id_lrrc_lphy_out_of_sync_info_ind */
-    /* end:add for 路测融合 */
+    ID_LRRC_DT_MEAS_INFO_IND     = (0x988),/* ??????????????????????Ind????id??0x988??????id_lrrc_lphy_conn_meas_ind */
+    ID_LRRC_DT_SYNC_INFO_IND     = (0x904),/* ??????????????????????Ind????id??0x904??????id_lrrc_lphy_sync_info_ind */
+    ID_LRRC_DT_OUT_OF_SYNC_INFO_IND = (0x90f),/* ??????????????????????Ind????id??0x90f??????id_lrrc_lphy_out_of_sync_info_ind */
+    /* end:add for ???????? */
 
     ID_RRC_APP_SERVING_CELL_CA_INFO_IND          = (PS_MSG_ID_RRC_TO_DT_BASE + 0x26),
     ID_APP_RRC_MSG_ID_BUTT
@@ -214,49 +214,49 @@ typedef VOS_UINT32    APP_RRC_MSG_ID_ENUM_UINT32;
   4 Enum
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : DT_CMD_ENUM
- 结构说明  : DT命令枚举
+ ??????    : DT_CMD_ENUM
+ ????????  : DT????????
 *****************************************************************************/
 enum DT_CMD_ENUM
 {
-    DT_CMD_STOP,        /*停止*/
-    DT_CMD_START,       /*启动*/
+    DT_CMD_STOP,        /*????*/
+    DT_CMD_START,       /*????*/
     DT_CMD_BUTT
 };
 typedef VOS_UINT8 DT_CMD_ENUM_UINT8;
 
 /*****************************************************************************
- 结构名    : DT_RESULT_ENUM
- 结构说明  : DT操作结果枚举
+ ??????    : DT_RESULT_ENUM
+ ????????  : DT????????????
 *****************************************************************************/
 enum DT_RESULT_ENUM
 {
     DT_RESULT_SUCC = 0,
     DT_RESULT_FAIL,
-    DT_RESULT_NOT_SUPPORT_MEASURE,                /*当前不支持的测量*/
+    DT_RESULT_NOT_SUPPORT_MEASURE,                /*????????????????*/
 
-    /**********各自模块分别在下面增加需要的结果值********/
-    /*RRC模式的结果值定义Begin*/
+    /**********??????????????????????????????????********/
+    /*RRC????????????????Begin*/
     DT_RESULT_RRC_BEGIN = 0x1000,
 
-    /*RRC模式的结果值定义End*/
+    /*RRC????????????????End*/
 
-    /*NAS模式的结果值定义Begin*/
+    /*NAS????????????????Begin*/
     DT_RESULT_NAS_BEGIN                 = 0x2000,
     DT_RESULT_NAS_PLMN_LOCK             = 0x2001,
     DT_RESULT_NAS_PLMN_UNLOCK           = 0x2002,
 
-    /*NAS模式的结果值定义End*/
+    /*NAS????????????????End*/
 
-    /*L2模式的结果值定义Begin*/
+    /*L2????????????????Begin*/
    DT_RESULT_L2_BEGIN = 0x3000,
 
-    /*L2模式的结果值定义End*/
+    /*L2????????????????End*/
 
-   /*RRU模式的结果值定义Begin*/
+   /*RRU????????????????Begin*/
    DT_RESULT_RRU_BEGIN = 0x4000,
 
-   /*RRU模式的结果值定义End*/
+   /*RRU????????????????End*/
 
     DT_RESULT_BUTT
 };
@@ -265,8 +265,8 @@ typedef VOS_UINT32 DT_RESULT_ENUM_UINT32;
 typedef DT_CMD_ENUM_UINT8       APP_CMD_ENUM_UINT8;
 typedef DT_RESULT_ENUM_UINT32   APP_RESULT_ENUM_UINT32;
 /*****************************************************************************
- 枚举名    : APP_RRC_CELL_RPT_PERIOD_ENUM
- 枚举说明  :
+ ??????    : APP_RRC_CELL_RPT_PERIOD_ENUM
+ ????????  :
 *****************************************************************************/
 enum APP_RRC_CELL_RPT_PERIOD_ENUM
 {
@@ -279,61 +279,61 @@ enum APP_RRC_CELL_RPT_PERIOD_ENUM
 typedef VOS_UINT8 APP_RRC_CELL_RPT_PERIOD_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : APP_LATENCY_TYPE_ENUM
- 枚举说明  :
+ ??????    : APP_LATENCY_TYPE_ENUM
+ ????????  :
 *****************************************************************************/
 enum APP_LATENCY_TYPE_ENUM
 {
-    APP_LATENCY_EST =0,               /*连接建立时延*/
-    APP_LATENCY_HO,                   /*切换时延*/
-    APP_LATENCY_REEST,                /*重建时延*/
+    APP_LATENCY_EST =0,               /*????????????*/
+    APP_LATENCY_HO,                   /*????????*/
+    APP_LATENCY_REEST,                /*????????*/
     APP_LATENCY_BUTT
 };
 typedef VOS_UINT8 APP_LATENCY_TYPE_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : APP_RRC_LOCK_WORK_INFO_TYPE_ENUM
- 枚举说明  : 锁定的类型
+ ??????    : APP_RRC_LOCK_WORK_INFO_TYPE_ENUM
+ ????????  : ??????????
 *****************************************************************************/
 enum APP_RRC_LOCK_WORK_INFO_TYPE_ENUM
 {
-    RRC_APP_LOCK_FREQPOINT,              /* 频点锁定 */
-    RRC_APP_LOCK_FREQANDCELL,            /* 频点和小区联合锁定 */
-    RRC_APP_LOCK_FREQBAND,               /* 频带锁定 */
+    RRC_APP_LOCK_FREQPOINT,              /* ???????? */
+    RRC_APP_LOCK_FREQANDCELL,            /* ?????????????????? */
+    RRC_APP_LOCK_FREQBAND,               /* ???????? */
     RRC_APP_LOCK_BUTT
 };
 typedef VOS_UINT8 APP_RRC_LOCK_WORK_INFO_TYPE_ENUM_UINT8;
 /*****************************************************************************
- 枚举名    : APP_DELAY_TYPE_ENUM
- 枚举说明  :
+ ??????    : APP_DELAY_TYPE_ENUM
+ ????????  :
 *****************************************************************************/
 enum APP_DELAY_TYPE_ENUM
 {
-    APP_DELAY_CONTROL_PLANE =0,     /*控制面时延*/
-    APP_DELAY_USER_PLANE,           /*用户面时延*/
-    APP_DELAY_HO,                   /*切换时延*/
+    APP_DELAY_CONTROL_PLANE =0,     /*??????????*/
+    APP_DELAY_USER_PLANE,           /*??????????*/
+    APP_DELAY_HO,                   /*????????*/
     APP_DELAY_BUTT
 };
 typedef VOS_UINT8 APP_DELAY_TYPE_ENUM_UINT8;
 /*****************************************************************************
- 枚举名    : APP_CAMPED_FLAG_ENUM
- 枚举说明  :
+ ??????    : APP_CAMPED_FLAG_ENUM
+ ????????  :
 *****************************************************************************/
 enum APP_CAMPED_FLAG_ENUM
 {
-    APP_CAMPED,                 /* 已驻留 */
-    APP_NOT_CAMPED,             /* 未驻留 */
+    APP_CAMPED,                 /* ?????? */
+    APP_NOT_CAMPED,             /* ?????? */
     APP_CAMPED_BUTT
 };
 typedef VOS_UINT8 APP_CAMPED_FLAG_ENUM_UINT8;
 /*****************************************************************************
- 枚举名    : APP_DELAY_TYPE_ENUM
- 枚举说明  :
+ ??????    : APP_DELAY_TYPE_ENUM
+ ????????  :
 *****************************************************************************/
 enum APP_STATE_FLAG_ENUM
 {
-    APP_STATE_NOT_IN_RANGE,                 /* 不在冲突范围内,状态2 */
-    APP_STATE_IN_RANGE,                     /* 在冲突范围内,状态1*/
+    APP_STATE_NOT_IN_RANGE,                 /* ??????????????,????2 */
+    APP_STATE_IN_RANGE,                     /* ????????????,????1*/
     APP_STATE_BUTT
 };
 typedef VOS_UINT8 APP_STATE_FLAG_ENUM_UINT8;
@@ -342,22 +342,22 @@ typedef VOS_UINT8 APP_STATE_FLAG_ENUM_UINT8;
    5 STRUCT
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : APP_OM_MSG_STRU
- 结构说明  : APP(后台工具)与OM交互的消息体
+ ??????    : APP_OM_MSG_STRU
+ ????????  : APP(????????)??OM????????????
 *****************************************************************************/
 typedef struct
 {
-     VOS_MSG_HEADER                     /*VOS头
+     VOS_MSG_HEADER                     /*VOS??
  */
      VOS_UINT32          ulMsgId;
-     APP_MSG_HEADER                     /*APP头
+     APP_MSG_HEADER                     /*APP??
  */
-     VOS_UINT8           aucPara[4];    /* 参数内容 */
+     VOS_UINT8           aucPara[4];    /* ???????? */
 }APP_OM_MSG_STRU;
 
 /*****************************************************************************
- 结构名    : APP_PLMN_ID_STRU
- 结构说明  :
+ ??????    : APP_PLMN_ID_STRU
+ ????????  :
     MCC, Mobile country code (aucPlmnId[0], aucPlmnId[1] bits 1 to 4)
     MNC, Mobile network code (aucPlmnId[2], aucPlmnId[1] bits 5 to 8).
 
@@ -378,7 +378,7 @@ typedef struct
     aucPlmnId[2] ||    MNC digit 2            |           MNC digit 1
     ---------------------------------------------------------------------------
 
-    AT命令：
+    AT??????
     at+cops=1,2,"mcc digit 1, mcc digit 2, mcc digit 3, mnc digit 1, mnc digit 2, mnc
 
 digit 3",2 :
@@ -391,7 +391,7 @@ digit 3",2 :
        7         |     8       |      9      |     4       |      5      |     6
     --------------------------------------------------------------------------------
 
-    在aucPlmnId[3]中的存放格式:
+    ??aucPlmnId[3]????????????:
     ---------------------------------------------------------------------------
                  ||(BIT8)|(BIT7)|(BIT6)|(BIT5)|(BIT4)|(BIT3)|(BIT2)|(BIT1)
     ---------------------------------------------------------------------------
@@ -410,8 +410,8 @@ typedef struct
 } APP_PLMN_ID_STRU;
 
 /*****************************************************************************
- 结构名    : APP_RRC_CELL_MEAS_RPT_REQ_STRU
- 结构说明  :
+ ??????    : APP_RRC_CELL_MEAS_RPT_REQ_STRU
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
@@ -425,8 +425,8 @@ typedef struct
 }APP_RRC_CELL_MEAS_RPT_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_APP_CELL_MEAS_RPT_CNF_STRU
- 结构说明  :
+ ??????    : RRC_APP_CELL_MEAS_RPT_CNF_STRU
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
@@ -438,8 +438,8 @@ typedef struct
 }RRC_APP_CELL_MEAS_RPT_CNF_STRU;
 
 /*****************************************************************************
- 结构名    :RRC_APP_CELL_MEAS_RSLT_STRU
- 结构说明  :小区测量结果
+ ??????    :RRC_APP_CELL_MEAS_RSLT_STRU
+ ????????  :????????????
 *****************************************************************************/
 typedef struct
 {
@@ -450,10 +450,10 @@ typedef struct
 }RRC_APP_CELL_MEAS_RSLT_STRU;
 
 /*****************************************************************************
- 结构名    :RRC_APP_CELL_MEAS_REPORT_IND_STRU
- 结构说明  :RRC通过此原语周期上报小区的能量测量结果。
-            当前存在同频测量时，RRC上报小区的测量结果；不存在，不上报数据；
-            如果当前不存在同频测量，但是网络侧之后发送了同频测量，RRC根据之前的OM设置进行上报小区测量结果。
+ ??????    :RRC_APP_CELL_MEAS_REPORT_IND_STRU
+ ????????  :RRC??????????????????????????????????????
+            ????????????????????RRC????????????????????????????????????????
+            ??????????????????????????????????????????????????????RRC??????????OM??????????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -461,14 +461,14 @@ typedef struct
     VOS_UINT32                          ulMsgId;            /*_H2ASN_Skip*/
     APP_MSG_HEADER
     VOS_UINT32                          ulOpId;
-    VOS_UINT8                           ucCellCnt;                              /* 小区数量 */
+    VOS_UINT8                           ucCellCnt;                              /* ???????? */
     VOS_UINT8                           aucReserved[3];
     RRC_APP_CELL_MEAS_RSLT_STRU         astCellMeasInd[RRC_APP_CELL_MAX_COUNT];
 }RRC_APP_CELL_MEAS_REPORT_IND_STRU;
 
 /*****************************************************************************
- 结构名    : APP_RRC_TIME_DELAY_RPT_REQ_STRU
- 结构说明  : 要求上报控制面时延。控制面时延：信令RB建立的开销时间，即发起连接建立请求到RB1建立成功的时间。
+ ??????    : APP_RRC_TIME_DELAY_RPT_REQ_STRU
+ ????????  : ????????????????????????????????????RB????????????????????????????????????RB1????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -482,8 +482,8 @@ typedef struct
 }APP_RRC_TIME_DELAY_RPT_REQ_STRU;
 
 /*****************************************************************************
- 结构名    :RRC_APP_TIME_DELAY_RPT_CNF_STRU
- 结构说明  :对原语APP_RRC_TIME_DELAY_RPT_REQ_STRU的回复
+ ??????    :RRC_APP_TIME_DELAY_RPT_CNF_STRU
+ ????????  :??????APP_RRC_TIME_DELAY_RPT_REQ_STRU??????
 *****************************************************************************/
 typedef struct
 {
@@ -497,8 +497,8 @@ typedef struct
 }RRC_APP_TIME_DELAY_RPT_CNF_STRU;
 
 /*****************************************************************************
- 结构名    :APP_RRC_INQ_CAMP_CELL_INFO_REQ_STRU
- 结构说明  :获取当前驻留小区的ID、频点等信息的查询请求，或者停止上报驻留小区信息的请求。
+ ??????    :APP_RRC_INQ_CAMP_CELL_INFO_REQ_STRU
+ ????????  :??????????????????ID????????????????????????????????????????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -511,8 +511,8 @@ typedef struct
 }APP_RRC_INQ_CAMP_CELL_INFO_REQ_STRU;
 
 /*****************************************************************************
- 结构名    :RRC_APP_INQ_CAMP_CELL_INFO_CNF_STRU
- 结构说明  :对原语APP_RRC_INQ_CAMP_CELL_INFO_REQ_STRU的回复
+ ??????    :RRC_APP_INQ_CAMP_CELL_INFO_CNF_STRU
+ ????????  :??????APP_RRC_INQ_CAMP_CELL_INFO_REQ_STRU??????
 *****************************************************************************/
 typedef struct
 {
@@ -524,8 +524,8 @@ typedef struct
 }RRC_APP_INQ_CAMP_CELL_INFO_CNF_STRU;
 
 /*****************************************************************************
- 结构名    :RRC_APP_INQ_CAMP_CELL_INFO_IND_STRU
- 结构说明  :上报当前驻留小区信息
+ ??????    :RRC_APP_INQ_CAMP_CELL_INFO_IND_STRU
+ ????????  :????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -540,44 +540,44 @@ typedef struct
 }RRC_APP_INQ_CAMP_CELL_INFO_IND_STRU;
 
 /*****************************************************************************
- 结构名    :APP_RRC_FREQ_BAND_STRU
- 结构说明  :频带范围
+ ??????    :APP_RRC_FREQ_BAND_STRU
+ ????????  :????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usLowBand;                              /* 频点下限 */
-    VOS_UINT16                          usHighBand;                             /* 频点上限 */
+    VOS_UINT16                          usLowBand;                              /* ???????? */
+    VOS_UINT16                          usHighBand;                             /* ???????? */
 }APP_RRC_FREQ_BAND_STRU;
 
 /*****************************************************************************
- 结构名    :APP_RRC_CELL_INFO_STRU
- 结构说明  :小区信息
+ ??????    :APP_RRC_CELL_INFO_STRU
+ ????????  :????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usCellId;                               /* 小区ID */
-    VOS_UINT16                          usFreqPoint;                            /* 频点信息 */
+    VOS_UINT16                          usCellId;                               /* ????ID */
+    VOS_UINT16                          usFreqPoint;                            /* ???????? */
 }APP_RRC_CELL_INFO_STRU;
 
 /*****************************************************************************
- 结构名    :APP_RRC_LOCK_INFO_STRU
- 结构说明  :锁定的相关信息
+ ??????    :APP_RRC_LOCK_INFO_STRU
+ ????????  :??????????????
 *****************************************************************************/
 typedef struct
 {
-    APP_RRC_LOCK_WORK_INFO_TYPE_ENUM_UINT8  enLockType;                         /* 锁定类型 */
+    APP_RRC_LOCK_WORK_INFO_TYPE_ENUM_UINT8  enLockType;                         /* ???????? */
     VOS_UINT8                               ucBandInd;
     union
     {
-        VOS_UINT16                      usFreqPoint;                            /* 锁定的频点 */
-        APP_RRC_CELL_INFO_STRU          stFreqAndCell;                          /* 锁定的小区ID和频点 */
-        APP_RRC_FREQ_BAND_STRU          stFreqBand;                             /* 锁定频带的上下限 */
+        VOS_UINT16                      usFreqPoint;                            /* ?????????? */
+        APP_RRC_CELL_INFO_STRU          stFreqAndCell;                          /* ??????????ID?????? */
+        APP_RRC_FREQ_BAND_STRU          stFreqBand;                             /* ???????????????? */
     }u;
 }APP_RRC_LOCK_INFO_STRU;
 
 /*****************************************************************************
- 结构名    :APP_RRC_LOCK_WORK_INFO_REQ_STRU
- 结构说明  :路测下发的锁定请求的结构体
+ ??????    :APP_RRC_LOCK_WORK_INFO_REQ_STRU
+ ????????  :??????????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -585,16 +585,16 @@ typedef struct
     VOS_UINT32 ulMsgID;                                     /*_H2ASN_Skip*/
     APP_MSG_HEADER
     VOS_UINT32                          ulOpId;
-    APP_CMD_ENUM_UINT8                  enCommand;                              /* 锁定还是解锁 */
-    VOS_UINT8                           aucReserved[3];                         /* 保留, 此处是2, 是因为下一个是单字节 */
+    APP_CMD_ENUM_UINT8                  enCommand;                              /* ???????????? */
+    VOS_UINT8                           aucReserved[3];                         /* ????, ??????2, ???????????????????? */
     APP_RRC_LOCK_INFO_STRU              stLockInfo;
 }APP_RRC_LOCK_WORK_INFO_REQ_STRU;
 
 /*****************************************************************************
- 结构名    :RRC_APP_LOCK_WORK_INFO_CNF_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :对原语APP_RRC_LOCK_WORK_INFO_REQ进行回复
+ ??????    :RRC_APP_LOCK_WORK_INFO_CNF_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :??????APP_RRC_LOCK_WORK_INFO_REQ????????
 *****************************************************************************/
 typedef struct
 {
@@ -607,10 +607,10 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : APP_RRC_TRANSPARENT_CMD_REQ
- 协议表格  :
- ASN.1描述 :
- 结构说明  :透明命令头
+ ??????    : APP_RRC_TRANSPARENT_CMD_REQ
+ ????????  :
+ ASN.1???? :
+ ????????  :??????????
 *****************************************************************************/
 typedef struct
 {
@@ -625,8 +625,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : RRC_APP_TRANSPARENT_CMD_CNF_STRU
- 结构说明  : PS->OMT的透明命令执行结果数据结构(
+ ??????    : RRC_APP_TRANSPARENT_CMD_CNF_STRU
+ ????????  : PS->OMT??????????????????????????(
 *****************************************************************************/
 typedef struct
 {
@@ -634,12 +634,12 @@ typedef struct
     VOS_UINT32          ulMsgId;                            /*_H2ASN_Skip*/
     APP_MSG_HEADER
     VOS_UINT32                          ulOpId;
-    VOS_UINT8           aucTransCmdCnf[4];  /*透明命令结果码流，可变*/
+    VOS_UINT8           aucTransCmdCnf[4];  /*??????????????????????*/
 }RRC_APP_TRANSPARENT_CMD_CNF_STRU;
 
 /*****************************************************************************
- 结构名    :PS_APP_HO_LATENCY_DETAIL_STRU
- 结构说明  :切换时延关键点的上报
+ ??????    :PS_APP_HO_LATENCY_DETAIL_STRU
+ ????????  :????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -661,8 +661,8 @@ typedef struct
     VOS_UINT32                          T11_ulRrcRcvRabmStatusRsp;
 }PS_APP_HO_LATENCY_DETAIL_STRU;
 /*****************************************************************************
- 结构名    :PS_APP_HO_COMP_DETAIL_STRU
- 结构说明  :切换时延与协议对比
+ ??????    :PS_APP_HO_COMP_DETAIL_STRU
+ ????????  :??????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -678,8 +678,8 @@ typedef struct
     VOS_UINT32                          ulPtlT11T4;         /* 100ms */
 }PS_APP_HO_COMP_DETAIL_STRU;
 /*****************************************************************************
- 结构名    :PS_APP_EST_LATENCY_DETAIL_STRU
- 结构说明  :建链时延关键点的上报
+ ??????    :PS_APP_EST_LATENCY_DETAIL_STRU
+ ????????  :????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -698,8 +698,8 @@ typedef struct
     VOS_UINT32                          T13_ulRrcSndRecfgCmp;
 }PS_APP_EST_LATENCY_DETAIL_STRU;
 /*****************************************************************************
- 结构名    :PS_APP_EST_COMP_STRU
- 结构说明  :建链时延与协议对比
+ ??????    :PS_APP_EST_COMP_STRU
+ ????????  :??????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -717,8 +717,8 @@ typedef struct
     VOS_UINT32                          ulPtlT13T1;             /* 61ms+2*Ts1c+Ts1u */
 }PS_APP_EST_COMP_DETAIL_STRU;
 /*****************************************************************************
- 结构名    :PS_APP_REEST_LATENCY_DETAIL_STRU
- 结构说明  :重建时延关键点的上报
+ ??????    :PS_APP_REEST_LATENCY_DETAIL_STRU
+ ????????  :????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -738,8 +738,8 @@ typedef struct
 }PS_APP_REEST_LATENCY_DETAIL_STRU;
 
 /*****************************************************************************
- 结构名    :PS_APP_REEST_COMP_DETAIL_STRU
- 结构说明  :重建时延与协议对比
+ ??????    :PS_APP_REEST_COMP_DETAIL_STRU
+ ????????  :??????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -752,8 +752,8 @@ typedef struct
 
 }PS_APP_REEST_COMP_DETAIL_STRU;
 /*****************************************************************************
- 结构名    :RRC_APP_TIME_LATENCY_RPT_IND_STRU
- 结构说明  :时延时间的上报
+ ??????    :RRC_APP_TIME_LATENCY_RPT_IND_STRU
+ ????????  :??????????????
 *****************************************************************************/
 typedef struct
 {
@@ -766,8 +766,8 @@ typedef struct
 }PS_APP_HO_LATENCY_STRU;
 
 /*****************************************************************************
- 结构名    :PS_APP_REEST_LATENCY_STRU
- 结构说明  :时延时间的上报
+ ??????    :PS_APP_REEST_LATENCY_STRU
+ ????????  :??????????????
 *****************************************************************************/
 typedef struct
 {
@@ -778,8 +778,8 @@ typedef struct
 }PS_APP_REEST_LATENCY_STRU;
 
 /*****************************************************************************
- 结构名    :PS_APP_EST_LATENCY_STRU
- 结构说明  :时延时间的上报
+ ??????    :PS_APP_EST_LATENCY_STRU
+ ????????  :??????????????
 *****************************************************************************/
 typedef struct
 {
@@ -792,8 +792,8 @@ typedef struct
 }PS_APP_EST_LATENCY_STRU;
 
 /*****************************************************************************
- 结构名    :RRC_APP_TIME_LATENCY_RPT_IND_STRU
- 结构说明  :时延时间的上报
+ ??????    :RRC_APP_TIME_LATENCY_RPT_IND_STRU
+ ????????  :??????????????
 *****************************************************************************/
 typedef struct
 {
@@ -813,8 +813,8 @@ union
 } RRC_APP_TIME_DELAY_RPT_IND_STRU;
 
 /*****************************************************************************
- 结构名    :APP_RRC_CSQ_REQ_STRU
- 结构说明  :CSQ查询请求
+ ??????    :APP_RRC_CSQ_REQ_STRU
+ ????????  :CSQ????????
 *****************************************************************************/
 typedef struct
 {
@@ -822,27 +822,27 @@ typedef struct
     VOS_UINT32                          ulMsgId;            /*_H2ASN_Skip*/
     APP_MSG_HEADER
     VOS_UINT32                          ulOpId;
-    VOS_UINT16                          usSwt;              /* 0: 停止周期上报 1: 查询RSSI，不启动IND上报  2: 启动周期上报RSSI */
+    VOS_UINT16                          usSwt;              /* 0: ???????????? 1: ????RSSI????????IND????  2: ????????????RSSI */
     VOS_UINT16                          usPeriod;
-    VOS_UINT16                          usNdb;              /* 范围 0-5 dbm*/
-    VOS_UINT16                          usMs;               /* 范围 1-20 s*/
+    VOS_UINT16                          usNdb;              /* ???? 0-5 dbm*/
+    VOS_UINT16                          usMs;               /* ???? 1-20 s*/
 }APP_RRC_CSQ_REQ_STRU;
 
 /*****************************************************************************
- 结构名    :RRC_APP_CSQ_CNF_STRU
- 结构说明  :CSQ查询请求响应
+ ??????    :RRC_APP_CSQ_CNF_STRU
+ ????????  :CSQ????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usRI;                /*RI值*/
-    VOS_UINT16                          ausCQI[2];           /* CQI两个码字 */
+    VOS_UINT16                          usRI;                /*RI??*/
+    VOS_UINT16                          ausCQI[2];           /* CQI???????? */
     VOS_UINT8                           aucRes[2];
 
 }APP_RRC_CQI_INFO_STRU;
 
 /*****************************************************************************
- 结构名    :RRC_APP_CSQ_CNF_STRU
- 结构说明  :CSQ查询请求响应
+ ??????    :RRC_APP_CSQ_CNF_STRU
+ ????????  :CSQ????????????
 *****************************************************************************/
 typedef struct
 {
@@ -851,34 +851,34 @@ typedef struct
     APP_MSG_HEADER
     VOS_UINT32                          ulOpId;
     APP_RESULT_ENUM_UINT32              enResult;
-    VOS_INT16                           sRsrp;              /* RSRP测量值范围：(-141,-44) */
-    VOS_INT16                           sRsrq;              /* RSRQ测量值范围：(-40, -6) */
-    VOS_INT16                           sRssi;              /* RSSI测量值 */
-    VOS_UINT16                          usBer;              /* 误码率 */
+    VOS_INT16                           sRsrp;              /* RSRP????????????(-141,-44) */
+    VOS_INT16                           sRsrq;              /* RSRQ????????????(-40, -6) */
+    VOS_INT16                           sRssi;              /* RSSI?????? */
+    VOS_UINT16                          usBer;              /* ?????? */
     VOS_INT32                           lSINR;              /* SINR  RS_SNR */
-    APP_RRC_CQI_INFO_STRU               stCQI;              /* CQI两个码字 */
+    APP_RRC_CQI_INFO_STRU               stCQI;              /* CQI???????? */
 }RRC_APP_CSQ_CNF_STRU;
 
 /*****************************************************************************
- 结构名    :RRC_APP_CSQ_IND_STRU
- 结构说明  :RRC上报给APP的周期CSQ查询指示
+ ??????    :RRC_APP_CSQ_IND_STRU
+ ????????  :RRC??????APP??????CSQ????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER                                          /*_H2ASN_Skip*/
     VOS_UINT32                          ulMsgId;            /*_H2ASN_Skip*/
     APP_MSG_HEADER
-    VOS_INT16                           sRsrp;              /* RSRP测量值范围：(-141,-44) */
-    VOS_INT16                           sRsrq;              /* RSRQ测量值范围：(-40, -6) */
-    VOS_INT16                           sRssi;              /* RSSI测量值 */
-    VOS_UINT16                          usBer;              /* 误码率 */
+    VOS_INT16                           sRsrp;              /* RSRP????????????(-141,-44) */
+    VOS_INT16                           sRsrq;              /* RSRQ????????????(-40, -6) */
+    VOS_INT16                           sRssi;              /* RSSI?????? */
+    VOS_UINT16                          usBer;              /* ?????? */
     VOS_INT32                           lSINR;              /* SINR  RS_SNR */
-    APP_RRC_CQI_INFO_STRU               stCQI;              /* CQI两个码字 */
+    APP_RRC_CQI_INFO_STRU               stCQI;              /* CQI???????? */
 }RRC_APP_CSQ_IND_STRU;
 
 /*****************************************************************************
- 结构名    :APP_RRC_PTL_STATE_QUERY_REQ_STRU
- 结构说明  :协议状态查询请求
+ ??????    :APP_RRC_PTL_STATE_QUERY_REQ_STRU
+ ????????  :????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -893,39 +893,39 @@ typedef struct
 }APP_RRC_PTL_STATE_QUERY_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_APP_PTL_STATE_QUERY_CNF_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RRC上报的协议状态
+ ??????    : RRC_APP_PTL_STATE_QUERY_CNF_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RRC??????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER                                          /*_H2ASN_Skip*/
     VOS_UINT32                          ulMsgId;            /*_H2ASN_Skip*/
     APP_MSG_HEADER
-    VOS_UINT32                          ulOpId;             /* MSP直接将此ID做为CmdID发给Prob */
+    VOS_UINT32                          ulOpId;             /* MSP????????ID????CmdID????Prob */
     APP_RESULT_ENUM_UINT32              enResult;
-    //VOS_UINT32                          ulCurrentState;     /* RRC协议状态, 0:表示IDLE态 1:表示CONNECTED 2:表示协议状态无效 */
+    //VOS_UINT32                          ulCurrentState;     /* RRC????????, 0:????IDLE?? 1:????CONNECTED 2:???????????????? */
 }RRC_APP_PTL_STATE_QUERY_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_APP_PTL_STATE_CHANGE_IND_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RRC上报的协议状态
+ ??????    : RRC_APP_PTL_STATE_CHANGE_IND_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RRC??????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER                                          /*_H2ASN_Skip*/
     VOS_UINT32                          ulMsgId;            /*_H2ASN_Skip*/
-    VOS_UINT32                          ulCurrentState;     /* RRC协议状态, 0:表示IDLE态 1:表示CONNECTED 2:表示协议状态无效 */
+    VOS_UINT32                          ulCurrentState;     /* RRC????????, 0:????IDLE?? 1:????CONNECTED 2:???????????????? */
 }RRC_APP_PTL_STATE_CHANGE_IND_STRU;
 /*niuxiufan DT begin */
 /*****************************************************************************
- 结构名    : RRC_APP_PTL_STATE_CHANGE_IND_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : RRC上报的协议状态
+ ??????    : RRC_APP_PTL_STATE_CHANGE_IND_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : RRC??????????????
 *****************************************************************************/
 typedef struct
 {
@@ -933,14 +933,14 @@ typedef struct
     VOS_UINT32                          ulMsgId;            /*_H2ASN_Skip*/
     APP_MSG_HEADER
     VOS_UINT32                          ulOpId;
-    VOS_UINT32                          ulCurrentState;     /* RRC协议状态, 0:表示IDLE态 1:表示CONNECTED 2:表示协议状态无效 */
+    VOS_UINT32                          ulCurrentState;     /* RRC????????, 0:????IDLE?? 1:????CONNECTED 2:???????????????? */
 }RRC_APP_DT_PTL_STATE_IND_STRU;
 
 /*niuxiufan DT end */
 
 /*****************************************************************************
- 结构名    :APP_RRC_PTL_STATE_QUERY_REQ_STRU
- 结构说明  :小区基本信息查询请求
+ ??????    :APP_RRC_PTL_STATE_QUERY_REQ_STRU
+ ????????  :????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -951,8 +951,8 @@ typedef struct
 }APP_RRC_CELL_INFO_QUERY_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_APP_PTL_STATE_QUERY_CNF_STRU
- 结构说明  : RRC回复的小区基本信息
+ ??????    : RRC_APP_PTL_STATE_QUERY_CNF_STRU
+ ????????  : RRC??????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -960,9 +960,9 @@ typedef struct
     VOS_UINT32                          ulMsgId;            /*_H2ASN_Skip*/
     APP_MSG_HEADER
     VOS_UINT32                          ulOpId;
-    VOS_UINT16                          usFreq;             /* 0xFFFF为无效,单位：100KHz */
-    VOS_UINT16                          usPci;              /* 0xFFFF为无效,范围：(0,503) */
-    VOS_UINT8                           ucDlBandWidth;      /* 0xff为无效,范围:(0,5): (0 : 1.4M , 1 : 3M , 2 : 5M ,3 : 10M , 4 : 15M, 5 : 20M) */
+    VOS_UINT16                          usFreq;             /* 0xFFFF??????,??????100KHz */
+    VOS_UINT16                          usPci;              /* 0xFFFF??????,??????(0,503) */
+    VOS_UINT8                           ucDlBandWidth;      /* 0xff??????,????:(0,5): (0 : 1.4M , 1 : 3M , 2 : 5M ,3 : 10M , 4 : 15M, 5 : 20M) */
     VOS_UINT8                           aucReserved[3];
 }RRC_APP_CELL_INFO_QUERY_CNF_STRU;
 
@@ -998,7 +998,7 @@ typedef struct
 
 /* niuxiufan DT end */
 
-/* begin:V7R2-DT 移植强制切换、重选和禁止限制小区接入等功能,c00134407,2014/3/26 */
+/* begin:V7R2-DT ??????????????????????????????????????????,c00134407,2014/3/26 */
 typedef struct
 {
     VOS_MSG_HEADER                                          /*_H2ASN_Skip*/
@@ -1035,13 +1035,13 @@ typedef struct
     VOS_UINT8                           ucRsv[3];
 }APP_RRC_BARCELL_ACCESS_REQ_STRU;
 
-/* end:V7R2-DT 移植强制切换、重选和禁止限制小区接入等功能,c00134407,2014/3/26 */
+/* end:V7R2-DT ??????????????????????????????????????????,c00134407,2014/3/26 */
 
 /*****************************************************************************
- 结构名    : APP_RRC_MSG_DATA
- 协议表格  :
- ASN.1描述 :
- 结构说明  : APP_RRC_MSG_DATA数据结构,以下为RRC专用
+ ??????    : APP_RRC_MSG_DATA
+ ????????  :
+ ASN.1???? :
+ ????????  : APP_RRC_MSG_DATA????????,??????RRC????
 *****************************************************************************/
 typedef struct
 {
@@ -1055,10 +1055,10 @@ typedef struct
 /*_H2ASN_Length UINT32*/
 
 /*****************************************************************************
- 结构名    : AppRrcInterface_MSG
- 协议表格  :
- ASN.1描述 :
- 结构说明  : AppRrcInterface_MSG数据结构,以下为RRC专用
+ ??????    : AppRrcInterface_MSG
+ ????????  :
+ ASN.1???? :
+ ????????  : AppRrcInterface_MSG????????,??????RRC????
 *****************************************************************************/
 typedef struct
 {
@@ -1066,10 +1066,10 @@ typedef struct
     APP_RRC_MSG_DATA                    stMsgData;
 }AppRrcInterface_MSG;
 /*********************************************************
- 枚举名    : LRRC_LPHY_LTE_BAND_WIDTH_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  :
+ ??????    : LRRC_LPHY_LTE_BAND_WIDTH_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  :
 **********************************************************/
 enum RRC_APP_BAND_WIDTH_ENUM
 {
@@ -1084,8 +1084,8 @@ enum RRC_APP_BAND_WIDTH_ENUM
 typedef VOS_UINT16 RRC_APP_BAND_WIDTH_ENUM_UINT16;
 
 /*****************************************************************************
- 结构名    : APP_RRC_LWCLASH_REQ_STRU
- 结构说明  :协议状态查询请求
+ ??????    : APP_RRC_LWCLASH_REQ_STRU
+ ????????  :????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -1095,38 +1095,38 @@ typedef struct
     VOS_UINT32                          ulOpId;
 } APP_RRC_LWCLASH_REQ_STRU;
 /*****************************************************************************
- 结构名    : RRC_APP_LWCLASH_PARA_STRU
-结构说明  : RRC上报的消息
+ ??????    : RRC_APP_LWCLASH_PARA_STRU
+????????  : RRC??????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                              usUlFreq;          /*上行中心频点单位:100Khz*/
-    VOS_UINT16                              usDlFreq;          /*下行中心频点 单位:100Khz*/
-    RRC_APP_BAND_WIDTH_ENUM_UINT16          usUlBandwidth;     /*上行带宽 */
-    RRC_APP_BAND_WIDTH_ENUM_UINT16          usDlBandwidth;     /*上行带宽 */
-    APP_CAMPED_FLAG_ENUM_UINT8              enCamped;          /*是否驻留 */
-    APP_STATE_FLAG_ENUM_UINT8               enState;           /*是否为冲突状态 */
-    VOS_UINT8                               usBand;            /*频带指示 */
+    VOS_UINT16                              usUlFreq;          /*????????????????:100Khz*/
+    VOS_UINT16                              usDlFreq;          /*???????????? ????:100Khz*/
+    RRC_APP_BAND_WIDTH_ENUM_UINT16          usUlBandwidth;     /*???????? */
+    RRC_APP_BAND_WIDTH_ENUM_UINT16          usDlBandwidth;     /*???????? */
+    APP_CAMPED_FLAG_ENUM_UINT8              enCamped;          /*???????? */
+    APP_STATE_FLAG_ENUM_UINT8               enState;           /*?????????????? */
+    VOS_UINT8                               usBand;            /*???????? */
     VOS_UINT8                               aucResv[1];
 } RRC_APP_LWCLASH_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_APP_LWCLASH_CNF_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    : RRC_APP_LWCLASH_CNF_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER                                      /*_H2ASN_Skip*/
     VOS_UINT32                          ulMsgId;        /*_H2ASN_Skip*/
     APP_MSG_HEADER
-    VOS_UINT32                          ulOpId;         /* MSP直接将此ID做为CmdID发给Prob */
+    VOS_UINT32                          ulOpId;         /* MSP????????ID????CmdID????Prob */
     RRC_APP_LWCLASH_PARA_STRU       stLWClashPara;
 } RRC_APP_LWCLASH_CNF_STRU;
 /*****************************************************************************
- 结构名    : RRC_APP_LWCLASH_IND_STRU
-结构说明  : RRC上报的消息
+ ??????    : RRC_APP_LWCLASH_IND_STRU
+????????  : RRC??????????
 *****************************************************************************/
 typedef struct
 {
@@ -1136,8 +1136,8 @@ typedef struct
 } RRC_APP_LWCLASH_IND_STRU;
 
 /*****************************************************************************
- 结构名    :APP_RRC_NMR_REQ_STRU
- 结构说明  :NMR查询请求
+ ??????    :APP_RRC_NMR_REQ_STRU
+ ????????  :NMR????????
 *****************************************************************************/
 typedef struct
 {
@@ -1148,45 +1148,45 @@ typedef struct
 }APP_RRC_NMR_REQ_STRU;
 
 /*****************************************************************************
- 结构名    :RRC_APP_NMR_CGI_STRU
- 结构说明  :NMR结构体定义
+ ??????    :RRC_APP_NMR_CGI_STRU
+ ????????  :NMR??????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usMncNum;           /*指示 MNC 个数*/
+    VOS_UINT16                          usMncNum;           /*???? MNC ????*/
     VOS_UINT16                          usMcc;
     VOS_UINT16                          usMnc;
     VOS_UINT8                           aucRes[2];
 } RRC_APP_PLMN_ID_STRU;
 
 /*****************************************************************************
- 结构名    :RRC_APP_NMR_CGI_STRU
- 结构说明  :NMR结构体定义
+ ??????    :RRC_APP_NMR_CGI_STRU
+ ????????  :NMR??????????
 *****************************************************************************/
 typedef struct
 {
     RRC_APP_PLMN_ID_STRU                stPlmnId;
-    VOS_UINT32                          sCellId;            /* 范围：(0,503) */
+    VOS_UINT32                          sCellId;            /* ??????(0,503) */
 } RRC_APP_CELL_GLOBAL_ID_STRU;
 
 /*****************************************************************************
- 结构名    :RRC_APP_NMR_CGI_STRU
- 结构说明  :NMR结构体定义
+ ??????    :RRC_APP_NMR_CGI_STRU
+ ????????  :NMR??????????
 *****************************************************************************/
 typedef struct
 {
     RRC_APP_CELL_GLOBAL_ID_STRU         stCellGloId;        /* CellGlobalId */
     VOS_UINT16                          usTAC;
-    VOS_UINT16                          usPci;              /* 0xFFFF为无效,范围：(0,503) */
-    VOS_INT16                           sRsrp;              /* RSRP测量值范围：(-141,-44) */
-    VOS_INT16                           sRsrq;              /* RSRQ测量值范围：(-40, -6) */
-    VOS_UINT16                          usTa;               /* TA值*/
+    VOS_UINT16                          usPci;              /* 0xFFFF??????,??????(0,503) */
+    VOS_INT16                           sRsrp;              /* RSRP????????????(-141,-44) */
+    VOS_INT16                           sRsrq;              /* RSRQ????????????(-40, -6) */
+    VOS_UINT16                          usTa;               /* TA??*/
     VOS_UINT8                           aucRes[2];
 } RRC_APP_LTE_CELL_INFO_STRU;
 
 /*****************************************************************************
- 结构名    :RRC_APP_NMR_CNF_STRU
- 结构说明  :NMR查询请求响应
+ ??????    :RRC_APP_NMR_CNF_STRU
+ ????????  :NMR????????????
 *****************************************************************************/
 typedef struct
 {
@@ -1199,8 +1199,8 @@ typedef struct
 }RRC_APP_NMR_CNF_STRU;
 
 /*****************************************************************************
- 结构名    :APP_RRC_CELLID_REQ_STRU
- 结构说明  :小区基本信息查询请求
+ ??????    :APP_RRC_CELLID_REQ_STRU
+ ????????  :????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -1211,8 +1211,8 @@ typedef struct
 }APP_RRC_CELLID_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : RRC_APP_CELLID_CNF_STRU
- 结构说明  : RRC回复的小区基本信息
+ ??????    : RRC_APP_CELLID_CNF_STRU
+ ????????  : RRC??????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -1222,8 +1222,8 @@ typedef struct
     VOS_UINT32                          ulOpId;
     APP_RESULT_ENUM_UINT32              enResult;
     APP_PLMN_ID_STRU                    stPlmnId;
-    VOS_UINT32                          ulCi;               /* 0xFFFF为无效, */
-    VOS_UINT16                          usPci;              /* 0xFFFF为无效,范围：(0,503) */
+    VOS_UINT32                          ulCi;               /* 0xFFFF??????, */
+    VOS_UINT16                          usPci;              /* 0xFFFF??????,??????(0,503) */
     VOS_UINT16                          usTAC;             /* TAC */
 }RRC_APP_CELLID_CNF_STRU;
 
@@ -1236,23 +1236,23 @@ typedef struct
   7 Extern Global Variable
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : APP_LPS_MSG_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : APP_LPS_MSG_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulMsgId;      /*消息ID*/
-    VOS_UINT32                          ulSize;       /*消息体的长度*/
-    VOS_UINT8                           aucValue[4];  /*消息体有效内容的指针*/
+    VOS_UINT32                          ulMsgId;      /*????ID*/
+    VOS_UINT32                          ulSize;       /*????????????*/
+    VOS_UINT8                           aucValue[4];  /*????????????????????*/
 }APP_LPS_MSG_STRU;
 
 /*****************************************************************************
- 结构名    : APP_LRRC_RESEL_OFFSET_CFG_NTF_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : APP_LRRC_RESEL_OFFSET_CFG_NTF_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -1266,10 +1266,10 @@ typedef struct
 
 /* gaojishan-dcom-resel-cfg */
 /*****************************************************************************
- 结构名    : APP_LRRC_CON_TO_IDLE_NTF_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : APP_LRRC_CON_TO_IDLE_NTF_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -1284,24 +1284,24 @@ typedef struct
 /* gaojishan-fast-dorm-cfg */
 
 /*****************************************************************************
- 枚举名    : LRRC_LPDCP_FAST_DORMANCY_CMD_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : 指示PDCP启动或停止FAST_DORMANCY
+ ??????    : LRRC_LPDCP_FAST_DORMANCY_CMD_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : ????PDCP??????????FAST_DORMANCY
 *****************************************************************************/
 enum APP_LRRC_FAST_DORM_ENUM
 {
-    APP_LRRC_FAST_DORMANCY_STOP         = 0,                                  /* 停止FAST_DORMANCY */
-    APP_LRRC_FAST_DORMANCY_START,                                             /* 启动FAST_DORMANCY */
+    APP_LRRC_FAST_DORMANCY_STOP         = 0,                                  /* ????FAST_DORMANCY */
+    APP_LRRC_FAST_DORMANCY_START,                                             /* ????FAST_DORMANCY */
     APP_LRRC_FAST_DORMANCY_BUTT
 };
 typedef VOS_UINT32 APP_LRRC_FAST_DORM_ENUM_UINT32;
 
 /*****************************************************************************
- 结构名    : APP_LRRC_FAST_DORM_CFG_NTF_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : APP_LRRC_FAST_DORM_CFG_NTF_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -1317,10 +1317,10 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : ID_APP_LRRC_SET_UE_REL_VERSION_REQ
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : ID_APP_LRRC_SET_UE_REL_VERSION_REQ
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -1333,26 +1333,26 @@ typedef struct
 }APP_LRRC_SET_UE_REL_VERSION_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : ID_LRRC_APP_SET_UE_REL_VERSION_CNF
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : ID_LRRC_APP_SET_UE_REL_VERSION_CNF
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER                                      /*_H2ASN_Skip*/
     VOS_UINT32                          ulMsgId;        /*_H2ASN_Skip*/
     APP_MSG_HEADER
-    VOS_UINT32                          ulOpId;         /* MSP直接将此ID做为CmdID发给Prob */
+    VOS_UINT32                          ulOpId;         /* MSP????????ID????CmdID????Prob */
     APP_RESULT_ENUM_UINT32              enResult;
 } LRRC_APP_SET_UE_REL_VERSION_CNF_STRU;
 
 
 /*****************************************************************************
- 结构名    : LRRC_DAM_BAR_LIST_ITEM_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    : LRRC_DAM_BAR_LIST_ITEM_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
@@ -1365,141 +1365,141 @@ typedef struct
 }LRRC_DAM_BAR_LIST_ITEM_STRU;
 
 /*****************************************************************************
- 结构名    : LRRC_APP_DAM_BAR_LIST_DBG_INFO_IND_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    : LRRC_APP_DAM_BAR_LIST_DBG_INFO_IND_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER                                          /*_H2ASN_Skip*/
     VOS_UINT32                          ulMsgId;            /*_H2ASN_Skip*/
-    VOS_UINT16                          usItemCount; /* Bar List中条目个数 */
-    VOS_UINT16                          usRev;  /* 保留 */
+    VOS_UINT16                          usItemCount; /* Bar List?????????? */
+    VOS_UINT16                          usRev;  /* ???? */
     LRRC_DAM_BAR_LIST_ITEM_STRU         astDamBarListItem[RRC_APP_MAX_LIMITED_ITEM_COUNT];
 }LRRC_APP_DAM_BAR_LIST_DBG_INFO_IND_STRU;
 /* add for AT&T LRRC DAM end */
 /*****************************************************************************
- 结构名    : LRRC_APP_IDLE_SERVE_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : LRRC_APP_IDLE_SERVE_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          enCurrReselPrior;    /* 当前使用的重选优先级，移动性转换的时候 */
-    VOS_UINT16                          enBandInd;           /* 频带指示 */
-    VOS_UINT16                          usFreqInfo;          /* 服务小区频点 */
-    VOS_UINT16                          usCellId;            /* 服务小区ID */
-    VOS_INT16                           sRsrp;               /* RSRP测量值 */
-    VOS_INT16                           sRsrq;               /* RSRQ测量值 */
-    VOS_INT16                           sRssi;               /* RSSI测量值 */
-    VOS_INT16                           sSValue;             /*计算得到的SP值*/
-    VOS_INT16                           sSqual;              /*计算得到的SQ值*/
-    VOS_INT16                           sQRxLevMin;          /*准则RSRP评估参数*/
-    VOS_INT16                           sPCompensation;      /* 根据 P-Max 和 UE Max Tx power 推算出来的 PCompensation */
-    VOS_INT16                           sQqualMin;           /* S准则RSRQ评估参数 */
-    VOS_INT16                           sSIntraSearchP;      /* 启动同频测量的rsrp阈值参数 */
-    VOS_INT16                           sSIntraSearchQ;      /* 启动同频测量的rsrq阈值参数 */
-    VOS_INT16                           sSNonIntraSearchP;   /* 启动同优先级和低优先级异频测量的rsrp阈值参数 */
-    VOS_INT16                           sSNonIntraSearchQ;   /* 启动同优先级和低优先级异频测量的rsrq阈值参数 */
-    VOS_INT16                           sThreshServingLowP;  /* 针对低优先级小区重选的服务小区质量门限 */
-    VOS_INT16                           sThreshServingLowQ;  /* 重选评估时使用R9参数 */
+    VOS_UINT16                          enCurrReselPrior;    /* ?????????????????????????????????????? */
+    VOS_UINT16                          enBandInd;           /* ???????? */
+    VOS_UINT16                          usFreqInfo;          /* ???????????? */
+    VOS_UINT16                          usCellId;            /* ????????ID */
+    VOS_INT16                           sRsrp;               /* RSRP?????? */
+    VOS_INT16                           sRsrq;               /* RSRQ?????? */
+    VOS_INT16                           sRssi;               /* RSSI?????? */
+    VOS_INT16                           sSValue;             /*??????????SP??*/
+    VOS_INT16                           sSqual;              /*??????????SQ??*/
+    VOS_INT16                           sQRxLevMin;          /*????RSRP????????*/
+    VOS_INT16                           sPCompensation;      /* ???? P-Max ?? UE Max Tx power ?????????? PCompensation */
+    VOS_INT16                           sQqualMin;           /* S????RSRQ???????? */
+    VOS_INT16                           sSIntraSearchP;      /* ??????????????rsrp???????? */
+    VOS_INT16                           sSIntraSearchQ;      /* ??????????????rsrq???????? */
+    VOS_INT16                           sSNonIntraSearchP;   /* ????????????????????????????????rsrp???????? */
+    VOS_INT16                           sSNonIntraSearchQ;   /* ????????????????????????????????rsrq???????? */
+    VOS_INT16                           sThreshServingLowP;  /* ?????????????????????????????????????? */
+    VOS_INT16                           sThreshServingLowQ;  /* ??????????????R9???? */
 } LRRC_APP_IDLE_SERVE_INFO_STRU;
 
 
 /*****************************************************************************
- 结构名    : LRRC_APP_IDLE_INTRA_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : LRRC_APP_IDLE_INTRA_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_UINT16                          usCellId;
-    VOS_INT16                           sSValue;            /*计算得到的SP值*/
-    VOS_INT16                           sSqual;             /*计算得到的SQ值*/
-    VOS_INT16                           sRsrp;              /* RSRP测量值 */
-    VOS_INT16                           sRsrq;              /* RSRQ测量值 */
-    VOS_INT16                           sRssi;              /* RSSI测量值 */
+    VOS_INT16                           sSValue;            /*??????????SP??*/
+    VOS_INT16                           sSqual;             /*??????????SQ??*/
+    VOS_INT16                           sRsrp;              /* RSRP?????? */
+    VOS_INT16                           sRsrq;              /* RSRQ?????? */
+    VOS_INT16                           sRssi;              /* RSSI?????? */
 }LRRC_APP_IDLE_CELL_MEAS_RESULT_STRU;
 
 typedef struct
 {
-    VOS_UINT16                          enCurrReselPrior;    /* 当前使用的重选优先级，移动性转换的时候 */
-    VOS_UINT16                          enBandInd;           /* 频带指示 */
-    VOS_UINT16                          usFreqInfo;          /*频点*/
-    VOS_UINT16                          usTotalCellNum;      /*小区总数*/
-    VOS_UINT16                          usDetectedCellNum;   /*检测到的小区数目*/
-    VOS_INT16                           sQRxLevMin;          /*计算SP值用到的最低接入电平*/
-    VOS_INT16                           sPCompensation;      /* 根据 P-Max 和 UE Max Tx power 推算出来的 PCompensation */
-    VOS_INT16                           sQqualMin;           /* S准则RSRQ评估参数 */
-    VOS_INT16                           sSIntraSearchP;      /* 启动同频测量的rsrp阈值参数 */
-    VOS_INT16                           sSIntraSearchQ;      /* 启动同频测量的rsrq阈值参数 */
+    VOS_UINT16                          enCurrReselPrior;    /* ?????????????????????????????????????? */
+    VOS_UINT16                          enBandInd;           /* ???????? */
+    VOS_UINT16                          usFreqInfo;          /*????*/
+    VOS_UINT16                          usTotalCellNum;      /*????????*/
+    VOS_UINT16                          usDetectedCellNum;   /*????????????????*/
+    VOS_INT16                           sQRxLevMin;          /*????SP????????????????????*/
+    VOS_INT16                           sPCompensation;      /* ???? P-Max ?? UE Max Tx power ?????????? PCompensation */
+    VOS_INT16                           sQqualMin;           /* S????RSRQ???????? */
+    VOS_INT16                           sSIntraSearchP;      /* ??????????????rsrp???????? */
+    VOS_INT16                           sSIntraSearchQ;      /* ??????????????rsrq???????? */
     LRRC_APP_IDLE_CELL_MEAS_RESULT_STRU astIntraCellMesRslt[LRRC_LCSEL_INTRA_CELL_REPORT_NUM];
 }LRRC_APP_IDLE_INTRA_INFO_STRU;
 
 
 
 /*****************************************************************************
- 结构名    : LRRC_APP_IDLE_INTER_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : LRRC_APP_IDLE_INTER_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                              enCurrReselPrior;    /* 当前使用的重选优先级，移动性转换的时候 */
+    VOS_UINT16                              enCurrReselPrior;    /* ?????????????????????????????????????? */
     VOS_UINT16                              usFreqInfo;
-    VOS_UINT16                              enBandInd;           /* 频带指示 */
-    VOS_INT16                               sThreshLowP;         /* 针对低优先级小区重选的服务小区质量门限 */
-    VOS_INT16                               sThreshLowQ;         /* 重选评估时使用R9参数 */
-    VOS_INT16                               sThreshHighP;        /* 针对低优先级小区重选的服务小区质量门限 */
-    VOS_INT16                               sThreshHighQ;        /* 重选评估时使用R9参数 */
-    VOS_UINT16                              usTotalCellNum;      /*小区总数*/
-    VOS_UINT16                              usDetectedCellNum;   /*检测到的小区数目*/
-    LRRC_APP_IDLE_CELL_MEAS_RESULT_STRU     astInterCellMesRslt[LRRC_LCSEL_INTER_CELL_REPORT_NUM];/* SCELL放在第一个的位置 */
+    VOS_UINT16                              enBandInd;           /* ???????? */
+    VOS_INT16                               sThreshLowP;         /* ?????????????????????????????????????? */
+    VOS_INT16                               sThreshLowQ;         /* ??????????????R9???? */
+    VOS_INT16                               sThreshHighP;        /* ?????????????????????????????????????? */
+    VOS_INT16                               sThreshHighQ;        /* ??????????????R9???? */
+    VOS_UINT16                              usTotalCellNum;      /*????????*/
+    VOS_UINT16                              usDetectedCellNum;   /*????????????????*/
+    LRRC_APP_IDLE_CELL_MEAS_RESULT_STRU     astInterCellMesRslt[LRRC_LCSEL_INTER_CELL_REPORT_NUM];/* SCELL???????????????? */
 }LRRC_APP_IDLE_SINGLE_FREQ_MEAS_RESULT_STRU;
 
 typedef struct
 {
     VOS_UINT16                                   usInterFreqNum;
-    VOS_INT16                                    sSNonIntraSearchP;   /* 启动同优先级和低优先级异频测量的rsrp阈值参数 */
-    VOS_INT16                                    sSNonIntraSearchQ;   /* 启动同优先级和低优先级异频测量的rsrq阈值参数 */
-    VOS_INT16                                    sServValue;          /*计算得到的SP值*/
-    VOS_INT16                                    sServqual;           /*计算得到的SQ值*/
-    VOS_INT16                                    sThreshServingLowP;  /* 针对低优先级小区重选的服务小区质量门限 */
-    VOS_INT16                                    sThreshServingLowQ;  /* 重选评估时使用R9参数 */
+    VOS_INT16                                    sSNonIntraSearchP;   /* ????????????????????????????????rsrp???????? */
+    VOS_INT16                                    sSNonIntraSearchQ;   /* ????????????????????????????????rsrq???????? */
+    VOS_INT16                                    sServValue;          /*??????????SP??*/
+    VOS_INT16                                    sServqual;           /*??????????SQ??*/
+    VOS_INT16                                    sThreshServingLowP;  /* ?????????????????????????????????????? */
+    VOS_INT16                                    sThreshServingLowQ;  /* ??????????????R9???? */
     LRRC_APP_IDLE_SINGLE_FREQ_MEAS_RESULT_STRU   astInterFreqMesRslt[LRRC_LCSEL_INTER_FREQ_REPORT_NUM];
 }LRRC_APP_IDLE_INTER_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : LRRC_APP_IDLE_UTRAN_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : LRRC_APP_IDLE_UTRAN_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_UINT16                              usPrimaryCode;
-    VOS_INT16                               sRscp;               /* 精度1/8 */
-    VOS_INT16                               sEcN0;               /* 精度1/8 */
-    VOS_INT16                               sSValue;             /*计算得到的SP值*/
-    VOS_INT16                               sSqual;              /*计算得到的SQ值*/
+    VOS_INT16                               sRscp;               /* ????1/8 */
+    VOS_INT16                               sEcN0;               /* ????1/8 */
+    VOS_INT16                               sSValue;             /*??????????SP??*/
+    VOS_INT16                               sSqual;              /*??????????SQ??*/
 }LRRC_APP_UTRAN_CELL_MEAS_RESULT_STRU;
 
 typedef struct
 {
-    VOS_UINT16                              enCurrReselPrior;    /* 当前使用的重选优先级，移动性转换的时候 */
+    VOS_UINT16                              enCurrReselPrior;    /* ?????????????????????????????????????? */
     VOS_UINT16                              usArfcn;
-    VOS_INT16                               sRssi;               /* 精度1/8 */
-    VOS_INT16                               sQRxLevMin;          /*计算SP值用到的最低接入电平*/
-    VOS_INT16                               sPCompensation;      /* 根据 P-Max 和 UE Max Tx power 推算出来的 PCompensation */
-    VOS_INT16                               sQqualMin;           /* S准则RSRQ评估参数 */
-    VOS_INT16                               sThreshLowP;         /* 针对低优先级小区重选的服务小区质量门限 */
-    VOS_INT16                               sThreshLowQ;         /* 重选评估时使用R9参数 */
-    VOS_INT16                               sThreshHighP;        /* 针对低优先级小区重选的服务小区质量门限 */
-    VOS_INT16                               sThreshHighQ;        /* 重选评估时使用R9参数 */
+    VOS_INT16                               sRssi;               /* ????1/8 */
+    VOS_INT16                               sQRxLevMin;          /*????SP????????????????????*/
+    VOS_INT16                               sPCompensation;      /* ???? P-Max ?? UE Max Tx power ?????????? PCompensation */
+    VOS_INT16                               sQqualMin;           /* S????RSRQ???????? */
+    VOS_INT16                               sThreshLowP;         /* ?????????????????????????????????????? */
+    VOS_INT16                               sThreshLowQ;         /* ??????????????R9???? */
+    VOS_INT16                               sThreshHighP;        /* ?????????????????????????????????????? */
+    VOS_INT16                               sThreshHighQ;        /* ??????????????R9???? */
     VOS_UINT16                              usCellNum;
     LRRC_APP_UTRAN_CELL_MEAS_RESULT_STRU    astUtranCellMesRslt[LRRC_LCSEL_UTRAN_CELL_REPORT_NUM];
 }LRRC_APP_UTRAN_SIGNLE_FREQ_MEAS_RESULT_STRU;
@@ -1507,83 +1507,83 @@ typedef struct
 typedef struct
 {
     VOS_UINT16                                      usArfcnNum;
-    VOS_INT16                                       sSNonIntraSearchP;   /* 启动同优先级和低优先级异频测量的rsrp阈值参数 */
-    VOS_INT16                                       sSNonIntraSearchQ;   /* 启动同优先级和低优先级异频测量的rsrq阈值参数 */
-    VOS_INT16                                       sServValue;          /*计算得到的SP值*/
-    VOS_INT16                                       sServqual;           /*计算得到的SQ值*/
-    VOS_INT16                                       sThreshServingLowP;  /* 针对低优先级小区重选的服务小区质量门限 */
-    VOS_INT16                                       sThreshServingLowQ;  /* 重选评估时蔛褂肦9参数 */
+    VOS_INT16                                       sSNonIntraSearchP;   /* ????????????????????????????????rsrp???????? */
+    VOS_INT16                                       sSNonIntraSearchQ;   /* ????????????????????????????????rsrq???????? */
+    VOS_INT16                                       sServValue;          /*??????????SP??*/
+    VOS_INT16                                       sServqual;           /*??????????SQ??*/
+    VOS_INT16                                       sThreshServingLowP;  /* ?????????????????????????????????????? */
+    VOS_INT16                                       sThreshServingLowQ;  /* ???????????S???R9???? */
     LRRC_APP_UTRAN_SIGNLE_FREQ_MEAS_RESULT_STRU     astUtranFreqMesRslt[LRRC_TRRC_PHY_MAX_SUPPORT_CARRIER_NUM];
 }LRRC_APP_IDLE_UTRAN_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : LRRC_APP_IDLE_UTRAN_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : LRRC_APP_IDLE_UTRAN_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                              enCurrReselPrior;   /* 当前使用的重选优先级，移动性转换的时候 */
+    VOS_UINT16                              enCurrReselPrior;   /* ?????????????????????????????????????? */
     VOS_UINT16                              usArfcn;
-    VOS_UINT16                              enBandInd;          /* 频点指示 */
-    VOS_INT16                               sRssi;              /* 精度1/8 */
+    VOS_UINT16                              enBandInd;          /* ???????? */
+    VOS_INT16                               sRssi;              /* ????1/8 */
     VOS_UINT16                              usNcc;
     VOS_UINT16                              usBcc;
-    VOS_INT16                               sSValue;             /*计算得到的SP值*/
-    VOS_INT16                               sQRxLevMin;          /*计算SP值用到的最低接入电平*/
-    VOS_INT16                               sPCompensation;      /* 根据 P-Max 和 UE Max Tx power 推算出来的 PCompensation */
-    VOS_INT16                               sThreshLowP;         /* 针对低优先级小区重选的服务小区质量门限 */
-    VOS_INT16                               sThreshHighP;        /* 针对低优先级小区重选的服务小区质量门限 */
+    VOS_INT16                               sSValue;             /*??????????SP??*/
+    VOS_INT16                               sQRxLevMin;          /*????SP????????????????????*/
+    VOS_INT16                               sPCompensation;      /* ???? P-Max ?? UE Max Tx power ?????????? PCompensation */
+    VOS_INT16                               sThreshLowP;         /* ?????????????????????????????????????? */
+    VOS_INT16                               sThreshHighP;        /* ?????????????????????????????????????? */
 }LRRC_APP_GERAN_SIGNLE_FREQ_MEAS_RESULT_STRU;
 
 typedef struct
 {
     VOS_UINT16                                    usArfcnNum;
-    VOS_INT16                                     sSNonIntraSearchP;   /* 启动同优先级和低优先级异频测量的rsrp阈值参数 */
-    VOS_INT16                                     sSNonIntraSearchQ;   /* 启动同优先级和低优先级异频测量的rsrq阈值参数 */
-    VOS_INT16                                     sServValue;          /*计算得到的SP值*/
-    VOS_INT16                                     sServqual;           /*计算得到的SQ值*/
-    VOS_INT16                                     sThreshServingLowP;  /* 针对低优先级小区重选的服务小区质量门限 */
-    VOS_INT16                                     sThreshServingLowQ;  /* 重选评估时使用R9参数 */
+    VOS_INT16                                     sSNonIntraSearchP;   /* ????????????????????????????????rsrp???????? */
+    VOS_INT16                                     sSNonIntraSearchQ;   /* ????????????????????????????????rsrq???????? */
+    VOS_INT16                                     sServValue;          /*??????????SP??*/
+    VOS_INT16                                     sServqual;           /*??????????SQ??*/
+    VOS_INT16                                     sThreshServingLowP;  /* ?????????????????????????????????????? */
+    VOS_INT16                                     sThreshServingLowQ;  /* ??????????????R9???? */
     LRRC_APP_GERAN_SIGNLE_FREQ_MEAS_RESULT_STRU   astGeranFreqMesRslt[LRRC_GURRC_GERAN_ARFCN_MAX_NUM];
 }LRRC_APP_IDLE_GERAN_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : LRRC_APP_CELL_MEAS_RSLT_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : LRRC_APP_CELL_MEAS_RSLT_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_UINT16                          usCellId;
     VOS_UINT16                          usFreqInfo;
-    VOS_INT16                           sRsrp;              /* RSRP测量值 */
-    VOS_INT16                           sRsrq;              /* RSRQ测量值 */
-    VOS_INT16                           sRssi;              /* RSSI测量值 */
+    VOS_INT16                           sRsrp;              /* RSRP?????? */
+    VOS_INT16                           sRsrq;              /* RSRQ?????? */
+    VOS_INT16                           sRssi;              /* RSSI?????? */
 } LRRC_APP_CELL_MEAS_RSLT_STRU;
 
 /*****************************************************************************
- 结构名    : LRRC_APP_UTRAN_MEAS_RSLT_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : LRRC_APP_UTRAN_MEAS_RSLT_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_UINT16                          usArfcn;
     VOS_UINT16                          usPrimaryCode;
-    VOS_INT16                           sRscp;               /* 精度1/8 */
-    VOS_INT16                           sEcN0;               /* 精度1/8 */
-    VOS_INT16                           sRssi;               /* 精度1/8 */
+    VOS_INT16                           sRscp;               /* ????1/8 */
+    VOS_INT16                           sEcN0;               /* ????1/8 */
+    VOS_INT16                           sRssi;               /* ????1/8 */
     VOS_UINT16                          UtranType;
 } LRRC_APP_UTRAN_CELL_RSLT_STRU;
 /*****************************************************************************
- 枚举名     :LRRC_GRR_BANDINDICATOR_ENUM
- 协议表格  :
- ASN.1描述   :
- 枚举说明 : 2G小区频带指示
+ ??????     :LRRC_GRR_BANDINDICATOR_ENUM
+ ????????  :
+ ASN.1????   :
+ ???????? : 2G????????????
 *****************************************************************************/
 enum LRRC_APP_GERAN_BANDIND_ENUM
 {
@@ -1595,10 +1595,10 @@ enum LRRC_APP_GERAN_BANDIND_ENUM
 typedef VOS_UINT16    LRRC_APP_GERAN_BANDIND_ENUM_UINT16;
 
 /*****************************************************************************
- 枚举名    : RRC_APP_PROTOCOL_STATE
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : RRC协议状态类型
+ ??????    : RRC_APP_PROTOCOL_STATE
+ ????????  :
+ ASN.1???? :
+ ????????  : RRC????????????
 *****************************************************************************/
 enum RRC_APP_PROTOCOL_STATE_ENUM
 {
@@ -1609,10 +1609,10 @@ enum RRC_APP_PROTOCOL_STATE_ENUM
 typedef VOS_UINT16 RRC_APP_PROTOCOL_STATE_ENUM_UINT16;
 
 /*****************************************************************************
- 枚举名     :LRRC_GRR_BANDINDICATOR_ENUM
- 协议表格  :
- ASN.1描述   :
- 枚举说明 : 2G小区频带指示
+ ??????     :LRRC_GRR_BANDINDICATOR_ENUM
+ ????????  :
+ ASN.1????   :
+ ???????? : 2G????????????
 *****************************************************************************/
 enum LRRC_GRR_BANDINDICATOR_ENUM
 {
@@ -1624,87 +1624,87 @@ enum LRRC_GRR_BANDINDICATOR_ENUM
 typedef VOS_UINT16    LRRC_GRR_BANDINDICATOR_ENUM_UINT16;
 
 /*****************************************************************************
- 结构名    : LRRC_APP_UTRAN_MEAS_RSLT_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : LRRC_APP_UTRAN_MEAS_RSLT_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_UINT16                          usArfcn;
-    LRRC_APP_GERAN_BANDIND_ENUM_UINT16  enBandInd;          /* 频点指示 */
-    VOS_INT16                           sRssi;              /* 精度1/8 */
+    LRRC_APP_GERAN_BANDIND_ENUM_UINT16  enBandInd;          /* ???????? */
+    VOS_INT16                           sRssi;              /* ????1/8 */
 } LRRC_APP_GERAN_CELL_RSLT_STRU;
 
 /*****************************************************************************
- 结构名    : LRRC_APP_SERV_MEAS_RSLT_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : LRRC_APP_SERV_MEAS_RSLT_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
-    RRC_APP_PROTOCOL_STATE_ENUM_UINT16 enState;             /* 当前协议状态 */
-    LRRC_APP_CELL_MEAS_RSLT_STRU       stServCellRslt;      /* 服务小区上报结果 */
+    RRC_APP_PROTOCOL_STATE_ENUM_UINT16 enState;             /* ???????????? */
+    LRRC_APP_CELL_MEAS_RSLT_STRU       stServCellRslt;      /* ???????????????? */
 } LRRC_APP_SERV_MEAS_RSLT_STRU;
 
 /*****************************************************************************
- 结构名    : LRRC_APP_SCELL_MEAS_RSLT_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : LRRC_APP_SCELL_MEAS_RSLT_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
-    LRRC_APP_CELL_MEAS_RSLT_STRU       astSCellRslt[LRRC_SCELL_MAX_NUM];          /* SCell上报结果 */
+    LRRC_APP_CELL_MEAS_RSLT_STRU       astSCellRslt[LRRC_SCELL_MAX_NUM];          /* SCell???????? */
 } LRRC_APP_SCELL_MEAS_RSLT_STRU;
 
 /*****************************************************************************
- 结构名    : LRRC_APP_INTRA_MEAS_RSLT_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : LRRC_APP_INTRA_MEAS_RSLT_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
-    LRRC_APP_CELL_MEAS_RSLT_STRU       astIntraCellRslt[LRRC_INTRA_CELL_MAX_NUM]; /* 同频小区上报结果 */
+    LRRC_APP_CELL_MEAS_RSLT_STRU       astIntraCellRslt[LRRC_INTRA_CELL_MAX_NUM]; /* ???????????????? */
 } LRRC_APP_INTRA_MEAS_RSLT_STRU;
 
 /*****************************************************************************
- 结构名    : LRRC_APP_INTER_MEAS_RSLT_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : LRRC_APP_INTER_MEAS_RSLT_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
-    LRRC_APP_CELL_MEAS_RSLT_STRU       astInterCellRslt[LRRC_INTER_CELL_MAX_NUM]; /* 异频小区上报结果 */
+    LRRC_APP_CELL_MEAS_RSLT_STRU       astInterCellRslt[LRRC_INTER_CELL_MAX_NUM]; /* ???????????????? */
 } LRRC_APP_INTER_MEAS_RSLT_STRU;
 /*****************************************************************************
- 结构名    : LRRC_APP_INTER_MEAS_RSLT_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : LRRC_APP_INTER_MEAS_RSLT_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
-    LRRC_APP_UTRAN_CELL_RSLT_STRU       astUtranCellRslt[LRRC_UTRAN_CELL_MAX_NUM]; /* 异频小区上报结果 */
+    LRRC_APP_UTRAN_CELL_RSLT_STRU       astUtranCellRslt[LRRC_UTRAN_CELL_MAX_NUM]; /* ???????????????? */
 } LRRC_APP_UTRAN_MEAS_RSLT_STRU;
 /*****************************************************************************
- 结构名    : LRRC_APP_INTER_MEAS_RSLT_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 协议栈和APP间的接口消息的结构体
+ ??????    : LRRC_APP_INTER_MEAS_RSLT_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????APP????????????????????
 *****************************************************************************/
 typedef struct
 {
-    LRRC_APP_GERAN_CELL_RSLT_STRU       astGeranCellRslt[LRRC_GERAN_CELL_MAX_NUM]; /* 异频小区上报结果 */
+    LRRC_APP_GERAN_CELL_RSLT_STRU       astGeranCellRslt[LRRC_GERAN_CELL_MAX_NUM]; /* ???????????????? */
 } LRRC_APP_GERAN_MEAS_RSLT_STRU;
 
 /* add for Conn Meas Filter Optimize begin */
 /*****************************************************************************
- 结构名    : LRRC_CONN_MEAS_FILTER_INFO_IND_TYPE_ENUM
- 结构说明  : LRRC上报滤波结果的类型
+ ??????    : LRRC_CONN_MEAS_FILTER_INFO_IND_TYPE_ENUM
+ ????????  : LRRC??????????????????
 *****************************************************************************/
 enum LRRC_CONN_MEAS_FILTER_INFO_IND_TYPE_ENUM
 {
@@ -1716,28 +1716,28 @@ enum LRRC_CONN_MEAS_FILTER_INFO_IND_TYPE_ENUM
 typedef VOS_UINT32 LRRC_CONN_MEAS_FILTER_INFO_IND_TYPE_ENUM_UNIT32;
 
 /*****************************************************************************
- 结构名    : LRRC_CONN_MEAS_FILTER_EUTRA_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : LRRC EUTRA滤波结果消息的结构体
+ ??????    : LRRC_CONN_MEAS_FILTER_EUTRA_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : LRRC EUTRA????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16    usCellId;    /* 小区id */
-    VOS_INT16     sRsrp;       /* 滤波后的RSRP测量值 */
-    VOS_INT16     sRsrq;       /* 滤波后的RSRQ测量值 */
-    VOS_INT16     sRssi;       /* 滤波后的RSSI测量值 */
-    VOS_UINT32    ulMeasTimeInterval;    /* 本次测量上报间隔 */
+    VOS_UINT16    usCellId;    /* ????id */
+    VOS_INT16     sRsrp;       /* ????????RSRP?????? */
+    VOS_INT16     sRsrq;       /* ????????RSRQ?????? */
+    VOS_INT16     sRssi;       /* ????????RSSI?????? */
+    VOS_UINT32    ulMeasTimeInterval;    /* ???????????????? */
 }LRRC_CONN_MEAS_FILTER_EUTRA_INFO_STRU;
 
 
 /*****************************************************************************
- 结构名    :LRRC_GRR_BSIC_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :CELL BAIC Info，协议36331 6.3.4
-            usNcc(GSM Network Colour Code)  正常范围:(0..7), 8 表示无效值
-            usBcc(GSM Base Station Colour Code)  正常范围:(0..7) , 8 表示无效值
+ ??????    :LRRC_GRR_BSIC_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :CELL BAIC Info??????36331 6.3.4
+            usNcc(GSM Network Colour Code)  ????????:(0..7), 8 ??????????
+            usBcc(GSM Base Station Colour Code)  ????????:(0..7) , 8 ??????????
 *****************************************************************************/
 typedef struct
 {
@@ -1746,25 +1746,25 @@ typedef struct
 }LRRC_GRR_BSIC_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : LRRC_CONN_MEAS_FILTER_GERA_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : LRRC GERAN滤波结果消息的结构体
+ ??????    : LRRC_CONN_MEAS_FILTER_GERA_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : LRRC GERAN????????????????????
 *****************************************************************************/
 typedef struct
 {
-    PS_BOOL_ENUM_UINT8        enBsicVaild;    /* BSIC有效标志 */
-    VOS_UINT8                 ucResv;         /* 保留位 */
-    VOS_INT16                 sRssi;          /* 滤波后的Rssi */
-    VOS_UINT16                usArfcn;            /* 频点 */
-    LRRC_GRR_BANDINDICATOR_ENUM_UINT16     enBandInd;          /* 频点指示 */
-    LRRC_GRR_BSIC_INFO_STRU   stBsic;         /* BSIC标志有效时的BSIC信息 */
-    VOS_UINT32                ulMeasTimeInterval;    /* 本次测量上报间隔 */
+    PS_BOOL_ENUM_UINT8        enBsicVaild;    /* BSIC???????? */
+    VOS_UINT8                 ucResv;         /* ?????? */
+    VOS_INT16                 sRssi;          /* ????????Rssi */
+    VOS_UINT16                usArfcn;            /* ???? */
+    LRRC_GRR_BANDINDICATOR_ENUM_UINT16     enBandInd;          /* ???????? */
+    LRRC_GRR_BSIC_INFO_STRU   stBsic;         /* BSIC????????????BSIC???? */
+    VOS_UINT32                ulMeasTimeInterval;    /* ???????????????? */
 }LRRC_CONN_MEAS_FILTER_GERA_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : LRRC_CONN_MEAS_UTRA_TYPE_ENUM
- 结构说明  : LRRC上报滤波结果的类型
+ ??????    : LRRC_CONN_MEAS_UTRA_TYPE_ENUM
+ ????????  : LRRC??????????????????
 *****************************************************************************/
 enum LRRC_CONN_MEAS_UTRA_TYPE_ENUM
 {
@@ -1775,26 +1775,26 @@ enum LRRC_CONN_MEAS_UTRA_TYPE_ENUM
 typedef VOS_UINT8 LRRC_CONN_MEAS_UTRA_TYPE_ENUM_UINT8;
 
 /*****************************************************************************
- 结构名    : LRRC_CONN_MEAS_FILTER_UTRA_INFO_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : LRRC FDD UTRA滤波结果消息的结构体
+ ??????    : LRRC_CONN_MEAS_FILTER_UTRA_INFO_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : LRRC FDD UTRA????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                usCellId;       /* 小区id */
-    LRRC_CONN_MEAS_UTRA_TYPE_ENUM_UINT8    enUtraType;    /* Utra的类型 */
-    VOS_UINT8                 ucResv;     /* 保留位 */
-    VOS_INT16                 sRscp;          /* 滤波后的Rscp */
-    VOS_INT16                 sEcN0;          /* 滤波后的EcN0 */
-    VOS_UINT32                ulMeasTimeInterval;    /* 本次测量上报间隔 */
+    VOS_UINT16                usCellId;       /* ????id */
+    LRRC_CONN_MEAS_UTRA_TYPE_ENUM_UINT8    enUtraType;    /* Utra?????? */
+    VOS_UINT8                 ucResv;     /* ?????? */
+    VOS_INT16                 sRscp;          /* ????????Rscp */
+    VOS_INT16                 sEcN0;          /* ????????EcN0 */
+    VOS_UINT32                ulMeasTimeInterval;    /* ???????????????? */
 }LRRC_CONN_MEAS_FILTER_UTRA_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : LRRC_CONN_MEAS_FILTER_INFO_IND_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : LRRC滤波结果消息的结构体
+ ??????    : LRRC_CONN_MEAS_FILTER_INFO_IND_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : LRRC????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -1811,15 +1811,15 @@ typedef struct
 /* add for Conn Meas Filter Optimize end */
 
 /*****************************************************************************
- 结构名    : APP_OM_MSG_REDF_STRU
- 结构说明  : APP(后台工具)与OM交互的消息体(和APP_OM_MSG_STRU相同)
+ ??????    : APP_OM_MSG_REDF_STRU
+ ????????  : APP(????????)??OM????????????(??APP_OM_MSG_STRU????)
 *****************************************************************************/
 typedef struct
 {
-     VOS_MSG_HEADER                     /*VOS头*/
+     VOS_MSG_HEADER                     /*VOS??*/
      VOS_UINT32          ulMsgId;
-     APP_MSG_HEADER                     /*APP头*/
-     VOS_UINT8           aucPara[4];    /* 参数内容 */
+     APP_MSG_HEADER                     /*APP??*/
+     VOS_UINT8           aucPara[4];    /* ???????? */
 }APP_OM_MSG_REDF_STRU;
 
 extern PS_BOOL_ENUM_UINT8  LRRC_COMM_LoadDspAlready( VOS_VOID );

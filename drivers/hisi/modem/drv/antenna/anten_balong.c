@@ -128,7 +128,7 @@ void anten_handle_work(struct anten_data *data)
     anten_msg.status = data->status;
     anten_print_info("modem id = 0x%x, status = %d.\n", anten_msg.modem_id, anten_msg.status);
 
-    /*通过IFC将消息发出*/
+    /*????IFC??????????*/
     len = bsp_icc_send(ICC_CPU_MODEM, anten->chan_id, (unsigned char*)&anten_msg, (u32)sizeof(struct anten_msg_stru));
     if(len != sizeof(struct anten_msg_stru))
     {
@@ -165,7 +165,7 @@ static irqreturn_t anten_irq_handle(int irq, void *dev_id)
     if(data->timer_debounce && (data->status != status) && (0 == data->is_debounce))
     {
         data->is_debounce = 1;
-        mod_timer(&data->timer, jiffies + msecs_to_jiffies(data->timer_debounce));/*考虑fiffies是否会溢出*/
+        mod_timer(&data->timer, jiffies + msecs_to_jiffies(data->timer_debounce));/*????fiffies??????????*/
     }
 
     return IRQ_HANDLED;

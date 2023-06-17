@@ -46,46 +46,13 @@
  *
  */
 
-/*****************************************************************************/
-/*                                                                           */
-/*                Copyright 1999 - 2003, Huawei Tech. Co., Ltd.              */
-/*                           ALL RIGHTS RESERVED                             */
-/*                                                                           */
-/* FileName: linux_sem.c                                                     */
-/*                                                                           */
-/* Author: Xu Cheng                                                          */
-/*                                                                           */
-/* Version: 1.0                                                              */
-/*                                                                           */
-/* Date: 2011-07                                                             */
-/*                                                                           */
-/* Description: implement linux semaphore                                    */
-/*                                                                           */
-/* Others:                                                                   */
-/*                                                                           */
-/* History:                                                                  */
-/* 1. Date:                                                                  */
-/*    Author:                                                                */
-/*    Modification: Create this file                                         */
-/*                                                                           */
-/*                                                                           */
-/*****************************************************************************/
-
 #include "vos_config.h"
 #include "v_sem.h"
 #include "v_IO.h"
 #include "v_task.h"
 #include "v_int.h"
 
-
-
-
-/*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
-*****************************************************************************/
-/*lint -e767 modify:x51137; review:h59254; cause:print log */
 #define    THIS_FILE_ID        PS_FILE_ID_V_SEM_C
-/*lint +e767 modify:x51137; review:h59254; */
 
 typedef struct SEM_CONTROL_STRU
 {
@@ -112,7 +79,6 @@ VOS_UINT32              vos_SemMaxSemId;
 
 VOS_CHAR g_acVosSemCtrlBuf[VOS_SEM_CTRL_BUF_SIZE];
 
-/* 自旋锁，用来作信号量的临界资源保护 */
 VOS_SPINLOCK             g_stVosSemSpinLock;
 
 /*****************************************************************************
@@ -260,7 +226,7 @@ VOS_UINT32 VOS_SmCCreate( VOS_CHAR   acSmName[4],
     if( 0xFFFFFFFF == ulSmInit )
     {
         iSemId->SemType  = VOS_SEM_TYPE_MUTEX;
-        sema_init(&(iSemId->sem), 1); /* 互斥信号量该值为1*/
+        sema_init(&(iSemId->sem), 1);
     }
     else
     {
@@ -471,12 +437,5 @@ VOS_UINT32 VOS_Sm_AsyP( VOS_SEM Sm_ID )
  *****************************************************************************/
 VOS_VOID VOS_show_sem_info( VOS_VOID )
 {
-    /*lint -e534*/
     vos_printf("Max be used sem is %x.\r\n",vos_SemMaxSemId);
-    /*lint +e534*/
 }
-
-
-
-
-

@@ -50,7 +50,7 @@
 #define _APS_L4A_INTERFACE_H_
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "vos.h"
 
@@ -66,17 +66,17 @@ extern "C" {
 
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
-#define APS_L4A_MAX_IPV6_PREFIX_NUM             (6)                             /* 最大IPv6地址前缀数量 */
+#define APS_L4A_MAX_IPV6_PREFIX_NUM             (6)                             /* ????IPv6???????????? */
 
-#define APS_L4A_MAX_APN_LEN                     (99)                            /* APN最大长度 */
+#define APS_L4A_MAX_APN_LEN                     (99)                            /* APN???????? */
 #define APS_L4A_MAX_IPV4_ADDR_LEN               (4)
 #define APS_L4A_MAX_IPV6_ADDR_LEN               (16)
 
-#define APS_L4A_MAX_ACCESS_NUM_LEN              (32)                            /* L模定义, 暂不使用 */
-#define APS_L4A_MAX_USERNAME_LEN                (255)                           /* 鉴权用户名长度 */
-#define APS_L4A_MAX_PASSWORD_LEN                (255)                           /* 鉴权密码长度 */
+#define APS_L4A_MAX_ACCESS_NUM_LEN              (32)                            /* L??????, ???????? */
+#define APS_L4A_MAX_USERNAME_LEN                (255)                           /* ?????????????? */
+#define APS_L4A_MAX_PASSWORD_LEN                (255)                           /* ???????????? */
 
 #define APS_L4A_MAX_SDF_PF_NUM                  (16)
 
@@ -117,14 +117,14 @@ extern "C" {
 
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 /*****************************************************************************
- 枚举名: APS_L4A_MSG_ID_ENUM
- 枚举说明: APS和L4A之间的原语
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_MSG_ID_ENUM
+ ????????: APS??L4A??????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_MSG_ID_ENUM
 {
@@ -145,12 +145,12 @@ enum APS_L4A_MSG_ID_ENUM
     ID_APS_L4A_IPV6_INFO_NOTIFY_IND     = 0x00010299,                           /* _H2ASN_MsgChoice APS_L4A_IPV6_INFO_NOTIFY_IND_STRU */
     ID_APS_L4A_ABORT_REQ                = 0x0001029A,                           /* _H2ASN_MsgChoice APS_L4A_ABORT_REQ_STRU */
 
-    /* Add by w00199382 for V7代码同步, 2012-04-07, Begin   */
+    /* Add by w00199382 for V7????????, 2012-04-07, Begin   */
     ID_APS_L4A_GET_LTE_CS_REQ           = 0x000102A4,                           /* _H2ASN_MsgChoice APS_L4A_GET_LTE_CS_REQ_STRU */
     ID_APS_L4A_SET_PDPROFMOD_REQ        = 0x000102A5,                           /* _H2ASN_MsgChoice APS_L4A_SET_PDPROFMOD_REQ_STRU */
     ID_APS_L4A_GET_CEMODE_REQ           = 0x000102A6,
 
-    /* Add by w00199382 for V7代码同步, 2012-04-07, End   */
+    /* Add by w00199382 for V7????????, 2012-04-07, End   */
 
     ID_APS_L4A_PPP_DIAL_REQ             = 0x000102A7,                           /* _H2ASN_MsgChoice APS_L4A_PPP_DIAL_REQ_STRU */
     ID_APS_L4A_PS_CALL_END_REQ          = 0x000102A8,                           /* _H2ASN_MsgChoice APS_L4A_PS_CALL_END_REQ_STRU */
@@ -180,12 +180,12 @@ enum APS_L4A_MSG_ID_ENUM
     ID_L4A_APS_SET_CGCMOD_CNF           = 0x1016,                               /* _H2ASN_MsgChoice APS_L4A_SET_CGCMOD_CNF_STRU */
     ID_L4A_APS_PDP_DEACTIVATE_REJ       = 0x1017,                               /* _H2ASN_MsgChoice APS_L4A_PDP_DEACTIVATE_REJ_STRU */
 
-    /* Add by w00199382 for V7代码同步, 2012-04-07, Begin   */
+    /* Add by w00199382 for V7????????, 2012-04-07, Begin   */
     ID_L4A_APS_GET_LTE_CS_CNF           = 0x1018,                               /* _H2ASN_MsgChoice APS_L4A_GET_LTE_CS_CNF_STRU */
     ID_L4A_APS_SET_PDPROFMOD_CNF        = 0x1019,                               /* _H2ASN_MsgChoice APS_L4A_SET_PDPROFMOD_CNF_STRU */
     ID_L4A_APS_GET_CEMODE_CNF           = 0x101d,                               /* _H2ASN_MsgChoice APS_L4A_GET_LTE_CS_CNF_STRU */
 
-    /* Add by w00199382 for V7代码同步, 2012-04-07, End   */
+    /* Add by w00199382 for V7????????, 2012-04-07, End   */
 
     ID_L4A_APS_PPP_DIAL_CNF             = 0x101E,                               /* _H2ASN_MsgChoice APS_L4A_PPP_DIAL_CNF_STRU */
     ID_L4A_APS_PS_CALL_END_CNF          = 0x101F,                               /* _H2ASN_MsgChoice APS_L4A_PS_CALL_END_CNF_STRU */
@@ -197,18 +197,18 @@ enum APS_L4A_MSG_ID_ENUM
 typedef VOS_UINT32 APS_L4A_MSG_ID_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名: APS_L4A_PDP_TYPE_ENUM_UINT8
- 枚举说明: APS和L4A之间PDP的类型
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_PDP_TYPE_ENUM_UINT8
+ ????????: APS??L4A????PDP??????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_PDP_TYPE_ENUM
 {
-    APS_L4A_PDP_IPV4                            = 0x01,                         /* IPV4类型 */
-    APS_L4A_PDP_IPV6                            = 0x02,                         /* IPV6类型 */
-    APS_L4A_PDP_IPV4V6                          = 0x03,                         /* IPV4V6类型 */
-    APS_L4A_PDP_PPP                             = 0x04,                         /* PPP类型 */
+    APS_L4A_PDP_IPV4                            = 0x01,                         /* IPV4???? */
+    APS_L4A_PDP_IPV6                            = 0x02,                         /* IPV6???? */
+    APS_L4A_PDP_IPV4V6                          = 0x03,                         /* IPV4V6???? */
+    APS_L4A_PDP_PPP                             = 0x04,                         /* PPP???? */
 
     APS_L4A_PDP_BUTT                            = 0xFF
 };
@@ -216,46 +216,46 @@ typedef VOS_UINT8 APS_L4A_PDP_TYPE_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名: APS_L4A_PDP_DATA_COMP_ENUM_UINT8
- 枚举说明: PDP数据压缩方式
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_PDP_DATA_COMP_ENUM_UINT8
+ ????????: PDP????????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_PDP_DATA_COMP_ENUM
 {
     APS_L4A_PDP_DATA_COMP_OFF                   = 0x00,                         /* default if value is omitted */
     APS_L4A_PDP_DATA_COMP_ON                    = 0x01,                         /* manufacturer preferred compression */
-    APS_L4A_PDP_DATA_COMP_V42                   = 0x02,                         /* V42压缩算法 */
+    APS_L4A_PDP_DATA_COMP_V42                   = 0x02,                         /* V42???????? */
 
     APS_L4A_PDP_DATA_COMP_BUTT                  = 0xFF
 };
 typedef VOS_UINT8 APS_L4A_PDP_DATA_COMP_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名: APS_L4A_PDP_HEAD_COMP_ENUM_UINT8
- 枚举说明: PDP头压缩方式
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_PDP_HEAD_COMP_ENUM_UINT8
+ ????????: PDP??????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_PDP_HEAD_COMP_ENUM
 {
     APS_L4A_PDP_HEAD_COMP_OFF                   = 0x00,                         /* default if value is omitted */
     APS_L4A_PDP_HEAD_COMP_ON                    = 0x01,                         /* manufacturer preferred compression */
-    APS_L4A_PDP_HEAD_COMP_RFC1144               = 0x02,                         /* RFC1144压缩算法，applicable for SNDCP only */
-    APS_L4A_PDP_HEAD_COMP_RFC2507               = 0x03,                         /* RFC2507，applicable for SNDCP only */
+    APS_L4A_PDP_HEAD_COMP_RFC1144               = 0x02,                         /* RFC1144??????????applicable for SNDCP only */
+    APS_L4A_PDP_HEAD_COMP_RFC2507               = 0x03,                         /* RFC2507??applicable for SNDCP only */
 
     APS_L4A_PDP_HEAD_COMP_BUTT                  = 0xFF
 };
 typedef VOS_UINT8 APS_L4A_PDP_HEAD_COMP_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名: APS_L4A_TRAFFIC_CLASS_ENUM_UINT8
- 枚举说明: Traffic Class类型的定义
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_TRAFFIC_CLASS_ENUM_UINT8
+ ????????: Traffic Class??????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_TRAFFIC_CLASS_ENUM
 {
@@ -269,11 +269,11 @@ enum APS_L4A_TRAFFIC_CLASS_ENUM
 typedef VOS_UINT8 APS_L4A_TRAFFIC_CLASS_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名: APS_L4A_TRAFFIC_CLASS_ENUM_UINT8
- 枚举说明: 发送优先级的定义
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_TRAFFIC_CLASS_ENUM_UINT8
+ ????????: ????????????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_DELIVER_ORDER_ENUM
 {
@@ -286,11 +286,11 @@ enum APS_L4A_DELIVER_ORDER_ENUM
 typedef VOS_UINT8 APS_L4A_DELIVER_ORDER_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名: APS_L4A_ERR_SDU_DELIVERED_ENUM_UINT8
- 枚举说明: 错误的 SDU是否被发送
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_ERR_SDU_DELIVERED_ENUM_UINT8
+ ????????: ?????? SDU??????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_ERR_SDU_DELIVERED_ENUM
 {
@@ -305,11 +305,11 @@ typedef VOS_UINT8 APS_L4A_ERR_SDU_DELIVERED_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名: APS_L4A_RESIDUAL_BER_ENUM_UINT8
- 枚举说明: SDU残留比特误码率
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_RESIDUAL_BER_ENUM_UINT8
+ ????????: SDU??????????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_RESIDUAL_BER_ENUM
 {
@@ -331,11 +331,11 @@ typedef VOS_UINT8 APS_L4A_RESIDUAL_BER_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名: APS_L4A_SDU_ERR_RATIO_ENUM_UINT8
- 枚举说明: SDU误码率
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_SDU_ERR_RATIO_ENUM_UINT8
+ ????????: SDU??????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_SDU_ERR_RATIO_ENUM
 {
@@ -353,11 +353,11 @@ enum APS_L4A_SDU_ERR_RATIO_ENUM
 typedef VOS_UINT8 APS_L4A_SDU_ERR_RATIO_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名: APS_L4A_TRAFFIC_HANDLE_PRIO_ENUM_UINT8
- 枚举说明: 流量处理优先级
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_TRAFFIC_HANDLE_PRIO_ENUM_UINT8
+ ????????: ??????????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_TRAFFIC_HANDLE_PRIO_ENUM
 {
@@ -371,27 +371,27 @@ enum APS_L4A_TRAFFIC_HANDLE_PRIO_ENUM
 typedef VOS_UINT8 APS_L4A_TRAFFIC_HANDLE_PRIO_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名: APS_L4A_PDP_STATE_ENUM_UINT8
- 枚举说明: PDP状态
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_PDP_STATE_ENUM_UINT8
+ ????????: PDP????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_PDP_STATE_ENUM
 {
-    APS_L4A_PDP_STATE_INACTIVE                  = 0x00,                         /* PDP没激活 */
-    APS_L4A_PDP_STATE_ACTIVE                    = 0x01,                         /* PDP已激活 */
+    APS_L4A_PDP_STATE_INACTIVE                  = 0x00,                         /* PDP?????? */
+    APS_L4A_PDP_STATE_ACTIVE                    = 0x01,                         /* PDP?????? */
 
     APS_L4A_PDP_STATE_BUTT                      = 0xFF
 };
 typedef VOS_UINT32 APS_L4A_PDP_STATE_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名: APS_L4A_TFT_FILTER_ENUM_UINT8
- 枚举说明: TFT过滤器方向
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_TFT_FILTER_ENUM_UINT8
+ ????????: TFT??????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_TFT_FILTER_ENUM
 {
@@ -405,11 +405,11 @@ enum APS_L4A_TFT_FILTER_ENUM
 typedef VOS_UINT8 APS_L4A_TFT_FILTER_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名: APS_L4A_AUTO_ANS_MODE_ENUM_UINT32
- 枚举说明: 自动应答模式
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_AUTO_ANS_MODE_ENUM_UINT32
+ ????????: ????????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_AUTO_ANS_MODE_ENUM
 {
@@ -424,11 +424,11 @@ enum APS_L4A_AUTO_ANS_MODE_ENUM
 typedef VOS_UINT32 APS_L4A_AUTO_ANS_MODE_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名: APS_L4A_IPV4_ADDR_ALLOC_TYPE_ENUM_UINT8
- 枚举说明: IPV4地址获取方式
- 1.日    期   : 2011年12月12日
-   作    者   : A00165503
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_IPV4_ADDR_ALLOC_TYPE_ENUM_UINT8
+ ????????: IPV4????????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : A00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_IPV4_ADDR_ALLOC_TYPE_ENUM
 {
@@ -440,27 +440,27 @@ enum APS_L4A_IPV4_ADDR_ALLOC_TYPE_ENUM
 typedef VOS_UINT8 APS_L4A_IPV4_ADDR_ALLOC_TYPE_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名: APS_L4A_BEARER_TYPE_ENUM_UINT8
- 枚举说明: 承载类型
- 1.日    期   : 2011年12月12日
-   作    者   : A00165503
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_BEARER_TYPE_ENUM_UINT8
+ ????????: ????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : A00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_BEARER_TYPE_ENUM
 {
-    APS_L4A_BEARER_TYPE_DEFAULT                 = 0x00,                         /* 缺省承载 */
-    APS_L4A_BEARER_TYPE_DEDICATED               = 0x01,                         /* 专有承载 */
+    APS_L4A_BEARER_TYPE_DEFAULT                 = 0x00,                         /* ???????? */
+    APS_L4A_BEARER_TYPE_DEDICATED               = 0x01,                         /* ???????? */
 
     APS_L4A_BEARER_TYPE_BUTT                    = 0xFF
 };
 typedef VOS_UINT8 APS_L4A_BEARER_TYPE_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名: APS_L4A_BEARER_TYPE_ENUM_UINT8
- 枚举说明: 鉴权类型
- 1.日    期   : 2011年12月12日
-   作    者   : A00165503
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_BEARER_TYPE_ENUM_UINT8
+ ????????: ????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : A00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_GW_AUTH_TYPE_ENUM
 {
@@ -473,43 +473,43 @@ enum APS_L4A_GW_AUTH_TYPE_ENUM
 typedef VOS_UINT32 APS_L4A_GW_AUTH_TYPE_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名: APS_L4A_BEARER_MANAGE_TYPE_ENUM_UINT8
- 枚举说明: 应答类型(应答, 拒绝)
- 1.日    期   : 2011年12月12日
-   作    者   : A00165503
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_BEARER_MANAGE_TYPE_ENUM_UINT8
+ ????????: ????????(????, ????)
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : A00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_BEARER_MANAGE_TYPE_ENUM
 {
-    APS_L4A_BEARER_MANAGE_TYPE_ACCEPT           = 0x00,                         /* 接受 */
-    APS_L4A_BEARER_MANAGE_TYPE_REJ              = 0x01,                         /* 拒绝 */
+    APS_L4A_BEARER_MANAGE_TYPE_ACCEPT           = 0x00,                         /* ???? */
+    APS_L4A_BEARER_MANAGE_TYPE_REJ              = 0x01,                         /* ???? */
 
     APS_L4A_BEARER_MANANGE_TYPE_BUTT            = 0xFF
 };
 typedef VOS_UINT8 APS_L4A_BEARER_MANAGE_TYPE_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名: APS_L4A_BEARER_MANAGE_MODE_ENUM_UINT8
- 枚举说明: 应答模式(手动, 自动)
- 1.日    期   : 2011年12月12日
-   作    者   : A00165503
-   修改内容   : Added for PS融合
+ ??????: APS_L4A_BEARER_MANAGE_MODE_ENUM_UINT8
+ ????????: ????????(????, ????)
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : A00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 enum APS_L4A_BEARER_MANAGE_MODE_ENUM
 {
-    APS_L4A_BEARER_MANAGE_MODE_AUTO             = 0x00,                         /* 自动 */
-    APS_L4A_BEARER_MANAGE_MODE_MANUAL           = 0x01,                         /* 手动 */
+    APS_L4A_BEARER_MANAGE_MODE_AUTO             = 0x00,                         /* ???? */
+    APS_L4A_BEARER_MANAGE_MODE_MANUAL           = 0x01,                         /* ???? */
 
     APS_L4A_BEARER_MANAGE_MODE_BUTT             = 0xFF
 };
 typedef VOS_UINT8 APS_L4A_BEARER_MANAGE_MODE_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名称: APS_L4A_AUTH_TYPE_ENUM
- 枚举说明: Authentication Type
- 1.日    期   : 2012年08月10日
-   作    者   : f00179208
-   修改内容   : Added for LTE PPP
+ ????????: APS_L4A_AUTH_TYPE_ENUM
+ ????????: Authentication Type
+ 1.??    ??   : 2012??08??10??
+   ??    ??   : f00179208
+   ????????   : Added for LTE PPP
 *****************************************************************************/
 enum APS_L4A_AUTH_TYPE_ENUM
 {
@@ -521,12 +521,12 @@ enum APS_L4A_AUTH_TYPE_ENUM
 typedef VOS_UINT8 APS_L4A_AUTH_TYPE_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名称: APS_L4A_EMC_IND_ENUM_UINT8
- 枚举说明: PDP上下文是否为紧急呼
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+ ????????: APS_L4A_EMC_IND_ENUM_UINT8
+ ????????: PDP??????????????????
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum APS_L4A_EMC_IND_ENUM
 {
@@ -538,13 +538,13 @@ enum APS_L4A_EMC_IND_ENUM
 typedef VOS_UINT8 APS_L4A_EMC_IND_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名  : TAF_PDP_PCSCF_DISCOVERY_ENUM
- 枚举说明: P-CSCF DISCOVERY
+ ??????  : TAF_PDP_PCSCF_DISCOVERY_ENUM
+ ????????: P-CSCF DISCOVERY
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum APS_L4A_PCSCF_DISCOVERY_ENUM
 {
@@ -557,13 +557,13 @@ enum APS_L4A_PCSCF_DISCOVERY_ENUM
 typedef VOS_UINT8 APS_L4A_PCSCF_DISCOVERY_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名  : APS_L4A_IMS_CN_SIG_FLAG_ENUM
- 枚举说明: IMS专有承载标志
+ ??????  : APS_L4A_IMS_CN_SIG_FLAG_ENUM
+ ????????: IMS????????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum APS_L4A_IMS_CN_SIG_FLAG_ENUM
 {
@@ -575,15 +575,15 @@ enum APS_L4A_IMS_CN_SIG_FLAG_ENUM
 typedef VOS_UINT8 APS_L4A_IMS_CN_SIG_FLAG_ENUM_UINT8;
 
 
-/* Modified by l60609 for L-C互操作项目, 2014-01-06, Begin */
+/* Modified by l60609 for L-C??????????, 2014-01-06, Begin */
 /*****************************************************************************
- 枚举名  : APS_L4A_PDN_REQUEST_TYPE_ENUM
- 枚举说明: Table 10.5.173/3GPP TS24.008: Request type information element
+ ??????  : APS_L4A_PDN_REQUEST_TYPE_ENUM
+ ????????: Table 10.5.173/3GPP TS24.008: Request type information element
 
- 修改历史      :
-  1.日    期   : 2014年01月06日
-    作    者   : l60609
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2014??01??06??
+    ??    ??   : l60609
+    ????????   : ????????
 *****************************************************************************/
 enum APS_L4A_PDN_REQUEST_TYPE_ENUM
 {
@@ -605,55 +605,55 @@ enum APS_L4A_PDN_REQUEST_TYPE_ENUM
 
 typedef VOS_UINT8 APS_L4A_PDN_REQUEST_TYPE_ENUM_UINT8;
 
-/* Modified by l60609 for L-C互操作项目, 2014-01-06, End */
+/* Modified by l60609 for L-C??????????, 2014-01-06, End */
 
 
 /*****************************************************************************
-  4 全局变量声明
+  4 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  5 消息头定义
+  5 ??????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 消息定义
+  6 ????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  7 STRUCT定义
+  7 STRUCT????
 *****************************************************************************/
 
 /*****************************************************************************
- 结构名    : APS_L4A_APPCTRL_STRU
- 结构说明  : 为支持多通道并发，需要和L4A定义应用的控制头，用于指明是哪个client对应的回复
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_APPCTRL_STRU
+ ????????  : ????????????????????????L4A????????????????????????????????client??????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulPid;                                  /* 针对AT或者DIAG的多应用 L4A发消息给该PID */
-    VOS_UINT32                          ulClientId;                             /* 多AT窗口 */
-    VOS_UINT32                          ulOpId;                                 /* 操作字，针对多次请求，每次请求加一,让用户结合 */
+    VOS_UINT32                          ulPid;                                  /* ????AT????DIAG???????? L4A??????????PID */
+    VOS_UINT32                          ulClientId;                             /* ??AT???? */
+    VOS_UINT32                          ulOpId;                                 /* ??????????????????????????????????,?????????? */
 } APS_L4A_APPCTRL_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_GW_AUTH_INFO_STRU
- 结构说明  : 鉴权参数
- 1.日    期   : 2011年12月12日
-   作    者   : A00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_GW_AUTH_INFO_STRU
+ ????????  : ????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : A00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
     APS_L4A_GW_AUTH_TYPE_ENUM_UINT32    enGwAuthType;
     VOS_UINT8                           ucAccNumLen;
     VOS_UINT8                           aucRsv1[3];
-    VOS_UINT8                           auAccessNum[APS_L4A_MAX_ACCESS_NUM_LEN];/*此参数保留，暂时不使用*/
+    VOS_UINT8                           auAccessNum[APS_L4A_MAX_ACCESS_NUM_LEN];/*??????????????????????*/
     VOS_UINT8                           ucUserNameLen;
     VOS_UINT8                           aucRsv2[3];
     VOS_UINT8                           aucUserName[APS_L4A_MAX_USERNAME_LEN];
@@ -663,11 +663,11 @@ typedef struct
 }APS_L4A_GW_AUTH_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_APN_INFO_STRU
- 结构说明  : APN信息, aucApnName不包含字符串结束符
- 1.日    期   : 2011年12月12日
-   作    者   : A00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_APN_INFO_STRU
+ ????????  : APN????, aucApnName??????????????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : A00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -676,25 +676,25 @@ typedef struct
 }APS_L4A_APN_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_PDP_MANAGE_INFO_STRU
- 结构说明  : PDP管理模式
- 1.日    期   : 2011年12月12日
-   作    者   : A00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_PDP_MANAGE_INFO_STRU
+ ????????  : PDP????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : A00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
-    APS_L4A_BEARER_MANAGE_MODE_ENUM_UINT8   enMode;                             /* 承载管理模式 */
-    APS_L4A_BEARER_MANAGE_TYPE_ENUM_UINT8   enType;                             /* 承载管理类型 */
-    VOS_UINT8                               aucReserved[2];                     /* 四字节对齐，保留 */
+    APS_L4A_BEARER_MANAGE_MODE_ENUM_UINT8   enMode;                             /* ???????????? */
+    APS_L4A_BEARER_MANAGE_TYPE_ENUM_UINT8   enType;                             /* ???????????? */
+    VOS_UINT8                               aucReserved[2];                     /* ???????????????? */
 }APS_L4A_PDP_MANAGE_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_EPS_QOS_STRU
- 结构说明  : EPS的QOS参数
- 1.日    期   : 2011年12月10日
-   作    者   : A00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_EPS_QOS_STRU
+ ????????  : EPS??QOS????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : A00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -720,14 +720,14 @@ typedef struct
 }APS_L4A_EPS_QOS_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_PDP_TFT_STRU
- 结构说明  : PDP上下文的报文过滤器(TFT)的参数
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
- 2.日    期   : 2015年9月28日
-   作    者   : W00316404
-   修改内容   : R11 TFT 协议升级
+ ??????    : APS_L4A_PDP_TFT_STRU
+ ????????  : PDP??????????????????(TFT)??????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
+ 2.??    ??   : 2015??9??28??
+   ??    ??   : W00316404
+   ????????   : R11 TFT ????????
 *****************************************************************************/
 typedef struct
 {
@@ -757,23 +757,23 @@ typedef struct
     VOS_UINT16                          usSingleRmtPort;
     VOS_UINT16                          usRmtPortHighLimit;
     VOS_UINT16                          usRmtPortLowLimit;
-    VOS_UINT8                           ucProtocolId;             /*协议号*/
+    VOS_UINT8                           ucProtocolId;             /*??????*/
     VOS_UINT8                           ucTypeOfService;          /*TOS*/
     VOS_UINT8                           ucTypeOfServiceMask;      /*TOS Mask*/
     VOS_UINT8                           aucReserved[1];
 
     VOS_UINT8                           aucRmtIpv4AddreTAFss[APS_L4A_MAX_IPV4_ADDR_LEN];
-                                                                  /*ucSourceIpAddress[0]为IP地址高字节位
-                                                                    ucSourceIpAddress[3]为低字节位*/
+                                                                  /*ucSourceIpAddress[0]??IP????????????
+                                                                    ucSourceIpAddress[3]??????????*/
     VOS_UINT8                           aucRmtIpv4Mask[APS_L4A_MAX_IPV4_ADDR_LEN];
-                                                                  /*ucSourceIpMask[0]为IP地址高字节位 ,
-                                                                    ucSourceIpMask[3]为低字节位*/
+                                                                  /*ucSourceIpMask[0]??IP???????????? ,
+                                                                    ucSourceIpMask[3]??????????*/
     VOS_UINT8                           aucRmtIpv6Address[APS_L4A_MAX_IPV6_ADDR_LEN];
-                                                                  /*ucRmtIpv6Address[0]为IPv6接口标识高字节位
-                                                                    ucRmtIpv6Address[7]为IPv6接口标识低字节位*/
+                                                                  /*ucRmtIpv6Address[0]??IPv6????????????????
+                                                                    ucRmtIpv6Address[7]??IPv6????????????????*/
     VOS_UINT8                           aucRmtIpv6Mask[APS_L4A_MAX_IPV6_ADDR_LEN];
-                                                                  /*ucRmtIpv6Mask[0]为高字节位
-                                                                    ucRmtIpv6Mask[7]为低字节位*/
+                                                                  /*ucRmtIpv6Mask[0]??????????
+                                                                    ucRmtIpv6Mask[7]??????????*/
 
     VOS_UINT32                          ulFlowLabelType;          /*FlowLabelType*/
 
@@ -786,11 +786,11 @@ typedef struct
 }APS_L4A_PDP_TFT_STRU;
 
 /*****************************************************************************
- 结构名称: APS_L4A_PDP_IPV6_PREFIX_STRU
- 结构说明: IPv6前缀地址结构
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ????????: APS_L4A_PDP_IPV6_PREFIX_STRU
+ ????????: IPv6????????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -803,11 +803,11 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : APS_L4A_PDP_ADDR_STRU
- 结构说明  : PDP地址
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_PDP_ADDR_STRU
+ ????????  : PDP????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -819,11 +819,11 @@ typedef struct
 } APS_L4A_PDP_ADDR_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGDCONT_CNF_STRU
- 结构说明  : ID_L4A_APS_SET_CGDCONT_CNF消息结构体
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGDCONT_CNF_STRU
+ ????????  : ID_L4A_APS_SET_CGDCONT_CNF??????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -831,16 +831,16 @@ typedef struct
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
     APS_L4A_APPCTRL_STRU                stCtrl;
-    VOS_UINT32                          ulErrorCode;                            /* 错误码     */
+    VOS_UINT32                          ulErrorCode;                            /* ??????     */
 
 } APS_L4A_SET_CGDCONT_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGDSCONT_CNF_STRU
- 结构说明  : ID_L4A_APS_SET_CGDSCONT_CNF消息结构体
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGDSCONT_CNF_STRU
+ ????????  : ID_L4A_APS_SET_CGDSCONT_CNF??????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -848,16 +848,16 @@ typedef struct
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
     APS_L4A_APPCTRL_STRU                stCtrl;
-    VOS_UINT32                          ulErrorCode;                            /* 错误码     */
+    VOS_UINT32                          ulErrorCode;                            /* ??????     */
 
 } APS_L4A_SET_CGDSCONT_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGTFT_CNF_STRU
- 结构说明  : ID_L4A_APS_SET_CGTFT_CNF消息结构体
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGTFT_CNF_STRU
+ ????????  : ID_L4A_APS_SET_CGTFT_CNF??????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -865,35 +865,35 @@ typedef struct
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
     APS_L4A_APPCTRL_STRU                stCtrl;
-    VOS_UINT32                          ulErrorCode;                            /* 错误码     */
+    VOS_UINT32                          ulErrorCode;                            /* ??????     */
 
 } APS_L4A_SET_CGTFT_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGANS_CNF_STRU
- 结构说明  : ID_L4A_APS_SET_CGANS_CNF消息结构体
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGANS_CNF_STRU
+ ????????  : ID_L4A_APS_SET_CGANS_CNF??????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
-    VOS_UINT16                          usClientId;                             /* 客户端ID   */
-    VOS_UINT8                           ucOpId;                                 /* 操作码ID   */
+    VOS_UINT16                          usClientId;                             /* ??????ID   */
+    VOS_UINT8                           ucOpId;                                 /* ??????ID   */
     VOS_UINT8                           aucReserved[1];
-    VOS_UINT32                          ulErrorCode;                            /* 错误码     */
+    VOS_UINT32                          ulErrorCode;                            /* ??????     */
 
 } APS_L4A_SET_CGANS_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGAUTO_CNF_STRU
- 结构说明  : ID_L4A_APS_SET_CGAUTO_CNF消息结构体
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGAUTO_CNF_STRU
+ ????????  : ID_L4A_APS_SET_CGAUTO_CNF??????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -901,20 +901,20 @@ typedef struct
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
     APS_L4A_APPCTRL_STRU                stCtrl;
-    VOS_UINT32                          ulErrorCode;                            /* 错误码     */
+    VOS_UINT32                          ulErrorCode;                            /* ??????     */
 
 } APS_L4A_SET_CGAUTO_CNF_STRU;
 
 
 /*****************************************************************************
- 结构名    : APS_L4A_PRIM_PDP_DYNAMIC_EXT_STRU
- 结构说明  :
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
- 2.日    期   : 2013年07月08日
-   作    者   : Y00213812
-   修改内容   : VoLTE_PhaseI 项目，增加enImCnSignalFlg
+ ??????    : APS_L4A_PRIM_PDP_DYNAMIC_EXT_STRU
+ ????????  :
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
+ 2.??    ??   : 2013??07??08??
+   ??    ??   : Y00213812
+   ????????   : VoLTE_PhaseI ??????????enImCnSignalFlg
 
 *****************************************************************************/
 typedef struct
@@ -967,11 +967,11 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGCONTRDP_CNF_STRU
- 结构说明  : ID_L4A_APS_SET_CGCONTRDP_CNF消息结构体
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGCONTRDP_CNF_STRU
+ ????????  : ID_L4A_APS_SET_CGCONTRDP_CNF??????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -979,18 +979,18 @@ typedef struct
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
     APS_L4A_APPCTRL_STRU                stCtrl;
-    VOS_UINT32                          ulErrorCode;                            /* 错误码   */
-    VOS_UINT32                          ulCidNum;                               /* CID数量  */
-    APS_L4A_PRIM_PDP_DYNAMIC_EXT_STRU   astPrimParaInfo[0];                     /* 缺省承载动态参数 */
+    VOS_UINT32                          ulErrorCode;                            /* ??????   */
+    VOS_UINT32                          ulCidNum;                               /* CID????  */
+    APS_L4A_PRIM_PDP_DYNAMIC_EXT_STRU   astPrimParaInfo[0];                     /* ???????????????? */
 
 } APS_L4A_SET_CGCONTRDP_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SEC_PDP_DYNAMIC_EXT_STRU
- 结构说明  :
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SEC_PDP_DYNAMIC_EXT_STRU
+ ????????  :
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1007,11 +1007,11 @@ typedef struct
 } APS_L4A_SEC_PDP_DYNAMIC_EXT_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGSCONTRDP_CNF_STRU
- 结构说明  : ID_L4A_APS_SET_CGSCONTRDP_CNF消息结构体
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGSCONTRDP_CNF_STRU
+ ????????  : ID_L4A_APS_SET_CGSCONTRDP_CNF??????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1019,21 +1019,21 @@ typedef struct
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
     APS_L4A_APPCTRL_STRU                stCtrl;
-    VOS_UINT32                          ulErrorCode;                            /* 错误码   */
-    VOS_UINT32                          ulCidNum;                               /* CID数量  */
-    APS_L4A_SEC_PDP_DYNAMIC_EXT_STRU    astSecParaInfo[0];                      /* 专用承载动态参数 */
+    VOS_UINT32                          ulErrorCode;                            /* ??????   */
+    VOS_UINT32                          ulCidNum;                               /* CID????  */
+    APS_L4A_SEC_PDP_DYNAMIC_EXT_STRU    astSecParaInfo[0];                      /* ???????????????? */
 
 } APS_L4A_SET_CGSCONTRDP_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_PDP_TFT_EXT_STRU
- 结构说明  :
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
- 2.日    期   : 2015年9月28日
-   作    者   : W00316404
-   修改内容   : R11 TFT 协议升级
+ ??????    : APS_L4A_PDP_TFT_EXT_STRU
+ ????????  :
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
+ 2.??    ??   : 2015??9??28??
+   ??    ??   : W00316404
+   ????????   : R11 TFT ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1077,11 +1077,11 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : APS_L4A_SDF_PF_TFT_STRU
- 结构说明  :
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SDF_PF_TFT_STRU
+ ????????  :
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1092,11 +1092,11 @@ typedef struct
 } APS_L4A_SDF_PF_TFT_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGTFTRDP_CNF_STRU
- 结构说明  : ID_L4A_APS_SET_CGTFTRDP_CNF消息结构体
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGTFTRDP_CNF_STRU
+ ????????  : ID_L4A_APS_SET_CGTFTRDP_CNF??????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1104,18 +1104,18 @@ typedef struct
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
     APS_L4A_APPCTRL_STRU                stCtrl;
-    VOS_UINT32                          ulErrorCode;                            /* 错误码      */
-    VOS_UINT32                          ulCidNum;                               /* CID数量     */
-    APS_L4A_SDF_PF_TFT_STRU             astPfTftInfo[0];                        /* 动态TFT参数 */
+    VOS_UINT32                          ulErrorCode;                            /* ??????      */
+    VOS_UINT32                          ulCidNum;                               /* CID????     */
+    APS_L4A_SDF_PF_TFT_STRU             astPfTftInfo[0];                        /* ????TFT???? */
 
 } APS_L4A_SET_CGTFTRDP_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGEQOS_CNF_STRU
- 结构说明  : ID_L4A_APS_SET_CGEQOS_CNF消息结构体
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGEQOS_CNF_STRU
+ ????????  : ID_L4A_APS_SET_CGEQOS_CNF??????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1123,16 +1123,16 @@ typedef struct
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
     APS_L4A_APPCTRL_STRU                stCtrl;
-    VOS_UINT32                          ulErrorCode;                            /* 错误码     */
+    VOS_UINT32                          ulErrorCode;                            /* ??????     */
 
 } APS_L4A_SET_CGEQOS_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_EPS_QOS_EXT_STRU
- 结构说明  :
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_EPS_QOS_EXT_STRU
+ ????????  :
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1167,11 +1167,11 @@ typedef struct
 }APS_L4A_EPS_QOS_EXT_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGEQOSRDP_CNF_STRU
- 结构说明  : ID_L4A_APS_SET_CGEQOSRDP_CNF消息结构体
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGEQOSRDP_CNF_STRU
+ ????????  : ID_L4A_APS_SET_CGEQOSRDP_CNF??????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1179,18 +1179,18 @@ typedef struct
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
     APS_L4A_APPCTRL_STRU                stCtrl;
-    VOS_UINT32                          ulErrorCode;                            /* 错误码      */
-    VOS_UINT32                          ulCidNum;                               /* CID数量     */
-    APS_L4A_EPS_QOS_EXT_STRU            astEpsQosInfo[0];                       /* 动态EPS QOS */
+    VOS_UINT32                          ulErrorCode;                            /* ??????      */
+    VOS_UINT32                          ulCidNum;                               /* CID????     */
+    APS_L4A_EPS_QOS_EXT_STRU            astEpsQosInfo[0];                       /* ????EPS QOS */
 
 } APS_L4A_SET_CGEQOSRDP_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGEQOS_CNF_STRU
- 结构说明  : ID_L4A_APS_SET_CGEQOS_CNF消息结构体
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGEQOS_CNF_STRU
+ ????????  : ID_L4A_APS_SET_CGEQOS_CNF??????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1198,16 +1198,16 @@ typedef struct
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
     APS_L4A_APPCTRL_STRU                stCtrl;
-    VOS_UINT32                          ulErrorCode;                            /* 错误码     */
+    VOS_UINT32                          ulErrorCode;                            /* ??????     */
 
 } APS_L4A_SET_AUTHDATA_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_IPV6_INFO_NOTIFY_IND_STRU
- 结构说明  : ID_APS_L4A_IPV6_INFO_NOTIFY_IND消息结构体
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_IPV6_INFO_NOTIFY_IND_STRU
+ ????????  : ID_APS_L4A_IPV6_INFO_NOTIFY_IND??????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1215,18 +1215,18 @@ typedef struct
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
     VOS_UINT8                           ucRabId;
-    VOS_UINT8                           ucIpv6PrefixNum;                        /* IPv6地址前缀数量 */
+    VOS_UINT8                           ucIpv6PrefixNum;                        /* IPv6???????????? */
     VOS_UINT8                           aucReserved[2];
     APS_L4A_PDP_IPV6_PREFIX_STRU        astIpv6PrefixArray[APS_L4A_MAX_IPV6_PREFIX_NUM];
 
 } APS_L4A_IPV6_INFO_NOTIFY_IND_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_ABORT_REQ_STRU
- 结构说明  : ID_APS_L4A_ABORT_REQ消息结构体
- 1.日    期   : 2011年12月10日
-   作    者   : a00165503
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_ABORT_REQ_STRU
+ ????????  : ID_APS_L4A_ABORT_REQ??????????
+ 1.??    ??   : 2011??12??10??
+   ??    ??   : a00165503
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1238,14 +1238,14 @@ typedef struct
 } APS_L4A_ABORT_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_PRIM_PDP_EXT_STRU
- 结构说明  : 主PDP上下文信息
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
- 2.日    期   : 2013年07月08日
-   作    者   : Y00213812
-   修改内容   : VoLTE_PhaseI 项目，增加enImCnSignalFlg和enPcscfDiscovery
+ ??????    : APS_L4A_PRIM_PDP_EXT_STRU
+ ????????  : ??PDP??????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
+ 2.??    ??   : 2013??07??08??
+   ??    ??   : Y00213812
+   ????????   : VoLTE_PhaseI ??????????enImCnSignalFlg??enPcscfDiscovery
 *****************************************************************************/
 typedef struct
 {
@@ -1283,11 +1283,11 @@ typedef struct
 }APS_L4A_PRIM_PDP_EXT_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGDCONT_REQ_STRU
- 结构说明  : AT命令CGDCONT发起设置主PDP上下文操作，发送消息给L4A
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGDCONT_REQ_STRU
+ ????????  : AT????CGDCONT??????????PDP??????????????????????L4A
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1301,11 +1301,11 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : APS_L4A_SEC_PDP_EXT_STRU
- 结构说明  : 辅PDP上下文信息
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SEC_PDP_EXT_STRU
+ ????????  : ??PDP??????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1323,11 +1323,11 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGDSCONT_REQ_STRU
- 结构说明  : AT命令CGDSCONT发起设置辅PDP上下文操作，发送消息给L4A
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGDSCONT_REQ_STRU
+ ????????  : AT????CGDSCONT??????????PDP??????????????????????L4A
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1341,11 +1341,11 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGTFT_REQ_STRU
- 结构说明  : AT命令CGTFT发起设置PDP 上下文的报文过滤器操作，发送消息给L4A
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGTFT_REQ_STRU
+ ????????  : AT????CGTFT????????PDP ??????????????????????????????????L4A
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1359,11 +1359,11 @@ typedef struct
 }APS_L4A_SET_CGTFT_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGAUTO_REQ_STRU
- 结构说明  : AT命令CGAUTO,设置自动应答模式
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGAUTO_REQ_STRU
+ ????????  : AT????CGAUTO,????????????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1372,16 +1372,16 @@ typedef struct
 
     APS_L4A_APPCTRL_STRU                stCtrl;
     APS_L4A_AUTO_ANS_MODE_ENUM_UINT32   enAnsMode;
-    VOS_UINT32                          ulTimeout;                              /* 用户回复IND的超时设定, ms为单位, 超过该时间未反馈则自动接受 */
+    VOS_UINT32                          ulTimeout;                              /* ????????IND??????????, ms??????, ?????????????????????????? */
 
 }APS_L4A_SET_CGAUTO_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGPADDR_REQ_STRU
- 结构说明  : AT命令CGPADDR,查询PDP地址
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGPADDR_REQ_STRU
+ ????????  : AT????CGPADDR,????PDP????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1394,11 +1394,11 @@ typedef struct
 }APS_L4A_SET_CGPADDR_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGCONTRDP_REQ_STRU
- 结构说明  : AT命令CGCONTRDP,获取CID对应的主PDP动态参数
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGCONTRDP_REQ_STRU
+ ????????  : AT????CGCONTRDP,????CID????????PDP????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1411,11 +1411,11 @@ typedef struct
 }APS_L4A_SET_CGCONTRDP_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGSCONTRDP_REQ_STRU
- 结构说明  : AT命令CGSCONTRDP,获取CID对应的辅PDP动态参数
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGSCONTRDP_REQ_STRU
+ ????????  : AT????CGSCONTRDP,????CID????????PDP????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1428,11 +1428,11 @@ typedef struct
 }APS_L4A_SET_CGSCONTRDP_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGTFTRDP_REQ_STRU
- 结构说明  : AT命令CGTFTRDP,获取TFT动态参数
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGTFTRDP_REQ_STRU
+ ????????  : AT????CGTFTRDP,????TFT????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1445,11 +1445,11 @@ typedef struct
 }APS_L4A_SET_CGTFTRDP_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_PS_CGEQOS_STRU
- 结构说明  : EQOS的参数
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_PS_CGEQOS_STRU
+ ????????  : EQOS??????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1474,11 +1474,11 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGEQOS_REQ_STRU
- 结构说明  : AT命令CGEQOS,设置EQOS参数
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGEQOS_REQ_STRU
+ ????????  : AT????CGEQOS,????EQOS????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1493,11 +1493,11 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_CGEQOSRDP_REQ_STRU
- 结构说明  : AT命令CGEQOSRDP,获取EQOS参数参数
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_CGEQOSRDP_REQ_STRU
+ ????????  : AT????CGEQOSRDP,????EQOS????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1510,18 +1510,18 @@ typedef struct
 }APS_L4A_SET_CGEQOSRDP_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_PDP_AUTHDATA_STRU
- 结构说明  : AUTH参数
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_PDP_AUTHDATA_STRU
+ ????????  : AUTH????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
     VOS_UINT8                           ucCid;                                  /* 1~16 */
     VOS_UINT8                           ucDefined;                              /* 0:undefined,1:defined */
     VOS_UINT16                          usAuthType;                             /* 0,1,2,0xFF */
-    VOS_UINT32                          ulPLMN;                                 /* 16进制存储 */
+    VOS_UINT32                          ulPLMN;                                 /* 16???????? */
     VOS_UINT8                           ucPwdLen;
     VOS_UINT8                           aucReserved1[3];
     VOS_UINT8                           aucPassword[APS_L4A_AUTHDATA_MAX_PASSWORD_LEN + 1];
@@ -1532,11 +1532,11 @@ typedef struct
 }APS_L4A_PDP_AUTHDATA_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SET_AUTHDATA_REQ_STRU
- 结构说明  : AT命令CGEQOSRDP,获取EQOS参数参数
- 1.日    期   : 2011年12月12日
-   作    者   : h44270
-   修改内容   : Added for PS融合
+ ??????    : APS_L4A_SET_AUTHDATA_REQ_STRU
+ ????????  : AT????CGEQOSRDP,????EQOS????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : h44270
+   ????????   : Added for PS????
 *****************************************************************************/
 typedef struct
 {
@@ -1549,14 +1549,14 @@ typedef struct
 }APS_L4A_SET_AUTHDATA_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_SDF_PARA_STRU
- 结构说明  : PDP上下文中所存储的参数
- 1.日    期   : 2011年12月12日
-   作    者   : l00198894
-   修改内容   : Added for PS融合
- 2.日    期   : 2013年07月08日
-   作    者   : Y00213812
-   修改内容   : VoLTE_PhaseI 项目，增加enImCnSignalFlg和enPcscfDiscovery
+ ??????    : APS_L4A_SDF_PARA_STRU
+ ????????  : PDP????????????????????
+ 1.??    ??   : 2011??12??12??
+   ??    ??   : l00198894
+   ????????   : Added for PS????
+ 2.??    ??   : 2013??07??08??
+   ??    ??   : Y00213812
+   ????????   : VoLTE_PhaseI ??????????enImCnSignalFlg??enPcscfDiscovery
 *****************************************************************************/
 typedef struct
 {
@@ -1574,7 +1574,7 @@ typedef struct
 
     APS_L4A_PDP_TYPE_ENUM_UINT8         enPdnType;
     APS_L4A_IPV4_ADDR_ALLOC_TYPE_ENUM_UINT8 enIpv4AddrAllocType;
-    APS_L4A_BEARER_TYPE_ENUM_UINT8      enBearerCntxtType;                      /* SM上下文对应承载的类型 */
+    APS_L4A_BEARER_TYPE_ENUM_UINT8      enBearerCntxtType;                      /* SM???????????????????? */
 
     APS_L4A_EMC_IND_ENUM_UINT8          enEmergencyInd;
     APS_L4A_PCSCF_DISCOVERY_ENUM_UINT8  enPcscfDiscovery;
@@ -1582,8 +1582,8 @@ typedef struct
     VOS_UINT8                           enImsSuppFlag;
     VOS_UINT8                           aucReserved[1];
 
-    VOS_UINT32                          ulCid;                                  /* 承载上下文ID */
-    VOS_UINT32                          ulLinkdCid;                             /* 关联CID */
+    VOS_UINT32                          ulCid;                                  /* ??????????ID */
+    VOS_UINT32                          ulLinkdCid;                             /* ????CID */
 
     VOS_UINT32                          ulPfNum;
     APS_L4A_EPS_QOS_STRU                stSdfQosInfo;
@@ -1593,14 +1593,14 @@ typedef struct
 
 }APS_L4A_SDF_PARA_STRU;
 
-/* Add by w00199382 for V7代码同步, 2012-04-07, Begin   */
+/* Add by w00199382 for V7????????, 2012-04-07, Begin   */
 
 /*****************************************************************************
- 结构名    : APS_L4A_GET_CEMODE_REQ_STRU
- 结构说明  : PDP上下文中所存储的参数
- 1.日    期   : 2012年04月21日
-   作    者   : w00182550
-   修改内容   : V7代码同步
+ ??????    : APS_L4A_GET_CEMODE_REQ_STRU
+ ????????  : PDP????????????????????
+ 1.??    ??   : 2012??04??21??
+   ??    ??   : w00182550
+   ????????   : V7????????
 *****************************************************************************/
 
 typedef struct
@@ -1613,11 +1613,11 @@ typedef struct
 }APS_L4A_GET_CEMODE_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : APS_L4A_GET_CEMODE_REQ_STRU
- 结构说明  : PDP上下文中所存储的参数
- 1.日    期   : 2012年04月21日
-   作    者   : w00182550
-   修改内容   : V7代码同步
+ ??????    : APS_L4A_GET_CEMODE_REQ_STRU
+ ????????  : PDP????????????????????
+ 1.??    ??   : 2012??04??21??
+   ??    ??   : w00182550
+   ????????   : V7????????
 *****************************************************************************/
 typedef struct
 {
@@ -1627,16 +1627,16 @@ typedef struct
     APS_L4A_APPCTRL_STRU                stCtrl;
     VOS_UINT32                          ulErrorCode;
 
-    VOS_UINT32                          ulCurrentUeMode;                        /*当前UE模式*/
-    VOS_UINT32                          ulSupportModeCnt;                       /*UE能够支持的模式的个数*/
-    VOS_UINT32                          aulSupportModeList[4];                  /*UE能够支持的模式*/
+    VOS_UINT32                          ulCurrentUeMode;                        /*????UE????*/
+    VOS_UINT32                          ulSupportModeCnt;                       /*UE????????????????????*/
+    VOS_UINT32                          aulSupportModeList[4];                  /*UE??????????????*/
 } APS_L4A_GET_CEMODE_CNF_STRU;
 /*****************************************************************************
- 结构名    : APS_L4A_GET_CEMODE_REQ_STRU
- 结构说明  : PDP上下文中所存储的参数
- 1.日    期   : 2012年04月21日
-   作    者   : w00182550
-   修改内容   : V7代码同步
+ ??????    : APS_L4A_GET_CEMODE_REQ_STRU
+ ????????  : PDP????????????????????
+ 1.??    ??   : 2012??04??21??
+   ??    ??   : w00182550
+   ????????   : V7????????
 *****************************************************************************/
 
 typedef struct
@@ -1648,11 +1648,11 @@ typedef struct
 
 }APS_L4A_GET_LTE_CS_REQ_STRU;
 /*****************************************************************************
- 结构名    : APS_L4A_GET_CEMODE_REQ_STRU
- 结构说明  : PDP上下文中所存储的参数
- 1.日    期   : 2012年04月21日
-   作    者   : w00182550
-   修改内容   : V7代码同步
+ ??????    : APS_L4A_GET_CEMODE_REQ_STRU
+ ????????  : PDP????????????????????
+ 1.??    ??   : 2012??04??21??
+   ??    ??   : w00182550
+   ????????   : V7????????
 *****************************************************************************/
 
 typedef struct
@@ -1661,7 +1661,7 @@ typedef struct
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
     APS_L4A_APPCTRL_STRU                stCtrl;
-    VOS_UINT32                          ulErrorCode;                            /* 错误码     */
+    VOS_UINT32                          ulErrorCode;                            /* ??????     */
 
     VOS_UINT8                             ucSmsOverSGs;
     VOS_UINT8                             ucSmsOverIMS;
@@ -1671,14 +1671,14 @@ typedef struct
     VOS_UINT8                             aucRsv[3];
 } APS_L4A_GET_LTE_CS_CNF_STRU;
 /*****************************************************************************
- 结构名    : APS_L4A_GET_CEMODE_REQ_STRU
- 结构说明  : PDP上下文中所存储的参数
- 1.日    期   : 2012年04月21日
-   作    者   : w00182550
-   修改内容   : V7代码同步
+ ??????    : APS_L4A_GET_CEMODE_REQ_STRU
+ ????????  : PDP????????????????????
+ 1.??    ??   : 2012??04??21??
+   ??    ??   : w00182550
+   ????????   : V7????????
 *****************************************************************************/
 
-/* DTS2012031901936            : x00126983 2012-3-19 字节对齐 + */
+/* DTS2012031901936            : x00126983 2012-3-19 ???????? + */
 typedef struct
 {
     VOS_UINT32                          bitOpPdpType        : 1;                /* PdpType */
@@ -1711,13 +1711,13 @@ typedef struct
     VOS_UINT8                           aucReserved3[2];
 
 }APS_L4A_PDP_PDPROFMOD_STRU;
-/* DTS2012031901936            : x00126983 2012-3-19 字节对齐 - */
+/* DTS2012031901936            : x00126983 2012-3-19 ???????? - */
 /*****************************************************************************
- 结构名    : APS_L4A_GET_CEMODE_REQ_STRU
- 结构说明  : PDP上下文中所存储的参数
- 1.日    期   : 2012年04月21日
-   作    者   : w00182550
-   修改内容   : V7代码同步
+ ??????    : APS_L4A_GET_CEMODE_REQ_STRU
+ ????????  : PDP????????????????????
+ 1.??    ??   : 2012??04??21??
+   ??    ??   : w00182550
+   ????????   : V7????????
 *****************************************************************************/
 typedef struct
 {
@@ -1729,11 +1729,11 @@ typedef struct
 
 }APS_L4A_SET_PDPROFMOD_REQ_STRU;
 /*****************************************************************************
- 结构名    : APS_L4A_GET_CEMODE_REQ_STRU
- 结构说明  : PDP上下文中所存储的参数
- 1.日    期   : 2012年04月21日
-   作    者   : w00182550
-   修改内容   : V7代码同步
+ ??????    : APS_L4A_GET_CEMODE_REQ_STRU
+ ????????  : PDP????????????????????
+ 1.??    ??   : 2012??04??21??
+   ??    ??   : w00182550
+   ????????   : V7????????
 *****************************************************************************/
 typedef struct
 {
@@ -1741,21 +1741,21 @@ typedef struct
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
     APS_L4A_APPCTRL_STRU                stCtrl;
-    VOS_UINT32                          ulErrorCode;                            /* 错误码     */
+    VOS_UINT32                          ulErrorCode;                            /* ??????     */
 
 } APS_L4A_SET_PDPROFMOD_CNF_STRU;
-/* Add by w00199382 for V7代码同步, 2012-04-07, End   */
+/* Add by w00199382 for V7????????, 2012-04-07, End   */
 
 /*****************************************************************************
-  8 UNION定义
+  8 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  9 OTHERS定义
+  9 OTHERS????
 *****************************************************************************/
 /*****************************************************************************
-  H2ASN顶级消息结构定义
+  H2ASN????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -1776,19 +1776,19 @@ typedef struct
 
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 
 /*****************************************************************************
- 函 数 名  : TAF_APS_GetCidSdfParaInfo
- 功能描述  : 获取CID对应的SDF参数, 由APS保证获取的SDF参数有效, 如果CID对应的
-             SDF参数无效, 返回VOS_ERR, 否则返回VOS_OK
- 输入参数  : ucCid                      - CID
- 输出参数  : pstSdfParaInfo             - CID对应的SDF参数
- 返 回 值  : VOS_OK                     - CID对应的SDF参数有效, 获取成功
-             VOS_ERR                    - CID对应的SDF参数无效, 获取失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_APS_GetCidSdfParaInfo
+ ????????  : ????CID??????SDF????, ??APS??????????SDF????????, ????CID??????
+             SDF????????, ????VOS_ERR, ????????VOS_OK
+ ????????  : ucCid                      - CID
+ ????????  : pstSdfParaInfo             - CID??????SDF????
+ ?? ?? ??  : VOS_OK                     - CID??????SDF????????, ????????
+             VOS_ERR                    - CID??????SDF????????, ????????
+ ????????  :
+ ????????  :
 *****************************************************************************/
 extern VOS_UINT32 TAF_APS_GetCidSdfParaInfo(
     VOS_UINT8                           ucCid,
@@ -1796,27 +1796,27 @@ extern VOS_UINT32 TAF_APS_GetCidSdfParaInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_APS_GetCidImsCfgFlag
- 功能描述  : 获取CID对应的IMS配置
- 输入参数  : ucCid                      - CID
- 输出参数  : 无
- 返 回 值  : VOS_TRUE                   - CID支持IMS
-             VOS_FALSE                  - CID不支持IMS
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_APS_GetCidImsCfgFlag
+ ????????  : ????CID??????IMS????
+ ????????  : ucCid                      - CID
+ ????????  : ??
+ ?? ?? ??  : VOS_TRUE                   - CID????IMS
+             VOS_FALSE                  - CID??????IMS
+ ????????  :
+ ????????  :
 *****************************************************************************/
 extern VOS_UINT8 TAF_APS_GetCidImsCfgFlag(VOS_UINT8 ucCid);
 
 
 /*****************************************************************************
- 函 数 名  : TAF_APS_GetPdpManageInfo
- 功能描述  : 获取PDP管理模式(自动应答/拒绝), 无失败场景
- 输入参数  : 无
- 输出参数  : pstPdpManageInfo           - PDP管理模式
- 返 回 值  : VOS_OK                     - 获取PDP管理模式成功
-             VOS_ERR                    - 获取PDP管理模式失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_APS_GetPdpManageInfo
+ ????????  : ????PDP????????(????????/????), ??????????
+ ????????  : ??
+ ????????  : pstPdpManageInfo           - PDP????????
+ ?? ?? ??  : VOS_OK                     - ????PDP????????????
+             VOS_ERR                    - ????PDP????????????
+ ????????  :
+ ????????  :
 *****************************************************************************/
 extern VOS_UINT32 TAF_APS_GetPdpManageInfo(
     APS_L4A_PDP_MANAGE_INFO_STRU       *pstPdpManageInfo

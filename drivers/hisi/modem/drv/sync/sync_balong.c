@@ -46,7 +46,6 @@
  *
  */
 
-/*lint --e{537,718,746,958,959}*/
 #include <linux/time.h>
 #include <linux/delay.h>
 #include <osl_spinlock.h>
@@ -66,7 +65,6 @@ struct sync_control
 	char *g_pSyncState;
 	spinlock_t lock;
 };
-	/*lint -save -e34 -e35*/
 
 struct sync_control sync_ctrl;
 
@@ -96,22 +94,7 @@ static void BSP_SYNC_Init(void)
         sync_init = true;
     }
 }
-/*****************************************************************************
-* 函 数 名 : BSP_SYNC_Lock
-*
-* 功能描述: 锁定并查询模块的初始化状态
-*
-* 输入参数: u32Module     模块
-*                         pState        状态指针
-*                         u32TimeOut    超时值，0为永远等待；
-*
-* 输出参数: 无
-*
-* 返 回 值   : OK&ERROR
-*
-* 其它说明: 无
-*
-*****************************************************************************/
+
 s32 mdrv_sync_lock(SYNC_MODULE_E u32Module, u32 *pState, u32 u32TimeOut)
 {
 	unsigned long flag;
@@ -125,8 +108,7 @@ s32 mdrv_sync_lock(SYNC_MODULE_E u32Module, u32 *pState, u32 u32TimeOut)
 	}
 	tick_begin = bsp_get_slice_value();
 	tick_end = tick_begin + HI_TIMER_STAMP_CLK*u32TimeOut/100;
-	/* 目前只是在usrAppInit中使用，单任务情况下，使用循环查询效率较高
-       如果需要支持多任务，需要适当的让出CPU */
+
 	for(;;)
 	{
 		if(!sync_ctrl.g_pSyncLock[u32Module])
@@ -154,28 +136,12 @@ s32 mdrv_sync_lock(SYNC_MODULE_E u32Module, u32 *pState, u32 u32TimeOut)
 		}
 		SYNC_SLEEP(1);
 	}
-	/*lint -save -e571*/
+
 	*pState = (u32)sync_ctrl.g_pSyncState[u32Module];
-	/*lint -restore +e571*/
+
 	return BSP_OK;
 }
 
-
-/*****************************************************************************
-* 函 数 名      : BSP_SYNC_UnLock
-*
-* 功能描述  : 解锁并更新模块初始化状态
-*
-* 输入参数  : u32Module     模块
-*                           u32State       更新模块状态
-*
-* 输出参数  : 无
-*
-* 返 回 值      : OK&ERROR
-*
-* 其它说明  : 无
-*
-*****************************************************************************/
 s32 mdrv_sync_unlock(SYNC_MODULE_E u32Module, u32 u32State)
 {
 	 BSP_SYNC_Init();
@@ -188,21 +154,7 @@ s32 mdrv_sync_unlock(SYNC_MODULE_E u32Module, u32 u32State)
 	sync_ctrl.g_pSyncLock[u32Module] = (char)0;
 	return BSP_OK;
 }
-/*****************************************************************************
-* 函 数 名     : BSP_SYNC_Wait
-*
-* 功能描述  : 从核等待主核操作完成函数
-*
-* 输入参数  : u32Module     模块
-*                           u32TimeOut    超时值，0为永远等待；
-*
-* 输出参数  : 无
-*
-* 返 回 值      : OK&ERROR
-*
-* 其它说明  : 无
-*
-*****************************************************************************/
+
 s32 mdrv_sync_wait(SYNC_MODULE_E u32Module, u32 u32TimeOut)
 {
 	u32 tick_begin = 0,tick_end = 0;
@@ -232,19 +184,7 @@ s32 mdrv_sync_wait(SYNC_MODULE_E u32Module, u32 u32TimeOut)
 		SYNC_SLEEP(1);
 	}
 }
-/*****************************************************************************
-* 函 数 名     : BSP_SYNC_Give
-*
-* 功能描述  : 主核通知从核主核操作已经完成
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值     : OK&ERROR
-*
-* 其它说明  : 无
-*
-*****************************************************************************/
+
 s32 mdrv_sync_give(SYNC_MODULE_E u32Module)
 {
 	 BSP_SYNC_Init();
@@ -271,14 +211,8 @@ int bsp_sync_reset(SYNC_MODULE_E u32Module)
 	return BSP_OK;
 }
 
-/*lint -restore +e34 +e35*/
-/*lint -save -e19*/
 EXPORT_SYMBOL(mdrv_sync_lock);
 EXPORT_SYMBOL(mdrv_sync_unlock);
 EXPORT_SYMBOL(mdrv_sync_wait);
 EXPORT_SYMBOL(mdrv_sync_give);
 EXPORT_SYMBOL(bsp_sync_reset);
-
-/*lint -restore +e19*/
-
-

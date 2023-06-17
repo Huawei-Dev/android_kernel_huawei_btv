@@ -46,8 +46,6 @@
  *
  */
 
-
-/*lint -save -e537*/
 #include <linux/vmalloc.h>
 #include <bsp_nvim.h>
 #include "nv_comm.h"
@@ -57,7 +55,6 @@
 #include "nv_crc.h"
 #include "nv_partition_img.h"
 #include "bsp_dump.h"
-/*lint -restore +e537*/
 
 u32 nv_img_write(u8* pdata, u32 len, u32 file_offset)
 {
@@ -162,13 +159,6 @@ nv_flush_err:
     return ret;
 }
 
-/*****************************************************************************
- 函 数 名  : nv_resume_item_from_img
- 功能描述  : 从工作恢复一个NV项
- 输入参数  : void
- 输出参数  : 无
- 返 回 值  : 无
-*****************************************************************************/
 u32 nv_img_resume_item(nv_item_info_s *item_info, u32 modem_id)
 {
     u32 ret         = NV_ERROR;
@@ -269,10 +259,3 @@ u32 nv_img_resume_item(nv_item_info_s *item_info, u32 modem_id)
 EXPORT_SYMBOL(nv_img_write);
 EXPORT_SYMBOL(nv_img_flush_all);
 EXPORT_SYMBOL(nv_img_resume_item);
-
-
-/*lint -restore*/
-
-
-
-

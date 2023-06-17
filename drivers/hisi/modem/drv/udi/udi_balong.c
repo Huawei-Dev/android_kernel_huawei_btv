@@ -70,14 +70,14 @@
 //#define UDI_MAX_INIT_FUNC_NUM UDI_TYPE_MAX
 #define UDI_OPEN_NODE_HEADER  0x5A0000
 
-/* Mutex 行为封装 */
+/* Mutex ???????? */
 
 #define UDI_DEBUG
 
 /**************************************************************************
-  类型定义
+  ????????
 **************************************************************************/
-/* 设备打开节点 */
+/* ???????????? */
 typedef struct tagUDI_OPEN_NODE
 {
 	int bOpen;
@@ -85,20 +85,20 @@ typedef struct tagUDI_OPEN_NODE
 	UDI_DRV_INTEFACE_TABLE *pstDrvTable;
 }UDI_OPEN_NODE;
 
-/* 设备实例属性 */
+/* ???????????? */
 typedef struct tagUDI_DEV_INSTANCE
 {
-	//unsigned int u32MagicNum;				/* 检查用 */
-	//unsigned int u32DevId;					/* 设备ID */
-	unsigned int u32Capability;					/* 设备特性 */
-	//BSP_U8* strDevName;					/* 设备名,用于适配系统标准设备 */
-	UDI_DRV_INTEFACE_TABLE *pDrvInterface;  /* 接口回调列表 */
-	void* pPrivate;					/* 每个驱动私有全局 */
+	//unsigned int u32MagicNum;				/* ?????? */
+	//unsigned int u32DevId;					/* ????ID */
+	unsigned int u32Capability;					/* ???????? */
+	//BSP_U8* strDevName;					/* ??????,???????????????????? */
+	UDI_DRV_INTEFACE_TABLE *pDrvInterface;  /* ???????????? */
+	void* pPrivate;					/* ???????????????? */
 }UDI_DEV_INSTANCE;
 
 
 /**************************************************************************
-  全局变量
+  ????????
 **************************************************************************/
 UDI_OPEN_NODE			g_openNodeTable[UDI_MAX_OPEN_NODE_NUM];
 unsigned int					g_openNodeCurPos = 0;
@@ -108,7 +108,7 @@ extern UDI_ADP_INIT_CB_T	g_udiInitFuncTable[UDI_DEV_MAX+1];
 struct semaphore			g_udiMtxOpen;
 
 /**************************************************************************
-  宏实现
+  ??????
 **************************************************************************/
 #define UDI_OFFSET_OF(type, member) ((unsigned int) (&((type *)0)->member))
 #define UDI_IDX_TO_HANDLE(idx) ((UDI_HANDLE)(UDI_OPEN_NODE_HEADER | (idx)))
@@ -141,7 +141,7 @@ do{\
 		/*	handle, __LINE__);*/\
 		return (-1);\
 	}\
-	/* 取出函数指针及参数 */\
+	/* ?????????????????? */\
 	pstDrvTable = g_openNodeTable[u32Idx].pstDrvTable;\
 	if (UDI_IS_INVALID_TABLE(pstDrvTable))\
     {\
@@ -157,7 +157,7 @@ do{\
 	}\
 	pPrivate = g_openNodeTable[u32Idx].pPrivate;\
 	\
-	/* 调用用户的回调函数 */\
+	/* ?????????????????? */\
 	ret = pstDrvTable->functionCB(pPrivate, param1, param2);\
 }while(0)
 
@@ -177,7 +177,7 @@ do{\
 #endif
 
 /**************************************************************************
-  内部函数
+  ????????
 **************************************************************************/
 static UDI_HANDLE udiGetOutOpenNode(void)
 {
@@ -185,7 +185,7 @@ static UDI_HANDLE udiGetOutOpenNode(void)
 	UDI_HANDLE handle = UDI_INVALID_HANDLE;
 
 	down(&g_udiMtxOpen);
-	/* 优先从当前位置找 */
+	/* ???????????????? */
 	for (u32Cnt = g_openNodeCurPos; u32Cnt < UDI_MAX_OPEN_NODE_NUM; u32Cnt++)
 	{
 		if (0 == g_openNodeTable[u32Cnt].bOpen)
@@ -195,7 +195,7 @@ static UDI_HANDLE udiGetOutOpenNode(void)
 		}
 	}
 
-	/* 否则, 再从头找 */
+	/* ????, ???????? */
 	if(UDI_INVALID_HANDLE == handle)
 	{
 		for (u32Cnt = 0; u32Cnt < g_openNodeCurPos; u32Cnt++)
@@ -208,7 +208,7 @@ static UDI_HANDLE udiGetOutOpenNode(void)
 		}
 	}
 
-	/* 找到一个可用的handle */
+	/* ??????????????handle */
 	if (UDI_INVALID_HANDLE != handle)
 	{
 		g_openNodeCurPos = (u32Cnt+1) % UDI_MAX_OPEN_NODE_NUM;
@@ -237,18 +237,18 @@ static int udiReturnOpenNode(unsigned int u32Idx)
 }
 
 /**************************************************************************
-  接口实现
+  ????????
 **************************************************************************/
 
 /*****************************************************************************
-* 函 数 名  : BSP_UDI_SetPrivate
+* ?? ?? ??  : BSP_UDI_SetPrivate
 *
-* 功能描述  : 设置驱动内部私有数据
+* ????????  : ????????????????????
 *
-* 输入参数  : devId: 设备ID
-*             pPrivate: 私有数据
-* 输出参数  : 无
-* 返 回 值  : 成功/失败
+* ????????  : devId: ????ID
+*             pPrivate: ????????
+* ????????  : ??
+* ?? ?? ??  : ????/????
 *****************************************************************************/
 int BSP_UDI_SetPrivate(UDI_DEVICE_ID_E devId, void* pPrivate)
 {
@@ -267,14 +267,14 @@ int BSP_UDI_SetPrivate(UDI_DEVICE_ID_E devId, void* pPrivate)
 }
 
 /*****************************************************************************
-* 函 数 名  : BSP_UDI_SetCapability
+* ?? ?? ??  : BSP_UDI_SetCapability
 *
-* 功能描述  : 设置设备特性值
+* ????????  : ??????????????
 *
-* 输入参数  : devId: 设备ID
-*             u32Capability: 设备特性值
-* 输出参数  : 无
-* 返 回 值  : 成功/失败
+* ????????  : devId: ????ID
+*             u32Capability: ??????????
+* ????????  : ??
+* ?? ?? ??  : ????/????
 *****************************************************************************/
 int BSP_UDI_SetCapability(UDI_DEVICE_ID_E devId, unsigned int u32Capability)
 {
@@ -296,14 +296,14 @@ int BSP_UDI_SetCapability(UDI_DEVICE_ID_E devId, unsigned int u32Capability)
 }
 
 /*****************************************************************************
-* 函 数 名  : BSP_UDI_SetInterfaceTable
+* ?? ?? ??  : BSP_UDI_SetInterfaceTable
 *
-* 功能描述  : 设置设备回调函数列表(由适配层调用)
+* ????????  : ????????????????????(????????????)
 *
-* 输入参数  : devId: 设备ID
-*             pDrvInterface: 驱动层的回调函数列表
-* 输出参数  : 无
-* 返 回 值  : 成功/失败
+* ????????  : devId: ????ID
+*             pDrvInterface: ????????????????????
+* ????????  : ??
+* ?? ?? ??  : ????/????
 *****************************************************************************/
 int BSP_UDI_SetInterfaceTable(UDI_DEVICE_ID_E devId, UDI_DRV_INTEFACE_TABLE *pDrvInterface)
 {
@@ -323,13 +323,13 @@ int BSP_UDI_SetInterfaceTable(UDI_DEVICE_ID_E devId, UDI_DRV_INTEFACE_TABLE *pDr
 }
 
 /*****************************************************************************
-* 函 数 名  : bsp_udi_init
+* ?? ?? ??  : bsp_udi_init
 *
-* 功能描述  : UDI 模块初始化
+* ????????  : UDI ??????????
 *
-* 输入参数  : 无
-* 输出参数  : 无
-* 返 回 值  : 成功/失败
+* ????????  : ??
+* ????????  : ??
+* ?? ?? ??  : ????/????
 *****************************************************************************/
 int bsp_udi_init(void)
 {
@@ -341,7 +341,7 @@ int bsp_udi_init(void)
 
 	sema_init(&g_udiMtxOpen, 1);
 
-	/* 调用初始化函数 */
+	/* ?????????????? */
 	for (u32Cnt = 0; u32Cnt < (unsigned int)UDI_DEV_MAX; u32Cnt++)
 	{
 		initCB = g_udiInitFuncTable[u32Cnt];
@@ -358,13 +358,13 @@ int bsp_udi_init(void)
 }
 
 /*****************************************************************************
-* 函 数 名  : udi_get_capability
+* ?? ?? ??  : udi_get_capability
 *
-* 功能描述  : 根据设备ID获取当前设备支持的特性
+* ????????  : ????????ID??????????????????????
 *
-* 输入参数  : devId: 设备ID
-* 输出参数  : 无
-* 返 回 值  : 支持的特性值
+* ????????  : devId: ????ID
+* ????????  : ??
+* ?? ?? ??  : ????????????
 *****************************************************************************/
 int udi_get_capability(UDI_DEVICE_ID_E devId)
 {
@@ -381,13 +381,13 @@ int udi_get_capability(UDI_DEVICE_ID_E devId)
 	return (int)g_deviceTable[u32MainId][u32DevType].u32Capability;
 }
 /*****************************************************************************
-* 函 数 名  : mdrv_udi_open
+* ?? ?? ??  : mdrv_udi_open
 *
-* 功能描述  : 打开设备(数据通道)
+* ????????  : ????????(????????)
 *
-* 输入参数  : pParam: 设备的打开配置参数
-* 输出参数  : 无
-* 返 回 值  : -1:失败 / 其他:成功
+* ????????  : pParam: ??????????????????
+* ????????  : ??
+* ?? ?? ??  : -1:???? / ????:????
 *****************************************************************************/
 UDI_HANDLE mdrv_udi_open(UDI_OPEN_PARAM_S *pParam)
 {
@@ -408,7 +408,7 @@ UDI_HANDLE mdrv_udi_open(UDI_OPEN_PARAM_S *pParam)
       /*printk("mdrv_udi_open para error: u32MainId=%u u32DevType=%u\n", u32MainId, u32DevType);*/
 	  goto UDI_OPEN_ERR;
 	}
-	/* 查找一个可用的节点 */
+	/* ?????????????????? */
 	handle = udiGetOutOpenNode();
 	if (UDI_INVALID_HANDLE == handle)
 	{
@@ -417,7 +417,7 @@ UDI_HANDLE mdrv_udi_open(UDI_OPEN_PARAM_S *pParam)
 	}
 	u32Idx = UDI_HANDLE_TO_IDX(handle);
 
-	/* 调用用户回调函数 */
+	/* ???????????????? */
 	pstDrvTable = g_deviceTable[u32MainId][u32DevType].pDrvInterface;
 	if (NULL == pstDrvTable || NULL == pstDrvTable->udi_open_cb)
 	{
@@ -430,7 +430,7 @@ UDI_HANDLE mdrv_udi_open(UDI_OPEN_PARAM_S *pParam)
 		goto UDI_OPEN_ERR_RET_NODE;
 	}
 
-	/* 保存驱动私有数据 */
+	/* ???????????????? */
 	g_openNodeTable[u32Idx].pstDrvTable =
 	g_deviceTable[u32MainId][u32DevType].pDrvInterface;
 	g_openNodeTable[u32Idx].pPrivate =
@@ -446,13 +446,13 @@ UDI_OPEN_ERR:
 EXPORT_SYMBOL(mdrv_udi_open);
 
 /*****************************************************************************
-* 函 数 名  : mdrv_udi_close
+* ?? ?? ??  : mdrv_udi_close
 *
-* 功能描述  : 关闭设备(数据通道)
+* ????????  : ????????(????????)
 *
-* 输入参数  : handle: 设备的handle
-* 输出参数  : 无
-* 返 回 值  : 无
+* ????????  : handle: ??????handle
+* ????????  : ??
+* ?? ?? ??  : ??
 *****************************************************************************/
 int mdrv_udi_close(UDI_HANDLE handle)
 {
@@ -469,7 +469,7 @@ int mdrv_udi_close(UDI_HANDLE handle)
 		/*printk(KERN_ERR "BSP_MODU_UDI invalid handle:0x%x, line:%d\n", handle, __LINE__);*/
 		return (-1);
 	}
-	/* 调用用户的回调函数 */
+	/* ?????????????????? */
 	pstDrvTable = g_openNodeTable[u32Idx].pstDrvTable;
 	if (UDI_IS_INVALID_TABLE(pstDrvTable))/*lint !e58*/
     {
@@ -483,7 +483,7 @@ int mdrv_udi_close(UDI_HANDLE handle)
 	}
 	s32Ret = pstDrvTable->udi_close_cb(g_openNodeTable[u32Idx].pPrivate);
 
-	/* 释放 Open Node */
+	/* ???? Open Node */
 	(void)udiReturnOpenNode(u32Idx);
 
 	return s32Ret;
@@ -491,16 +491,16 @@ int mdrv_udi_close(UDI_HANDLE handle)
 EXPORT_SYMBOL(mdrv_udi_close);
 
 /*****************************************************************************
-* 函 数 名  : mdrv_udi_write
+* ?? ?? ??  : mdrv_udi_write
 *
-* 功能描述  : 数据写
+* ????????  : ??????
 *
-* 输入参数  : handle:  设备的handle
-*             pMemObj: buffer内存 或 内存链表对象
-*             u32Size: 数据写尺寸 或 内存链表对象可不设置
-* 输出参数  :
+* ????????  : handle:  ??????handle
+*             pMemObj: buffer???? ?? ????????????
+*             u32Size: ?????????? ?? ????????????????????
+* ????????  :
 *
-* 返 回 值  : 完成字节数 或 成功/失败
+* ?? ?? ??  : ?????????? ?? ????/????
 *****************************************************************************/
 int mdrv_udi_write(UDI_HANDLE handle, void* pMemObj, unsigned int u32Size)
 {
@@ -513,16 +513,16 @@ int mdrv_udi_write(UDI_HANDLE handle, void* pMemObj, unsigned int u32Size)
 EXPORT_SYMBOL(mdrv_udi_write);
 
 /*****************************************************************************
-* 函 数 名  : mdrv_udi_read
+* ?? ?? ??  : mdrv_udi_read
 *
-* 功能描述  : 数据读
+* ????????  : ??????
 *
-* 输入参数  : handle:  设备的handle
-*             pMemObj: buffer内存 或 内存链表对象
-*             u32Size: 数据读尺寸 或 内存链表对象可不设置
-* 输出参数  :
+* ????????  : handle:  ??????handle
+*             pMemObj: buffer???? ?? ????????????
+*             u32Size: ?????????? ?? ????????????????????
+* ????????  :
 *
-* 返 回 值  : 完成字节数 或 成功/失败
+* ?? ?? ??  : ?????????? ?? ????/????
 *****************************************************************************/
 int mdrv_udi_read(UDI_HANDLE handle, void* pMemObj, unsigned int u32Size)
 {
@@ -535,16 +535,16 @@ int mdrv_udi_read(UDI_HANDLE handle, void* pMemObj, unsigned int u32Size)
 EXPORT_SYMBOL(mdrv_udi_read);
 
 /*****************************************************************************
-* 函 数 名  : mdrv_udi_ioctl
+* ?? ?? ??  : mdrv_udi_ioctl
 *
-* 功能描述  : 数据通道属性配置
+* ????????  : ????????????????
 *
-* 输入参数  : handle: 设备的handle
-*             u32Cmd: IOCTL命令码
-*             pParam: 操作参数
-* 输出参数  :
+* ????????  : handle: ??????handle
+*             u32Cmd: IOCTL??????
+*             pParam: ????????
+* ????????  :
 *
-* 返 回 值  : 成功/失败
+* ?? ?? ??  : ????/????
 *****************************************************************************/
 int mdrv_udi_ioctl(UDI_HANDLE handle, unsigned int u32Cmd, void* pParam)
 {

@@ -95,13 +95,13 @@
 #include "VosTaskPrioDef.h"
 
 
-/* LINUX 不支持 */
+/* LINUX ?????? */
 
 
 
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
 /*lint -e767 modify:x51137; review:h59254; cause:print log */
 #define    THIS_FILE_ID        PS_FILE_ID_V_TIMER_C
@@ -195,13 +195,13 @@ VOS_VOID VOS_ShowUsed26MTimerInfo( VOS_VOID );
 
 VOS_VOID VOS_TimerDump(VOS_INT lModId, VOS_UINT32 ulFileID, VOS_UINT32 ulLineNo);
 
-/* 自旋锁，用来作Timer的临界资源保护 */
+/* ??????????????Timer?????????????? */
 VOS_SPINLOCK                  g_stVosTimerSpinLock;
 
 
 #define VOS_26M_TIMER_ID     (TIMER_ACPU_OM_TCXO_ID)
 
-/* 记录 VOS 26 timer 可维可测信息 */
+/* ???? VOS 26 timer ???????????? */
 VOS_TIMER_SOC_TIMER_INFO_STRU g_st26MSocTimerInfo;
 
 /* the semaphore will be given when 26M's interrupt occures */
@@ -550,7 +550,7 @@ VOS_VOID VOS_TimerTaskFunc( VOS_UINT32 Para0, VOS_UINT32 Para1,
                 else
                 {
                     /*lint -e613*/
-                    vos_Timer_expire_tail_Ptr->next = vos_TimerCtrlBlkCurrent;/* [false alarm]: 屏蔽Fortify 错误 */
+                    vos_Timer_expire_tail_Ptr->next = vos_TimerCtrlBlkCurrent;/* [false alarm]: ????Fortify ???? */
                     /*lint +e613*/
                     vos_Timer_expire_tail_Ptr = vos_TimerCtrlBlkCurrent;
                 }
@@ -610,7 +610,7 @@ VOS_VOID VOS_TimerTaskFunc( VOS_UINT32 Para0, VOS_UINT32 Para1,
 
                 TempValue = (VOS_UINT_PTR)(vos_Timer_expire_head_Ptr->CallBackFunc);
 
-                /* CallBackFunc需要用32位传入，所以和name互换位置保证数据不丢失 */
+                /* CallBackFunc??????32??????????????name?????????????????????? */
                 OM_RecordInfoStart(VOS_EXC_DUMP_MEM_NUM_4, (VOS_UINT32)(vos_Timer_expire_head_Ptr->Pid), vos_Timer_expire_head_Ptr->Name, (VOS_UINT32)TempValue);
 
                 if ( VOS_NULL_PTR == vos_Timer_expire_head_Ptr->CallBackFunc )
@@ -798,20 +798,20 @@ VOS_VOID Add_Timer_To_List( VOS_TIMER_CONTROL_BLOCK  *Timer)
 }
 
 /*****************************************************************************
- 函 数 名  : VOS_CheckTimer
- 功能描述  : 检查TIMER是否正确
- 输入参数  : HTIMER  *phTm
+ ?? ?? ??  : VOS_CheckTimer
+ ????????  : ????TIMER????????
+ ????????  : HTIMER  *phTm
              VOS_UINT32 ulFileID
              VOS_INT32 usLineNo
- 输出参数  : VOS_UINT32 *ulTimerID
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : VOS_UINT32 *ulTimerID
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年5月5日
-    作    者   : s00207770
-    修改内容   : 规避TimerId被修改导致的检查错误发起主动复位
+ ????????      :
+  1.??    ??   : 2014??5??5??
+    ??    ??   : s00207770
+    ????????   : ????TimerId????????????????????????????????
 
 *****************************************************************************/
 VOS_UINT32 VOS_CheckTimer( HTIMER  *phTm, VOS_UINT32 *ulTimerID,

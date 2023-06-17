@@ -79,19 +79,19 @@ static const char* const modem_state_str[] = {
 static int modem_power_off_flag = 0;
 
 /*****************************************************************************
- 函 数 名  : modem_state_set
- 功能描述  : 提供ttf设置modem状态的API
- 输入参数  : unsigned int state
- 输出参数  : 无
- 返 回 值  : <0     failed,invalid state
+ ?? ?? ??  : modem_state_set
+ ????????  : ????ttf????modem??????API
+ ????????  : unsigned int state
+ ????????  : ??
+ ?? ?? ??  : <0     failed,invalid state
              =0     success
- 调用函数  :
- 被调函数  :
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2013年5月25日
-    作    者   : 陈易超
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2013??5??25??
+    ??    ??   : ??????
+    ????????   : ??????????
 
 *****************************************************************************/
 int mdrv_set_modem_state(unsigned int state)
@@ -141,7 +141,7 @@ ssize_t modem_reset_set(struct device *dev, struct device_attribute *attr, const
 	pr_err("endp = 0x%x\n", *(int*)endp);
 	pr_err("count = %lu\n", (unsigned long)count);
 
-	/* 整机复位对rild为桩,应该整机复位 */
+	/* ??????????rild????,???????????? */
 	if (!bsp_reset_is_connect_ril())
 	{
 		pr_err("<modem_reset_set>: modem reset not to be connected to ril\n");
@@ -153,7 +153,7 @@ ssize_t modem_reset_set(struct device *dev, struct device_attribute *attr, const
 	{
 		return count;
 	}
-	if (state == BALONG_MODEM_RESET) /* 切卡 */
+	if (state == BALONG_MODEM_RESET) /* ???? */
 	{
 		pr_err("modem reset %d\n", BALONG_MODEM_RESET);
 		system_error(DRV_ERRNO_RESET_SIM_SWITCH, 0, 0, NULL, 0);
@@ -172,7 +172,7 @@ ssize_t modem_reset_set(struct device *dev, struct device_attribute *attr, const
 		modem_power_off_flag = 1;
 		return count;
 	}
-	else if(state == BALONG_MODEM_ON) /* TODO: 是否需要上电，根HIFI什么关系 */
+	else if(state == BALONG_MODEM_ON) /* TODO: ????????????????HIFI???????? */
 	{
 		bsp_modem_power_on();
 		pr_err("modem power on %d\n", BALONG_MODEM_ON);

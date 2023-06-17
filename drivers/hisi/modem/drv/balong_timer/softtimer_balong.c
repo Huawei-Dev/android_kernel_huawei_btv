@@ -343,7 +343,7 @@ int  softtimer_task_func(void* data)
 			else
 				break;
 		}
-		if (!list_empty(&(ptimer_control->timer_list_head)))/*如果还有未超时定时器*/
+		if (!list_empty(&(ptimer_control->timer_list_head)))
 		{
 			p=list_first_entry(&(ptimer_control->timer_list_head),struct softtimer_list,entry);
 			if(p->is_running == TIMER_FALSE)
@@ -358,9 +358,7 @@ int  softtimer_task_func(void* data)
 		}
 		spin_unlock_irqrestore(&ptimer_control->timer_list_lock,flags); 
 	} 
-	/*lint -save -e527*/ 
 	return 0;
-	/*lint -restore +e527*/ 
 }
 
 
@@ -525,6 +523,3 @@ EXPORT_SYMBOL(bsp_softtimer_free);
 EXPORT_SYMBOL(check_softtimer_support_type);
 EXPORT_SYMBOL(show_list);
 arch_initcall(bsp_softtimer_init);
-
-
-

@@ -46,7 +46,6 @@
  *
  */
 
-
 #ifndef __MSP_DEBUG_H__
 #define __MSP_DEBUG_H__
 
@@ -56,38 +55,24 @@ extern "C" {
 #endif
 #endif
 
-/*****************************************************************************
-  1 Include Headfile
-*****************************************************************************/
 #include  "product_config.h"
 #include  "vos.h"
 
 #pragma pack(4)
 
-
 #define DIAG_DEBUG_START        (0xaaaa5555)
 #define DIAG_DEBUG_END          (0x5555aaaa)
 
-/* debug版本 V1.00 */
 #define DIAG_DEBUG_VERSION      (0x00010000)
 
-/* debug提示信息的长度 */
 #define DIAG_DEBUG_INFO_LEN     (32)
 
-/* 两次数据采集的时间间隔 */
 #define DIAG_DEBUG_DEALAY       (5000)
 
-/* 复杂的数据结构，存储信息前先存储信息长度，高8位是0xa5，低24位是数据长度 */
 #define DIAG_DEBUG_SIZE_FLAG    (0xa5000000)
 
-
-/* PTR ***********************************************************************/
 #if((VOS_OS_VER == VOS_LINUX) || (VOS_OS_VER == VOS_WIN32))
 
-/*
-初步估计每个诊断命令由10-20个点能覆盖整个处理流程，
-1000个点能缓存50-100个诊断命令的处理流程
-*/
 #define DIAG_PTR_NUMBER             (1000)
 
 typedef enum
@@ -120,8 +105,6 @@ typedef enum
     EN_DIAG_PTR_SCM_SENDTOUDI,
     EN_DIAG_PTR_CPM_COMSEND,
     EN_DIAG_PTR_PPM_PORTSEND,
-
-    /* 失败流程的点 */
     EN_DIAG_PTR_ERR_BEGIN = 0x100,
     EN_DIAG_PTR_PPM_ERR1,
     EN_DIAG_PTR_PPM_ERR2,
@@ -165,13 +148,11 @@ extern VOS_VOID DIAG_DebugFileTail(void *pFile, VOS_CHAR *FilePath);
 extern VOS_VOID DIAG_DebugNoIndLog(VOS_VOID);
 extern VOS_VOID diag_numberinfo(void *pFile);
 
-
 #if (VOS_OS_VER == VOS_WIN32)
 #pragma pack()
 #else
 #pragma pack(0)
 #endif
-
 
 #ifdef __cplusplus
     #if __cplusplus
@@ -180,4 +161,3 @@ extern VOS_VOID diag_numberinfo(void *pFile);
 #endif
 
 #endif /* end of diag_Debug.h */
-

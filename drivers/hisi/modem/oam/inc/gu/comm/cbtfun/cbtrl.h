@@ -49,9 +49,6 @@
 #ifndef __CBTRL_H__
 #define __CBTRL_H__
 
-/*****************************************************************************
-  1 头文件包含
-*****************************************************************************/
 #include "vos.h"
 #include "phyoaminterface.h"
 
@@ -61,10 +58,6 @@ extern "C"{
 #endif
 #endif
 
-/*****************************************************************************
-  2 宏定义
-*****************************************************************************/
-/*OM<->APP : NON SIGALING Transparent Message.*/
 #define APP_OM_NON_SIG_BT_TRAN_REQ      (0x1601)
 #define OM_APP_NON_SIG_BT_TRAN_CNF      (0x1602)
 
@@ -107,8 +100,8 @@ extern "C"{
 #define OM_APP_SWITCH_RF_ANT_CNF         0x0068
 
 
-#define CBT_STATE_IDLE                          0 /*IDLE态，不能正常与工具进行通信*/
-#define CBT_STATE_ACTIVE                        1 /*ACTIVE态，能够正常工作*/
+#define CBT_STATE_IDLE                          0
+#define CBT_STATE_ACTIVE                        1
 
 #define CBT_MSG_ID_COMP_LENGTH                  (4U)
 
@@ -128,8 +121,8 @@ extern "C"{
 
 #define OM_BER_DATA_MAX_SIZE                    (1024)
 
-#define OM_STATE_IDLE                               0 /*IDLE态，OM不能正常与工具进行通信*/
-#define OM_STATE_ACTIVE                             1 /*ACTIVE态，OM能够正常工作*/
+#define OM_STATE_IDLE                               0
+#define OM_STATE_ACTIVE                             1
 
 /*OM<->APP : Just for LMT.*/
 #define APP_OM_HANDLE_LMT_REQ                     0x80a1
@@ -138,19 +131,15 @@ extern "C"{
 #define APP_OM_ACTIVE_PHY_REQ                     0x80a3
 #define OM_APP_ACTIVE_PHY_CNF                     0x80a4
 
-/*OM<->APP :查询PA的属性*/
 #define APP_OM_PA_ATTRIBUTE_REQ                   0x80c1
 #define OM_APP_PA_ATTRIBUTE_IND                   0x80c2
 
-/*OM<->APP :通过物理通道查询PA的温度*/
 #define APP_OM_PA_TEMP_PHY_CHAN_REQ               0x80c7
 #define OM_APP_PA_TEMP_PHY_CHAN_IND               0x80c8
 
-/*设置从信令下切换到非信令下*/
 #define APP_OM_SET_FTM_REQ                        0x80e5
 #define OM_APP_SET_FTM_CNF                        0x80e6
 
-/* OM<->APP :LMT查询DSDA支持状态 */
 #define APP_OM_QUERY_MODEM_NUM_REQ                0x8211
 #define OM_APP_QUERY_MODEM_NUM_CNF                0x8212
 
@@ -173,10 +162,6 @@ extern "C"{
 
 #define OM_TRANS_PRIMID                           0x5001
 
-
-/*****************************************************************************
-  6 STRUCT定义
-*****************************************************************************/
 enum OM_W_SNYC_STATUS
 {
     OM_W_SYNC_STATUS_SYNC = 0,
@@ -263,37 +248,21 @@ typedef enum
     CBT_COMP_BUTT
 } CBT_COMPONET_ID_ENUM;
 
-/*****************************************************************************
-结构名    : MODEM_SSID_STRU
-结构说明  : 定义包含modem和ssid的数据结构
-*****************************************************************************/
-/*lint -e46*/
 typedef struct
 {
-    VOS_UINT8 ucModem  : 3;  /*modem0: 0  modem1: 1*/
+    VOS_UINT8 ucModem  : 3;
     VOS_UINT8 ucResv   : 1;
-    VOS_UINT8 ucSsid   : 4;  /**/
+    VOS_UINT8 ucSsid   : 4;
 } CBT_MODEM_SSID_STRU;
-/*lint +e46*/
 
-/*****************************************************************************
-结构名    : FRAGMENT_INFO_STRU
-结构说明  : 定义包含消息类型和消息分段信息的数据结构
-*****************************************************************************/
-/*lint -e46*/
 typedef struct
 {
-    VOS_UINT8 ucMsgType    : 2; /*消息类型，REQ: 1   CNF: 2   IND: 3*/
-    VOS_UINT8 ucFragIndex  : 4; /*消息分段的片段索引*/
-    VOS_UINT8 ucEof        : 1; /*分段结束标识，0分段未结束，1分段结束*/
-    VOS_UINT8 ucFragFlag   : 1; /*是否分段标识，0不分段，1分段*/
+    VOS_UINT8 ucMsgType    : 2;
+    VOS_UINT8 ucFragIndex  : 4;
+    VOS_UINT8 ucEof        : 1;
+    VOS_UINT8 ucFragFlag   : 1;
 } CBT_FRAGMENT_INFO_STRU;
-/*lint +e46*/
 
-/*****************************************************************************
-结构名    : TIME_STAMP_STRU
-结构说明  : 定义包含时间戳的数据结构
-*****************************************************************************/
 typedef struct
 {
     VOS_UINT32 ulTimestampL;
@@ -301,111 +270,77 @@ typedef struct
     VOS_UINT16 usRsv;
 } CBT_TIME_STAMP_STRU;
 
-/*****************************************************************************
-结构名    : COMPONENT_MODE_STRU
-结构说明  : 定义包含组件和模的数据结构
-*****************************************************************************/
-/*lint -e46*/
 typedef struct
 {
     VOS_UINT8 ucRsv;
-    VOS_UINT8 ucMode     : 4;  /*区分GUTLC模*/
+    VOS_UINT8 ucMode     : 4;
     VOS_UINT8 ucCompID   : 4;
 } CBT_COMPONENT_MODE_STRU;
-/*lint +e46*/
 
-/*****************************************************************************
-结构名    : CBT_MSG_HEAD_STRU
-结构说明  : 定义OM消息头的数据结构
-*****************************************************************************/
 typedef struct
 {
-    VOS_UINT8               ucSid;              /* 固定为 7*/
+    VOS_UINT8               ucSid;
     CBT_MODEM_SSID_STRU     stModemSsid;
-    VOS_UINT8               ucSessionID;        /*固定为 1*/
+    VOS_UINT8               ucSessionID;
     CBT_FRAGMENT_INFO_STRU  stMsgSegment;
     VOS_UINT32              ulTransId;
-    CBT_TIME_STAMP_STRU     stTimeStamp;        /*时间戳信息*/
+    CBT_TIME_STAMP_STRU     stTimeStamp;
 } CBT_MSG_HEAD_STRU;
 
-/*****************************************************************************
-结构名    : CBT_UNIFORM_MSG_STRU
-结构说明  : 工具下发数据包扩展结构
-*****************************************************************************/
 typedef struct
 {
     CBT_MSG_HEAD_STRU               stMsgHeader;
-    VOS_UINT16                      usMsgId;      /* 消息ID */
+    VOS_UINT16                      usMsgId;
     CBT_COMPONENT_MODE_STRU         stCompMode;
     VOS_UINT32                      ulMsgLength;
-    VOS_UINT8                       aucPara[4];   /* 消息内容 */
+    VOS_UINT8                       aucPara[4];
 } CBT_UNIFORM_MSG_STRU;
 
-/*****************************************************************************
-结构名    : CBT_TRANS_MSG_STRU
-结构说明  : 工具下发数据包扩展结构
-*****************************************************************************/
 typedef struct
 {
     CBT_MSG_HEAD_STRU               stMsgHeader;
-    VOS_UINT16                      usMsgId;      /* 消息ID */
+    VOS_UINT16                      usMsgId;
     VOS_UINT16                      usCompMode;
     VOS_UINT32                      ulMsgLength;
-    VOS_UINT32                      ulReceiverPid; /* 接收消息的模块PID */
-    VOS_UINT8                       aucPara[4];    /* 消息内容 */
+    VOS_UINT32                      ulReceiverPid;
+    VOS_UINT8                       aucPara[4];
 } CBT_TRANS_MSG_STRU;
-/*****************************************************************************
-结构名    : CBT_HOOK_MSG_STRU
-结构说明  : 发送给CBT模块的非透传消息数据包结构
-*****************************************************************************/
+
 typedef struct
 {
     VOS_UINT16                          usPrimId;
     VOS_UINT16                          usReserve;
-    VOS_UINT8                           aucPara[4];   /* 消息内容 */
+    VOS_UINT8                           aucPara[4];
 } CBT_HOOK_MSG_STRU;
-/*****************************************************************************
-结构名    : CBT_RCV_TRANS_MSG_STRU
-结构说明  : 透传给CBT模块的数据包结构
-*****************************************************************************/
+
 typedef struct
 {
     VOS_UINT16                          usTransPrimId;
     VOS_UINT16                          usRsv;
-    VOS_UINT16                          usMsgId;     /* 指示当前消息类型 */
+    VOS_UINT16                          usMsgId;
     VOS_UINT16                          usCompMode;
-    VOS_UINT8                           aucPara[4];   /* 消息内容 */
+    VOS_UINT8                           aucPara[4];
 }CBT_RCV_TRANS_MSG_STRU;
 
-/*****************************************************************************
-结构名    : CBT_SEND_COMM_MSG_STRU
-结构说明  : PHY层或者Agent代理层发送给CBT模块的数据包结构
-*****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    VOS_UINT16                          usMsgId;     /* 指示当前消息类型 */
+    VOS_UINT16                          usMsgId;
     VOS_UINT16                          usCompMode;
-    VOS_UINT8                           aucPara[4];   /* 消息内容 */
+    VOS_UINT8                           aucPara[4];
 }CBT_SEND_COMM_MSG_STRU;
-/*****************************************************************************
-结构名    : PS_TO_CBT_MSG_STRU
-结构说明  : PHY层或者Agent代理层发送给CBT模块的数据包结构
-*****************************************************************************/
+
 typedef struct
 {
-    VOS_UINT16                          usMsgId;     /* 指示当前消息类型 */
-    VOS_UINT16                          usCompMode;     /* 目前未使用 */
-    VOS_UINT8                           aucPara[4];   /* 消息内容 */
+    VOS_UINT16                          usMsgId;
+    VOS_UINT16                          usCompMode;
+    VOS_UINT8                           aucPara[4];
 }PS_TO_CBT_MSG_STRU;
-/*****************************************************************************
-结构名    : CBT_CTOA_MSG_STRU
-结构说明  : 工具下发数据包扩展结构
-*****************************************************************************/
+
 typedef struct
 {
     VOS_MSG_HEADER
-    VOS_UINT16                      usPrimId;            /* 消息ID */
+    VOS_UINT16                      usPrimId;
     VOS_UINT16                      usLen;
     VOS_UINT8                       aucData[4];
 }CBT_CTOA_MSG_STRU;
@@ -419,16 +354,12 @@ typedef struct
     VOS_UINT32  ulPrimId;           /*Indicates current msg type.*/
     VOS_UINT32  ulReturnPrimId;     /*Indicates return msg type.*/
 } CBT_MSG_FUN_STRU;
-/*****************************************************************************
- 结构名    : CBT_LISI_MODE_CTRL_STRU
- 协议表格  :
- 结构说明  : Listmode相关的数据结构
-*****************************************************************************/
+
 typedef struct
 {
     CBT_MODEM_SSID_STRU         stModemSsid;            /* Modem */
-    VOS_UINT8                   ucReserve;              /* 保留字 */
-    CBT_COMPONENT_MODE_STRU     stCompMode;             /* 组件ID */
+    VOS_UINT8                   ucReserve;
+    CBT_COMPONENT_MODE_STRU     stCompMode;
 
     VOS_UINT32                  ulBand;
     VOS_UINT16                  usTxChan;
@@ -444,24 +375,20 @@ typedef struct
     VOS_UINT16                  usRecvPrimId;
     VOS_UINT16                  usEnableReport;
 
-    VOS_UINT16                  usTotalFrameNum;        /* 总帧数 */
-    VOS_UINT16                  usCurFrameNum;          /* 上报的BER当前帧数 */
-    VOS_UINT16                  usReportFrameNum;       /* 上报的BER总帧数 */
-    VOS_UINT16                  usCurReportFrameNum;    /* 上报的BER总帧数 */
+    VOS_UINT16                  usTotalFrameNum;
+    VOS_UINT16                  usCurFrameNum;
+    VOS_UINT16                  usReportFrameNum;
+    VOS_UINT16                  usCurReportFrameNum;
 
-    VOS_UINT16                  usTxTotalFrameNum;      /* 上报的BER总帧数 */
-    VOS_UINT16                  usTxCurFrameNum;        /* 上报的BER当前帧数 */
+    VOS_UINT16                  usTxTotalFrameNum;
+    VOS_UINT16                  usTxCurFrameNum;
 
     VOS_SEM                     ulCbtTotalFrameSem;
     VOS_SEM                     ulCbtTxSegmentFrameSem;
     VOS_SEM                     ulCbtSyncSem;
     VOS_SEM                     ulCbtGeDlQualitySem;
 }CBT_LISI_MODE_CTRL_STRU;
-/*****************************************************************************
- 结构名    : CBT_GE_DL_STATUS_STRU
- 协议表格  :
- 结构说明  : GSM上报下行质量消息结构
-*****************************************************************************/
+
 typedef struct
 {
     CBT_MSG_HEAD_STRU      stHeader;
@@ -470,11 +397,7 @@ typedef struct
     VOS_UINT32             ulMsgLength;
     VOS_UINT16             usBerValue[2];
 }CBT_GE_DL_STATUS_STRU;
-/*****************************************************************************
- 结构名    : CBT_LIST_MODE_BER_IND_STRU
- 协议表格  :
- 结构说明  : Ber上报消息结构
-*****************************************************************************/
+
 typedef struct
 {
     CBT_MSG_HEAD_STRU       stHeader;
@@ -488,14 +411,10 @@ typedef struct
     VOS_UINT16              usRxChan;
     VOS_UINT16              usCrcData;
     VOS_UINT16              usRsv;
-    VOS_UINT32              ulDataLen;           /* 数据长度,单位:字节,在数值上是4的整数倍,范围[0..WTTFPHY_MAX_PHY_DATA_REQ_LEN-1] */
-    VOS_UINT8               aucData[OM_BER_DATA_MAX_SIZE]; /* 上行数据块 */
+    VOS_UINT32              ulDataLen;
+    VOS_UINT8               aucData[OM_BER_DATA_MAX_SIZE];
 }CBT_LIST_MODE_BER_IND_STRU;
-/*****************************************************************************
- 结构名    : CBT_LIST_MODE_BER_IND_STRU
- 协议表格  :
- 结构说明  : Ber上报消息结构
-*****************************************************************************/
+
 typedef struct
 {
     CBT_MSG_HEAD_STRU       stHeader;
@@ -509,11 +428,6 @@ typedef struct
 
 }CBT_C_FER_DATA_CNF_STRU;
 
-/*****************************************************************************
- 结构名    : CBT_LT_SWITCH_RF_ANT_STRU
- 协议表格  :
- 结构说明  : Ber上报消息结构
-*****************************************************************************/
 typedef struct
 {
     VOS_UINT16  usGpioNo;
@@ -522,10 +436,6 @@ typedef struct
 
 
 typedef VOS_UINT32 (* RTTAgentFunc)(VOS_VOID *pMsg);
-
-/*****************************************************************************
-  函数声明
-*****************************************************************************/
 
 VOS_VOID CBT_ResetMsgHead(CBT_UNIFORM_MSG_STRU * pstCbtToPcMsg);
 
@@ -551,7 +461,6 @@ extern VOS_UINT32 RTTAGENT_FchanLTESet(VOS_VOID * pMsg);
 #if ( FEATURE_MULTI_MODEM == FEATURE_ON )
 extern VOS_VOID I1_SLEEP_ActivateHw(SLEEP_MODE_ENUM_UINT32 enMode);
 #endif
-
 
 #ifdef __cplusplus
 #if __cplusplus

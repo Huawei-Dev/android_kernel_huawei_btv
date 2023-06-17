@@ -46,31 +46,6 @@
  *
  */
 
-/*****************************************************************************/
-/*                                                                           */
-/*                Copyright 1999 - 2003, Huawei Tech. Co., Ltd.              */
-/*                           ALL RIGHTS RESERVED                             */
-/*                                                                           */
-/* FileName: linux_task.c                                                    */
-/*                                                                           */
-/* Author: Xu Cheng                                                          */
-/*                                                                           */
-/* Version: 1.0                                                              */
-/*                                                                           */
-/* Date: 2011-07                                                             */
-/*                                                                           */
-/* Description: implement Linux task                                         */
-/*                                                                           */
-/* Others:                                                                   */
-/*                                                                           */
-/* History:                                                                  */
-/* 1. Date:                                                                  */
-/*    Author:                                                                */
-/*    Modification: Create this file                                         */
-/*                                                                           */
-/*                                                                           */
-/*****************************************************************************/
-
 #include "vos_config.h"
 #include "v_typdef.h"
 #include "v_task.h"
@@ -82,17 +57,7 @@
 #include "mdrv.h"
 #include <linux/kthread.h>
 
-
-
-
-
-/*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
-*****************************************************************************/
-/*lint -e767 modify:x51137; review:h59254; cause:print log */
 #define    THIS_FILE_ID        PS_FILE_ID_V_TASK_C
-/*lint +e767 modify:x51137; review:h59254; */
-
 
 typedef struct
 {
@@ -125,7 +90,6 @@ VOS_UINT32 g_acVosTaskCtrlBuf[VOS_TASK_CTRL_BUF_SIZE/4];
 
 typedef VOS_INT (*LINUX_START_ROUTINE)( VOS_VOID * );
 
-/* 自旋锁，用来作task的临界资源保护 */
 VOS_SPINLOCK             g_stVosTaskSpinLock;
 
 
@@ -299,7 +263,6 @@ VOS_VOID VOS_LinuxTaskEntry( VOS_VOID * pulArg )
     ulPara3 = pstTemp->Args[2];
     ulPara4 = pstTemp->Args[3];
 
-    /* ulPara4为全F代表为FID任务或FID自处理任务等待OSA启动完毕后再正常运行 */
     if (VOS_NULL_DWORD == ulPara4)
     {
         down(&g_stVosTaskRunSem);
@@ -933,9 +896,3 @@ VOS_UINT32 VOS_GetTCBFromTID(VOS_UINT32 ulTid)
 {
     return (VOS_UINT32)vos_TaskCtrlBlk[ulTid].ulLinuxThreadId;
 }
-
-
-
-
-
-

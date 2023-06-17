@@ -66,9 +66,6 @@ extern "C" {
 #define HI_SHARED_DDR_SIZE                (DDR_SHARED_MEM_SIZE)
 #endif
 
-/*****************************************************************************************************************************
-*共享内存基地址
-******************************************************************************************************************************/
 #if !defined(__KERNEL__) && !defined(__OS_VXWORKS__) && !defined(__OS_RTOSCK__)
 #define SHM_BASE_ADDR                  (HI_SHARED_DDR_BASE_ADDR)
 #else
@@ -76,9 +73,7 @@ extern "C" {
 #define SHD_DDR_V2P(addr)              (void *)((unsigned long)(addr) - (unsigned long)g_mem_ctrl.sddr_virt_addr + (unsigned long)g_mem_ctrl.sddr_phy_addr)
 #define SHD_DDR_P2V(addr)              (void *)((unsigned long)(addr) - (unsigned long)g_mem_ctrl.sddr_phy_addr + (unsigned long)g_mem_ctrl.sddr_virt_addr)
 #endif
-/*****************************************************************************************************************************
-*各模块定义的偏移和大小,偏移定义:SHM_OFFSET_XXX  大小定义:SHM_SIZE_XXXX，新增不满足KB对齐请从 SHM_OFFSET_SLICE_MEM 添加
-******************************************************************************************************************************/
+
 #define SHM_OFFSET_HIFI_MBX		    	(0x0)
 
 #define SHM_OFFSET_HIFI		    		(SHM_OFFSET_HIFI_MBX + SHM_SIZE_HIFI_MBX)
@@ -89,8 +84,6 @@ extern "C" {
 
 #define SHM_OFFSET_DDM_LOAD				(SHM_OFFSET_TEMPERATURE + SHM_SIZE_TEMPERATURE)
 
-/* v7r2 a9_boot_addr 对齐方式可配置，需要64/32/16KB/8KB对齐 */
-/* 64K全占满 */
 #define SHM_OFFSET_APPA9_PM_BOOT        (SHM_OFFSET_DDM_LOAD + SHM_SIZE_DDM_LOAD)
 
 #define SHM_OFFSET_MDMA9_PM_BOOT        (SHM_OFFSET_APPA9_PM_BOOT + SHM_SIZE_MEM_APPA9_PM_BOOT)
@@ -98,10 +91,8 @@ extern "C" {
 /*CT BT*/
 #define SHM_OFFSET_TENCILICA_MULT_BAND  (SHM_OFFSET_MDMA9_PM_BOOT + SHM_SIZE_MEM_MDMA9_PM_BOOT)
 
-/* 总大小为236KB, 其中, GU通道192KB, L通道40KB, icc控制结构体为页对齐取为4KB */
 #define SHM_OFFSET_ICC                  (SHM_OFFSET_TENCILICA_MULT_BAND + SHM_SIZE_TENCILICA_MULT_BAND)
 
-/* 总大小为64KB, 其中, 用于从AXI(SRAM)移过来的IPF描述符和IPF低功耗的寄存器保存恢复, 首地址要求8字节对齐 */
 #define SHM_OFFSET_IPF             	    (SHM_OFFSET_ICC + SHM_SIZE_ICC)
 
 #define SHM_OFFSET_PSAM             	(SHM_OFFSET_IPF + SHM_SIZE_IPF)
@@ -118,28 +109,22 @@ extern "C" {
 
 #define SHM_OFFSET_RESTORE_AXI          (SHM_OFFSET_IOS + SHM_SIZE_IOS)
 
-/* 电压源属性控制表，大小有预留，实际使用为0x85c */
 #define SHM_OFFSET_PMU                  (SHM_OFFSET_RESTORE_AXI + SHM_SIZE_RESTORE_AXI)
 
-/* 分区表 */
 #define SHM_OFFSET_PTABLE               (SHM_OFFSET_PMU + SHM_SIZE_PMU)
 
-/* modem 单独复位标记 */
 #define SHM_OFFSET_CCORE_RESET          (SHM_OFFSET_PTABLE + SHM_SIZE_PTABLE)
 
-/* pm om log区 */
 #define SHM_OFFSET_PM_OM                (SHM_OFFSET_CCORE_RESET + SHM_SIZE_CCORE_RESET)
 
 #define SHM_OFFSET_M3PM            (SHM_OFFSET_PM_OM + SHM_SIZE_PM_OM)
 
-/*用于分配不满足KB对齐的分配*/
 #define SHM_OFFSET_SLICE_MEM            (SHM_OFFSET_M3PM + SHM_SIZE_M3PM)
 
 #define SHM_OFFSET_OSA_LOG            (SHM_OFFSET_SLICE_MEM + SHM_SIZE_SLICE_MEM)
 
 #define SHM_OFFSET_WAS_LOG            (SHM_OFFSET_OSA_LOG + SHM_SIZE_OSA_LOG)
 
-/* sram needs store/restore since hi6950 because of sram powerdown */
 #define SHM_OFFSET_SRAM_BAK             (SHM_OFFSET_WAS_LOG + SHM_SIZE_WAS_LOG)  
 
 /* for sec, move sram to ddr */
@@ -147,16 +132,11 @@ extern "C" {
 
 #define SHM_OFFSET_M3RSRACC_BD             (SHM_OFFSET_SRAM_TO_DDR + SHM_SIZE_SRAM_TO_DDR) 
 
-/* 电话本使用内存 */
 #define SHM_OFFSET_SIM_MEMORY           (SHM_OFFSET_M3RSRACC_BD + SHM_SIZE_M3RSRACC_BD)
 
-/*共享内存剩余部分偏移和大小*/
 #define SHM_OFFSET_MEMMGR               (SHM_OFFSET_SIM_MEMORY + SHM_SIZE_SIM_MEMORY)
 #define SHM_SIZE_MEMMGR                 (DDR_SHARED_MEM_SIZE - SHM_OFFSET_MEMMGR)
 
-/**************************************用于分配不满足Kb对齐的分配*******************************************************
-*所有小内存的分配都是在SHM_OFFSET_SLICE_MEM 内分配，目前SHM_OFFSET_SLICE_MEM大小0x1000,新增注意不要超了
-************************************************************************************************************************/
 #define SHM_SIZE_MEMMGR_FLAG            (0x180)
 #define SHM_OFFSET_MEMMGR_FLAG          (SHM_OFFSET_SLICE_MEM)
 
@@ -179,7 +159,6 @@ extern "C" {
 #define SHM_SIZE_CCORE_FIQ          (0x4*40)
 #define SHM_OFFSET_CCORE_FIQ        (SHM_OFFSET_CDSP_FLAG + SHM_SIZE_CDSP_FLAG)
 
-/* modem 镜像标记 */
 #define SHM_SIZE_LOADM                  (0x0C)
 #define SHM_OFFSET_LOADM                (SHM_OFFSET_CCORE_FIQ + SHM_SIZE_CCORE_FIQ)
 
@@ -230,30 +209,23 @@ extern "C" {
 #define SHM_SIZE_DEFLATE                (0)
 #endif
 #define SHM_OFFSET_DEFLATE              (SHM_SIZE_BUSSTRESS_TEST + SHM_OFFSET_BUSSTRESS_TEST)
-/*****************************************************************************************************************************
-*安全共享内存资源分配
-******************************************************************************************************************************/
+
 #if (defined(__FASTBOOT__) || defined(__OS_RTOSCK__)) && defined(DDR_SEC_SHARED_ADDR)
 #define SHM_SEC_BASE_ADDR          (DDR_SEC_SHARED_ADDR)
 #define SHM_SEC_SIZE               (DDR_SEC_SHARED_SIZE)
 
-#define SHM_SIZE_PROTECT_BARRIER   (0x1000)     /* 预留(4K)防止被踩，初始化为全F */
+#define SHM_SIZE_PROTECT_BARRIER   (0x1000)
 #define SHM_OFFSET_PROTECT_BARRIER (0x0)
 
-#define SHM_SIZE_PARAM_CFG         (0x4000)     /* 传入安全OS的配置参数预留(16K)大小 */
+#define SHM_SIZE_PARAM_CFG         (0x4000)
 #define SHM_OFFSET_PARAM_CFG       (SHM_OFFSET_PROTECT_BARRIER + SHM_SIZE_PROTECT_BARRIER)
 
-#define SHM_SIZE_SEC_ICC           (0x20000)     /* 安全ICC使用(128K)大小 */
+#define SHM_SIZE_SEC_ICC           (0x20000)
 #define SHM_OFFSET_SEC_ICC         (SHM_OFFSET_PARAM_CFG + SHM_SIZE_PARAM_CFG)
 #endif
-
-
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif    /* __BSP_SHARED_DDR_H__ */
-
-
-

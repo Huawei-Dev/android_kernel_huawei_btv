@@ -77,13 +77,13 @@ OSL_TASK_ID  ca_icc_task_id;
 
 /******************************************************************************
 Function:       TEEK_ca_icc_init
-Description:    TEEK初始化
+Description:    TEEK??????
 Input:          session
                 context
                 svc_uuid
                 svc_name
 Output:         none
-Return:         0: OK  其他: ERROR码
+Return:         0: OK  ????: ERROR??
 ******************************************************************************/
 static int TEEK_ca_icc_init(TEEC_Session *session, TEEC_Context *context, TEEC_UUID *svc_uuid, const char *svc_name)
 {
@@ -130,11 +130,11 @@ static int TEEK_ca_icc_init(TEEC_Session *session, TEEC_Context *context, TEEC_U
 
 /******************************************************************************
 Function:        TEEK_ca_icc_session
-Description:     通过session传入命令字或值
+Description:     ????session??????????????
 Input:
-        cmd_id      - 传送给安全OS的cmd_id
+        cmd_id      - ??????????OS??cmd_id
 Output:          none
-Return:          0: OK  其他: ERROR码
+Return:          0: OK  ????: ERROR??
 ******************************************************************************/
 static int TEEK_ca_icc_session(TEEC_Session *session, u32 cmd_id)
 {

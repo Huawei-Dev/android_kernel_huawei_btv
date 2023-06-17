@@ -47,7 +47,7 @@
 */
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include  "product_config.h"
 #include  "PsTypeDef.h"
@@ -56,9 +56,9 @@
 #include  "MnMsgApi.h"
 #include  "mnmsgcbencdec.h"
 #include  "MnMsgTs.h"
-/* Added by f62575 for V9R1 STK升级, 2013-6-26, begin */
+/* Added by f62575 for V9R1 STK????, 2013-6-26, begin */
 #include  "TafStdlib.h"
-/* Added by f62575 for V9R1 STK升级, 2013-6-26, end */
+/* Added by f62575 for V9R1 STK????, 2013-6-26, end */
 
 
 /*lint -e767*/
@@ -68,33 +68,33 @@
 /*lint -save -e958 */
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
 
 #define MSG_CBPAGE_HEADER_LEN                               6
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  4 全局变量声明
+  4 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  5 消息头定义
+  5 ??????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 消息定义
+  6 ????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  7 STRUCT定义
+  7 STRUCT????
 *****************************************************************************/
 typedef struct
 {
@@ -105,12 +105,12 @@ typedef struct
 
 
 /*****************************************************************************
-  8 UNION定义
+  8 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  9 OTHERS定义
+  9 OTHERS????
 *****************************************************************************/
 
 LOCAL MN_MSG_LANG_CONVERT_STRU f_astMsgCbLangTable[MN_MSG_MAX_LANG_NUM] =
@@ -139,22 +139,22 @@ LOCAL MN_MSG_LANG_CONVERT_STRU f_astMsgCbLangTable[MN_MSG_MAX_LANG_NUM] =
 
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 
 /*****************************************************************************
- 函 数 名  : MN_MSG_Iso639LangToDef
- 功能描述  : 映射ISO 639 [12]编码的语言类型编码到TAF的语言类型编码
- 输入参数  : enIso639Lang - ISO 639 [12]编码的语言类型编码
- 输出参数  : 无
- 返 回 值  : TAF的语言类型编码
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : MN_MSG_Iso639LangToDef
+ ????????  : ????ISO 639 [12]????????????????????TAF??????????????
+ ????????  : enIso639Lang - ISO 639 [12]??????????????????
+ ????????  : ??
+ ?? ?? ??  : TAF??????????????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2006年12月20日
-    作    者   : 傅映君 62575
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2006??12??20??
+    ??    ??   : ?????? 62575
+    ????????   : ??????????
 
 *****************************************************************************/
 MN_MSG_CBLANG_ENUM_U8 MN_MSG_Iso639LangToDef(
@@ -178,19 +178,19 @@ MN_MSG_CBLANG_ENUM_U8 MN_MSG_Iso639LangToDef(
 }
 
 /*****************************************************************************
- 函 数 名  : MN_MSG_DecodeDcsIf01
- 功能描述  : 解析DCS的值，当前高四位为01
- 输入参数  : ucDcs:DCS的当前值
- 输出参数  : pstDcsInfo:DCS解析后的参数
- 返 回 值  : VOS_UINT32 :MN_ERR_NO_ERROR,解析成功
-                         其他:解析失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : MN_MSG_DecodeDcsIf01
+ ????????  : ????DCS??????????????????01
+ ????????  : ucDcs:DCS????????
+ ????????  : pstDcsInfo:DCS????????????
+ ?? ?? ??  : VOS_UINT32 :MN_ERR_NO_ERROR,????????
+                         ????:????????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2010年5月14日
-    作    者   : zhoujun /z40661
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2010??5??14??
+    ??    ??   : zhoujun /z40661
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 MN_MSG_DecodeDcsIf01(
@@ -217,13 +217,13 @@ VOS_UINT32 MN_MSG_DecodeDcsIf01(
     ulRet                               = MN_ERR_NO_ERROR;
     switch(ucDcs&0x0F)
     {
-        /* 表明是7 Bit编码 language Represetation Occupy 3 7bit,但最后一个字节时<CR>,因此长度还是2*/
+        /* ??????7 Bit???? language Represetation Occupy 3 7bit,????????????????<CR>,????????????2*/
         case 0:
             pstDcsInfo->enMsgCoding     = MN_MSG_MSG_CODING_7_BIT;
             pstDcsInfo->ucLangIndLen    = 3 - 1;
             break;
 
-        /*表明为UCS2 language Represetation Occupy 2 8bit*/
+        /*??????UCS2 language Represetation Occupy 2 8bit*/
         case 1:
             pstDcsInfo->enMsgCoding     = MN_MSG_MSG_CODING_UCS2;
             pstDcsInfo->ucLangIndLen    = 2;
@@ -231,7 +231,7 @@ VOS_UINT32 MN_MSG_DecodeDcsIf01(
 
         default:
             /*Reserved selection we don't support;*/
-            /*记录错误Trace               设置返回值*/
+            /*????????Trace               ??????????*/
             ulRet = MN_ERR_CLASS_SMS_INVALID_MSG_CODING;
             break;
     }
@@ -240,19 +240,19 @@ VOS_UINT32 MN_MSG_DecodeDcsIf01(
 }
 
 /*****************************************************************************
- 函 数 名  : MN_MSG_DecodeDcsIf07
- 功能描述  : 解析DCS的值，判断高四位为01xx
- 输入参数  : ucDcs:DCS的当前值
- 输出参数  : pstDcsInfo:DCS解析后的参数
- 返 回 值  : VOS_UINT32 :MN_ERR_NO_ERROR,解析成功
-                         其他:解析失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : MN_MSG_DecodeDcsIf07
+ ????????  : ????DCS??????????????????01xx
+ ????????  : ucDcs:DCS????????
+ ????????  : pstDcsInfo:DCS????????????
+ ?? ?? ??  : VOS_UINT32 :MN_ERR_NO_ERROR,????????
+                         ????:????????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2010年5月14日
-    作    者   : zhoujun /z40661
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2010??5??14??
+    ??    ??   : zhoujun /z40661
+    ????????   : ??????????
 
 *****************************************************************************/
 LOCAL VOS_UINT32 MN_MSG_DecodeDcsIf07(
@@ -294,7 +294,7 @@ LOCAL VOS_UINT32 MN_MSG_DecodeDcsIf07(
     {
         pstDcsInfo->bCompressed     =  VOS_FALSE;
     }
-    switch((ucDcs&0x0C)>>2) /*bit2,3，具体为编码方式*/
+    switch((ucDcs&0x0C)>>2) /*bit2,3????????????????*/
     {
         case 0:
             pstDcsInfo->enMsgCoding = MN_MSG_MSG_CODING_7_BIT;
@@ -314,7 +314,7 @@ LOCAL VOS_UINT32 MN_MSG_DecodeDcsIf07(
             break;
     }
 
-    /*判断bit4的值，0表示无Class含义，1表示有Class含义*/
+    /*????bit4??????0??????Class??????1??????Class????*/
     if (0 == (ucDcs&0x10))
     {
         pstDcsInfo->enMsgClass      = MN_MSG_MSG_CLASS_NONE;
@@ -330,19 +330,19 @@ LOCAL VOS_UINT32 MN_MSG_DecodeDcsIf07(
 
 
 /*****************************************************************************
- 函 数 名  : MN_MSG_DecodeDcsIf09
- 功能描述  : 解析DCS的值，当前高位为1001
- 输入参数  : ucDcs:DCS的当前值
- 输出参数  : pstDcsInfo:DCS解析后的参数
- 返 回 值  : VOS_UINT32 :MN_ERR_NO_ERROR,解析成功
-                         其他:解析失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : MN_MSG_DecodeDcsIf09
+ ????????  : ????DCS????????????????1001
+ ????????  : ucDcs:DCS????????
+ ????????  : pstDcsInfo:DCS????????????
+ ?? ?? ??  : VOS_UINT32 :MN_ERR_NO_ERROR,????????
+                         ????:????????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2010年5月14日
-    作    者   : zhoujun /z40661
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2010??5??14??
+    ??    ??   : zhoujun /z40661
+    ????????   : ??????????
 
 *****************************************************************************/
 LOCAL VOS_UINT32 MN_MSG_DecodeDcsIf09(
@@ -354,7 +354,7 @@ LOCAL VOS_UINT32 MN_MSG_DecodeDcsIf09(
 
     ulRet                           = MN_ERR_NO_ERROR;
 
-    switch((ucDcs&0x0C)>>2) /*bit2,3，具体为编码方式*/
+    switch((ucDcs&0x0C)>>2) /*bit2,3????????????????*/
     {
         case 0:
             pstDcsInfo->enMsgCoding = MN_MSG_MSG_CODING_7_BIT;
@@ -377,18 +377,18 @@ LOCAL VOS_UINT32 MN_MSG_DecodeDcsIf09(
 }
 
 /*****************************************************************************
- 函 数 名  : MN_MSG_DecodeDcsIf0F
- 功能描述  : 解析DCS的值，当前高位为1111
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : MN_MSG_DecodeDcsIf0F
+ ????????  : ????DCS????????????????1111
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2010年5月14日
-    作    者   : zhoujun /z40661
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2010??5??14??
+    ??    ??   : zhoujun /z40661
+    ????????   : ??????????
 
 *****************************************************************************/
 LOCAL VOS_UINT32 MN_MSG_DecodeDcsIf0F(
@@ -424,32 +424,32 @@ LOCAL VOS_UINT32 MN_MSG_DecodeDcsIf0F(
 }
 
 /*****************************************************************************
- 函 数 名  : MN_MSG_DecodeCbsDcs
- 功能描述  : 根据协议23038 5解析CBS页的DCS字节
- 输入参数  : ucDcs: 空口接收到的DCS
-             pucContent: 广播短信内容或USSD STRING的首地址
- 输出参数  : pstDcsInfo:解析好的DCS内容
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : MN_MSG_DecodeCbsDcs
+ ????????  : ????????23038 5????CBS????DCS????
+ ????????  : ucDcs: ????????????DCS
+             pucContent: ??????????????USSD STRING????????
+ ????????  : pstDcsInfo:????????DCS????
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2008年1月11日
-    作    者   : 傅映君 62575
-    修改内容   : 新生成函数
-  2.日    期   : 2012年8月10日
-    作    者   : L00171473
-    修改内容   : DTS2012082204471, TQE清理
-  3.日    期   : 2013年6月26日
-    作    者   : f62575
-    修改内容   : V9R1 STK升级，更新函数名为MN_MSG_DecodeCbsDcs，开放为外部接口
-                 入口参数由pstGsmPage修改为ucDcs和pucContent
-  4.日    期   : 2013年6月26日
-    作    者   : f62575
-    修改内容   : V9R1 STK升级
-  5.日    期   : 2013年10月08日
-    作    者   : j00174725
-    修改内容   : TQE
+ ????????      :
+  1.??    ??   : 2008??1??11??
+    ??    ??   : ?????? 62575
+    ????????   : ??????????
+  2.??    ??   : 2012??8??10??
+    ??    ??   : L00171473
+    ????????   : DTS2012082204471, TQE????
+  3.??    ??   : 2013??6??26??
+    ??    ??   : f62575
+    ????????   : V9R1 STK??????????????????MN_MSG_DecodeCbsDcs????????????????
+                 ??????????pstGsmPage??????ucDcs??pucContent
+  4.??    ??   : 2013??6??26??
+    ??    ??   : f62575
+    ????????   : V9R1 STK????
+  5.??    ??   : 2013??10??08??
+    ??    ??   : j00174725
+    ????????   : TQE
 *****************************************************************************/
 
 VOS_UINT32 MN_MSG_DecodeCbsDcs(
@@ -464,8 +464,8 @@ VOS_UINT32 MN_MSG_DecodeCbsDcs(
     MN_MSG_ISO639_LANG_ENUM_U16         uslang;
 
     ulRet                           = MN_ERR_NO_ERROR;
-    /* Deleted by f62575 for V9R1 STK升级, 2013-6-26, begin */
-    /* Deleted by f62575 for V9R1 STK升级, 2013-6-26, end */
+    /* Deleted by f62575 for V9R1 STK????, 2013-6-26, begin */
+    /* Deleted by f62575 for V9R1 STK????, 2013-6-26, end */
     pstDcsInfo->ucRawDcsData        = ucDcs;
     pstDcsInfo->ucMsgCodingGroup    = (ucDcs >> 4) & 0x0f ;
     pstDcsInfo->enMsgCoding         = MN_MSG_MSG_CODING_7_BIT;
@@ -473,8 +473,8 @@ VOS_UINT32 MN_MSG_DecodeCbsDcs(
     pstDcsInfo->enMsgLang           = MN_MSG_CBLANG_ENGLISH;
     pstDcsInfo->enMsgClass          = MN_MSG_MSG_CLASS_MAX;
     pstDcsInfo->ucLangIndLen        = 0;
-    /* Deleted by f62575 for V9R1 STK升级, 2013-6-26, begin */
-    /* Deleted by f62575 for V9R1 STK升级, 2013-6-26, end */
+    /* Deleted by f62575 for V9R1 STK????, 2013-6-26, begin */
+    /* Deleted by f62575 for V9R1 STK????, 2013-6-26, end */
 
 
     PS_MEM_SET(aucLang, 0x00, sizeof(aucLang));
@@ -482,21 +482,21 @@ VOS_UINT32 MN_MSG_DecodeCbsDcs(
 
     switch (pstDcsInfo->ucMsgCodingGroup)
     {
-        /*判断高四位为0000,0011,0010*/
+        /*????????????0000,0011,0010*/
         case 0x00:
         case 0x02:
         case 0x03:
             pstDcsInfo->enMsgLang = (ucDcs & 0x0f) ;
             break;
 
-        case 0x01: /*判断高四位为0001*/
-            /* Added by f62575 for V9R1 STK升级, 2013-6-26, begin */
+        case 0x01: /*????????????0001*/
+            /* Added by f62575 for V9R1 STK????, 2013-6-26, begin */
             if (ulContentLength < TAF_MSG_CBA_LANG_LENGTH)
             {
                 MN_WARN_LOG("MSG_CbDecodeDcs: Invalid ulContentLength.");
                 return MN_ERR_CLASS_SMS_INVALID_MSG_LANG;
             }
-            /* Added by f62575 for V9R1 STK升级, 2013-6-26, end */
+            /* Added by f62575 for V9R1 STK????, 2013-6-26, end */
 
             ulRet = MN_MSG_DecodeDcsIf01(ucDcs,pstDcsInfo);
             if ( MN_ERR_NO_ERROR != ulRet )
@@ -504,20 +504,20 @@ VOS_UINT32 MN_MSG_DecodeCbsDcs(
                 MN_WARN_LOG("MSG_CbDecodeDcs: Invalid Dcs Info.");
             }
 
-            /*根据消息内容的前两个字符得到CBS语言编码LangCode*/
-            /* Modified by f62575 for V9R1 STK升级, 2013-6-26, begin */
+            /*????????????????????????????CBS????????LangCode*/
+            /* Modified by f62575 for V9R1 STK????, 2013-6-26, begin */
             ulRet = TAF_STD_UnPack7Bit(pucContent, pstDcsInfo->ucLangIndLen, 0, aucLang);
             if (VOS_OK != ulRet)
             {
                 MN_WARN_LOG("MSG_CbDecodeDcs: TAF_STD_UnPack7Bit Err.");
             }
-            /* Modified by f62575 for V9R1 STK升级, 2013-6-26, end */
+            /* Modified by f62575 for V9R1 STK????, 2013-6-26, end */
 
             uslang = *(MN_MSG_ISO639_LANG_ENUM_U16 *)aucLang;
             pstDcsInfo->enMsgLang = MN_MSG_Iso639LangToDef(uslang);
             break;
 
-        /*判断高四位为01xx  */
+        /*????????????01xx  */
         case 0x04:
         case 0x05:
         case 0x06:
@@ -561,18 +561,18 @@ VOS_UINT32 MN_MSG_DecodeCbsDcs(
 }
 
 /*****************************************************************************
- 函 数 名  : MSG_CbDecodeSn
- 功能描述  : 根据协议23038 5解码CBS页的SN
- 输入参数  : pstGsmPage:当前页CBS的消息内容
- 输出参数  : pstSn:解析好的serial number的值
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : MSG_CbDecodeSn
+ ????????  : ????????23038 5????CBS????SN
+ ????????  : pstGsmPage:??????CBS??????????
+ ????????  : pstSn:????????serial number????
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2008年1月11日
-    作    者   : 傅映君 62575
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2008??1??11??
+    ??    ??   : ?????? 62575
+    ????????   : ??????????
 
 *****************************************************************************/
 LOCAL VOS_UINT32 MSG_CbDecodeSn(
@@ -590,37 +590,37 @@ LOCAL VOS_UINT32 MSG_CbDecodeSn(
 }
 
 /*****************************************************************************
- 函 数 名  : MN_MSG_DecodeCbsPage
- 功能描述  : 解码GSM格式的广播短消息页, Refer to 23041 9.4.1和23038 5
- 输入参数  : pstGsmPage  - CBS短信的TPDU格式
- 输出参数  : pstPage     - CBS短信属性结构，包括原始数据区
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : MN_MSG_DecodeCbsPage
+ ????????  : ????GSM??????????????????, Refer to 23041 9.4.1??23038 5
+ ????????  : pstGsmPage  - CBS??????TPDU????
+ ????????  : pstPage     - CBS????????????????????????????
+ ?? ?? ??  : ??
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2006年12月20日
-    作    者   : 傅映君 62575
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2006??12??20??
+    ??    ??   : ?????? 62575
+    ????????   : ??????????
 
-  2.日    期   : 2010年7月12日
-    作    者   : zhoujun /40661
-    修改内容   : 异常情况的处理和标竿一致
-  3.日    期   : 2012年4月5日
-    作    者   : l00171473
-    修改内容   : for V7R1C50 CSFB&PPAC&ETWS&ISR
-  4.日    期   : 2012年4月11日
-    作    者   : l00171473
-    修改内容   : DTS2012041103201, 7Bit码转8Bit时长度不正确
-  5.日    期   : 2013年6月26日
-    作    者   : f62575
-    修改内容   : V9R1 STK升级
-  6.日    期   : 2013年10月08日
-    作    者   : j00174725
-    修改内容   : TQE
-  7.日    期   : 2015年12月10日
-    作    者   : s00217060
-    修改内容   : DTS2015120405133:安全检查修改，防止copy越界
+  2.??    ??   : 2010??7??12??
+    ??    ??   : zhoujun /40661
+    ????????   : ????????????????????????
+  3.??    ??   : 2012??4??5??
+    ??    ??   : l00171473
+    ????????   : for V7R1C50 CSFB&PPAC&ETWS&ISR
+  4.??    ??   : 2012??4??11??
+    ??    ??   : l00171473
+    ????????   : DTS2012041103201, 7Bit????8Bit????????????
+  5.??    ??   : 2013??6??26??
+    ??    ??   : f62575
+    ????????   : V9R1 STK????
+  6.??    ??   : 2013??10??08??
+    ??    ??   : j00174725
+    ????????   : TQE
+  7.??    ??   : 2015??12??10??
+    ??    ??   : s00217060
+    ????????   : DTS2015120405133:??????????????????copy????
 *****************************************************************************/
 VOS_UINT32  MN_MSG_DecodeCbmPage(
     const MN_MSG_CBRAW_TS_DATA_STRU     *pstCbRawInfo,
@@ -631,7 +631,7 @@ VOS_UINT32  MN_MSG_DecodeCbmPage(
     MN_MSG_CBGSMPAGE_STRU               *pstGsmPage;
     VOS_UINT32                          ulDataLen;
 
-    /*判断输入参数的合法性*/
+    /*????????????????????*/
     if ((VOS_NULL_PTR == pstCbRawInfo)
      || (VOS_NULL_PTR == pstCbmPageInfo))
     {
@@ -641,26 +641,26 @@ VOS_UINT32  MN_MSG_DecodeCbmPage(
 
     pstGsmPage = (MN_MSG_CBGSMPAGE_STRU   *)pstCbRawInfo->aucData;
 
-    /* 解析DCS */
-    /* Modified by f62575 for V9R1 STK升级, 2013-6-26, begin */
+    /* ????DCS */
+    /* Modified by f62575 for V9R1 STK????, 2013-6-26, begin */
     ulRet = MN_MSG_DecodeCbsDcs(pstGsmPage->ucDCS,
                                 pstGsmPage->aucContent,
                                 TAF_CBA_MAX_CBDATA_LEN,
                                 &(pstCbmPageInfo->stDcs));
-    /* Modified by f62575 for V9R1 STK升级, 2013-6-26, end */
+    /* Modified by f62575 for V9R1 STK????, 2013-6-26, end */
     if (MN_ERR_NO_ERROR != ulRet)
     {
         MN_WARN_LOG1("MN_MSG_DecodeCbmPage:DCS Invalid:ulRet",(VOS_INT32)ulRet);
     }
 
-    /* 解析SN */
+    /* ????SN */
     ulRet = MSG_CbDecodeSn(pstGsmPage, &(pstCbmPageInfo->stSn));
     if (MN_ERR_NO_ERROR != ulRet)
     {
         MN_WARN_LOG1("MN_MSG_DecodeCbmPage:SN Invalid:ulRet",(VOS_INT32)ulRet);
     }
 
-    /* 解析MID */
+    /* ????MID */
     pstCbmPageInfo->usMid = pstGsmPage->ucMIdHigh;
     pstCbmPageInfo->usMid = (VOS_UINT16)(pstCbmPageInfo->usMid << 8) | pstGsmPage->ucMIdLow;
 
@@ -681,7 +681,7 @@ VOS_UINT32  MN_MSG_DecodeCbmPage(
     }
     ulDataLen = pstCbRawInfo->ulLen - MSG_CBPAGE_HEADER_LEN;
 
-    /* 如果是 7bit编码需要将其转化为8bit */
+    /* ?????? 7bit??????????????????8bit */
     if (MN_MSG_MSG_CODING_7_BIT == pstCbmPageInfo->stDcs.enMsgCoding )
     {
 
@@ -692,7 +692,7 @@ VOS_UINT32  MN_MSG_DecodeCbmPage(
             pstCbmPageInfo->stContent.ulLen = TAF_CBA_MAX_RAW_CBDATA_LEN;
         }
 
-        /* Modified by f62575 for V9R1 STK升级, 2013-6-26, begin */
+        /* Modified by f62575 for V9R1 STK????, 2013-6-26, begin */
         ulRet = TAF_STD_UnPack7Bit(pstGsmPage->aucContent,
                            pstCbmPageInfo->stContent.ulLen,
                            0,
@@ -701,7 +701,7 @@ VOS_UINT32  MN_MSG_DecodeCbmPage(
         {
             MN_WARN_LOG("MN_MSG_DecodeCbmPage:TAF_STD_UnPack7Bit fail");
         }
-        /* Modified by f62575 for V9R1 STK升级, 2013-6-26, end */
+        /* Modified by f62575 for V9R1 STK????, 2013-6-26, end */
     }
     else
     {
@@ -718,9 +718,9 @@ VOS_UINT32  MN_MSG_DecodeCbmPage(
     return MN_ERR_NO_ERROR;
 }
 
-/* Deleted by f62575 for V9R1 STK升级, 2013-6-26, begin */
+/* Deleted by f62575 for V9R1 STK????, 2013-6-26, begin */
 /* Deleted MN_MSG_DecodeCbsDcs */
-/* Deleted by f62575 for V9R1 STK升级, 2013-6-26, end */
+/* Deleted by f62575 for V9R1 STK????, 2013-6-26, end */
 
 /*lint -restore */
 

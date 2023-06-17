@@ -48,25 +48,25 @@
 
 /******************************************************************************
 
-                  版权所有 (C), 2001-2011, 华为技术有限公司
+                  ???????? (C), 2001-2011, ????????????????
 
  ******************************************************************************
-  文 件 名   : phyoaminterface.h
-  版 本 号   : 初稿
-  作    者   : luoqingquan
-  生成日期   : 2012年11月14日
-  最近修改   :
-  功能描述   : phyoaminterface.h 的头文件
-  函数列表   :
-  修改历史   :
-  1.日    期   : 2012年10月14日
-    作    者   : luoqingquan
-    修改内容   : 创建文件
+  ?? ?? ??   : phyoaminterface.h
+  ?? ?? ??   : ????
+  ??    ??   : luoqingquan
+  ????????   : 2012??11??14??
+  ????????   :
+  ????????   : phyoaminterface.h ????????
+  ????????   :
+  ????????   :
+  1.??    ??   : 2012??10??14??
+    ??    ??   : luoqingquan
+    ????????   : ????????
 
 ******************************************************************************/
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "vos.h"
 
@@ -84,34 +84,34 @@ extern "C" {
 
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
 
-/* 降SAR的ulMask类型 */
+/* ??SAR??ulMask???? */
 #define UPHY_OAM_SAR_MASK_ANTSTATE          ( 0x1 )
 #define UPHY_OAM_SAR_MASK_REDUCTION         ( 0x2 )
 
-/* 动态加载段数,目前V9R1上没有实质的加载动作,定义段数为1 */
+/* ????????????,????V9R1????????????????????,??????????1 */
 #define UPHY_DYN_CODE_MODULE_BUTT           ( 0x01 )
 
-/* 必须保持和phytoolinterface.h中UPHY_TOOL_SLEEP_INFO_NUM的大小保持一致 */
+/* ??????????phytoolinterface.h??UPHY_TOOL_SLEEP_INFO_NUM?????????????? */
 #define UPHY_OAM_SLEEP_INFO_NUM             ( 16 )
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 
 
 
 /*****************************************************************************
- 枚举名    :UPHY_OAM_MSG_ID_ENUM_UINT16
- 协议表格  :
- ASN.1描述 :
- 枚举说明  :PHY与OAM原语列表
+ ??????    :UPHY_OAM_MSG_ID_ENUM_UINT16
+ ????????  :
+ ASN.1???? :
+ ????????  :PHY??OAM????????
 *****************************************************************************/
 enum UPHY_OAM_MSG_ID_ENUM
 {
-    /* OAM与UPHY_APM的原语 */
+    /* OAM??UPHY_APM?????? */
     ID_OAM_UPHY_ACTIVE_UPHY_REQ             = 0xD200,                   /* _H2ASN_MsgChoice  UPHY_OAM_ACTIVE_UPHY_REQ_STRU */
     ID_UPHY_OAM_ACTIVE_UPHY_CNF             = 0x2D00,                   /* _H2ASN_MsgChoice  UPHY_OAM_ACTIVE_UPHY_CNF_STRU */
 
@@ -124,7 +124,7 @@ enum UPHY_OAM_MSG_ID_ENUM
     ID_UPHY_OAM_BOOT_INFO_REQ               = 0x2D03,                   /* _H2ASN_MsgChoice  UPHY_OAM_BOOT_INFO_REQ_STRU */
     ID_OAM_UPHY_BOOT_INFO_IND               = 0xD203,                   /* _H2ASN_MsgChoice  UPHY_OAM_BOOT_INFO_IND_STRU */
 
-    /* OAM与UPHY_DRX的原语 */
+    /* OAM??UPHY_DRX?????? */
     ID_OAM_UPHY_MASTER_WAKE_CMD             = 0xD220,                   /* _H2ASN_MsgChoice  UPHY_OAM_WAKE_CMD_STRU */
     ID_UPHY_OAM_MASTER_SLEEP_IND            = 0x2D20,                   /* _H2ASN_MsgChoice  UPHY_OAM_SLEEP_IND_STRU */
 
@@ -132,7 +132,7 @@ enum UPHY_OAM_MSG_ID_ENUM
     ID_UPHY_OAM_SLAVE_SLEEP_IND             = 0x2D21,                   /* _H2ASN_MsgChoice  UPHY_OAM_SLEEP_IND_STRU */
 
 
-    /* OAM与W/GPHY的原语,根据接收PID区分 */
+    /* OAM??W/GPHY??????,????????PID???? */
     ID_OAM_PHY_LOAD_PHY_REQ                 = 0xD240,                   /* _H2ASN_MsgChoice  PHY_OAM_LOAD_PHY_REQ_STRU */
     ID_PHY_OAM_LOAD_PHY_CNF                 = 0x2D40,                   /* _H2ASN_MsgChoice  PHY_OAM_LOAD_PHY_CNF_STRU */
 
@@ -142,12 +142,12 @@ enum UPHY_OAM_MSG_ID_ENUM
     ID_OAM_PHY_SET_WORK_MODE_REQ            = 0xD242,                   /* _H2ASN_MsgChoice  PHY_OAM_SET_WORK_MODE_REQ_STRU */
     ID_PHY_OAM_SET_WORK_MODE_CNF            = 0x2D42,                   /* _H2ASN_MsgChoice  PHY_OAM_SET_WORK_MODE_CNF_STRU */
 
-    /* OAM与GPHY的原语 */
+    /* OAM??GPHY?????? */
     ID_OAM_GPHY_RF_AGING_TEST_REQ           = 0xD280,                   /* _H2ASN_MsgChoice  GPHY_OAM_RF_AGING_TEST_REQ_STRU */
     ID_GPHY_OAM_RF_AGING_TEST_CNF           = 0x2D80,                   /* _H2ASN_MsgChoice  GPHY_OAM_RF_AGING_TEST_CNF_STRU */
 
 
-    /* OAM与WPHY的原语 */
+    /* OAM??WPHY?????? */
     ID_OAM_WPHY_RF_AGING_TEST_REQ           = 0xD2C0,                   /* _H2ASN_MsgChoice  WPHY_OAM_RF_AGING_TEST_REQ_STRU */
     ID_WPHY_OAM_RF_AGING_TEST_CNF           = 0x2DC0,                   /* _H2ASN_MsgChoice  WPHY_OAM_RF_AGING_TEST_CNF_STRU */
 
@@ -167,17 +167,17 @@ typedef VOS_UINT32 SLEEP_MODE_ENUM_UINT32;
 
 
 /*****************************************************************************
- 枚举名    :UPHY_OAM_BUSINESS_TYPE_ENUM_UINT16
- 协议表格  :
- ASN.1描述 :
- 枚举说明  :物理层代码加载业务类型
+ ??????    :UPHY_OAM_BUSINESS_TYPE_ENUM_UINT16
+ ????????  :
+ ASN.1???? :
+ ????????  :??????????????????????
 *****************************************************************************/
 enum UPHY_OAM_BUSINESS_TYPE_ENUM
 {
-    UPHY_OAM_BUSINESS_TYPE_NORMAL           = 0,                                /* 正常业务类型 */
-    UPHY_OAM_BUSINESS_TYPE_CT                  ,                                /* 校准CT类型 */
-    UPHY_OAM_BUSINESS_TYPE_NO_SIG_BT           ,                                /* 高层非信令BT类型 */
-    UPHY_OAM_BUSINESS_TYPE_SIG_BT              ,                                /* 信令BT类型 */
+    UPHY_OAM_BUSINESS_TYPE_NORMAL           = 0,                                /* ???????????? */
+    UPHY_OAM_BUSINESS_TYPE_CT                  ,                                /* ????CT???? */
+    UPHY_OAM_BUSINESS_TYPE_NO_SIG_BT           ,                                /* ??????????BT???? */
+    UPHY_OAM_BUSINESS_TYPE_SIG_BT              ,                                /* ????BT???? */
 
     UPHY_OAM_BUSINESS_TYPE_BUTT
 };
@@ -186,10 +186,10 @@ typedef VOS_UINT16 UPHY_OAM_BUSINESS_TYPE_ENUM_UINT16;
 
 
 /*****************************************************************************
- 枚举名    :UPHY_OAM_WAKE_TYPE_ENUM_UINT32
- 协议表格  :
- ASN.1描述 :
- 枚举说明  :唤醒类型定义
+ ??????    :UPHY_OAM_WAKE_TYPE_ENUM_UINT32
+ ????????  :
+ ASN.1???? :
+ ????????  :????????????
 *****************************************************************************/
 enum UPHY_OAM_WAKE_TYPE_ENUM
 {
@@ -202,10 +202,10 @@ typedef VOS_UINT32 UPHY_OAM_WAKE_TYPE_ENUM_UINT32;
 
 
 /*****************************************************************************
- 枚举名    :UPHY_OAM_RSLT_ENUM_UINT16
- 协议表格  :
- ASN.1描述 :
- 枚举说明  :UPHY回复OAM的CNF中,携带的处理结果枚举
+ ??????    :UPHY_OAM_RSLT_ENUM_UINT16
+ ????????  :
+ ASN.1???? :
+ ????????  :UPHY????OAM??CNF??,??????????????????
 *****************************************************************************/
 enum UPHY_OAM_RSLT_ENUM
 {
@@ -217,10 +217,10 @@ enum UPHY_OAM_RSLT_ENUM
 typedef VOS_UINT16 UPHY_OAM_RSLT_ENUM_UINT16;
 
 /*****************************************************************************
- 枚举名    :UPHY_OAM_BOOL_ENUM_UINT16
- 协议表格  :
- ASN.1描述 :
- 枚举说明  :UPHY回复OAM的CNF中,携带的处理结果枚举
+ ??????    :UPHY_OAM_BOOL_ENUM_UINT16
+ ????????  :
+ ASN.1???? :
+ ????????  :UPHY????OAM??CNF??,??????????????????
 *****************************************************************************/
 enum UPHY_OAM_BOOL_ENUM
 {
@@ -233,10 +233,10 @@ typedef VOS_UINT16 UPHY_OAM_BOOL_ENUM_UINT16;
 
 
 /*****************************************************************************
- 枚举名    :UPHY_OAM_AGING_TEST_CTRL_ENUM_UINT16
- 协议表格  :
- ASN.1描述 :
- 枚举说明  :老化测试枚举定义
+ ??????    :UPHY_OAM_AGING_TEST_CTRL_ENUM_UINT16
+ ????????  :
+ ASN.1???? :
+ ????????  :????????????????
 *****************************************************************************/
 enum UPHY_OAM_AGING_TEST_CTRL_ENUM
 {
@@ -257,13 +257,13 @@ typedef VOS_UINT16  PS_REG_UPDATE_STATE_ENUM_UINT16;
 
 
 /*****************************************************************************
- 枚举名    :UPHY_OAM_NV_INDEX_UINT16
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : NV项索引 取值为0-15
-             其中全网通的功能使用index=10
-             index8~15给海思商用特性商用
-             index0~7保留开放给终端调试使用
+ ??????    :UPHY_OAM_NV_INDEX_UINT16
+ ????????  :
+ ASN.1???? :
+ ????????  : NV?????? ??????0-15
+             ????????????????????index=10
+             index8~15??????????????????
+             index0~7??????????????????????
 *****************************************************************************/
 enum UPHY_OAM_NV_INDEX_ENUM
 {
@@ -274,10 +274,10 @@ enum UPHY_OAM_NV_INDEX_ENUM
 typedef VOS_UINT16  UPHY_OAM_NV_INDEX_ENUM_UINT16;
 
 /*****************************************************************************
- 枚举名    :PHY_OM_TRANS_MSG_ID_ENUM_UINT16
- 协议表格  :
- ASN.1描述 :
- 枚举说明  :物理理层和OM之间消息透传的ID
+ ??????    :PHY_OM_TRANS_MSG_ID_ENUM_UINT16
+ ????????  :
+ ASN.1???? :
+ ????????  :??????????OM??????????????ID
 *****************************************************************************/
 enum PHY_OM_TRANS_MSG_ID_ENUM
 {
@@ -290,10 +290,10 @@ enum PHY_OM_TRANS_MSG_ID_ENUM
 typedef VOS_UINT16 PHY_OM_TRANS_MSG_ID_ENUM_UINT16;
 
 /*****************************************************************************
- 枚举名    :UPHY_OAM_RTT_STATE_ENUM_UINT16
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : 当前RTT运行的状态
+ ??????    :UPHY_OAM_RTT_STATE_ENUM_UINT16
+ ????????  :
+ ASN.1???? :
+ ????????  : ????RTT??????????
 *****************************************************************************/
 enum UPHY_OAM_RTT_STATE_ENUM
 {
@@ -305,83 +305,83 @@ enum UPHY_OAM_RTT_STATE_ENUM
 typedef VOS_UINT16 UPHY_OAM_RTT_STATE_ENUM_UINT16;
 
 /*****************************************************************************
-  4 消息头定义
+  4 ??????????
 *****************************************************************************/
 
 /*****************************************************************************
- 结构名    : PHY_TOOL_MSG_HEAD_STRU
- 协议表格  :
- 结构说明  : 工具和物理层之间消息透传时消息透结构
+ ??????    : PHY_TOOL_MSG_HEAD_STRU
+ ????????  :
+ ????????  : ????????????????????????????????????
 *****************************************************************************/
 
 typedef struct
 {
-    PHY_OM_TRANS_MSG_ID_ENUM_UINT16     usTransPrimId;                          /* 透传消息ID = 0x5001 */
-    VOS_UINT16                          usRsv;                                  /* 保留 */
+    PHY_OM_TRANS_MSG_ID_ENUM_UINT16     usTransPrimId;                          /* ????????ID = 0x5001 */
+    VOS_UINT16                          usRsv;                                  /* ???? */
 }PHY_TOOL_MSG_HEAD_STRU;
 
 
 
 
 /*****************************************************************************
-  5 消息定义
+  5 ????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    VOS_UINT16                              usMsgId;                            /* 原语ID */
+    VOS_UINT16                              usMsgId;                            /* ????ID */
     VOS_UINT8                               aucData[2];                         /* Msg Data*/
 }PHY_OAM_MSG_STRU;
 
 
 /*****************************************************************************
-  6 STRUCT定义
+  6 STRUCT????
 *****************************************************************************/
 
 
 
 
 /*****************************************************************************
- 结构名    : UPHY_OAM_ACTIVE_UPHY_REQ_STRU
- 结构说明  : 上电初始化命令请求
+ ??????    : UPHY_OAM_ACTIVE_UPHY_REQ_STRU
+ ????????  : ??????????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM信息 */
-    VOS_RATMODE_ENUM_UINT32                 enRatTpye;                          /* 模式 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM???? */
+    VOS_RATMODE_ENUM_UINT32                 enRatTpye;                          /* ???? */
 }UPHY_OAM_ACTIVE_UPHY_REQ_STRU;
 
 
 
 
 /*****************************************************************************
- 结构名    : UPHY_OAM_ACTIVE_UPHY_CNF_STRU
- 结构说明  : 上电初始化命令回复
+ ??????    : UPHY_OAM_ACTIVE_UPHY_CNF_STRU
+ ????????  : ??????????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM信息 */
-    VOS_RATMODE_ENUM_UINT32                 enRatTpye;                          /* 模式 */
-    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* 处理结果 */
-    VOS_UINT16                              usRsv;                              /* 保留 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM???? */
+    VOS_RATMODE_ENUM_UINT32                 enRatTpye;                          /* ???? */
+    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* ???????? */
+    VOS_UINT16                              usRsv;                              /* ???? */
 }UPHY_OAM_ACTIVE_UPHY_CNF_STRU;
 
 
 
 /*****************************************************************************
- 结构名    : UPHY_OAM_LOAD_NV_REQ_STRU
- 结构说明  : UPHY向OAM主动上报NV首地址,OAM收到地址后,将NV项写入
+ ??????    : UPHY_OAM_LOAD_NV_REQ_STRU
+ ????????  : UPHY??OAM????????NV??????,OAM??????????,??NV??????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM信息 */
-    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* 上报模式 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM???? */
+    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* ???????? */
     VOS_UINT32                              uwNvAddr;
 }UPHY_OAM_LOAD_NV_REQ_STRU;
 
@@ -389,46 +389,46 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : UPHY_OAM_LOAD_NV_CNF_STRU
- 结构说明  : OAM获取首地址后,将NV项写入,然后回复CNF
+ ??????    : UPHY_OAM_LOAD_NV_CNF_STRU
+ ????????  : OAM????????????,??NV??????,????????CNF
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM信息 */
-    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* 上报模式 */
-    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* 处理结果 */
-    VOS_UINT16                              usRsv;                              /* 保留 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM???? */
+    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* ???????? */
+    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* ???????? */
+    VOS_UINT16                              usRsv;                              /* ???? */
 }UPHY_OAM_LOAD_NV_CNF_STRU;
 
 
 
 
 /*****************************************************************************
- 结构名    : UPHY_OAM_GET_NV_ADDR_REQ_STRU
- 结构说明  : OAM下发获取NV项的首地址请求
+ ??????    : UPHY_OAM_GET_NV_ADDR_REQ_STRU
+ ????????  : OAM????????NV??????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM信息 */
-    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* 上报模式 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM???? */
+    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* ???????? */
 }UPHY_OAM_GET_NV_ADDR_REQ_STRU;
 
 
 
 /*****************************************************************************
- 结构名    : UPHY_OAM_GET_NV_ADDR_IND_STRU
- 结构说明  : UPHY向OAM回复NV首地址
+ ??????    : UPHY_OAM_GET_NV_ADDR_IND_STRU
+ ????????  : UPHY??OAM????NV??????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM信息 */
-    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* 上报模式 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM???? */
+    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* ???????? */
     VOS_UINT32                              uwNvAddr;
 }UPHY_OAM_GET_NV_ADDR_IND_STRU;
 
@@ -437,54 +437,54 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : UPHY_OAM_BOOT_INFO_REQ_STRU
- 结构说明  : UPHY向OAM请求信息,包括:
-             ulUmtsBandBitMap:W支持的频段
-             ulCQIAddr:CQI表首地址
-             ulAPTAddr:APT表首地址
-             ulETAddr:ET表首地址
-             UPHY_MODULE_ADDR_INFO_STRU:加载的段信息
+ ??????    : UPHY_OAM_BOOT_INFO_REQ_STRU
+ ????????  : UPHY??OAM????????,????:
+             ulUmtsBandBitMap:W??????????
+             ulCQIAddr:CQI????????
+             ulAPTAddr:APT????????
+             ulETAddr:ET????????
+             UPHY_MODULE_ADDR_INFO_STRU:????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM信息 */
-    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* 上报模式 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM???? */
+    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* ???????? */
 }UPHY_OAM_BOOT_INFO_REQ_STRU;
 
 
 
 
 /*****************************************************************************
- 结构名    : UPHY_OAM_BOOT_INFO_IND_STRU
- 结构说明  : OAM下发BOOT INFO相关信息给GPHY
-             ulUmtsBandBitMap:W支持的频段
-             ulCQIAddr:CQI表首地址
-             ulAPTAddr:APT表首地址
-             ulETAddr:ET表首地址
-             PHY_MODULE_ADDR_INFO_STRU:加载的段信息
-             上移情况下,没有加载,不需要加载段地址信息,因此本接口保留,不写数据.
-             本信息一张卡获取一次,如果已经获取,则可以不再获取
+ ??????    : UPHY_OAM_BOOT_INFO_IND_STRU
+ ????????  : OAM????BOOT INFO??????????GPHY
+             ulUmtsBandBitMap:W??????????
+             ulCQIAddr:CQI????????
+             ulAPTAddr:APT????????
+             ulETAddr:ET????????
+             PHY_MODULE_ADDR_INFO_STRU:????????????
+             ??????????,????????,????????????????????,??????????????,????????.
+             ????????????????????,????????????,??????????????
 *****************************************************************************/
 
 typedef struct
 {
-    VOS_UINT32                              ulSegSDRamAddr;                         /* 数据段或者代码段在SDRAM中的地址 */
-    VOS_UINT32                              ulSegSDRamLength;                       /* 数据段或者代码段长度 */
-    VOS_UINT32                              ulSegTcmAddr;                           /* 数据段或者代码段在DSP内部的AHB地址 */
+    VOS_UINT32                              ulSegSDRamAddr;                         /* ??????????????????SDRAM???????? */
+    VOS_UINT32                              ulSegSDRamLength;                       /* ???????????????????? */
+    VOS_UINT32                              ulSegTcmAddr;                           /* ??????????????????DSP??????AHB???? */
 }UPHY_MODULE_ADDR_INFO_STRU;
 
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM信息 */
-    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* 上报模式 */
-    VOS_UINT32                              ulUmtsBandBitMap;                   /* 频段有效位图 */
-    VOS_UINT32                              ulCQIAddr;                          /* CQI表在SDRAM中的首地址 */
-    VOS_UINT32                              ulAPTAddr;                          /* APT表地址:注意V3R3这个地址段没有 */
-    VOS_UINT32                              ulETAddr;                           /* ET表地址:注意V3R3这个地址段没有 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM???? */
+    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* ???????? */
+    VOS_UINT32                              ulUmtsBandBitMap;                   /* ???????????? */
+    VOS_UINT32                              ulCQIAddr;                          /* CQI????SDRAM?????????? */
+    VOS_UINT32                              ulAPTAddr;                          /* APT??????:????V3R3?????????????? */
+    VOS_UINT32                              ulETAddr;                           /* ET??????:????V3R3?????????????? */
     UPHY_MODULE_ADDR_INFO_STRU              astPhyModuleAddrInfo[UPHY_DYN_CODE_MODULE_BUTT];
 }UPHY_OAM_BOOT_INFO_IND_STRU;
 
@@ -494,38 +494,38 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : UPHY_OAM_WAKE_CMD_STRU
- 结构说明  : OAM给UPHY_DRX下发唤醒:包含信息为:MODEM/MODE/主模/从模/强制/正常唤醒
+ ??????    : UPHY_OAM_WAKE_CMD_STRU
+ ????????  : OAM??UPHY_DRX????????:??????????:MODEM/MODE/????/????/????/????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 消息ID */
-    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM信息 */
-    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* 上报模式 */
-    UPHY_OAM_WAKE_TYPE_ENUM_UINT32          enWakeType;                         /* 唤醒类型 */
-    VOS_UINT8                               pRecordInfo[4];                     /* 唤醒时间可维可测信息 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM???? */
+    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* ???????? */
+    UPHY_OAM_WAKE_TYPE_ENUM_UINT32          enWakeType;                         /* ???????? */
+    VOS_UINT8                               pRecordInfo[4];                     /* ???????????????????? */
 }UPHY_OAM_WAKE_CMD_STRU;
 
 
 
 /*****************************************************************************
- 结构名    : UPHY_OAM_SLEEP_IND_STRU
- 结构说明  : UPHY_DRX 给OAM发送睡眠包含信息为:MODEM/MODE/主模/从模/睡眠
+ ??????    : UPHY_OAM_SLEEP_IND_STRU
+ ????????  : UPHY_DRX ??OAM??????????????????:MODEM/MODE/????/????/????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM信息 */
-    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* 上报模式 */
-    VOS_UINT32                              uwCurSlice;                         /* 当前Slice */
-    VOS_UINT32                              uwCalSleepLen;                      /* 计算的睡眠长度 */
-    VOS_UINT32                              uwCalCLkSwitchLen;                  /* 计算的时钟切换长度 */
-    VOS_UINT32                              uwExptWakeSlice;                    /* 期望的唤醒时间 */
-    VOS_UINT32                              uwCfgGaugePara;                     /* 配置的校准参数 */
-    VOS_UINT32                              uwCfgSleepLen;                      /* 配置的睡眠长度 */
-    VOS_UINT32                              uwCfgClkSwitchLen;                  /* 配置的时钟切换长度 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM???? */
+    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* ???????? */
+    VOS_UINT32                              uwCurSlice;                         /* ????Slice */
+    VOS_UINT32                              uwCalSleepLen;                      /* ?????????????? */
+    VOS_UINT32                              uwCalCLkSwitchLen;                  /* ?????????????????? */
+    VOS_UINT32                              uwExptWakeSlice;                    /* ?????????????? */
+    VOS_UINT32                              uwCfgGaugePara;                     /* ?????????????? */
+    VOS_UINT32                              uwCfgSleepLen;                      /* ?????????????? */
+    VOS_UINT32                              uwCfgClkSwitchLen;                  /* ?????????????????? */
 }UPHY_OAM_SLEEP_IND_STRU;
 
 
@@ -533,17 +533,17 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : PHY_OAM_LOAD_PHY_REQ_STRU
- 结构说明  : OAM下发加载W/GPHY,接入模式,信令/非信令
+ ??????    : PHY_OAM_LOAD_PHY_REQ_STRU
+ ????????  : OAM????????W/GPHY,????????,????/??????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM信息 */
-    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* 上报模式 */
-    UPHY_OAM_BUSINESS_TYPE_ENUM_UINT16      enBusinessType;                     /* 加载业务类型 */
-    VOS_UINT16                              usRsv;                              /* 保留 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM???? */
+    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* ???????? */
+    UPHY_OAM_BUSINESS_TYPE_ENUM_UINT16      enBusinessType;                     /* ???????????? */
+    VOS_UINT16                              usRsv;                              /* ???? */
 }PHY_OAM_LOAD_PHY_REQ_STRU;
 
 
@@ -551,244 +551,244 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : PHY_OAM_LOAD_PHY_CNF_STRU
- 结构说明  : W/GPHY接收到LOAD命令加载完成后回复CNF
+ ??????    : PHY_OAM_LOAD_PHY_CNF_STRU
+ ????????  : W/GPHY??????LOAD??????????????????CNF
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM信息 */
-    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* 上报模式 */
-    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* 处理结果 */
-    VOS_UINT16                              usRsv;                              /* 保留 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM???? */
+    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* ???????? */
+    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* ???????? */
+    VOS_UINT16                              usRsv;                              /* ???? */
 }PHY_OAM_LOAD_PHY_CNF_STRU;
 
 
 
 /*****************************************************************************
- 结构名    : PHY_OAM_SET_WORK_MODE_REQ_STRU
- 结构说明  : OAM下发SET_WORK_MODE给W/GPHY,接入模式,信令/非信令
+ ??????    : PHY_OAM_SET_WORK_MODE_REQ_STRU
+ ????????  : OAM????SET_WORK_MODE??W/GPHY,????????,????/??????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM信息 */
-    VOS_RATMODE_ENUM_UINT32                 enMasterMode;                       /* 主模模式 */
-    VOS_RATMODE_ENUM_UINT32                 enSlaveMode;                        /* 从模模式 */
-    UPHY_OAM_BUSINESS_TYPE_ENUM_UINT16      enBusinessType;                     /* 加载业务类型 */
-    UPHY_OAM_BOOL_ENUM_UINT16               enPhyInitFlag;                      /* 是否需要初始化PHY */
-    UPHY_OAM_BOOL_ENUM_UINT16               enNvUpdateFlag;                     /* 是否需要更新NV项 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM???? */
+    VOS_RATMODE_ENUM_UINT32                 enMasterMode;                       /* ???????? */
+    VOS_RATMODE_ENUM_UINT32                 enSlaveMode;                        /* ???????? */
+    UPHY_OAM_BUSINESS_TYPE_ENUM_UINT16      enBusinessType;                     /* ???????????? */
+    UPHY_OAM_BOOL_ENUM_UINT16               enPhyInitFlag;                      /* ??????????????PHY */
+    UPHY_OAM_BOOL_ENUM_UINT16               enNvUpdateFlag;                     /* ????????????NV?? */
     VOS_UINT16                              sRsv;
 }PHY_OAM_SET_WORK_MODE_REQ_STRU;
 
 
 
 /*****************************************************************************
- 结构名    : PHY_OAM_SET_WORK_MODE_CNF_STRU
- 结构说明  : W/GPHY接收到SET_WORK_MODE命令加载完成后回复CNF
+ ??????    : PHY_OAM_SET_WORK_MODE_CNF_STRU
+ ????????  : W/GPHY??????SET_WORK_MODE??????????????????CNF
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM信息 */
-    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* 上报模式 */
-    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* 处理结果 */
-    VOS_UINT16                              usRsv;                              /* 保留 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    MODEM_ID_ENUM_UINT16                    enModem;                            /* MODEM???? */
+    VOS_RATMODE_ENUM_UINT32                 enRatMode;                          /* ???????? */
+    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* ???????? */
+    VOS_UINT16                              usRsv;                              /* ???? */
 }PHY_OAM_SET_WORK_MODE_CNF_STRU;
 
 
 
 /*****************************************************************************
- 结构名    : PHY_OAM_SAR_CTRL_REQ_STRU
- 结构说明  : OAM给W/GPHY下发SAR控制命令
+ ??????    : PHY_OAM_SAR_CTRL_REQ_STRU
+ ????????  : OAM??W/GPHY????SAR????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 消息ID */
-    VOS_UINT16                              usRsv;                              /* 保留 */
-    VOS_UINT32                              ulMask;                             /* 变更类型 */
-    VOS_INT32                               lAntenStatus;                       /* 当前天线的状态，仅在mask为PHY_OM_SAR_MASK_ANTSTATE时，该域才有效,如果值为-1代表底软函数执行错误*/
-    VOS_UINT32                              ulSarReduction;                     /* 功率回退等级,仅在mask为PHY_OM_SAR_MASK_REDUCTION时,该域才有效*/
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    VOS_UINT16                              usRsv;                              /* ???? */
+    VOS_UINT32                              ulMask;                             /* ???????? */
+    VOS_INT32                               lAntenStatus;                       /* ????????????????????mask??PHY_OM_SAR_MASK_ANTSTATE??????????????,????????-1????????????????????*/
+    VOS_UINT32                              ulSarReduction;                     /* ????????????,????mask??PHY_OM_SAR_MASK_REDUCTION??,??????????*/
 }PHY_OAM_SAR_CTRL_REQ_STRU;
 
 
 
 
 /*****************************************************************************
- 结构名    : PHY_OAM_SAR_CTRL_CNF_STRU
- 结构说明  : W/GPHY给OAM回复SAR控制命令
+ ??????    : PHY_OAM_SAR_CTRL_CNF_STRU
+ ????????  : W/GPHY??OAM????SAR????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 消息ID */
-    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* 处理结果 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* ???????? */
 }PHY_OAM_SAR_CTRL_CNF_STRU;
 
 
 
 /*****************************************************************************
- 结构名    : GPHY_OAM_RF_AGING_TEST_REQ_STRU
- 结构说明  : OAM给GPHY下发老化测试命令
+ ??????    : GPHY_OAM_RF_AGING_TEST_REQ_STRU
+ ????????  : OAM??GPHY????????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 消息ID */
-    VOS_UINT16                              usRsv;                              /* 保留 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    VOS_UINT16                              usRsv;                              /* ???? */
     VOS_UINT16                              usFreqNum;                          /* (Band << 12) | Arfcn */
-    UPHY_OAM_AGING_TEST_CTRL_ENUM_UINT16    enTxEnable;                         /* 发送使能控制:0x5555-使能发送;0xAAAA-停止发送;TSC 0; TxData: 随机数 */
-    VOS_UINT16                              usModType;                          /* 发射调制方式:0为GMSK调制;1为8PSK调制方式 */
-    VOS_UINT16                              usTxPower;                          /* 目标发射功率,单位为0.1dBm,GSM和EDGE共用 */
-    VOS_UINT16                              usSlotCnt;                          /* 配置时隙个数，范围1~4，不需指定具体使用哪些时隙，DSP自动配置1~4时隙发射 */
+    UPHY_OAM_AGING_TEST_CTRL_ENUM_UINT16    enTxEnable;                         /* ????????????:0x5555-????????;0xAAAA-????????;TSC 0; TxData: ?????? */
+    VOS_UINT16                              usModType;                          /* ????????????:0??GMSK????;1??8PSK???????? */
+    VOS_UINT16                              usTxPower;                          /* ????????????,??????0.1dBm,GSM??EDGE???? */
+    VOS_UINT16                              usSlotCnt;                          /* ??????????????????1~4????????????????????????????DSP????????1~4???????? */
     VOS_UINT16                              usRsv2;
 }GPHY_OAM_RF_AGING_TEST_REQ_STRU;
 
 
 
 /*****************************************************************************
- 结构名    : GPHY_OAM_RF_AGING_TEST_CNF_STRU
- 结构说明  : OAM给GPHY下发老化测试命令处理后回复CNF
+ ??????    : GPHY_OAM_RF_AGING_TEST_CNF_STRU
+ ????????  : OAM??GPHY??????????????????????????CNF
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* 处理结果 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* ???????? */
 }GPHY_OAM_RF_AGING_TEST_CNF_STRU;
 
 
 
 /*****************************************************************************
- 结构名    : WPHY_OAM_RF_AGING_TEST_REQ_STRU
- 结构说明  : OAM给WPHY下发老化测试命令
+ ??????    : WPHY_OAM_RF_AGING_TEST_REQ_STRU
+ ????????  : OAM??WPHY????????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgID;                                /* 消息ID */
-    VOS_UINT16                              usRsv;                                  /* 保留位 */
-    UPHY_OAM_AGING_TEST_CTRL_ENUM_UINT16    enTxOnOff;                              /* 发送使能控制:0x5555-使能发送;0xAAAA-停止发送 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgID;                                /* ????ID */
+    VOS_UINT16                              usRsv;                                  /* ?????? */
+    UPHY_OAM_AGING_TEST_CTRL_ENUM_UINT16    enTxOnOff;                              /* ????????????:0x5555-????????;0xAAAA-???????? */
     VOS_UINT16                              usTxBand;                               /* band */
-    VOS_UINT16                              usTxChannel;                            /* 邋邋 */
-    VOS_UINT16                              usTxPower;                              /* 目标发射功率,单位为0.1dBm */
+    VOS_UINT16                              usTxChannel;                            /* ???? */
+    VOS_UINT16                              usTxPower;                              /* ????????????,??????0.1dBm */
 }WPHY_OAM_RF_AGING_TEST_REQ_STRU;
 
 
 /*****************************************************************************
- 结构名    : WPHY_OAM_RF_AGING_TEST_CNF_STRU
- 结构说明  : OAM给WPHY下发老化测试命令处理后回复CNF
+ ??????    : WPHY_OAM_RF_AGING_TEST_CNF_STRU
+ ????????  : OAM??WPHY??????????????????????????CNF
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* 处理结果 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* ???????? */
 }WPHY_OAM_RF_AGING_TEST_CNF_STRU;
 
 
 
 /*****************************************************************************
- 结构名    : WPHY_OAM_UPDATE_REG_STATE_REQ_STRU
- 协议表格  :
- 结构说明  : 寄存器勾包配置消息原语控制请求
+ ??????    : WPHY_OAM_UPDATE_REG_STATE_REQ_STRU
+ ????????  :
+ ????????  : ??????????????????????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
     UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;
-    PS_REG_UPDATE_STATE_ENUM_UINT16         enRegState;                         /* 0：表示不进行寄存器勾包, 1：进行寄存器勾包 */
+    PS_REG_UPDATE_STATE_ENUM_UINT16         enRegState;                         /* 0??????????????????????, 1???????????????? */
 }WPHY_OAM_UPDATE_REG_STATE_REQ_STRU;
 
 
 /*****************************************************************************
- 结构名    : WPHY_OAM_UPDATE_REG_STATE_CNF_STRU
- 协议表格  :
- 结构说明  : 寄存器勾包配置消息原语回复
+ ??????    : WPHY_OAM_UPDATE_REG_STATE_CNF_STRU
+ ????????  :
+ ????????  : ??????????????????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* 处理结果 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    UPHY_OAM_RSLT_ENUM_UINT16               enRslt;                             /* ???????? */
 }WPHY_OAM_UPDATE_REG_STATE_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : WPHY_OAM_QUERY_SAMPLE_REQ_STRU
- 结构说明  : 获取ACPU PHY ADDR接口消息结构体
+ ??????    : WPHY_OAM_QUERY_SAMPLE_REQ_STRU
+ ????????  : ????ACPU PHY ADDR??????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    VOS_UINT16                              usRsv;                              /* 保留位 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    VOS_UINT16                              usRsv;                              /* ?????? */
 }WPHY_OAM_QUERY_SAMPLE_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : WPHY_OAM_QUERY_SAMPLE_CNF_STRU
- 结构说明  : 获取ACPU PHY ADDR接口消息结构体
+ ??????    : WPHY_OAM_QUERY_SAMPLE_CNF_STRU
+ ????????  : ????ACPU PHY ADDR??????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* 原语ID */
-    VOS_UINT16                              esRslt;                             /* 处理结果:VOS_TURE:表示查询结果可用。VOS_FALSE:表示查询地址为空 */
-    VOS_UINT32                              ulPhyAddr;                          /* PHY地址 */
-    VOS_UINT32                              ulPhySize;                          /* PHY内存大小 */
+    UPHY_OAM_MSG_ID_ENUM_UINT16             enMsgId;                            /* ????ID */
+    VOS_UINT16                              esRslt;                             /* ????????:VOS_TURE:??????????????????VOS_FALSE:???????????????? */
+    VOS_UINT32                              ulPhyAddr;                          /* PHY???? */
+    VOS_UINT32                              ulPhySize;                          /* PHY???????? */
 }WPHY_OAM_QUERY_SAMPLE_CNF_STRU;
 
 /*****************************************************************************
-  7 UNION定义
+  7 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  8 OTHERS定义
+  8 OTHERS????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  9 全局变量声明
+  9 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 
 
 /*****************************************************************************
- 函 数 名  : SLEEP_MasterWakeSlave
- 功能描述  : GUPHY作为主模唤醒从模函数.
- 输入参数  : MODEM_ID_ENUM_UINT16      enModem   需要唤醒的MODEM
-             VOS_RATMODE_ENUM_UINT32   enRatMode 需要唤醒的MODE
+ ?? ?? ??  : SLEEP_MasterWakeSlave
+ ????????  : GUPHY????????????????????.
+ ????????  : MODEM_ID_ENUM_UINT16      enModem   ??????????MODEM
+             VOS_RATMODE_ENUM_UINT32   enRatMode ??????????MODE
 
- 输出参数  : 无
+ ????????  : ??
 
- 返 回 值  : VOS_UINT32
+ ?? ?? ??  : VOS_UINT32
 *****************************************************************************/
 VOS_UINT32 SLEEP_MasterWakeSlave(
                     SLEEP_MODE_ENUM_UINT32   enRatMode );
 
 
 /*****************************************************************************
- 函 数 名  : SLEEP_AwakeInfoGet
- 功能描述  : 获取器件上电流程
- 输入参数  : SLEEP_MODE_ENUM_UINT32 enMode  当前模式
-             VOS_UINT32 uLen                传入的数组长度,32bit为单位
- 输出参数  : VOS_UINT32 *pstDrxInfo         上电流程时间信息
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : SLEEP_AwakeInfoGet
+ ????????  : ????????????????
+ ????????  : SLEEP_MODE_ENUM_UINT32 enMode  ????????
+             VOS_UINT32 uLen                ??????????????,32bit??????
+ ????????  : VOS_UINT32 *pstDrxInfo         ????????????????
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年3月11日
-    作    者   : s00207770
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2014??3??11??
+    ??    ??   : s00207770
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 SLEEP_AwakeInfoGet( SLEEP_MODE_ENUM_UINT32 enMode, VOS_UINT32 *pstAwakeHWInfo, VOS_UINT32 uLen );
@@ -799,18 +799,18 @@ extern UPHY_OAM_RTT_STATE_ENUM_UINT16 UPHY_COMM_GetRttStateInfo( MODEM_ID_ENUM_U
 VOS_UINT16 UPHY_DSDA_GetGsmSlaveDrxFlag( MODEM_ID_ENUM_UINT16 enModemId );
 
 /*****************************************************************************
- 函 数 名  : SLEEP_BBE16CprocResumeProc
- 功能描述  : OAM提供注册函数给CPROC注册resume proc
- 输入参数  : SLEEP_BBE16_CPROC_RESUME_FUNC pFun
- 输出参数  : 无
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : SLEEP_BBE16CprocResumeProc
+ ????????  : OAM??????????????CPROC????resume proc
+ ????????  : SLEEP_BBE16_CPROC_RESUME_FUNC pFun
+ ????????  : ??
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年9月15日
-    作    者   : x00306642
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??9??15??
+    ??    ??   : x00306642
+    ????????   : ??????????
 
 *****************************************************************************/
 typedef VOS_VOID (*SLEEP_BBE16_CPROC_WAKEUP_FUNC)(VOS_VOID* pulPara);
@@ -818,47 +818,47 @@ typedef VOS_VOID (*SLEEP_BBE16_CPROC_WAKEUP_FUNC)(VOS_VOID* pulPara);
 typedef VOS_VOID (*SLEEP_BBE16_CPROC_SLEEP_FUNC)(VOS_VOID* pulPara);
 
 /*****************************************************************************
- 函 数 名  : SLEEP_BBE16CprocWakeupProc
- 功能描述  : OAM提供注册函数给CPROC注册Wakeup handler
- 输入参数  : SLEEP_BBE16_CPROC_WAKEUP_FUNC pFun,
+ ?? ?? ??  : SLEEP_BBE16CprocWakeupProc
+ ????????  : OAM??????????????CPROC????Wakeup handler
+ ????????  : SLEEP_BBE16_CPROC_WAKEUP_FUNC pFun,
              VOS_RATMODE_ENUM_UINT32 enMode,
              VOS_VOID* pulPara
- 输出参数  : 无
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
 *****************************************************************************/
 VOS_VOID SLEEP_BBE16CprocWakeupProc(SLEEP_BBE16_CPROC_WAKEUP_FUNC pFun, VOS_RATMODE_ENUM_UINT32 enMode, VOS_VOID *pulPara);
 
 /*****************************************************************************
- 函 数 名  : SLEEP_BBE16CprocSleepProc
- 功能描述  : OAM提供注册函数给CPROC注册Sleep handler
- 输入参数  : SLEEP_BBE16_CPROC_SLEEP_FUNC pFun,
+ ?? ?? ??  : SLEEP_BBE16CprocSleepProc
+ ????????  : OAM??????????????CPROC????Sleep handler
+ ????????  : SLEEP_BBE16_CPROC_SLEEP_FUNC pFun,
              VOS_RATMODE_ENUM_UINT32 enMode,
              VOS_VOID* pulPara
- 输出参数  : 无
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
 *****************************************************************************/
 VOS_VOID SLEEP_BBE16CprocSleepProc(SLEEP_BBE16_CPROC_SLEEP_FUNC pFun, VOS_RATMODE_ENUM_UINT32 enMode, VOS_VOID *pulPara);
 
 /*****************************************************************************
- 函 数 名  : SLEEP_IsSlaveSleep
- 功能描述  : 获取当前模式是否处于从模低功耗状态
- 输入参数  : SLEEP_MODE_ENUM_UINT32 enMode  当前模式
- 输出参数  : 无
- 返 回 值  : VOS_BOOL   VOS_TRUE    当前模式处于从模低功耗态
-                        VOS_FALSE   当前模式没有处于从模低功耗状态
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : SLEEP_IsSlaveSleep
+ ????????  : ??????????????????????????????????
+ ????????  : SLEEP_MODE_ENUM_UINT32 enMode  ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_BOOL   VOS_TRUE    ????????????????????????
+                        VOS_FALSE   ??????????????????????????????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年11月30日
-    作    者   : s00207770
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??11??30??
+    ??    ??   : s00207770
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_BOOL SLEEP_IsSlaveSleep(SLEEP_MODE_ENUM_UINT32 enMode);

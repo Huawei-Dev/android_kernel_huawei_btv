@@ -50,12 +50,6 @@
 #include <linux/module.h>
 #include "bsp_version.h"
 
-/*****************************************************************************
-* 函 数 名  : show_product_version
-*
-* 功能描述  : 获取PRODUCT_FULL_VERSION_STRING
-*
-*****************************************************************************/
 static ssize_t show_product_version(struct device *cdev,struct device_attribute *attr,char *buf)
 {
        /* coverity[secure_coding] */

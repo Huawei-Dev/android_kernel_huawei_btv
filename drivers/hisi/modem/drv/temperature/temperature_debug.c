@@ -82,7 +82,6 @@ void tem_volt_null_test(void)
     }
 }
 
-
 void tem_volt_get_test(void)
 {
     unsigned short volt = 0;
@@ -101,7 +100,6 @@ void tem_volt_get_test(void)
     }
 }
 
-/* 温度保护DEBUG函数 */
 void tem_phy_logic(void)
 {
     int i = 0;
@@ -122,15 +120,15 @@ void tem_battery_show(void)
     DRV_HKADC_DATA_AREA *p_area = (DRV_HKADC_DATA_AREA *)TEMPERATURE_VIRT_ADDR;
 
     tem_print_info("-------------BATTERY TEMPERATURE PROTECT CONFIG------------\n");
-    tem_print_info("high tem protect:        %s\n", p_area->sys_temp_cfg.enable & 0x1 ? "yes" : "no"); /* bit0：高温保护使能；bit1：低温保护使能 */
+    tem_print_info("high tem protect:        %s\n", p_area->sys_temp_cfg.enable & 0x1 ? "yes" : "no");
     tem_print_info("low tem protect:         %s\n", p_area->sys_temp_cfg.enable & 0x2 ? "yes" : "no");
 
-    tem_print_info("hkadc count is:          %d\n", p_area->sys_temp_cfg.hkadc_id);          /* 高低温保护的hkadc通道ID */
-    tem_print_info("high tem gate is:        %d\n", p_area->sys_temp_cfg.high_thres);        /* 高温保护的阀值 */
-    tem_print_info("high gate count is:      %d\n", p_area->sys_temp_cfg.high_count);        /* 高温保护次数门限，到达该次数后系统关机 */
+    tem_print_info("hkadc count is:          %d\n", p_area->sys_temp_cfg.hkadc_id);
+    tem_print_info("high tem gate is:        %d\n", p_area->sys_temp_cfg.high_thres);
+    tem_print_info("high gate count is:      %d\n", p_area->sys_temp_cfg.high_count);
 
-    tem_print_info("low tem gate is:         %d\n", p_area->sys_temp_cfg.low_thres);         /* 低温保护的阀值 */
-    tem_print_info("low gate count is:       %d\n", p_area->sys_temp_cfg.low_count);         /* 低温保护次数门限，到达该次数后系统关机 */
+    tem_print_info("low tem gate is:         %d\n", p_area->sys_temp_cfg.low_thres);
+    tem_print_info("low gate count is:       %d\n", p_area->sys_temp_cfg.low_count);
 
     tem_print_info("-------------------------------------------------------------\n");
 
@@ -179,8 +177,6 @@ void tem_table_show(void)
 
 }
 
-
-
 void drv_hkadc_get_temp_debug(HKADC_TEMP_PROTECT_E mode)
 {
     short psTemp = 0;
@@ -219,6 +215,3 @@ void tem_output_show(void)
     tem_print_info(" ------- \t ------------ \t -----------\n");
 
 }
-
-
-

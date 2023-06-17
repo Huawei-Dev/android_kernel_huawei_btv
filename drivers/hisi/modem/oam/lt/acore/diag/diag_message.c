@@ -46,8 +46,6 @@
  *
  */
 
-
-
 #include "diag_common.h"
 #include "SCMProc.h"
 #include "diag_api.h"
@@ -57,45 +55,11 @@
 
 #define    THIS_FILE_ID        MSP_FILE_ID_DIAG_MESSAGE_C
 
-
 struct DIAG_MESSAGE_PROC_STRU
 {
     DIAG_MESSAGE_TYPE_U32   ulMsgType;
     DIAG_MESSAGE_FUNC       fnMsgProc;
 };
-
-
-/******************************************************************************
-MSP----connect/disconnect
-      |
-      |-C_reset/get timestamp
-      |
-      |-LAYER/MSG/PRINT/AIR/USERPLANE/EVENT/Trans/L1 cfg
-
-PS-----trans
-      |
-      |-PS_REPLAY
-      |
-      |-MMA鉴权
-      |
-      |-RTT GTR
-
-PHY----TL trans
-      |
-      |-W trans
-      |
-      |-G trans
-
-LBBP---GEN_REQ/ADDR_REQ/CHNSIZE_REQ/GET_VERSION_REQ/ABLE_CHN_REQ
-
-BSP----Read NV/Write NV/NV_IMPORT/NV_EXPORT/GetNvIdList/BackupNv/NVID filterlist
-      |
-      |-FS_QUERY_DIR/FS_SCAN_DIR/FS_MAKE_DIR/FS_OPEN/FS_IMPORTFS_EXPORT/FS_DELETE/FS_SPACE
-      |
-      |-SYSVIEW_SWT/SYSVIEW_IND/AXI_DATA_CFG/AXI_REG_CFG/AXI_DATA_CTRL/AXI_MON_CFG/AXI_MON_START/AXI_MON_TERMINATE/UTRACE_START/UTRACE_TERMINATE/CPU_SWT
-
-GUBBP---BBP dump/配置BBP数采/停止BBP数采/配置BBP上报/配置BBP收到EDMA错误消息后通知PC
-******************************************************************************/
 
 struct DIAG_MESSAGE_PROC_STRU g_aFnMsgTbl[DIAG_MSG_TYPE_BUTT] =
 {
@@ -114,29 +78,11 @@ struct DIAG_MESSAGE_PROC_STRU g_aFnMsgTbl[DIAG_MSG_TYPE_BUTT] =
 
 VOS_UINT32 diag_MessageProc(DIAG_FRAME_INFO_STRU *pData);
 
-
-/*****************************************************************************
- Function Name   : diag_MessageInit
- Description     : DIAG message层初始化接口
-
- History         :
-    1.c64416         2014-11-18  Draft Enact
-
-*****************************************************************************/
 VOS_VOID diag_MessageInit(VOS_VOID)
 {
     diag_ServiceProcReg(diag_MessageProc);
 }
 
-
-/*****************************************************************************
- Function Name   : diag_MessageProc
- Description     : DIAG message层处理接口
-
- History         :
-    1.c64416         2014-11-18  Draft Enact
-
-*****************************************************************************/
 VOS_UINT32 diag_MessageProc(DIAG_FRAME_INFO_STRU *pData)
 {
     VOS_UINT32 ulRet = VOS_ERR;
@@ -160,15 +106,6 @@ VOS_UINT32 diag_MessageProc(DIAG_FRAME_INFO_STRU *pData)
     return ulRet;
 }
 
-
-/*****************************************************************************
- Function Name   : DIAG_MsgProcReg
- Description     : 诊断命令解包回调注册接口
-
- History         :
-    1.c64416         2014-11-18  Draft Enact
-
-*****************************************************************************/
 VOS_UINT32 DIAG_MsgProcReg (DIAG_MESSAGE_TYPE_U32 ulMsgType, DIAG_MESSAGE_FUNC pMsgfn)
 {
     if((ulMsgType >= DIAG_MSG_TYPE_BUTT) || (VOS_NULL_PTR == pMsgfn))
@@ -181,21 +118,12 @@ VOS_UINT32 DIAG_MsgProcReg (DIAG_MESSAGE_TYPE_U32 ulMsgType, DIAG_MESSAGE_FUNC p
     return VOS_OK;
 }
 
-/*****************************************************************************
- Function Name   : DIAG_MsgReport
- Description     : DIAG message 层上报接口
-
- History         :
-    1.c64416         2014-11-18  Draft Enact
-
-*****************************************************************************/
 VOS_UINT32 DIAG_MsgReport (MSP_DIAG_CNF_INFO_STRU *pstDiagInfo, VOS_VOID *pstData, VOS_UINT32 ulLen)
 {
     DIAG_MSG_REPORT_HEAD_STRU stDiagHead;
 
     diag_PTR(EN_DIAG_PTR_MESSAGE_REPORT);
 
-    /*检查DIAG是否初始化且HSO是否连接上*/
     if(!DIAG_IS_CONN_ON)
     {
         return ERR_MSP_NO_INITILIZATION;
@@ -227,8 +155,3 @@ VOS_UINT32 DIAG_MsgReport (MSP_DIAG_CNF_INFO_STRU *pstDiagInfo, VOS_VOID *pstDat
 
     return VOS_OK;
 }
-
-
-
-
-

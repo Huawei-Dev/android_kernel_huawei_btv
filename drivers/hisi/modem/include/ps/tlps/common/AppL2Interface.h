@@ -1,23 +1,23 @@
 /******************************************************************************
 
-                  版权所有 (C), 2001-2011, 华为技术有限公司
+                  ???????? (C), 2001-2011, ????????????????
 
  ******************************************************************************
-  文 件 名   : AppL2Interface.h
-  版 本 号   : 初稿
-  作    者   : q00208938
-  生成日期   : 2014年6月10日
-  最近修改   :
-  功能描述   : L2和APP之间接口定义
-  函数列表   :
+  ?? ?? ??   : AppL2Interface.h
+  ?? ?? ??   : ????
+  ??    ??   : q00208938
+  ????????   : 2014??6??10??
+  ????????   :
+  ????????   : L2??APP????????????
+  ????????   :
 
-  修改历史   :
-  1.日    期   :
-    作    者   :
-    修改内容   :
-  2.日    期   :
-    作    者   :
-    修改内容   :
+  ????????   :
+  1.??    ??   :
+    ??    ??   :
+    ????????   :
+  2.??    ??   :
+    ??    ??   :
+    ????????   :
 
 ******************************************************************************/
 
@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "LPSCommon.h"
 
@@ -41,9 +41,9 @@ extern "C" {
 #pragma pack(push, 4)
 #endif
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
-/*CA最大小区数*/
+/*CA??????????*/
 #define CA_MAX_CELL_NUM             8
 
 #ifndef VOS_MSG_HEADER
@@ -73,15 +73,15 @@ extern "C" {
 #define PDCP_APP_MSG_HDR            PS_MSG_ID_PDCP_TO_APP_BASE          /*0xec0*/
 #define APP_PDCP_MSG_HDR            PS_MSG_ID_APP_TO_PDCP_BASE          /*0xee0*/
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 
 
 /*****************************************************************************
- 枚举名    : LUP_OM_MSG_ID_SECTION_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : LTE 用户面OM消息分段
+ ??????    : LUP_OM_MSG_ID_SECTION_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : LTE ??????OM????????
 *****************************************************************************/
 enum LUP_OM_MSG_ID_SECTION_ENUM
 {
@@ -96,27 +96,27 @@ enum LUP_OM_MSG_ID_SECTION_ENUM
 
 
 /*****************************************************************************
- 枚举名    : APP_L2_MSG_TYPE_ENUM
- 协议表格  :
- ASN.1描述 :
- 枚举说明  :L2内部与APP 之间消息ID定义. 消息范围后续不再使用.
+ ??????    : APP_L2_MSG_TYPE_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  :L2??????APP ????????ID????. ????????????????????.
 *****************************************************************************/
 enum APP_L2_MSG_TYPE_ENUM
 {
-    /* 透明命令 */
+    /* ???????? */
     ID_APP_L2_TRANSPARENT_CMD_REQ           = (APP_L2_MSG_HDR + 0x01),
     ID_APP_L2_TRANSPARENT_CMD_CNF           = (L2_APP_MSG_HDR + 0x02),
     ID_APP_L2_TRANSPARENT_CMD_IND           = (L2_APP_MSG_HDR + 0x03),
 
-    /*可维可测-数传吞吐量统计  */
+    /*????????-??????????????  */
     ID_OM_L2_THROUGHPUT_CMD_REQ             = (APP_L2_MSG_HDR + 0x03),  /*0xe13*/
     ID_L2_OM_THROUGHPUT_CMD_CNF             = (L2_APP_MSG_HDR + 0x06),  /*0xe06*/
 
-    /*可维可测-数传SDU统计  */
+    /*????????-????SDU????  */
     ID_OM_L2_SDUCOUNT_CMD_REQ               = (APP_L2_MSG_HDR + 0x04),  /*0xe14*/
     ID_L2_OM_SDUCOUNT_CMD_CNF               = (L2_APP_MSG_HDR + 0x07),  /*0xe07*/
 
-    /*新增路测消息*/
+    /*????????????*/
     ID_OM_L2_DT_RA_INFO_CMD_REQ             = (APP_L2_MSG_HDR + 0x05),  /*0xe15*/
     ID_L2_OM_DT_RA_INFO_CMD_CNF             = (L2_APP_MSG_HDR + 0x08),  /*0xe08*/
     ID_OM_L2_DT_RB_INFO_CMD_REQ             = (APP_L2_MSG_HDR + 0x06),  /*0xe16*/
@@ -128,7 +128,7 @@ enum APP_L2_MSG_TYPE_ENUM
     ID_OM_L2_DT_SR_STATUS_CMD_REQ           = (APP_L2_MSG_HDR + 0x09),  /*0xe19*/
     ID_L2_OM_DT_SR_STATUS_CMD_CNF           = (L2_APP_MSG_HDR + 0x0C),  /*0xe0C*/
 
-    /*DCM logger, MAC PDU 上报*/
+    /*DCM logger, MAC PDU ????*/
     ID_OM_L2_DCM_MAC_PDU_RPT_CMD_REQ        = (APP_L2_MSG_HDR + 0x0A),  /*0xe1A*/
     ID_L2_OM_DCM_MAC_PDU_RPT_CMD_CNF        = (L2_APP_MSG_HDR + 0x0D),  /*0xe0D*/
     ID_L2_OM_DCM_DL_MAC_PDU_RPT_IND         = (L2_APP_MSG_HDR + 0x0E),  /*0xe0E*/
@@ -142,12 +142,12 @@ enum APP_L2_MSG_TYPE_ENUM
     ID_APP_MAC_TRANSPARENT_CMD_CNF          = (MAC_APP_MSG_HDR + 0x02),
     ID_APP_MAC_TRANSPARENT_CMD_IND          = (MAC_APP_MSG_HDR + 0x03),
 
-    /*CA CELL状态上报*/
+    /*CA CELL????????*/
     ID_APP_MAC_CA_CELL_CMD_REQ              = (APP_MAC_MSG_HDR + 0x02),
     ID_MAC_APP_CA_CELL_CMD_CNF              = (MAC_APP_MSG_HDR + 0x04),
     ID_MAC_APP_CA_CELL_CMD_IND              = (MAC_APP_MSG_HDR + 0x05),
 
-    /* L2增加随机接入过程统计可维可测调测信息，m00280824 2014/12/09 BEGIN*/
+    /* L2??????????????????????????????????????m00280824 2014/12/09 BEGIN*/
     ID_PS_OM_MAC_RA_MSG1_INFO_IND             = (MAC_APP_MSG_HDR + 0x06),
     ID_PS_OM_MAC_RA_MSG2_INFO_IND             = (MAC_APP_MSG_HDR + 0x07),
     ID_PS_OM_MAC_RA_MSG3_INFO_IND             = (MAC_APP_MSG_HDR + 0x08),
@@ -155,7 +155,7 @@ enum APP_L2_MSG_TYPE_ENUM
     ID_PS_OM_MAC_RAMSG4_CCCH_INFO_IND         = (MAC_APP_MSG_HDR + 0x0A),
     ID_PS_OM_MAC_RAMSG4_CRNTI_INFO_IND        = (MAC_APP_MSG_HDR + 0x0B),
     ID_PS_OM_MAC_RAMSG4_PDCCH_INFO_IND        = (MAC_APP_MSG_HDR + 0x0C),
-    /* L2增加随机接入过程统计可维可测调测信息，m00280824 2014/12/09 END*/
+    /* L2??????????????????????????????????????m00280824 2014/12/09 END*/
 
     ID_APP_RLC_TRANSPARENT_CMD_REQ          = (APP_RLC_MSG_HDR + 0x01),
     ID_APP_RLC_TRANSPARENT_CMD_CNF          = (RLC_APP_MSG_HDR + 0x02),
@@ -167,7 +167,7 @@ enum APP_L2_MSG_TYPE_ENUM
 
     ID_OM_L2_SWITCH_CONTROL_CMD_REQ         = (APP_PDCP_MSG_HDR + 0x02),  /*0xec2*/
     ID_L2_OM_SWITCH_CONTROL_CMD_CNF         = (PDCP_APP_MSG_HDR + 0x04),   /*0xee4*/
-    /* DTS2014081204455 L2定位信令相关问题增加调测，w00161397 2014/08/07 */
+    /* DTS2014081204455 L2??????????????????????????w00161397 2014/08/07 */
 
     ID_PS_OM_PDCP_UL_SRB_INFO_IND           = (PDCP_APP_MSG_HDR + 0x05),
     ID_PS_OM_PDCP_UL_RRC_CNF_INFO_IND       = (PDCP_APP_MSG_HDR + 0x06),
@@ -176,15 +176,15 @@ enum APP_L2_MSG_TYPE_ENUM
     ID_PS_OM_RLC_DL_RX_CTRL_PDU_INFO_IND    = (PDCP_APP_MSG_HDR + 0x09),
     ID_PS_OM_RLC_DL_SRB_PDU_INFO_IND        = (PDCP_APP_MSG_HDR + 0x0A)
 
-    /* DTS2014081204455 L2定位信令相关问题增加调测，w00161397 2014/08/07 */
+    /* DTS2014081204455 L2??????????????????????????w00161397 2014/08/07 */
 };
 typedef         VOS_UINT32          APP_L2_MSG_TYPE_ENUM_UINT32;
 
 /*****************************************************************************
- 结构名    : LUP_OM_MSG_TYPE_ENUM
- 协议表格  :
- ASN.1描述 :
- 结构说明  : LTE用户面OM消息上报
+ ??????    : LUP_OM_MSG_TYPE_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : LTE??????OM????????
 *****************************************************************************/
 enum LUP_OM_MSG_TYPE_ENUM
 {
@@ -217,67 +217,67 @@ typedef VOS_UINT32 LRRC_LMAC_MSG_TYPE_ENUM_UINT32;
 
 
 /*****************************************************************************
- 结构名    : LMAC_APP_SCELL_CONFIG_TYPE_ENUM
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SCELL的配置/未配置状态枚举
+ ??????    : LMAC_APP_SCELL_CONFIG_TYPE_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : SCELL??????/??????????????
 *****************************************************************************/
 enum LMAC_APP_SCELL_CONFIG_TYPE_ENUM
 {
-    LMAC_APP_SCELL_NOT_CONFIGED                    = 0x0,                           /*SCELL未被配置*/
-    LMAC_APP_SCELL_CONFIGED                        = 0x1,                           /*SCELL已被配置*/
+    LMAC_APP_SCELL_NOT_CONFIGED                    = 0x0,                           /*SCELL????????*/
+    LMAC_APP_SCELL_CONFIGED                        = 0x1,                           /*SCELL????????*/
     LMAC_APP_SCELL_CONFIG_TYPE_BUTT
 };
 typedef         VOS_UINT8           LMAC_APP_SCELL_CONFIG_TYPE_ENUM_UINT8;
 /*****************************************************************************
- 结构名    : LMAC_APP_SCELL_STATUS_TYPE_ENUM
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SCELL的激活/去激活状态枚举
+ ??????    : LMAC_APP_SCELL_STATUS_TYPE_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : SCELL??????/??????????????
 *****************************************************************************/
 enum LMAC_APP_SCELL_STATUS_TYPE_ENUM
 {
-    LMAC_APP_SCELL_DEACTIVED                       = 0x0,                           /*SCELL处于去激活态*/
-    LMAC_APP_SCELL_ACTIVED                         = 0x1,                           /*SCELL处于激活态*/
+    LMAC_APP_SCELL_DEACTIVED                       = 0x0,                           /*SCELL????????????*/
+    LMAC_APP_SCELL_ACTIVED                         = 0x1,                           /*SCELL??????????*/
     LMAC_APP_SCELL_STATUS_TYPE_BUTT
 };
 typedef         VOS_UINT8           LMAC_APP_SCELL_STATUS_TYPE_ENUM_UINT8;
 /*****************************************************************************
-  4 全局变量声明
+  4 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  5 消息头定义
+  5 ??????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 消息定义
+  6 ????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  7 STRUCT定义
+  7 STRUCT????
 *****************************************************************************/
 /*****************************************************************************
- 结构名    :CA_CELL_STATUS_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    :CA_CELL_STATUS_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                   ucUlConfigured;     /*CA上行是否被配置，0:未配置，1:已配置*/
-    VOS_UINT8                   ucDlConfigured;     /*CA下行是否被配置，0:未配置，1:已配置*/
-    VOS_UINT8                   ucActived;          /*SCell是否被激活，0:去激活，1:激活*/
+    VOS_UINT8                   ucUlConfigured;     /*CA????????????????0:????????1:??????*/
+    VOS_UINT8                   ucDlConfigured;     /*CA????????????????0:????????1:??????*/
+    VOS_UINT8                   ucActived;          /*SCell????????????0:????????1:????*/
     VOS_UINT8                   ucRsv;
 }CA_CELL_STATUS_STRU;
 /*****************************************************************************
- 结构名    :APP_L2_CA_CELL_INFO_REQ_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    :APP_L2_CA_CELL_INFO_REQ_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
@@ -287,10 +287,10 @@ typedef struct
     VOS_UINT32 ulOpId;
 }APP_L2_CA_CELL_INFO_REQ_STRU;
 /*****************************************************************************
- 结构名    :L2_APP_CA_CELL_INFO_CNF_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    :L2_APP_CA_CELL_INFO_CNF_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
@@ -301,10 +301,10 @@ typedef struct
     CA_CELL_STATUS_STRU         astCellStatus[CA_MAX_CELL_NUM];
 }L2_APP_CA_CELL_INFO_CNF_STRU;
 /*****************************************************************************
- 结构名    :L2_APP_CA_CELL_INFO_IND_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    :L2_APP_CA_CELL_INFO_IND_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
@@ -315,17 +315,17 @@ typedef struct
     CA_CELL_STATUS_STRU         astCellStatus[CA_MAX_CELL_NUM];
 }L2_APP_CA_CELL_INFO_IND_STRU;
 /*****************************************************************************
-  8 UNION定义
+  8 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  9 OTHERS定义
+  9 OTHERS????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 
 

@@ -54,7 +54,7 @@ typedef void                VOID;
 #endif
 
 /*************************GLOBAL BEGIN*****************************/
-/* 基本数据类型定义 */
+/* ???????????????? */
 #ifndef _WIN32_COMPILE
 typedef signed long long    BSP_S64;
 #else
@@ -179,8 +179,8 @@ typedef int (*PWRCTRLFUNCPTRVOID)(void);
 #endif
 
 
-/* 错误码宏定义 */
-#define BSP_ERR_MODULE_OFFSET (0x1000)    /* 防止和系统的错误码重叠 */
+/* ???????????? */
+#define BSP_ERR_MODULE_OFFSET (0x1000)    /* ?????????????????????? */
 #define BSP_DEF_ERR( mod, errid) \
     ((((BSP_U32) mod + BSP_ERR_MODULE_OFFSET) << 16) | (errid))
 
@@ -208,18 +208,18 @@ typedef int (*PWRCTRLFUNCPTRVOID)(void);
 
 
 /*****************************************************************************
-  1 GU侧驱动对外接口，GUPorting项目添加.
+  1 GU????????????????GUPorting????????.
 *****************************************************************************/
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
 
 #define DRV_OK                          (0)
 #define DRV_ERROR                       (-1)
 #define DRV_INTERFACE_RSLT_OK           (0)
 
-/* 基本数据类型定义 */
+/* ???????????????? */
 
 typedef int  (*pFUNCPTR)(void);
 
@@ -227,19 +227,19 @@ typedef unsigned long (*pFUNCPTR2)( unsigned long ulPara1, unsigned long ulPara2
 
 typedef unsigned int tagUDI_DEVICE_ID_UINT32;
 
-/* 上行线路收包函数指针 */
+/* ???????????????????? */
 typedef BSP_VOID (*UpLinkRxFunc)(BSP_U8 *buf, BSP_U32 len);
 
-/* 包封装释放函数指针 */
+/* ?????????????????? */
 typedef BSP_VOID (*FreePktEncap)(BSP_VOID *PktEncap);
 
-/* GMAC调用者枚举 */
+/* GMAC?????????? */
 typedef enum tagGMAC_OWNER_E
 {
-    GMAC_OWNER_VXWORKS = 0, /* Vxworks网络协议栈 */
-    GMAC_OWNER_PS,          /* LTE网络协议栈 */
+    GMAC_OWNER_VXWORKS = 0, /* Vxworks?????????? */
+    GMAC_OWNER_PS,          /* LTE?????????? */
     GMAC_OWNER_MSP,         /* MSP */
-    GMAC_OWNER_MAX          /* 边界值 */
+    GMAC_OWNER_MAX          /* ?????? */
 }GMAC_OWNER_E;
 
 typedef enum tagWDT_TIMEOUT_E

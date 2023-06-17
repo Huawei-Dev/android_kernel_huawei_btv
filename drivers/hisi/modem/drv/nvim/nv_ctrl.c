@@ -257,7 +257,7 @@ s32 nv_file_ftell(FILE* fp)
   * Discription: check the file is exist?
   * Parameter  : fp:   file pointer
   * Output     :
-  * return     : 0:表示有文件 其他没文件
+  * return     : 0:?????????? ??????????
   * History    : yuyangyang  00228784  create
   */
 s32 nv_file_access(const s8* path,s32 mode)
@@ -278,7 +278,7 @@ s32 nv_file_access(const s8* path,s32 mode)
   * Discription: update the file info?
   * Parameter  : fp:   file pointer
   * Output     :
-  * return     : 0:刷新信息成功 其他失败
+  * return     : 0:???????????? ????????
   * History    :
   */
 s32 nv_file_update(const s8* path)
@@ -358,8 +358,8 @@ u32 nv_copy_img2backup(void)
 }
 
 
-/*修改升级包标志
- *true :有效   false :无效
+/*??????????????
+ *true :????   false :????
  */
 
 s32 nv_modify_upgrade_flag(bool flag)
@@ -396,8 +396,8 @@ s32 nv_modify_upgrade_flag(bool flag)
 
 }
 
-/*获取升级包数据有效性
- *true :有效 false: 无效
+/*????????????????????
+ *true :???? false: ????
  */
 bool nv_get_upgrade_flag(void)
 {

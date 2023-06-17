@@ -119,16 +119,16 @@ typedef struct
 {
     VOS_UINT32 ulSrcError;   /* USIM,NAS...
  */
-    VOS_UINT32 ulATError;    /* AT错误码
+    VOS_UINT32 ulATError;    /* AT??????
  */
 }AT_ERROR_CODE_TABLE_STRU;
 
-/*lint -e958 -e959 修改人:l60609;原因:64bit*/
+/*lint -e958 -e959 ??????:l60609;????:64bit*/
 typedef struct{
     VOS_UINT32 ulMsgId;
     PFN_AT_FW_MSG_PROC   pfnCnfMsgProc;
 }AT_FTM_CNF_MSG_PROC_STRU;
-/*lint +e958 +e959 修改人:l60609;原因:64bit*/
+/*lint +e958 +e959 ??????:l60609;????:64bit*/
 
 
 /*+CSQ
@@ -151,7 +151,7 @@ extern VOS_VOID CmdErrProc(VOS_UINT8 ucClientId, VOS_UINT32 ulErrCode, VOS_UINT1
 extern VOS_UINT32 atSetSdloadCnf(VOS_UINT8 ucClientId,VOS_VOID *pMsgBlock);
 
 
-/* AT模块给FTM 模块发送消息
+/* AT??????FTM ????????????
  */
 extern VOS_UINT32 atSendFtmDataMsg(VOS_UINT32 TaskId, VOS_UINT32 MsgId, VOS_UINT32 ulClientId, VOS_VOID* pData, VOS_UINT32 uLen);
 
@@ -171,10 +171,10 @@ extern VOS_UINT32 AT_QryLwclashPara(VOS_UINT8 ucIndex);
 
 extern VOS_UINT32 AT_QryLcacellPara(VOS_UINT8 ucIndex);
 
-/*Added by y00228784 for ^inforbu , &f  LTE AT命令控制移到A核 2013-8-28 begin*/
+/*Added by y00228784 for ^inforbu , &f  LTE AT????????????A?? 2013-8-28 begin*/
 extern VOS_UINT32 atSetNVFactoryBack(VOS_UINT8 ucClientId);
 extern VOS_UINT32 atSetNVFactoryRestore(VOS_UINT8 ucClientId);
-/*Added by y00228784 for ^inforbu , &f  LTE AT命令控制移到A核 2013-8-28 end*/
+/*Added by y00228784 for ^inforbu , &f  LTE AT????????????A?? 2013-8-28 end*/
 
 extern VOS_UINT32 atSetLTCommCmdPara(VOS_UINT8 ucClientId);
 extern VOS_UINT32 atSetLTCommCmdParaCnfProc(VOS_UINT8 ucClientId, VOS_VOID * pMsgBlock);

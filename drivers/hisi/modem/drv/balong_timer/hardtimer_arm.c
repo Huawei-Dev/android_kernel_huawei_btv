@@ -49,8 +49,7 @@
 #include <bsp_hardtimer.h>
 #include "hardtimer_core.h"
 #include "hardtimer_arm.h"
-/*lint --e{129, 63 ,666,732,746} */
-/*lint -save -e14*/
+
 static u32 is_timer_enabled(struct timer_device *device)
 {
 	u32 ret = 0;
@@ -92,15 +91,12 @@ static void timer_int_clear(struct timer_device *device)
 
 static s32 timer_disable(struct timer_device *device)
 {
-	/*最后1bit写0,关闭之前先清中断*/
 	u32 ret = 0;
 	ret = readl(device->base_addr + ARM_CTRL_OFFSET);
 	writel(ret&(~0xA0),device->base_addr + ARM_CTRL_OFFSET);
 	timer_int_clear(device);
 	return BSP_OK;
 }
-
-/*lint -save -e550*/
 
 static s32 timer_config_init(struct timer_device *device)
 {
@@ -153,8 +149,6 @@ static void timer_int_unmask(struct timer_device *device)
 	writel(ret|0x20,device->base_addr + ARM_CTRL_OFFSET);
 }
 
-/*lint -restore +e550*/
-
 static void timer_suspend(struct timer_device *device)
 {
 	u32 ret = 0;
@@ -175,12 +169,9 @@ static void timer_suspend(struct timer_device *device)
 static void timer_resume(struct timer_device *device)
 {
 	u32 ret = 0;
-	/*1. 在load值之前，先统一配为32bit计时，load值之后，再恢复保存的控制寄存器的值*/
 	ret = readl(device->base_addr+ARM_CTRL_OFFSET);
 	writel(ret|0x2,device->base_addr+ARM_CTRL_OFFSET);
-	/*2.恢复配置初始值*/
 	timer_set_value(device,device->lp_timer_valuereg);
-	/*3.恢复控制寄存器值*/
 	writel(device->lp_timer_ctrlreg,device->base_addr+ARM_CTRL_OFFSET);
 	return ;
 }
@@ -210,6 +201,3 @@ void arm_timer_drviver_init(void)
 	INIT_LIST_HEAD(&arm_timer_driver.timer_drivers);
     bsp_timer_driver_register(&arm_timer_driver);
 }
-
-/*lint -restore +e14*/
-

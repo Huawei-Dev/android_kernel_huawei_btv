@@ -50,7 +50,7 @@
 #define  AT_MN_INTERFACE_H
 
 /*****************************************************************************
-  1 头文件包含
+  1 ??????????
 *****************************************************************************/
 #include "product_config.h"
 #include "vos.h"
@@ -68,7 +68,7 @@
 
 
 /*****************************************************************************
-  2 常量定义
+  2 ????????
 *****************************************************************************/
 #define AT_MN_MSG_HEADER                VOS_MSG_HEADER\
                                         AT_MN_MSGTYPE_ENUM_UINT16 enMsgId;\
@@ -77,40 +77,40 @@
 
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
-/* Added by f62575 for AT Project，2011-10-03,  Begin*/
+/* Added by f62575 for AT Project??2011-10-03,  Begin*/
 /*****************************************************************************
- 枚举名    : MN_AT_MSGTYPE_ENUM
- 枚举说明  : AT与MN模块间的原语
- 1.日    期   : 2012年6月11日
-   作    者   : w00166186
-   修改内容   : AT&T&DCM项目
- 2.日    期   : 2013年07月22日
-   作    者   : s00217060
-   修改内容   : VoLTE_PhaseI项目
+ ??????    : MN_AT_MSGTYPE_ENUM
+ ????????  : AT??MN????????????
+ 1.??    ??   : 2012??6??11??
+   ??    ??   : w00166186
+   ????????   : AT&T&DCM????
+ 2.??    ??   : 2013??07??22??
+   ??    ??   : s00217060
+   ????????   : VoLTE_PhaseI????
 *****************************************************************************/
 enum AT_MN_MSGTYPE_ENUM
 {
-    /* 消息名称 */                                          /*消息ID*/          /* 备注 */
-    /* AT与CALL模块间消息 */
+    /* ???????? */                                          /*????ID*/          /* ???? */
+    /* AT??CALL?????????? */
     MN_APP_MSG_CLASS_CALL                                   = TAF_CALL_APP_MSG_BASE,
-    /* Added by f00179208 for AT Project，2011-10-14,  Begin*/
-    /* 发起呼叫 */
+    /* Added by f00179208 for AT Project??2011-10-14,  Begin*/
+    /* ???????? */
     MN_CALL_APP_ORIG_REQ                                    = 0x0001,           /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
-    /* 结束呼叫 */
+    /* ???????? */
     MN_CALL_APP_END_REQ,                                                        /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
-    /* 应答来电 */
+    /* ???????? */
     MN_CALL_APP_ANSWER_REQ,                                                     /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
-    /* 开始发送DTMF */
+    /* ????????DTMF */
     MN_CALL_APP_START_DTMF_REQ,                                                 /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
-    /* 停止发送DTMF */
+    /* ????????DTMF */
     MN_CALL_APP_STOP_DTMF_REQ,                                                  /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
-    /* 发起呼叫相关补充业务操作 */
+    /* ???????????????????????? */
     MN_CALL_APP_SUPS_CMD_REQ,                                                   /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
-    /* 获取呼叫信息 */
+    /* ???????????? */
     MN_CALL_APP_GET_INFO_REQ,                                                   /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
-    /* 获取通话时长 */
+    /* ???????????? */
     MN_CALL_APP_GET_CDUR_REQ,                                                   /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
     MN_CALL_APP_SET_UUSINFO_REQ,                                                /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
     MN_CALL_APP_QRY_UUSINFO_REQ,                                                /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
@@ -118,23 +118,23 @@ enum AT_MN_MSGTYPE_ENUM
     MN_CALL_APP_QRY_ALS_REQ,                                                    /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
 
     MN_CALL_APP_MAX_REQ,
-    /* Added by f00179208 for AT Project，2011-10-14,  End */
+    /* Added by f00179208 for AT Project??2011-10-14,  End */
 
     MN_CALL_APP_CUSTOM_ECC_NUM_REQ,                                             /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
 
-    ID_TAFAGENT_MN_GET_CALL_INFO_REQ,                                           /* TAFAGENT_>MN  获取通话信息请求消息*/
+    ID_TAFAGENT_MN_GET_CALL_INFO_REQ,                                           /* TAFAGENT_>MN  ????????????????????*/
 
     MN_CALL_APP_CLPR_GET_REQ,                                                   /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
 
     MN_CALL_APP_XLEMA_REQ,                                                      /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
 
-    /* Added by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-3, begin */
+    /* Added by s00217060 for ????????AT??????????????C??, 2013-4-3, begin */
     MN_CALL_APP_SET_CSSN_REQ,                                                   /* _H2ASN_MsgChoice MN_CALL_APP_REQ_MSG_STRU */
-    /* Added by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-3, end */
+    /* Added by s00217060 for ????????AT??????????????C??, 2013-4-3, end */
 
-    /* Added by y00245242 for V3R3C60_eCall项目, 2014-3-29, begin */
+    /* Added by y00245242 for V3R3C60_eCall????, 2014-3-29, begin */
     MN_CALL_QRY_ECALL_INFO_REQ,                                                 /* _H2ASN_MsgChoice MN_CALL_QRY_ECALL_INFO_REQ_STRU */
-    /* Added by y00245242 for V3R3C60_eCall项目, 2014-3-29, end */
+    /* Added by y00245242 for V3R3C60_eCall????, 2014-3-29, end */
 
     /* Added by l60609 for CDMA 1X Iteration 2, 2014-9-3, begin */
     TAF_CALL_APP_SEND_FLASH_REQ,                                                /* _H2ASN_MsgChoice TAF_CALL_APP_SEND_FLASH_REQ_STRU*/
@@ -158,7 +158,7 @@ enum AT_MN_MSGTYPE_ENUM
 
     TAF_CALL_APP_CCWAI_SET_REQ,
 
-    /* AT与MSG模块间消息 */
+    /* AT??MSG?????????? */
     MN_APP_MSG_CLASS_MSG                                    = TAF_MSG_APP_MSG_BASE,
     MN_MSG_MSGTYPE_SEND_RPDATA_DIRECT                       = 0x1001,           /* _H2ASN_MsgChoice MN_MSG_SEND_PARM_STRU */
     MN_MSG_MSGTYPE_SEND_RPDATA_FROMMEM                      = 0x1002,           /* _H2ASN_MsgChoice MN_MSG_SEND_FROMMEM_PARM_STRU */
@@ -192,10 +192,10 @@ enum AT_MN_MSGTYPE_ENUM
 
     MN_MSG_MSGTYPE_MAX,
 
-    /* AT与SSA模块间消息 */
+    /* AT??SSA?????????? */
     MN_APP_MSG_CLASS_SSA                                    = TAF_SSA_APP_MSG_BASE,
 /* Added by f62575 for SS FDN&Call Control, 2013-05-06, begin */
-    /*补充业务发起操作时的消息类型*/
+    /*????????????????????????????*/
     TAF_MSG_REGISTERSS_MSG,
     TAF_MSG_ERASESS_MSG,
     TAF_MSG_ACTIVATESS_MSG,
@@ -204,27 +204,27 @@ enum AT_MN_MSGTYPE_ENUM
     TAF_MSG_REGPWD_MSG,
     TAF_MSG_PROCESS_USS_MSG,
     TAF_MSG_ERASECCENTRY_MSG,
-    /* Deleted by s00217060 for VoLTE_PhaseIII  项目, 2014-01-06, begin */
-    /* Deleted by s00217060 for VoLTE_PhaseIII  项目, 2014-01-06, end */
+    /* Deleted by s00217060 for VoLTE_PhaseIII  ????, 2014-01-06, begin */
+    /* Deleted by s00217060 for VoLTE_PhaseIII  ????, 2014-01-06, end */
     TAF_MSG_RLEASE_MSG,
     TAF_MSG_SET_USSDMODE_MSG,
 /* Added by f62575 for SS FDN&Call Control, 2013-05-06, end */
 
-    /* AT与MMA模块间消息 */
+    /* AT??MMA?????????? */
     MN_APP_MSG_CLASS_MMA                                    = TAF_MMA_APP_MSG_BASE,
 
-    /* AT与MN模块间设置操作相关消息，未优化部分，待优化后删除 */
+    /* AT??MN???????????????????????????????????????????????? */
     MN_APP_MSG_CLASS_SET                                    = TAF_APP_SET_MSG_BASE,
 
-    /* AT与MN模块间查询操作相关消息，未优化部分，待优化后删除 */
+    /* AT??MN???????????????????????????????????????????????? */
     MN_APP_MSG_CLASS_QRY                                    = TAF_APP_QRY_MSG_BASE,
 
-    /* AT与PS适配模块间消息 */
+    /* AT??PS?????????????? */
     MN_APP_MSG_CLASS_PS                                     = TAF_APS_MSG_BASE,
 
-    /* Deleted by Y00213812 for VoLTE_PhaseI 项目, 2013-6-29, begin */
-    /* 这部分消息的定义迁移到TafAppAps.h文件中 */
-    /* Deleted by Y00213812 for VoLTE_PhaseI 项目, 2013-6-29, end */
+    /* Deleted by Y00213812 for VoLTE_PhaseI ????, 2013-6-29, begin */
+    /* ??????????????????????TafAppAps.h?????? */
+    /* Deleted by Y00213812 for VoLTE_PhaseI ????, 2013-6-29, end */
 
 
     MN_APP_MSG_CLASS_MASK                                   = TAF_IMSA_MSG_MASK
@@ -234,19 +234,19 @@ typedef VOS_UINT16 AT_MN_MSGTYPE_ENUM_UINT16;
 typedef AT_MN_MSGTYPE_ENUM_UINT16 MN_MSG_MSGTYPE_ENUM_U16;
 
 typedef VOS_UINT32  MN_CALL_APP_REQ_ENUM_UINT32;
-/* Added by f62575 for AT Project，2011-10-03,  End*/
+/* Added by f62575 for AT Project??2011-10-03,  End*/
 
 /*****************************************************************************
- 枚举名    : AT_CC_MSGTYPE_ENUM
- 枚举说明  : AT与CC模块间的原语
+ ??????    : AT_CC_MSGTYPE_ENUM
+ ????????  : AT??CC????????????
 *****************************************************************************/
 enum AT_CC_MSGTYPE_ENUM
 {
-    /* 消息名称 */                                          /*消息ID*/          /* 备注 */
-    /* AT发给CC的消息 */
+    /* ???????? */                                          /*????ID*/          /* ???? */
+    /* AT????CC?????? */
     AT_CC_MSG_STATE_QRY_REQ                                 = 0x0000,
 
-    /* CC发给AT的消息 */
+    /* CC????AT?????? */
     AT_CC_MSG_STATE_QRY_CNF                                 = 0x0001,
 
     AT_CC_MSG_BUTT
@@ -255,16 +255,16 @@ enum AT_CC_MSGTYPE_ENUM
 typedef VOS_UINT16 AT_CC_MSGTYPE_ENUM_UINT16;
 
 /*****************************************************************************
-  4 宏定义
+  4 ??????
 *****************************************************************************/
 #define ECALL_MAX_DIAL_NUM_LEN               (18)
 
 /*****************************************************************************
-  5 STRUCT定义
+  5 STRUCT????
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : AT_APPCTRL_STRU
- 结构说明  : AT APP 控制结构
+ ??????    : AT_APPCTRL_STRU
+ ????????  : AT APP ????????
 *****************************************************************************/
 typedef struct
 {
@@ -273,12 +273,12 @@ typedef struct
     VOS_UINT8                           aucReserved[1];
 } AT_APPCTRL_STRU;
 
-/* Added by f62575 for AT Project，2011-10-03,  Begin*/
-/* MN发往AT的事件结构 */
+/* Added by f62575 for AT Project??2011-10-03,  Begin*/
+/* MN????AT?????????? */
 typedef struct
 {
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
-    VOS_UINT16                          usMsgName;                              /* _H2ASN_Skip *//* 消息ID */
+    VOS_UINT16                          usMsgName;                              /* _H2ASN_Skip *//* ????ID */
     VOS_UINT8                           aucReserved1[2];
     MN_CLIENT_ID_T                      clientId;
     VOS_UINT16                          usLen;
@@ -286,8 +286,8 @@ typedef struct
 }MN_AT_IND_EVT_STRU;
 
 /*****************************************************************************
- 结构名称  : TAF_MNTN_LOG_PRINT_STRU
- 结构说明  : 可维可测LOG信息结构
+ ????????  : TAF_MNTN_LOG_PRINT_STRU
+ ????????  : ????????LOG????????
 *****************************************************************************/
 typedef struct
 {
@@ -295,17 +295,17 @@ typedef struct
     VOS_UINT32                          ulMsgName;
     MODEM_ID_ENUM_UINT16                enModemId;
     VOS_UINT8                           aucReserve[2];
-    VOS_CHAR                            acLog[4];           /* 打印字符串 */
+    VOS_CHAR                            acLog[4];           /* ?????????? */
 } TAF_MNTN_LOG_PRINT_STRU;
 
 
 /*****************************************************************************
-  H2ASN顶级消息结构定义
+  H2ASN????????????????
 *****************************************************************************/
 typedef struct
 {
     AT_MN_MSGTYPE_ENUM_UINT16           enMsgID;                                /*_H2ASN_MsgChoice_Export AT_MN_MSGTYPE_ENUM_U32*/
-                                                                                /* 为了兼容NAS的消息头定义，所以转换ASN.1使用AT_MN_MSGTYPE_ENUM_U32 */
+                                                                                /* ????????NAS??????????????????????ASN.1????AT_MN_MSGTYPE_ENUM_U32 */
 
     VOS_UINT8                           aucMsgBlock[2];
     /***************************************************************************
@@ -319,31 +319,31 @@ typedef struct
     VOS_MSG_HEADER
     AT_MN_MSG_DATA                      stMsgData;
 }AtMnInterface_MSG;
-/* Added by f62575 for AT Project，2011-10-03,  End*/
+/* Added by f62575 for AT Project??2011-10-03,  End*/
 
 /*****************************************************************************
- 枚举名    : MN_APP_REQ_MSG_STRU
- 结构说明  : 来自APP的请求消息结构
+ ??????    : MN_APP_REQ_MSG_STRU
+ ????????  : ????APP??????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    VOS_UINT16                          usMsgName;                              /* 消息名 */
-    VOS_UINT8                           aucReserve1[2];                             /* 保留 */
+    VOS_UINT16                          usMsgName;                              /* ?????? */
+    VOS_UINT8                           aucReserve1[2];                             /* ???? */
     MN_CLIENT_ID_T                      clientId;                               /* Client ID */
     MN_OPERATION_ID_T                   opId;                                   /* Operation ID */
-    VOS_UINT8                           aucReserve2[1];                         /* 保留 */
-    VOS_UINT8                           aucContent[4];                          /* 消息内容 */
+    VOS_UINT8                           aucReserve2[1];                         /* ???? */
+    VOS_UINT8                           aucContent[4];                          /* ???????? */
 } MN_APP_REQ_MSG_STRU;
 
 
-/* Deleted by Y00213812 for VoLTE_PhaseI 项目, 2013-07-08, begin */
-/* Deleted by Y00213812 for VoLTE_PhaseI 项目, 2013-07-08, end */
+/* Deleted by Y00213812 for VoLTE_PhaseI ????, 2013-07-08, begin */
+/* Deleted by Y00213812 for VoLTE_PhaseI ????, 2013-07-08, end */
 
 
 
 /*****************************************************************************
-  6 函数声明
+  6 ????????
 *****************************************************************************/
 
 #ifdef  __cplusplus

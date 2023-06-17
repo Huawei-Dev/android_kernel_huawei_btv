@@ -62,7 +62,7 @@
 #include  "OmVcomPpm.h"
 #include "soc_socp_adapter.h"
 
-/*lint -save -e767 原因:Log打印*/
+/*lint -save -e767 ????:Log????*/
 #define    THIS_FILE_ID        MSP_FILE_ID_DIAG_DEBUG_C
 /*lint -restore +e767*/
 
@@ -77,8 +77,8 @@ extern VOS_UINT8 g_EventModuleCfg[DIAG_CFG_PID_NUM];
 *****************************************************************************/
 
 /*****************************************************************************
- Function Name   : CBT : Count Branch Timestamp (计数、分支、时间戳定位功能)
- Description     : 用于统计次数和所走分支的问题定位
+ Function Name   : CBT : Count Branch Timestamp (??????????????????????????)
+ Description     : ????????????????????????????????
 *****************************************************************************/
 
 DIAG_CBT_INFO_TBL_STRU g_astCBTInfoTbl[EN_DIAG_DEBUG_INFO_MAX] = {{0}};
@@ -108,15 +108,15 @@ VOS_VOID diag_CBT(DIAG_CBT_ID_ENUM ulType,
 
 
 /*****************************************************************************
- Function Name   : LNR : Last N Ring buffer store (最后N条信息循环存储功能)
- Description     : 保存最近的N条信息
+ Function Name   : LNR : Last N Ring buffer store (????N??????????????????)
+ Description     : ??????????N??????
 *****************************************************************************/
 
 DIAG_LNR_INFO_TBL_STRU g_astLNRInfoTbl[EN_DIAG_LNR_INFO_MAX] = {{0}};
 
 /*****************************************************************************
  Function Name   : diag_LNR
- Description     : 最后NV条信息的记录接口
+ Description     : ????NV????????????????
 
  History         :
     1.c00326366    2015-06-21 Draft Enact
@@ -146,8 +146,8 @@ VOS_VOID DIAG_ShowLNR(DIAG_LNR_ID_ENUM ulType, VOS_UINT32 n)
 
 /*****************************************************************************
  Function Name   : diag_CreateDFR
- Description     : 创建码流录制录制的缓存buffer(初始化时调用)
-                    申请的空间长度必须四字节对齐
+ Description     : ??????????????????????buffer(????????????)
+                    ????????????????????????????
 
  History         :
     1.c00326366    2015-06-21 Draft Enact
@@ -193,7 +193,7 @@ VOS_UINT32 diag_CreateDFR(VOS_CHAR *name, VOS_UINT32 ulLen, DIAG_DFR_INFO_STRU *
 
 /*****************************************************************************
  Function Name   : diag_SaveDFR
- Description     : 码流录制接口(接收命令和上报命令时调用)
+ Description     : ????????????(????????????????????????)
 
  History         :
     1.c00326366    2015-06-21 Draft Enact
@@ -213,7 +213,7 @@ VOS_VOID diag_SaveDFR(DIAG_DFR_INFO_STRU *pDfr, VOS_UINT8 *pData, VOS_UINT32 ulL
         return ;
     }
 
-    /* 如果有任务正在进行中，需要等待其完成 */
+    /* ???????????????????????????????????? */
     if (VOS_OK != VOS_SmP(pDfr->semid, 0))
     {
         return ;
@@ -222,7 +222,7 @@ VOS_VOID diag_SaveDFR(DIAG_DFR_INFO_STRU *pDfr, VOS_UINT8 *pData, VOS_UINT32 ulL
     stDfrHeader.ulStart = DIAG_DFR_START_NUM;
     stDfrHeader.ulTime  = VOS_GetSlice();
 
-    /* 拷贝开始标记和时间戳 */
+    /* ???????????????????? */
     if((pDfr->ulCur + sizeof(DIAG_DFR_HEADER_STRU)) <= pDfr->ulLen)
     {
         (VOS_VOID)VOS_MemCpy(&(pDfr->pData[pDfr->ulCur]), &stDfrHeader, sizeof(DIAG_DFR_HEADER_STRU));
@@ -235,7 +235,7 @@ VOS_VOID diag_SaveDFR(DIAG_DFR_INFO_STRU *pDfr, VOS_UINT8 *pData, VOS_UINT32 ulL
     }
     pDfr->ulCur = (DFR_ALIGN_WITH_4BYTE(pDfr->ulCur + sizeof(DIAG_DFR_HEADER_STRU))) % pDfr->ulLen;
 
-    /* 拷贝码流 */
+    /* ???????? */
     if((pDfr->ulCur + ulLen) <= pDfr->ulLen)
     {
         (VOS_VOID)VOS_MemCpy(&(pDfr->pData[pDfr->ulCur]), pData, ulLen);
@@ -256,7 +256,7 @@ VOS_VOID diag_SaveDFR(DIAG_DFR_INFO_STRU *pDfr, VOS_UINT8 *pData, VOS_UINT32 ulL
 
 /*****************************************************************************
  Function Name   : diag_GetDFR
- Description     : 码流录制接口(接收命令和上报命令时调用)
+ Description     : ????????????(????????????????????????)
 
  History         :
     1.c00326366    2015-06-21 Draft Enact
@@ -276,7 +276,7 @@ VOS_VOID diag_GetDFR(DIAG_DFR_INFO_STRU *pDfr)
         return ;
     }
 
-    /* 如果DIAG目录不存在则先创建目录 */
+    /* ????DIAG?????????????????????? */
     if (VOS_OK != mdrv_file_access(DirPath, 0))
     {
         if (VOS_OK != mdrv_file_mkdir(DirPath))
@@ -311,21 +311,21 @@ VOS_VOID diag_GetDFR(DIAG_DFR_INFO_STRU *pDfr)
     (VOS_VOID)VOS_MemSet(aucInfo, 0, DIAG_DEBUG_INFO_LEN);
     (VOS_VOID)VOS_StrCpy(aucInfo, "DIAG DFR info");
 
-    /* 通用信息 */
+    /* ???????? */
     ret = (VOS_UINT32)mdrv_file_write(aucInfo, 1, DIAG_DEBUG_INFO_LEN, pFile);
     if(ret != DIAG_DEBUG_INFO_LEN)
     {
         (VOS_VOID)vos_printf(" mdrv_file_write DIAG number info failed.\n");
     }
 
-    /* 当前指针 */
+    /* ???????? */
     ret = (VOS_UINT32)mdrv_file_write(&pDfr->ulCur, 1, sizeof(pDfr->ulCur), pFile);
     if(ret != sizeof(pDfr->ulCur))
     {
         diag_printf(" mdrv_file_write failed 1.\n");
     }
 
-    /* 缓冲区长度 */
+    /* ?????????? */
     ret = (VOS_UINT32)mdrv_file_write(&pDfr->ulLen, 1, sizeof(pDfr->ulCur), pFile);
     if(ret != sizeof(pDfr->ulCur))
     {
@@ -350,7 +350,7 @@ DIAG_THRPUT_INFO_STRU g_astThroughput[EN_DIAG_THRPUT_MAX] = {{0,0,0,0,{{0,0},}}}
 
 /*****************************************************************************
  Function Name   : diag_ThroughputIn
- Description     : 吞吐率记录
+ Description     : ??????????
 
  History         :
     1.c00326366    2015-07-11 Draft Enact
@@ -365,7 +365,7 @@ VOS_VOID diag_ThroughputSave(DIAG_THRPUT_ID_ENUM enChn, VOS_UINT32 bytes)
 
     if(slice >= g_astThroughput[enChn].ulSlice)
     {
-        /* 每次统计吞吐率最少间隔5秒以上 */
+        /* ??????????????????????5?????? */
         if((slice - g_astThroughput[enChn].ulSlice) > DIAG_THRPUT_DEBUG_LEN)
         {
             ptr = g_astThroughput[enChn].ulPtr;
@@ -389,7 +389,7 @@ VOS_VOID diag_ThroughputSave(DIAG_THRPUT_ID_ENUM enChn, VOS_UINT32 bytes)
             g_astThroughput[enChn].ulBytes = 0;
         }
     }
-    else    /* 如果反转则清零，重新统计 */
+    else    /* ???????????????????????? */
     {
         g_astThroughput[enChn].ulSlice = slice;
         g_astThroughput[enChn].ulBytes = 0;
@@ -419,7 +419,7 @@ VOS_VOID DIAG_ShowThroughput(VOS_UINT32 ulIndex)
 
 /*****************************************************************************
  Function Name   : DIAG_Throughput
- Description     : 保存吞吐率信息，用于定位由于PC侧读取的慢造成的丢包问题
+ Description     : ????????????????????????????PC????????????????????????
 
  History         :
     1.c00326366    2015-06-21 Draft Enact
@@ -433,7 +433,7 @@ VOS_VOID DIAG_Throughput(VOS_VOID)
     VOS_CHAR *FilePath = "/modem_log/DIAG/DIAG_Throughput.bin";
     VOS_CHAR   aucInfo[DIAG_DEBUG_INFO_LEN];
 
-    /* 如果DIAG目录不存在则先创建目录 */
+    /* ????DIAG?????????????????????? */
     if (VOS_OK != mdrv_file_access(DirPath, 0))
     {
         if (VOS_OK != mdrv_file_mkdir(DirPath))
@@ -492,13 +492,13 @@ VOS_VOID DIAG_Throughput(VOS_VOID)
 
 /*****************************************************************************
  Function Name   : DIAG_ShowLogCfg
- Description     : 根据输入的任务PID查询log配置开关信息
+ Description     : ??????????????PID????log????????????
 *****************************************************************************/
 VOS_VOID DIAG_ShowLogCfg(VOS_UINT32 ulModuleId)
 {
     VOS_UINT32 level;
 
-    /*检查DIAG是否初始化且HSO是否连接上*/
+    /*????DIAG????????????HSO??????????*/
     if(!DIAG_IS_CONN_ON)
     {
         diag_printf("!DIAG_IS_CONN_ON!\n");
@@ -510,7 +510,7 @@ VOS_VOID DIAG_ShowLogCfg(VOS_UINT32 ulModuleId)
         return;
     }
 
-    /* level中存储的值(0|ERROR|WARNING|NORMAL|INFO|0|0|0) bit 6-3 分别表示ERROR-INFO */
+    /* level??????????(0|ERROR|WARNING|NORMAL|INFO|0|0|0) bit 6-3 ????????ERROR-INFO */
     level = g_PrintModuleCfg[ulModuleId - VOS_PID_DOPRAEND];
     if(level & 0x08)
     {
@@ -539,11 +539,11 @@ VOS_VOID DIAG_ShowLogCfg(VOS_UINT32 ulModuleId)
 
 /*****************************************************************************
  Function Name   : DIAG_ShowEventCfg
- Description     : 查询EVENT配置开关信息
+ Description     : ????EVENT????????????
 *****************************************************************************/
 VOS_VOID DIAG_ShowEventCfg(VOS_UINT32 ulpid)
 {
-    /*检查DIAG是否初始化且HSO是否连接上*/
+    /*????DIAG????????????HSO??????????*/
     if(!DIAG_IS_CONN_ON)
     {
         diag_printf("!DIAG_IS_CONN_ON\n");
@@ -579,11 +579,11 @@ VOS_VOID DIAG_ShowEventCfg(VOS_UINT32 ulpid)
 
 /*****************************************************************************
  Function Name   : DIAG_ShowAirCfg
- Description     : 查询空口配置开关信息
+ Description     : ????????????????????
 *****************************************************************************/
 VOS_VOID DIAG_ShowAirCfg(VOS_VOID)
 {
-    /*检查DIAG是否初始化且HSO是否连接上*/
+    /*????DIAG????????????HSO??????????*/
     if(!DIAG_IS_CONN_ON)
     {
         diag_printf("!DIAG_IS_CONN_ON\n");
@@ -603,20 +603,20 @@ VOS_VOID DIAG_ShowAirCfg(VOS_VOID)
 
 /*****************************************************************************
  Function Name   : DIAG_ShowLayerCfg
- Description     : 根据输入的任务PID查询层间消息配置开关信息
+ Description     : ??????????????PID????????????????????????
 *****************************************************************************/
 VOS_VOID DIAG_ShowLayerCfg(VOS_UINT32 ulModuleId, VOS_UINT32 ulSrcDst)
 {
     VOS_UINT32 ulOffset = 0;
     VOS_UINT32 ulState = 0;
 
-    /*检查DIAG是否初始化且HSO是否连接上*/
+    /*????DIAG????????????HSO??????????*/
     if(!DIAG_IS_CONN_ON)
     {
         diag_printf("!DIAG_IS_CONN_ON!\n");
     }
 
-    /* 0表示源模块 */
+    /* 0?????????? */
     if(DIAG_CMD_LAYER_MOD_SRC == ulSrcDst)
     {
         if(DIAG_CFG_LAYER_MODULE_IS_ACORE(ulModuleId))
@@ -679,7 +679,7 @@ VOS_VOID DIAG_ShowLayerCfg(VOS_UINT32 ulModuleId, VOS_UINT32 ulSrcDst)
 
 /*****************************************************************************
  Function Name   : DIAG_ShowUsrCfg
- Description     : 查询用户面配置开关信息
+ Description     : ??????????????????????
 *****************************************************************************/
 VOS_VOID DIAG_ShowUsrCfg(VOS_VOID)
 {
@@ -688,7 +688,7 @@ VOS_VOID DIAG_ShowUsrCfg(VOS_VOID)
 
 /*****************************************************************************
  Function Name   : DIAG_ShowTrans
- Description     : 查询最后n个透传上报相关信息
+ Description     : ????????n??????????????????
 *****************************************************************************/
 VOS_VOID DIAG_ShowTrans(VOS_UINT32 n)
 {
@@ -697,7 +697,7 @@ VOS_VOID DIAG_ShowTrans(VOS_UINT32 n)
 
 /*****************************************************************************
  Function Name   : DIAG_ShowTrans
- Description     : 查询最后n个透传上报相关信息
+ Description     : ????????n??????????????????
 *****************************************************************************/
 VOS_VOID DIAG_ShowPsTransCmd(VOS_UINT32 n)
 {
@@ -706,7 +706,7 @@ VOS_VOID DIAG_ShowPsTransCmd(VOS_UINT32 n)
 
 /*****************************************************************************
  Function Name   : DIAG_ShowLost
- Description     : 查询上报失败丢包的信息
+ Description     : ??????????????????????
 *****************************************************************************/
 VOS_VOID DIAG_ShowLost(VOS_VOID)
 {
@@ -718,7 +718,7 @@ extern HTIMER g_DebugTimer;
 VOS_UINT32 g_ulMntnSn = 0;
 /*****************************************************************************
  Function Name   : diag_ReportMntn
- Description     : 通过控制通道定时上报可维可测信息
+ Description     : ????????????????????????????????
 *****************************************************************************/
 VOS_VOID diag_ReportMntn(VOS_VOID)
 {
@@ -734,7 +734,7 @@ VOS_VOID diag_ReportMntn(VOS_VOID)
     
     OM_ACPU_DEBUG_INFO *pstdebug;
 
-    /* HIDS未连接 */
+    /* HIDS?????? */
     if(!DIAG_IS_CONN_ON)
     {
         return ;
@@ -799,7 +799,7 @@ VOS_VOID diag_ReportMntn(VOS_VOID)
     (VOS_VOID)BSP_SOCP_GetReadBuff(SOCP_CODER_DST_OM_IND, &stSocpBuff);
     stDiagInfo.pstMntnInfo.ulDstChnSize     = stSocpBuff.u32Size + stSocpBuff.u32RbSize;
 
-    /*申请源buffer*/
+    /*??????buffer*/
     SCM_SPINLOCK_INTLOCK(ulLockLevel);
 
     ulDataLen = ALIGN_DDR_WITH_8BYTE(sizeof(stDiagInfo));
@@ -822,7 +822,7 @@ VOS_VOID diag_ReportMntn(VOS_VOID)
 
     SCM_SPINUNLOCK_INTUNLOCK(ulLockLevel);
 
-    /* 启动定时器上报可维可测信息给工具定位丢包问题 */
+    /* ???????????????????????????????????????????? */
     ulRet = VOS_StartRelTimer(&g_DebugTimer, DIAG_AGENT_PID, DIAG_DEBUG_TIMER_LEN, DIAG_DEBUG_TIMER_NAME, \
                             DIAG_DEBUG_TIMER_PARA, VOS_RELTIMER_NOLOOP, VOS_TIMER_NO_PRECISION);
     if(ulRet != ERR_MSP_SUCCESS)
@@ -837,7 +837,7 @@ DIAG_DEBUG_LOST_STRU g_stLostInfo = {};
 
 /*****************************************************************************
  Function Name   : diag_ReportLost
- Description     : 通过控制通道上报丢包信息
+ Description     : ????????????????????????
 *****************************************************************************/
 VOS_VOID diag_ReportLost(DIAG_LOST_ID_ENUM enLostId)
 {
@@ -856,13 +856,13 @@ VOS_VOID diag_ReportLost(DIAG_LOST_ID_ENUM enLostId)
 
     ulRet = NV_Read(en_NV_Item_Om_Port_Type, &stPortCfg, sizeof(OM_CHANNLE_PORT_CFG_STRU));
 
-    /* 如果是连接HIDP则最短间隔1分钟 */
+    /* ??????????HIDP??????????1???? */
     if((VOS_OK == ulRet) && (CPM_OM_PORT_TYPE_VCOM == stPortCfg.enPortNum))
     {
         ulInterval = DIAG_DEBUG_LOST_MINUTE;
     }
 
-    /* HIDS未连接 */
+    /* HIDS?????? */
     if(!DIAG_IS_CONN_ON)
     {
         return ;
@@ -871,7 +871,7 @@ VOS_VOID diag_ReportLost(DIAG_LOST_ID_ENUM enLostId)
     g_stLostInfo.pstLostInfo.ulLostTotalNum++;
     g_stLostInfo.pstLostInfo.aulCurFailNum[enLostId]++;
 
-    /* 两条消息之间的间隔不小于5s */
+    /* ????????????????????????5s */
     ulCurSlice = mdrv_timer_get_normal_timestamp();
     if((ulCurSlice - ulLastSlice) < ulInterval)
     {
@@ -911,7 +911,7 @@ VOS_VOID diag_ReportLost(DIAG_LOST_ID_ENUM enLostId)
     g_stLostInfo.pstLostInfo.ulDstChnSize     = stSocpBuff.u32Size + stSocpBuff.u32RbSize;
     
 
-    /*申请源buffer*/
+    /*??????buffer*/
     SCM_SPINLOCK_INTLOCK(ulLockLevel);
 
     ulDataLen = ALIGN_DDR_WITH_8BYTE(sizeof(g_stLostInfo));
@@ -944,7 +944,7 @@ VOS_VOID diag_ReportLost(DIAG_LOST_ID_ENUM enLostId)
 
 
 
-/* EVENT上报调测接口 */
+/* EVENT???????????? */
 VOS_VOID DIAG_DebugEventReport(VOS_UINT32 ulpid)
 {
     DIAG_EVENT_IND_STRU stEvent = {0};
@@ -960,7 +960,7 @@ VOS_VOID DIAG_DebugEventReport(VOS_UINT32 ulpid)
 }
 
 
-/* 层间消息上报调测接口 */
+/* ???????????????????? */
 VOS_VOID DIAG_DebugLayerReport(VOS_UINT32 ulsndpid, VOS_UINT32 ulrcvpid, VOS_UINT32 ulMsg)
 {
     DIAG_DATA_MSG_STRU *pDataMsg;
@@ -984,7 +984,7 @@ VOS_VOID DIAG_DebugLayerReport(VOS_UINT32 ulsndpid, VOS_UINT32 ulrcvpid, VOS_UIN
 }
 
 
-/* log上报调测接口 */
+/* log???????????? */
 VOS_VOID DIAG_DebugLogReport(VOS_UINT32 ulpid, VOS_UINT32 level)
 {
     VOS_UINT32 ulMod = DIAG_GEN_LOG_MODULE(1, 2, level);
@@ -992,7 +992,7 @@ VOS_VOID DIAG_DebugLogReport(VOS_UINT32 ulpid, VOS_UINT32 level)
 }
 
 
-/* 透传上报调测接口 */
+/* ???????????????? */
 VOS_VOID DIAG_DebugTransReport(VOS_UINT32 ulpid)
 {
     DIAG_TRANS_IND_STRU std;
@@ -1008,7 +1008,7 @@ VOS_VOID DIAG_DebugTransReport(VOS_UINT32 ulpid)
 }
 
 
-/* 层间开关调测接口 */
+/* ???????????????? */
 VOS_VOID DIAG_DebugLayerCfg(VOS_UINT32 ulModuleId, VOS_UINT8 ucFlag)
 {
     VOS_UINT32 ulOffset = 0;

@@ -50,7 +50,7 @@
 #define  AT_IMSA_INTERFACE_H
 
 /*****************************************************************************
-  1 头文件包含
+  1 ??????????
 *****************************************************************************/
 #include "vos.h"
 #include "TafTypeDef.h"
@@ -71,15 +71,15 @@ extern "C" {
 /* equals IMSA_MAX_CALL_NUMBER_LENGTH */
 #define AT_IMSA_CALL_ASCII_NUM_MAX_LENGTH     (40)
 /*****************************************************************************
-  2 枚举定义
+  2 ????????
 *****************************************************************************/
 /*****************************************************************************
-枚举名    : AT_IMSA_MSG_TYPE_ENUM
-结构说明  : AT 和IMSA的之间的消息
+??????    : AT_IMSA_MSG_TYPE_ENUM
+????????  : AT ??IMSA????????????
 
-  1.日    期   : 2013年9月13日
-    作    者   : Y00213812
-    修改内容   : 定义AT和IMSA之间的接口消息
+  1.??    ??   : 2013??9??13??
+    ??    ??   : Y00213812
+    ????????   : ????AT??IMSA??????????????
 *****************************************************************************/
 enum AT_IMSA_MSG_TYPE_ENUM
 {
@@ -136,12 +136,12 @@ typedef  VOS_UINT32  AT_IMSA_MSG_TYPE_ENUM_UINT32;
 
 
 /*****************************************************************************
-枚举名    : AT_IMSA_IMS_REG_STATE_REPORT_ENUM
-结构说明  : IMS注册状态上报控制
+??????    : AT_IMSA_IMS_REG_STATE_REPORT_ENUM
+????????  : IMS????????????????
 
-  1.日    期   : 2013年9月13日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+  1.??    ??   : 2013??9??13??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum AT_IMSA_IMS_REG_STATE_REPORT_ENUM
 {
@@ -154,12 +154,12 @@ enum AT_IMSA_IMS_REG_STATE_REPORT_ENUM
 typedef  VOS_UINT32  AT_IMSA_IMS_REG_STATE_REPORT_ENUM_UINT32;
 
 /*****************************************************************************
-枚举名    : AT_IMSA_CCWAI_MODE_ENUM
-结构说明  : 网络是否支持IMSVOPS
+??????    : AT_IMSA_CCWAI_MODE_ENUM
+????????  : ????????????IMSVOPS
 
-  1.日    期   : 2013年9月13日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+  1.??    ??   : 2013??9??13??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum AT_IMSA_CCWAI_MODE_ENUM
 {
@@ -172,12 +172,12 @@ typedef  VOS_UINT8 AT_IMSA_CCWAI_MODE_ENUM_UINT8;
 
 
 /*****************************************************************************
-枚举名    : AT_IMSA_IMSVOPS_CAPABILITY_ENUM
-结构说明  : 网络是否支持IMSVOPS
+??????    : AT_IMSA_IMSVOPS_CAPABILITY_ENUM
+????????  : ????????????IMSVOPS
 
-  1.日    期   : 2013年9月13日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+  1.??    ??   : 2013??9??13??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum AT_IMSA_IMSVOPS_CAPABILITY_ENUM
 {
@@ -190,12 +190,12 @@ typedef  VOS_UINT32  AT_IMSA_IMSVOPS_CAPABILITY_ENUM_UINT32;
 
 
 /*****************************************************************************
-枚举名    : AT_IMSA_CIREP_REPORT_ENUM
-结构说明  : 是否允许CIREPH和CIREPI主动上报
+??????    : AT_IMSA_CIREP_REPORT_ENUM
+????????  : ????????CIREPH??CIREPI????????
 
-  1.日    期   : 2013年9月13日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+  1.??    ??   : 2013??9??13??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum AT_IMSA_CIREP_REPORT_ENUM
 {
@@ -208,12 +208,12 @@ typedef  VOS_UINT32  AT_IMSA_CIREP_REPORT_ENUM_UINT32;
 
 
 /*****************************************************************************
-枚举名    : AT_IMSA_SRVCC_HANDVOER_ENUM
-结构说明  : SRVCC过程状态
+??????    : AT_IMSA_SRVCC_HANDVOER_ENUM
+????????  : SRVCC????????
 
-  1.日    期   : 2013年9月13日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+  1.??    ??   : 2013??9??13??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum AT_IMSA_SRVCC_HANDVOER_ENUM
 {
@@ -227,11 +227,11 @@ enum AT_IMSA_SRVCC_HANDVOER_ENUM
 typedef  VOS_UINT32  AT_IMSA_SRVCC_HANDVOER_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名    : IMSA_AT_IMS_RAT_TYPE_ENUM
- 枚举说明  : IMS接入类型
- 1.日    期   : 2015年10月07日
-   作    者   : f00179208
-   修改内容   : 创建
+ ??????    : IMSA_AT_IMS_RAT_TYPE_ENUM
+ ????????  : IMS????????
+ 1.??    ??   : 2015??10??07??
+   ??    ??   : f00179208
+   ????????   : ????
 *****************************************************************************/
 enum IMSA_AT_IMS_RAT_TYPE_ENUM
 {
@@ -241,12 +241,12 @@ enum IMSA_AT_IMS_RAT_TYPE_ENUM
 };
 typedef VOS_UINT8 IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8;
 /*****************************************************************************
-枚举名    : AT_IMSA_ROAMING_IMS_SUPPORT_ENUM
-结构说明  : 漫游状态下是否支持IMS服务
+??????    : AT_IMSA_ROAMING_IMS_SUPPORT_ENUM
+????????  : ??????????????????IMS????
 
-  1.日    期   : 2016年1月15日
-    作    者   : w00316404
-    修改内容   : 新增枚举
+  1.??    ??   : 2016??1??15??
+    ??    ??   : w00316404
+    ????????   : ????????
 *****************************************************************************/
 enum AT_IMSA_ROAMING_IMS_SUPPORT_ENUM
 {
@@ -258,11 +258,11 @@ enum AT_IMSA_ROAMING_IMS_SUPPORT_ENUM
 typedef  VOS_UINT32  AT_IMSA_ROAMING_IMS_SUPPORT_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名    : IMSA_AT_IMS_REG_DOMAIN_TYPE_ENUM
- 枚举说明  : IMS注册域类型
- 1.日    期   : 2015年10月07日
-   作    者   : f00179208
-   修改内容   : 创建
+ ??????    : IMSA_AT_IMS_REG_DOMAIN_TYPE_ENUM
+ ????????  : IMS??????????
+ 1.??    ??   : 2015??10??07??
+   ??    ??   : f00179208
+   ????????   : ????
 *****************************************************************************/
 enum IMSA_AT_IMS_REG_DOMAIN_TYPE_ENUM
 {
@@ -275,11 +275,11 @@ typedef VOS_UINT8 IMSA_AT_IMS_REG_DOMAIN_TYPE_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名    : IMSA_AT_IMS_RAT_HO_STATUS_ENUM
- 枚举说明  : IMS注册域切换状态
- 1.日    期   : 2016年04月07日
-   作    者   : f00179208
-   修改内容   : 创建
+ ??????    : IMSA_AT_IMS_RAT_HO_STATUS_ENUM
+ ????????  : IMS??????????????
+ 1.??    ??   : 2016??04??07??
+   ??    ??   : f00179208
+   ????????   : ????
 *****************************************************************************/
 enum IMSA_AT_IMS_RAT_HO_STATUS_ENUM
 {
@@ -291,11 +291,11 @@ enum IMSA_AT_IMS_RAT_HO_STATUS_ENUM
 typedef VOS_UINT8 IMSA_AT_IMS_RAT_HO_STATUS_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : IMSA_AT_IMS_SERVICE_STATUS_ENUM
- 枚举说明  : IMS的服务状态
- 1.日    期   : 2016年04月07日
-   作    者   : f00179208
-   修改内容   : 创建
+ ??????    : IMSA_AT_IMS_SERVICE_STATUS_ENUM
+ ????????  : IMS??????????
+ 1.??    ??   : 2016??04??07??
+   ??    ??   : f00179208
+   ????????   : ????
 *****************************************************************************/
 enum IMSA_AT_IMS_SERVICE_STATUS_ENUM
 {
@@ -307,28 +307,28 @@ enum IMSA_AT_IMS_SERVICE_STATUS_ENUM
 typedef VOS_UINT8 IMSA_AT_IMS_SERVICE_STATUS_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : IMSA_AT_HO_CAUSE_ENUM
- 枚举说明  : IMS的HO状态
- 1.日    期   : 2016年04月07日
-   作    者   :  z00353461
-   修改内容   : 创建
+ ??????    : IMSA_AT_HO_CAUSE_ENUM
+ ????????  : IMS??HO????
+ 1.??    ??   : 2016??04??07??
+   ??    ??   :  z00353461
+   ????????   : ????
 *****************************************************************************/
 
 enum IMSA_AT_HO_CAUSE_ENUM
 {
-    IMSA_AT_HO_CAUSE_SUCCESS                    = 0,       /**< HO命令执行成功 */
-    IMSA_AT_HO_CAUSE_FAIL_PARA_ERR              = 1,       /**< HO命令执行失败，由于参数错误 */
-    IMSA_AT_HO_CAUSE_FAIL_CN_REJ                = 2,       /**< HO命令执行失败，由于被网侧拒绝 */
-    IMSA_AT_HO_CAUSE_FAIL_TIMER_EXP             = 3,       /**< HO命令执行失败，由于定时器超时 */
-    IMSA_AT_HO_CAUSE_FAIL_CONN_RELEASING        = 4,       /**< HO命令执行失败，由于正在释放连接 */
-    IMSA_AT_HO_CAUSE_FAIL_PDP_ACTIVATE_LIMIT    = 5,       /**< HO命令执行失败，由于激活的承载数限制 */
-    IMSA_AT_HO_CAUSE_FAIL_SAME_APN_OPERATING    = 6,       /**< HO命令执行失败，由于APS正在执行操作 */
-    IMSA_AT_HO_CAUSE_FAIL_TEMP_FORBIDDEN        = 7,       /**< HO命令执行失败，收到临时被拒原因值或者网侧不响应 */
-    IMSA_AT_HO_CAUSE_FAIL_PERM_FORBIDDEN        = 8,       /**< HO命令执行失败，收到永久被拒原因值 */
-    IMSA_AT_HO_CAUSE_FAIL_WIFI_READY_IND_TIMEOUT    = 9,   /**< HO命令执行失败，由于WIFI下发送READY IND超时 */
+    IMSA_AT_HO_CAUSE_SUCCESS                    = 0,       /**< HO???????????? */
+    IMSA_AT_HO_CAUSE_FAIL_PARA_ERR              = 1,       /**< HO?????????????????????????? */
+    IMSA_AT_HO_CAUSE_FAIL_CN_REJ                = 2,       /**< HO???????????????????????????? */
+    IMSA_AT_HO_CAUSE_FAIL_TIMER_EXP             = 3,       /**< HO???????????????????????????? */
+    IMSA_AT_HO_CAUSE_FAIL_CONN_RELEASING        = 4,       /**< HO?????????????????????????????? */
+    IMSA_AT_HO_CAUSE_FAIL_PDP_ACTIVATE_LIMIT    = 5,       /**< HO?????????????????????????????????? */
+    IMSA_AT_HO_CAUSE_FAIL_SAME_APN_OPERATING    = 6,       /**< HO??????????????????APS???????????? */
+    IMSA_AT_HO_CAUSE_FAIL_TEMP_FORBIDDEN        = 7,       /**< HO?????????????????????????????????????????????? */
+    IMSA_AT_HO_CAUSE_FAIL_PERM_FORBIDDEN        = 8,       /**< HO???????????????????????????????? */
+    IMSA_AT_HO_CAUSE_FAIL_WIFI_READY_IND_TIMEOUT    = 9,   /**< HO??????????????????WIFI??????READY IND???? */
 
-    IMSA_AT_HO_CAUSE_FAIL_OHTERS                    = 11,    /**< HO命令执行失败，由于其他原因 */
-	IMSA_AT_HO_CAUSE_FAIL_NO_DSDS_RESOURCE			= 12,    /**< HO命令执行失败，由于DSDS下申请无线资源失败 */
+    IMSA_AT_HO_CAUSE_FAIL_OHTERS                    = 11,    /**< HO?????????????????????????? */
+	IMSA_AT_HO_CAUSE_FAIL_NO_DSDS_RESOURCE			= 12,    /**< HO??????????????????DSDS?????????????????? */
 
     IMSA_AT_HO_CAUSE_BUTT
 };
@@ -339,15 +339,15 @@ typedef VOS_UINT32 IMSA_AT_HO_CAUSE_ENUM_UINT32;
 
 
 /*****************************************************************************
-  3 类型定义
+  3 ????????
 *****************************************************************************/
 /*****************************************************************************
-结构名    : AT_IMSA_MSG_STRU
-结构说明  : AT模块与IMSA模块间的消息结构
+??????    : AT_IMSA_MSG_STRU
+????????  : AT??????IMSA????????????????
 
-1.日    期  : 2013年09月12日
-  作    者  : Y00213812
-  修改内容  : 新增结构
+1.??    ??  : 2013??09??12??
+  ??    ??  : Y00213812
+  ????????  : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -360,44 +360,44 @@ typedef struct
 } AT_IMSA_MSG_STRU;
 
 /*****************************************************************************
-结构名    : AT_IMSA_CIREG_QRY_REQ_STRU
-结构说明  : ID_AT_IMSA_CIREG_QRY_REQ的消息结构
+??????    : AT_IMSA_CIREG_QRY_REQ_STRU
+????????  : ID_AT_IMSA_CIREG_QRY_REQ??????????
 
-1.日    期  : 2013年09月12日
-  作    者  : Y00213812
-  修改内容  : 新增结构
+1.??    ??  : 2013??09??12??
+  ??    ??  : Y00213812
+  ????????  : ????????
 *****************************************************************************/
 typedef AT_IMSA_MSG_STRU AT_IMSA_CIREG_QRY_REQ_STRU;
 
 
 /*****************************************************************************
-结构名    : AT_IMSA_CIREP_QRY_REQ_STRU
-结构说明  : ID_AT_IMSA_CIREP_QRY_REQ的消息结构
+??????    : AT_IMSA_CIREP_QRY_REQ_STRU
+????????  : ID_AT_IMSA_CIREP_QRY_REQ??????????
 
-1.日    期  : 2013年09月12日
-  作    者  : Y00213812
-  修改内容  : 新增结构
+1.??    ??  : 2013??09??12??
+  ??    ??  : Y00213812
+  ????????  : ????????
 *****************************************************************************/
 typedef AT_IMSA_MSG_STRU AT_IMSA_CIREP_QRY_REQ_STRU;
 
 /*****************************************************************************
-结构名    : AT_IMSA_VOLTEIMPU_QRY_REQ_STRU
-结构说明  : ID_AT_IMSA_VOLTEIMPU_QRY_REQ的消息结构
+??????    : AT_IMSA_VOLTEIMPU_QRY_REQ_STRU
+????????  : ID_AT_IMSA_VOLTEIMPU_QRY_REQ??????????
 
-1.日    期  : 2013年12月05日
-  作    者  : Y00213812
-  修改内容  : 新增结构
+1.??    ??  : 2013??12??05??
+  ??    ??  : Y00213812
+  ????????  : ????????
 *****************************************************************************/
 typedef AT_IMSA_MSG_STRU AT_IMSA_VOLTEIMPU_QRY_REQ_STRU;
 
 
 /*****************************************************************************
- 结构名  : AT_IMSA_CCWAI_SET_REQ_STRU
- 结构说明: ^CCWAI IMS  呼叫等待
- 修改历史      :
-  1.日    期   : 2014年3月11日
-    作    者   : w00209181
-    修改内容   : 新增结构
+ ??????  : AT_IMSA_CCWAI_SET_REQ_STRU
+ ????????: ^CCWAI IMS  ????????
+ ????????      :
+  1.??    ??   : 2014??3??11??
+    ??    ??   : w00209181
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -410,12 +410,12 @@ typedef struct
 } AT_IMSA_CCWAI_SET_REQ_STRU;
 
 /*****************************************************************************
- 结构名  : IMSA_AT_CCWAI_SET_CNF_STRU
- 结构说明: ^CCWAI IMS  呼叫等待
- 修改历史      :
-  1.日    期   : 2014年3月11日
-    作    者   : w00209181
-    修改内容   : 新增结构
+ ??????  : IMSA_AT_CCWAI_SET_CNF_STRU
+ ????????: ^CCWAI IMS  ????????
+ ????????      :
+  1.??    ??   : 2014??3??11??
+    ??    ??   : w00209181
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -429,12 +429,12 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名  : AT_IMSA_CALL_ENCRYPT_SET_REQ_STRU
- 结构说明: ^CALLENCRYPT: 设置语音加密请求
- 修改历史      :
-  1.日    期   : 2015年10月14日
-    作    者   : f00179208
-    修改内容   : 新增结构
+ ??????  : AT_IMSA_CALL_ENCRYPT_SET_REQ_STRU
+ ????????: ^CALLENCRYPT: ????????????????
+ ????????      :
+  1.??    ??   : 2015??10??14??
+    ??    ??   : f00179208
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -443,17 +443,17 @@ typedef struct
     VOS_UINT16                          usClientId;
     VOS_UINT8                           ucOpId;
     VOS_UINT8                           aucReserved1[1];
-    VOS_UINT8                           ucEncrypt;                              /* 0:不加密，1:加密 */
+    VOS_UINT8                           ucEncrypt;                              /* 0:????????1:???? */
     VOS_UINT8                           aucReserved2[3];
 } AT_IMSA_CALL_ENCRYPT_SET_REQ_STRU;
 
 /*****************************************************************************
- 结构名  : AT_IMSA_CALL_ENCRYPT_SET_CNF_STRU
- 结构说明: ^CALLENCRYPT: 设置语音加密回复
- 修改历史      :
-  1.日    期   : 2015年10月14日
-    作    者   : f00179208
-    修改内容   : 新增结构
+ ??????  : AT_IMSA_CALL_ENCRYPT_SET_CNF_STRU
+ ????????: ^CALLENCRYPT: ????????????????
+ ????????      :
+  1.??    ??   : 2015??10??14??
+    ??    ??   : f00179208
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -462,17 +462,17 @@ typedef struct
     VOS_UINT16                          usClientId;
     VOS_UINT8                           ucOpId;
     VOS_UINT8                           ucReserved;
-    VOS_UINT32                          ulResult;                               /* 成功返回VOS_OK，失败返回VOS_ERR */
+    VOS_UINT32                          ulResult;                               /* ????????VOS_OK??????????VOS_ERR */
 } IMSA_AT_CALL_ENCRYPT_SET_CNF_STRU;
 
 /*****************************************************************************
- 结构名  : AT_IMSA_CIREG_SET_REQ_STRU
- 结构说明: +CIREG IMS注册状态主动上报控制设置
+ ??????  : AT_IMSA_CIREG_SET_REQ_STRU
+ ????????: +CIREG IMS????????????????????????
 
- 修改历史      :
-  1.日    期   : 2013年9月13日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??9??13??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -486,13 +486,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名  : IMSA_AT_CIREG_SET_CNF_STRU
- 结构说明: +CIREG IMS注册状态主动上报控制
+ ??????  : IMSA_AT_CIREG_SET_CNF_STRU
+ ????????: +CIREG IMS????????????????????
 
- 修改历史      :
-  1.日    期   : 2013年9月13日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??9??13??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -501,18 +501,18 @@ typedef struct
     VOS_UINT16                          usClientId;
     VOS_UINT8                           ucOpId;
     VOS_UINT8                           aucReserved[1];
-    VOS_UINT32                          ulResult;                               /* 成功返回VOS_OK，失败返回VOS_ERR */
+    VOS_UINT32                          ulResult;                               /* ????????VOS_OK??????????VOS_ERR */
 } IMSA_AT_CIREG_SET_CNF_STRU;
 
 
 /*****************************************************************************
- 结构名  : IMSA_AT_CIREG_QRY_CNF_STRU
- 结构说明: +CIREG IMS注册状态查询结果
+ ??????  : IMSA_AT_CIREG_QRY_CNF_STRU
+ ????????: +CIREG IMS????????????????
 
- 修改历史      :
-  1.日    期   : 2013年9月13日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??9??13??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -522,30 +522,30 @@ typedef struct
     VOS_UINT8                           ucOpId;
     VOS_UINT8                           aucReserved[1];
 
-    VOS_UINT32                          bitOpExtInfo    : 1 ;                   /* +CIREG=2时,标志位置1 */
+    VOS_UINT32                          bitOpExtInfo    : 1 ;                   /* +CIREG=2??,????????1 */
     VOS_UINT32                          bitOpSpare      : 31;
 
     AT_IMSA_IMS_REG_STATE_REPORT_ENUM_UINT32    enCireg;
     VOS_UINT32                          ulRegInfo;
-    VOS_UINT32                          ulExtInfo;                              /* +CIREG=2时 ，扩展信息暂时回复0 */
-    VOS_UINT32                          ulResult;                               /* 成功返回VOS_OK，失败返回VOS_ERR */
+    VOS_UINT32                          ulExtInfo;                              /* +CIREG=2?? ??????????????????0 */
+    VOS_UINT32                          ulResult;                               /* ????????VOS_OK??????????VOS_ERR */
 } IMSA_AT_CIREG_QRY_CNF_STRU;
 
 /*****************************************************************************
- 结构名  : IMSA_AT_CIREGU_IND_STRU
- 结构说明: ID_IMSA_AT_CIREGU_IND IMS注册状态主动上报
+ ??????  : IMSA_AT_CIREGU_IND_STRU
+ ????????: ID_IMSA_AT_CIREGU_IND IMS????????????????
 
- 修改历史      :
-  1.日    期   : 2013年9月13日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??9??13??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
     VOS_UINT32                          ulMsgId;                                /* _H2ASN_Skip */
-    VOS_UINT16                          usClientId;                             /* 主动上报时填0X3FFF */
-    VOS_UINT8                           ucOpId;                                 /* 填0 */
+    VOS_UINT16                          usClientId;                             /* ????????????0X3FFF */
+    VOS_UINT8                           ucOpId;                                 /* ??0 */
     VOS_UINT8                           aucReserved[1];
 
     VOS_UINT32                          bitOpExtInfo    : 1 ;
@@ -557,13 +557,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名  : AT_IMSA_CIREP_SET_REQ_STRU
- 结构说明: +CIREP SRVCC切换状态主动上报控制
+ ??????  : AT_IMSA_CIREP_SET_REQ_STRU
+ ????????: +CIREP SRVCC????????????????????
 
- 修改历史      :
-  1.日    期   : 2013年9月13日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??9??13??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -577,13 +577,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名  : IMSA_AT_CIREP_SET_CNF_STRU
- 结构说明: +CIREP SRVCC切换状态主动上报控制
+ ??????  : IMSA_AT_CIREP_SET_CNF_STRU
+ ????????: +CIREP SRVCC????????????????????
 
- 修改历史      :
-  1.日    期   : 2013年9月13日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??9??13??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -592,18 +592,18 @@ typedef struct
     VOS_UINT16                          usClientId;
     VOS_UINT8                           ucOpId;
     VOS_UINT8                           aucReserved[1];
-    VOS_UINT32                          ulResult;                               /* 成功返回VOS_OK，失败返回VOS_ERR */
+    VOS_UINT32                          ulResult;                               /* ????????VOS_OK??????????VOS_ERR */
 } IMSA_AT_CIREP_SET_CNF_STRU;
 
 
 /*****************************************************************************
- 结构名  : IMSA_AT_CIREP_QRY_CNF_STRU
- 结构说明: +CIREP IMSVOPS能力查询
+ ??????  : IMSA_AT_CIREP_QRY_CNF_STRU
+ ????????: +CIREP IMSVOPS????????
 
- 修改历史      :
-  1.日    期   : 2013年9月13日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??9??13??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -614,17 +614,17 @@ typedef struct
     VOS_UINT8                           aucReserved[1];
     AT_IMSA_CIREP_REPORT_ENUM_UINT32            enReport;
     AT_IMSA_IMSVOPS_CAPABILITY_ENUM_UINT32      enImsvops;
-    VOS_UINT32                          ulResult;                               /* 成功返回VOS_OK，失败返回VOS_ERR */
+    VOS_UINT32                          ulResult;                               /* ????????VOS_OK??????????VOS_ERR */
 } IMSA_AT_CIREP_QRY_CNF_STRU;
 
 /*****************************************************************************
- 结构名  : IMSA_AT_VOLTEIMPU_QRY_CNF_STRU
- 结构说明: ^VOLTEIMPU IMPU信息查询结果
+ ??????  : IMSA_AT_VOLTEIMPU_QRY_CNF_STRU
+ ????????: ^VOLTEIMPU IMPU????????????
 
- 修改历史      :
-  1.日    期   : 2013年12月05日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??12??05??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -633,31 +633,31 @@ typedef struct
     VOS_UINT16                          usClientId;
     VOS_UINT8                           ucOpId;
     VOS_UINT8                           aucReserved[1];
-    VOS_UINT32                          ulResult;              /* 成功返回VOS_OK，失败返回VOS_ERR */
+    VOS_UINT32                          ulResult;              /* ????????VOS_OK??????????VOS_ERR */
     VOS_UINT32                          ulImpuLen;
     VOS_CHAR                            aucImpu[AT_IMSA_IMPU_MAX_LENGTH];
 } IMSA_AT_VOLTEIMPU_QRY_CNF_STRU;
 
 
 /*****************************************************************************
- 结构名  : AT_IMSA_ROAMING_IMS_QRY_REQ_STRU
- 结构说明: AT通知IMSA查询漫游是否支持的结构
+ ??????  : AT_IMSA_ROAMING_IMS_QRY_REQ_STRU
+ ????????: AT????IMSA??????????????????????
 
- 修改历史      :
-  1.日    期   : 2016年1月15日
-    作    者   : w00316404
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2016??1??15??
+    ??    ??   : w00316404
+    ????????   : ????????
 *****************************************************************************/
 typedef AT_IMSA_MSG_STRU AT_IMSA_ROAMING_IMS_QRY_REQ_STRU;
 
 /*****************************************************************************
- 结构名  : IMSA_AT_ROAMING_IMS_QRY_CNF_STRU
- 结构说明: ^ROAMIMSSERVICE 漫游状态下IMS服务是否支持查询命令CNF消息
+ ??????  : IMSA_AT_ROAMING_IMS_QRY_CNF_STRU
+ ????????: ^ROAMIMSSERVICE ??????????IMS????????????????????CNF????
 
- 修改历史      :
-  1.日    期   : 2016年1月15日
-    作    者   : w00316404
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2016??1??15??
+    ??    ??   : w00316404
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -672,52 +672,52 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名  : IMSA_AT_CIREPH_IND_STRU
- 结构说明: +CIREPH SRVCC切换状态主动上报
+ ??????  : IMSA_AT_CIREPH_IND_STRU
+ ????????: +CIREPH SRVCC????????????????
 
- 修改历史      :
-  1.日    期   : 2013年9月13日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??9??13??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
     VOS_UINT32                          ulMsgId;                                /* _H2ASN_Skip */
-    VOS_UINT16                          usClientId;                             /* 主动上报时填0X3FFF */
-    VOS_UINT8                           ucOpId;                                 /* 填0 */
+    VOS_UINT16                          usClientId;                             /* ????????????0X3FFF */
+    VOS_UINT8                           ucOpId;                                 /* ??0 */
     VOS_UINT8                           aucReserved[1];
     AT_IMSA_SRVCC_HANDVOER_ENUM_UINT32  enHandover;
 } IMSA_AT_CIREPH_IND_STRU;
 
 /*****************************************************************************
- 结构名  : IMSA_AT_CIREPI_IND_STRU
- 结构说明: +CIREPI IMSVOPS主动上报
+ ??????  : IMSA_AT_CIREPI_IND_STRU
+ ????????: +CIREPI IMSVOPS????????
 
- 修改历史      :
-  1.日    期   : 2013年9月23日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??9??23??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
     VOS_UINT32                          ulMsgId;                                /* _H2ASN_Skip */
-    VOS_UINT16                          usClientId;                             /* 主动上报时填0X3FFF */
-    VOS_UINT8                           ucOpId;                                 /* 填0 */
+    VOS_UINT16                          usClientId;                             /* ????????????0X3FFF */
+    VOS_UINT8                           ucOpId;                                 /* ??0 */
     VOS_UINT8                           aucReserved[1];
     AT_IMSA_IMSVOPS_CAPABILITY_ENUM_UINT32      enImsvops;
 } IMSA_AT_CIREPI_IND_STRU;
 
 
 /*****************************************************************************
- 结构名称: IMSA_AT_VT_PDP_ACTIVATE_IND_STRU
- 结构说明: IMSA上报VT承载激活成功结果的结构
+ ????????: IMSA_AT_VT_PDP_ACTIVATE_IND_STRU
+ ????????: IMSA????VT??????????????????????
 
- 修改历史      :
-  1.日    期   : 2014年07月31日
-    作    者   : f00179208
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2014??07??31??
+    ??    ??   : f00179208
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -725,7 +725,7 @@ typedef struct
     VOS_UINT32                          ulMsgId;               /* _H2ASN_Skip */
     VOS_UINT16                          usClientId;
     VOS_UINT8                           ucOpId;
-    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8     enRatType;                  /* 注册域 */
+    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8     enRatType;                  /* ?????? */
     TAF_PDP_ADDR_STRU                   stPdpAddr;
     TAF_PDP_DNS_STRU                    stIpv4Dns;
     TAF_PDP_IPV6_DNS_STRU               stIpv6Dns;
@@ -733,13 +733,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: IMSA_AT_VT_PDP_DEACTIVATE_IND_STRU
- 结构说明: IMSA上报VT承载去激活成功结果的结构
+ ????????: IMSA_AT_VT_PDP_DEACTIVATE_IND_STRU
+ ????????: IMSA????VT????????????????????????
 
- 修改历史      :
-  1.日    期   : 2014年07月31日
-    作    者   : f00179208
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2014??07??31??
+    ??    ??   : f00179208
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -748,18 +748,18 @@ typedef struct
     VOS_UINT16                          usClientId;
     VOS_UINT8                           ucOpId;
     TAF_PDP_TYPE_ENUM_UINT8             enPdpType;
-    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8     enRatType;             /* 注册域 */
+    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8     enRatType;             /* ?????? */
     VOS_UINT8                           aucReserved[3];
 } IMSA_AT_VT_PDP_DEACTIVATE_IND_STRU;
 
 /*****************************************************************************
- 结构名称： IMSA_AT_MT_STATES_IND_STRU
- 结构说明:  IMSA上报AT收到被叫事件的结构
+ ?????????? IMSA_AT_MT_STATES_IND_STRU
+ ????????:  IMSA????AT??????????????????
 
- 修改历史:
- 1.日期: 2015年03月18日
-   作者: m00277840
-   修改内容:新增结构
+ ????????:
+ 1.????: 2015??03??18??
+   ????: m00277840
+   ????????:????????
 *****************************************************************************/
 typedef struct
 {
@@ -775,22 +775,22 @@ typedef struct
 } IMSA_AT_MT_STATES_IND_STRU;
 
 /*****************************************************************************
- 结构名  : AT_IMSA_IMS_REG_DOMAIN_QRY_REQ_STRU
- 结构说明: 查询IMS注册域请求
- 修改历史      :
-  1.日    期   : 2015年10月07日
-    作    者   : f00179208
-    修改内容   : 新增结构
+ ??????  : AT_IMSA_IMS_REG_DOMAIN_QRY_REQ_STRU
+ ????????: ????IMS??????????
+ ????????      :
+  1.??    ??   : 2015??10??07??
+    ??    ??   : f00179208
+    ????????   : ????????
 *****************************************************************************/
 typedef AT_IMSA_MSG_STRU AT_IMSA_IMS_REG_DOMAIN_QRY_REQ_STRU;
 
 /*****************************************************************************
- 结构名  : IMSA_AT_IMS_REG_DOMAIN_QRY_CNF_STRU
- 结构说明: 查询IMS注册域回复
- 修改历史      :
-  1.日    期   : 2015年10月07日
-    作    者   : f00179208
-    修改内容   : 新增结构
+ ??????  : IMSA_AT_IMS_REG_DOMAIN_QRY_CNF_STRU
+ ????????: ????IMS??????????
+ ????????      :
+  1.??    ??   : 2015??10??07??
+    ??    ??   : f00179208
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -802,12 +802,12 @@ typedef struct
 } IMSA_AT_IMS_REG_DOMAIN_QRY_CNF_STRU;
 
 /*****************************************************************************
- 结构名  : AT_IMSA_IMS_CTRL_MSG_STRU
- 结构说明: AT转发MAPCON->IMSA的内部消息
- 修改历史      :
-  1.日    期   : 2015年10月07日
-    作    者   : f00179208
-    修改内容   : 新增结构
+ ??????  : AT_IMSA_IMS_CTRL_MSG_STRU
+ ????????: AT????MAPCON->IMSA??????????
+ ????????      :
+  1.??    ??   : 2015??10??07??
+    ??    ??   : f00179208
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -821,12 +821,12 @@ typedef struct
 } AT_IMSA_IMS_CTRL_MSG_STRU;
 
 /*****************************************************************************
- 结构名  : IMSA_AT_IMS_CTRL_MSG_STRU
- 结构说明: AT转发IMSA->MAPCON的内部消息
- 修改历史      :
-  1.日    期   : 2015年10月07日
-    作    者   : f00179208
-    修改内容   : 新增结构
+ ??????  : IMSA_AT_IMS_CTRL_MSG_STRU
+ ????????: AT????IMSA->MAPCON??????????
+ ????????      :
+  1.??    ??   : 2015??10??07??
+    ??    ??   : f00179208
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -841,72 +841,72 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名  : IMSA_AT_IMS_RAT_HANDOVER_IND_STRU
- 结构说明: IMS注册域切换指示
+ ??????  : IMSA_AT_IMS_RAT_HANDOVER_IND_STRU
+ ????????: IMS??????????????
 
- 修改历史      :
-  1.日    期   : 2016年04月07日
-    作    者   : f00179208
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2016??04??07??
+    ??    ??   : f00179208
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
     VOS_UINT32                              ulMsgId;                            /* _H2ASN_Skip */
-    VOS_UINT16                              usClientId;                         /* 主动上报时填0X3FFF */
-    VOS_UINT8                               ucOpId;                             /* 填0 */
-    IMSA_AT_IMS_RAT_HO_STATUS_ENUM_UINT8    enHoStatus;                         /* 切换状态 */
-    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8         enSrcRat;                           /* 原有IMS注册域 */
-    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8         enDstRat;                           /* 目标IMS注册域 */
+    VOS_UINT16                              usClientId;                         /* ????????????0X3FFF */
+    VOS_UINT8                               ucOpId;                             /* ??0 */
+    IMSA_AT_IMS_RAT_HO_STATUS_ENUM_UINT8    enHoStatus;                         /* ???????? */
+    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8         enSrcRat;                           /* ????IMS?????? */
+    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8         enDstRat;                           /* ????IMS?????? */
     VOS_UINT8                               aucReserved[2];
-    IMSA_AT_HO_CAUSE_ENUM_UINT32            enCause;                            /* 切换失败原因值 */
+    IMSA_AT_HO_CAUSE_ENUM_UINT32            enCause;                            /* ?????????????? */
 } IMSA_AT_IMS_RAT_HANDOVER_IND_STRU;
 
 /*****************************************************************************
- 结构名  : IMSA_AT_IMS_SRV_STATUS_UPDATE_IND_STRU
- 结构说明: IMS服务状态变化指示
+ ??????  : IMSA_AT_IMS_SRV_STATUS_UPDATE_IND_STRU
+ ????????: IMS????????????????
 
- 修改历史      :
-  1.日    期   : 2016年04月07日
-    作    者   : f00179208
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2016??04??07??
+    ??    ??   : f00179208
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
     VOS_UINT32                              ulMsgId;                            /* _H2ASN_Skip */
-    VOS_UINT16                              usClientId;                         /* 主动上报时填0X3FFF */
-    VOS_UINT8                               ucOpId;                             /* 填0 */
+    VOS_UINT16                              usClientId;                         /* ????????????0X3FFF */
+    VOS_UINT8                               ucOpId;                             /* ??0 */
     VOS_UINT8                               aucReserved[1];
-    IMSA_AT_IMS_SERVICE_STATUS_ENUM_UINT8   enSmsSrvStatus;                     /* 短信的IMS服务状态 */
-    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8         enSmsSrvRat;                        /* 短信的IMS服务域 */
-    IMSA_AT_IMS_SERVICE_STATUS_ENUM_UINT8   enVoIpSrvStatus;                    /* VoIP的IMS服务状态 */
-    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8         enVoIpSrvRat;                       /* VoIP的IMS服务域 */
-    IMSA_AT_IMS_SERVICE_STATUS_ENUM_UINT8   enVtSrvStatus;                      /* VT的IMS服务状态 */
-    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8         enVtSrvRat;                         /* VT的IMS服务域 */
-    IMSA_AT_IMS_SERVICE_STATUS_ENUM_UINT8   enVsSrvStatus;                      /* VS的IMS服务状态 */
-    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8         enVsSrvRat;                         /* VS的IMS服务域 */
+    IMSA_AT_IMS_SERVICE_STATUS_ENUM_UINT8   enSmsSrvStatus;                     /* ??????IMS???????? */
+    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8         enSmsSrvRat;                        /* ??????IMS?????? */
+    IMSA_AT_IMS_SERVICE_STATUS_ENUM_UINT8   enVoIpSrvStatus;                    /* VoIP??IMS???????? */
+    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8         enVoIpSrvRat;                       /* VoIP??IMS?????? */
+    IMSA_AT_IMS_SERVICE_STATUS_ENUM_UINT8   enVtSrvStatus;                      /* VT??IMS???????? */
+    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8         enVtSrvRat;                         /* VT??IMS?????? */
+    IMSA_AT_IMS_SERVICE_STATUS_ENUM_UINT8   enVsSrvStatus;                      /* VS??IMS???????? */
+    IMSA_AT_IMS_RAT_TYPE_ENUM_UINT8         enVsSrvRat;                         /* VS??IMS?????? */
 } IMSA_AT_IMS_SRV_STATUS_UPDATE_IND_STRU;
 
 /*****************************************************************************
-  4 宏定义
+  4 ??????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  5 全局变量声明
+  5 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 接口函数声明
+  6 ????????????
 *****************************************************************************/
 
 /*****************************************************************************
-  7 OTHERS定义
+  7 OTHERS????
 *****************************************************************************/
 
-/* ASN解析结构 */
+/* ASN???????? */
 typedef struct
 {
     VOS_UINT32                          ulMsgId;                                /*_H2ASN_MsgChoice_Export AT_IMSA_MSG_TYPE_ENUM_UINT32 */

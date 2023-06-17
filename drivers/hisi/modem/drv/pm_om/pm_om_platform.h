@@ -68,8 +68,8 @@ extern "C"
 #define PM_OM_ICC_ACORE_CHN_ID  (ICC_CHANNEL_ID_MAKEUP(ICC_CHN_IFC, IFC_RECV_FUNC_PM_OM))
 #define PM_OM_CPUID             (IPC_CORE_ACORE)
 #define PM_OM_WAKEUP_INTERVAL   (3000)
-#define PM_OM_LOG_THRE_CORE_NUM (4)   /* 有几个核需要配置水线 */
-#define PM_OM_LOG_THRE_BUF_SIZE (200) /* 从文件节点读取水线的buffer大小 */
+#define PM_OM_LOG_THRE_CORE_NUM (4)   /* ???????????????????? */
+#define PM_OM_LOG_THRE_BUF_SIZE (200) /* ????????????????????buffer???? */
 
 #define memset_s(dest, destMax, val, count) memset(dest, val, count)
 #define memcpy_s(dest, destMax, src, count) memcpy(dest, src, count)

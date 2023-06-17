@@ -54,7 +54,7 @@ static const VOS_CHAR * const papcodes[] = {
 
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
 #define    THIS_FILE_ID        PS_FILE_ID_PAP_C
 
@@ -80,10 +80,10 @@ SendPapCode(struct link *l, VOS_CHAR code, VOS_CHAR *message)
         PPP_MNTN_LOG(PS_PID_APP_PPP, DIAG_MODE_COMM, PS_PRINT_WARNING, "no mbuf");
     return;
   }
-    /*预留头部*/
+    /*????????*/
     bp->m_offset = PPP_RECIEVE_RESERVE_FOR_HEAD;
 
-    /*头部与尾部都留出来了*/
+    /*????????????????????*/
     bp->m_len = plen + sizeof(struct fsmheader);
 
   PS_MEM_CPY(PPP_MBUF_CTOP(bp), &lh, sizeof(struct fsmheader));
@@ -196,7 +196,7 @@ pap_Input(/*struct bundle *bundle,*/ struct link *l, PPP_ZC_STRU *pstMem)
   /*fanzhibin f49086 add it begin*/
   if (authp->in.hdr.code == PAP_REQUEST)
   {
-    /*将config req报文头部拷贝到缓存中*/
+    /*??config req????????????????????*/
     PS_MEM_CPY(l->pap.RecordData.BufRequest,&(authp->in.hdr),sizeof(authp->in.hdr));
 
     ppp_mbuf_View(bp,(l->pap.RecordData.BufRequest + sizeof(authp->in.hdr)),

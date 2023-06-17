@@ -39,9 +39,6 @@ extern "C" {
 #endif
 #endif
 
-/*****************************************************************************
-  1 其他头文件包含
-*****************************************************************************/
 #include "vos.h"
 #include "AtPppInterface.h"
 #include "PsCommonDef.h"
@@ -55,10 +52,6 @@ extern "C" {
 #include "ImmInterface.h"
 
 #pragma pack(4)
-
-/*****************************************************************************
-  2 宏定义
-*****************************************************************************/
 
 #if (VOS_OS_VER == VOS_WIN32)
 #define   PS_PID_APP_PPP        WUEPS_PID_PPP
@@ -145,22 +138,18 @@ extern "C" {
         *(((VOS_CHAR*)tgt)+1) = *((VOS_CHAR*)src);
 
 #endif
-/*系统最多需要的PPP ID的数目，实际需要的空间是
-该值加一，因为头是不被分配的*/
-/*#define PPP_MAX_ID_NUM 1*/
+
 #define PPP_MAX_ID_NUM_ALLOC (PPP_MAX_ID_NUM+1)
 
-/*接收到的报文向系统申请空间，需要预留的添加头部的*/
 #define PPP_RECIEVE_RESERVE_FOR_HEAD 4
 
-/*接收到的报文向系统申请空间，需要预留的添加尾部的*/
 #define PPP_RECIEVE_RESERVE_FOR_TAIL 2
 
-#define PPPoE_RESERVE_HEADER_LEN    20     /*预留的字节数，供PPPoE填写以太帧头部和PPPoE头部*/
+#define PPPoE_RESERVE_HEADER_LEN    20
 
-#define PPP_FEATURE_PPP         0          /*使用PPP*/
+#define PPP_FEATURE_PPP         0
 
-#define PPP_FEATURE             PPP_FEATURE_PPP   /*当前选择PPP*/
+#define PPP_FEATURE             PPP_FEATURE_PPP
 
 #define PPP_MAX_DATA_CNT_IN_QUEUE (2000)
 
@@ -181,13 +170,12 @@ extern "C" {
 #define PPP_MNTN_LOG4(ModulePID, SubMod, Level, String, Para1, Para2, Para3, Para4) \
             TTF_LOG4(ModulePID, SubMod, Level, String, Para1, Para2, Para3, Para4)
 
-/* --------------零拷贝操作相关宏-------------- */
 typedef IMM_ZC_STRU      PPP_ZC_STRU;
 typedef IMM_ZC_HEAD_STRU PPP_ZC_QUEUE_STRU;
 
-#define PPP_ZC_MAX_DATA_LEN                  (IMM_MAX_ETH_FRAME_LEN)            /* A核内可申请内存块最大长度 */
-#define PPP_ZC_UL_RESERVE_LEN                (IMM_MAC_HEADER_RES_LEN)           /* MAC头长度，上行方向需要保留 */
-#define PPP_ZC_DL_RESERVE_LEN                (0)                                /* 下行方向不需要保留 */
+#define PPP_ZC_MAX_DATA_LEN                  (IMM_MAX_ETH_FRAME_LEN)
+#define PPP_ZC_UL_RESERVE_LEN                (IMM_MAC_HEADER_RES_LEN)
+#define PPP_ZC_DL_RESERVE_LEN                (0)
 
 #define PPP_ZC_MEM_ALLOC(ulLen)              (IMM_ZcStaticAlloc(ulLen))
 #define PPP_ZC_MEM_FREE(pstMem)              (IMM_ZcFree(pstMem))
@@ -209,43 +197,14 @@ typedef IMM_ZC_HEAD_STRU PPP_ZC_QUEUE_STRU;
 #define PPP_ZC_PEEK_QUEUE_TAIL(pstZcQueue)      (IMM_ZcQueuePeekTail(pstZcQueue))
 #define PPP_ZC_GET_QUEUE_LEN(pstZcQueue)        (IMM_ZcQueueLen(pstZcQueue))
 
-
-
-/* A核可维可测接口 */
 #define PPP_MNTN_TRACE_MSG(pMsg)                DIAG_TraceReport(pMsg)
 
-/*****************************************************************************
-  3 枚举定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  4 全局变量声明
-*****************************************************************************/
 extern VOS_UINT32                       g_ulPppDebugLevel;
 
-
-/*****************************************************************************
-  5 消息头定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  6 消息定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  7 STRUCT定义
-*****************************************************************************/
-/* STRUCT声明 */
 struct link;
 struct ppp_mbuf;
 struct lcp;
 
-
-
-/*IP地址*/
 struct ppp_in_addr
 {
     VOS_UINT32 s_addr;
@@ -253,45 +212,32 @@ struct ppp_in_addr
 
 typedef struct
 {
-    VOS_UINT32                  ulUplinkCnt;                /* 上行数据包总个数 */
-    VOS_UINT32                  ulUplinkDropCnt;            /* 上行丢包数 */
-    VOS_UINT32                  ulUplinkSndDataCnt;         /* 上行发包数 */
+    VOS_UINT32                  ulUplinkCnt;
+    VOS_UINT32                  ulUplinkDropCnt;
+    VOS_UINT32                  ulUplinkSndDataCnt;
 
-    VOS_UINT32                  ulDownlinkCnt;              /* 下行数据包总个数 */
-    VOS_UINT32                  ulDownlinkDropCnt;          /* 下行丢包数 */
-    VOS_UINT32                  ulDownlinkSndDataCnt;       /* 下行发包数 */
+    VOS_UINT32                  ulDownlinkCnt;
+    VOS_UINT32                  ulDownlinkDropCnt;
+    VOS_UINT32                  ulDownlinkSndDataCnt;
 
-    VOS_UINT32                  ulMemAllocDownlinkCnt;      /* 下行内存申请次数 */
-    VOS_UINT32                  ulMemAllocDownlinkFailCnt;  /* 下行内存申请失败次数 */
-    VOS_UINT32                  ulMemAllocUplinkCnt;        /* 上行内存申请次数 */
-    VOS_UINT32                  ulMemAllocUplinkFailCnt;    /* 上行内存申请失败次数 */
-    VOS_UINT32                  ulMemFreeCnt;               /* 其他内存释放次数 */
+    VOS_UINT32                  ulMemAllocDownlinkCnt;
+    VOS_UINT32                  ulMemAllocDownlinkFailCnt;
+    VOS_UINT32                  ulMemAllocUplinkCnt;
+    VOS_UINT32                  ulMemAllocUplinkFailCnt;
+    VOS_UINT32                  ulMemFreeCnt;
 
-    VOS_UINT32                  ulQMaxCnt;                  /* 队列中出现过的最大结点个数 */
-    VOS_UINT32                  ulSndMsgCnt;                /* DataNotify消息发送数 */
-    VOS_UINT32                  ulProcMsgCnt;               /* DataNotify消息处理数 */
+    VOS_UINT32                  ulQMaxCnt;
+    VOS_UINT32                  ulSndMsgCnt;
+    VOS_UINT32                  ulProcMsgCnt;
 } PPP_DATA_Q_STAT_ST;
 
 typedef struct
 {
-    PPP_ZC_QUEUE_STRU           stDataQ;                    /* PPP数据队列，上下行数据都在其中 */
-    PPP_DATA_Q_STAT_ST          stStat;                     /* PPP数据队列的统计信息 */
-    volatile VOS_UINT32         ulNotifyMsgCnt;             /* PPP消息队列中待处理的消息个数 */
+    PPP_ZC_QUEUE_STRU           stDataQ;
+    PPP_DATA_Q_STAT_ST          stStat;
+    volatile VOS_UINT32         ulNotifyMsgCnt;
 }PPP_DATA_Q_CTRL_ST;
 
-/*****************************************************************************
-  8 UNION定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  9 OTHERS定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  10 函数声明
-*****************************************************************************/
 extern PPP_ZC_STRU *PPP_MemAlloc(VOS_UINT16 usLen, VOS_UINT16 usReserveLen);
 extern PPP_ZC_STRU *PPP_MemCopyAlloc(VOS_UINT8 *pSrc, VOS_UINT16 usLen, VOS_UINT16 usReserveLen);
 extern VOS_VOID     PPP_MemWriteData(PPP_ZC_STRU *pstMem, VOS_UINT8 *pucSrc, VOS_UINT16 usLen);
@@ -362,6 +308,5 @@ extern VOS_VOID     PPP_PrintLog4
         }
     #endif
 #endif
-
 
 #endif  /*end of __PPP_PUBLIC_H__*/

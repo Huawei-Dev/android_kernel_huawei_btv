@@ -50,7 +50,7 @@
 #define __ATINIT_H__
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "vos.h"
 #include "AtCtx.h"
@@ -74,13 +74,13 @@ extern "C" {
 #pragma pack(4)
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
-/* 多时隙等级最大宏定义 */
+/* ???????????????????? */
 #define AT_GAS_GRR_MULTISLOT_CLASS_MAX  (12)
 
 #if (defined(CONFIG_BALONG_SPE))
-/* 设置SPE端口参数 */
+/* ????SPE???????? */
 /*lint -emacro({717}, AT_SET_SPE_PORT_ATTR_BYPASS_MODE)*/
 #define AT_SET_SPE_PORT_ATTR_BYPASS_MODE(pstAttr,pstNetDev,ulTdNum,ulRdNum)\
             do\
@@ -95,16 +95,16 @@ extern "C" {
 
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 
 /*****************************************************************************
- 枚举名    : AT_GAS_HIGH_MULTISLOT_CLASS_ENUM
- 枚举说明  : High multislot class等级
- 修改历史  :
- 1.日    期    : 2011年12月13日
-   作    者    : C00173809
-   修改内容    : 新建枚举类型, for V7R1 GTL PhaseI
+ ??????    : AT_GAS_HIGH_MULTISLOT_CLASS_ENUM
+ ????????  : High multislot class????
+ ????????  :
+ 1.??    ??    : 2011??12??13??
+   ??    ??    : C00173809
+   ????????    : ????????????, for V7R1 GTL PhaseI
 *****************************************************************************/
 enum AT_GAS_HIGH_MULTISLOT_CLASS_ENUM
 {
@@ -119,66 +119,66 @@ typedef VOS_UINT8 AT_GAS_HIGH_MULTISLOT_CLASS_ENUM_UINT8;
 
 
 /*****************************************************************************
-  4 全局变量声明
+  4 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  5 消息头定义
+  5 ??????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 消息定义
+  6 ????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  7 STRUCT定义
+  7 STRUCT????
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : AT_NV_UE_CAPABILITY_STRU
- 协议表格  : 无
- 结构说明  : 存储在NV中的UE能力信息
+ ??????    : AT_NV_UE_CAPABILITY_STRU
+ ????????  : ??
+ ????????  : ??????NV????UE????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           aucReserved1[11];                       /* 留作以后扩展 */
+    VOS_UINT8                           aucReserved1[11];                       /* ???????????? */
     VOS_UINT8                           ucAsRelIndicator;                       /* Access Stratum Release Indicator             */
 
-    VOS_UINT8                           ucHSDSCHSupport;                        /* 是否支持enHSDSCHSupport的标志                */
-    VOS_UINT8                           ucHSDSCHPhyCategory;                    /* 支持HS-DSCH物理层的类型标志                  */
+    VOS_UINT8                           ucHSDSCHSupport;                        /* ????????enHSDSCHSupport??????                */
+    VOS_UINT8                           ucHSDSCHPhyCategory;                    /* ????HS-DSCH????????????????                  */
 
     VOS_UINT8                           ucMacEhsSupport;
     VOS_UINT8                           ucHSDSCHPhyCategoryExt;
-    VOS_UINT8                           ucMultiCellSupport;                     /* 是否支持 Multi cell support,如果支持MultiCell,Ex2存在 */
+    VOS_UINT8                           ucMultiCellSupport;                     /* ???????? Multi cell support,????????MultiCell,Ex2???? */
     VOS_UINT8                           ucHSDSCHPhyCategoryExt2;                /* HS-DSCH physical layer category extension 2 */
 
-    VOS_UINT8                           aucReserved2[17];                       /* 留作以后扩展 */
+    VOS_UINT8                           aucReserved2[17];                       /* ???????????? */
 
     VOS_UINT8                           ucHSDSCHPhyCategoryExt3;                /* HS-DSCH physical layer category extension 3 */
-    VOS_UINT8                           ucDcMimoSupport;                        /* 是否支持DC+MIMO */
+    VOS_UINT8                           ucDcMimoSupport;                        /* ????????DC+MIMO */
 
-    VOS_UINT8                           aucReserved3[3];                        /* 留作以后扩展 */
+    VOS_UINT8                           aucReserved3[3];                        /* ???????????? */
 
 } AT_NV_UE_CAPABILITY_STRU;
 
-/* Deleted by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-10, begin */
-/* Deleted by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-10, end */
+/* Deleted by s00217060 for ????????AT??????????????C??, 2013-4-10, begin */
+/* Deleted by s00217060 for ????????AT??????????????C??, 2013-4-10, end */
 
 
 /*****************************************************************************
-  8 UNION定义
+  8 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  9 OTHERS定义
+  9 OTHERS????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 extern VOS_VOID AT_ReadPlatformNV(VOS_VOID);
 extern VOS_VOID AT_ReadClientConfigNV(VOS_VOID);
@@ -195,8 +195,8 @@ extern VOS_VOID AT_ReadSmsMeStorageInfoNV(VOS_VOID);
 extern VOS_VOID AT_ReadSmsClass0TailorNV(VOS_VOID);
 extern VOS_VOID AT_ReadSmsNV(VOS_VOID);
 
-/* Deleted by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-3, begin */
-/* Deleted by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-3, end */
+/* Deleted by s00217060 for ????????AT??????????????C??, 2013-4-3, begin */
+/* Deleted by s00217060 for ????????AT??????????????C??, 2013-4-3, end */
 
 extern VOS_VOID  AT_ReadRoamCapaNV(VOS_VOID);
 extern VOS_VOID AT_ReadSmsFilterCfgNv( VOS_VOID );

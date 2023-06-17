@@ -53,9 +53,6 @@
 extern "C" {
 #endif
 
-/* field id定义只允许添加，不允许删除，枚举定义删除之后，id值需要保留，新添加id需要跳过删除id */
-/* 后续新增id放到DYNAMIC区域，添加AP新的field，放到DUMP_AP_FIELD_END之前，添加CP新的field，放到DUMP_CP_FIELD_END之前 */
-/* 添加M3新的field，放到DUMP_M3_FIELD_END之前 */
 typedef enum{
     /*AP FIELD IDs*/
     DUMP_MODEMAP_FIELD_BEGIN     = (0x010F0000),
@@ -163,17 +160,17 @@ typedef enum{
 }DUMP_SAVE_MOD_ENUM;
 
 typedef enum _teeos_errno_e{
-    TEEOS_ERRNO_LOAD_SEC_IMAGE  = 0x83000000,   /* modem单独复位中,加载安全镜像失败 */
+    TEEOS_ERRNO_LOAD_SEC_IMAGE  = 0x83000000,
     TEEOS_ERRNO_BUTT            = 0x83ffffff
 }dump_teeos_errno_t;
 
 typedef enum _hifi_errno_e{
-    HIFI_ERRNO_MODEM_RESET      = 0x84000000,   /* modem单独复位中HIFI回调失败 */
+    HIFI_ERRNO_MODEM_RESET      = 0x84000000,
     HIFI_ERRNO_BUTT             = 0x84ffffff
 }dump_hifi_errno_t;
 
 typedef enum _mcore_errno_e{
-    LPM3_ERRNO_MODEM_RESET      = 0x85000000,   /* modem单独复位中M3异常 */
+    LPM3_ERRNO_MODEM_RESET      = 0x85000000,
     LPM3_ERRNO_BUTT             = 0x85ffffff
 }dump_mcore_errno_t;
 
@@ -181,7 +178,4 @@ typedef enum _mcore_errno_e{
 }
 #endif
 
-
 #endif /* __BSP_OM_ENUM_H__ */
-
-

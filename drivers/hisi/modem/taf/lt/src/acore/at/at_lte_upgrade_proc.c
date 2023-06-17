@@ -59,12 +59,12 @@
 #include "ScInterface.h"
 #include "mdrv.h"
 #include <osm.h>
-/*lint -e767 原因:Log打印*/
+/*lint -e767 ????:Log????*/
 #define    THIS_FILE_ID        MSP_FILE_ID_AT_LTE_UPGRADE_PROC_C
 /*lint +e767 */
 VOS_UINT32 g_atNvBackupFlag = 0;
 
-/*bootrom的版本查询*/
+/*bootrom??????????*/
 VOS_UINT32 atQryBootRomVer(VOS_UINT8 ucClientId)
 {
     return AT_ERROR;
@@ -166,7 +166,7 @@ VOS_UINT32 At_GetImei(VOS_CHAR szimei [ 16 ])
 
         for (subscript = 0; subscript < uslen; subscript++)
         {
-            *(szimei + subscript) = *(auctemp + subscript) + 0x30; /*字符转换*/
+            *(szimei + subscript) = *(auctemp + subscript) + 0x30; /*????????*/
         }
 
         szimei[AT_NV_IMEI_LEN - 1] = checkdata + 0x30;
@@ -203,7 +203,7 @@ VOS_UINT32 atQryDLoadVer(VOS_UINT8 ucClientId)
     return AT_OK;
 }
 
-/*本命令用户查询单板信息，用于返回单板和后台版本号、产品型号名称、下载类型信息*/
+/*????????????????????????????????????????????????????????????????????????????*/
 VOS_UINT32 atQryDLoadInfo(VOS_UINT8 ucClientId)
 {
     DLOAD_VER_INFO_S                   *pstDloadVerInfo;
@@ -245,7 +245,7 @@ VOS_UINT32 atQryDLoadInfo(VOS_UINT8 ucClientId)
     return AT_OK;
 }
 
-/*NV备份命令*/
+/*NV????????*/
 VOS_UINT32 atSetNVBackup(VOS_UINT8 ucClientId)
 {
     VOS_UINT32 ulRst = AT_OK;
@@ -269,7 +269,7 @@ VOS_UINT32 atSetNVBackup(VOS_UINT8 ucClientId)
     return AT_OK;
 }
 
-/*NV恢复命令*/
+/*NV????????*/
 VOS_UINT32 atSetNVRestore(VOS_UINT8 ucClientId)
 {
     VOS_UINT32 ulRst = AT_OK;
@@ -346,7 +346,7 @@ VOS_UINT32 atQryAuthorityID(VOS_UINT8 ucClientId)
     return AT_OK;
 }
 
-//切换到下载模式命令单板重启后将进入下载模式
+//??????????????????????????????????????????
 VOS_UINT32 atSetGodLoad(VOS_UINT8 ucClientId)
 {
     gstAtSendData.usBufLen = 0;
@@ -368,21 +368,21 @@ VOS_UINT32 atSetGodLoad(VOS_UINT8 ucClientId)
 }
 
 // *****************************************************************************
-// 函数名称: atSetReset
-// 功能描述: 单板重启命令 "^RESET"
+// ????????: atSetReset
+// ????????: ???????????? "^RESET"
 //
-// 参数说明:
-//   ulIndex [in] 用户索引
+// ????????:
+//   ulIndex [in] ????????
 //
-// 返 回 值:
+// ?? ?? ??:
 //    TODO: ...
 //
-// 调用要求: TODO: ...
-// 调用举例: TODO: ...
-// 作    者: 岑雪青/c00172979 [2010-11-29]
+// ????????: TODO: ...
+// ????????: TODO: ...
+// ??    ??: ??????/c00172979 [2010-11-29]
 
-//  2.日    期   : 2015年01月26日
-//    修改内容   : 修改问题单DTS2015011307352，AT^RESET命令打印OK
+//  2.??    ??   : 2015??01??26??
+//    ????????   : ??????????DTS2015011307352??AT^RESET????????OK
 
 // *****************************************************************************
 VOS_UINT32 atSetReset(VOS_UINT8 ucClientId)
@@ -398,7 +398,7 @@ VOS_UINT32 atSetReset(VOS_UINT8 ucClientId)
     return AT_SUCCESS;
 }
 
-//自动恢复状态查询
+//????????????????
 VOS_UINT32 atSetNVRstSTTS(VOS_UINT8 ucClientId)
 {
     VOS_UINT32 ulRst = AT_OK;
@@ -427,7 +427,7 @@ VOS_UINT32 atSetNVFactoryRestore(VOS_UINT8 ucClientId)
 {
     VOS_UINT32 ulRst = AT_OK;
 
-    /*因为MODEN拨号会下发该命令，所以在moden口不进行NV恢复，直接返回OK*/
+    /*????MODEN????????????????????????moden????????NV??????????????OK*/
     if ( AT_MODEM_USER == gastAtClientTab[ucClientId].UserType )
     {
         return AT_OK;
@@ -464,7 +464,7 @@ VOS_UINT32 atSetNVFactoryBack(VOS_UINT8 ucClientId)
         return AT_ERROR;
     }
 
-    /* Added by d00212987 在该AT命令中增加SC的备份。 2015-08-10, begin */
+    /* Added by d00212987 ????AT??????????SC???????? 2015-08-10, begin */
     ulRst = SC_COMM_Backup();
     if(ulRst != ERR_MSP_SUCCESS)
     {
@@ -474,7 +474,7 @@ VOS_UINT32 atSetNVFactoryBack(VOS_UINT8 ucClientId)
 
         return AT_ERROR;
     }
-    /* Added by d00212987 在该AT命令中增加SC的备份。 2015-08-10, end */
+    /* Added by d00212987 ????AT??????????SC???????? 2015-08-10, end */
 
     gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf( AT_CMD_MAX_LEN,
                                            (VOS_CHAR *)pgucAtSndCodeAddr,

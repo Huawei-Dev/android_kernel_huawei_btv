@@ -101,7 +101,7 @@ struct lcp {
   VOS_UINT16 auth_ineed;        /* I require that the peer authenticates */
 
   VOS_INT32 LcpFailedMagic;        /* Number of `magic is same' errors */
-  HTIMER    hLcpCloseTimer;        /*PPP握手结束定时器*/
+  HTIMER    hLcpCloseTimer;        /*PPP??????????????*/
 
   struct {
     VOS_UINT16 mru;        /* Preferred MRU value */

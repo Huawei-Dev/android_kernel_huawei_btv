@@ -74,20 +74,20 @@ typedef struct
 
 typedef struct
 {
-    VOS_UINT16      ucIndex;        /* AT通道ID */
+    VOS_UINT16      ucIndex;        /* AT????ID */
     VOS_UINT16      aucRsv;
-    VOS_UINT32      ulMsgId;        /* 原语ID */
-    VOS_UINT16      aucData[4];     /* 原语内容 */
+    VOS_UINT32      ulMsgId;        /* ????ID */
+    VOS_UINT16      aucData[4];     /* ???????? */
 }TDS_AT_PS_MSG_INFO_STRU;
 
 
 /*****************************************************************************
  Prototype       : TDS_PsAppSendMsg
- Description     : PS调用APP的接口，用于从DSP接收TDS维修原语(AT实现，PS调用)
- Input           : VOS_UINT32 ulLen 消息长度(数据长度不大于48字节)
-                   TDS_AT_PS_MSG_INFO_STRU * pstTdsAppPsMsg 消息内容
+ Description     : PS????APP??????????????DSP????TDS????????(AT??????PS????)
+ Input           : VOS_UINT32 ulLen ????????(??????????????48????)
+                   TDS_AT_PS_MSG_INFO_STRU * pstTdsAppPsMsg ????????
  Output          : None.
- Return Value    : 成功:0,失败:其他值
+ Return Value    : ????:0,????:??????
  History         : ---
  *****************************************************************************/
 extern VOS_UINT32 TDS_PsAtSendMsg(VOS_UINT32 ulLen, TDS_AT_PS_MSG_INFO_STRU * pstTdsAppPsMsg);

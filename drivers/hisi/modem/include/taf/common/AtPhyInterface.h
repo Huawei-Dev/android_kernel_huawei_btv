@@ -50,7 +50,7 @@
 #define __ATPHYINTERFACE_H__
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 
 #ifdef __cplusplus
@@ -64,64 +64,64 @@ extern "C" {
 #pragma pack(4)
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
 
-#define W_AFC_INIT_VALUE                (0x959)           /* W_AFC状态初值 */
+#define W_AFC_INIT_VALUE                (0x959)           /* W_AFC???????? */
 
-#define WDSP_CTRL_TX_OFF                 2       /*表示DSP强制上行RF关闭*/
-#define WDSP_CTRL_TX_ON                  3       /*表示DSP强制上行RF打开*/
+#define WDSP_CTRL_TX_OFF                 2       /*????DSP????????RF????*/
+#define WDSP_CTRL_TX_ON                  3       /*????DSP????????RF????*/
 
-#define WDSP_CTRL_TX_ONE_TONE            8       /* 表示打开同相单音信号 */
-#define WDSP_CTRL_TX_TWO_TONE            9       /* 表示打开反相单音信号 */
+#define WDSP_CTRL_TX_ONE_TONE            8       /* ???????????????????? */
+#define WDSP_CTRL_TX_TWO_TONE            9       /* ???????????????????? */
 
-#define GDSP_CTRL_TX_OFF                0xAAAA   /*表示DSP强制上行RF关闭*/
-#define GDSP_CTRL_TX_ON                 0x5555   /*表示DSP强制上行RF打开*/
+#define GDSP_CTRL_TX_OFF                0xAAAA   /*????DSP????????RF????*/
+#define GDSP_CTRL_TX_ON                 0x5555   /*????DSP????????RF????*/
 
 #define WDSP_MAX_TX_AGC                 2047
 #define GDSP_MAX_TX_VPA                 1023
 
-#define BBP_PA_HIGH_MODE                1       /*PA高增益模式*/
-#define BBP_PA_MID_MODE                 2       /*PA中增益模式*/
-#define BBP_PA_LOW_MODE                 3       /*PA低增益模式*/
-#define BBP_PA_AUTO_MODE                0       /*PA自动增益模式*/
+#define BBP_PA_HIGH_MODE                1       /*PA??????????*/
+#define BBP_PA_MID_MODE                 2       /*PA??????????*/
+#define BBP_PA_LOW_MODE                 3       /*PA??????????*/
+#define BBP_PA_AUTO_MODE                0       /*PA????????????*/
 
-#define DSP_CTRL_RX_OFF                2       /*CPU控制关闭射频芯片。*/
-#define DSP_CTRL_RX_ANT1_ON            3       /*CPU控制打开射频芯片,天线1。*/
-#define DSP_CTRL_RX_ALL_ANT_ON         7       /*CPU控制打开射频芯片,天线1和2 */
+#define DSP_CTRL_RX_OFF                2       /*CPU??????????????????*/
+#define DSP_CTRL_RX_ANT1_ON            3       /*CPU????????????????,????1??*/
+#define DSP_CTRL_RX_ALL_ANT_ON         7       /*CPU????????????????,????1??2 */
 
-#define DSP_LNA_HIGH_GAIN_MODE          (0x2)     /* DSP固定LNA为高增益模式 */
-#define DSP_LNA_LOW_GAIN_MODE           (0x1)     /* DSP固定LNA为低增益模式 */
-#define DSP_LNA_NO_CTRL_GAIN_MODE       (0x0)     /* WBBP控制LNA模式,自动模式 */
+#define DSP_LNA_HIGH_GAIN_MODE          (0x2)     /* DSP????LNA???????????? */
+#define DSP_LNA_LOW_GAIN_MODE           (0x1)     /* DSP????LNA???????????? */
+#define DSP_LNA_NO_CTRL_GAIN_MODE       (0x0)     /* WBBP????LNA????,???????? */
 
-#define AT_GDSP_AGC_GAIN1_75DB          (0)      /*GDSP AGC增益,0档*/
-#define AT_GDSP_AGC_GAIN2_63DB          (1)      /*GDSP AGC增益,1档*/
-#define AT_GDSP_AGC_GAIN3_43DB          (2)      /*GDSP AGC增益,2档*/
-#define AT_GDSP_AGC_GAIN4_23DB          (3)      /*GDSP AGC增益,3档*/
+#define AT_GDSP_AGC_GAIN1_75DB          (0)      /*GDSP AGC????,0??*/
+#define AT_GDSP_AGC_GAIN2_63DB          (1)      /*GDSP AGC????,1??*/
+#define AT_GDSP_AGC_GAIN3_43DB          (2)      /*GDSP AGC????,2??*/
+#define AT_GDSP_AGC_GAIN4_23DB          (3)      /*GDSP AGC????,3??*/
 
 
-#define AT_GDSP_RX_MODE_BURST           (0)      /*接收*/
-#define AT_GDSP_RX_MODE_CONTINOUS_BURST (1)      /*连续接收*/
-#define AT_GDSP_RX_MODE_STOP            (2)      /*停止*/
+#define AT_GDSP_RX_MODE_BURST           (0)      /*????*/
+#define AT_GDSP_RX_MODE_CONTINOUS_BURST (1)      /*????????*/
+#define AT_GDSP_RX_MODE_STOP            (2)      /*????*/
 
 
 #define AT_GDSP_RX_SLOW_AGC_MODE        (0)      /*Slow AGC*/
 #define AT_GDSP_RX_FAST_AGC_MODE        (1)      /*fast AGC*/
 
-#define AT_DSP_RF_AGC_STATE_ERROR       (-1)     /*取得测量值时的增益状态，-1表示出错 */
+#define AT_DSP_RF_AGC_STATE_ERROR       (-1)     /*????????????????????????-1???????? */
 
-#define AT_DSP_RSSI_MEASURE_NUM         (1)      /*RSSI的测量次数*/
-#define AT_DSP_RSSI_MEASURE_INTERVAL    (0)      /*RSSI的测量间隔时间，单位ms */
-#define AT_DSP_RSSI_VALUE_UINT          (0.125)  /*RSSI测量值，单位0.125dBm*/
-#define AT_DSP_RSSI_VALUE_MUL_THOUSAND  (125)    /*RSSI测量值,单位0.125dBm*1000*/
+#define AT_DSP_RSSI_MEASURE_NUM         (1)      /*RSSI??????????*/
+#define AT_DSP_RSSI_MEASURE_INTERVAL    (0)      /*RSSI????????????????????ms */
+#define AT_DSP_RSSI_VALUE_UINT          (0.125)  /*RSSI????????????0.125dBm*/
+#define AT_DSP_RSSI_VALUE_MUL_THOUSAND  (125)    /*RSSI??????,????0.125dBm*1000*/
 
 /*tyg*/
 #define AT_DPS_NOISERSSI_MAX_NUM        (32)
 
-#define AT_RX_PRI_ON                    (0)      /*测量主集*/
-#define AT_RX_DIV_ON                    (1)      /*测量分集*/
-#define AT_RXON_OPEN                    (0)      /*最近一次执行的是打开接收机RXON=1操作*/
-#define AT_TXON_OPEN                    (1)      /*最近一次执行的是打开发射机TXON=1操作*/
+#define AT_RX_PRI_ON                    (0)      /*????????*/
+#define AT_RX_DIV_ON                    (1)      /*????????*/
+#define AT_RXON_OPEN                    (0)      /*??????????????????????????RXON=1????*/
+#define AT_TXON_OPEN                    (1)      /*??????????????????????????TXON=1????*/
 
 #define AT_BIT0                            0x00000001L
 #define AT_BIT1                            0x00000002L
@@ -140,7 +140,7 @@ extern "C" {
 #define AT_BIT14                           0x00004000L
 #define AT_BIT15                           0x00008000L
 
-/* W_RF_CFG_REQ命令的掩码 */
+/* W_RF_CFG_REQ?????????? */
 #define W_RF_MASK_AFC                   AT_BIT0
 #define W_RF_MASK_TX_ARFCN              AT_BIT1
 #define W_RF_MASK_TX_TXONOFF            AT_BIT2
@@ -154,51 +154,51 @@ extern "C" {
 #define W_RF_MASK_RX_PGC                AT_BIT10
 #define W_RF_MASK_TX_POWDET             AT_BIT11
 
-/* G_RF_RX_CFG_REQ_STRU结构中uhwMask的比特位定义 */
-#define G_RF_MASK_RX_ARFCN              AT_BIT0            /* 下发频点 */
-#define G_RF_MASK_RX_MODE               AT_BIT1            /* 下发接收模式 */
-#define G_RF_MASK_RX_AGCMODE            AT_BIT2            /* 下发测量模式 */
-#define G_RF_MASK_RX_AGCGAIN            AT_BIT3            /* 下发AGC档位 */
+/* G_RF_RX_CFG_REQ_STRU??????uhwMask???????????? */
+#define G_RF_MASK_RX_ARFCN              AT_BIT0            /* ???????? */
+#define G_RF_MASK_RX_MODE               AT_BIT1            /* ???????????? */
+#define G_RF_MASK_RX_AGCMODE            AT_BIT2            /* ???????????? */
+#define G_RF_MASK_RX_AGCGAIN            AT_BIT3            /* ????AGC???? */
 
-/* G_RF_TX_CFG_REQ_STRU结构中uhwMask的比特位定义 */
-/* 注意: 1)在GMSK调制方式下，目标发射功率可通过G_RF_MASK_TX_GSMK_PA_VOLT
-           或G_RF_MASK_TX_POWER下发,但不能同时下发;
-         2)在8PSK调制方式下:目标功率值只能通过G_RF_MASK_TX_POWER下发
-         3)各比特位可以同时下发，但不能相互冲突 */
-#define G_RF_MASK_TX_AFC                AT_BIT0            /* 下发单板频率控制值 */
-#define G_RF_MASK_TX_ARFCN              AT_BIT1            /* 下发发射频点 */
-#define G_RF_MASK_TX_TXEN               AT_BIT2            /* 下发发射控制位 */
-#define G_RF_MASK_TX_TXMODE             AT_BIT3            /* 下发发送模式 */
-#define G_RF_MASK_TX_MOD_TYPE           AT_BIT4            /* 下发调制模式 */
-#define G_RF_MASK_TX_GSMK_PA_VOLT       AT_BIT5            /* 下发GMSK调制时 PA目标控制电压 */
-#define G_RF_MASK_TX_POWER              AT_BIT6            /* 下发目标发射控制值,GMSK和8PSK共用 */
-#define G_RF_MASK_TX_8PSK_PA_VBIAS      AT_BIT7            /* 下发8PSK调制时PA偏置电压 */
-#define G_RF_MASK_TX_TXOLC              AT_BIT8            /* 下发TXOLC寄存器值 */
+/* G_RF_TX_CFG_REQ_STRU??????uhwMask???????????? */
+/* ????: 1)??GMSK??????????????????????????????G_RF_MASK_TX_GSMK_PA_VOLT
+           ??G_RF_MASK_TX_POWER????,??????????????;
+         2)??8PSK??????????:??????????????????G_RF_MASK_TX_POWER????
+         3)???????????????????????????????????? */
+#define G_RF_MASK_TX_AFC                AT_BIT0            /* ?????????????????? */
+#define G_RF_MASK_TX_ARFCN              AT_BIT1            /* ???????????? */
+#define G_RF_MASK_TX_TXEN               AT_BIT2            /* ?????????????? */
+#define G_RF_MASK_TX_TXMODE             AT_BIT3            /* ???????????? */
+#define G_RF_MASK_TX_MOD_TYPE           AT_BIT4            /* ???????????? */
+#define G_RF_MASK_TX_GSMK_PA_VOLT       AT_BIT5            /* ????GMSK?????? PA???????????? */
+#define G_RF_MASK_TX_POWER              AT_BIT6            /* ??????????????????,GMSK??8PSK???? */
+#define G_RF_MASK_TX_8PSK_PA_VBIAS      AT_BIT7            /* ????8PSK??????PA???????? */
+#define G_RF_MASK_TX_TXOLC              AT_BIT8            /* ????TXOLC???????? */
 #define G_RF_MASK_TX_DATA_PATTERN       AT_BIT9
 
-/*调制方式*/
-#define G_MOD_TYPE_GMSK                 0       /* GMSK调制方式 */
-#define G_MOD_TYPE_8PSK                 1       /* 8PSK调制方式 */
+/*????????*/
+#define G_MOD_TYPE_GMSK                 0       /* GMSK???????? */
+#define G_MOD_TYPE_8PSK                 1       /* 8PSK???????? */
 
-/* noise tool 最大上报的结果个数 */
+/* noise tool ?????????????????? */
 #define PHY_NOISE_MAX_RESULT_NUMB       32
 
-/* 如果工具下发的上行功率为0xff则为不打开上行 */
+/* ????????????????????????0xff?????????????? */
 #define PHY_NOIST_TOOL_CLOSE_TX         0xff
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
-/* 打开天线的模式 */
+/* ?????????????? */
 enum AT_ANT_MODE_ENUM
 {
-    ANT_ONE  = 1,/*只打开主集天线*/
-    ANT_TWO  = 2,/*同时打开主集和分集天线*/
+    ANT_ONE  = 1,/*??????????????*/
+    ANT_TWO  = 2,/*??????????????????????*/
     ANT_BUTT
 };
 typedef VOS_UINT8 AT_ANT_MODE_UINT8;
 
-/* WDSP 格式频段定义*/
+/* WDSP ????????????*/
 enum AT_W_BAND_ENUM
 {
     W_FREQ_BAND1 = 1,
@@ -210,13 +210,13 @@ enum AT_W_BAND_ENUM
     W_FREQ_BAND7,
     W_FREQ_BAND8,
     W_FREQ_BAND9,
-    W_FREQ_BAND10,                                                              /*  BAND10 不支持 */
+    W_FREQ_BAND10,                                                              /*  BAND10 ?????? */
     W_FREQ_BAND11,
     W_FREQ_BAND_BUTT
 };
 typedef VOS_UINT16 AT_WDSP_BAND_ENUM_UINT16;
 
-/* GDSP 频段定义 */
+/* GDSP ???????? */
 enum AT_GDSP_BAND_ENUM
 {
     G_FREQ_BAND_GSM850 = 0,
@@ -227,7 +227,7 @@ enum AT_GDSP_BAND_ENUM
 };
 typedef VOS_UINT16 AT_GDSP_BAND_ENUM_UINT16;
 
-/* AT HPA设置结果 0:success, 1:fail */
+/* AT HPA???????? 0:success, 1:fail */
 enum AT_HPA_CFG_RLST_ENUM
 {
     AT_HPA_RSLT_SUCC = 0,
@@ -237,53 +237,53 @@ enum AT_HPA_CFG_RLST_ENUM
 typedef VOS_UINT16 AT_HPA_CFG_RLST_ENUM_UINT16;
 
 /*****************************************************************************
-  4 全局变量声明
+  4 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  5 消息头定义
+  5 ??????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 消息定义
+  6 ????????
 *****************************************************************************/
-/*#define ID_HPA_AT_TRANS_MSG_ID          0x8001            透明消息ID */
+/*#define ID_HPA_AT_TRANS_MSG_ID          0x8001            ????????ID */
 
-        /* W慢速校准原语ID*/
+        /* W????????????ID*/
 #define ID_AT_HPA_RF_CFG_REQ            0x2621
 #define ID_HPA_AT_RF_CFG_CNF            0x62E0
 
 #define ID_AT_HPA_RF_RX_RSSI_REQ        0x2622
 #define ID_HPA_AT_RF_RX_RSSI_IND        0x62E1
 
-        /* W PLL锁定状态查询原语ID*/
+        /* W PLL????????????????ID*/
 #define ID_AT_WPHY_RF_PLL_STATUS_REQ    0x2623
 #define ID_AT_WPHY_RF_PLL_STATUS_CNF    0x62E2
 
-        /* G慢速校准原语ID*/
-#define ID_AT_GHPA_RF_RX_CFG_REQ        0x2415          /*RX慢速校准参数配置*/
-#define ID_AT_GHPA_RF_TX_CFG_REQ        0x2418          /*TX慢速校准参数配置*/
-#define ID_GHPA_AT_RF_MSG_CNF           0x4212          /* 通用回复消息原语 */
+        /* G????????????ID*/
+#define ID_AT_GHPA_RF_RX_CFG_REQ        0x2415          /*RX????????????????*/
+#define ID_AT_GHPA_RF_TX_CFG_REQ        0x2418          /*TX????????????????*/
+#define ID_GHPA_AT_RF_MSG_CNF           0x4212          /* ???????????????? */
 
-#define ID_AT_GHPA_RF_RX_RSSI_REQ       0x2416          /*RX慢速校准测量请求*/
-#define ID_GHPA_AT_RF_RX_RSSI_IND       0x4210          /*RX慢速校准测量结果上报*/
+#define ID_AT_GHPA_RF_RX_RSSI_REQ       0x2416          /*RX????????????????*/
+#define ID_GHPA_AT_RF_RX_RSSI_IND       0x4210          /*RX????????????????????*/
 
-        /* G PLL锁定状态查询原语ID*/
+        /* G PLL????????????????ID*/
 #define ID_AT_GPHY_RF_PLL_STATUS_REQ    0x2419
 #define ID_AT_GPHY_RF_PLL_STATUS_CNF    0x4219
 
-        /* PD检测状态查询原语ID*/
+        /* PD????????????????ID*/
 #define ID_AT_WPHY_POWER_DET_REQ        0x2624
 #define ID_AT_WPHY_POWER_DET_CNF        0x62e3
 
 /* Added by tyg for noise tool, 2014-12-23, begin */
-/* noise tool 和wphy的接口 */
+/* noise tool ??wphy?????? */
 #define ID_AT_HPA_RF_NOISE_CFG_REQ      0x2625
 #define ID_HPA_AT_RF_NOISE_RSSI_IND     0x62e4
 /**/
-/* 回复给NOISE TOOL的消息原语 原语ID */
+/* ??????NOISE TOOL?????????? ????ID */
 #define ID_AT_GHPA_RF_NOISE_CFG_REQ     0x241A
 #define ID_GHPA_AT_RF_NOISE_RSSI_IND    0x421A
 
@@ -300,7 +300,7 @@ typedef VOS_UINT16 AT_HPA_CFG_RLST_ENUM_UINT16;
 #define ID_AT_HPA_PDM_CTRL_REQ          0x2494
 #define ID_HPA_AT_PDM_CTRL_CNF          0x4294
 
-        /* CDMA慢速校准原语ID*/
+        /* CDMA????????????ID*/
 #define ID_AT_CHPA_RF_CFG_REQ            0x6300
 #define ID_CHPA_AT_RF_CFG_CNF            0x6301
 
@@ -308,132 +308,132 @@ typedef VOS_UINT16 AT_HPA_CFG_RLST_ENUM_UINT16;
 #define ID_CHPA_AT_RF_RX_RSSI_IND        0x6303
 
 /*****************************************************************************
- 结构名    : C_RF_CFG_PARA_STRU
- 结构说明  : RF配置参数结构
- 1.日    期   : 2011年11月16日
-   作    者   : f62575
-   修改内容   : 补充结构注释
+ ??????    : C_RF_CFG_PARA_STRU
+ ????????  : RF????????????
+ 1.??    ??   : 2011??11??16??
+   ??    ??   : f62575
+   ????????   : ????????????
 *****************************************************************************/
 typedef struct
 {
     /* Tx Cfg */
-    VOS_UINT16                          usMask;                                 /* 按位标识配置类型 */
+    VOS_UINT16                          usMask;                                 /* ???????????????? */
     VOS_UINT16                          usTxAFCInit;                            /* AFC */
-    VOS_UINT16                          usTxBand;                               /* 1,2,3...,协议中的band编号,注意不是BandId */
+    VOS_UINT16                          usTxBand;                               /* 1,2,3...,????????band????,????????BandId */
     VOS_UINT16                          usTxFreqNum;                            /* Arfcn */
-    VOS_UINT16                          usTxEnable;                             /* TX通道使能控制 */
-    VOS_UINT16                          usTxPAMode;                             /* PA模式控制 */
+    VOS_UINT16                          usTxEnable;                             /* TX???????????? */
+    VOS_UINT16                          usTxPAMode;                             /* PA???????? */
     VOS_INT16                           sTxPower;                               /* 0.1dBm */
 
     /* Rx Cfg */
-    VOS_UINT16                          usRxEnable;                             /* RX通道使能控制 */
-    VOS_UINT16                          usRxBand;                               /* 1,2,3...,协议中的band编号*/
+    VOS_UINT16                          usRxEnable;                             /* RX???????????? */
+    VOS_UINT16                          usRxBand;                               /* 1,2,3...,????????band????*/
     VOS_UINT16                          usRxFreqNum;                            /* Arfcn*/
     VOS_UINT16                          usRxAntSel;                             /* Ant1/Ant2*/
-    VOS_UINT16                          usRsv;             /* 保留位 */
+    VOS_UINT16                          usRsv;             /* ?????? */
 
 }C_RF_CFG_PARA_STRU;
 
-/* AT_HPA 参数配置原语接口 */
+/* AT_HPA ???????????????? */
 typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usMsgID;           /* Msg ID */
-    VOS_UINT16                          usRsv;             /* 保留位 */
-    C_RF_CFG_PARA_STRU                  stRfCfgPara;            /* RF配置参数结构 */
+    VOS_UINT16                          usRsv;             /* ?????? */
+    C_RF_CFG_PARA_STRU                  stRfCfgPara;            /* RF???????????? */
 }AT_CHPA_RF_CFG_REQ_STRU;
 
 typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usMsgID;           /* Msg ID */
-    VOS_UINT16                          usRsv;             /* 保留位 */
-    VOS_UINT16                          usMeasNum;             /* RSSI的测量次数 */
-    VOS_UINT16                          usInterval;            /* RSSI的测量间隔时间，单位ms */
+    VOS_UINT16                          usRsv;             /* ?????? */
+    VOS_UINT16                          usMeasNum;             /* RSSI?????????? */
+    VOS_UINT16                          usInterval;            /* RSSI????????????????????ms */
 }AT_CHPA_RF_RX_RSSI_REQ_STRU;
 
 
 
 /*****************************************************************************
-  7 STRUCT定义
+  7 STRUCT????
 *****************************************************************************/
-/* W的RF配置结构 */
-/* RF配置参数结构 */
+/* W??RF???????? */
+/* RF???????????? */
 /*****************************************************************************
- 结构名    : W_RF_CFG_PARA_STRU
- 结构说明  : RF配置参数结构
- 1.日    期   : 2011年11月16日
-   作    者   : f62575
-   修改内容   : 补充结构注释
- 2.日    期   : 2011年11月16日
-   作    者   : f62575
-   修改内容   : 适配物理层接口变更
-                增加sRrcWidth, sDbbAtten, usRxCarrMode, usPaVbias
-                移动sTxPower,
-                删除sRxPGC
+ ??????    : W_RF_CFG_PARA_STRU
+ ????????  : RF????????????
+ 1.??    ??   : 2011??11??16??
+   ??    ??   : f62575
+   ????????   : ????????????
+ 2.??    ??   : 2011??11??16??
+   ??    ??   : f62575
+   ????????   : ??????????????????
+                ????sRrcWidth, sDbbAtten, usRxCarrMode, usPaVbias
+                ????sTxPower,
+                ????sRxPGC
 *****************************************************************************/
 typedef struct
 {
-    /* TX RX均使用 */
-    VOS_INT16                           sRrcWidth;                              /* 该变量暂时不用,双载波模式时,该值为RRC带宽,范围[-5,5]MHz */
+    /* TX RX?????? */
+    VOS_INT16                           sRrcWidth;                              /* ??????????????,????????????,??????RRC????,????[-5,5]MHz */
 
     /* Tx Cfg */
-    VOS_UINT16                          usMask;                                 /* 按位标识配置类型 */
+    VOS_UINT16                          usMask;                                 /* ???????????????? */
     VOS_UINT16                          usTxAFCInit;                            /* AFC */
-    VOS_UINT16                          usTxBand;                               /* 1,2,3...,协议中的band编号,注意不是BandId */
+    VOS_UINT16                          usTxBand;                               /* 1,2,3...,????????band????,????????BandId */
     VOS_UINT16                          usTxFreqNum;                            /* Arfcn */
-    VOS_UINT16                          usTxEnable;                             /* TX通道使能控制 */
-    VOS_UINT16                          usTxPAMode;                             /* PA模式控制 */
+    VOS_UINT16                          usTxEnable;                             /* TX???????????? */
+    VOS_UINT16                          usTxPAMode;                             /* PA???????? */
     VOS_INT16                           sTxPower;                               /* 0.1dBm */
-    VOS_INT16                           sDbbAtten;                              /* DBB对信号衰减的控制字 映射到usTxAGC???，但含义不一致，找深圳确认 */
-    VOS_UINT16                          usRfAtten;                              /* RF对信号衰减的控制字 */
-    VOS_UINT16                          usTxAGC;                                /* 发射AGC控制 */
-    VOS_UINT16                          usPaVbias;                              /* W PA Vbias 的控制字 */
+    VOS_INT16                           sDbbAtten;                              /* DBB?????????????????? ??????usTxAGC????????????????????????????? */
+    VOS_UINT16                          usRfAtten;                              /* RF?????????????????? */
+    VOS_UINT16                          usTxAGC;                                /* ????AGC???? */
+    VOS_UINT16                          usPaVbias;                              /* W PA Vbias ???????? */
 
     /* Rx Cfg */
-    VOS_UINT16                          usRxEnable;                             /* RX通道使能控制 */
-    VOS_UINT16                          usRxBand;                               /* 1,2,3...,协议中的band编号*/
+    VOS_UINT16                          usRxEnable;                             /* RX???????????? */
+    VOS_UINT16                          usRxBand;                               /* 1,2,3...,????????band????*/
     VOS_UINT16                          usRxFreqNum;                            /* Arfcn*/
     VOS_UINT16                          usRxAntSel;                             /* Ant1/Ant2*/
-    VOS_UINT16                          usRxLNAGainMode;                        /* LNA模式控制 */
+    VOS_UINT16                          usRxLNAGainMode;                        /* LNA???????? */
 
 
-    VOS_UINT16                          usRxCarrMode;                           /* 0:单载波;1:双载波 */
+    VOS_UINT16                          usRxCarrMode;                           /* 0:??????;1:?????? */
 }W_RF_CFG_PARA_STRU;
 
 
-/* AT_HPA 参数配置原语接口 */
+/* AT_HPA ???????????????? */
 typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usMsgID;           /* Msg ID */
-    VOS_UINT16                          usRsv;             /* 保留位 */
-    W_RF_CFG_PARA_STRU                  stRfCfgPara;            /* RF配置参数结构 */
+    VOS_UINT16                          usRsv;             /* ?????? */
+    W_RF_CFG_PARA_STRU                  stRfCfgPara;            /* RF???????????? */
 }AT_HPA_RF_CFG_REQ_STRU;
 
-/* G的RF配置结构 */
+/* G??RF???????? */
 typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usMsgID;           /* Msg ID */
-    VOS_UINT16                          usRsv;             /* 保留位 */
+    VOS_UINT16                          usRsv;             /* ?????? */
     VOS_UINT16                          usMask;        /* Reference MASK_CAL_RF_G_RX_* section */
     VOS_UINT16                          usFreqNum;     /* (Band << 12) | Arfcn */
-    VOS_UINT16                          usRxMode;      /* 0:burst接收; 1:连续接收;, */
+    VOS_UINT16                          usRxMode;      /* 0:burst????; 1:????????;, */
     VOS_UINT16                          usAGCMode;     /* Fast AGC,Slow AGC */
-    VOS_UINT16                          usAgcGain;     /* AGC档位，共四档,取值为0-3*/
+    VOS_UINT16                          usAgcGain;     /* AGC????????????,??????0-3*/
     VOS_UINT16                          usRsv2;
 }AT_GHPA_RF_RX_CFG_REQ_STRU;
 
 /*****************************************************************************
- 枚举名    : AT_GHPA_RF_CTRLMODE_TYPE_ENUM
- 结构说明  : 发射控制方式：
-             0：GMSK电压控制,此方式下usTxVpa要配置；
-             1：功率控制,此方式下usTxPower要配置；
-             2：8PSK PaVbias电压&DBB Atten&RF Atten控制，usPAVbias和usRfAtten,sDbbAtten三个参数都要配置；
-1.日    期   : 2011年11月17日
-  作    者   : f62575
-  修改内容   : 新生成
+ ??????    : AT_GHPA_RF_CTRLMODE_TYPE_ENUM
+ ????????  : ??????????????
+             0??GMSK????????,????????usTxVpa????????
+             1??????????,????????usTxPower????????
+             2??8PSK PaVbias????&DBB Atten&RF Atten??????usPAVbias??usRfAtten,sDbbAtten??????????????????
+1.??    ??   : 2011??11??17??
+  ??    ??   : f62575
+  ????????   : ??????
 *****************************************************************************/
 enum AT_GHPA_RF_CTRLMODE_TYPE_ENUM
 {
@@ -445,57 +445,57 @@ enum AT_GHPA_RF_CTRLMODE_TYPE_ENUM
 typedef VOS_UINT8 AT_GHPA_RF_CTRLMODE_TYPE_ENUM_UINT8;
 
 /*****************************************************************************
- 结构名    : AT_GHPA_RF_TX_CFG_REQ_STRU
- 结构说明  :
- 1.日    期   : 2011年11月16日
-   作    者   : f62575
-   修改内容   : 补充注释
- 2.日    期   : 2011年11月16日
-   作    者   : f62575
-   修改内容   : 适配物理层接口变更
-                增加enCtrlMode, uhwRfAtten
-                移动usModType,
-                删除usTxolc
+ ??????    : AT_GHPA_RF_TX_CFG_REQ_STRU
+ ????????  :
+ 1.??    ??   : 2011??11??16??
+   ??    ??   : f62575
+   ????????   : ????????
+ 2.??    ??   : 2011??11??16??
+   ??    ??   : f62575
+   ????????   : ??????????????????
+                ????enCtrlMode, uhwRfAtten
+                ????usModType,
+                ????usTxolc
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usMsgID;                                /* Msg ID */
-    VOS_UINT16                          usRsv;                                  /* 保留位 */
+    VOS_UINT16                          usRsv;                                  /* ?????? */
     VOS_UINT16                          usMask;                                 /* Reference MASK_CAL_RF_G_TX_* section*/
     VOS_UINT16                          usAFC;                                  /* AFC */
-    VOS_UINT16                          usModType;                              /* 发射调制方式:0表示GMSK调制;1表示8PSK调制方式 */
+    VOS_UINT16                          usModType;                              /* ????????????:0????GMSK????;1????8PSK???????? */
     VOS_UINT16                          usFreqNum;                              /* (Band << 12) | Arfcn */
-    VOS_UINT16                          usTxEnable;                             /* 发送使能控制:0x5555-使能发送;0xAAAA-停止发送;TSC 0; TxData: 随机数 */
-    VOS_UINT16                          usTxMode;                               /* 0:burst发送; 1:连续发送 */
-    AT_GHPA_RF_CTRLMODE_TYPE_ENUM_UINT8 enCtrlMode;                             /* 发射控制方式：
-                                                                                    0：GMSK电压控制,此方式下usTxVpa要配置；
-                                                                                    1：功率控制,此方式下usTxPower要配置；
-                                                                                    2：8PSK PaVbias电压&DBB Atten&RF Atten控制，
-                                                                                    usPAVbias和usRfAtten,sDbbAtten三个参数都要配置；*/
+    VOS_UINT16                          usTxEnable;                             /* ????????????:0x5555-????????;0xAAAA-????????;TSC 0; TxData: ?????? */
+    VOS_UINT16                          usTxMode;                               /* 0:burst????; 1:???????? */
+    AT_GHPA_RF_CTRLMODE_TYPE_ENUM_UINT8 enCtrlMode;                             /* ??????????????
+                                                                                    0??GMSK????????,????????usTxVpa????????
+                                                                                    1??????????,????????usTxPower????????
+                                                                                    2??8PSK PaVbias????&DBB Atten&RF Atten??????
+                                                                                    usPAVbias??usRfAtten,sDbbAtten??????????????????*/
     VOS_UINT8                           ucReserved;
     VOS_UINT16                          uhwRfAtten;
-    VOS_UINT16                          usTxPower;                              /* 目标发射功率,单位为0.1dBm,GSM和EDGE共用 */
-    VOS_UINT16                          usTxVpa;                                /* GSM PA发射功率控制电压,取值范围: */
+    VOS_UINT16                          usTxPower;                              /* ????????????,??????0.1dBm,GSM??EDGE???? */
+    VOS_UINT16                          usTxVpa;                                /* GSM PA????????????????,????????: */
     VOS_INT16                           shwDbbAtten;
-    VOS_UINT16                          usPAVbias;                              /* EDGE PA Vbais 电压 */
+    VOS_UINT16                          usPAVbias;                              /* EDGE PA Vbais ???? */
 }AT_GHPA_RF_TX_CFG_REQ_STRU;
 
 
-/*Response Head Struct    W/G通用 */
+/*Response Head Struct    W/G???? */
 typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usTransPrimID;     /* 0x8001 */
-    VOS_UINT16                          usRsv1;            /* 保留位 */
+    VOS_UINT16                          usRsv1;            /* ?????? */
     VOS_UINT16                          usMsgID;           /* Msg ID */
-    VOS_UINT16                          usRsv;             /* 保留位 */
+    VOS_UINT16                          usRsv;             /* ?????? */
 }HPA_AT_HEADER_STRU;
 
 typedef struct
 {
     HPA_AT_HEADER_STRU                  stMsgHeader;
-    VOS_UINT16                          usCfgMsgID;        /* 接收到的消息ID */
+    VOS_UINT16                          usCfgMsgID;        /* ????????????ID */
     VOS_UINT16                          usErrFlg;          /* 0:success, 1:fail */
 }HPA_AT_RF_CFG_CNF_STRU;
 
@@ -504,149 +504,149 @@ typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usMsgID;           /* Msg ID */
-    VOS_UINT16                          usRsv;             /* 保留位 */
-    VOS_UINT16                          usMeasNum;             /* RSSI的测量次数 */
-    VOS_UINT16                          usInterval;            /* RSSI的测量间隔时间，单位ms */
+    VOS_UINT16                          usRsv;             /* ?????? */
+    VOS_UINT16                          usMeasNum;             /* RSSI?????????? */
+    VOS_UINT16                          usInterval;            /* RSSI????????????????????ms */
 }AT_HPA_RF_RX_RSSI_REQ_STRU;
 
-/* 接收到测量质量上报请求后，上报前一次接收的RSSI测量结果  G/W通用 */
+/* ??????????????????????????????????????????RSSI????????  G/W???? */
 typedef struct
 {
     HPA_AT_HEADER_STRU                  stMsgHeader;
-    VOS_INT16                           sRSSI;            /* RSSI测量值 [-2048,+2047]，单位0.125dBm*/
-    VOS_INT16                           sAGCGain;         /* 取得测量值时的增益状态，-1表示出错 */
+    VOS_INT16                           sRSSI;            /* RSSI?????? [-2048,+2047]??????0.125dBm*/
+    VOS_INT16                           sAGCGain;         /* ????????????????????????-1???????? */
 }HPA_AT_RF_RX_RSSI_IND_STRU;
 
 /*****************************************************************************
- 结构名    : PHY_NOISE_RESULT_STRU
- 结构说明  : PHY向AT上报的单个结果的结构
- 1.日    期   : 2014年12月29日
-   作    者   : tianyige
-   修改内容   : Noise tool PHY上报结构
+ ??????    : PHY_NOISE_RESULT_STRU
+ ????????  : PHY??AT????????????????????
+ 1.??    ??   : 2014??12??29??
+   ??    ??   : tianyige
+   ????????   : Noise tool PHY????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usDLFreq;                               /*PHY上报当前测量频点*/
-    VOS_INT16                           sDLPriRssi;                             /*PHY上报对应主集RSSI*/
-    VOS_INT16                           sDLDivRssi;                             /*PHY上报对应分集RSSI*/
+    VOS_UINT16                          usDLFreq;                               /*PHY????????????????*/
+    VOS_INT16                           sDLPriRssi;                             /*PHY????????????RSSI*/
+    VOS_INT16                           sDLDivRssi;                             /*PHY????????????RSSI*/
     VOS_UINT16                          usRsv;
 }PHY_NOISE_RESULT_STRU;
 
 /*****************************************************************************
- 结构名    : HPA_NOISE_RSSI_IND_STRU
- 结构说明  : WPHY或GPHY向AT上报的消息结构
- 1.日    期   : 2014年12月29日
-   作    者   : tianyige
-   修改内容   : Noise tool PHY上报结构
+ ??????    : HPA_NOISE_RSSI_IND_STRU
+ ????????  : WPHY??GPHY??AT??????????????
+ 1.??    ??   : 2014??12??29??
+   ??    ??   : tianyige
+   ????????   : Noise tool PHY????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usDLRssiNum;                            /*PHY上报测量RSSI个数*/
-    VOS_UINT16                          usMeaStatus;                            /*PHY上报测量状态，0表示成功，1表示参数错误，2表示超时 */
+    VOS_UINT16                          usDLRssiNum;                            /*PHY????????RSSI????*/
+    VOS_UINT16                          usMeaStatus;                            /*PHY??????????????0??????????1??????????????2???????? */
     PHY_NOISE_RESULT_STRU               astDlRssiResult[AT_DPS_NOISERSSI_MAX_NUM];
 }HPA_NOISE_RSSI_IND_STRU;
 
 
 /*****************************************************************************
- 结构名    : PHY_AT_RF_NOISE_RSSI_IND_STRU
- 结构说明  : WPHY或GPHY向AT上报的消息结构
- 1.日    期   : 2014年12月29日
-   作    者   : tianyige
-   修改内容   : Noise tool PHY上报结构
+ ??????    : PHY_AT_RF_NOISE_RSSI_IND_STRU
+ ????????  : WPHY??GPHY??AT??????????????
+ 1.??    ??   : 2014??12??29??
+   ??    ??   : tianyige
+   ????????   : Noise tool PHY????????
 *****************************************************************************/
 typedef struct
 {
-    HPA_AT_HEADER_STRU                  stMsgHeader;                            /* 标准头 */
-    HPA_NOISE_RSSI_IND_STRU             stRssiInd;                              /* 结果 */
+    HPA_AT_HEADER_STRU                  stMsgHeader;                            /* ?????? */
+    HPA_NOISE_RSSI_IND_STRU             stRssiInd;                              /* ???? */
 }PHY_AT_RF_NOISE_RSSI_IND_STRU;
 
 /*****************************************************************************
- 结构名    : AT_PHY_RF_PLL_STATUS_REQ_STRU
- 结构说明  : AT向WPHY或GPHY查询PLL状态的消息结构
- 1.日    期   : 2013年11月29日
-   作    者   : L00256032
-   修改内容   : Added for PLL status query
+ ??????    : AT_PHY_RF_PLL_STATUS_REQ_STRU
+ ????????  : AT??WPHY??GPHY????PLL??????????????
+ 1.??    ??   : 2013??11??29??
+   ??    ??   : L00256032
+   ????????   : Added for PLL status query
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usMsgID;           /* Msg ID */
-    VOS_UINT16                          usRsv1;            /* 保留位 */
-    VOS_UINT16                          usDspBand;         /* DSP格式的频段值 */
-    VOS_UINT16                          usRsv2;            /* 保留位 */
+    VOS_UINT16                          usRsv1;            /* ?????? */
+    VOS_UINT16                          usDspBand;         /* DSP???????????? */
+    VOS_UINT16                          usRsv2;            /* ?????? */
 }AT_PHY_RF_PLL_STATUS_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : AT_PHY_RF_PLL_STATUS_REQ_STRU
- 结构说明  : WPHY或GPHY向AT返回PLL状态的消息结构
- 1.日    期   : 2013年11月29日
-   作    者   : L00256032
-   修改内容   : Added for PLL status query
+ ??????    : AT_PHY_RF_PLL_STATUS_REQ_STRU
+ ????????  : WPHY??GPHY??AT????PLL??????????????
+ 1.??    ??   : 2013??11??29??
+   ??    ??   : L00256032
+   ????????   : Added for PLL status query
 *****************************************************************************/
 typedef struct
 {
     HPA_AT_HEADER_STRU                  stMsgHeader;
-    VOS_UINT16                          usTxStatus;        /* 0:PLL失锁, 1:PLL锁定 */
-    VOS_UINT16                          usRxStatus;        /* 0:PLL失锁, 1:PLL锁定 */
+    VOS_UINT16                          usTxStatus;        /* 0:PLL????, 1:PLL???? */
+    VOS_UINT16                          usRxStatus;        /* 0:PLL????, 1:PLL???? */
 }PHY_AT_RF_PLL_STATUS_CNF_STRU;
 
 
 /*****************************************************************************
- 结构名    : AT_PHY_POWER_DET_REQ_STRU
- 结构说明  : AT向WPHY查询功率检测的消息结构
- 1.日    期   : 2014年05月06日
-   作    者   : c00242732
-   修改内容   : Added for Power_Detect query
+ ??????    : AT_PHY_POWER_DET_REQ_STRU
+ ????????  : AT??WPHY??????????????????????
+ 1.??    ??   : 2014??05??06??
+   ??    ??   : c00242732
+   ????????   : Added for Power_Detect query
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usMsgID;           /* Msg ID */
-    VOS_UINT16                          usRsv;             /* 保留位 */
+    VOS_UINT16                          usRsv;             /* ?????? */
 }AT_PHY_POWER_DET_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : PHY_AT_POWER_DET_CNF_STRU
- 结构说明  : WPHY向AT返回功率检测结果的消息结构
- 1.日    期   : 2014年05月06日
-   作    者   : c00242732
-   修改内容   : Added for Power_Detect query
+ ??????    : PHY_AT_POWER_DET_CNF_STRU
+ ????????  : WPHY??AT??????????????????????????
+ 1.??    ??   : 2014??05??06??
+   ??    ??   : c00242732
+   ????????   : Added for Power_Detect query
 *****************************************************************************/
 typedef struct
 {
     HPA_AT_HEADER_STRU                  stMsgHeader;
-    VOS_INT16                           sPowerDet;         /* 功率检测结果，0.1dBm精度 */
-    VOS_UINT16                          usRsv;             /* 保留位 */
+    VOS_INT16                           sPowerDet;         /* ??????????????0.1dBm???? */
+    VOS_UINT16                          usRsv;             /* ?????? */
 }PHY_AT_POWER_DET_CNF_STRU;
 
 
 /*****************************************************************************
- 结构名    : AT_HPA_RF_NOISE_CFG_REQ_STRU
- 结构说明  : AT向GPHY下发noise tool请求
- 1.日    期   : 2014年12月19日
-   作    者   : tianyige
-   修改内容   : Added for noise tool
+ ??????    : AT_HPA_RF_NOISE_CFG_REQ_STRU
+ ????????  : AT??GPHY????noise tool????
+ 1.??    ??   : 2014??12??19??
+   ??    ??   : tianyige
+   ????????   : Added for noise tool
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usMsgID;                                /* Msg ID */
-    VOS_UINT16                          usMode;                                 /* UE 模式 */
-    VOS_UINT16                          usBand;                                 /* band信息 */
-    VOS_UINT16                          usDlStartFreq;                          /* 下行开始频点 */
-    VOS_UINT16                          usDlEndFreq;                            /* 下行结束频点 */
-    VOS_UINT16                          usFreqStep;                             /* 步长 */
-    VOS_INT16                           sTxPwr;                                 /* 发射功率 */
-    VOS_UINT16                          usRsv;                                  /* 保留位 */
+    VOS_UINT16                          usMode;                                 /* UE ???? */
+    VOS_UINT16                          usBand;                                 /* band???? */
+    VOS_UINT16                          usDlStartFreq;                          /* ???????????? */
+    VOS_UINT16                          usDlEndFreq;                            /* ???????????? */
+    VOS_UINT16                          usFreqStep;                             /* ???? */
+    VOS_INT16                           sTxPwr;                                 /* ???????? */
+    VOS_UINT16                          usRsv;                                  /* ?????? */
 }AT_HPA_RF_NOISE_CFG_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : AT_HPA_MIPI_WR_REQ_STRU
- 结构说明  : 设置MIPI 寄存器请求结构体
+ ??????    : AT_HPA_MIPI_WR_REQ_STRU
+ ????????  : ????MIPI ????????????????
 
- 1.日    期   : 2015年9月10日
-    作    者   : l00227485
-    修改内容   : 新增结构体
+ 1.??    ??   : 2015??9??10??
+    ??    ??   : l00227485
+    ????????   : ??????????
 *****************************************************************************/
 typedef struct
 {
@@ -660,11 +660,11 @@ typedef struct
 }AT_HPA_MIPI_WR_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : HPA_AT_MIPI_WR_CNF_STRU
- 结构说明  : AT与AT AGENT 设置MIPI 寄存器请求结构体
-1.日    期   : 2015年9月10日
-   作    者   :l00227485
-   修改内容   : 新增结构体
+ ??????    : HPA_AT_MIPI_WR_CNF_STRU
+ ????????  : AT??AT AGENT ????MIPI ????????????????
+1.??    ??   : 2015??9??10??
+   ??    ??   :l00227485
+   ????????   : ??????????
 *****************************************************************************/
 typedef struct
 {
@@ -673,27 +673,27 @@ typedef struct
 }HPA_AT_MIPI_WR_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : AT_HPA_MIPI_RD_REQ_STRU
- 结构说明  :查询MIPI 寄存器请求结构体
- 1.日    期   : 2015年9月10日
-    作    者   : l00227485
-    修改内容   : 新增结构体
+ ??????    : AT_HPA_MIPI_RD_REQ_STRU
+ ????????  :????MIPI ????????????????
+ 1.??    ??   : 2015??9??10??
+    ??    ??   : l00227485
+    ????????   : ??????????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usMsgID;                                /* Msg ID */
-    VOS_UINT16                          uhwSlaveAddr;                           /* 接收端地址 */
-    VOS_UINT16                          uhwReg;                                 /* 寄存器个数 */
-    VOS_UINT16                          uhwChannel;                             /* 开始的寄存器 */
+    VOS_UINT16                          uhwSlaveAddr;                           /* ?????????? */
+    VOS_UINT16                          uhwReg;                                 /* ?????????? */
+    VOS_UINT16                          uhwChannel;                             /* ???????????? */
 }AT_HPA_MIPI_RD_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : HPA_AT_MIPI_RD_CNF_STRU
- 结构说明  : AT与AT AGENT 设置MIPI 寄存器请求结构体
-1.日    期   : 2015年9月10日
-   作    者   :l00227485
-   修改内容   : 新增结构体
+ ??????    : HPA_AT_MIPI_RD_CNF_STRU
+ ????????  : AT??AT AGENT ????MIPI ????????????????
+1.??    ??   : 2015??9??10??
+   ??    ??   :l00227485
+   ????????   : ??????????
 *****************************************************************************/
 typedef struct
 {
@@ -703,27 +703,27 @@ typedef struct
 }HPA_AT_MIPI_RD_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : AT_HPA_SSI_WR_REQ_STRU
- 结构说明  : AT向PHY下发SSI请求
- 1.日    期   : 2015年09月19日
-   作    者   : x00316382
-   修改内容   : Added for ssi tool
+ ??????    : AT_HPA_SSI_WR_REQ_STRU
+ ????????  : AT??PHY????SSI????
+ 1.??    ??   : 2015??09??19??
+   ??    ??   : x00316382
+   ????????   : Added for ssi tool
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usMsgID;
     VOS_UINT16                          usRficSsi;                              /* Mipi */
-    VOS_UINT16                          usRegAddr;                              /* 开始的寄存器 */
-    VOS_UINT16                          usData;                                 /* 数据 */
+    VOS_UINT16                          usRegAddr;                              /* ???????????? */
+    VOS_UINT16                          usData;                                 /* ???? */
 }AT_HPA_SSI_WR_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : HPA_AT_SSI_WR_CNF_STRU
- 结构说明  : AT与AT AGENT 设置MIPI 寄存器请求结构体
-1.日    期   : 2015年9月10日
-   作    者   :l00227485
-   修改内容   : 新增结构体
+ ??????    : HPA_AT_SSI_WR_CNF_STRU
+ ????????  : AT??AT AGENT ????MIPI ????????????????
+1.??    ??   : 2015??9??10??
+   ??    ??   :l00227485
+   ????????   : ??????????
 *****************************************************************************/
 typedef struct
 {
@@ -732,26 +732,26 @@ typedef struct
 }HPA_AT_SSI_WR_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : AT_HPA_SSI_RD_REQ_STRU
- 结构说明  :
- 1.日    期   : 2015年09月19日
-   作    者   : x00316382
-   修改内容   : Added for tool
+ ??????    : AT_HPA_SSI_RD_REQ_STRU
+ ????????  :
+ 1.??    ??   : 2015??09??19??
+   ??    ??   : x00316382
+   ????????   : Added for tool
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usMsgID;                                /* Msg ID */
-    VOS_UINT16                          usChannelNo;                            /* 接收端地址 */
+    VOS_UINT16                          usChannelNo;                            /* ?????????? */
     VOS_UINT32                          uwRficReg;
 }AT_HPA_SSI_RD_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : HPA_AT_SSI_RD_CNF_STRU
- 结构说明  : AT与AT AGENT 设置MIPI 寄存器请求结构体
-1.日    期   : 2015年9月10日
-   作    者   :l00227485
-   修改内容   : 新增结构体
+ ??????    : HPA_AT_SSI_RD_CNF_STRU
+ ????????  : AT??AT AGENT ????MIPI ????????????????
+1.??    ??   : 2015??9??10??
+   ??    ??   :l00227485
+   ????????   : ??????????
 *****************************************************************************/
 typedef struct
 {
@@ -760,33 +760,33 @@ typedef struct
     VOS_UINT32                          ulResult;
 }HPA_AT_SSI_RD_CNF_STRU;
 
-/* 接收到测量质量上报请求后，上报前一次接收的RSSI测量结果  G/W通用 */
+/* ??????????????????????????????????????????RSSI????????  G/W???? */
 typedef struct
 {
     HPA_AT_HEADER_STRU                  stMsgHeader;
-    VOS_INT16                           sRSSI;            /* RSSI测量值 [-2048,+2047]，单位0.125dBm*/
-    VOS_INT16                           sAGCGain;         /* 取得测量值时的增益状态，-1表示出错 */
+    VOS_INT16                           sRSSI;            /* RSSI?????? [-2048,+2047]??????0.125dBm*/
+    VOS_INT16                           sAGCGain;         /* ????????????????????????-1???????? */
 }CHPA_AT_RF_RX_RSSI_IND_STRU;
 
 typedef struct
 {
     HPA_AT_HEADER_STRU                  stMsgHeader;
-    VOS_UINT16                          usCfgMsgID;        /* 接收到的消息ID */
+    VOS_UINT16                          usCfgMsgID;        /* ????????????ID */
     VOS_UINT16                          usErrFlg;          /* 0:success, 1:fail */
 }CHPA_AT_RF_CFG_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : AT_HPA_PDM_CTRL_REQ_STRU
- 结构说明  :
- 1.日    期   : 2015年10月20日
-   作    者   : x00316382
-   修改内容   : Added for tool
+ ??????    : AT_HPA_PDM_CTRL_REQ_STRU
+ ????????  :
+ 1.??    ??   : 2015??10??20??
+   ??    ??   : x00316382
+   ????????   : Added for tool
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
     VOS_UINT16                          usMsgID;                                /* Msg ID */
-    VOS_UINT16                          usRsv;                                  /* 保留位 */
+    VOS_UINT16                          usRsv;                                  /* ?????? */
     VOS_UINT16                          usPdmRegValue;
     VOS_UINT16                          usPaVbias;
     VOS_UINT16                          usPaVbias2;
@@ -794,11 +794,11 @@ typedef struct
 }AT_HPA_PDM_CTRL_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : HPA_AT_PDM_CTRL_CNF_STRU
- 结构说明  : AT与AT AGENT 设置PDM 寄存器请求结构体
-1.日    期   : 2015年10月20日
-  作    者   : x00316382
-  修改内容   : 新增结构体
+ ??????    : HPA_AT_PDM_CTRL_CNF_STRU
+ ????????  : AT??AT AGENT ????PDM ????????????????
+1.??    ??   : 2015??10??20??
+  ??    ??   : x00316382
+  ????????   : ??????????
 *****************************************************************************/
 typedef struct
 {
@@ -807,17 +807,17 @@ typedef struct
 }HPA_AT_PDM_CTRL_CNF_STRU;
 
 /*****************************************************************************
-  8 UNION定义
+  8 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  9 OTHERS定义
+  9 OTHERS????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 
 

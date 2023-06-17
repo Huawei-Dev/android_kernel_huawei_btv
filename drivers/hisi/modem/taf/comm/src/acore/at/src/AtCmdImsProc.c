@@ -47,7 +47,7 @@
 */
 
 /*****************************************************************************
-  1 头文件包含
+  1 ??????????
 *****************************************************************************/
 #include "AtCmdImsProc.h"
 #include "ATCmdProc.h"
@@ -56,7 +56,7 @@
 
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
 /*lint -e767 -e960*/
 #define    THIS_FILE_ID                 PS_FILE_ID_AT_CMD_IMS_PROC_C
@@ -64,12 +64,12 @@
 
 
 /*****************************************************************************
-  2 全局变量定义
+  2 ????????????
 *****************************************************************************/
-/*AT与IMSA模块间消息处理函数指针*/
+/*AT??IMSA??????????????????????*/
 const AT_IMSA_MSG_PRO_FUNC_STRU g_astAtImsaMsgTab[]=
 {
-    /* 消息ID */                            /* 消息处理函数 */
+    /* ????ID */                            /* ???????????? */
     {ID_IMSA_AT_CIREG_SET_CNF,              AT_RcvImsaCiregSetCnf},
     {ID_IMSA_AT_CIREG_QRY_CNF,              AT_RcvImsaCiregQryCnf},
     {ID_IMSA_AT_CIREP_SET_CNF,              AT_RcvImsaCirepSetCnf},
@@ -93,22 +93,22 @@ const AT_IMSA_MSG_PRO_FUNC_STRU g_astAtImsaMsgTab[]=
 
 
 /*****************************************************************************
-  3 函数实现
+  3 ????????
 *****************************************************************************/
 
 /*****************************************************************************
- 函 数 名  : AT_ProcImsaMsg
- 功能描述  : 处理来自IMSA模块的消息
- 输入参数  : AT_IMSA_MSG_STRU *pMsg
- 输出参数  : 无
- 返 回 值  : TAF_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_ProcImsaMsg
+ ????????  : ????????IMSA??????????
+ ????????  : AT_IMSA_MSG_STRU *pMsg
+ ????????  : ??
+ ?? ?? ??  : TAF_VOID
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2013年09月18日
-    作    者   : Y00213812
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2013??09??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_VOID AT_ProcImsaMsg(AT_IMSA_MSG_STRU *pstMsg)
@@ -118,13 +118,13 @@ VOS_VOID AT_ProcImsaMsg(AT_IMSA_MSG_STRU *pstMsg)
     VOS_UINT32                          ulMsgId;
     VOS_UINT32                          ulRst;
 
-    /*从g_astAtProcMsgFromImsaTab中获取消息个数*/
+    /*??g_astAtProcMsgFromImsaTab??????????????*/
     ulMsgCnt = sizeof(g_astAtImsaMsgTab)/sizeof(AT_IMSA_MSG_PRO_FUNC_STRU);
 
-    /*从消息包中获取MSG ID*/
+    /*??????????????MSG ID*/
     ulMsgId  = pstMsg->ulMsgId;
 
-    /*g_astAtProcMsgFromImsaTab查表，进行消息分发*/
+    /*g_astAtProcMsgFromImsaTab??????????????????*/
     for (i = 0; i < ulMsgCnt; i++)
     {
         if (g_astAtImsaMsgTab[i].ulMsgId == ulMsgId)
@@ -140,7 +140,7 @@ VOS_VOID AT_ProcImsaMsg(AT_IMSA_MSG_STRU *pstMsg)
         }
     }
 
-    /*没有找到匹配的消息*/
+    /*??????????????????*/
     if (ulMsgCnt == i)
     {
         AT_ERR_LOG("AT_ProcImsaMsg: Msg Id is invalid!");
@@ -150,32 +150,32 @@ VOS_VOID AT_ProcImsaMsg(AT_IMSA_MSG_STRU *pstMsg)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaCiregSetCnf
- 功能描述  : +CIREG设置命令回复处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaCiregSetCnf
+ ????????  : +CIREG????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2013年09月18日
-    作    者   : Y00213812
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2013??09??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaCiregSetCnf(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_CIREG_SET_CNF_STRU         *pstCiregCnf;
     VOS_UINT8                           ucIndex;
     VOS_UINT32                          ulResult;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex     = 0;
     pstCiregCnf = (IMSA_AT_CIREG_SET_CNF_STRU *)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if ( AT_FAILURE == At_ClientIdToUserId(pstCiregCnf->usClientId, &ucIndex) )
     {
         AT_WARN_LOG("AT_RcvImsaCiregSetCnf: WARNING:AT INDEX NOT FOUND!");
@@ -188,17 +188,17 @@ VOS_UINT32 AT_RcvImsaCiregSetCnf(VOS_VOID * pMsg)
         return VOS_ERR;
     }
 
-    /* 判断当前操作类型是否为AT_CMD_CIREG_SET */
+    /* ??????????????????????AT_CMD_CIREG_SET */
     if ( AT_CMD_CIREG_SET != gastAtClientTab[ucIndex].CmdCurrentOpt )
     {
         AT_WARN_LOG("AT_RcvImsaCiregSetCnf: WARNING:Not AT_CMD_CIREG_SET!");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 判断查询操作是否成功 */
+    /* ???????????????????? */
     if ( VOS_OK == pstCiregCnf->ulResult )
     {
         ulResult    = AT_OK;
@@ -210,41 +210,41 @@ VOS_UINT32 AT_RcvImsaCiregSetCnf(VOS_VOID * pMsg)
 
     gstAtSendData.usBufLen = 0;
 
-    /* 调用At_FormatResultData发送命令结果 */
+    /* ????At_FormatResultData???????????? */
     At_FormatResultData(ucIndex, ulResult);
 
     return VOS_OK;
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaCiregQryCnf
- 功能描述  : +CIREG查询命令回复处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaCiregQryCnf
+ ????????  : +CIREG????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2013年09月18日
-    作    者   : Y00213812
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2013??09??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaCiregQryCnf(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_CIREG_QRY_CNF_STRU         *pstCiregCnf;
     VOS_UINT8                           ucIndex;
     VOS_UINT32                          ulResult;
     VOS_UINT16                          usLength;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex     = 0;
     usLength    = 0;
     pstCiregCnf = (IMSA_AT_CIREG_QRY_CNF_STRU *)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if ( AT_FAILURE == At_ClientIdToUserId(pstCiregCnf->usClientId, &ucIndex) )
     {
         AT_WARN_LOG("AT_RcvImsaCiregQryCnf: WARNING:AT INDEX NOT FOUND!");
@@ -257,17 +257,17 @@ VOS_UINT32 AT_RcvImsaCiregQryCnf(VOS_VOID * pMsg)
         return VOS_ERR;
     }
 
-    /* 判断当前操作类型是否为AT_CMD_CIREG_QRY */
+    /* ??????????????????????AT_CMD_CIREG_QRY */
     if ( AT_CMD_CIREG_QRY != gastAtClientTab[ucIndex].CmdCurrentOpt )
     {
         AT_WARN_LOG("AT_RcvImsaCiregQryCnf: WARNING:Not AT_CMD_CIREG_SET!");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 判断查询操作是否成功 */
+    /* ???????????????????? */
     if ( VOS_OK == pstCiregCnf->ulResult )
     {
 
@@ -284,7 +284,7 @@ VOS_UINT32 AT_RcvImsaCiregQryCnf(VOS_VOID * pMsg)
                                            "%d",
                                            pstCiregCnf->ulRegInfo);
 
-        /* 如果IMS未注册，<ext_info>参数无意义，且不输出，详见3GPP 27007 v11 8.71 */
+        /* ????IMS????????<ext_info>??????????????????????????3GPP 27007 v11 8.71 */
         if ((VOS_FALSE != pstCiregCnf->ulRegInfo) && (VOS_FALSE != pstCiregCnf->bitOpExtInfo))
         {
             usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
@@ -303,39 +303,39 @@ VOS_UINT32 AT_RcvImsaCiregQryCnf(VOS_VOID * pMsg)
 
     gstAtSendData.usBufLen  = usLength;
 
-    /* 调用At_FormatResultData发送命令结果 */
+    /* ????At_FormatResultData???????????? */
     At_FormatResultData(ucIndex, ulResult);
 
     return VOS_OK;
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaCirepSetCnf
- 功能描述  : +CIREP设置命令回复处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaCirepSetCnf
+ ????????  : +CIREP????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2013年09月18日
-    作    者   : Y00213812
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2013??09??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaCirepSetCnf(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_CIREP_SET_CNF_STRU         *pstCirepCnf;
     VOS_UINT8                           ucIndex;
     VOS_UINT32                          ulResult;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex     = 0;
     pstCirepCnf = (IMSA_AT_CIREP_SET_CNF_STRU *)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if ( AT_FAILURE == At_ClientIdToUserId(pstCirepCnf->usClientId, &ucIndex) )
     {
         AT_WARN_LOG("AT_RcvImsaCirepSetCnf: WARNING:AT INDEX NOT FOUND!");
@@ -348,17 +348,17 @@ VOS_UINT32 AT_RcvImsaCirepSetCnf(VOS_VOID * pMsg)
         return VOS_ERR;
     }
 
-    /* 判断当前操作类型是否为AT_CMD_CIREP_SET */
+    /* ??????????????????????AT_CMD_CIREP_SET */
     if ( AT_CMD_CIREP_SET != gastAtClientTab[ucIndex].CmdCurrentOpt )
     {
         AT_WARN_LOG("AT_RcvImsaCirepSetCnf: WARNING:Not AT_CMD_CIREP_SET!");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 判断查询操作是否成功 */
+    /* ???????????????????? */
     if ( VOS_OK == pstCirepCnf->ulResult )
     {
         ulResult    = AT_OK;
@@ -370,39 +370,39 @@ VOS_UINT32 AT_RcvImsaCirepSetCnf(VOS_VOID * pMsg)
 
     gstAtSendData.usBufLen = 0;
 
-    /* 调用At_FormatResultData发送命令结果 */
+    /* ????At_FormatResultData???????????? */
     At_FormatResultData(ucIndex, ulResult);
 
     return VOS_OK;
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaCirepQryCnf
- 功能描述  : +CIREP查询命令回复处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaCirepQryCnf
+ ????????  : +CIREP????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2013年09月18日
-    作    者   : Y00213812
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2013??09??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaCirepQryCnf(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_CIREP_QRY_CNF_STRU         *pstCirepCnf;
     VOS_UINT8                           ucIndex;
     VOS_UINT32                          ulResult;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex     = 0;
     pstCirepCnf = (IMSA_AT_CIREP_QRY_CNF_STRU *)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if ( AT_FAILURE == At_ClientIdToUserId(pstCirepCnf->usClientId, &ucIndex) )
     {
         AT_WARN_LOG("AT_RcvImsaCirepQryCnf: WARNING:AT INDEX NOT FOUND!");
@@ -415,17 +415,17 @@ VOS_UINT32 AT_RcvImsaCirepQryCnf(VOS_VOID * pMsg)
         return VOS_ERR;
     }
 
-    /* 判断当前操作类型是否为AT_CMD_CIREP_QRY */
+    /* ??????????????????????AT_CMD_CIREP_QRY */
     if ( AT_CMD_CIREP_QRY != gastAtClientTab[ucIndex].CmdCurrentOpt )
     {
         AT_WARN_LOG("AT_RcvImsaCirepQryCnf: WARNING:Not AT_CMD_CIREP_QRY!");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 判断查询操作是否成功 */
+    /* ???????????????????? */
     if ( VOS_OK == pstCirepCnf->ulResult )
     {
 
@@ -445,7 +445,7 @@ VOS_UINT32 AT_RcvImsaCirepQryCnf(VOS_VOID * pMsg)
         ulResult                = AT_ERROR;
     }
 
-    /* 调用At_FormatResultData发送命令结果 */
+    /* ????At_FormatResultData???????????? */
     At_FormatResultData(ucIndex, ulResult);
 
     return VOS_OK;
@@ -453,33 +453,33 @@ VOS_UINT32 AT_RcvImsaCirepQryCnf(VOS_VOID * pMsg)
 
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaImpuSetCnf
- 功能描述  : +CIREP查询命令回复处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaImpuSetCnf
+ ????????  : +CIREP????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年1月17日
-    作    者   : c64416
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2014??1??17??
+    ??    ??   : c64416
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaImpuSetCnf(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_VOLTEIMPU_QRY_CNF_STRU      *pstImpuCnf;
     VOS_UINT8                           ucIndex;
     VOS_UINT32                          ulResult;
     VOS_CHAR                            acString[AT_IMSA_IMPU_MAX_LENGTH+1];
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex     = 0;
     pstImpuCnf  = (IMSA_AT_VOLTEIMPU_QRY_CNF_STRU *)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if ( AT_FAILURE == At_ClientIdToUserId(pstImpuCnf->usClientId, &ucIndex) )
     {
         AT_WARN_LOG("AT_RcvImsaImpuSetCnf: WARNING:AT INDEX NOT FOUND!");
@@ -492,14 +492,14 @@ VOS_UINT32 AT_RcvImsaImpuSetCnf(VOS_VOID * pMsg)
         return VOS_ERR;
     }
 
-    /* 判断当前操作类型是否为AT_CMD_IMPU_SET */
+    /* ??????????????????????AT_CMD_IMPU_SET */
     if ( AT_CMD_IMPU_SET != gastAtClientTab[ucIndex].CmdCurrentOpt )
     {
         AT_WARN_LOG("AT_RcvImsaImpuSetCnf: WARNING:Not AT_CMD_IMPU_SET!");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
     VOS_MemSet(acString, 0, sizeof(acString));
@@ -512,7 +512,7 @@ VOS_UINT32 AT_RcvImsaImpuSetCnf(VOS_VOID * pMsg)
         VOS_MemCpy(acString, pstImpuCnf->aucImpu, pstImpuCnf->ulImpuLen);
     }
 
-    /* 判断查询操作是否成功 */
+    /* ???????????????????? */
     if ( VOS_OK == pstImpuCnf->ulResult )
     {
 
@@ -531,45 +531,45 @@ VOS_UINT32 AT_RcvImsaImpuSetCnf(VOS_VOID * pMsg)
         ulResult                = AT_ERROR;
     }
 
-    /* 调用At_FormatResultData发送命令结果 */
+    /* ????At_FormatResultData???????????? */
     At_FormatResultData(ucIndex, ulResult);
 
     return VOS_OK;
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaCirephInd
- 功能描述  : +CIREPH主动上报命令处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaCirephInd
+ ????????  : +CIREPH????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2013年09月18日
-    作    者   : Y00213812
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2013??09??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaCirephInd(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_CIREPH_IND_STRU            *pstCirephInd;
     VOS_UINT8                           ucIndex;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex      = 0;
     pstCirephInd = (IMSA_AT_CIREPH_IND_STRU *)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if ( AT_FAILURE == At_ClientIdToUserId(pstCirephInd->usClientId, &ucIndex) )
     {
         AT_WARN_LOG("AT_RcvImsaCirephInd: WARNING:AT INDEX NOT FOUND!");
         return VOS_ERR;
     }
 
-    /* 判断查询操作是否成功 */
+    /* ???????????????????? */
     gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
@@ -585,38 +585,38 @@ VOS_UINT32 AT_RcvImsaCirephInd(VOS_VOID * pMsg)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaCirepiInd
- 功能描述  : +CIREPI主动上报命令处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaCirepiInd
+ ????????  : +CIREPI????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2013年09月18日
-    作    者   : Y00213812
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2013??09??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaCirepiInd(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_CIREPI_IND_STRU            *pstCirepiInd;
     VOS_UINT8                           ucIndex;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex      = 0;
     pstCirepiInd = (IMSA_AT_CIREPI_IND_STRU *)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if ( AT_FAILURE == At_ClientIdToUserId(pstCirepiInd->usClientId, &ucIndex) )
     {
         AT_WARN_LOG("AT_RcvImsaCirepiInd: WARNING:AT INDEX NOT FOUND!");
         return VOS_ERR;
     }
 
-    /* 判断查询操作是否成功 */
+    /* ???????????????????? */
     gstAtSendData.usBufLen = (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
                                                     (VOS_CHAR *)pgucAtSndCodeAddr,
@@ -632,40 +632,40 @@ VOS_UINT32 AT_RcvImsaCirepiInd(VOS_VOID * pMsg)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaCireguInd
- 功能描述  : +CIREGU主动上报命令处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaCireguInd
+ ????????  : +CIREGU????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2013年09月18日
-    作    者   : Y00213812
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2013??09??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaCireguInd(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_CIREGU_IND_STRU            *pstCireguInd;
     VOS_UINT8                           ucIndex;
     VOS_UINT16                          usLength;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex      = 0;
     usLength     = 0;
     pstCireguInd = (IMSA_AT_CIREGU_IND_STRU *)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if ( AT_FAILURE == At_ClientIdToUserId(pstCireguInd->usClientId, &ucIndex) )
     {
         AT_WARN_LOG("AT_RcvImsaCireguInd: WARNING:AT INDEX NOT FOUND!");
         return VOS_ERR;
     }
 
-    /* 判断查询操作是否成功 */
+    /* ???????????????????? */
     usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                        (VOS_CHAR *)pgucAtSndCodeAddr,
                                        (VOS_CHAR *)pgucAtSndCodeAddr,
@@ -674,7 +674,7 @@ VOS_UINT32 AT_RcvImsaCireguInd(VOS_VOID * pMsg)
                                        gastAtStringTab[AT_STRING_CIREGU].pucText,
                                        pstCireguInd->ulRegInfo);
 
-    /* 如果IMS未注册，<ext_info>参数无意义 */
+    /* ????IMS????????<ext_info>?????????? */
     if ((VOS_FALSE != pstCireguInd->ulRegInfo) && (VOS_FALSE != pstCireguInd->bitOpExtInfo))
     {
         usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
@@ -699,18 +699,18 @@ VOS_UINT32 AT_RcvImsaCireguInd(VOS_VOID * pMsg)
 
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaVtIpv4PdpActInd
- 功能描述  : VT IPV4承载激活指示处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaVtIpv4PdpActInd
+ ????????  : VT IPV4????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年07月31日
-    作    者   : f00179208
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2014??07??31??
+    ??    ??   : f00179208
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_VOID AT_RcvImsaVtIpv4PdpActInd(
@@ -718,11 +718,11 @@ VOS_VOID AT_RcvImsaVtIpv4PdpActInd(
     IMSA_AT_VT_PDP_ACTIVATE_IND_STRU   *pstPdpActInd
 )
 {
-    VOS_UINT32                          ulIPAddr;                               /* IP 地址，网侧分配*/
-    VOS_UINT32                          ulSubNetMask;                           /* 子网掩码地址，根据IP地址计算*/
-    VOS_UINT32                          ulGateWay;                              /* 网关地址，也是本DHCP Server的地址*/
-    VOS_UINT32                          ulPrimDNS;                              /* 主 DNS地址，网侧分配*/
-    VOS_UINT32                          ulSecDNS;                               /* 次 DNS地址，网侧分配*/
+    VOS_UINT32                          ulIPAddr;                               /* IP ??????????????*/
+    VOS_UINT32                          ulSubNetMask;                           /* ??????????????????IP????????*/
+    VOS_UINT32                          ulGateWay;                              /* ????????????????DHCP Server??????*/
+    VOS_UINT32                          ulPrimDNS;                              /* ?? DNS??????????????*/
+    VOS_UINT32                          ulSecDNS;                               /* ?? DNS??????????????*/
 
     ulIPAddr     = AT_GetLanAddr32(pstPdpActInd->stPdpAddr.aucIpv4Addr);
     ulSubNetMask = AT_DHCPGetIPMask(ulIPAddr);
@@ -764,18 +764,18 @@ VOS_VOID AT_RcvImsaVtIpv4PdpActInd(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaVtIpv6PdpActInd
- 功能描述  : VT IPV6承载激活指示处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaVtIpv6PdpActInd
+ ????????  : VT IPV6????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年07月31日
-    作    者   : f00179208
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2014??07??31??
+    ??    ??   : f00179208
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_VOID AT_RcvImsaVtIpv6PdpActInd(
@@ -800,7 +800,7 @@ VOS_VOID AT_RcvImsaVtIpv6PdpActInd(
     usLength  += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN, (VOS_CHAR*)pgucAtSndCodeAddr,
                            (VOS_CHAR*)pgucAtSndCodeAddr + usLength, "%s^VTDCONNV6:", gaucAtCrLf);
 
-    /* 填写IPV6地址 */
+    /* ????IPV6???? */
     AT_ConvertIpv6AddrToCompressedStr(aucIpv6AddrStr,
                                       pstPdpActInd->stPdpAddr.aucIpv6Addr,
                                       TAF_IPV6_STR_RFC2373_TOKENS);
@@ -808,35 +808,35 @@ VOS_VOID AT_RcvImsaVtIpv6PdpActInd(
     usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN, (VOS_CHAR*)pgucAtSndCodeAddr,
                           (VOS_CHAR*)pgucAtSndCodeAddr + usLength, "%s", aucIpv6AddrStr);
 
-    /* 填写IPV6掩码, 该字段填全0 */
+    /* ????IPV6????, ??????????0 */
     AT_ConvertIpv6AddrToCompressedStr(aucIpv6AddrStr,
                                       aucInvalidIpv6Addr,
                                       TAF_IPV6_STR_RFC2373_TOKENS);
     usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN, (VOS_CHAR*)pgucAtSndCodeAddr,
                           (VOS_CHAR*)pgucAtSndCodeAddr + usLength, ",%s", aucIpv6AddrStr);
 
-    /* 填写IPV6网关, 该字段填全0 */
+    /* ????IPV6????, ??????????0 */
     AT_ConvertIpv6AddrToCompressedStr(aucIpv6AddrStr,
                                       aucInvalidIpv6Addr,
                                       TAF_IPV6_STR_RFC2373_TOKENS);
     usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN, (VOS_CHAR*)pgucAtSndCodeAddr,
                           (VOS_CHAR*)pgucAtSndCodeAddr + usLength, ",%s", aucIpv6AddrStr);
 
-    /* 填写DHCP IPV6, 该字段填全0 */
+    /* ????DHCP IPV6, ??????????0 */
     AT_ConvertIpv6AddrToCompressedStr(aucIpv6AddrStr,
                                       aucInvalidIpv6Addr,
                                       TAF_IPV6_STR_RFC2373_TOKENS);
     usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN, (VOS_CHAR*)pgucAtSndCodeAddr,
                           (VOS_CHAR*)pgucAtSndCodeAddr + usLength, ",%s", aucIpv6AddrStr);
 
-    /* 填写IPV6 Primary DNS */
+    /* ????IPV6 Primary DNS */
     AT_ConvertIpv6AddrToCompressedStr(aucIpv6AddrStr,
                                       pstPdpActInd->stIpv6Dns.aucPrimDnsAddr,
                                       TAF_IPV6_STR_RFC2373_TOKENS);
     usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN, (VOS_CHAR*)pgucAtSndCodeAddr,
                           (VOS_CHAR*)pgucAtSndCodeAddr + usLength, ",%s", aucIpv6AddrStr);
 
-    /* 填写IPV6 Secondary DNS */
+    /* ????IPV6 Secondary DNS */
     AT_ConvertIpv6AddrToCompressedStr(aucIpv6AddrStr,
                                       pstPdpActInd->stIpv6Dns.aucSecDnsAddr,
                                       TAF_IPV6_STR_RFC2373_TOKENS);
@@ -857,18 +857,18 @@ VOS_VOID AT_RcvImsaVtIpv6PdpActInd(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaVtIpv4v6PdpActInd
- 功能描述  : VT IPV4V6承载激活指示处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaVtIpv4v6PdpActInd
+ ????????  : VT IPV4V6????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年07月31日
-    作    者   : f00179208
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2014??07??31??
+    ??    ??   : f00179208
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_VOID AT_RcvImsaVtIpv4v6PdpActInd(
@@ -881,31 +881,31 @@ VOS_VOID AT_RcvImsaVtIpv4v6PdpActInd(
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaVtPdpActInd
- 功能描述  : VT承载激活指示处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaVtPdpActInd
+ ????????  : VT????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年07月31日
-    作    者   : f00179208
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2014??07??31??
+    ??    ??   : f00179208
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaVtPdpActInd(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_VT_PDP_ACTIVATE_IND_STRU   *pstPdpActInd;
     VOS_UINT8                           ucIndex;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex     = 0;
     pstPdpActInd = (IMSA_AT_VT_PDP_ACTIVATE_IND_STRU *)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if ( AT_FAILURE == At_ClientIdToUserId(pstPdpActInd->usClientId, &ucIndex) )
     {
         AT_WARN_LOG("AT_RcvImsaVtPdpActInd: WARNING:AT INDEX NOT FOUND!");
@@ -931,33 +931,33 @@ VOS_UINT32 AT_RcvImsaVtPdpActInd(VOS_VOID * pMsg)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaVtPdpDeactInd
- 功能描述  : VT承载去激活指示处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaVtPdpDeactInd
+ ????????  : VT??????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2014年07月31日
-    作    者   : f00179208
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2014??07??31??
+    ??    ??   : f00179208
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaVtPdpDeactInd(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_VT_PDP_DEACTIVATE_IND_STRU *pstPdpDeactInd;
     VOS_UINT8                           ucIndex;
     VOS_UINT16                          usLength;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     usLength       = 0;
     ucIndex        = 0;
     pstPdpDeactInd = (IMSA_AT_VT_PDP_DEACTIVATE_IND_STRU *)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if ( AT_FAILURE == At_ClientIdToUserId(pstPdpDeactInd->usClientId, &ucIndex) )
     {
         AT_WARN_LOG("AT_RcvImsaVtPdpDeactInd: WARNING:AT INDEX NOT FOUND!");
@@ -1021,32 +1021,32 @@ VOS_UINT32 AT_RcvImsaVtPdpDeactInd(VOS_VOID * pMsg)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaMtStateInd
- 功能描述  : 被叫状态指示处理函数
- 输入参数  : *pMsg        IMSA上报消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaMtStateInd
+ ????????  : ????????????????????
+ ????????  : *pMsg        IMSA????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年03月18日
-    作    者   : m00277840
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2015??03??18??
+    ??    ??   : m00277840
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaMtStateInd(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_MT_STATES_IND_STRU          *pstMtStatusInd;
     VOS_UINT8                           ucIndex;
     VOS_CHAR                            acString[AT_IMSA_CALL_ASCII_NUM_MAX_LENGTH + 1];
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex     = 0;
     pstMtStatusInd  = (IMSA_AT_MT_STATES_IND_STRU*)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if ( AT_FAILURE == At_ClientIdToUserId(pstMtStatusInd->usClientId, &ucIndex) )
     {
         AT_WARN_LOG("AT_RcvImsaImpuSetCnf: WARNING:AT INDEX NOT FOUND!");
@@ -1065,39 +1065,39 @@ VOS_UINT32 AT_RcvImsaMtStateInd(VOS_VOID * pMsg)
                                                    pstMtStatusInd->ucMtStatus,
                                                    pstMtStatusInd->ulCauseCode,
                                                    gaucAtCrLf);
-    /* 调用At_SendResultData发送命令结果 */
+    /* ????At_SendResultData???????????? */
     At_SendResultData(ucIndex, pgucAtSndCodeAddr, gstAtSendData.usBufLen);
 
     return VOS_OK;
 }
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaImsRegDomainQryCn
- 功能描述  : ^IMSREGDOMAIN?查询命令回复处理函数
- 输入参数  : *pMsg        IMSA上报消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaImsRegDomainQryCn
+ ????????  : ^IMSREGDOMAIN?????????????????????
+ ????????  : *pMsg        IMSA????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年03月18日
-    作    者   : h00360002
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2015??03??18??
+    ??    ??   : h00360002
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaImsRegDomainQryCnf(VOS_VOID *pMsg)
 {
-    /* 局部变量 */
+    /* ???????? */
     IMSA_AT_IMS_REG_DOMAIN_QRY_CNF_STRU     *pstImsRegDomainCnf = VOS_NULL_PTR;
     VOS_UINT8                                ucIndex;
     VOS_UINT32                               ulResult;
 
-    /* 初始化变量 */
+    /* ?????????? */
     ucIndex             = 0;
     ulResult            = 0;
     pstImsRegDomainCnf  = (IMSA_AT_IMS_REG_DOMAIN_QRY_CNF_STRU *)pMsg;
 
-    /* 获取ucIndex */
+    /* ????ucIndex */
     if (AT_FAILURE == At_ClientIdToUserId(pstImsRegDomainCnf->usClientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvImsaImsRegDomainQryCnf: WARNING: AT INDEX NOT FOUND1");
@@ -1110,17 +1110,17 @@ VOS_UINT32 AT_RcvImsaImsRegDomainQryCnf(VOS_VOID *pMsg)
         return VOS_ERR;
     }
 
-    /* 判断当前操作是否为AT_CMD_IMSREGDOMAIN_QRY */
+    /* ??????????????????AT_CMD_IMSREGDOMAIN_QRY */
     if (AT_CMD_IMSREGDOMAIN_QRY != gastAtClientTab[ucIndex].CmdCurrentOpt)
     {
         AT_WARN_LOG("AT_RcvImsaImsRegDomainQryCnf: WARNING: Not AT_CMD_IMSREGDOMAIN_QRY!");
         return VOS_ERR;
     }
 
-    /* 复位状态 */
+    /* ???????? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 判断返回值是否合法 */
+    /* ?????????????????? */
     if (IMSA_AT_IMS_REG_DOMAIN_TYPE_BUTT <= (pstImsRegDomainCnf->enImsRegDomain))
     {
         ulResult = AT_ERROR;
@@ -1142,34 +1142,34 @@ VOS_UINT32 AT_RcvImsaImsRegDomainQryCnf(VOS_VOID *pMsg)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaImsCtrlMsg
- 功能描述  : AT透传IMSA给MAPCON发送的消息
- 输入参数  : VOS_VOID * pMsg
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaImsCtrlMsg
+ ????????  : AT????IMSA??MAPCON??????????
+ ????????  : VOS_VOID * pMsg
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年10月28日
-    作    者   : n00269697
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2015??10??28??
+    ??    ??   : n00269697
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaImsCtrlMsg(VOS_VOID *pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_IMS_CTRL_MSG_STRU                              *pstImsCtrlMsgInd;
     AT_IMS_CTRL_MSG_RECEIVE_MODULE_ENUM_UINT8               enModule;
     VOS_UINT16                                              usLength = 0;
     VOS_UINT8                                               ucIndex;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     enModule          = AT_IMS_CTRL_MSG_RECEIVE_MODULE_MAPCON;
     ucIndex           = 0;
     pstImsCtrlMsgInd  = (IMSA_AT_IMS_CTRL_MSG_STRU *)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if (AT_FAILURE == At_ClientIdToUserId(pstImsCtrlMsgInd->usClientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvImsaImsCtrlMsg: WARNING:AT INDEX NOT FOUND!");
@@ -1196,7 +1196,7 @@ VOS_UINT32 AT_RcvImsaImsCtrlMsg(VOS_VOID *pMsg)
                                        "\"%s",
                                        gaucAtCrLf);
 
-    /* 调用At_SendResultData发送命令结果 */
+    /* ????At_SendResultData???????????? */
     At_SendResultData(ucIndex, pgucAtSndCodeAddr, usLength);
 
     return VOS_OK;
@@ -1204,32 +1204,32 @@ VOS_UINT32 AT_RcvImsaImsCtrlMsg(VOS_VOID *pMsg)
 
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaCallEncryptSetCnf
- 功能描述  : ^CALLENCRYPT设置命令回复处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaCallEncryptSetCnf
+ ????????  : ^CALLENCRYPT????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2015年11月04日
-    作    者   : f00179208
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2015??11??04??
+    ??    ??   : f00179208
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaCallEncryptSetCnf(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_CALL_ENCRYPT_SET_CNF_STRU  *pstCallEncryptCnf;
     VOS_UINT8                           ucIndex;
     VOS_UINT32                          ulResult;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex           = 0;
     pstCallEncryptCnf = (IMSA_AT_CALL_ENCRYPT_SET_CNF_STRU *)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if (AT_FAILURE == At_ClientIdToUserId(pstCallEncryptCnf->usClientId, &ucIndex))
     {
         AT_WARN_LOG("AT_RcvImsaCallEncryptSetCnf: WARNING:AT INDEX NOT FOUND!");
@@ -1242,17 +1242,17 @@ VOS_UINT32 AT_RcvImsaCallEncryptSetCnf(VOS_VOID * pMsg)
         return VOS_ERR;
     }
 
-    /* 判断当前操作类型是否为AT_CMD_CALLENCRYPT_SET */
+    /* ??????????????????????AT_CMD_CALLENCRYPT_SET */
     if (AT_CMD_CALLENCRYPT_SET != gastAtClientTab[ucIndex].CmdCurrentOpt)
     {
         AT_WARN_LOG("AT_RcvImsaCallEncryptSetCnf: WARNING:Not AT_CMD_CALLENCRYPT_SET!");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 判断查询操作是否成功 */
+    /* ???????????????????? */
     if (VOS_OK == pstCallEncryptCnf->ulResult)
     {
         ulResult    = AT_OK;
@@ -1264,41 +1264,41 @@ VOS_UINT32 AT_RcvImsaCallEncryptSetCnf(VOS_VOID * pMsg)
 
     gstAtSendData.usBufLen = 0;
 
-    /* 调用At_FormatResultData发送命令结果 */
+    /* ????At_FormatResultData???????????? */
     At_FormatResultData(ucIndex, ulResult);
 
     return VOS_OK;
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaRoamImsServiceQryCnf
- 功能描述  : ^ROAMIMSSERVICE查询命令回复处理函数
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaRoamImsServiceQryCnf
+ ????????  : ^ROAMIMSSERVICE????????????????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2016年01月15日
-    作    者   : w00316404
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2016??01??15??
+    ??    ??   : w00316404
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaRoamImsServiceQryCnf(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_ROAMING_IMS_QRY_CNF_STRU   *pstRoamImsServiceCnf;
     VOS_UINT8                           ucIndex;
     VOS_UINT32                          ulResult;
     VOS_UINT16                          usLength;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex              = 0;
     usLength             = 0;
     pstRoamImsServiceCnf = (IMSA_AT_ROAMING_IMS_QRY_CNF_STRU *)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if ( AT_FAILURE == At_ClientIdToUserId(pstRoamImsServiceCnf->usClientId, &ucIndex) )
     {
         AT_WARN_LOG("AT_RcvImsaRoamImsServiceQryCnf: WARNING:AT INDEX NOT FOUND!");
@@ -1311,17 +1311,17 @@ VOS_UINT32 AT_RcvImsaRoamImsServiceQryCnf(VOS_VOID * pMsg)
         return VOS_ERR;
     }
 
-    /* 判断当前操作类型是否为AT_CMD_ROAM_IMS_QRY */
+    /* ??????????????????????AT_CMD_ROAM_IMS_QRY */
     if ( AT_CMD_ROAM_IMS_QRY != gastAtClientTab[ucIndex].CmdCurrentOpt )
     {
         AT_WARN_LOG("AT_RcvImsaRoamImsServiceQryCnf: WARNING:Not AT_CMD_ROAM_IMS_QRY!");
         return VOS_ERR;
     }
 
-    /* 复位AT状态 */
+    /* ????AT???? */
     AT_STOP_TIMER_CMD_READY(ucIndex);
 
-    /* 判断查询操作是否成功 */
+    /* ???????????????????? */
     if ( VOS_OK == pstRoamImsServiceCnf->ulResult )
     {
 
@@ -1341,7 +1341,7 @@ VOS_UINT32 AT_RcvImsaRoamImsServiceQryCnf(VOS_VOID * pMsg)
 
     gstAtSendData.usBufLen  = usLength;
 
-    /* 调用At_FormatResultData发送命令结果 */
+    /* ????At_FormatResultData???????????? */
     At_FormatResultData(ucIndex, ulResult);
 
     return VOS_OK;
@@ -1349,31 +1349,31 @@ VOS_UINT32 AT_RcvImsaRoamImsServiceQryCnf(VOS_VOID * pMsg)
 
 
 /*****************************************************************************
- 函 数 名  : AT_RcvImsaRatHandoverInd
- 功能描述  : imsa主动上报ID_IMSA_AT_IMS_RAT_HANDOVER_IND消息处理
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvImsaRatHandoverInd
+ ????????  : imsa????????ID_IMSA_AT_IMS_RAT_HANDOVER_IND????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2016年04月22日
-    作    者   : m00217266
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2016??04??22??
+    ??    ??   : m00217266
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvImsaRatHandoverInd(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_IMS_RAT_HANDOVER_IND_STRU  *pstHandoverInd;
     VOS_UINT8                           ucIndex;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex     = 0;
     pstHandoverInd  = (IMSA_AT_IMS_RAT_HANDOVER_IND_STRU*)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if ( AT_FAILURE == At_ClientIdToUserId(pstHandoverInd->usClientId, &ucIndex) )
     {
         AT_WARN_LOG("AT_RcvImsaRatHandoverInd: WARNING:AT INDEX NOT FOUND!");
@@ -1390,38 +1390,38 @@ VOS_UINT32 AT_RcvImsaRatHandoverInd(VOS_VOID * pMsg)
                                                    pstHandoverInd->enDstRat,
                                                    pstHandoverInd->enCause,
                                                    gaucAtCrLf);
-    /* 调用At_SendResultData发送命令结果 */
+    /* ????At_SendResultData???????????? */
     At_SendResultData(ucIndex, pgucAtSndCodeAddr, gstAtSendData.usBufLen);
 
     return VOS_OK;
 }
 
 /*****************************************************************************
- 函 数 名  : AT_RcvSrvStatusUpdateInd
- 功能描述  : imsa主动上报ID_IMSA_AT_IMS_SRV_STATUS_UPDATE_IND消息处理
- 输入参数  : *pMsg        回复消息
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_RcvSrvStatusUpdateInd
+ ????????  : imsa????????ID_IMSA_AT_IMS_SRV_STATUS_UPDATE_IND????????
+ ????????  : *pMsg        ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2016年04月22日
-    作    者   : m00217266
-    修改内容   : 新增函数
+ ????????      :
+  1.??    ??   : 2016??04??22??
+    ??    ??   : m00217266
+    ????????   : ????????
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvSrvStatusUpdateInd(VOS_VOID * pMsg)
 {
-    /* 定义局部变量 */
+    /* ???????????? */
     IMSA_AT_IMS_SRV_STATUS_UPDATE_IND_STRU *pstSrvUpdateInd;
     VOS_UINT8                               ucIndex;
 
-    /* 初始化消息变量 */
+    /* ?????????????? */
     ucIndex             = 0;
     pstSrvUpdateInd     = (IMSA_AT_IMS_SRV_STATUS_UPDATE_IND_STRU*)pMsg;
 
-    /* 通过ClientId获取ucIndex */
+    /* ????ClientId????ucIndex */
     if ( AT_FAILURE == At_ClientIdToUserId(pstSrvUpdateInd->usClientId, &ucIndex) )
     {
         AT_WARN_LOG("AT_RcvSrvStatusUpdateInd: WARNING:AT INDEX NOT FOUND!");
@@ -1442,7 +1442,7 @@ VOS_UINT32 AT_RcvSrvStatusUpdateInd(VOS_VOID * pMsg)
                                                    pstSrvUpdateInd->enVsSrvStatus,
                                                    pstSrvUpdateInd->enVsSrvRat,
                                                    gaucAtCrLf);
-    /* 调用At_SendResultData发送命令结果 */
+    /* ????At_SendResultData???????????? */
     At_SendResultData(ucIndex, pgucAtSndCodeAddr, gstAtSendData.usBufLen);
 
     return VOS_OK;

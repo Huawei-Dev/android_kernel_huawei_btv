@@ -66,52 +66,35 @@ extern "C" {
 #include "sre_shell.h"
 #endif
 
-/*****************************************************************************
-  2 宏定义
-*****************************************************************************/
 #define BSP_OM_MODU_ID                     THIS_MODU_ID
 
+#define BSP_SOCP_SID_DIAG_SERVER          (0x2)
 
-/*SOCP头SID:用于HiStudio检测与Modem的连接状态*/
-#define BSP_SOCP_SID_DIAG_SERVER          (0x2) /* DIAG Service，配置诊断消息输出*/
-
-/*SOCP头 usSSId:低四位保留,高四位;SSID指明App CPU*/
 #define BSP_SOCP_HIGH4BIT_SSID_ACPU       (0x1)
 #define BSP_SOCP_HIGH4BIT_SSID_MCPU       (0x2)      /*Modem*/
 #define BSP_SOCP_HIGH4BIT_SSID_M3         (0xA)      /* M3 */
 
-/*SOCP头 ucServiceSessionId:标识Service与Client之间的连接*/
-#define BSP_SOCP_SERVER_SESSION_ID        (0x1) /* Service Session ID固定为1*/
+#define BSP_SOCP_SERVER_SESSION_ID        (0x1)
 
-/*SOCP头 ucMsgType: 表示消息类型，高6比特保留，设为0，低2比特取值如下*/
-#define BSP_SOCP_MSG_TYPE_REQ             (0x1) /* 请求*/
-#define BSP_SOCP_MSG_TYPE_CNF             (0x2) /* 响应*/
-#define BSP_SOCP_MSG_TYPE_IND             (0x3) /* 上报*/
+#define BSP_SOCP_MSG_TYPE_REQ             (0x1)
+#define BSP_SOCP_MSG_TYPE_CNF             (0x2)
+#define BSP_SOCP_MSG_TYPE_IND             (0x3)
 
-
-/* 结构化ID里面的一级（高四位(28~31)）字段*/
 #define BSP_STRU_ID_28_31_GROUP_MSP  (0x1)
 #define BSP_STRU_ID_28_31_GROUP_BSP    (0x9)
 
-/* 结构化ID里面的二级（高四位(16_23)）字段,对应的一级字段是BSP_STRU_ID_28_31_GROUP_BSP*/
-#define BSP_STRU_ID_16_23_BSP_CMD         (0x1) /* BSP内部相关命令*/
-#define BSP_STRU_ID_16_23_BSP_CPU         (0x2) /* CPU占用率数据上报*/
-#define BSP_STRU_ID_16_23_BSP_PRINT       (0x3) /* BSP 打印信息*/
-#define BSP_STRU_ID_16_23_BSP_MEM         (0x4) /* BSP内存TRACEA上报*/
-#define BSP_STRU_ID_16_23_BSP_TASK        (0x5) /* 系统任务(包括中断)调度信息上报*/
-#define BSP_STRU_ID_16_23_BSP_CMD_IND   (0x5) /* 底软二进制上报，为了适配HSO，id定义为5*/
-#define BSP_STRU_ID_16_23_BSP_INT_LOCK    (0x6) /* 系统锁中断调度信息上报*/
-#define BSP_STRU_ID_16_23_BSP_AMON        (0x7) /* AXI Monitor时间窗监控结束上报 */
+#define BSP_STRU_ID_16_23_BSP_CMD         (0x1)
+#define BSP_STRU_ID_16_23_BSP_CPU         (0x2)
+#define BSP_STRU_ID_16_23_BSP_PRINT       (0x3)
+#define BSP_STRU_ID_16_23_BSP_MEM         (0x4)
+#define BSP_STRU_ID_16_23_BSP_TASK        (0x5)
+#define BSP_STRU_ID_16_23_BSP_CMD_IND   (0x5)
+#define BSP_STRU_ID_16_23_BSP_INT_LOCK    (0x6)
+#define BSP_STRU_ID_16_23_BSP_AMON        (0x7)
 
 #define CMD_BSP_SYSVIEW_IND_ACORE           (0x5310)
 #define CMD_BSP_SYSVIEW_IND_CCORE           (0x5311)
 
-
-/*****************************************************************************
-  2 枚举定义
-*****************************************************************************/
-
-/* 模块定义 */
 typedef enum _bsp_module_e
 {
     BSP_MODU_ICC = 1,
@@ -212,8 +195,8 @@ typedef enum _bsp_module_e
 	BSP_MODU_RSRACC,
 	BSP_MODU_THERMAL_UP,
 	BSP_MODU_DSPDFS,
-    BSP_MODU_ALL,   /* 代表所有的模块 */
-    BSP_MODU_MAX = 128    /* 边界值 */
+    BSP_MODU_ALL,
+    BSP_MODU_MAX = 128
 } bsp_module_e;
 
 
@@ -227,7 +210,7 @@ typedef enum _bsp_log_level_e
     BSP_LOG_LEVEL_CRIT,       /* 0x5:critical conditions                          */
     BSP_LOG_LEVEL_ALERT,      /* 0x6:action must be taken immediately             */
     BSP_LOG_LEVEL_FATAL,      /* 0x7:just for compatibility with previous version */
-    BSP_LOG_LEVEL_MAX         /* 边界值 */
+    BSP_LOG_LEVEL_MAX
 } bsp_log_level_e;
 
 typedef enum
@@ -237,19 +220,12 @@ typedef enum
     BSP_SYSVIEW_TASK_INFO       = 3,
     BSP_SYSVIEW_INT_LOCK_INFO   = 4,
     BSP_SYSVIEW_SWT_ALL         = 0xf,
-    BSP_SYSVIEW_SWT_MAX         /* 边界值 */
+    BSP_SYSVIEW_SWT_MAX
 } bsp_sysview_type_e;
 
-
-/*****************************************************************************
-  2 函数声明
-*****************************************************************************/
-
-/* 打印接口，输出trace到HSO*/
 #ifdef ENABLE_BUILD_OM
 void bsp_trace(bsp_log_level_e log_level, bsp_module_e mod_id, char *fmt,...);
 
-/* 记录异常到文件*/
 void error_log(char *fmt ,...);
 void print2file(char* filename, char *fmt,...);
 int dmesg_write(const char* buffer, const unsigned len);
@@ -338,16 +314,10 @@ static void bsp_print2dmsg(fmt, ...)
     return;
 }
 
-
 #endif
 
 #ifdef __cplusplus
 }
 #endif
 
-
 #endif
-
-
-
-

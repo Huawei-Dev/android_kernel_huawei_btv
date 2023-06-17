@@ -49,14 +49,8 @@
 #ifndef _SOCP_INTERFACE_H_
 #define _SOCP_INTERFACE_H_
 
-/*****************************************************************************
-  1 其他头文件包含
-*****************************************************************************/
 #include "product_config.h"
 #include "mdrv_socp.h"
 #include "mdrv_socp_common.h"
 
-
 #endif
-
-

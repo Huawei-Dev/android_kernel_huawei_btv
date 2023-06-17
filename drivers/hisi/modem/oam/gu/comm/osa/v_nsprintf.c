@@ -46,50 +46,10 @@
  *
  */
 
-/*****************************************************************************/
-/*                                                                           */
-/*                Copyright 1999 - 2003, Huawei Tech. Co., Ltd.              */
-/*                           ALL RIGHTS RESERVED                             */
-/*                                                                           */
-/* FileNmae: v_nsprintf.c                                                    */
-/*                                                                           */
-/* Author:Tong ChaoZhu                                                       */
-/*                                                                           */
-/* Version: 1.0                                                              */
-/*                                                                           */
-/* Date:  2001-12-26                                                         */
-/*                                                                           */
-/* Description: copy this file from Dopra                                    */
-/*                                                                           */
-/*                                                                           */
-/* Others:                                                                   */
-/*                                                                           */
-/* History:                                                                  */
-/* 1. Date:                                                                  */
-/*    Author:                                                                */
-/*    Modification:                                                          */
-/*                                                                           */
-/*****************************************************************************/
-
-
 #include "v_IO.h"
 
-/*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
-*****************************************************************************/
-/*lint -e767 modify:x51137; review:h59254; cause:print log */
 #define    THIS_FILE_ID        PS_FILE_ID_V_NSPRINTF_C
-/*lint +e767 modify:x51137; review:h59254; */
 
-
-/*****************************************************************************
- Function   : ANSI_nvsprintf
- Description:
- Input      :
-            :
- Return     :
- Other      :
- *****************************************************************************/
 VOS_INT32 ANSI_nvsprintf(VOS_CHAR *out_buf, VOS_UINT32 ulStrLen, const VOS_CHAR *fmt0, va_list argp)
 {
     VOS_UINT_PTR    ulLong;
@@ -116,8 +76,6 @@ VOS_INT32 ANSI_nvsprintf(VOS_CHAR *out_buf, VOS_UINT32 ulStrLen, const VOS_CHAR 
     pucFmt  = (VOS_UCHAR*)fmt0;
     pucDigs = "0123456789abcdef";
 
-
-    /*lint -e801 -e445 屏蔽goto语句*/
     for (;; ++pucFmt)
     {
             for (; ((lChar = *pucFmt)!=0) && lChar != '%'; ++pucFmt)
@@ -145,47 +103,30 @@ VOS_INT32 ANSI_nvsprintf(VOS_CHAR *out_buf, VOS_UINT32 ulStrLen, const VOS_CHAR 
 
 rflag: switch (*++pucFmt) {
         case ' ':
-            /* 若空格和加号同时出现，则忽略空格 -- ANSI X3J11  */
             if (!ucPrefixSign)
             {
                 ucPrefixSign = ' ';
             }
-            /*lint -e801 */
             goto rflag;
-            /*lint +e801 */
         case '#':
             lFlags |= ALT;
-            /*lint -e801 */
             goto rflag;
-            /*lint +e801 */
         case '*':
-            /*lint -e147 -e586*/
             if ((lFormatWidth = va_arg(argp, VOS_INT)) >= 0)
             {
-                /*lint +e147 +e586*/
-                /*lint -e801 */
                 goto rflag;
-                /*lint +e801 */
             }
             lFormatWidth = -lFormatWidth;
-        /*lint -e616 */
         case '-':
-        /*lint +e616 */
-            lFlags |= LADJUST; /* 左对齐 */
-            /*lint -e801 */
+            lFlags |= LADJUST;
             goto rflag;
-            /*lint +e801 */
         case '+':
             ucPrefixSign = '+';
-            /*lint -e801 */
             goto rflag;
-            /*lint +e801 */
         case '.':
             if (*++pucFmt == '*')
             {
-                /*lint -e147 -e586*/
                 ltemp = va_arg(argp, VOS_INT);
-                /*lint +e147 +e586*/
             }
             else
             {
@@ -197,14 +138,10 @@ rflag: switch (*++pucFmt) {
                 --pucFmt;
             }
             lPrec = ltemp < 0 ? -1 : ltemp;
-            /*lint -e801 */
             goto rflag;
-            /*lint +e801 */
         case '0':
             lFlags |= ZEROPAD;
-            /*lint -e801 */
             goto rflag;
-            /*lint +e801 */
         case '1':
         case '2':
         case '3':
@@ -221,95 +158,66 @@ rflag: switch (*++pucFmt) {
             } while (isascii(*++pucFmt) && isdigit(*pucFmt));
             lFormatWidth = ltemp;
             --pucFmt;
-            /*lint -e801 */
             goto rflag;
-            /*lint +e801 */
         case 'L':
-            lFlags |= LONGDBL;
-            /*lint -e801 */
+            lFlags |= LONGDBL;        
             goto rflag;
-            /*lint +e801 */
         case 'h':
-            lFlags |= SHORTINT;
-            /*lint -e801 */
-            goto rflag;
-            /*lint +e801 */
+            lFlags |= SHORTINT;          
+            goto rflag;    
         case 'l':
-            lFlags |= LONGINT;
-            /*lint -e801 */
-            goto rflag;
-            /*lint +e801 */
+            lFlags |= LONGINT;      
+            goto rflag;     
         case 'c':
-            /*lint -e147 -e586*/
             *(pcBuf = ucBuf) = (VOS_CHAR)va_arg(argp, VOS_INT);
-            /*lint +e147 +e586*/
             lConverSize = 1;
-            ucPrefixSign = '\0';
-            /*lint -e801 */
+            ucPrefixSign = '\0';       
             goto pforw;
-            /*lint +e801 */
         case 'D':
             lFlags |= LONGINT;
-            /*lint -save -e732 -e501 -e737 -e713*/
         case 'd':
         case 'i':
-            /*lint -e147 -e586*/
             ARG(int);
-            /*lint +e147 +e586*/
             if ((VOS_INT32)ulLong < 0)
             {
                 ulLong = -ulLong;
                 ucPrefixSign = '-';
             }
             lBase = 10;
-            /*lint -e801 */
+            
             goto number;
-            /*lint +e801 */
+            
         case 'n':
             if (lFlags & LONGINT)
             {
-                /*lint -e147 -e586*/
                 *va_arg(argp, VOS_INT32*) = (VOS_INT32)(pucOutBuf-out_buf);
-                /*lint +e147 +e586*/
             }
             else if (lFlags & SHORTINT)
             {
-                /*lint -e147 -e586*/
                 *va_arg(argp, VOS_INT16*) = (VOS_INT16)(pucOutBuf-out_buf);
-                /*lint +e147 +e586*/
             }
             else
             {
-                /*lint -e147 -e586*/
                 *va_arg(argp, VOS_INT*) = (VOS_INT)(pucOutBuf-out_buf);
-                /*lint +e147 +e586*/
             }
             break;
         case 'O':
             lFlags |= LONGINT;
-        /*lint -e616 */
         case 'o':
-        /*lint +e616 */
-            /*lint -e147 -e586*/
             ARG(unsigned);
-            /*lint +e147 +e586*/
             lBase = 8;
-            /*lint -e801 */
+            
             goto nosign;
-            /*lint +e801 */
+            
         case 'p':
-            /*lint -e147 -e586*/
             ulLong = (VOS_UINT_PTR)va_arg(argp, VOS_VOID *);
-            /*lint +e147 +e586*/
             lBase = 16;
-            /*lint -e801 */
+            
             goto nosign;
-            /*lint +e801 */
+            
         case 's':
-            /*lint -e147 -e586*/
             if ( (pcBuf = va_arg(argp, VOS_CHAR*))==0 )
             {
-            /*lint +e147 +e586*/
                 pcBuf = "(null)";
             }
             if (lPrec >= 0)
@@ -334,36 +242,27 @@ rflag: switch (*++pucFmt) {
                 lConverSize = VOS_StrLen(pcBuf);
             }
             ucPrefixSign = '\0';
-            /*lint -e801 */
+            
             goto pforw;
-            /*lint +e801 */
+            
         case 'U':
             lFlags |= LONGINT;
-        /*lint -e616 */
         case 'u':
-        /*lint +e616 */
-            /*lint -e147 -e586*/
             ARG(unsigned);
-            /*lint +e147 +e586*/
             lBase = 10;
-            /*lint -e801 */
+            
             goto nosign;
-            /*lint +e801 */
+            
         case 'X':
             pucDigs = "0123456789ABCDEF";
-        /*lint -e616 */
         case 'x':
-        /*lint +e616 */
-            /*lint -e147 -e586*/
             ARG(unsigned);
-            /*lint +e147 +e586*/
             lBase = 16;
             if (lFlags & ALT && ulLong != 0)
             {
                 lFlags |= HEXPREFIX;
             }
 
-            /* 无符号数转换 */
 nosign:    ucPrefixSign = '\0';
 
 number:     if ((lDprec = lPrec) >= 0)
@@ -372,7 +271,6 @@ number:     if ((lDprec = lPrec) >= 0)
             }
 
             pcBuf = ucBuf + BUF;
-            /*lint -save -e727 -e728 -e729 -e732 -e713 -e573 -e529*/
             if (ulLong != 0 || lPrec != 0)
             {
                 do {
@@ -382,7 +280,7 @@ number:     if ((lDprec = lPrec) >= 0)
                 pucDigs = "0123456789abcdef";
                 if (lFlags & ALT && lBase == 8 && *pcBuf != '0')
                 {
-                    *--pcBuf = '0'; /* 8进制标志 */
+                    *--pcBuf = '0';
                 }
             }
             lConverSize = ucBuf + BUF - pcBuf;
@@ -515,9 +413,9 @@ pforw:
 
             break;
         case '\0':
-                        /*lint -e801 */
+                        
                         goto    lvspret;
-                        /*lint +e801 */
+                        
         default:
                         if(ulWriteLen--)
                         {
@@ -530,7 +428,6 @@ pforw:
 
             }
         }
-        /*lint +e801 +e445 屏蔽goto语句*/
 lvspret:
         if(ulWriteLen--)
         {
@@ -541,16 +438,8 @@ lvspret:
             return (VOS_INT32)ulStrLen;
         }
         return (VOS_INT)(pucOutBuf-out_buf);
-}/*lint -restore*/
+}
 
-/*****************************************************************************
- Function   : VOS_nvsprintf
- Description:
- Input      :
-            :
- Return     :
- Other      :
- *****************************************************************************/
 VOS_INT32 VOS_nvsprintf(VOS_CHAR * str, VOS_UINT32 ulMaxStrLen, const VOS_CHAR *format, va_list arguments)
 {
     VOS_INT32 nc;
@@ -561,9 +450,7 @@ VOS_INT32 VOS_nvsprintf(VOS_CHAR * str, VOS_UINT32 ulMaxStrLen, const VOS_CHAR *
     }
     else
     {
-        /*lint -e534*/
         VOS_MemSet_s(str, ulMaxStrLen, 0, ulMaxStrLen);
-        /*lint +e534*/
     }
 
     nc = ANSI_nvsprintf(str, ulMaxStrLen - 1, (const VOS_CHAR *) format, arguments);
@@ -571,14 +458,6 @@ VOS_INT32 VOS_nvsprintf(VOS_CHAR * str, VOS_UINT32 ulMaxStrLen, const VOS_CHAR *
     return nc;
 }
 
-/*****************************************************************************
- Function   : VOS_nvsprintf_s
- Description:
- Input      :
-            :
- Return     :
- Other      :
- *****************************************************************************/
 VOS_INT VOS_nvsprintf_s(VOS_CHAR * str, VOS_SIZE_T ulMaxStrLen, VOS_SIZE_T ulCount, const VOS_CHAR *format, va_list arguments)
 {
     if ( ulCount > VOS_SECUREC_MEM_MAX_LEN )
@@ -592,26 +471,14 @@ VOS_INT VOS_nvsprintf_s(VOS_CHAR * str, VOS_SIZE_T ulMaxStrLen, VOS_SIZE_T ulCou
     }
     else
     {
-        /*lint -e534*/
         VOS_MemSet_s(str, ulMaxStrLen, 0, ulMaxStrLen);
-        /*lint +e534*/
     }
 
     return (VOS_INT)ANSI_nvsprintf(str, (VOS_UINT32)(ulMaxStrLen - 1), (const VOS_CHAR *) format, arguments);
 }
 
-/*****************************************************************************
- Function   : VOS_nsprintf
- Description:
- Input      :
-            :
- Return     :
- Other      :
- *****************************************************************************/
 VOS_INT32 VOS_nsprintf(VOS_CHAR *str, VOS_UINT32 ulMaxStrLen, const VOS_CHAR *fmt, ...)
 {
-
-    /*lint -e530 -e830 */
     va_list arg;
     register VOS_INT32 nc;
 
@@ -622,34 +489,18 @@ VOS_INT32 VOS_nsprintf(VOS_CHAR *str, VOS_UINT32 ulMaxStrLen, const VOS_CHAR *fm
     }
     else
     {
-        /*lint -e534*/
         VOS_MemSet_s(str, ulMaxStrLen, 0, ulMaxStrLen);
-        /*lint +e534*/
     }
 
-    /*lint -e586*/
     va_start(arg, fmt);
-    /*lint +e586*/
     nc = ANSI_nvsprintf(str, ulMaxStrLen - 1, (const VOS_CHAR *) fmt, arg);
-    /*lint -e586*/
     va_end(arg);
-    /*lint +e586*/
     return (nc);
-    /*lint +e530 +e830 */
 }
 
-/*****************************************************************************
- Function   : VOS_nsprintf_s
- Description:
- Input      :
-            :
- Return     :
- Other      :
- *****************************************************************************/
 VOS_INT VOS_nsprintf_s(VOS_CHAR *str, VOS_SIZE_T ulMaxStrLen, VOS_SIZE_T ulCount, const VOS_CHAR *fmt, ...)
 {
-    /*lint -e530 -e830 */
-    va_list arg;
+     va_list arg;
     register VOS_INT nc;
 
     if ( ulCount > VOS_SECUREC_MEM_MAX_LEN )
@@ -663,34 +514,17 @@ VOS_INT VOS_nsprintf_s(VOS_CHAR *str, VOS_SIZE_T ulMaxStrLen, VOS_SIZE_T ulCount
     }
     else
     {
-        /*lint -e534*/
         VOS_MemSet_s(str, ulMaxStrLen, 0, ulMaxStrLen);
-        /*lint +e534*/
     }
 
-    /*lint -e586*/
     va_start(arg, fmt);
-    /*lint +e586*/
     nc = (VOS_INT)ANSI_nvsprintf(str, (VOS_UINT32)(ulMaxStrLen - 1), (const VOS_CHAR *) fmt, arg);
-    /*lint -e586*/
     va_end(arg);
-    /*lint +e586*/
     return (nc);
-    /*lint +e530 +e830 */
 }
 
 VOS_PRINT_HOOK g_pfnPrintHook = VOS_NULL_PTR;
 
-/*****************************************************************************
- Function   : VOS_HookPrint
- Description: Register the redirect funciton for vos_printf
- Input      : newHook -- New print hook
- Output     : None
- Return     : Old print hook
- Other      : 1) The print hook might be re-enterred.
-              2) The print hook should be call in Interrupt level and task
-                 context.
- *****************************************************************************/
 VOS_PRINT_HOOK VOS_HookPrint( VOS_PRINT_HOOK newHook )
 {
     VOS_PRINT_HOOK oldHook = g_pfnPrintHook;
@@ -700,32 +534,16 @@ VOS_PRINT_HOOK VOS_HookPrint( VOS_PRINT_HOOK newHook )
     return oldHook;
 }
 
-
-/*****************************************************************************
- Function   : vos_printf
- Description: Print function
- Input      : format -- Format string to print
- Output     : None
- Return     : VOS_OK on success and VOS_ERROR on error
- *****************************************************************************/
 VOS_INT32 vos_printf( const VOS_CHAR * format, ... )
 {
     VOS_INT32  rc;
     VOS_UINT32 ulReturn = VOS_OK;
 
-    /*lint -e530 -e830 */
     va_list    argument;
     VOS_CHAR   output_info[VOS_MAX_PRINT_LEN + 4];
-
-    /*lint -e586*/
     va_start( argument, format );
-    /*lint +e586*/
     rc = VOS_nvsprintf( output_info, VOS_MAX_PRINT_LEN, format, argument );
-    /*lint -e586*/
     va_end( argument );
-    /*lint +e586*/
-    /*lint +e530 +e830 */
-
     output_info[VOS_MAX_PRINT_LEN - 1] = '\0';
 
     if( rc >= VOS_MAX_PRINT_LEN - 1 )
@@ -733,19 +551,15 @@ VOS_INT32 vos_printf( const VOS_CHAR * format, ... )
         VOS_UINT32  ulTempLen;
         VOS_CHAR *  pcWarning = " [!!!Warning: Print too long!!!]\r\n";
         ulTempLen = VOS_StrLen( pcWarning );
-        /*lint -e534*/
         VOS_StrNCpy( output_info + ( VOS_MAX_PRINT_LEN - ulTempLen - 1 ), pcWarning, ulTempLen );
         VOS_SetErrorNo( VOS_ERRNO_LIB_PRINTF_INPUTFORMATTOOLONG );
-        /*lint +e534*/
         ulReturn = VOS_ERRNO_LIB_PRINTF_INPUTFORMATTOOLONG;
     }
     else if( rc < 0 )
     {
         VOS_CHAR *  pcWarning = "\r\n### vos printf error: unknown internal error. ###\r\n";
-        /*lint -e534*/
         VOS_StrCpy( output_info, pcWarning );
         VOS_SetErrorNo( VOS_ERRNO_LIB_PRINTF_UNKNOWNINTERERROR );
-        /*lint +e534*/
         ulReturn = VOS_ERRNO_LIB_PRINTF_UNKNOWNINTERERROR;
     }
 
@@ -757,19 +571,6 @@ VOS_INT32 vos_printf( const VOS_CHAR * format, ... )
             return (VOS_INT32)VOS_OK;
         }
     }
-
-    /*lint -e534*/
-
-
     printk( "%s",output_info );
-
-    /*lint +e534*/
-
     return (VOS_INT32)ulReturn;
 }
-
-
-
-
-
-

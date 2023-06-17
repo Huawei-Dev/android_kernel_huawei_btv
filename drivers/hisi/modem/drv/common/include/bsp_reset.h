@@ -91,8 +91,6 @@ enum DRV_RESET_CB_PIOR
 	DRV_RESET_CB_PIOR_MIN = 0,
 	DRV_RESET_CB_PIOR_ICC = 0,
 	DRV_RESET_CB_PIOR_IPF = 5,
-	// RESET_CALLCBFUN_PIOR_<组件名>
-	//...
 	DRV_RESET_CB_PIOR_CSHELL = 16,
 	DRV_RESET_CB_PIOR_RFILE,
 	DRV_RESET_CB_PIOR_RDR = 50,
@@ -109,8 +107,6 @@ enum MODEM_ACTION
 	INVALID_MODEM_ACTION
 };
 
-
-/* M核和C核之间核间消息约定: 复位阶段信息复用DRV_RESET_CALLCBFUN_MOMENT枚举定义 */
 enum RESET_ICC_MSG
 {
 	RESET_MCORE_BEFORE_RESET_OK,
@@ -129,7 +125,6 @@ enum RESET_ICC_MSG
 	RESET_INNER_CORE_INVALID_MSG,
 };
 
-/* 标识可否向对方核发送核间消息 */
 enum RESET_MULTICORE_CHANNEL_STATUS
 {
 	CCORE_STATUS    = 0x00000001,
@@ -144,9 +139,6 @@ enum RESET_CBFUNC_PRIO
 	RESET_CBFUNC_PRIO_LEVEL_HIGH = 51
 };
 
-/**
-* 定义用户注册的master进idle子模块枚举类型。
-*/
 typedef enum tagBSP_MASTER_IDLE
 {
     HWSPINLOCK_IDLE = 0x0,
@@ -182,9 +174,6 @@ do{ 	\
 	(flag)  =  (flag) & (~(status)); \
 }while(0)
 
-/**
-* 定义用户注册的master进idle钩子函数类型。
-*/
 typedef int (*MASTER_IDLE_HOOK_FUNC)(void);
 
 #ifdef CONFIG_BALONG_MODEM_RESET
@@ -204,17 +193,6 @@ static inline u32 bsp_reset_ccore_is_reboot(void)
 #endif
 }
 
-/**
-* 
-* @brief 向CP单独复位主流程的钩子注册函数
-*
-* @param  master_idle  [IN] 类型#MASTER_IDLE_HOOK_FUNC，注册的钩子函数。
-*
-* @retval  #BSP_OK  0，成功。#BSP_ERROR  0，失败。
-* 
-* @par 依赖:bsp_reset.h：该接口声明所在的头文件。
-* 
-*/
 int bsp_register_master_idle(BSP_MASTER_IDLE_E type, MASTER_IDLE_HOOK_FUNC master_idle);
 
 u32 bsp_reset_is_successful(u32 timeout_ms);
@@ -237,11 +215,9 @@ static inline u32 bsp_reset_is_successful(u32 timeout_ms) {
 
 #endif /* end of CONFIG_BALONG_MODEM_RESET */
 
-/*共享内存中保存MODEM单独复位流程中的时间戳*/
-/*以下用于CCPU 复位流程时间戳*/
 #define STAMP_RESET_BASE_ADDR                 (SHM_OFFSET_CCORE_RESET + (unsigned long)SHM_BASE_ADDR)
-#define STAMP_RESET_FIQ_COUNT                 (0x4 + STAMP_RESET_BASE_ADDR) /*用于FIQ次数*/
-#define STAMP_RESET_IDLE_FAIL_COUNT           (0x4 + STAMP_RESET_FIQ_COUNT) /*用于master idle失败次数*/
+#define STAMP_RESET_FIQ_COUNT                 (0x4 + STAMP_RESET_BASE_ADDR)
+#define STAMP_RESET_IDLE_FAIL_COUNT           (0x4 + STAMP_RESET_FIQ_COUNT)
 #define STAMP_RESET_MASTER_ENTER_IDLE         (0x4 + STAMP_RESET_IDLE_FAIL_COUNT)
 #define STAMP_RESET_CIPHER_SOFT_RESET         (0x4 + STAMP_RESET_MASTER_ENTER_IDLE)
 #define STAMP_RESET_CIPHER_DISABLE_CHANNLE    (0x4 + STAMP_RESET_CIPHER_SOFT_RESET)
@@ -271,7 +247,6 @@ static inline u32 bsp_reset_is_successful(u32 timeout_ms) {
 #define STAMP_RESET_MASTER_IDLE_QUIT          (0x4 + STAMP_RESET_MASTER_INOUT_IDLE)
 #define STAMP_RESET_FIQ_OUT_COUNT             (0x4 + STAMP_RESET_MASTER_IDLE_QUIT)
 
-/*以下用于M3单独复位流程时间戳*/
 #define STAMP_RESET_M3_BASE_ADDR              (0x4 + STAMP_RESET_FIQ_OUT_COUNT)
 #define STAMP_RESET_M3_BUSERROR_STEP1         (0x4 + STAMP_RESET_M3_BASE_ADDR)
 #define STAMP_RESET_M3_BUSERROR_STEP2         (0x4 + STAMP_RESET_M3_BUSERROR_STEP1)
@@ -283,27 +258,11 @@ static inline u32 bsp_reset_is_successful(u32 timeout_ms) {
 #define STAMP_RESET_M3_CLEAN_NMI              (0x4 + STAMP_RESET_M3_NOC_ENTER_LPMODE_STEP2)
 #define STAMP_RESET_M3_RESET_SUBSYS           (0x4 + STAMP_RESET_M3_CLEAN_NMI)
 
-/*以下用于M3单独解复位流程时间戳*/
 #define STAMP_UNRESET_M3_BASE_ADDR              (0x4 + STAMP_RESET_M3_RESET_SUBSYS)
 #define STAMP_UNRESET_M3_UNRESET_SUBSYS         (0x4 + STAMP_UNRESET_M3_BASE_ADDR)
 #define STAMP_UNRESET_M3_A9_STAR_ADDR           (0x4 + STAMP_UNRESET_M3_UNRESET_SUBSYS)
 #define STAMP_UNRESET_M3_UNRESET_A9             (0x4 + STAMP_UNRESET_M3_A9_STAR_ADDR)
 
-/*****************************************************************************
- 函 数 名  : bsp_reset_ccpu_status_get
- 功能描述  : 用于判别C核当前是否可用，可用于判断是否可以发送核间消息。A核和M3都可以使用。
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : int,1:可用，可以与C核交互; 0: 不可用
-*****************************************************************************/
-
-/*****************************************************************************
- 函 数 名  : bsp_reset_init
- 功能描述  : reset模块初始化
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : s32, RESET_OK: 初始化成功；其他值: 初始化失败
-*****************************************************************************/
 s32 bsp_reset_init(void);
 
 int reset_of_node_init(void);
@@ -325,7 +284,6 @@ u32 modem_reset_fail_id_get(void);
 #define CCORE_RST_TIMEOUT_1MSNUM         (33) /*1ms*/
 #define CHECK_TIMEOUT_1MS(a)   (get_timer_slice_delta(a, bsp_get_slice_value()) < CCORE_RST_TIMEOUT_1MSNUM)
 
-/* 失败信息记录 */
 typedef enum
 {
     ENUM_RESET_CICOM = 0,
@@ -343,34 +301,12 @@ typedef enum
     ENUM_RESET_NULL = 32
 } RESET_FIAL_ENUM;
 
-/*****************************************************************************
- 函 数 名  : bsp_modem_master_enter_idle
- 功能描述  : 配置modem master进入IDLE
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  :
-*****************************************************************************/
 void bsp_modem_master_enter_idle(void);
 
-/*****************************************************************************
- 函 数 名  : bsp_reset_cb_func_register
- 功能描述  : 用于底软注册回调函数，处理Modem复位前后
- 输入参数  : const char *pname, 组件注册的名字
-         pdrv_reset_cbfun cbfun,    组件注册的回调函数
-         int userdata,组件的私有数据
-         Int Priolevel, 回调函数调用优先级 0-49，其中0-9 保留。使用枚举 enum DRV_RESET_CB_PIOR
- 输出参数  : 无
- 返 回 值  : s32, RESET_OK: 初始化成功；其他值: 初始化失败
-*****************************************************************************/
-
-/*----------------------------------------------*
- * 外部函数原型说明                             *
- *----------------------------------------------*/
 extern void FIQ_SysInt (void);
 extern void FIQ_SysIrqEn(void);
 extern void FIQ_SysIrqDis (void);
 
-/*打点时间戳函数*/
 static inline void bsp_reset_timestamp(u32 value, unsigned addr)
 {
     (*(volatile unsigned int *) (addr)) = (value);

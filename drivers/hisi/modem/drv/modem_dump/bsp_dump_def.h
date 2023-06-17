@@ -58,9 +58,6 @@ extern "C"
 #include "osl_types.h"
 #include "product_config.h"
 
-/**************************************************************************
-  宏定义
-**************************************************************************/
 #define DUMP_SECTION_INVALID                (-1)
 
 #define DUMP_INT_IN_FLAG                    0xAAAA
@@ -162,7 +159,7 @@ typedef struct
 
     u32 cpu_usage;          /*0x84 */
     u32 mem_free;           /*0x88 */
-    u32 axi_dlock_reg[3];   /*0x8C --- AXI总线挂死寄存器，0x624,0x628,0x658*/
+    u32 axi_dlock_reg[3];   /*0x8C */
 }dump_base_info_t;
 
 typedef struct
@@ -188,7 +185,7 @@ typedef struct
     u32 cpu_usage;          /*0x84 */
     u32 mem_free;          /*0x88 */
 
-    u32 axi_dlock_reg[3];   /*0x8C --- AXI总线挂死寄存器，0x624,0x628,0x658*/
+    u32 axi_dlock_reg[3];   /*0x8C */
     u32 int_stack_base;     /*0x98 */
     u32 int_stack_end;      /*0x9C */
     u8  version[32];        /*0xA0 */
@@ -198,7 +195,6 @@ typedef struct
 
 }cp_dump_base_info_t;
 
-// ALL_TASK_TCB
 typedef struct
 {
     u32 pid;
@@ -240,7 +236,7 @@ typedef struct
           |   |   reg group1(4K-32) |    |
            ==============================
 */
-//最多支持3组，每组最大4K，具体大小按照头信息指示
+
 typedef struct
 {
     u32 reg_addr1;
@@ -276,20 +272,8 @@ typedef struct
 }mdm_dump_crtl_s;
 
 
-
-/**************************************************************************
-  UNION定义
-**************************************************************************/
-
-/**************************************************************************
-  OTHERS定义
-**************************************************************************/
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
 #endif    /* End #define __BSP_DUMP_H__ */
-
-
-

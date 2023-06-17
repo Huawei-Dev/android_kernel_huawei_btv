@@ -80,9 +80,9 @@ char *wakelock_name[]={
     "PM",            /* PM  ---shangmianyou */
     "UART0",        /*UART0 -zhangliangdong */
     "TDS",         /*TRRC&TL2----leixiantiao*/
-    "CDMAUART",         /*drv cdma uart 数传*/
+    "CDMAUART",         /*drv cdma uart ????*/
     "USIM",             /*oam*/
-    "DSPPOWERON",       /*v8r1 ccore 提供给GUTL DSP作为c核上电初始化投票用*/
+    "DSPPOWERON",       /*v8r1 ccore ??????GUTL DSP????c??????????????????*/
     "RESET",            /*RESET -nieluhua */
     "PS_G2",        /*GU--ganlan*/
     "FTM_2",       /*GU--zhangyizhan*/
@@ -121,7 +121,7 @@ void pm_om_wakeup_stat(void)
 		g_pmom_debug.stat.waket_min = delta_slice;
 	}
 
-	/* 32768hz，转换成秒 */
+	/* 32768hz?????????? */
 	delta_slice /= TIME_SLICE_FREQ;
 	g_pmom_debug.stat.wrs_flag = 1;
 	pmom_print("[C SR]pm om wakeup\n");
@@ -208,7 +208,7 @@ u32 pm_om_feature_on(void)
 	return 0;
 }
 
-/* pmom在mbb/phone共代码, 都需要实现. pm_wakeup_ccore在phone需要在pmom模块实现,mbb上在pm模块实现 */
+/* pmom??mbb/phone??????, ??????????. pm_wakeup_ccore??phone??????pmom????????,mbb????pm???????? */
 s32 pm_wakeup_ccore(enum debug_wake_type type)
 {
 	u32 channel_id = (ICC_CHN_IFC << 16) | IFC_RECV_FUNC_WAKEUP;
@@ -240,7 +240,7 @@ static s32 pm_wakeup_icc_msg(u32 id , u32 len, void* context)
 	u32 ret = 0;
 	struct debug_pm_s read_data;
 
-	/* 不可以通过icc发送非法长度的消息过来(包括长度为0) */
+	/* ??????????icc??????????????????????(??????????0) */
 	if(len != (u32)sizeof(read_data))
 	{
 		pmom_pr_err("icc packet len(%d) != sizeof(struct debug_pm_s)(%d)\n", len, (u32)sizeof(read_data));
@@ -278,7 +278,7 @@ static inline void print_dpm_device_info(void)
         if( ((unsigned long)device_info + sizeof(struct dpm_device_info)) >= ((unsigned long)g_pmom_debug.cdrx_dump_addr+CDRX_DUMP_DPM_INFOS_END)){
             return;
         }
-        count += snprintf(print_buf+count,print_buf_size-count,"%s(%d,%d,%d)," ,device_info->device_name, device_info->fail_cnt, device_info->max_s, device_info->max_r);/* [false alarm]:屏蔽Fortify */
+        count += snprintf(print_buf+count,print_buf_size-count,"%s(%d,%d,%d)," ,device_info->device_name, device_info->fail_cnt, device_info->max_s, device_info->max_r);/* [false alarm]:????Fortify */
 
         device_info++;
     }
@@ -295,7 +295,7 @@ static inline void print_ccpu_wakeup_irq_info(void)
 	cnt += snprintf((char*)print_buf+cnt,print_buf_size-cnt,"[C_SR]pm wake cnt:");
 	for(i=0;i<ret;i++)
 	{
-		cnt += snprintf((char*)print_buf+cnt,print_buf_size-cnt,"%s(%d),",(wakeirq_debug_addr+i)->name,(wakeirq_debug_addr+i)->wake_cnt);/* [false alarm]:屏蔽Fortify */
+		cnt += snprintf((char*)print_buf+cnt,print_buf_size-cnt,"%s(%d),",(wakeirq_debug_addr+i)->name,(wakeirq_debug_addr+i)->wake_cnt);/* [false alarm]:????Fortify */
 	}
 	cnt += snprintf((char*)print_buf+cnt,print_buf_size-cnt,"\n");
 	printk(KERN_ERR"%s",print_buf);
@@ -348,7 +348,7 @@ int cp_pm_notify(struct notifier_block *nb, unsigned long event, void *dummy)
 	{
 		if(!g_pmom_debug.cdrx_dump_addr)
 		{
-			/*获取DUMP 低功耗共享内存地址*/
+			/*????DUMP ??????????????????*/
 			dump_base = (char *)bsp_dump_get_field_addr(DUMP_CP_DRX);
 			if(NULL == dump_base)
 			{
@@ -361,7 +361,7 @@ int cp_pm_notify(struct notifier_block *nb, unsigned long event, void *dummy)
 	}
 	if ((event == PM_POST_SUSPEND)&&(g_pmom_debug.cdrx_dump_addr))
 	{
-		/*此处用于增加CCPU的打印信息函数*/
+		/*????????????CCPU??????????????*/
 		print_ccpu_lowpower_info();
 	}
 	return 0;
@@ -374,7 +374,7 @@ void pm_wakeup_init(void)
 
 	wake_lock_init(&g_pmom_debug.wakelock_debug, WAKE_LOCK_SUSPEND, "cp_pm_wakeup");
 
-	/* 即使注册icc失败(有错误打印),只影响调测,不影响功能 */
+	/* ????????icc????(??????????),??????????,?????????? */
 	(void)bsp_icc_event_register(ICC_CHN_IFC << 16 | IFC_RECV_FUNC_WAKEUP, \
 		(read_cb_func)pm_wakeup_icc_msg, NULL, NULL, NULL);
 	(void)bsp_icc_event_register(ICC_CHN_MCORE_ACORE << 16 | MCORE_ACORE_FUNC_WAKEUP, \
@@ -385,7 +385,7 @@ void pm_wakeup_init(void)
 
 	if(!g_pmom_debug.cdrx_dump_addr)
 	{
-    	/*获取DUMP 低功耗共享内存地址*/
+    	/*????DUMP ??????????????????*/
 		dump_base = (char *)bsp_dump_get_field_addr(DUMP_CP_DRX);
 		if(NULL == dump_base)
 		{
@@ -479,7 +479,7 @@ static int get_u32_seq_data_from_user(const char  __user *usr_buf, size_t usr_co
 	return 0;
 }
 
-/* 通知其他核开启log功能 */
+/* ??????????????log???? */
 void pm_om_notify_other_core(pm_om_icc_data_type data)
 {
 	s32 ret = 0;
@@ -492,7 +492,7 @@ void pm_om_notify_other_core(pm_om_icc_data_type data)
 		goto icc_send_fail;
 	}
 
-	/* TODO:  等M3开启后打开 */
+	/* TODO:  ??M3?????????? */
 	return;
 
 icc_send_fail:

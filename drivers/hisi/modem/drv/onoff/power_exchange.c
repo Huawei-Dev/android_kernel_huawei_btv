@@ -46,7 +46,6 @@
  *
  */
 
-/*lint --e{537} */
 #include <linux/kernel.h>
 #include "bsp_sram.h"
 #include "mdrv_sysboot.h"
@@ -57,16 +56,6 @@
 
 #define SRAM_REBOOT_ADDR  (((SRAM_SMALL_SECTIONS*)(SRAM_BASE_ADDR + SRAM_OFFSET_SMALL_SECTIONS))->SRAM_REBOOT_INFO)
 
-
-/*****************************************************************************
- 函 数 名  : power_on_wdt_cnt_set
- 功能描述  : 清除狗复位计数
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
-*****************************************************************************/
 void power_on_wdt_cnt_set( void )
 {
     power_info_s * power_info = (power_info_s *)(SRAM_REBOOT_ADDR);
@@ -74,15 +63,6 @@ void power_on_wdt_cnt_set( void )
     power_info->wdg_rst_cnt = 0;
 }
 
-/*****************************************************************************
- 函 数 名  : power_on_wdt_cnt_get
- 功能描述  : 获取狗复位计数值
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
-*****************************************************************************/
 unsigned int power_on_wdt_cnt_get( void )
 {
     power_info_s * power_info = (power_info_s *)(SRAM_REBOOT_ADDR);
@@ -90,15 +70,6 @@ unsigned int power_on_wdt_cnt_get( void )
     return power_info->wdg_rst_cnt;
 }
 
-/*****************************************************************************
- 函 数 名  : power_on_reboot_flag_set
- 功能描述  : 设置重启标志
- 输入参数  : power_off_reboot_flag 重启原因
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
-*****************************************************************************/
 void power_on_reboot_flag_set( power_off_reboot_flag enFlag )
 {
     power_info_s *power_info = (power_info_s *)(SRAM_REBOOT_ADDR);
@@ -108,15 +79,6 @@ void power_on_reboot_flag_set( power_off_reboot_flag enFlag )
     pr_dbg(KERN_DEBUG "#########  power_on_reboot_flag_set = 0x%08X ######## \r\n", (unsigned int)enFlag);
 }
 
-/*****************************************************************************
- 函 数 名  : power_on_reboot_flag_get
- 功能描述  : 获取重启原因
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : power_off_reboot_flag 重启原因
- 调用函数  :
- 被调函数  :
-*****************************************************************************/
 power_off_reboot_flag power_on_reboot_flag_get( void )
 {
     power_info_s *power_info = (power_info_s *)(SRAM_REBOOT_ADDR);
@@ -125,15 +87,6 @@ power_off_reboot_flag power_on_reboot_flag_get( void )
     return (power_off_reboot_flag)power_info->last_shut_reason;
 }
 
-/*****************************************************************************
- 函 数 名  : power_on_start_reason_set
- 功能描述  : 设置开机原因
- 输入参数  : power_on_start_reason 开机原因
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
-*****************************************************************************/
 void power_on_start_reason_set( power_on_start_reason enReason )
 {
     power_info_s *power_info = (power_info_s *)(SRAM_REBOOT_ADDR);
@@ -143,15 +96,6 @@ void power_on_start_reason_set( power_on_start_reason enReason )
     pr_dbg(KERN_DEBUG "#########  power_on_start_reason_set = 0x%08X ######## \r\n", enReason );
 }
 
-/*****************************************************************************
- 函 数 名  : power_on_start_reason_get
- 功能描述  : 获取开机原因
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : power_on_start_reason 开机原因
- 调用函数  :
- 被调函数  :
-*****************************************************************************/
 power_on_start_reason power_on_start_reason_get( void )
 {
     power_info_s *power_info = (power_info_s *)(SRAM_REBOOT_ADDR);
@@ -160,15 +104,6 @@ power_on_start_reason power_on_start_reason_get( void )
     return (power_on_start_reason)(power_info->power_on_reason);
 }
 
-/*****************************************************************************
- 函 数 名  : power_on_start_reason_set
- 功能描述  : 设置开机原因
- 输入参数  : power_on_start_reason 开机原因
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
-*****************************************************************************/
 void power_reboot_cmd_set( power_reboot_cmd cmd )
 {
     power_info_s *power_info = (power_info_s *)(SRAM_REBOOT_ADDR);
@@ -178,15 +113,6 @@ void power_reboot_cmd_set( power_reboot_cmd cmd )
     pr_dbg(KERN_DEBUG "#########  power_reboot_cmd_set = 0x%08X ######## \r\n", cmd );
 }
 
-/*****************************************************************************
- 函 数 名  : power_on_c_status_get
- 功能描述  : 获取C核状态
- 输入参数  : power_on_c_status_get 开机原因
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
-*****************************************************************************/
 c_power_st_e power_on_c_status_get(void)
 {
     power_info_s *power_info = (power_info_s *)(SRAM_REBOOT_ADDR);
@@ -196,4 +122,3 @@ c_power_st_e power_on_c_status_get(void)
     return (c_power_st_e)(power_info->c_power_state);
 
 }
-

@@ -46,52 +46,20 @@
  *
  */
 
-/*lint -save -e537*/
 #include "bsp_nvim.h"
 #include "mdrv_nvim.h"
 #include "drv_comm.h"
 #include "nv_comm.h"
 #include "NVIM_ResumeId.h"
 #include "nv_factory_check.h"
-/*lint -restore +e537*/
-
-/*lint -save -e958 -e438*/
-
 
 #define  NV_RESULT_CODE            0xffff
 
-
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_get_nvid_num
-*
-* 功能描述  : 获取NV项数量
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_get_nvid_num()
 {
     return bsp_nvm_get_nv_num();
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_get_nvid_list
-*
-* 功能描述  : 获取NV列表
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_get_nvid_list(NV_LIST_INFO_STRU *pstNvIdList)
 {
     if(pstNvIdList == NULL)
@@ -102,19 +70,6 @@ unsigned int mdrv_nv_get_nvid_list(NV_LIST_INFO_STRU *pstNvIdList)
 
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_readex
-*
-* 功能描述  : 读不同Modem NV项数据
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_readex(unsigned int modemid, unsigned int itemid, void *pdata, unsigned int ulLength)
 {
     BSP_U32 card_id = 0;
@@ -131,19 +86,6 @@ unsigned int mdrv_nv_readex(unsigned int modemid, unsigned int itemid, void *pda
 
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_writeex
-*
-* 功能描述  : 写不同Modem NV项数据
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_writeex(unsigned int modemid, unsigned int itemid,void *pdata, unsigned int ulLength)
 {
     BSP_U32 card_id = 0;
@@ -161,19 +103,6 @@ unsigned int mdrv_nv_writeex(unsigned int modemid, unsigned int itemid,void *pda
 
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_read_partex
-*
-* 功能描述  : 读NV项数据
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_read_partex(unsigned int modemid, unsigned int itemid, unsigned int ulOffset, void *pdata, unsigned int ulLength)
 {
     BSP_U32 card_id = 0;
@@ -191,19 +120,6 @@ unsigned int mdrv_nv_read_partex(unsigned int modemid, unsigned int itemid, unsi
 
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_write_partex
-*
-* 功能描述  : 写部分NV项数据
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_write_partex(unsigned int modemid, unsigned int itemid, unsigned int ulOffset, void *pdata, unsigned int ulLength)
 {
     BSP_U32 card_id = 0;
@@ -220,38 +136,11 @@ unsigned int mdrv_nv_write_partex(unsigned int modemid, unsigned int itemid, uns
     return bsp_nvm_dcwritepart(card_id,itemid,ulOffset,(BSP_U8*)pdata,ulLength);
 }
 
-
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_flush
-*
-* 功能描述  : 将内存中的nv数据刷到flash 文件系统中
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_flush(void)
 {
    return bsp_nvm_flush() & NV_RESULT_CODE;
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_get_length
-*
-* 功能描述  : 获取NV长度
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_get_length(unsigned int itemid, unsigned int *pulLength)
 {
     BSP_U32 len = 0;
@@ -266,109 +155,31 @@ unsigned int mdrv_nv_get_length(unsigned int itemid, unsigned int *pulLength)
     return 0;
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_read
-*
-* 功能描述  : 读NV项数据
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_read(unsigned int itemid, void *pdata, unsigned int ulLength)
 {
     return bsp_nvm_read(itemid,pdata,ulLength);
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_write
-*
-* 功能描述  : 写NV项数据
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_write(unsigned int itemid, void *pdata, unsigned int ulLength)
 {
     return bsp_nvm_write(itemid,pdata,ulLength);
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_readpart
-*
-* 功能描述  : 读部分NV项数据
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_readpart(unsigned int itemid, unsigned int ulOffset, void *pdata, unsigned int ulLength)
 {
     return bsp_nvm_readpart(itemid,ulOffset,pdata,ulLength);
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_writepart
-*
-* 功能描述  : 写部分NV项数据
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_writepart(unsigned int itemid, unsigned int ulOffset, void *pdata, unsigned int ulLength)
 {
     return bsp_nvm_writepart(itemid,ulOffset,pdata,ulLength);
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_backup
-*
-* 功能描述  :  备份NV数据
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_backup()
 {
     return bsp_nvm_backup(NV_FLAG_NEED_CRC) & NV_RESULT_CODE;
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_restore_result
-*
-* 功能描述  :  恢复结果检查
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_restore_result(void)
 {
     BSP_U32 ret = NV_ERROR;
@@ -386,38 +197,11 @@ unsigned int mdrv_nv_restore_result(void)
     return 0;
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_restore
-*
-* 功能描述  :  恢复生产NV项
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Yangzhi create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_restore()
 {
     return 0;
 }
 
-
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_backup_factorynv
-*
-* 功能描述  : 备份NV到出厂区，用于AT命令^inforbu
-*
-* 输入参数  :
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  :
-*
-*****************************************************************************/
 unsigned int mdrv_nv_backup_factorynv()
 {
     return bsp_nvm_update_default();
@@ -428,25 +212,10 @@ unsigned int mdrv_nv_revert_factorynv()
     return bsp_nvm_revert_default();
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_nv_readex
-*
-* 功能描述  : 对校准NV进行CRC校验
-*
-* 输入参数  : u32 mode
-*
-* 输出参数  : 无
-*
-* 返 回 值  : OK
-*
-* 修改记录  : Fuxin create
-*
-*****************************************************************************/
 unsigned int mdrv_nv_check_factorynv(u32 mode)
 {
     return nv_check_factory_nv_status(mode);
 }
-
 
 EXPORT_SYMBOL(mdrv_nv_restore);
 EXPORT_SYMBOL(mdrv_nv_flush);
@@ -462,7 +231,3 @@ EXPORT_SYMBOL(mdrv_nv_get_length);
 EXPORT_SYMBOL(mdrv_nv_restore_result);
 EXPORT_SYMBOL(mdrv_nv_backup);
 EXPORT_SYMBOL(mdrv_nv_backup_factorynv);
-
-
-/*lint -restore*/
-

@@ -80,7 +80,6 @@ while(0)
 #define GET_CHN_ID(channel_id)    (((channel_id)>>16) & 0xffff)
 #define GET_FUNC_ID(channel_id)   ((channel_id) & 0xffff)
 
-/* 宏定义start */
 #define ICC_CHN_MAGIC_SIGN    (0x87651234)
 #define ICC_CHN_MAGIC_UNSIGN  (0xabcd8765)
 
@@ -88,9 +87,9 @@ while(0)
 #define PRIVATE_MODE          ((ICC_TASK_PRIVATE << 1) |(ICC_IPC_PRIVATE))
 #define SHARED_MODE           ((ICC_TASK_SHARED << 1) |(ICC_IPC_SHARED))
 
-#define ICC_SDDR_ADDR_MAX      (SHM_ADDR_ICC + SHM_SIZE_ICC)    /* 用于ICC的共享DDR不能大于此地址 */
-#define ICC_SRAM_ADDR_MAX      (SRAM_ADDR_ICC + SRAM_SIZE_ICC)  /* 用于ICC的SRAM不能大于此地址 */
-#define ICC_SDDR_S_ADDR_MAX    (SHM_S_ADDR_ICC + SHM_S_SIZE_ICC)/* 用于安全ICC的共享DDR不能大于此地址 */
+#define ICC_SDDR_ADDR_MAX      (SHM_ADDR_ICC + SHM_SIZE_ICC)
+#define ICC_SRAM_ADDR_MAX      (SRAM_ADDR_ICC + SRAM_SIZE_ICC)
+#define ICC_SDDR_S_ADDR_MAX    (SHM_S_ADDR_ICC + SHM_S_SIZE_ICC)
 
 #define ICC_SEM_FULL          (1)
 #define ICC_SEM_EMPTY         (0)
@@ -108,8 +107,6 @@ struct icc_init_info
 	const char *name;
 };
 
-/* 枚举定义start */
-/* icc状态 */
 enum ICC_STATUS
 {
 	ICC_UNINITIALIZED = 0,
@@ -117,7 +114,6 @@ enum ICC_STATUS
 	ICC_STATUS_MAX
 };
 
-/* 任务类别分配 */
 enum ICC_TASK_TYPE
 {
 	ICC_TASK_PRIVATE = 0,
@@ -139,7 +135,6 @@ enum ICC_HAS_TASK
 	ICC_TASK_MAX
 };
 
-/* 通道状态 */
 enum ICC_CHN_STAT
 {
 	ICC_CHN_CLOSED = 0,
@@ -154,47 +149,45 @@ enum ICC_PACKET_RETURN
 	ICC_PACKET_RETURN_MAX
 };
 
-/* 枚举定义end */
-
 union ipc_task_shared
 {
 	u32 val;
 	struct
 	{
-		u32 ipc_shared :1;  /* 1:共享IPC  0:私有IPC */
-		u32 task_shared:1;  /* 1:共享任务 0:私有任务 */
-		u32 no_task    :1;  /* 1:无任务   0:有任务 */
+		u32 ipc_shared :1;
+		u32 task_shared:1;
+		u32 no_task    :1;
 		u32 reserved   :29;
 	}union_stru;
 };
 
 struct icc_channel
 {
-	u32                       id;               /* 通道id */
-	const char                *name;            /* 通道名称 */
-	u32                       state;            /* 通道状态: 标识发送通道是否可用 */
-	u32                       ready_recv;       /* 通道状态: 标识接收通道是否可用 */
-	union ipc_task_shared     mode;             /* 通道接收处理任务类型: shared|private */
-	icc_task_id               private_task_id;  /* 通道私有的处理任务id */
-	u32                       ipc_send_irq_id;  /* 通道私有的发送数据使用的ipc中断 */
-	u32                       ipc_recv_irq_id;  /* 通道私有的接收数据使用的ipc中断 */
-	osl_sem_id                private_task_sem; /* 唤醒通道私有的接收任务的信号量 */
-	struct icc_channel_fifo   *fifo_recv;       /* 接收fifo的指针 */
-	struct icc_channel_fifo   *fifo_send;       /* 发送fifo的指针 */
-	spinlock_t                write_lock;       /* 保护通道写互斥的spin锁 */
-	spinlock_t                read_lock;        /* 保护通道读互斥的spin锁 */
-	struct icc_channel_vector *vector;          /* 接收向量(子通道)指针 */
-	u32                       func_size;        /* 接收向量(子通道)大小 */
+	u32                       id;
+	const char                *name;
+	u32                       state;
+	u32                       ready_recv;
+	union ipc_task_shared     mode;
+	icc_task_id               private_task_id;
+	u32                       ipc_send_irq_id;
+	u32                       ipc_recv_irq_id;
+	osl_sem_id                private_task_sem;
+	struct icc_channel_fifo   *fifo_recv;
+	struct icc_channel_fifo   *fifo_send;
+	spinlock_t                write_lock;
+	spinlock_t                read_lock;
+	struct icc_channel_vector *vector;
+	u32                       func_size;
 };
 
 struct channel_cfg{
-    unsigned int id;             /* 物理通道ID */
-	unsigned int mode;           /* 通道模式:共享or独享 */
-	unsigned int size;           /* 本通道发送fifo及接收fifo大小 */
-	unsigned int tx_ipc;         /* 发送到对方核的IPC中断号 */
-	unsigned int rx_ipc;         /* 在此IPC中断号上接收 */
-	unsigned int func_size;      /* 支持的func_size个数 */
-	unsigned int rx_fifo_first;  /* 本通道，对于本核，接收fifo在前 */
+    unsigned int id;
+	unsigned int mode;
+	unsigned int size;
+	unsigned int tx_ipc;
+	unsigned int rx_ipc;
+	unsigned int func_size;
+	unsigned int rx_fifo_first;
 };
 
 struct icc_wait_data
@@ -203,7 +196,6 @@ struct icc_wait_data
 	u32 packet_seq_num;
 };
 
-/* 消息类型定义for debug */
 enum ICC_MSG_TYPE
 {
 	ICC_MSG_SEND = 0,
@@ -211,44 +203,42 @@ enum ICC_MSG_TYPE
 	ICC_MSG_TYPE_MAX
 };
 
-
-/*** 发送/接收消息统计，以消息为维度，需要调用dump接口，以备异常时分析 ***/
 #define ICC_MSG_RECORED_DATA_LEN  40
 #define ICC_STAT_MSG_NUM          10
 struct icc_uni_msg_info
 {
-	u32 channel_id;    /* channel_id + func_id */
+	u32 channel_id;
 	u32 send_task_id;
 	u32 recv_task_id;
-	u32 len;            /* 用户数据长度，不包括pkg头 */
-	u32 write_pos;      /* write位置 */
-	u32 read_pos;       /* read位置 */
-	u32 duration_prev;  /* 发送或者接收之前的slice */
-	u32 duration_post;  /* 发送或者接收之后的slice */
+	u32 len;
+	u32 write_pos;
+	u32 read_pos;
+	u32 duration_prev;
+	u32 duration_post;
 	u8 data[ICC_MSG_RECORED_DATA_LEN];       
 };
 
 struct icc_debug_perf
 {
-    u32 max_readcb_consume_slice; /* 读回调执行最长的时间 */
-	u32 max_readcb_channel_id;    /* 读回调执行最长时间的chan_id_func_id */
-	u32 cnt;   /* 统计的次数 */
-	u32 sum;   /* 统计的总的执行时长(slice)，从发送到接收完成 */
-	u32 avg;   /* 统计的平均执行时长(slice)，从发送到接收完成 */
+    u32 max_readcb_consume_slice;
+	u32 max_readcb_channel_id;
+	u32 cnt;
+	u32 sum;
+	u32 avg;
 };
 
 struct icc_recv_msg_info
 {
-	u32 channel_id;    /* channel_id + func_id */
+	u32 channel_id;
 	u32 send_task_id;
 	u32 recv_task_id;
-	u32 len;            /* 用户数据长度，不包括pkg头 */
-	u32 write_pos;      /* write位置 */
-	u32 read_pos;       /* read位置 */
-	u32 before_recv_slice;  /* 发送或者接收之前的slice */
-	u32 in_read_cb_slice;  /* 接收回调中的slice */
-	u32 after_recv_slice;  /* 发送或者接收之后的slice */
-	struct icc_debug_perf perf; /* 性能统计 */
+	u32 len;
+	u32 write_pos;
+	u32 read_pos;
+	u32 before_recv_slice;
+	u32 in_read_cb_slice;
+	u32 after_recv_slice;
+	struct icc_debug_perf perf;
 };
 
 struct icc_msg_fifo
@@ -273,7 +263,6 @@ struct icc_msg_info
 	struct icc_msg_fifo_recv recv;
 };
 
-/*** 发送/接收消息统计，以通道为维度，分析通道数据 ***/
 struct icc_channel_stat_info
 {
 	u32 sum_len;
@@ -327,5 +316,3 @@ struct icc_channel *icc_channel_init(struct icc_init_info *info, s32 *ret);
 #endif
 
 #endif
-
-

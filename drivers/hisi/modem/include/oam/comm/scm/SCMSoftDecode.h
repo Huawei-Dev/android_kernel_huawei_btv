@@ -49,13 +49,9 @@
 #ifndef _SCM_SOFTDECODE_H_
 #define _SCM_SOFTDECODE_H_
 
-/*****************************************************************************
-  1 其他头文件包含
-*****************************************************************************/
 #include "vos.h"
 #include "omringbuffer.h"
 #include "msp_debug.h"
-
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -63,25 +59,9 @@ extern "C"{
 #endif
 #endif
 
-/**************************************************************************
-  2 宏定义
-**************************************************************************/
-#define SCM_DATA_RCV_BUFFER_SIZE    (100*1024)      /* SCM数据接收buffer大小 */
-#define SCM_DATA_RCV_PKT_SIZE       (8*1024)        /* SCM数据接收PKT大小 */
+#define SCM_DATA_RCV_BUFFER_SIZE    (100*1024)
+#define SCM_DATA_RCV_PKT_SIZE       (8*1024)
 
-
-/**************************************************************************
-  3 枚举定义
-**************************************************************************/
-
-/**************************************************************************
-  4 结构体定义
-**************************************************************************/
-
-/*****************************************************************************
-结构名    : SCM_DATE_RCV_CTRL_STRU
-结构说明  : SCM数据接收的控制结构
-*****************************************************************************/
 typedef struct
 {
     VOS_SEM                     SmID;
@@ -90,24 +70,16 @@ typedef struct
 }SCM_DATA_RCV_CTRL_STRU;
 
 #if 0
-/*****************************************************************************
-结构名    : SCM_DATA_RCV_HEADER_STRU
-结构说明  : SCM数据接收时放入环形缓冲区的数据头
-*****************************************************************************/
 typedef struct
 {
     VOS_UINT32                  ulLen;
 }SCM_DATA_RCV_HEADER_STRU;
 #endif
 
-/*****************************************************************************
-结构名    : SCM_MAINTENANCE_INFO_STRU
-结构说明  : SCM软解码模块可维可测信息记录结构
-*****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulDataLen; /* 接收或发送数据长度 */
-    VOS_UINT32                          ulNum;     /* 接收或发送数据次数 */
+    VOS_UINT32                          ulDataLen;
+    VOS_UINT32                          ulNum;
 }SCM_MAINTENANCE_INFO_STRU;
 
 typedef struct
@@ -122,10 +94,6 @@ typedef struct
 }SCM_SOFTDECODE_RB_INFO_STRU;
 
 
-/*****************************************************************************
-结构名    : OM_ACPU_PC_UE_SUC_STRU
-结构说明  : OM模块正常接收可维可测信息记录结构
-*****************************************************************************/
 typedef struct
 {
     SCM_SOFTDECODE_RB_INFO_STRU         stRbInfo;
@@ -137,10 +105,6 @@ typedef struct
     VOS_UINT32                          ulDataTypeErr;
     VOS_UINT32                          ulCpmRegLogicRcvSuc;
 }SCM_SOFTDECODE_INFO_STRU;
-
-/**************************************************************************
-  6 函数定义
-**************************************************************************/
 
 #if ((OSA_CPU_ACPU == VOS_OSA_CPU)|| (VOS_WIN32 == VOS_OS_VER))
 
@@ -164,8 +128,6 @@ VOS_VOID   CBTSCM_SoftDecodeReqRcvSelfTask(
     VOS_UINT32                          ulPara3,
     VOS_UINT32                          ulPara4);
 
-
-
 #endif
 
 #ifdef __cplusplus
@@ -175,5 +137,3 @@ VOS_VOID   CBTSCM_SoftDecodeReqRcvSelfTask(
 #endif
 
 #endif
-
-

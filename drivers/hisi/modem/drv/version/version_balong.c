@@ -46,9 +46,6 @@
  *
  */
 
-/*lint --e{537}*/
-/*lint -save -e958*/
-
 #include <linux/module.h>
 #include <linux/string.h>
 #include <drv_nv_id.h>
@@ -58,22 +55,11 @@
 PRODUCT_INFO_NV_STRU huawei_product_info = {0};
 NV_SW_VER_STRU nv_sw_ver={0};
 
-/*****************************************************************************
-* 函 数 名  	: bsp_version_productinfo_init
-*
-* 功能描述  : 读NV(0xD115)的值到huawei_product_info
-*
-* 参数说明  : 无
-*
-*返回值 : VER_ERROR表示读取异常
-*                   VER_OK表示读取正常
-*****************************************************************************/
 static __inline__ int bsp_version_productinfo_init(void)
 {
     u32 ret = 0;
     u32 hw_ver = bsp_get_version_info()->board_id;
 
-    /*lint -save -e26 -e119*/
     ret = bsp_nvm_read(NV_ID_DRV_NV_VERSION_INIT,(u8*)&huawei_product_info,sizeof(PRODUCT_INFO_NV_STRU));
     if(NV_OK != ret)
     {
@@ -86,20 +72,10 @@ static __inline__ int bsp_version_productinfo_init(void)
         huawei_product_info.index = hw_ver;
         return VER_ERROR;
     }
-    /*lint -restore*/
 
     return VER_OK;
 }
 
-/*****************************************************************************
-* 函 数 名  	: bsp_version_acore_init
-*
-* 功能描述  : acore版本号初始化
-*
-* 参数说明  : 无
-*
-*返回值 : 无
-*****************************************************************************/
 int bsp_version_acore_init(void)
 {
     int ret = VER_ERROR;
@@ -115,20 +91,6 @@ int bsp_version_acore_init(void)
     return ret;
 }
 
-
-
-/*****************************************************************************
-*                                                                                                                               *
-*            以下接口提供给mdrv接口调用                                                  *
-*                                                                                                                               *
-******************************************************************************/
-
-
-
-/*****************************************************************************
-* 函 数	: bsp_version_get_hardware
-* 功 能	: 获取硬件版本号(硬件版本名称+ Ver.+硬件子版本号+A)
-*****************************************************************************/
 char * bsp_version_get_hardware(void)
 {
     u32 len;
@@ -143,12 +105,9 @@ char * bsp_version_get_hardware(void)
     }
 
     if(!b_geted){
-        /*lint -save -e18 -e718 -e746*/
         len = (unsigned int)(strlen(huawei_product_info.hwVer) + strlen(" Ver.X"));
         hardware_sub_ver = (char)huawei_product_info.hwIdSub+'A';
         (void)memset((void *)hardware_version, 0, MemparamType(len));
-        /*lint -restore*/
-        /* coverity[secure_coding] */
         strncat(strncat(hardware_version, huawei_product_info.hwVer, strlen(huawei_product_info.hwVer)), " Ver.", strlen(" Ver."));
         *((hardware_version + len) - 1) = hardware_sub_ver;
         *(hardware_version + len) = 0;
@@ -158,10 +117,6 @@ char * bsp_version_get_hardware(void)
     return (char *)hardware_version;
 }
 
-/*****************************************************************************
-* 函 数	: bsp_get_product_inner_name
-* 功 能	: 获取内部产品名称(内部产品名+ 内部产品名plus)
-*****************************************************************************/
 char * bsp_version_get_product_inner_name(void)
 {
     unsigned int len;
@@ -187,10 +142,6 @@ char * bsp_version_get_product_inner_name(void)
     return  (char*)product_inner_name;
 }
 
-/*****************************************************************************
-* 函 数	: bsp_get_product_out_name
-* 功 能	: 获取外部产品名称
-*****************************************************************************/
 char * bsp_version_get_product_out_name(void)
 {
     if(HW_VER_INVALID == huawei_product_info.index)
@@ -202,44 +153,21 @@ char * bsp_version_get_product_out_name(void)
     return (char *)huawei_product_info.productId;
 }
 
-
-
-/*****************************************************************************
-*                                                                                                                               *
-*            以下接口提供给dump模块调用                                                 *
-*                                                                                                                               *
-******************************************************************************/
-
-
-
-/*****************************************************************************
-* 函 数	: bsp_get_build_date_time
-* 功 能	: 获取编译日期和时间
-*****************************************************************************/
 char * bsp_version_get_build_date_time(void)
 {
 	static char * build_date   = __DATE__ ", " __TIME__;
 	return build_date;
 }
 
-/*****************************************************************************
-* 函 数	: bsp_get_chip_version
-* 功 能	: 获取芯片版本号
-*****************************************************************************/
 char * bsp_version_get_chip(void)
 {
 	return (char *)PRODUCT_CFG_CHIP_SOLUTION_NAME;
 }
 
-/*****************************************************************************
-* 函 数	: bsp_get_firmware_version
-* 功 能	: 获取软件版本号
-*****************************************************************************/
 char * bsp_version_get_firmware(void)
 {
     u32 ret = VER_OK;
 
-    /*lint -save -e26 -e119*/
     ret=bsp_nvm_read(NV_ID_DRV_NV_DRV_VERSION_REPLACE_I, (u8 *)&nv_sw_ver, sizeof(NV_SW_VER_STRU));
     if(NV_OK != ret){
         ver_print_error("get NV_SW_VERSION_REPLACE failed!\n");
@@ -248,40 +176,20 @@ char * bsp_version_get_firmware(void)
     else if(0 == nv_sw_ver.nvStatus){
         return (char*)PRODUCT_DLOAD_SOFTWARE_VER;
     }
-    /*lint -restore*/
 
     return (char *)nv_sw_ver.nv_version_info;
 }
 
-/*****************************************************************************
-* 函 数	: bsp_version_get_release
-* 功 能	: 获取全版本号
-*****************************************************************************/
 char * bsp_version_get_release(void)
 {
     return PRODUCT_FULL_VERSION_STR;
 }
 
-
-
-/*****************************************************************************
-* 函 数 名  	: bsp_get_version_info
-*
-* 功能描述  : 为其他模块提供各种版本号信息
-*
-* 参数说明  : 无
-*
-*返回值 : version的共享内存数据结构体的地址
-*****************************************************************************/
 const BSP_VERSION_INFO_S* bsp_get_version_info(void)
 {
 	return (BSP_VERSION_INFO_S *)(SHM_BASE_ADDR + SHM_OFFSET_VERSION);
 }
 
-/*****************************************************************************
-* 函 数	: bsp_version_debug
-* 功 能	: 用于调试查看版本号相关信息
-*****************************************************************************/
 int bsp_version_debug(void)
 {
     if(huawei_product_info.index == HW_VER_INVALID){
@@ -326,7 +234,6 @@ int bsp_version_debug(void)
     return VER_OK;
 }
 
-/*注意:需在nv模块初始化之后*/
 module_init(bsp_version_acore_init);
 
 EXPORT_SYMBOL_GPL(huawei_product_info);
@@ -336,6 +243,3 @@ EXPORT_SYMBOL_GPL(bsp_version_get_product_out_name);
 EXPORT_SYMBOL_GPL(bsp_version_get_product_inner_name);
 EXPORT_SYMBOL_GPL(bsp_get_version_info);
 EXPORT_SYMBOL_GPL(bsp_version_debug);
-
-/*lint -restore*/
-

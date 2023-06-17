@@ -210,7 +210,7 @@ inline u32 nv_debug_product(void)
 
 inline bool nv_debug_is_reset(void)
 {
-    /* MBB产品默认不复位 */
+    /* MBB?????????????? */
     if(NV_PRODUCT_MBB == nv_debug_product())
     {
         nv_printf("mbb product don't reset system! %d\n",g_nv_debug_cfg.reset);
@@ -224,7 +224,7 @@ inline bool nv_debug_is_reset(void)
             return true;
         }
 
-        /* 手机产品产线上不复位 */
+        /* ???????????????????? */
         if(NV_MODE_FACTORY == g_nv_ctrl.nv_self_ctrl.ulResumeMode)
         {
             nv_printf("phone product don't reset system in factory! %d\n",g_nv_ctrl.nv_self_ctrl.ulResumeMode);
@@ -232,7 +232,7 @@ inline bool nv_debug_is_reset(void)
         }
         else
         {
-            /* 手机beta阶段复位，商用阶段不复位 */
+            /* ????beta???????????????????????? */
             if(EDITION_USER == bbox_check_edition())
             {
                 nv_printf("phone product don't reset system in user! \n");
@@ -396,11 +396,11 @@ u32 nv_debug_store_file(char * src)
     return NV_OK;
 }
 /*****************************************************************************
- 函 数 名  : nv_debug_switch
- 功能描述  : nv debug功能开关
- 输入参数  : void
- 输出参数  : 无
- 返 回 值  : 无
+ ?? ?? ??  : nv_debug_switch
+ ????????  : nv debug????????
+ ????????  : void
+ ????????  : ??
+ ?? ?? ??  : ??
 *****************************************************************************/
 u32 nv_debug_switch(u32 value)
 {
@@ -408,11 +408,11 @@ u32 nv_debug_switch(u32 value)
     return g_nv_debug_info.debug_ctrl.value;
 }
 /*****************************************************************************
- 函 数 名  : nv_debug_record
- 功能描述  : 对读写操作过程记录打点时间
- 输入参数  : void
- 输出参数  : 无
- 返 回 值  : 无
+ ?? ?? ??  : nv_debug_record
+ ????????  : ??????????????????????????
+ ????????  : void
+ ????????  : ??
+ ?? ?? ??  : ??
 *****************************************************************************/
 void nv_debug_record(u32 current_state)
 {
@@ -457,11 +457,11 @@ void nv_debug_record(u32 current_state)
 }
 /*lint -restore*/
 /*****************************************************************************
- 函 数 名  : nv_debug_print_dump_queue
- 功能描述  : 打印dump队列中的信息
- 输入参数  : void
- 输出参数  : 无
- 返 回 值  : 无
+ ?? ?? ??  : nv_debug_print_dump_queue
+ ????????  : ????dump????????????
+ ????????  : void
+ ????????  : ??
+ ?? ?? ??  : ??
 *****************************************************************************/
 void nv_debug_print_dump_queue(void)
 {
@@ -513,11 +513,11 @@ void nv_debug_print_dump_queue(void)
     return;
 }
 /*****************************************************************************
- 函 数 名  : nv_debug_record_delta_time
- 功能描述  : 记录操作最大时间
- 输入参数  : void
- 输出参数  : 无
- 返 回 值  : 无
+ ?? ?? ??  : nv_debug_record_delta_time
+ ????????  : ????????????????
+ ????????  : void
+ ????????  : ??
+ ?? ?? ??  : ??
 *****************************************************************************/
 void nv_debug_record_delta_time(u32 type, u32 start, u32 end)
 {
@@ -620,7 +620,7 @@ void nv_show_ref_info(u32 arg1,u32 arg2)
 
     for(i = _min;i<_max;i++)
     {
-        printf("第%d项 :\n",i);
+        printf("??%d?? :\n",i);
         printf("nvid   :0x%-8x, file id : 0x%-8x\n",ref_info->itemid,ref_info->file_id);
         printf("nvlen  :0x%-8x, nv_off  : 0x%-8x, nv_pri 0x%-8x\n",ref_info->nv_len,ref_info->nv_off,ref_info->priority);
         printf("dsda   :0x%-8x\n",ref_info->modem_num);
@@ -693,10 +693,10 @@ void nv_help(u32 type)
 }
 /*
 * Function   : nv_show_item_info
-* Discription: 打印nv id 为itemid的nv相关的信息
-* Parameter  : itemid: 需要查询的nv项的id
-* Output     : 0     : 查询成功
-               -1    : 查询失败不存在该nv项
+* Discription: ????nv id ??itemid??nv??????????
+* Parameter  : itemid: ??????????nv????id
+* Output     : 0     : ????????
+               -1    : ????????????????nv??
 * History    : yuyangyang  00228784  create
 */
 
@@ -755,7 +755,7 @@ void nv_debug(u32 type,u32 reseverd1,u32 reserved2,u32 reserved3,u32 reserved4)
 }
 
 
-/*系统启动log记录接口，保存到 NV_LOG_PATH 中，大小限定在 NV_LOG_MAX_SIZE*/
+/*????????log???????????????? NV_LOG_PATH ?????????????? NV_LOG_MAX_SIZE*/
 void nv_mntn_record(char* fmt,...)
 {
     char   buffer[256];

@@ -47,21 +47,21 @@
 */
 
 /*****************************************************************************
-  1 头文件包含
+  1 ??????????
 *****************************************************************************/
 #include "AtParse.h"
 #include "ATCmdProc.h"
 #include "AtInputProc.h"
 #include "AtCmdPacketProc.h"
 #include "Taf_Tafm_Remote.h"
-/* Added by l00167671 for NV拆分项目 , 2013-05-17, begin */
+/* Added by l00167671 for NV???????? , 2013-05-17, begin */
 #include "NasNvInterface.h"
-/* Added by l00167671 for NV拆分项目 , 2013-05-17, end*/
+/* Added by l00167671 for NV???????? , 2013-05-17, end*/
 #include "AtCmdFtmProc.h"
 
-/* Added by Y00213812 for VoLTE_PhaseI 项目, 2013-07-08, begin */
+/* Added by Y00213812 for VoLTE_PhaseI ????, 2013-07-08, begin */
 #include "siappstk.h"
-/* Added by Y00213812 for VoLTE_PhaseI 项目, 2013-07-08, end */
+/* Added by Y00213812 for VoLTE_PhaseI ????, 2013-07-08, end */
 
 /* Added by L47619 for V9R1 vSIM Project, 2013-8-27, begin */
 #include "AtCmdSimProc.h"
@@ -71,9 +71,9 @@
 #include "at_lte_common.h"
 /* ADD by c64416 for V9R1/V7R1 AT, 2013/09/18 end */
 
-/* Added by j00174725 for V3R3C60_eCall项目, 2014-3-29, begin */
+/* Added by j00174725 for V3R3C60_eCall????, 2014-3-29, begin */
 #include "AtCmdCallProc.h"
-/* Added by j00174725 for V3R3C60_eCall项目, 2014-3-29, end */
+/* Added by j00174725 for V3R3C60_eCall????, 2014-3-29, end */
 
 #include "AtTestParaCmd.h"
 
@@ -83,24 +83,24 @@
 
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
-/*lint -e767 -e960 修改人:罗建 107747;检视人:孙少华65952;原因:Log打印*/
+/*lint -e767 -e960 ??????:???? 107747;??????:??????65952;????:Log????*/
 #define    THIS_FILE_ID        PS_FILE_ID_AT_EXTENDPRIVATECMD_C
-/*lint +e767 +e960 修改人:罗建 107747;检视人:sunshaohua*/
+/*lint +e767 +e960 ??????:???? 107747;??????:sunshaohua*/
 
 /*****************************************************************************
-  2 全局变量定义
+  2 ????????????
 *****************************************************************************/
 
-/* Modified by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-25, begin */
-/* 主动上报相关命令下移至C核，设置和查询时需要等待C核回复，添加等待设置回复和查询回复的时间 */
+/* Modified by s00217060 for ????????AT??????????????C??, 2013-4-25, begin */
+/* ??????????????????????C????????????????????????C???????????????????????????????????????? */
 AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
 
-/* 示例: ^CMDX 命令是不受E5密码保护命令，且在+CLAC列举所有命令时不显示，第一个参数是不带双引号的字符串,
-        第二个参数是带双引号的字符串，第三个参数是整数型参数
+/* ????: ^CMDX ??????????E5??????????????????+CLAC????????????????????????????????????????????????????,
+        ????????????????????????????????????????????????????
 
-   !!!!!!!!!!!注意: param1和param2是示例，实际定义命令时应尽量定义的简短(可提高解析效率)!!!!!!!!!!!!!
+   !!!!!!!!!!!????: param1??param2??????????????????????????????????????(??????????????)!!!!!!!!!!!!!
 
     {AT_CMD_CMDX,
     At_SetCmdxPara, AT_SET_PARA_TIME, At_QryCmdxPara, AT_QRY_PARA_TIME, At_TestCmdxPara, AT_NOT_SET_TIME,
@@ -241,11 +241,11 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_NO_LIMITED,
     (TAF_UINT8*)"^AUTORESELSTUB",    (TAF_UINT8*)"(0,1)"},
 
-     /* Added by c00318887 for file refresh需要触发背景搜, 2015-4-28, begin */
-    /* Added by c00318887 for file refresh需要触发背景搜, 2015-4-28, end */
+     /* Added by c00318887 for file refresh??????????????, 2015-4-28, begin */
+    /* Added by c00318887 for file refresh??????????????, 2015-4-28, end */
 
 /* AUTO TEST */
-    /* Added by 傅映君/f62575 for CPULOAD&MFREELOCKSIZE处理过程移至C核, 2011/11/15, begin */
+    /* Added by ??????/f62575 for CPULOAD&MFREELOCKSIZE????????????C??, 2011/11/15, begin */
     {AT_CMD_CPULOAD,
     TAF_NULL_PTR,           AT_NOT_SET_TIME,  At_QryCpuLoadPara, AT_QRY_PARA_TIME, VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -257,15 +257,15 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED | CMD_TBL_CLAC_IS_INVISIBLE,
     (TAF_UINT8*)"^MFREELOCKSIZE", TAF_NULL_PTR},
-    /* Added by 傅映君/f62575 for CPULOAD&MFREELOCKSIZE处理过程移至C核, 2011/11/15, end */
+    /* Added by ??????/f62575 for CPULOAD&MFREELOCKSIZE????????????C??, 2011/11/15, end */
 
-    /* Added by l00171473 for 内存监控AT命令, 2011-11-29,  begin */
+    /* Added by l00171473 for ????????AT????, 2011-11-29,  begin */
     {AT_CMD_MEMQUERY,
     AT_SetMemInfoPara,      AT_SET_PARA_TIME,  TAF_NULL_PTR, AT_NOT_SET_TIME, VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED | CMD_TBL_CLAC_IS_INVISIBLE,
     (TAF_UINT8*)"^MEMQUERY", (VOS_UINT8*)"(0,1)"},
-    /* Added by l00171473 for 内存监控AT命令, 2011-11-29,  end */
+    /* Added by l00171473 for ????????AT????, 2011-11-29,  end */
 
 /* SMS */
     {AT_CMD_CMST,
@@ -289,7 +289,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CMS_OPERATION_NOT_ALLOWED,       CMD_TBL_PIN_IS_LOCKED,
     (TAF_UINT8*)"^CMMT", (TAF_UINT8*)"(0-254),(0,1)"},
 
-    /* E5命令 begin */
+    /* E5???? begin */
     {AT_CMD_APTHROUGHPUT,
     At_SetApThroughputPara, AT_SET_PARA_TIME,  At_QryApThroughputPara,   AT_QRY_PARA_TIME,   AT_TestApThroughputPara, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -343,8 +343,8 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS,       CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^SHELL",       (VOS_UINT8*)"(0-2)"},
- /* Add by c00172979 for V7代码同步, 2012-04-07, Begin   */
- /* Modify by c00172979 for V7代码同步, 2012-04-07, End   */
+ /* Add by c00172979 for V7????????, 2012-04-07, Begin   */
+ /* Modify by c00172979 for V7????????, 2012-04-07, End   */
    {AT_CMD_RSRPCFG,
    AT_SetRsrpCfgPara,      AT_NOT_SET_TIME,  AT_QryRsrpCfgPara,            AT_NOT_SET_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -362,8 +362,8 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
    VOS_NULL_PTR,   AT_NOT_SET_TIME,
    AT_CME_INCORRECT_PARAMETERS,       CMD_TBL_PIN_IS_LOCKED,
    (VOS_UINT8*)"^ECIOCFG",      (VOS_UINT8*)"(0-3),(0-200)"},
-   /* Modify by z60575 for DTS2012061500001 删除AT^CELLROAM命令,2012-6-15, begin */
-   /* Modify by z60575 for TS2012061500001 删除AT^CELLROAM命令,2012-6-15, end */
+   /* Modify by z60575 for DTS2012061500001 ????AT^CELLROAM????,2012-6-15, begin */
+   /* Modify by z60575 for TS2012061500001 ????AT^CELLROAM????,2012-6-15, end */
    {AT_CMD_PDPROFMOD,
     AT_SetPdprofmodPara,    AT_SET_PARA_TIME,  AT_QryPdprofmodPara,        AT_NOT_SET_TIME,   At_CmdTestProcOK, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -393,7 +393,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS,       CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^CSQLVLEXT",   (VOS_UINT8*)"(0,20,40,60,80,99),(99)"},
-    /* Modified by s62952 for BalongV300R002 Build优化项目 2012-02-28, begin */
+    /* Modified by s62952 for BalongV300R002 Build???????? 2012-02-28, begin */
 
     {AT_CMD_DISSD,
     AT_SetDissdCmd,         AT_NOT_SET_TIME,  VOS_NULL_PTR,             AT_NOT_SET_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
@@ -406,7 +406,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_ERROR,       CMD_TBL_E5_IS_LOCKED,
     (VOS_UINT8*)"^SDREBOOT",       (VOS_UINT8*)"(pwd)"},
-    /* Modified by s62952 for BalongV300R002 Build优化项目 2012-02-28, end */
+    /* Modified by s62952 for BalongV300R002 Build???????? 2012-02-28, end */
 
     {AT_CMD_DOCK,
     AT_SetDockPara,         AT_SET_PARA_TIME, VOS_NULL_PTR,             AT_NOT_SET_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
@@ -479,31 +479,31 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS,       CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^APBATLVL",    VOS_NULL_PTR},
-    /* Modified by s62952 for BalongV300R002 Build优化项目 2012-02-28, begin */
+    /* Modified by s62952 for BalongV300R002 Build???????? 2012-02-28, begin */
     {AT_CMD_OPENPORT,
     AT_SetOpenportPara,     AT_NOT_SET_TIME,  VOS_NULL_PTR,              AT_NOT_SET_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS,       CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^OPENPORT",    VOS_NULL_PTR},
-    /* Modified by s62952 for BalongV300R002 Build优化项目 2012-02-28, end */
+    /* Modified by s62952 for BalongV300R002 Build???????? 2012-02-28, end */
 
-/* E5命令 end */
+/* E5???? end */
 
-    /*闪电卡版本自动化测试控制应用手动拨号*/
+    /*????????????????????????????????????*/
     {AT_CMD_APPDIALMODE,
     At_SetAppDialModePara,  AT_NOT_SET_TIME,  VOS_NULL_PTR,              AT_NOT_SET_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS,       CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^APPDIALMODE", (VOS_UINT8*)"(0-1)"},
 
-    /* 统计从上电到pdp激活成功的启动时间*/
+    /* ????????????pdp??????????????????*/
     {AT_CMD_LCSTARTTIME,
     VOS_NULL_PTR,           AT_NOT_SET_TIME,  At_QryLcStartTimePara,     AT_NOT_SET_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS,       CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^LCSTARTTIME", VOS_NULL_PTR},
 
-/* HUAWEI 移动宽带产品终端设备一键升级接口规范V1.07.doc 文档涉及的命令底软未归一: V700R001版本使用LTE的实现，V300R002版本使用GU模的实现 */
+/* HUAWEI ????????????????????????????????????V1.07.doc ????????????????????????: V700R001????????LTE????????V300R002????????GU???????? */
     {AT_CMD_DLOADVER,
     VOS_NULL_PTR, AT_NOT_SET_TIME, atQryDLoadVer, AT_UPGRADE_TIME_5S, VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -620,7 +620,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS,       CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^APLANADDR",   (VOS_UINT8*)"(1-11)"},
 
-/* XML命令 begin */
+/* XML???? begin */
     {AT_CMD_APRPTSRVURL,
     AT_SetApRptSrvUrlPara,  AT_NOT_SET_TIME,  AT_QryApRptSrvUrlPara,     AT_NOT_SET_TIME,    At_CmdTestProcOK, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -638,7 +638,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS,       CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^APXMLRPTFLAG",   (VOS_UINT8*)"(0,1)"},
-/* XML命令 end  */
+/* XML???? end  */
 
     {AT_CMD_RSTRIGGER,
     AT_SetRstriggerPara,    AT_NOT_SET_TIME,  AT_QryRstriggerPara,       AT_NOT_SET_TIME,    AT_TestRstriggerPara, AT_NOT_SET_TIME,
@@ -653,7 +653,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     (VOS_UINT8*)"^CMSTUB",      (VOS_UINT8*)"(0-11),(0-6)"},
 /* Added by f62575 for AT Project,2011-10-17,  End*/
 
-    /* 支持5中形态的语音类型 */
+    /* ????5???????????????? */
     {AT_CMD_VMSET,
     At_SetVMSETPara,        AT_SET_PARA_TIME, At_QryVMSETPara,          AT_QRY_PARA_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -703,7 +703,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_ERROR, CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^VERTIME", VOS_NULL_PTR},
 
-    /*WAS应终端要求新增AT命令*/
+    /*WAS??????????????AT????*/
     {AT_CMD_FREQLOCK,
     At_SetFreqLock,         AT_SET_PARA_TIME, At_QryFreqLock,           AT_QRY_PARA_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -717,30 +717,30 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     (VOS_UINT8*)"^CSNR", (VOS_UINT8*)"(-145 - -60),(-32 - 0)"},
 
 
-    /* 协议升级,将HSPA的设置范围由(0-3),更改为(0-7),其中4对应R8,5对应R9，其它数字用于以后的扩展 */
+    /* ????????,??HSPA????????????(0-3),??????(0-7),????4????R8,5????R9???????????????????????? */
     {AT_CMD_HSPA,
     At_SetRRCVersion,       AT_SET_PARA_TIME, At_QryRRCVersion,         AT_QRY_PARA_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^HSPA", (VOS_UINT8*)"(0-7)"},
 
-    /*OAM调试用AT命令*/
+    /*OAM??????AT????*/
     {AT_CMD_COMM,
     At_SetCommDebugPara,    AT_NOT_SET_TIME,  At_QryCommDebugPara,      AT_NOT_SET_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED | CMD_TBL_CLAC_IS_INVISIBLE_E5,
     (VOS_UINT8*)"^COMM", (VOS_UINT8*)"(0-31)"},
 
-    /*OAM应终端要求新增AT命令*/
+    /*OAM??????????????AT????*/
     {AT_CMD_ADCTEMP,
-    /* Added by 傅映君/f62575 for ADCTEMP处理过程移动到C核, 2011/11/15, begin */
+    /* Added by ??????/f62575 for ADCTEMP??????????????C??, 2011/11/15, begin */
     At_SetAdcTempPara,      AT_SET_PARA_TIME,  At_QryAdcTempPara,        AT_NOT_SET_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
-    /* Added by 傅映君/f62575 for ADCTEMP处理过程移动到C核, 2011/11/15, end */
+    /* Added by ??????/f62575 for ADCTEMP??????????????C??, 2011/11/15, end */
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED | CMD_TBL_CLAC_IS_INVISIBLE,
     (VOS_UINT8*)"^ADCTEMP", (VOS_UINT8*)"(0,1),(0-150),(0-150),(0-150)"},
 
-    /*NAS应终端要求新增AT命令*/
+    /*NAS??????????????AT????*/
     {AT_CMD_CRPN,
     At_SetCrpnPara,         AT_SET_PARA_TIME, At_QryCrpnPara,           AT_NOT_SET_TIME,    At_CmdTestProcOK, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -753,13 +753,13 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED | CMD_TBL_CLAC_IS_INVISIBLE,
     (VOS_UINT8*)"^YJCX", (VOS_UINT8*)"(0,1)"},
 
-    /* Added by 傅映君/f62575 for AT Project, SIM卡保护标志确认, 2011/11/15, begin */
+    /* Added by ??????/f62575 for AT Project, SIM??????????????, 2011/11/15, begin */
     {AT_CMD_USSDMODE,
     At_SetUssdModePara,     AT_NOT_SET_TIME,  At_QryUssdModePara,       AT_NOT_SET_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED | CMD_TBL_CLAC_IS_INVISIBLE,
     (VOS_UINT8*)"^USSDMODE", (VOS_UINT8*)"(0-1)"},
-    /* Added by 傅映君/f62575 for AT Project, SIM卡保护标志确认, 2011/11/15, end */
+    /* Added by ??????/f62575 for AT Project, SIM??????????????, 2011/11/15, end */
 
     {AT_CMD_GETPORTMODE,
     At_SetGetportmodePara,  AT_NOT_SET_TIME,  At_QryGetportmodePara,    AT_NOT_SET_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
@@ -803,14 +803,14 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^SPN", (VOS_UINT8*)"(0-1)"},
 
-    /*为自动化测试需求增加，w101153*/
+    /*??????????????????????w101153*/
     {AT_CMD_CCC,
     AT_SetCccPara,          AT_SET_PARA_TIME, VOS_NULL_PTR,             AT_NOT_SET_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_CLAC_IS_INVISIBLE_E5,
     (VOS_UINT8*)"^CCC", (VOS_UINT8*)"(0,1),(1-7)"},
 
-    /* Modified by z00234330 for 增加AT命令, 2013-7-20, begin */
+    /* Modified by z00234330 for ????AT????, 2013-7-20, begin */
     /* Modified by s46746 for CS/PS mode 1, 2012-6-19, begin */
     {AT_CMD_CMM,
     At_SetCmmPara,          AT_SET_PARA_TIME, VOS_NULL_PTR,             AT_NOT_SET_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
@@ -818,7 +818,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_CLAC_IS_INVISIBLE,
     (VOS_UINT8*)"^CMM", (VOS_UINT8*)"(0-12),(0-255)"},
     /* Modified by s46746 for CS/PS mode 1, 2012-6-19, end */
-    /* Modified by z00234330 for 增加AT命令, 2013-7-20, begin */
+    /* Modified by z00234330 for ????AT????, 2013-7-20, begin */
 
     {AT_CMD_MEANRPT,
     At_GetMeanRpt,          AT_SET_PARA_TIME, VOS_NULL_PTR,             AT_NOT_SET_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
@@ -832,7 +832,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^CELLINFO", (VOS_UINT8*)"(0,1)"},
 
-    /* 内部测试命令 */
+    /* ???????????? */
     {AT_CMD_CGAS,
     At_SetCGasPara,         AT_SET_PARA_TIME, VOS_NULL_PTR,             AT_NOT_SET_TIME,    At_CmdTestProcERROR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -858,7 +858,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_CLAC_IS_INVISIBLE_E5,
     (VOS_UINT8*)"^CMLCK", (VOS_UINT8*)"(\"PS\"),(0,1),(psw),(str)"},
 
-    /*数传GCF测试命令 */
+    /*????GCF???????? */
     {AT_CMD_GCFIND,
     At_SetGcfIndPara,       AT_NOT_SET_TIME,    VOS_NULL_PTR,           AT_NOT_SET_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -967,7 +967,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     (VOS_UINT8*)"^CQST",        (VOS_UINT8*)"(0,1)"},
 
 
-    /* SVLTE项目AP需要在无卡时候设置CAATT命令 */
+    /* SVLTE????AP??????????????????CAATT???? */
     {AT_CMD_CAATT,
     At_SetAutoAttach,       AT_SET_PARA_TIME,   At_QryAutoAttach,       AT_QRY_PARA_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -986,8 +986,8 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^SYSINFOEX",   TAF_NULL_PTR},
 
-/* Modify by c00172979 for V7代码同步, 2012-04-13, Begin   */
-/* Modify by c00172979 for V7代码同步, 2012-04-13, End   */
+/* Modify by c00172979 for V7????????, 2012-04-13, Begin   */
+/* Modify by c00172979 for V7????????, 2012-04-13, End   */
 
     {AT_CMD_CEMODE,
     VOS_NULL_PTR,     AT_SET_PARA_TIME,   At_QryCemode,           AT_QRY_PARA_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
@@ -1037,14 +1037,14 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^CPAM",        (VOS_UINT8*)"(0-3),(0-2)"},
 
-    /* Modified by s62952 for BalongV300R002 Build优化项目 2012-02-28, begin */
+    /* Modified by s62952 for BalongV300R002 Build???????? 2012-02-28, begin */
 /* Added by c64416 for AT Project 2011-10-24  Begin */
     {AT_CMD_NDISSTATQRY,
     VOS_NULL_PTR, AT_NOT_SET_TIME, AT_QryNdisStatPara, AT_QRY_PARA_TIME, At_CmdTestProcOK, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^NDISSTATQRY", VOS_NULL_PTR},
-    /* Modified by s62952 for BalongV300R002 Build优化项目 2012-02-28, end */
+    /* Modified by s62952 for BalongV300R002 Build???????? 2012-02-28, end */
 
     {AT_CMD_AUTHDATA,
     At_SetAuthdataPara, AT_SET_PARA_TIME, AT_QryAuthdataPara, AT_QRY_PARA_TIME, At_TestAuhtdata, AT_NOT_SET_TIME,
@@ -1083,13 +1083,13 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^NDISCONN", (VOS_UINT8*)NDISCONN_TEST_CMD_PARA_STRING},
 
-    /* Modified by s62952 for BalongV300R002 Build优化项目 2012-02-28, begin */
+    /* Modified by s62952 for BalongV300R002 Build???????? 2012-02-28, begin */
     {AT_CMD_NDISADD,
     At_SetNdisAddPara, AT_SET_PARA_TIME, At_QryNdisAddPara, AT_QRY_PARA_TIME, VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^NDISADD", (VOS_UINT8*)"(0,1),(ipAddr),(primaryDNS),(secondaryDNS),(primaryNBNS),(secondaryNBNS)"},
-    /* Modified by s62952 for BalongV300R002 Build优化项目 2012-02-28, end */
+    /* Modified by s62952 for BalongV300R002 Build???????? 2012-02-28, end */
 /* Added by c64416 for AT Project 2011-10-24  End*/
 
     {AT_CMD_CGDNS,
@@ -1098,22 +1098,22 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^CGDNS",    (VOS_UINT8*)"(1-11),(PriDns),(SecDns)"},
 
-    /*数传GCF测试命令 */
+    /*????GCF???????? */
     {AT_CMD_TRIG,
     At_SetTrigPara,         AT_SET_PARA_TIME,   VOS_NULL_PTR,           AT_NOT_SET_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^TRIG",    (VOS_UINT8*)"(0,1),(5-15),(1-65535),(1-40),(1-10000)"},
 
-    /* Added by 傅映君/f62575 for AT Project, SIM卡保护标志确认, 2011/11/15, begin */
+    /* Added by ??????/f62575 for AT Project, SIM??????????????, 2011/11/15, begin */
     {AT_CMD_DSFLOWRPT,
     AT_SetDsFlowRptPara,    AT_SET_PARA_TIME,   VOS_NULL_PTR,           AT_NOT_SET_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^DSFLOWRPT",   (VOS_UINT8*)"(0,1)"},
-    /* Added by 傅映君/f62575 for AT Project, SIM卡保护标志确认, 2011/11/15, end */
+    /* Added by ??????/f62575 for AT Project, SIM??????????????, 2011/11/15, end */
 
-    /* 自定义命令 */
+    /* ?????????? */
     {AT_CMD_CCIN,
     At_SetCcinPara,         AT_NOT_SET_TIME,    VOS_NULL_PTR,           AT_NOT_SET_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -1125,8 +1125,8 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^TIME",    (VOS_UINT8*)"(0,1)"},
-    /* Deleted by s00217060 for VoLTE_PhaseI  项目, 2013-08-22, begin */
-    /* Deleted by s00217060 for VoLTE_PhaseI  项目, 2013-08-22, end */
+    /* Deleted by s00217060 for VoLTE_PhaseI  ????, 2013-08-22, begin */
+    /* Deleted by s00217060 for VoLTE_PhaseI  ????, 2013-08-22, end */
     {AT_CMD_CSND,
     At_SetCsndPara,         AT_SET_PARA_TIME,   VOS_NULL_PTR,           AT_NOT_SET_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -1249,7 +1249,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^DNSQUERY",    (VOS_UINT8*)DNSQUERY_TEST_CMD_PARA_STRING},
 
-    /* 与K3对接命令 */
+    /* ??K3???????? */
     {AT_CMD_CSASM,
     AT_SetMemStatusPara,  AT_SET_PARA_TIME, VOS_NULL_PTR,   AT_NOT_SET_TIME, VOS_NULL_PTR,  AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -1431,13 +1431,13 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_NO_LIMITED,
     (VOS_UINT8*)"^WLTHRESHOLDCFG",       (VOS_UINT8*)"(0,1)"},
 
-    /* Added by w00176964 for V7R1C50_DCM接入禁止小区信息上报, 2012-12-12, begin */
+    /* Added by w00176964 for V7R1C50_DCM????????????????????, 2012-12-12, begin */
     {AT_CMD_ACINFO,
     VOS_NULL_PTR, AT_SET_PARA_TIME ,  AT_QryAcInfoPara  ,  AT_QRY_PARA_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_LIMITED_NULL,
     (VOS_UINT8*)"^ACINFO",    VOS_NULL_PTR},
-    /* Added by w00176964 for V7R1C50_DCM接入禁止小区信息上报, 2012-12-12, end */
+    /* Added by w00176964 for V7R1C50_DCM????????????????????, 2012-12-12, end */
     {AT_CMD_CLTEROAMALLOW,
     AT_SetCLteRoamAllowPara,    AT_SET_PARA_TIME,   AT_QryCLteRoamAllowPara,   AT_NOT_SET_TIME,    VOS_NULL_PTR,       AT_NOT_SET_TIME,
     VOS_NULL_PTR, AT_NOT_SET_TIME,
@@ -1505,13 +1505,13 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS,    CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^IMEIVERIFY",  VOS_NULL_PTR},
 
-    /* Modified by L60609 for add app vcom，2013-06-17,  Begin */
+    /* Modified by L60609 for add app vcom??2013-06-17,  Begin */
     {AT_CMD_LOGPORT,
     At_SetLogPortPara,       AT_NOT_SET_TIME,  At_QryLogPortPara,   AT_NOT_SET_TIME,    At_CmdTestProcOK,    AT_NOT_SET_TIME,
     VOS_NULL_PTR,        AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS,    CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^LOGPORT",  (VOS_UINT8*)"(0,1),(0,1)"},
-    /* Modified by L60609 for add app vcom，2013-06-17,  End */
+    /* Modified by L60609 for add app vcom??2013-06-17,  End */
 
     {AT_CMD_CHISFREQ,
     AT_SetHistoryFreqPara, AT_SET_PARA_TIME,  VOS_NULL_PTR,   AT_QRY_PARA_TIME,    VOS_NULL_PTR,    AT_NOT_SET_TIME,
@@ -1652,13 +1652,13 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"^EOPLMN",      (VOS_UINT8*)"(@version),(0-5),(0-500),(@PDU_DATA)"},
 
-    /* Added by l00198894 for 新增+ECID命令, 2013-12-09, begin */
+    /* Added by l00198894 for ????+ECID????, 2013-12-09, begin */
     {AT_CMD_ECID,
     AT_SetEcidPara,     AT_SET_PARA_TIME,   VOS_NULL_PTR,   AT_NOT_SET_TIME,    At_CmdTestProcERROR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_PIN_IS_LOCKED,
     (VOS_UINT8*)"+ECID",      (VOS_UINT8*)"(0)"},
-    /* Added by l00198894 for 新增+ECID命令, 2013-12-09, end */
+    /* Added by l00198894 for ????+ECID????, 2013-12-09, end */
 
 
     {AT_CMD_ANTSWITCH,
@@ -1691,7 +1691,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS,    CMD_TBL_NO_LIMITED,
     (VOS_UINT8 *)"^CACMIMS",   (VOS_UINT8 *)"(1-5),(0-1),(@number),(@number),(@number),(@number),(@number)"},
 
-    /* 添加了class域支持VIDEO */
+    /* ??????class??????VIDEO */
     {AT_CMD_CCWAI,
     AT_SetCcwaiPara,     AT_SET_PARA_TIME,   At_CmdTestProcOK,       AT_NOT_SET_TIME,   At_CmdTestProcOK,   AT_NOT_SET_TIME,
     VOS_NULL_PTR,        AT_NOT_SET_TIME,
@@ -1740,7 +1740,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     VOS_NULL_PTR,        AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS,    CMD_TBL_NO_LIMITED,
     (VOS_UINT8 *)"^MIPICLK",   VOS_NULL_PTR},
-    /* Modify by j00174725 for K3V3 多模多天线特性, 2014-06-16, Begin */
+    /* Modify by j00174725 for K3V3 ??????????????, 2014-06-16, Begin */
     {AT_CMD_DPDTTEST,
     At_SetDpdtTestFlagPara,       AT_SET_PARA_TIME,   VOS_NULL_PTR,     AT_NOT_SET_TIME,    VOS_NULL_PTR, AT_NOT_SET_TIME,
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
@@ -1758,7 +1758,7 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     VOS_NULL_PTR,   AT_NOT_SET_TIME,
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_NO_LIMITED,
     (VOS_UINT8*)"^DPDTQRY", (VOS_UINT8*)"(0-4)"},
-    /* Modify by j00174725 for K3V3 多模多天线特性, 2014-06-16, End */
+    /* Modify by j00174725 for K3V3 ??????????????, 2014-06-16, End */
 
     {AT_CMD_JDETEX,
     At_SetJamDetectPara,   AT_SET_PARA_TIME,   At_QryJamDetectPara,   AT_NOT_SET_TIME,   VOS_NULL_PTR, AT_NOT_SET_TIME,
@@ -1777,8 +1777,8 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     AT_CME_INCORRECT_PARAMETERS, CMD_TBL_NO_LIMITED,
     (VOS_UINT8*)"^PHYINIT",       VOS_NULL_PTR},
 
-    /* Added by n00269697 for V3R3C60_eCall项目, 2014-3-29, begin */
-    /* Added by n00269697 for V3R3C60_eCall项目, 2014-3-29, end */
+    /* Added by n00269697 for V3R3C60_eCall????, 2014-3-29, begin */
+    /* Added by n00269697 for V3R3C60_eCall????, 2014-3-29, end */
 
     {AT_CMD_RATFREQLOCK,
     AT_SetRatFreqLock,    AT_SET_PARA_TIME,    AT_QryRatFreqLock,    AT_NOT_SET_TIME,    At_CmdTestProcERROR,    AT_NOT_SET_TIME,
@@ -2119,40 +2119,40 @@ AT_PAR_CMD_ELEMENT_STRU g_astAtPrivateCmdTbl[] = {
     (VOS_UINT8*)"^PORTCONCURRENT", (VOS_UINT8*)"(0-1)"}
     /* add by lwx3331495 for listening path flag  2016-05-18 end*/
 };
-/* Modified by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-25, end */
+/* Modified by s00217060 for ????????AT??????????????C??, 2013-4-25, end */
 
 
 /*****************************************************************************
-  3 函数实现
+  3 ????????
 *****************************************************************************/
 
 /* Added by f62575 for AT Project, 2011-10-28, begin */
 /*****************************************************************************
- 函 数 名  : AT_SetDissdCmd
- 功能描述  : 处理 AT^DISSD 命令
- 输入参数  : VOS_UINT8 ucIndex  用户索引
- 输出参数  : 无
- 返 回 值  : VOS_UINT32         ATC返回码
-             VOS_ERROR : 密码判断失败, 调用函数AT输出 ERROR
-             VOS_OK    : 处理成功, 调用函数AT输出OK
+ ?? ?? ??  : AT_SetDissdCmd
+ ????????  : ???? AT^DISSD ????
+ ????????  : VOS_UINT8 ucIndex  ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32         ATC??????
+             VOS_ERROR : ????????????, ????????AT???? ERROR
+             VOS_OK    : ????????, ????????AT????OK
 
- 调用函数  :
- 被调函数  :
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2010年11月19日
-    作    者   : lijun 00171473
-    修改内容   : 新生成函数
-  2.日    期   : 2012年03月03日
-    作    者   : s62952
-    修改内容   : BalongV300R002 Build优化项目:删除NAS_FEATURE_SD_PWD宏
-  3.日    期   : 2012年8月10日
-    作    者   : L00171473
-    修改内容   : DTS2012082204471, TQE清理
+ ????????      :
+  1.??    ??   : 2010??11??19??
+    ??    ??   : lijun 00171473
+    ????????   : ??????????
+  2.??    ??   : 2012??03??03??
+    ??    ??   : s62952
+    ????????   : BalongV300R002 Build????????:????NAS_FEATURE_SD_PWD??
+  3.??    ??   : 2012??8??10??
+    ??    ??   : L00171473
+    ????????   : DTS2012082204471, TQE????
 *****************************************************************************/
 VOS_UINT32  AT_SetDissdCmd(VOS_UINT8 ucIndex)
 {
-    /* Modify by w00199382 for V7代码同步, 2012-04-07, Begin   */
+    /* Modify by w00199382 for V7????????, 2012-04-07, Begin   */
 
     VOS_UINT32                          ulRlst;
     AT_DYNAMIC_PID_TYPE_STRU            stDynamicPidType;
@@ -2161,20 +2161,20 @@ VOS_UINT32  AT_SetDissdCmd(VOS_UINT8 ucIndex)
     PS_MEM_SET(&stDynamicPidType, 0x00, sizeof(stDynamicPidType));
 
 
-    /* 参数检查: 必须要第0和第1个参数有数据 */
+    /* ????????: ????????0????1???????????? */
     if ((0 == gastAtParaList[0].usParaLen)
      || (0 == gastAtParaList[1].usParaLen))
     {
         return AT_ERROR;
     }
 
-    /* 密码不一致则写NV项返回AT_ERROR */
+    /* ??????????????NV??????AT_ERROR */
     if ( 0 != VOS_StrCmp((VOS_CHAR *)g_acATE5DissdPwd, (VOS_CHAR *)gastAtParaList[1].aucPara))
     {
         return AT_ERROR;
     }
 
-    /* 读NV项en_NV_Item_Huawei_Dynamic_PID_Type获取当前的端口状态 */
+    /* ??NV??en_NV_Item_Huawei_Dynamic_PID_Type?????????????????? */
     if (NV_OK != NV_ReadEx(MODEM_ID_0, en_NV_Item_Huawei_Dynamic_PID_Type,
                         &stDynamicPidType,
                         sizeof(AT_DYNAMIC_PID_TYPE_STRU)))
@@ -2182,7 +2182,7 @@ VOS_UINT32  AT_SetDissdCmd(VOS_UINT8 ucIndex)
         return AT_ERROR;
     }
 
-    /* 判断NV项是否激活 */
+    /* ????NV?????????? */
     if (VOS_TRUE != stDynamicPidType.ulNvStatus)
     {
         return AT_ERROR;
@@ -2195,7 +2195,7 @@ VOS_UINT32  AT_SetDissdCmd(VOS_UINT8 ucIndex)
         return ulRlst;
     }
 
-    /* 关闭DIAG口 */
+    /* ????DIAG?? */
     if ( AT_DISSD_CLOSE == gastAtParaList[0].ulParaValue )
     {
         ulRlst = AT_CloseSpecificPort(AT_DEV_SD);
@@ -2203,51 +2203,51 @@ VOS_UINT32  AT_SetDissdCmd(VOS_UINT8 ucIndex)
         return ulRlst;
     }
 
-    /* Modify by w00199382 for V7代码同步, 2012-04-07, End   */
+    /* Modify by w00199382 for V7????????, 2012-04-07, End   */
 
     return AT_OK;
 
 }
 
 /*****************************************************************************
- 函 数 名  : AT_SetSdrebootCmd
- 功能描述  : 处理AT^SDREBOOT命令
- 输入参数  : VOS_UINT8 ucIndex  用户索引
- 输出参数  : 无
- 返 回 值  : VOS_UINT32         ATC返回码
-             AT_ERROR : 密码判断失败等异常, 调用函数AT输出 ERROR
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_SetSdrebootCmd
+ ????????  : ????AT^SDREBOOT????
+ ????????  : VOS_UINT8 ucIndex  ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32         ATC??????
+             AT_ERROR : ??????????????????, ????????AT???? ERROR
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2010年11月19日
-    作    者   : lijun 00171473
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2010??11??19??
+    ??    ??   : lijun 00171473
+    ????????   : ??????????
 
-  2.日    期   : 2011年11月3日
-    作    者   : 傅映君
-    修改内容   : 发消息到C核重启单板
-  3.日    期   : 2012年03月03日
-    作    者   : s62952
-    修改内容   : BalongV300R002 Build优化项目:删除NAS_FEATURE_SD_PWD宏
+  2.??    ??   : 2011??11??3??
+    ??    ??   : ??????
+    ????????   : ????????C??????????
+  3.??    ??   : 2012??03??03??
+    ??    ??   : s62952
+    ????????   : BalongV300R002 Build????????:????NAS_FEATURE_SD_PWD??
 *****************************************************************************/
 VOS_UINT32 AT_SetSdrebootCmd(VOS_UINT8 ucIndex)
 {
     VOS_UINT32                          ulRet;
 
-    /* 参数检查: 第一个参数用户输入密码必需存在 */
+    /* ????????: ?????????????????????????????? */
     if (0 == gastAtParaList[0].usParaLen)
     {
         return AT_ERROR;
     }
 
-    /* 密码不对返回AT_ERROR */
+    /* ????????????AT_ERROR */
     if ( 0 != VOS_StrCmp( (VOS_CHAR*)g_acATE5DissdPwd, (VOS_CHAR *)gastAtParaList[0].aucPara) )
     {
         return AT_ERROR;
     }
 
-    /* 密码一致则 发消息到C核REBOOT 单板 */
+    /* ?????????? ????????C??REBOOT ???? */
     ulRet = AT_FillAndSndAppReqMsg(gastAtClientTab[ucIndex].usClientId,
                                    gastAtClientTab[ucIndex].opId,
                                    DRV_AGENT_SDREBOOT_REQ,
@@ -2264,18 +2264,18 @@ VOS_UINT32 AT_SetSdrebootCmd(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestRstriggerPara
- 功能描述  : ^RSTRIGGER命令的测试命令
- 输入参数  : VOS_UINT8 ucIndex  用户索引
- 输出参数  : 无
- 返 回 值  : VOS_UINT32 ATC返回码
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestRstriggerPara
+ ????????  : ^RSTRIGGER??????????????
+ ????????  : VOS_UINT8 ucIndex  ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32 ATC??????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年10月18日
-    作    者   : 傅映君/f62575
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2011??10??18??
+    ??    ??   : ??????/f62575
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestRstriggerPara(VOS_UINT8 ucIndex)
@@ -2289,21 +2289,21 @@ VOS_UINT32 AT_TestRstriggerPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestStsfPara
- 功能描述  : STSF测试命令
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestStsfPara
+ ????????  : STSF????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年10月28日
-    作    者   : f62575
-    修改内容   : 新生成函数
-  2.日    期   : 2012年4月23日
-    作    者   : z60575
-    修改内容   : DTS2012031400425 测试命令需要输出STSF:
+ ????????      :
+  1.??    ??   : 2011??10??28??
+    ??    ??   : f62575
+    ????????   : ??????????
+  2.??    ??   : 2012??4??23??
+    ??    ??   : z60575
+    ????????   : DTS2012031400425 ????????????????STSF:
 *****************************************************************************/
 VOS_UINT32 AT_TestStsfPara(VOS_UINT8 ucIndex)
 {
@@ -2314,22 +2314,22 @@ VOS_UINT32 AT_TestStsfPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestCpnnPara
- 功能描述  : CPNN测试命令
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestCpnnPara
+ ????????  : CPNN????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年10月28日
-    作    者   : f62575
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2011??10??28??
+    ??    ??   : f62575
+    ????????   : ??????????
 
-  2.日    期   : 2011年11月3日
-    作    者   : 鲁琳/l60609
-    修改内容   : AT Project:由C核实现
+  2.??    ??   : 2011??11??3??
+    ??    ??   : ????/l60609
+    ????????   : AT Project:??C??????
 *****************************************************************************/
 VOS_UINT32 AT_TestCpnnPara(VOS_UINT8 ucIndex)
 {
@@ -2356,18 +2356,18 @@ VOS_UINT32 AT_TestCpnnPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestOplPara
- 功能描述  : OPL测试命令
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestOplPara
+ ????????  : OPL????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年10月28日
-    作    者   : f62575
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2011??10??28??
+    ??    ??   : f62575
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestOplPara(VOS_UINT8 ucIndex)
@@ -2377,15 +2377,15 @@ VOS_UINT32 AT_TestOplPara(VOS_UINT8 ucIndex)
 
     PS_MEM_SET(&stUsimInfo, 0, sizeof(TAF_PH_QRY_USIM_INFO_STRU));
 
-    /* 执行命令操作 */
+    /* ???????????? */
     stUsimInfo.enEfId = TAF_PH_OPL_FILE;
     stUsimInfo.Icctype = TAF_PH_ICC_USIM;
     stUsimInfo.ulRecNum = TAF_PH_INVALID_USIM_REC;
     if(AT_SUCCESS == TAF_QryUsimInfo(gastAtClientTab[ucIndex].usClientId, 0, &stUsimInfo))
     {
-        /* 设置当前操作类型 */
+        /* ???????????????? */
         gastAtClientTab[ucIndex].CmdCurrentOpt = AT_CMD_OPL_READ;
-        return AT_WAIT_ASYNC_RETURN;    /* 返回命令处理挂起状态 */
+        return AT_WAIT_ASYNC_RETURN;    /* ???????????????????? */
     }
     else
     {
@@ -2394,18 +2394,18 @@ VOS_UINT32 AT_TestOplPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestPnnPara
- 功能描述  : PNN测试命令
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestPnnPara
+ ????????  : PNN????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年10月28日
-    作    者   : f62575
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2011??10??28??
+    ??    ??   : f62575
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestPnnPara(VOS_UINT8 ucIndex)
@@ -2415,15 +2415,15 @@ VOS_UINT32 AT_TestPnnPara(VOS_UINT8 ucIndex)
 
     PS_MEM_SET(&stUsimInfo, 0, sizeof(TAF_PH_QRY_USIM_INFO_STRU));
 
-    /* 执行命令操作 */
+    /* ???????????? */
     stUsimInfo.enEfId = TAF_PH_PNN_FILE;
     stUsimInfo.Icctype = TAF_PH_ICC_USIM;
     stUsimInfo.ulRecNum = TAF_PH_INVALID_USIM_REC;
     if(AT_SUCCESS == TAF_QryUsimInfo(gastAtClientTab[ucIndex].usClientId,0,&stUsimInfo))
     {
-        /* 设置当前操作类型 */
+        /* ???????????????? */
         gastAtClientTab[ucIndex].CmdCurrentOpt = AT_CMD_PNN_READ;
-        return AT_WAIT_ASYNC_RETURN;    /* 返回命令处理挂起状态 */
+        return AT_WAIT_ASYNC_RETURN;    /* ???????????????????? */
     }
     else
     {
@@ -2432,18 +2432,18 @@ VOS_UINT32 AT_TestPnnPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestStgiPara
- 功能描述  : STGI测试命令
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestStgiPara
+ ????????  : STGI????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年10月28日
-    作    者   : f62575
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2011??10??28??
+    ??    ??   : f62575
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestStgiPara(VOS_UINT8 ucIndex)
@@ -2464,18 +2464,18 @@ VOS_UINT32 AT_TestStgiPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestStgrPara
- 功能描述  : STGR测试命令
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestStgrPara
+ ????????  : STGR????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年10月28日
-    作    者   : f62575
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2011??10??28??
+    ??    ??   : f62575
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestStgrPara(VOS_UINT8 ucIndex)
@@ -2491,18 +2491,18 @@ VOS_UINT32 AT_TestStgrPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestImsichgPara
- 功能描述  : IMSICHG测试命令
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestImsichgPara
+ ????????  : IMSICHG????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年10月28日
-    作    者   : f62575
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2011??10??28??
+    ??    ??   : f62575
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestImsichgPara(VOS_UINT8 ucIndex)
@@ -2522,21 +2522,21 @@ VOS_UINT32 AT_TestImsichgPara(VOS_UINT8 ucIndex)
     return AT_OK;
 }
 
-/* Add by f62575 for V7代码同步, 2012-04-07, Begin   */
+/* Add by f62575 for V7????????, 2012-04-07, Begin   */
 /*****************************************************************************
- 函 数 名     : AT_GetPortInfoIndex
- 功能描述  : 获取端口对应的信息全局变量数值AT_GetPortInfoIndex的偏移
- 输入参数  : VOS_UINT8 ucPortType   端口类型
- 输出参数  : VOS_UINT8 *pucIndex   指定端口类型在AT_GetPortInfoIndex的偏移
- 返 回 值  :     VOS_UINT32 VOS_ERR获取操作失败
-                                                VOS_OK获取操作成功
- 调用函数  :
- 被调函数  :
+ ?? ?? ??     : AT_GetPortInfoIndex
+ ????????  : ??????????????????????????????AT_GetPortInfoIndex??????
+ ????????  : VOS_UINT8 ucPortType   ????????
+ ????????  : VOS_UINT8 *pucIndex   ??????????????AT_GetPortInfoIndex??????
+ ?? ?? ??  :     VOS_UINT32 VOS_ERR????????????
+                                                VOS_OK????????????
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年04月20日
-    作    者   : 傅映君/f62575
-    修改内容   : 新生成函数: 支持动态获取支持的端口集合
+ ????????      :
+  1.??    ??   : 2012??04??20??
+    ??    ??   : ??????/f62575
+    ????????   : ??????????: ??????????????????????????
 
 *****************************************************************************/
 VOS_UINT32 AT_GetPortInfoIndex(VOS_UINT8   ucPortType, VOS_UINT8 *pucIndex)
@@ -2554,30 +2554,30 @@ VOS_UINT32 AT_GetPortInfoIndex(VOS_UINT8   ucPortType, VOS_UINT8 *pucIndex)
 
     return VOS_ERR;
 }
-/* Add by f62575 for V7代码同步, 2012-04-07, End   */
+/* Add by f62575 for V7????????, 2012-04-07, End   */
 
 /*****************************************************************************
- 函 数 名  : AT_TestSetPort
- 功能描述  : ^SETPORT命令的测试命令
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestSetPort
+ ????????  : ^SETPORT??????????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年10月18日
-    作    者   : 傅映君/f62575
-    修改内容   : 新生成函数
-  2.日    期   : 2012年04月19日
-    作    者   : f62575
-    修改内容   : V7代码同步: 支持动态获取支持的端口集合
-  3.日    期   : 2012年8月10日
-    作    者   : L00171473
-    修改内容   : DTS2012082204471, TQE清理
-  4.日    期   : 2012年12月13日
-    作    者   : L00171473
-    修改内容   : DTS2012121802573, TQE清理
+ ????????      :
+  1.??    ??   : 2011??10??18??
+    ??    ??   : ??????/f62575
+    ????????   : ??????????
+  2.??    ??   : 2012??04??19??
+    ??    ??   : f62575
+    ????????   : V7????????: ??????????????????????????
+  3.??    ??   : 2012??8??10??
+    ??    ??   : L00171473
+    ????????   : DTS2012082204471, TQE????
+  4.??    ??   : 2012??12??13??
+    ??    ??   : L00171473
+    ????????   : DTS2012121802573, TQE????
 *****************************************************************************/
 VOS_UINT32 AT_TestSetPort(VOS_UINT8 ucIndex)
 {
@@ -2618,7 +2618,7 @@ VOS_UINT32 AT_TestSetPort(VOS_UINT8 ucIndex)
                                         "%s:",
                                         g_stParseContext[ucIndex].pstCmdElement->pszCmdName);
 
-        /*参数*/
+        /*????*/
         usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                         (VOS_CHAR *)pgucAtSndCodeAddr,
                                         (VOS_CHAR *)pgucAtSndCodeAddr + usLength,
@@ -2628,7 +2628,7 @@ VOS_UINT32 AT_TestSetPort(VOS_UINT8 ucIndex)
 
         if (i < (ulAvailablePortTypeNum - 1))
         {
-            /*回车换行*/
+            /*????????*/
             usLength += (VOS_UINT16)At_sprintf(AT_CMD_MAX_LEN,
                                             (VOS_CHAR *)pgucAtSndCodeAddr,
                                             (VOS_CHAR *)pgucAtSndCodeAddr + usLength,
@@ -2642,18 +2642,18 @@ VOS_UINT32 AT_TestSetPort(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_ProcIpv6capTest
- 功能描述  : ^IPV6CAP命令的测试命令
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_ProcIpv6capTest
+ ????????  : ^IPV6CAP??????????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年10月18日
-    作    者   : 傅映君/f62575
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2011??10??18??
+    ??    ??   : ??????/f62575
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestIpv6capPara(VOS_UINT8 ucIndex)
@@ -2671,30 +2671,30 @@ VOS_UINT32 AT_TestIpv6capPara(VOS_UINT8 ucIndex)
 
 
 /*****************************************************************************
- 函 数 名  : AT_QryDloadVerPara
- 功能描述  : 查询当前下载协议版本， 用于区分升级使用的协议以便后续兼容
+ ?? ?? ??  : AT_QryDloadVerPara
+ ????????  : ?????????????????????? ??????????????????????????????????
              <CR><LF><dload verison><CR><LF>
              <CR><LF>OK<CR><LF>
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_ERR或VOS_OK
- 调用函数  :
- 被调函数  :
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR??VOS_OK
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年2月19日
-    作    者   : s62952
-    修改内容   : 新生成函数
-  2.日    期   : 2011年10月22日
-    作    者   : f62575
-    修改内容   : AT PROJECT
+ ????????      :
+  1.??    ??   : 2011??2??19??
+    ??    ??   : s62952
+    ????????   : ??????????
+  2.??    ??   : 2011??10??22??
+    ??    ??   : f62575
+    ????????   : AT PROJECT
 *****************************************************************************/
 VOS_UINT32 AT_QryDloadVerPara( VOS_UINT8 ucIndex )
 {
     /* Modified  by f62575 for AT Project, 2011-10-17, begin */
     VOS_UINT32                          ulRet;
 
-    /* 发消息到C核获取鉴权标识 */
+    /* ????????C?????????????? */
     ulRet = AT_FillAndSndAppReqMsg(gastAtClientTab[ucIndex].usClientId,
                                    gastAtClientTab[ucIndex].opId,
                                    DRV_AGENT_DLOADVER_QRY_REQ,
@@ -2707,7 +2707,7 @@ VOS_UINT32 AT_QryDloadVerPara( VOS_UINT8 ucIndex )
         return AT_ERROR;
     }
 
-    /* 设置AT模块实体的状态为等待异步返回 */
+    /* ????AT???????????????????????????? */
     gastAtClientTab[ucIndex].CmdCurrentOpt = AT_CMD_DLOADVER_READ;
     return AT_WAIT_ASYNC_RETURN;
     /* Modified  by f62575 for AT Project, 2011-10-17, end */
@@ -2716,18 +2716,18 @@ VOS_UINT32 AT_QryDloadVerPara( VOS_UINT8 ucIndex )
 
 
 /*****************************************************************************
- 函 数 名  : At_TestCmlckPara
- 功能描述  : CMLCK测试函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : At_TestCmlckPara
+ ????????  : CMLCK????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年10月18日
-    作    者   : f00179208
-    修改内容   : AT移植项目
+ ????????      :
+  1.??    ??   : 2011??10??18??
+    ??    ??   : f00179208
+    ????????   : AT????????
 *****************************************************************************/
 VOS_UINT32 At_TestCmlckPara(VOS_UINT8 ucIndex)
 {
@@ -2744,21 +2744,21 @@ VOS_UINT32 At_TestCmlckPara(VOS_UINT8 ucIndex)
     return AT_OK;
 }
 /*****************************************************************************
- 函 数 名  : AT_TestSyscfg
- 功能描述  : SYSCFG测试函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestSyscfg
+ ????????  : SYSCFG????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年10月24日
-    作    者   : c00173809
-    修改内容   : AT移植项目,修改测试SYSCFG函数通过异步消息调用TAF的API
-  2.日    期   : 2013年2月22日
-    作    者   : l60609
-    修改内容   : DSDA PHASE III
+ ????????      :
+  1.??    ??   : 2011??10??24??
+    ??    ??   : c00173809
+    ????????   : AT????????,????????SYSCFG????????????????????TAF??API
+  2.??    ??   : 2013??2??22??
+    ??    ??   : l60609
+    ????????   : DSDA PHASE III
 *****************************************************************************/
 VOS_UINT32 AT_TestSyscfg(VOS_UINT8 ucIndex)
 {
@@ -2780,21 +2780,21 @@ VOS_UINT32 AT_TestSyscfg(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestSyscfgEx
- 功能描述  : SYSCFGEx测试函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestSyscfgEx
+ ????????  : SYSCFGEx????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年10月24日
-    作    者   : c00173809
-    修改内容   : AT移植项目,修改测试SYSCFGEx函数通过异步消息调用TAF的API
-  2.日    期   : 2013年2月22日
-    作    者   : l60609
-    修改内容   : DSDA PHASE III
+ ????????      :
+  1.??    ??   : 2011??10??24??
+    ??    ??   : c00173809
+    ????????   : AT????????,????????SYSCFGEx????????????????????TAF??API
+  2.??    ??   : 2013??2??22??
+    ??    ??   : l60609
+    ????????   : DSDA PHASE III
 *****************************************************************************/
 VOS_UINT32 AT_TestSyscfgEx(VOS_UINT8 ucIndex)
 {
@@ -2814,18 +2814,18 @@ VOS_UINT32 AT_TestSyscfgEx(VOS_UINT8 ucIndex)
     return AT_OK;
 }
 /*****************************************************************************
- 函 数 名  : At_RegisterExPrivateCmdTable
- 功能描述  : 注册私有命令表
- 输入参数  : VOS_VOID
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : At_RegisterExPrivateCmdTable
+ ????????  : ??????????????
+ ????????  : VOS_VOID
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2011年10月21日
-    作    者   : 鲁琳/l60609
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2011??10??21??
+    ??    ??   : ????/l60609
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 At_RegisterExPrivateCmdTable(VOS_VOID)
@@ -2834,28 +2834,28 @@ VOS_UINT32 At_RegisterExPrivateCmdTable(VOS_VOID)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestApRptPortSelectPara
- 功能描述  : ^APRPTPORTSEL测试函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestApRptPortSelectPara
+ ????????  : ^APRPTPORTSEL????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年03月20日
-    作    者   : l00198894
-    修改内容   : 新增函数
-  2.日    期   : 2012年8月13日
-    作    者   : l60609
-    修改内容   : MUX:增加MUX通道的处理
+ ????????      :
+  1.??    ??   : 2012??03??20??
+    ??    ??   : l00198894
+    ????????   : ????????
+  2.??    ??   : 2012??8??13??
+    ??    ??   : l60609
+    ????????   : MUX:????MUX??????????
 *****************************************************************************/
 VOS_UINT32 AT_TestApRptPortSelectPara(VOS_UINT8 ucIndex)
 {
-    /* 通道检查 */
-    /* Modified by L60609 for MUX，2012-08-13,  Begin */
+    /* ???????? */
+    /* Modified by L60609 for MUX??2012-08-13,  Begin */
     if (VOS_FALSE == AT_IsApPort(ucIndex))
-    /* Modified by L60609 for MUX，2012-08-13,  End */
+    /* Modified by L60609 for MUX??2012-08-13,  End */
     {
         return AT_ERROR;
     }
@@ -2872,28 +2872,28 @@ VOS_UINT32 AT_TestApRptPortSelectPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestUsbSwitchPara
- 功能描述  : +USBSWITCH测试函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestUsbSwitchPara
+ ????????  : +USBSWITCH????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年03月20日
-    作    者   : l00198894
-    修改内容   : 新增函数
-  2.日    期   : 2012年8月13日
-    作    者   : l60609
-    修改内容   : MUX:增加MUX通道的处理
+ ????????      :
+  1.??    ??   : 2012??03??20??
+    ??    ??   : l00198894
+    ????????   : ????????
+  2.??    ??   : 2012??8??13??
+    ??    ??   : l60609
+    ????????   : MUX:????MUX??????????
 *****************************************************************************/
 VOS_UINT32 AT_TestUsbSwitchPara(VOS_UINT8 ucIndex)
 {
-    /* 通道检查 */
-    /* Modified by L60609 for MUX，2012-08-13,  Begin */
+    /* ???????? */
+    /* Modified by L60609 for MUX??2012-08-13,  Begin */
     if (VOS_FALSE == AT_IsApPort(ucIndex))
-    /* Modified by L60609 for MUX，2012-08-13,  End */
+    /* Modified by L60609 for MUX??2012-08-13,  End */
     {
         return AT_ERROR;
     }
@@ -2908,25 +2908,25 @@ VOS_UINT32 AT_TestUsbSwitchPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestGpioPara
- 功能描述  : ^GPIO测试函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestGpioPara
+ ????????  : ^GPIO????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年03月20日
-    作    者   : l00198894
-    修改内容   : 新增函数
-  2.日    期   : 2012-05-10
-    作    者   : y00213812
-    修改内容   : DTS2012050700665问题单修改，GPIO管脚参数值的由200改为(0-65535)
+ ????????      :
+  1.??    ??   : 2012??03??20??
+    ??    ??   : l00198894
+    ????????   : ????????
+  2.??    ??   : 2012-05-10
+    ??    ??   : y00213812
+    ????????   : DTS2012050700665????????????GPIO??????????????200????(0-65535)
 *****************************************************************************/
 VOS_UINT32 AT_TestGpioPara(VOS_UINT8 ucIndex)
 {
-    /* 如果不支持HSIC特性，不支持^GPIO测试命令 */
+    /* ??????????HSIC????????????^GPIO???????? */
     if (BSP_MODULE_SUPPORT != mdrv_misc_support_check(BSP_MODULE_TYPE_HSIC))
     {
         return AT_ERROR;
@@ -2942,18 +2942,18 @@ VOS_UINT32 AT_TestGpioPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestRsfrPara
- 功能描述  : ^RSFR命令的测试命令(本函数只支持和CustomInfoSetting 工具软件对接的实现)
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestRsfrPara
+ ????????  : ^RSFR??????????????(??????????????CustomInfoSetting ??????????????????)
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年3月29日
-    作    者   : c64416
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2012??3??29??
+    ??    ??   : c64416
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestRsfrPara(VOS_UINT8 ucIndex)
@@ -2966,18 +2966,18 @@ VOS_UINT32 AT_TestRsfrPara(VOS_UINT8 ucIndex)
 
 
 /*****************************************************************************
- 函 数 名  : AT_TestRsfwPara
- 功能描述  : ^RSFW命令的测试命令(本函数只支持和CustomInfoSetting 工具软件对接的实现)
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestRsfwPara
+ ????????  : ^RSFW??????????????(??????????????CustomInfoSetting ??????????????????)
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年3月29日
-    作    者   : c64416
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2012??3??29??
+    ??    ??   : c64416
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestRsfwPara(VOS_UINT8 ucIndex)
@@ -2991,28 +2991,28 @@ VOS_UINT32 AT_TestRsfwPara(VOS_UINT8 ucIndex)
 
 
 /*****************************************************************************
- 函 数 名  : AT_TestApSimStPara
- 功能描述  : ^APSIMST测试函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestApSimStPara
+ ????????  : ^APSIMST????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年06月18日
-    作    者   : f00179208
-    修改内容   : 新增函数
-  2.日    期   : 2012年8月13日
-    作    者   : l60609
-    修改内容   : MUX:增加MUX通道的处理
+ ????????      :
+  1.??    ??   : 2012??06??18??
+    ??    ??   : f00179208
+    ????????   : ????????
+  2.??    ??   : 2012??8??13??
+    ??    ??   : l60609
+    ????????   : MUX:????MUX??????????
 *****************************************************************************/
 VOS_UINT32 AT_TestApSimStPara(VOS_UINT8 ucIndex)
 {
-    /* 通道检查 */
-    /* Modified by L60609 for MUX，2012-08-13,  Begin */
+    /* ???????? */
+    /* Modified by L60609 for MUX??2012-08-13,  Begin */
     if (VOS_FALSE == AT_IsApPort(ucIndex))
-    /* Modified by L60609 for MUX，2012-08-13,  End */
+    /* Modified by L60609 for MUX??2012-08-13,  End */
     {
         return AT_ERROR;
     }
@@ -3026,28 +3026,28 @@ VOS_UINT32 AT_TestApSimStPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestXcposrPara
- 功能描述  : ^XCPOSR测试命令处理函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestXcposrPara
+ ????????  : ^XCPOSR????????????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年06月27日
-    作    者   : y00213812
-    修改内容   : V7R1C50 A-GPS项目新增函数
-  2.日    期   : 2012年8月13日
-    作    者   : l60609
-    修改内容   : MUX:增加MUX通道的处理
+ ????????      :
+  1.??    ??   : 2012??06??27??
+    ??    ??   : y00213812
+    ????????   : V7R1C50 A-GPS????????????
+  2.??    ??   : 2012??8??13??
+    ??    ??   : l60609
+    ????????   : MUX:????MUX??????????
 *****************************************************************************/
 VOS_UINT32 AT_TestXcposrPara(VOS_UINT8 ucIndex)
 {
-    /* 通道检查 */
-    /* Modified by L60609 for MUX，2012-08-13,  Begin */
+    /* ???????? */
+    /* Modified by L60609 for MUX??2012-08-13,  Begin */
     if (VOS_FALSE == AT_IsApPort(ucIndex))
-    /* Modified by L60609 for MUX，2012-08-13,  End */
+    /* Modified by L60609 for MUX??2012-08-13,  End */
     {
         return AT_ERROR;
     }
@@ -3062,29 +3062,29 @@ VOS_UINT32 AT_TestXcposrPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestCgpsClockPara
- 功能描述  : ^CGPSCLOCK测试命令处理函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestCgpsClockPara
+ ????????  : ^CGPSCLOCK????????????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年06月27日
-    作    者   : y00213812
-    修改内容   : V7R1C50 A-GPS项目新增函数
-  2.日    期   : 2012年8月13日
-    作    者   : l60609
-    修改内容   : MUX:增加MUX通道的处理
+ ????????      :
+  1.??    ??   : 2012??06??27??
+    ??    ??   : y00213812
+    ????????   : V7R1C50 A-GPS????????????
+  2.??    ??   : 2012??8??13??
+    ??    ??   : l60609
+    ????????   : MUX:????MUX??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestCgpsClockPara(VOS_UINT8 ucIndex)
 {
-    /* 通道检查 */
-    /* Modified by L60609 for MUX，2012-08-13,  Begin */
+    /* ???????? */
+    /* Modified by L60609 for MUX??2012-08-13,  Begin */
     if (VOS_FALSE == AT_IsApPort(ucIndex))
-    /* Modified by L60609 for MUX，2012-08-13,  End */
+    /* Modified by L60609 for MUX??2012-08-13,  End */
     {
         return AT_ERROR;
     }
@@ -3099,23 +3099,23 @@ VOS_UINT32 AT_TestCgpsClockPara(VOS_UINT8 ucIndex)
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestApSecPara
- 功能描述  : ^APSEC测试命令处理函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestApSecPara
+ ????????  : ^APSEC????????????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年8月31日
-    作    者   : 李紫剑/00198894
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2012??8??31??
+    ??    ??   : ??????/00198894
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestApSecPara( VOS_UINT8 ucIndex )
 {
-    /* 通道检查, 非指定通道下发此命令均返回ERROR */
+    /* ????????, ??????????????????????????ERROR */
     if (AT_MUX4_USER != gastAtClientTab[ucIndex].UserType)
     {
         return AT_ERROR;
@@ -3126,18 +3126,18 @@ VOS_UINT32 AT_TestApSecPara( VOS_UINT8 ucIndex )
 
 
 /*****************************************************************************
- 函 数 名  : AT_TestClprPara
- 功能描述  : 设置命令处理函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestClprPara
+ ????????  : ????????????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2012年09月18日
-    作    者   : y00213812
-    修改内容   : STK&DCM 项目新增函数
+ ????????      :
+  1.??    ??   : 2012??09??18??
+    ??    ??   : y00213812
+    ????????   : STK&DCM ????????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestClprPara( VOS_UINT8 ucIndex )
@@ -3153,18 +3153,18 @@ VOS_UINT32 AT_TestClprPara( VOS_UINT8 ucIndex )
 
 
 /*****************************************************************************
- 函 数 名  : AT_TestBodySarWcdmaPara
- 功能描述  : ^BODYSARWCDMA测试命令处理函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestBodySarWcdmaPara
+ ????????  : ^BODYSARWCDMA????????????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2013年03月11日
-    作    者   : l00198894
-    修改内容   : BODY SAR 项目新增函数
+ ????????      :
+  1.??    ??   : 2013??03??11??
+    ??    ??   : l00198894
+    ????????   : BODY SAR ????????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestBodySarWcdmaPara( VOS_UINT8 ucIndex )
@@ -3173,7 +3173,7 @@ VOS_UINT32 AT_TestBodySarWcdmaPara( VOS_UINT8 ucIndex )
 
     PS_MEM_SET(&stWGBand, 0, sizeof(stWGBand));
 
-    /* 获取WCDMA Band能力值 */
+    /* ????WCDMA Band?????? */
     if (NV_OK != NV_ReadEx(MODEM_ID_0,
                            en_NV_Item_WG_RF_MAIN_BAND,
                            &stWGBand,
@@ -3194,18 +3194,18 @@ VOS_UINT32 AT_TestBodySarWcdmaPara( VOS_UINT8 ucIndex )
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestBodySarGsmPara
- 功能描述  : ^BODYSARGSM测试命令处理函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestBodySarGsmPara
+ ????????  : ^BODYSARGSM????????????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2013年03月11日
-    作    者   : l00198894
-    修改内容   : BODY SAR 项目新增函数
+ ????????      :
+  1.??    ??   : 2013??03??11??
+    ??    ??   : l00198894
+    ????????   : BODY SAR ????????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestBodySarGsmPara( VOS_UINT8 ucIndex )
@@ -3230,21 +3230,21 @@ VOS_UINT32 AT_TestBodySarGsmPara( VOS_UINT8 ucIndex )
 }
 
 /*****************************************************************************
- 函 数 名  : AT_TestNetScan
- 功能描述  : ^NETSCAN测试命令处理函数
- 输入参数  : VOS_UINT8 ucIndex
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : AT_TestNetScan
+ ????????  : ^NETSCAN????????????????
+ ????????  : VOS_UINT8 ucIndex
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2013年10月21日
-    作    者   : w00242748
-    修改内容   : NETSCAN 项目新增函数
-  2.日    期   : 2013年12月2日
-    作    者   : w00242748
-    修改内容   : DTS2013112202356:测试命令范围有问题
+ ????????      :
+  1.??    ??   : 2013??10??21??
+    ??    ??   : w00242748
+    ????????   : NETSCAN ????????????
+  2.??    ??   : 2013??12??2??
+    ??    ??   : w00242748
+    ????????   : DTS2013112202356:??????????????????
 
 *****************************************************************************/
 VOS_UINT32 AT_TestNetScan( VOS_UINT8 ucIndex )

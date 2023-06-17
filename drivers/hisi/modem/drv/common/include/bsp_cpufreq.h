@@ -70,21 +70,21 @@ extern int g_cpufreq_max_profile;
 #define CPUFREQ_DOWN_PROFILE(core_type)  				 (((SRAM_SMALL_SECTIONS * )((unsigned long)SRAM_BASE_ADDR+SRAM_OFFSET_SMALL_SECTIONS))->SRAM_CPUFREQ_DOWN_PROFILE[core_type])
 
 enum CPUFREQ_MSG_TYPE{
-	CPUFREQ_ADJUST_FREQ = 1,			/*通知M3调频*/
-	CPUFREQ_DEBUG_FREQ = 2,			/*用于DEBUG  标记*/
-	CPUFREQ_GET_FREQ_FROM_M = 3,		/*获取当前频率*/
-	CPUFREQ_SEND_CPUFREQ_FROM_M = 4,			/*M3回复当前频率*/
-	CPUFREQ_LOCK_MCORE_ACTION = 5,			/*锁定M3调频*/
+	CPUFREQ_ADJUST_FREQ = 1,			/*????M3????*/
+	CPUFREQ_DEBUG_FREQ = 2,			/*????DEBUG  ????*/
+	CPUFREQ_GET_FREQ_FROM_M = 3,		/*????????????*/
+	CPUFREQ_SEND_CPUFREQ_FROM_M = 4,			/*M3????????????*/
+	CPUFREQ_LOCK_MCORE_ACTION = 5,			/*????M3????*/
     CPUFREQ_SET_DDR_LIMIT = 6,
 };
-/*哪个核发的消息*/
+/*??????????????*/
 enum CPUFREQ_SOURCE{
 	CPUFREQ_ACORE = 0,
 	CPUFREQ_CCORE,
 	CPUFREQ_MCORE
 };
 
-/*content 低4BIT 上调下调 高4BIT 哪个profile*/
+/*content ??4BIT ???????? ??4BIT ????profile*/
 struct cpufreq_msg {
 	u32 msg_type;
 	u32 source;

@@ -46,14 +46,9 @@
  *
  */
 
-
-
 #ifndef __CAS_ERRLOG_CFG_H__
 #define __CAS_ERRLOG_CFG_H__
 
-/*****************************************************************************
-  1 其他头文件包含
-*****************************************************************************/
 #include "vos.h"
 
 #ifdef __cplusplus
@@ -62,91 +57,46 @@ extern "C" {
 #endif
 #endif
 
-
 #pragma pack(4)
 
-/*****************************************************************************
-  2 宏定义
-*****************************************************************************/
-
-/*****************************************************************************
-  3 枚举定义
-*****************************************************************************/
-
-/*****************************************************************************
- 枚举名    : CAS_1X_ERR_LOG_ALARM_ID_ENUM_UINT8
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : CAS 1X需要上报的ErrLog类型定义, ALARM ID
-             同一组件的ALARM ID不能相同，否则AP侧解析ERRLOG会出错
-*****************************************************************************/
 enum CAS_1X_ERR_LOG_ALARM_ENUM
 {
-    ID_CAS_1X_ERR_LOG_ALARM_ABNORMAL_REL                    = 0x01,            /* CAS_1X_OM_ERR_LOG_ABNORMAL_REL_STRU */
-    ID_CAS_1X_ERR_LOG_ALARM_EST_CNF_FAIL                    = 0x02,            /* CAS_1X_OM_ERR_LOG_EST_CNF_FAIL_STRU */
-    ID_CAS_1X_ERR_LOG_ALARM_SYS_DETERMIN                    = 0x03,            /* CAS_1X_OM_ERR_LOG_SYS_DETERMIN_STRU */
-    ID_CAS_1X_ERR_LOG_ALARM_HANDOFF_FAIL_REVERT             = 0x04,            /* CAS_1X_OM_ERR_LOG_HANDOFF_FAIL_REVERT_STRU */
-    ID_CAS_1X_ERR_LOG_ALARM_REJECT                          = 0x05,            /* CAS_1X_OM_ERR_LOG_REJECT_STRU */
-    ID_CAS_1X_ERR_LOG_ALARM_OTA_DECODE_FAIL                 = 0x06,            /* CAS_1X_OM_ERR_LOG_OTA_ENCODE_FAIL_STRU */
-    ID_CAS_1X_ERR_LOG_ALARM_OHM_UPDATE_FAIL                 = 0x07,            /* CAS_1X_OM_ERR_LOG_OHM_UPDATE_FAIL_STRU */
-    ID_CAS_1X_ERR_LOG_ALARM_HANDOFF_SYNC_FAIL               = 0x08,            /* CAS_1X_OM_ERR_LOG_HANDOFF_SYNC_FAIL_STRU */
-    ID_CAS_1X_ERR_LOG_ALARM_TCH_HANDOFF_FAIL                = 0x09,            /* CAS_1X_OM_ERR_LOG_TCH_HANDOFF_FAIL_STRU */
-    ID_CAS_1X_ERR_LOG_ALARM_NEGOTIATION_FAIL                = 0x0a,            /* CAS_1X_OM_ERR_LOG_NEGOTIATION_FAIL_STRU */
-    ID_CAS_1X_ERR_LOG_ALARM_MULTI_HANDOFF                   = 0x0b,            /* CAS_1X_OM_ERR_LOG_MULTI_HANDOFF_STRU */
-    ID_CAS_1X_ERR_LOG_ALARM_AUTHENTICATION_FAIL             = 0x0c,            /* CAS_1X_OM_ERR_LOG_AUTHENTICATION_FAIL_STRU */
-    ID_CAS_1X_ERR_LOG_ALARM_OTA_ENCODE_FAIL                 = 0x0d,            /* CAS_1X_OM_ERR_LOG_OTA_ENCODE_FAIL_STRU */
-    ID_CAS_1X_ERR_LOG_ALARM_COMMON_INFO                     = 0x0e,            /* CAS_1X_OM_ERR_LOG_COMMON_INFO_STRU */
+    ID_CAS_1X_ERR_LOG_ALARM_ABNORMAL_REL                    = 0x01,
+    ID_CAS_1X_ERR_LOG_ALARM_EST_CNF_FAIL                    = 0x02,
+    ID_CAS_1X_ERR_LOG_ALARM_SYS_DETERMIN                    = 0x03,
+    ID_CAS_1X_ERR_LOG_ALARM_HANDOFF_FAIL_REVERT             = 0x04,
+    ID_CAS_1X_ERR_LOG_ALARM_REJECT                          = 0x05,
+    ID_CAS_1X_ERR_LOG_ALARM_OTA_DECODE_FAIL                 = 0x06,
+    ID_CAS_1X_ERR_LOG_ALARM_OHM_UPDATE_FAIL                 = 0x07,
+    ID_CAS_1X_ERR_LOG_ALARM_HANDOFF_SYNC_FAIL               = 0x08,
+    ID_CAS_1X_ERR_LOG_ALARM_TCH_HANDOFF_FAIL                = 0x09,
+    ID_CAS_1X_ERR_LOG_ALARM_NEGOTIATION_FAIL                = 0x0a,
+    ID_CAS_1X_ERR_LOG_ALARM_MULTI_HANDOFF                   = 0x0b,
+    ID_CAS_1X_ERR_LOG_ALARM_AUTHENTICATION_FAIL             = 0x0c,
+    ID_CAS_1X_ERR_LOG_ALARM_OTA_ENCODE_FAIL                 = 0x0d,
+    ID_CAS_1X_ERR_LOG_ALARM_COMMON_INFO                     = 0x0e,
 
-    ID_CAS_1X_ERR_LOG_ALARM_BUTT                            = 0x9F             /* 从0xA1开始是HRPD的ALARM ID */
+    ID_CAS_1X_ERR_LOG_ALARM_BUTT                            = 0x9F
 };
 typedef VOS_UINT8 CAS_1X_ERR_LOG_ALARM_ENUM_UINT8;
 
-/*****************************************************************************
- 枚举名    : CAS_HRPD_ERR_LOG_ALARM_ENUM_UINT8
- 协议表格  :
- ASN.1描述 :
- 枚举说明  : CAS HRPD需要上报的ErrLog类型定义, ALARM ID
-             同一组件的ALARM ID不能相同，否则AP侧解析ERRLOG会出错；
-             A0对应的AlarmId给AP主动上报时使用
-*****************************************************************************/
 enum CAS_HRPD_ERR_LOG_ALARM_ENUM
 {
-    ID_CAS_HRPD_ERR_LOG_REPORT_IND                          = 0xA0,            /* CAS_HRPD_OM_ERR_LOG_REPORT_STRU */
-    ID_CAS_HRPD_ERR_LOG_CONN_OPEN_FAIL                      = 0xA1,            /* CAS_HRPD_OM_ERR_LOG_CONN_OPEN_FAIL_SRTU */
-    ID_CAS_HRPD_ERR_LOG_SESSION_NEG_FAIL                    = 0xA2,            /* CAS_HRPD_OM_ERR_LOG_SESSION_FAIL_STRU */
-    ID_CAS_HRPD_ERR_LOG_NETWORK_LOST                        = 0xA3,            /* CAS_HRPD_OM_ERR_LOG_NETWORK_LOST_STRU */
-    ID_CAS_HRPD_ERR_LOG_RESEL_TO_LTE_FAIL                   = 0xA4,            /* CAS_HRPD_OM_ERR_LOG_C2L_RESEL_FAIL_STRU */
-    ID_CAS_HRPD_ERR_LOG_L2C_RESEL_FAIL                      = 0xA5,            /* CAS_HRPD_OM_ERR_LOG_C2L_RESEL_FAIL_STRU */
-    ID_CAS_HRPD_ERR_LOG_L2C_REDIRECT_FAIL                   = 0xA6,            /* CAS_HRPD_OM_ERR_LOG_C2L_RESEL_FAIL_STRU */
-    ID_CAS_HRPD_ERR_LOG_CODEC_FAIL                          = 0xA7,            /* CAS_HRPD_OM_ERR_LOG_C2L_RESEL_FAIL_STRU */
-    ID_CAS_HRPD_ERR_LOG_NETWORK_SEARCH_FAIL                 = 0xA8,            /* CAS_HRPD_OM_ERR_LOG_C2L_RESEL_FAIL_STRU */
-    ID_CAS_HRPD_ERR_LOG_COMMON_INFO                         = 0xA9,            /* CAS_HRPD_OM_ERR_LOG_COMMON_INFO_STRU */
-    ID_CAS_HRPD_ERR_LOG_TCA_RCV_FAIL                        = 0xAA,            /* CAS_HRPD_OM_ERR_LOG_TCA_RCV_FAI_STRU */
+    ID_CAS_HRPD_ERR_LOG_REPORT_IND                          = 0xA0,
+    ID_CAS_HRPD_ERR_LOG_CONN_OPEN_FAIL                      = 0xA1,
+    ID_CAS_HRPD_ERR_LOG_SESSION_NEG_FAIL                    = 0xA2,
+    ID_CAS_HRPD_ERR_LOG_NETWORK_LOST                        = 0xA3,
+    ID_CAS_HRPD_ERR_LOG_RESEL_TO_LTE_FAIL                   = 0xA4,
+    ID_CAS_HRPD_ERR_LOG_L2C_RESEL_FAIL                      = 0xA5,
+    ID_CAS_HRPD_ERR_LOG_L2C_REDIRECT_FAIL                   = 0xA6,
+    ID_CAS_HRPD_ERR_LOG_CODEC_FAIL                          = 0xA7,
+    ID_CAS_HRPD_ERR_LOG_NETWORK_SEARCH_FAIL                 = 0xA8,
+    ID_CAS_HRPD_ERR_LOG_COMMON_INFO                         = 0xA9,
+    ID_CAS_HRPD_ERR_LOG_TCA_RCV_FAIL                        = 0xAA,
 
     ID_CAS_HRPD_ERR_LOG_BUTT                                = 0xFF
 };
 typedef VOS_UINT8 CAS_HRPD_ERR_LOG_ALARM_ENUM_UINT8;
-
-
-/*****************************************************************************
-  4 全局变量声明
-*****************************************************************************/
-
-
-/*****************************************************************************
-  5 消息头定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  6 消息定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  7 STRUCT定义
-*****************************************************************************/
-
 
 #if ((VOS_OS_VER == VOS_WIN32) || (VOS_OS_VER == VOS_NUCLEUS))
 #pragma pack()
@@ -161,5 +111,3 @@ typedef VOS_UINT8 CAS_HRPD_ERR_LOG_ALARM_ENUM_UINT8;
 #endif
 
 #endif /* end of cas_errlog_cfg.h */
-
-

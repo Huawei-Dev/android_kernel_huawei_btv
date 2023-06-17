@@ -64,10 +64,6 @@
 
 #define ARM_REGS_NUM                        17
 
-/**************************************************************************
-  STRUCT定义
-**************************************************************************/
-
 typedef enum _dump_arm_vec_e
 {
     DUMP_ARM_VEC_RESET          = 0x0,
@@ -114,14 +110,9 @@ typedef struct __dump_ctrl_s
 {
     u32 dump_task_id;
     u32 dump_task_job;
-    u32 current_task_info;           /*0xA0 */
+    u32 current_task_info;
     struct semaphore sem_dump_task;
 }dump_ctrl_s;
-
-
-
-
-
 
 #define RDR_AP_DUMP_ARM_RESET_MOD_ID             (0x80000000)
 #define RDR_AP_DUMP_ARM_UNDEF_MOD_ID             (0x80000001)
@@ -134,12 +125,7 @@ typedef struct __dump_ctrl_s
 #define RDR_AP_DUMP_NORMAL_EXC_MOD_ID            (0x80000008)
 #define RDR_AP_DUMP_PANIC_IN_INT_MOD_ID          (0x80000009)
 #define RDR_AP_DUMP_AP_WDT_MOD_ID                (0x80000010)
-#define DUMP_INIT_WAIT_MAX   60    //60s
-
-
-/**************************************************************************
-  宏定义
-**************************************************************************/
+#define DUMP_INIT_WAIT_MAX   60
 
 #define DUMP_INIT_FLAG_PHASE1               (0x5B5B0000)
 #define DUMP_INIT_FLAG_PHASE2               (0x5B5B0001)
@@ -153,15 +139,12 @@ typedef struct __dump_ctrl_s
 #define DUMP_TASK_JOB_SAVE_INIT             (DUMP_TASK_JOB_SAVE | DUMP_TASK_JOB_INIT)
 #define DUMP_TASK_JOB_SAVE_REBOOT           (DUMP_TASK_JOB_SAVE | DUMP_TASK_JOB_REBOOT)
 
-
-
 #define PID_PPID_GET(taskTCB)  ((((struct task_struct *)taskTCB)->pid & 0xffff)| \
                                  ((((struct task_struct *)taskTCB)->real_parent->pid & 0xffff)<< 16))
 
 #define DUMP_T_TASK_ERROR(mod_id)      (mod_id & (1<<24))
 #define DUMP_LINUX_TASK_NUM_MAX         128
 #define DUMP_REG_SET_MAX                4096
-
 
 void ap_system_error(u32 mod_id, u32 arg1, u32 arg2, char *data, u32 length);
 
@@ -172,7 +155,6 @@ typedef enum _ap_dump_reboot_reason_e
     AP_DUMP_REASON_STACKFLOW   = 0x2,
     AP_DUMP_REASON_UNDEF       = 0xff
 }ap_dump_reboot_reason_e;
-
 
 #define ap_dump_fetal(fmt,...)        printk(KERN_CRIT"[AP_DUMP]: <%s> line = %d  "fmt, __FUNCTION__,__LINE__, ##__VA_ARGS__)
 #define ap_dump_warning(fmt,...)      printk(KERN_WARNING"[AP_DUMP]: <%s> line = %d  "fmt, __FUNCTION__,__LINE__, ##__VA_ARGS__)

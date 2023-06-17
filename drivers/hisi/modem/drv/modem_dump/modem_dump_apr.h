@@ -53,42 +53,42 @@
 
 typedef struct module_info
 {
-    u32     moudle_sum;               /*组件总数*/
+    u32     moudle_sum;
     struct
     {
-    	u32 module;	                  /*责任组件*/
-        char module_name[DUMP_MODULE_NAME_LEN];         /*责任组件名称*/
+    	u32 module;
+        char module_name[DUMP_MODULE_NAME_LEN];
     }module_info[1];
 }module_info_t;
 
 typedef struct modid_info
 {
-    u32     moudid_sum;             /*范围总数*/
+    u32     moudid_sum;
     struct
     {
-    	u32  modid_start;		    /*组件主动复位modid起始值*/
-    	u32  modid_end;		        /*组件主动复位modid结束值*/
-    	char module[DUMP_MODULE_NAME_LEN];	        /*责任组件*/
+    	u32  modid_start;
+    	u32  modid_end;
+    	char module[DUMP_MODULE_NAME_LEN];
     }modid_info[1];
 }modid_info_t;
 
 typedef struct task_table
 {
-    u32 task_sum;                /*任务总数*/
+    u32 task_sum;
     struct
     {
-    	char  task_name[16]; 	/*任务名*/
-    	char  module[DUMP_MODULE_NAME_LEN]; 		/*责任组件*/
+    	char  task_name[16];
+    	char  module[DUMP_MODULE_NAME_LEN];
     }task_info[1];
 }task_table_t;
 
 typedef struct interupt_table
 {
-    u32 intrupt_sum;            /*中断总数*/
+    u32 intrupt_sum;
     struct
     {
-    	u32 interrpt_id; 		/*中断号*/
-    	char  module[DUMP_MODULE_NAME_LEN]; 		/*责任组件*/
+    	u32 interrpt_id;
+    	char  module[DUMP_MODULE_NAME_LEN];
     }interupt_info[1];
 }interupt_table_t;
 
@@ -105,14 +105,14 @@ typedef struct
 
 typedef struct
 {
-    u8  brieftype[16];       /*module+voice*/
-    u8  module_name[12];      /*根因组件名*/
-    u8  voice[4];            /*是否在语音下异常, yes,no*/
-    u8  task_name[16];       /*复位任务名,如果为中断则为中断号,如果临终为任务则为任务名*/
-    u32 reboot_int;          /*复位中断号*/
-    u32 modid;               /*复位modid,system_error的第一个入参*/
-    u8  reboot_core[8];      /*取值AP CP*/
-    u8  reboot_reson[16];    /*取值Normal/DataAbort/Wdt*/
+    u8  brieftype[16];
+    u8  module_name[12];
+    u8  voice[4];
+    u8  task_name[16];
+    u32 reboot_int;
+    u32 modid;
+    u8  reboot_core[8];
+    u8  reboot_reson[16];
 }dump_reset_log_t;
 u32 bsp_apr_init(void);
 void bsp_dump_parse_reset_info( dump_reset_log_t *dump_reset_info, dump_except_info_t dump_except_info);
@@ -127,6 +127,5 @@ void bsp_dump_get_reset_ccore(u32 core, char *reboot_core);
 void bsp_dump_get_reset_ccore(u32 core, char *reboot_core);
 void om_get_reset_info(char * reset_info, u32 size);
 void bsp_dump_get_reset_modid(u32 reason, u32 reboot_modid, u32 * modId);
-
 
 #endif

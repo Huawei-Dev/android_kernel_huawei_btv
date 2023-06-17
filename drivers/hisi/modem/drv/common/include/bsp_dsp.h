@@ -78,66 +78,66 @@ extern "C" {
 
 
 /*****************************************************************************
- 实 体 名  : DRV_HIFI_IMAGE_SEC_TYPE_ENUM
- 功能描述  : 镜像段类型
+ ?? ?? ??  : DRV_HIFI_IMAGE_SEC_TYPE_ENUM
+ ????????  : ??????????
 *****************************************************************************/
 enum DRV_HIFI_IMAGE_SEC_TYPE_ENUM {
-    DRV_HIFI_IMAGE_SEC_TYPE_CODE = 0,        /* 代码 */
-    DRV_HIFI_IMAGE_SEC_TYPE_DATA,            /* 数据 */
+    DRV_HIFI_IMAGE_SEC_TYPE_CODE = 0,        /* ???? */
+    DRV_HIFI_IMAGE_SEC_TYPE_DATA,            /* ???? */
     DRV_HIFI_IMAGE_SEC_TYPE_BUTT,
 };
 
 /*****************************************************************************
- 实 体 名  : DRV_HIFI_IMAGE_SEC_LOAD_ENUM
- 功能描述  : 镜像段加载属性
+ ?? ?? ??  : DRV_HIFI_IMAGE_SEC_LOAD_ENUM
+ ????????  : ??????????????
 *****************************************************************************/
 enum DRV_HIFI_IMAGE_SEC_LOAD_ENUM {
-    DRV_HIFI_IMAGE_SEC_LOAD_STATIC = 0,      /* 单次加载, 即解复位前加载 */
-    DRV_HIFI_IMAGE_SEC_LOAD_DYNAMIC,         /* 多次加载, 由其他机制加载 */
-    DRV_HIFI_IMAGE_SEC_UNLOAD,               /* 不需要底软加载 */
+    DRV_HIFI_IMAGE_SEC_LOAD_STATIC = 0,      /* ????????, ?????????????? */
+    DRV_HIFI_IMAGE_SEC_LOAD_DYNAMIC,         /* ????????, ?????????????? */
+    DRV_HIFI_IMAGE_SEC_UNLOAD,               /* ?????????????? */
     DRV_HIFI_IMAGE_SEC_LOAD_BUTT,
 };
 
 /*****************************************************************************
- 实 体 名  : DRV_HIFI_IMAGE_SEC_STRU
- 功能描述  : 镜像段定义
+ ?? ?? ??  : DRV_HIFI_IMAGE_SEC_STRU
+ ????????  : ??????????
 *****************************************************************************/
 struct drv_hifi_image_sec
 {
-    unsigned short                      sn;              /* 编号 */
-    unsigned char                       type;            /* 类型 */
-    unsigned char                       load_attib;      /* 加载属性 */
-    unsigned long                       src_offset;      /* 在文件中的偏移, bytes */
-    unsigned long                       des_addr;        /* 加载目的地址, bytes */
-    unsigned long                       size;            /* 段长度, bytes */
+    unsigned short                      sn;              /* ???? */
+    unsigned char                       type;            /* ???? */
+    unsigned char                       load_attib;      /* ???????? */
+    unsigned long                       src_offset;      /* ??????????????, bytes */
+    unsigned long                       des_addr;        /* ????????????, bytes */
+    unsigned long                       size;            /* ??????, bytes */
 };
 
 /*****************************************************************************
- 实 体 名  : drv_hifi_image_head
- 功能描述  : 镜像文件头定义
+ ?? ?? ??  : drv_hifi_image_head
+ ????????  : ??????????????
 *****************************************************************************/
 struct drv_hifi_image_head
 {
-    char                                time_stamp[24]; /* 镜像编译时间 */
-    unsigned long                       image_size;     /* 镜像文件大小, bytes */
-    unsigned int                        sections_num;   /* 文件包含段数目 */
-    struct drv_hifi_image_sec           sections[HIFI_SEC_MAX_NUM];    /* 段信息, 共sections_num个 */
+    char                                time_stamp[24]; /* ???????????? */
+    unsigned long                       image_size;     /* ????????????, bytes */
+    unsigned int                        sections_num;   /* ?????????????? */
+    struct drv_hifi_image_sec           sections[HIFI_SEC_MAX_NUM];    /* ??????, ??sections_num?? */
 };
 
 /*****************************************************************************
- 实 体 名  : drv_hifi_sec_addr_info
- 功能描述  : Hifi动态加载段地址结构
+ ?? ?? ??  : drv_hifi_sec_addr_info
+ ????????  : Hifi??????????????????
 *****************************************************************************/
 struct drv_hifi_sec_addr
 {
-    unsigned int  sec_source_addr;  /*段的源地址*/
-    unsigned int  sec_length;       /*段的长度*/
-    unsigned int  sec_dest_addr;    /*段的目的地址*/
+    unsigned int  sec_source_addr;  /*??????????*/
+    unsigned int  sec_length;       /*????????*/
+    unsigned int  sec_dest_addr;    /*????????????*/
 };
 
 /*****************************************************************************
- 实 体 名  : drv_hifi_sec_load_info
- 功能描述  : Hifi动态加载段结构
+ ?? ?? ??  : drv_hifi_sec_load_info
+ ????????  : Hifi??????????????
 *****************************************************************************/
 #define HIFI_SEC_DATA_LENGTH (SHM_SIZE_HIFI \
                                - HIFI_DYNAMIC_SEC_MAX_NUM*sizeof(struct drv_hifi_sec_addr) \
@@ -145,10 +145,10 @@ struct drv_hifi_sec_addr
 
 struct drv_hifi_sec_load_info
 {
-    unsigned int             sec_magic;         /*段信息开始的保护字*/
-    unsigned int             sec_num;           /*段的个数*/
-    struct drv_hifi_sec_addr sec_addr_info[HIFI_DYNAMIC_SEC_MAX_NUM]; /*段的地址信息*/
-    char                     sec_data[HIFI_SEC_DATA_LENGTH];          /*段信息*/
+    unsigned int             sec_magic;         /*??????????????????*/
+    unsigned int             sec_num;           /*????????*/
+    struct drv_hifi_sec_addr sec_addr_info[HIFI_DYNAMIC_SEC_MAX_NUM]; /*????????????*/
+    char                     sec_data[HIFI_SEC_DATA_LENGTH];          /*??????*/
 };
 
 struct dsp_pm_om_qos_log {
@@ -169,7 +169,7 @@ struct dsp_pm_om_qos_log {
 
 struct dsp_dump_proc_flag
 {
-    unsigned int dsp_dump_flag;         /* 异常流程中，记录dsp保存tcm的过程标志 */
+    unsigned int dsp_dump_flag;         /* ????????????????dsp????tcm?????????? */
 };
 
 #ifndef CONFIG_DSP

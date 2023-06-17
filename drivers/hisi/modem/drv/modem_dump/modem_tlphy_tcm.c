@@ -76,19 +76,6 @@
 #include "modem_dump_base.h"
 #include "bsp_dump_drv.h"
 #include "modem_dump.h"
-/*****************************************************************************
-* 函 数 名  : om_save_lphy_tcm
-* 功能描述  : 保存tldsp的镜像
-*
-* 输入参数  :
-* 输出参数  :
-
-* 返 回 值  :
-
-*
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 
 void dump_save_lphy_tcm(char * dst_path)
 {
@@ -125,7 +112,6 @@ void dump_save_lphy_tcm(char * dst_path)
         flag = false;
     }
 
-    /*DSP DDR内存分布参考hi_dsp.h*/
     if(flag == true)
     {
         /* DTCM PUB */
@@ -162,7 +148,6 @@ void dump_save_lphy_tcm(char * dst_path)
     }
     else if(TRUE == is_beta)
     {
-        /*MBB与PHONE均保存DTCM*/
         memset(file_name, 0, sizeof(file_name));
         snprintf(file_name, sizeof(file_name), "%slphy_dtcm.bin", dst_path);
         fd = bsp_open(file_name,RFILE_RDWR|RFILE_CREAT,0660);
@@ -184,7 +169,6 @@ void dump_save_lphy_tcm(char * dst_path)
     err0:
         bsp_close(fd);
 
-        /*如果是PHONE产品则同时保存LPHY ITCM，MBB受空间限制则只保存DTCM部分*/
         if(DUMP_PHONE == dump_get_product_type())
         {
             memset(file_name, 0, sizeof(file_name));
@@ -214,4 +198,3 @@ void dump_save_lphy_tcm(char * dst_path)
     iounmap(data);
     return;
 }
-

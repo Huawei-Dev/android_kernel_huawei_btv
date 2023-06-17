@@ -48,44 +48,44 @@
 
 /******************************************************************************
 
-                  版权所有 (C), 2001-2011, 华为技术有限公司
+                  ???????? (C), 2001-2011, ????????????????
 
  ******************************************************************************
-  文 件 名   : OM_Hdlc.c
-  版 本 号   : 初稿
-  作    者   : zengfei 57034
-  生成日期   : 2008年6月4日
-  最近修改   :
-  功能描述   :
-  函数列表   :
-  修改历史   :
-  1.日    期   : 2008年6月4日
-    作    者   : zengfei 57034
-    修改内容   : 创建文件
+  ?? ?? ??   : OM_Hdlc.c
+  ?? ?? ??   : ????
+  ??    ??   : zengfei 57034
+  ????????   : 2008??6??4??
+  ????????   :
+  ????????   :
+  ????????   :
+  ????????   :
+  1.??    ??   : 2008??6??4??
+    ??    ??   : zengfei 57034
+    ????????   : ????????
 
 ******************************************************************************/
 
 
 
 /******************************************************************************
-   1 头文件包含
+   1 ??????????
 ******************************************************************************/
 #include "OmHdlcInterface.h"
 
 /******************************************************************************
-   2 外部函数变量声明
+   2 ????????????????
 ******************************************************************************/
 
 
 /******************************************************************************
-   3 私有定义
+   3 ????????
 ******************************************************************************/
 
 
 /******************************************************************************
-   4 全局变量定义
+   4 ????????????
 ******************************************************************************/
-/* 该全局数组为FCS查找表，用于计算16位FCS。
+/* ????????????FCS????????????????16??FCS??
     rfc1662: the lookup table used to calculate the FCS-16. */
 VOS_UINT16 const g_ausOmHdlcFcsTab[256] = {
    /* 00 */ 0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
@@ -125,28 +125,28 @@ VOS_UINT16 const g_ausOmHdlcFcsTab[256] = {
 
 
 /******************************************************************************
-   5 函数实现
+   5 ????????
 ******************************************************************************/
 
 /*****************************************************************************
- 函 数 名  : Om_HdlcEncap
- 功能描述  : 将输入的原始数据封装成HDLC帧
- 输入参数  : VOS_UINT8 *pucSrc
+ ?? ?? ??  : Om_HdlcEncap
+ ????????  : ??????????????????????HDLC??
+ ????????  : VOS_UINT8 *pucSrc
              VOS_UINT16 usSrcLen
              VOS_UINT8 *pucDest
              VOS_UINT16 usDestBuffLen
- 输出参数  : VOS_UINT16* pusDestLen
- 返 回 值  : VOS_UINT32
-             PS_SUCC: 成功
-             PS_FAIL: 失败
+ ????????  : VOS_UINT16* pusDestLen
+ ?? ?? ??  : VOS_UINT32
+             PS_SUCC: ????
+             PS_FAIL: ????
 
- 调用函数  :
- 被调函数  :
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2008年6月3日
-    作    者   : zengfei 57034
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2008??6??3??
+    ??    ??   : zengfei 57034
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT32 Om_HdlcEncap(
@@ -177,7 +177,7 @@ VOS_UINT32 Om_HdlcEncap(
         return VOS_ERR;
     }
 
-    if (usDestBuffLen <= 4)             /* 信息域长度不为0的HDLC帧长度至少为5 */
+    if (usDestBuffLen <= 4)             /* ??????????????0??HDLC????????????5 */
     {
         *pusDestLen = 0;
         /*lint -e534*/
@@ -186,10 +186,10 @@ VOS_UINT32 Om_HdlcEncap(
         return VOS_ERR;
     }
 
-    /* 填帧头 */
+    /* ?????? */
     *pucDestPos++   = OM_HDLC_FRAME_FLAG;
 
-    /* 遍历输入数据，计算FCS并转义 */
+    /* ??????????????????FCS?????? */
     while (usSrcLen-- && ((pucDestPos - pucDest) <= (usDestBuffLen - 3)))
     {
         usFcs = (usFcs >> 8) ^ g_ausOmHdlcFcsTab[(usFcs ^ *pucSrc) & 0xff];
@@ -205,7 +205,7 @@ VOS_UINT32 Om_HdlcEncap(
         }
     }
 
-    /* 判断目的BUFFER是否够添加FCS和帧尾 */
+    /* ????????BUFFER??????????FCS?????? */
     if ((pucDestPos - pucDest) > (usDestBuffLen - 3))
     {
         *pusDestLen = 0;
@@ -217,7 +217,7 @@ VOS_UINT32 Om_HdlcEncap(
 
     usFcs       = ~usFcs;
 
-    /* 转义并添加FCS第一个字节 */
+    /* ??????????FCS?????????? */
     ucFcsChar   = usFcs & 0xFF;
     if ((OM_HDLC_FRAME_FLAG == ucFcsChar) || (OM_HDLC_ESC == ucFcsChar))
     {
@@ -229,7 +229,7 @@ VOS_UINT32 Om_HdlcEncap(
         *pucDestPos++ = ucFcsChar;
     }
 
-    /* 判断目的BUFFER是否够添加FCS和帧尾 */
+    /* ????????BUFFER??????????FCS?????? */
     if ((pucDestPos - pucDest) > (usDestBuffLen - 2))
     {
         *pusDestLen = 0;
@@ -239,7 +239,7 @@ VOS_UINT32 Om_HdlcEncap(
         return VOS_ERR;
     }
 
-    /* 转义并添加FCS第二个字节 */
+    /* ??????????FCS?????????? */
     ucFcsChar       = (usFcs >> 8) & 0xFF;
     if ((OM_HDLC_FRAME_FLAG == ucFcsChar) || (OM_HDLC_ESC == ucFcsChar))
     {
@@ -251,7 +251,7 @@ VOS_UINT32 Om_HdlcEncap(
         *pucDestPos++ = ucFcsChar;
     }
 
-    /* 判断目的BUFFER是否够添加帧尾 */
+    /* ????????BUFFER?????????????? */
     if ((pucDestPos - pucDest) > (usDestBuffLen - 1))
     {
         *pusDestLen = 0;
@@ -268,19 +268,19 @@ VOS_UINT32 Om_HdlcEncap(
 }
 
 /*****************************************************************************
- 函 数 名  : Om_HdlcInit
- 功能描述  : 该接口初始化HDLC实体的内部变量, 每个应用在第一次使用解封装功能
-             Om_HdlcDecap前需要调用一次该函数
- 输入参数  : OM_HDLC_STRU *pstHdlc
- 输出参数  : OM_HDLC_STRU *pstHdlc
- 返 回 值  : VOS_VOID
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : Om_HdlcInit
+ ????????  : ????????????HDLC??????????????, ??????????????????????????????
+             Om_HdlcDecap????????????????????
+ ????????  : OM_HDLC_STRU *pstHdlc
+ ????????  : OM_HDLC_STRU *pstHdlc
+ ?? ?? ??  : VOS_VOID
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2008年6月4日
-    作    者   : zengfei 57034
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2008??6??4??
+    ??    ??   : zengfei 57034
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_VOID Om_HdlcInit( OM_HDLC_STRU *pstHdlc )
@@ -299,19 +299,19 @@ VOS_VOID Om_HdlcInit( OM_HDLC_STRU *pstHdlc )
 }
 
 /*****************************************************************************
- 函 数 名  : OM_HdlcFcs
- 功能描述  : 计算FCS. 见RFC 1662 Appendix C and CCITT X.25 section 2.27.
- 输入参数  : VOS_UINT8 *pucData
+ ?? ?? ??  : OM_HdlcFcs
+ ????????  : ????FCS. ??RFC 1662 Appendix C and CCITT X.25 section 2.27.
+ ????????  : VOS_UINT8 *pucData
              VOS_UINT32 ulDataLen
- 输出参数  : 无
- 返 回 值  : VOS_UINT16
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT16
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2008年6月3日
-    作    者   : zengfei 57034
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2008??6??3??
+    ??    ??   : zengfei 57034
+    ????????   : ??????????
 
 *****************************************************************************/
 VOS_UINT16 OM_HdlcFcs( VOS_UINT8 *pucData, VOS_UINT32 ulDataLen )
@@ -327,19 +327,19 @@ VOS_UINT16 OM_HdlcFcs( VOS_UINT8 *pucData, VOS_UINT32 ulDataLen )
 }
 
 /*****************************************************************************
- 函 数 名  : Om_HdlcDecap
- 功能描述  : 从输入的HDLC帧字符流中解析出数据内容
- 输入参数  : OM_HDLC_STRU *pstHdlc
+ ?? ?? ??  : Om_HdlcDecap
+ ????????  : ????????HDLC????????????????????????
+ ????????  : OM_HDLC_STRU *pstHdlc
              VOS_UINT8 ucChar
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
+ ????????  :
+ ????????  :
 
- 修改历史      :
-  1.日    期   : 2008年6月3日
-    作    者   : zengfei 57034
-    修改内容   : 新生成函数
+ ????????      :
+  1.??    ??   : 2008??6??3??
+    ??    ??   : zengfei 57034
+    ????????   : ??????????
 
 *****************************************************************************/
 OM_HDLC_RESULT_ENUM_UINT32 Om_HdlcDecap( OM_HDLC_STRU *pstHdlc, VOS_UINT8 ucChar )
@@ -362,20 +362,20 @@ OM_HDLC_RESULT_ENUM_UINT32 Om_HdlcDecap( OM_HDLC_STRU *pstHdlc, VOS_UINT8 ucChar
         return HDLC_PARA_ERROR;
     }
 
-    /* 未找到帧头时，丢弃非OM_HDLC_FRAME_FLAG字符 */
+    /* ????????????????????OM_HDLC_FRAME_FLAG???? */
     if ((pstHdlc->ulMode & OM_HDLC_MODE_HUNT) && (OM_HDLC_FRAME_FLAG != ucChar))
     {
-        pstHdlc->ulLength   = 0;        /* 如果用户首次调用Om_HdlcDecap前进行了初始化Om_HdlcInit，则此处pstHdlc->ulLength可以不清0 */
+        pstHdlc->ulLength   = 0;        /* ????????????????Om_HdlcDecap??????????????Om_HdlcInit????????pstHdlc->ulLength????????0 */
         return HDLC_NOT_HDLC_FRAME;
     }
 
     switch (ucChar)
     {
         case OM_HDLC_FRAME_FLAG:
-            pstHdlc->ulMode &= ~OM_HDLC_MODE_HUNT;          /* 清标记 */
+            pstHdlc->ulMode &= ~OM_HDLC_MODE_HUNT;          /* ?????? */
 
             if (pstHdlc->ulLength > OM_HDLC_FCS_LEN)
-            {                           /* 该分支表示解析到(信息域+FCS)长度大于2 BYTE的帧 */
+            {                           /* ????????????????(??????+FCS)????????2 BYTE???? */
                 usFcs = OM_HdlcFcs(pstHdlc->pucDecapBuff, pstHdlc->ulLength);
                 if (OM_HDLC_GOOD_FCS != usFcs)
                 {
@@ -388,20 +388,20 @@ OM_HDLC_RESULT_ENUM_UINT32 Om_HdlcDecap( OM_HDLC_STRU *pstHdlc, VOS_UINT8 ucChar
                 return HDLC_SUCC;
             }
             else
-            {                           /* 该分支若pstHdlc->ulLength为0，认为是正常情况：连续的OM_HDLC_FRAME_FLAG */
-                                        /* 该分支若pstHdlc->ulLength不为0，认为有HDLC帧，但(信息域+FCS)长度小于3，故丢弃 */
+            {                           /* ????????pstHdlc->ulLength??0????????????????????????OM_HDLC_FRAME_FLAG */
+                                        /* ????????pstHdlc->ulLength????0????????HDLC??????(??????+FCS)????????3???????? */
                 pstHdlc->ulLength   = 0;
                 break;
             }
         case OM_HDLC_ESC:
             if (!(pstHdlc->ulMode & OM_HDLC_MODE_ESC))
             {
-                pstHdlc->ulMode |= OM_HDLC_MODE_ESC;        /* 置标记 */
+                pstHdlc->ulMode |= OM_HDLC_MODE_ESC;        /* ?????? */
             }
             else
-            {                           /* 异常情况: 连续两个OM_HDLC_ESC */
-                pstHdlc->ulMode &= ~OM_HDLC_MODE_ESC;       /* 清标记 */
-                pstHdlc->ulMode |= OM_HDLC_MODE_HUNT;       /* 置标记 */
+            {                           /* ????????: ????????OM_HDLC_ESC */
+                pstHdlc->ulMode &= ~OM_HDLC_MODE_ESC;       /* ?????? */
+                pstHdlc->ulMode |= OM_HDLC_MODE_HUNT;       /* ?????? */
                 pstHdlc->ulLength = 0;
                 /*lint -e534*/
                 vos_printf("\n\rERROR, Om_HdlcDecap, Esc Char Error:0x%x !\n\r", ucChar);
@@ -410,10 +410,10 @@ OM_HDLC_RESULT_ENUM_UINT32 Om_HdlcDecap( OM_HDLC_STRU *pstHdlc, VOS_UINT8 ucChar
             }
             break;
         default:
-            /* 判断目的BUFFER是否已满 */
+            /* ????????BUFFER???????? */
             if (pstHdlc->ulLength >= pstHdlc->ulDecapBuffSize)
-            {                           /* 异常情况: 解封装BUFFER不足 */
-                pstHdlc->ulMode |= OM_HDLC_MODE_HUNT;        /* 置标记 */
+            {                           /* ????????: ??????BUFFER???? */
+                pstHdlc->ulMode |= OM_HDLC_MODE_HUNT;        /* ?????? */
                 pstHdlc->ulLength = 0;
                 /*lint -e534*/
                 vos_printf("\n\rWARNING, Om_HdlcDecap, Dst Buf is full #1:BufLen:%d !\n\r", (VOS_INT32)pstHdlc->ulDecapBuffSize);
@@ -423,15 +423,15 @@ OM_HDLC_RESULT_ENUM_UINT32 Om_HdlcDecap( OM_HDLC_STRU *pstHdlc, VOS_UINT8 ucChar
 
             if (pstHdlc->ulMode & OM_HDLC_MODE_ESC)
             {
-                pstHdlc->ulMode &= ~OM_HDLC_MODE_ESC;          /* 清标记 */
+                pstHdlc->ulMode &= ~OM_HDLC_MODE_ESC;          /* ?????? */
                 if (((OM_HDLC_FRAME_FLAG^OM_HDLC_ESC_MASK) == ucChar)
                     || ((OM_HDLC_ESC^OM_HDLC_ESC_MASK) == ucChar))
                 {
                     ucChar ^= OM_HDLC_ESC_MASK;
                 }
                 else
-                {                           /* 异常情况: OM_HDLC_ESC后面的字符不正确 */
-                    pstHdlc->ulMode |= OM_HDLC_MODE_HUNT;        /* 置标记 */
+                {                           /* ????????: OM_HDLC_ESC???????????????? */
+                    pstHdlc->ulMode |= OM_HDLC_MODE_HUNT;        /* ?????? */
                     pstHdlc->ulLength = 0;
                     /*lint -e534*/
                     vos_printf("\n\rERROR, Om_HdlcDecap, Esc Char Error:0x%x !\n\r", ucChar);

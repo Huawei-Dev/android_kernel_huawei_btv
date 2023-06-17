@@ -46,31 +46,6 @@
  *
  */
 
-/*****************************************************************************/
-/*                                                                           */
-/*                Copyright 1999 - 2015, Huawei Tech. Co., Ltd.              */
-/*                           ALL RIGHTS RESERVED                             */
-/*                                                                           */
-/* FileName: v_private.c                                                     */
-/*                                                                           */
-/* Author: dongtinghuan                                                      */
-/*                                                                           */
-/* Version: 1.0                                                              */
-/*                                                                           */
-/* Date: 2014-11                                                             */
-/*                                                                           */
-/* Description: 对底软接口的私有封装                                         */
-/*                                                                           */
-/* Others:                                                                   */
-/*                                                                           */
-/* History:                                                                  */
-/* 1. Date:                                                                  */
-/*    Author:                                                                */
-/*    Modification: Create this file                                         */
-/*                                                                           */
-/*****************************************************************************/
-
-
 #include "v_typdef.h"
 #include "v_IO.h"
 #include "v_int.h"
@@ -79,18 +54,8 @@
 #include "v_private.h"
 #include "mdrv.h"
 
-/*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
-*****************************************************************************/
 #define    THIS_FILE_ID        PS_FILE_ID_V_PRIVATE_C
 
-/*****************************************************************************
- Function   : VOS_GetDrvVerInfo
- Description: 获取单板版本信息
- Input      : enVerInfo -- 获取类型
- Return     : VOS_INT   -- 获取类型值
- Other      :
- *****************************************************************************/
 VOS_INT VOS_GetDrvVerInfo(VOS_GET_DRV_VER_INFO_ENUM_UINT32 enVerInfo)
 {
     const MODEM_VER_INFO_S             *pstModemVerInfo;
@@ -114,5 +79,3 @@ VOS_INT VOS_GetDrvVerInfo(VOS_GET_DRV_VER_INFO_ENUM_UINT32 enVerInfo)
 
     return pstModemVerInfo->stproductinfo.eboardatype;
 }
-
-

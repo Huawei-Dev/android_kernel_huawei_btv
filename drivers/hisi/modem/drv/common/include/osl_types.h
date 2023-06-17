@@ -53,7 +53,7 @@
 extern "C"
 {
 #else
-#if defined(__CMSIS_RTOS) || defined(__OS_VXWORKS__) ||defined(__OS_RTOSCK__) /* linux中有bool枚举定义 */
+#if defined(__CMSIS_RTOS) || defined(__OS_VXWORKS__) ||defined(__OS_RTOSCK__) /* linux????bool???????? */
 #ifndef bool
 typedef enum {
 	false	= 0,

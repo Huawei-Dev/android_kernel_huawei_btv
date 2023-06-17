@@ -5,23 +5,21 @@
 
 #include <sre_buildef.h>
 
-/*配置系统支持的最大module个数*/
 #ifndef CONFIG_MODULE_MAX_NUM
 #define CONFIG_MODULE_MAX_NUM      200
 #endif
 
-/*配置module静态初始化优先级*/
 typedef enum _module_level
 {
 	mod_level_libc_init = 0,
 	mod_level_dts,
-	mod_level_HardBoot_end, /*SRE_HardBootInit阶段的放此之前*/
+	mod_level_HardBoot_end,
 
 	mod_level_l2cache,
 	mod_level_gic,
 	mod_level_syslog_cb,
 	mod_level_serial,
-	mod_level_HardDrv_end, /*SRE_HardDrvInit 阶段的放此之前*/
+	mod_level_HardDrv_end,
 
 	mod_level_dt_sysctrl,
 	mod_level_share_mem,
@@ -98,7 +96,7 @@ typedef enum _module_level
 	mod_level_ddrtst_pm,
 	mod_level_sysbus_core,
 	mod_level_dsp_dvs,
-	mod_level_dsp_dfs,                /* dspdfs初始化需要放在dspdvs的后面 */
+	mod_level_dsp_dfs,
 	mod_level_dload,
 	mod_level_rsracc_late,
 
@@ -107,14 +105,11 @@ typedef enum _module_level
 	mod_level_regidle,
 	mod_level_dump_init_tsk,
 	mod_level_onoff_modem_ok,
-	mod_level_App_end/*SRE_AppInit阶段的放此之前*/
+	mod_level_App_end
 } module_level;
 
+typedef int (*modcall_t)(void);
 
-/*
- * module初始化信息结构体
- */
- typedef int (*modcall_t)(void);
 struct module
 {
 	const char	name[32];
@@ -125,7 +120,6 @@ struct module
 	const char	exit_func_name[64];
 };
 
-/*module初始化注册接口*/
 #define __init           __attribute__((section(".init.text")))
 #define __exit          __attribute__((section(".exit.text")))
 #define __used	    __attribute__((__used__))
@@ -134,49 +128,10 @@ struct module
 	__used __attribute__((section(".mod.info"))) static struct module __mod_##initcall \
 		= { name,  initcall, exitcall, initlevel,  #initcall ,#exitcall}
 
-/**
- * @brief module初始化入口。
- *
- * @par 描述:
- * 入参为不同初始化阶段的优先级水线。
- *
- * @attention
- * 只在系统启动阶段调用
- * *
- * @retval 
- *无
- * @par 依赖:
- *无
-*/
 void bsp_module_init(module_level module_level_t);
-/**
- * @brief module加载
- *
- * @par 描述:
- * 待加载的module名字
- *
- * @attention
- * *接口里使用信号量，会造成休眠
- * *
- * @retval 
- *返回待加载module的控制结构体
- * @par 依赖:
- *rfile\icc\ipc\
-*/
 
 struct module * bsp_module_get(const char *module_name);
-/**
- * @brief module卸载
- *
- * @par 描述:
- * 待卸载的module名字
- *
- * @attention
- * *接口里使用信号量，会造成休眠
- * @retval 
- * @par 依赖:
- *无
-*/
+
 int bsp_module_put(struct module *module);
 #endif
 #endif

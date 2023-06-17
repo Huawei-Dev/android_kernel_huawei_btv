@@ -46,8 +46,6 @@
  *
  */
 
-
-/*lint -save -e537*/
 #include <linux/kthread.h>
 #include <linux/vmalloc.h>
 #include <osl_thread.h>
@@ -64,9 +62,6 @@
 #include "NVIM_ResumeId.h"
 #include "bsp_dump.h"
 
-/*lint -restore +e537*/
-
-/* 计算字符串的CRC */
 u32 nv_cal_crc32(u8 *Packet, u32 dwLength)
 {
     static u32 CRC32_TABLE[256] = {
@@ -125,8 +120,6 @@ bool nv_crc_need_check_inwr(nv_item_info_s *item_info, u32 datalen)
 {
     bool need_check = false;
 
-    /* 写全NV时，不需要check crc, 写部分nv时，需要在写前做crc */
-    /* itemid crc */
     if(NV_ITEM_CRC_CHECK_YES)
     {
         if((1 == item_info->modem_num) && (datalen == item_info->nv_len))
@@ -162,8 +155,6 @@ bool nv_crc_need_make_inwr(void)
 {
     bool need_check = false;
 
-    /* 写全NV时，不需要check crc, 写部分nv时，需要在写前做crc */
-    /* itemid crc */
     if(NV_ITEM_CRC_CHECK_YES)
     {
         need_check = true;
@@ -181,14 +172,6 @@ bool nv_crc_need_make_inwr(void)
     return need_check;
 }
 
-/*****************************************************************************
- 函 数 名  : nv_check_nv_data_crc
- 功能描述  : 对偏移为offset，长度为datalen的数据按照4k为单位，进行CRC校验
- 输入参数  : offset:要写入的数据的偏移，相对于控制文件头
-             datalen:待校验的数据长度
- 输出参数  : NV_OK:校验通过
- 返 回 值  : 无
-*****************************************************************************/
 u32 nv_crc_check_data_section(u32 resume, u32 *pitemid, u32 *pmodemid)
 {
     nv_ctrl_info_s*   ctrl_info = (nv_ctrl_info_s*)NV_GLOBAL_CTRL_INFO_ADDR;
@@ -307,7 +290,6 @@ u32 nv_crc_check_data_section(u32 resume, u32 *pitemid, u32 *pmodemid)
     return NV_OK;
 }
 
-
 u32 nv_crc_check_ctrl_section(void)
 {
     nv_ctrl_info_s*   ctrl_info = (nv_ctrl_info_s*)NV_GLOBAL_CTRL_INFO_ADDR;
@@ -333,20 +315,12 @@ u32 nv_crc_check_ctrl_section(void)
     }
 }
 
-/*****************************************************************************
- 函 数 名  : nv_crc_make_crc
- 功能描述  : 对NV数据nv.bin生成CRC校验码
- 输入参数  : path 文件路径
- 输出参数  : 无
- 返 回 值  : 无
-*****************************************************************************/
 u32 nv_crc_check_ddr(u32 resume)
 {
     u32 ret = NV_ERROR;
     u32 itemid;
     u32 modemid;
 
-    /*检查ctrl段的CRC校验码*/
     ret = nv_crc_check_ctrl_section();
     if(ret)
     {
@@ -354,7 +328,6 @@ u32 nv_crc_check_ddr(u32 resume)
         return ret;
     }
 
-    /*检查data段的CRC校验码*/
     ret = nv_crc_check_data_section(resume, &itemid, &modemid);
     if(ret)
     {
@@ -381,8 +354,6 @@ u32 nv_crc_check_item(nv_item_info_s *item_info, u32 modem_id)
     u32  cur_crc;
     u32  new_crc;
 
-    /* 写全NV时，不需要check crc, 写部分nv时，需要在写前做crc */
-    /* itemid crc */
     if(NV_ITEM_CRC_CHECK_YES)
     {
         data = nv_get_item_base(item_info);
@@ -399,7 +370,6 @@ u32 nv_crc_check_item(nv_item_info_s *item_info, u32 modem_id)
         return NV_OK;
     }
 
-    /*IPC锁保护，防止在校验CRC时写NV操作还没有完成*/
     nv_debug_record(NV_DEBUG_WRITEEX_GET_IPC_START);
     nv_ipc_sem_take(IPC_SEM_NV_CRC, IPC_SME_TIME_OUT);
     nv_debug_record(NV_DEBUG_WRITEEX_GET_IPC_END);
@@ -518,16 +488,6 @@ u32 nv_crc_make_item_wr(nv_wr_req *wreq, nv_item_info_s *item_info, u8 **sbuff, 
     return NV_OK;
 }
 
-
-
-/*****************************************************************************
- 函 数 名  : nv_crc_make_ctrl_section
- 功能描述  : 生成NV CTRL段的CRC校验码
- 输入参数  :
-
- 输出参数  : NV_OK:成功
- 返 回 值  : 无
-*****************************************************************************/
 u32 nv_crc_make_ctrl_section(void)
 {
     nv_ctrl_info_s*   ctrl_info = (nv_ctrl_info_s*)NV_GLOBAL_CTRL_INFO_ADDR;
@@ -544,15 +504,6 @@ u32 nv_crc_make_ctrl_section(void)
     return NV_OK;
 }
 
-
-/*****************************************************************************
- 函 数 名  : nv_crc_make_data_section
- 功能描述  : 对NV写入的NV以4K为单位生成CRC校验码,并写入内存对应位置
- 输入参数  : offset:写入偏移,相对于ctrl文件头
-             datalen:计算CRC数据的长度
- 输出参数  : NV_OK:成功
- 返 回 值  : 无
-*****************************************************************************/
 u32 nv_crc_make_data_section(void)
 {
     nv_ctrl_info_s*   ctrl_info = (nv_ctrl_info_s*)NV_GLOBAL_CTRL_INFO_ADDR;
@@ -589,25 +540,13 @@ u32 nv_crc_make_data_section(void)
     return NV_OK;
 }
 
-
-/*****************************************************************************
- 函 数 名  : nv_crc_make_ddr
- 功能描述  : 对NV数据nv.bin生成CRC校验码
- 输入参数  : path 文件路径
- 输出参数  : 无
- 返 回 值  : 无
-*****************************************************************************/
 u32 nv_crc_make_ddr(void)
 {
-    /*对ctrl段计算CRC校验码*/
     (void)nv_crc_make_ctrl_section();
-    
-    /*对nv data段计算CRC校验码*/
     (void)nv_crc_make_data_section();
     
     return NV_OK;
 }
-/*lint -restore*/
 
 EXPORT_SYMBOL(nv_cal_crc32);
 EXPORT_SYMBOL(nv_crc_need_make_inwr);
@@ -623,5 +562,3 @@ EXPORT_SYMBOL(nv_crc_make_item_wr);
 EXPORT_SYMBOL(nv_crc_make_ctrl_section);
 EXPORT_SYMBOL(nv_crc_make_data_section);
 EXPORT_SYMBOL(nv_crc_make_ddr);
-
-

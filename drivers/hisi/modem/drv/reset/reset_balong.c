@@ -192,7 +192,7 @@ s32 drv_reset_cb (DRV_RESET_CB_MOMENT_E stage, int userdata)
 			(void)bsp_loadps_reset_cb(stage, 0);
 
 			ipc_modem_reset_cb(stage, 0);
-			/* 在C核drv启动之后，icc需要准备好 */
+			/* ??C??drv??????????icc?????????? */
 			ccore_msg_switch_on(g_modem_reset_ctrl.multicore_msg_switch, CCORE_STATUS);
 
 			ret = bsp_rfile_reset_cb(stage, 0);
@@ -240,7 +240,7 @@ s32 invoke_reset_cb(DRV_RESET_CB_MOMENT_E stage)
 
 	reset_print_debug("(%d) @reset %d\n", ++g_reset_debug.main_stage, (u32)stage);
 
-	/*根据回调函数优先级，调用回调函数*/
+	/*????????????????????????????????*/
     while (NULL != p)
     {
         if (NULL != p->cb_info.cbfun)
@@ -264,11 +264,11 @@ s32 invoke_reset_cb(DRV_RESET_CB_MOMENT_E stage)
 s32 send_sync_msg_to_mcore(u32 reset_info, u32 *ack_val)
 {
 	s32 ret = 0;
-	/*如果是modem处于复位状态，则调用AP侧IPC*/
+	/*??????modem????????????????????AP??IPC*/
 	/*ap receive mabx 0,send mbx 13*/
 	rproc_msg_t tx_buffer[2] ;
 	rproc_msg_t ack_buffer[2] ;
-	/*发送标志，用于LPM3上接收时解析*/
+	/*??????????????LPM3????????????*/
 	tx_buffer[0] = (0<<24|9<<16|3<<8);
 	tx_buffer[1] = reset_info;
 	ret = RPROC_SYNC_SEND(LPM3_RRPOC_ID, tx_buffer, 2, ack_buffer, 2);
@@ -293,7 +293,7 @@ s32 send_msg_to_hifi(DRV_RESET_CB_MOMENT_E stage)
 
 	if (MDRV_RESET_CB_BEFORE == stage)
 	{
-		/*消息ID*/
+		/*????ID*/
         ret = bsp_reset_core_notify(BSP_HIFI, ID_AP_HIFI_CCPU_RESET_REQ, 5000, &val);
         switch(ret)
         {
@@ -325,7 +325,7 @@ s32 send_msg_to_hifi(DRV_RESET_CB_MOMENT_E stage)
         }
 	}
 
-	/* 如果有必要，其他阶段也通知hifi */
+	/* ??????????????????????????hifi */
 	return ret;
 }
 
@@ -370,12 +370,12 @@ s32 do_power_off(u16 action)
 	s32 ret = RESET_ERROR;
 	u32 ack_val = 0xff;
 
-	/* 设置启动模式为C核单独复位 */
+	/* ??????????????C?????????? */
 	bsp_reset_bootflag_set(CCORE_IS_REBOOT);
 	g_modem_reset_ctrl.boot_mode = readl((volatile const void *)get_scbakdata13());
 	reset_print_debug("(%d) set boot mode:0x%x\n", ++g_reset_debug.main_stage, g_modem_reset_ctrl.boot_mode);
 
-	/* 唤醒ccore */
+	/* ????ccore */
     (void)bsp_sync_reset(SYNC_MODULE_RESET);
 	ret = bsp_ipc_int_send(IPC_CORE_CCORE, g_modem_reset_ctrl.ipc_send_irq_wakeup_ccore);
 	if(ret != 0)
@@ -383,7 +383,7 @@ s32 do_power_off(u16 action)
 		reset_print_err("wakeup ccore failt\n");
 	}
 
-	/* 复位前各组件回调 */
+	/* ???????????????? */
 	ret = invoke_reset_cb(MDRV_RESET_CB_BEFORE);
 	if(ret < 0)
 	{
@@ -391,7 +391,7 @@ s32 do_power_off(u16 action)
 		return RESET_ERROR;
 	}
 
-	/* 阻止核间通信 */
+	/* ???????????? */
 	ccore_msg_switch_off(g_modem_reset_ctrl.multicore_msg_switch, CCORE_STATUS);
 
 	ret = bsp_sec_call(FUNC_ICC_MSG_SWITCH_OFF, 0);
@@ -402,7 +402,7 @@ s32 do_power_off(u16 action)
 
 	reset_print_debug("(%d) switch off msg connect:%d\n", ++g_reset_debug.main_stage, g_modem_reset_ctrl.multicore_msg_switch);
 
-	/* 通知hifi停止与modem交互并等待hifi处理完成 */
+	/* ????hifi??????modem??????????hifi???????? */
 	ret = send_msg_to_hifi(MDRV_RESET_CB_BEFORE);
 	if(-1 == ret)
 	{
@@ -414,7 +414,7 @@ s32 do_power_off(u16 action)
 		reset_print_err("waiting wakeup reply from ccore timeout(%d)!\n", RESET_WAIT_CCORE_WAKEUP_REPLY_TIMEOUT);
 	}
 
-	/* 通知modem master进idle态,并等待ccore回复 */
+	/* ????modem master??idle??,??????ccore???? */
 	if(BSP_OK != bsp_send_cp_fiq(FIQ_RESET))
 	{
 		reset_print_err("fiq trigger fail\n");
@@ -433,11 +433,11 @@ s32 do_power_off(u16 action)
 	ipc_modem_reset_cb(MDRV_RESET_CB_BEFORE, 0);
 	master_in_idle_timestamp_dump();
 
-	/* 通知m3进行复位前辅助处理 */
+	/* ????m3?????????????????? */
 	msg = RESET_INFO_MAKEUP(action, MDRV_RESET_CB_BEFORE); /*lint !e701 */
 	ret = RESET_ERROR;
 
-	/* 复位解复位modem子系统期间不接收ipc消息 */
+	/* ??????????modem????????????????ipc???? */
 	disable_ipc_irq();
 	ret = send_sync_msg_to_mcore(msg, &ack_val);
 	if(ret)
@@ -476,8 +476,8 @@ s32 do_power_on(u16 action)
 		return RESET_ERROR;
 	}
 
-	/* C核和dsp镜像加载 */
-	/* 如出现错误，重试3次，直至每次都错误，则复位系统 */
+	/* C????dsp???????? */
+	/* ????????????????3?????????????????????????????? */
 	for (i=0; i<RESET_RETRY_TIMES; i++)
 	{
 		ret = bsp_load_modem_images();
@@ -493,7 +493,7 @@ s32 do_power_on(u16 action)
 		return RESET_ERROR;
 	}
 
-	/* 通知m3进行复位中相关处理 */
+	/* ????m3?????????????????? */
 	msg = RESET_INFO_MAKEUP(action, (u32)MDRV_RESET_RESETTING); /*lint !e701 */
 	ret = RESET_ERROR;
 	ret = send_sync_msg_to_mcore(msg, &ack_val);
@@ -514,7 +514,7 @@ s32 do_power_on(u16 action)
 	}
 	reset_print_debug("(%d) at reseting stage has communicated with lpm3 succeed\n", ++g_reset_debug.main_stage);
 
-	/* 复位中相关处理:与C核需要交互的模块在此阶段准备好 */
+	/* ??????????????:??C?????????????????????????????? */
 	if ((MODEM_POWER_ON == action) || (MODEM_RESET == action))
 	{
 		ccore_ipc_enable();
@@ -534,7 +534,7 @@ s32 do_power_on(u16 action)
 	}
 
 
-	/* 复位后相关处理 */
+	/* ?????????????? */
 	ret = invoke_reset_cb(MDRV_RESET_CB_AFTER);
 	if(ret < 0)
 	{
@@ -542,7 +542,7 @@ s32 do_power_on(u16 action)
 		return RESET_ERROR;
 	}
 
-	/* 复位后通知M3进行相关处理 */
+	/* ??????????M3???????????? */
 	msg = RESET_INFO_MAKEUP(action, MDRV_RESET_CB_AFTER); /*lint !e701 */
 	ret = RESET_ERROR;
 	ret = send_sync_msg_to_mcore(msg, &ack_val);
@@ -562,7 +562,7 @@ s32 do_power_on(u16 action)
 	}
 	reset_print_debug("(%d) after reset stage has communicated with lpm3 succeed\n", ++g_reset_debug.main_stage);
 
-	/* 将启动模式置回普通模式 */
+	/* ?????????????????????? */
 	bsp_reset_bootflag_set(CCORE_BOOT_NORMAL);
 
 	return RESET_OK;
@@ -640,7 +640,7 @@ struct reset_cb_list *sort_list_insert(struct reset_cb_list *list, struct reset_
     }
     while (NULL != curr)
     {
-        /* 由小到大, 按优先级插入 */
+        /* ????????, ???????????? */
         if (curr->cb_info.priolevel > node->cb_info.priolevel)
         {
             if (head == curr)
@@ -708,7 +708,7 @@ void modem_reset_do_work(struct work_struct *work)
 	{
 		if (!wait_for_completion_timeout(&(g_modem_reset_ctrl.suspend_completion), HZ*10))
 		{
-			machine_restart("system halt"); /* 调systemError */
+			machine_restart("system halt"); /* ??systemError */
 			return;
 		}
 	}
@@ -722,7 +722,7 @@ void modem_power_off_do_work(struct work_struct *work)
 	{
 		if (!wait_for_completion_timeout(&(g_modem_reset_ctrl.suspend_completion), HZ*10))
 		{
-			machine_restart("system halt"); /* todo: 是否需要调用system_error */
+			machine_restart("system halt"); /* todo: ????????????system_error */
 			return;
 		}
 	}
@@ -930,7 +930,7 @@ int __init bsp_reset_init(void)
 	memset(&g_reset_debug, 0, sizeof(g_reset_debug));
 	g_reset_debug.print_sw = 1;
 
-	/* NV控制是否打开单独复位功能以及与RIL的对接 */
+	/* NV??????????????????????????????RIL?????? */
 	if(BSP_OK != bsp_nvm_read(NV_ID_DRV_CCORE_RESET, (u8*)&(g_modem_reset_ctrl.nv_config), sizeof(DRV_CCORE_RESET_STRU)))
 	{
 		reset_print_err("nv read fail, use default value\n");
@@ -939,7 +939,7 @@ int __init bsp_reset_init(void)
 
 	bsp_reset_bootflag_set(CCORE_BOOT_NORMAL);
 
-	/* 置上acore与ccore之间通信状态可用标识 */
+	/* ????acore??ccore???????????????????? */
 	g_modem_reset_ctrl.multicore_msg_switch = 1;
 	g_modem_reset_ctrl.modem_action = MODEM_NORMAL;
 

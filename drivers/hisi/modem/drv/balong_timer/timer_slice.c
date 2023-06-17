@@ -58,11 +58,11 @@
 
 struct timerslice_control{
 	void* timerslice_base_addr;
-	void* timerslice_base_addr_phy;  /*时间戳实地址*/
+	void* timerslice_base_addr_phy;  /*????????????*/
 	void* timerslice_hrt_base_addr;   /*udelay timer stamp addr*/
 	u32 hrt_slice_is_increase;
 	u32 slice_is_increase;
-	u32 hrt_slice_offset[2];                     /*udelay timer stamp 偏移*/
+	u32 hrt_slice_offset[2];                     /*udelay timer stamp ????*/
 	u32 slice_offset[2];/*32 k slice offset*/
 	u32 hrt_slice_clock_freq;
 	u32 slice_clock_freq;
@@ -97,11 +97,11 @@ void slice_set_judgetime(u64 time_s)
 }
 
 /*****************************************************************************
-* 函数  : bbp_get_curtime
-* 功能  : 被PS调用，用来获取系统精确时间
-* 输入  : void
-* 输出  : u64 *pcurtime
-* 返回  : u32
+* ????  : bbp_get_curtime
+* ????  : ??PS??????????????????????????
+* ????  : void
+* ????  : u64 *pcurtime
+* ????  : u32
 *****************************************************************************/
 u32 bsp_slice_getcurtime(u64 *pcurtime)
 {
@@ -223,7 +223,7 @@ int slice_init(void){
 	const u32 *regaddr_p=NULL;
 	u64 regaddr64=0, size64=0;
 	s32 ret = 0;
-	/*p532 fpga 与p532 asic读取同一套dts，所以通过版本号区分slice来源;
+	/*p532 fpga ??p532 asic??????????dts????????????????????slice????;
 	*porting timer slice also come from timer*/
 	if(BSP_BOARD_TYPE_SOC == bsp_get_version_info()->board_type|| \
 		BSP_BOARD_TYPE_SFT == bsp_get_version_info()->board_type)
@@ -284,7 +284,7 @@ int hrt_slice_init(void){
 		hardtimer_print_error("timer hrtslice dts status is not ok.\n");
 		return BSP_ERROR;
 	}
-	/* 内存映射，获得基址 */
+	/* ?????????????????? */
 	iomap_node = of_iomap(node, 0);
 	if (NULL == iomap_node)
 	{

@@ -46,7 +46,6 @@
  *
  */
 
-/*lint -save -e537*/
 #include <linux/sched.h>
 #include <linux/timer.h>
 #include <linux/thread_info.h>
@@ -121,7 +120,6 @@ int bsp_wdt_register_hook(WDT_CORE_ID core_id, void *func)
 
     struct device_node *node = NULL;
 
-    /*austin 版本上CP的看门狗中断注册在AP,由dump模块负责去存储*/
     node = of_find_compatible_node(NULL, NULL, "hisilicon,watchdog_app");
     if(node)
     {
@@ -142,7 +140,3 @@ int bsp_wdt_register_hook(WDT_CORE_ID core_id, void *func)
     g_wdt_reboot_func = func;
     return BSP_OK;
 }
-
-
-
-

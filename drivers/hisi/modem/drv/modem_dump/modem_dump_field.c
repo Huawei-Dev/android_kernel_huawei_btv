@@ -55,9 +55,6 @@
 
 struct dump_field_ctrl_info_s   g_st_field_ctrl;
 
-
-
-/* 验证field_id是否合法，异常id返回BSP_ERROR，正常id返回area id */
 static u32 dump_get_areaid_by_fieldid(u32 field_id)
 {
     u32 ret;
@@ -119,14 +116,12 @@ u8 * bsp_dump_get_field_addr(u32 field_id)
     s32    area_id;
     struct dump_area_mntn_addr_info_s area_info;
 
-    /*根据field查找对应的area id*/
     area_id = dump_get_areaid_by_fieldid(field_id);
     if(area_id >= DUMP_AREA_BUTT)
     {
         dump_fetal("not find area\n");
         return NULL;
     }
-    /*根据area id查找对应area 基地址*/
     memset(&area_info,0,sizeof(area_info));
     if(dump_get_area_info(area_id,&area_info))
     {
@@ -190,13 +185,6 @@ u8 * bsp_dump_get_field_map(u32 field_id)
     return NULL;
 }
 
-/* register field in current core area
- * 1. 不带地址注册，传入参数时virt_addr,phy_addr必须传0，成功返回dump注册地址
- * 2. 自带地址注册，传入参数时phy_addr为自带物理地址，virt_addr为虚拟地址，同时在dump内存中分配相同大小内存，成功返回邋virt_addr
- * PS:
- * 1. 两种注册方式，都将在dump划分内存，对于自带地址的注册方式，在系统异常时，由dump模块做数据拷贝
- * 2. 每个注册区域需要由使用者传入对应的版本号，高8位为主版本号，低8位为次版本号
- */
 u8 * bsp_dump_register_field(u32 field_id, char * name, void * virt_addr, void * phy_addr, u32 length, u16 version)
 {
     dump_area_t* area_info = NULL;
@@ -212,7 +200,6 @@ u8 * bsp_dump_register_field(u32 field_id, char * name, void * virt_addr, void *
         bsp_dump_mem_init();
     }
 
-    /*注册的不是当前子系统范围的field*/
     if((field_id < CURRENT_FIELD_ID_START)||(field_id > CURRENT_FIELD_ID_END))
     {
         dump_fetal("field error field = %d\n",field_id);
@@ -229,9 +216,7 @@ u8 * bsp_dump_register_field(u32 field_id, char * name, void * virt_addr, void *
     spin_lock_irqsave(&g_st_field_ctrl.lock, flags);
 
     area_info = (dump_area_t*)g_st_field_ctrl.virt_area_addr;
-    /*注册field个数超出最大范围*/
     index = area_info->area_head.field_num;
-    /*检查是否有重复注册*/
     for(i=0;i<index;i++)
     {
         if(area_info->fields[i].field_id == field_id)
@@ -249,8 +234,6 @@ u8 * bsp_dump_register_field(u32 field_id, char * name, void * virt_addr, void *
 
         return NULL;
     }
-
-    /*剩余空间不足*/
     if(g_st_field_ctrl.free_length < length)
     {
         spin_unlock_irqrestore(&g_st_field_ctrl.lock, flags);
@@ -270,8 +253,6 @@ u8 * bsp_dump_register_field(u32 field_id, char * name, void * virt_addr, void *
     g_st_field_ctrl.field_num ++;
 
     area_info->area_head.field_num = g_st_field_ctrl.field_num;
-
-    /*自带地址注册*/
     if( virt_addr || phy_addr )
     {
         self = (struct dump_field_self_info_s*)ret;
@@ -437,4 +418,3 @@ void dump_show_field(void)
 }
 
 arch_initcall_sync(bsp_dump_mem_init);
-

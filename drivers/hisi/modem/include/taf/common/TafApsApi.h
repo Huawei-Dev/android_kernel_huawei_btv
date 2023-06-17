@@ -50,7 +50,7 @@
 
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "vos.h"
 #include "TafTypeDef.h"
@@ -70,7 +70,7 @@ extern "C" {
 
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
 
 #define TAF_PS_MSG_ID_BASE                  (0x0000)
@@ -101,7 +101,7 @@ extern "C" {
 
 #define TAF_MAX_APN_LEN                 (99)
 
-/*所支持最大的PDP参数表项目数*/
+/*????????????PDP????????????*/
 
 #if (FEATURE_ON == FEATURE_LTE)
 #define TAF_MAX_CID                     (31)
@@ -115,23 +115,23 @@ extern "C" {
 /* 4 x 3 char dec nums + 3 x '.' + '\0' */
 #define TAF_MAX_IPV4_ADDR_STR_LEN       (16)
 
-/* 8 x 4 字符(HEX) + 7 x ':' + '\0' */
+/* 8 x 4 ????(HEX) + 7 x ':' + '\0' */
 #define TAF_MAX_IPV6_ADDR_COLON_STR_LEN (40)
 
-/* 32 x 3 字符(DEC) + 31 x '.' + '\0' */
+/* 32 x 3 ????(DEC) + 31 x '.' + '\0' */
 #define TAF_MAX_IPV6_ADDR_DOT_STR_LEN   (128)
 
-#define TAF_IPV6_STR_MAX_TOKENS         (16)                                    /* IPV6字符串格式使用的分隔符标记最大个数 */
+#define TAF_IPV6_STR_MAX_TOKENS         (16)                                    /* IPV6?????????????????????????????????? */
 
-#define TAF_IPV6_STR_RFC2373_TOKENS     (8)                                     /* RFC2373规定的IPV6字符串格式使用的分隔符标记最大个数 */
+#define TAF_IPV6_STR_RFC2373_TOKENS     (8)                                     /* RFC2373??????IPV6?????????????????????????????????? */
 
-#define TAF_IPV4_STR_DELIMITER          '.'                                     /* RFC协议使用的IPV4文本表达方式使用的分隔符 */
-#define TAF_IPV6_STR_DELIMITER          ':'                                     /* RFC2373使用的IPV6文本表达方式使用的分隔符 */
+#define TAF_IPV4_STR_DELIMITER          '.'                                     /* RFC??????????IPV4???????????????????????? */
+#define TAF_IPV6_STR_DELIMITER          ':'                                     /* RFC2373??????IPV6???????????????????????? */
 
-#define TAF_IPV6_PREFIX_LEN             (8)                                     /* IPv6地址前缀长度 */
+#define TAF_IPV6_PREFIX_LEN             (8)                                     /* IPv6???????????? */
 
-#define TAF_MAX_USERNAME_LEN            (99)                                    /*AUTHLEN 为100，包含1个字节的Peer-ID Length和99字节的Peer-ID，故此处定义为99*/
-#define TAF_MAX_PASSCODE_LEN            (99)                                    /*PASSWORDLEN 为100，包含1个字节的Passwd-Length和99字节的Passwd，故此处定义为99*/
+#define TAF_MAX_USERNAME_LEN            (99)                                    /*AUTHLEN ??100??????1????????Peer-ID Length??99??????Peer-ID??????????????99*/
+#define TAF_MAX_PASSCODE_LEN            (99)                                    /*PASSWORDLEN ??100??????1????????Passwd-Length??99??????Passwd??????????????99*/
 
 #define TAF_PS_MAX_PDPID                (11)
 
@@ -149,7 +149,7 @@ extern "C" {
 
 #define TAF_PPP_IPCP_FRAME_BUF_MAX_LEN      (256)
 
-#define TAF_DEFAULT_DSFLOW_NV_WR_INTERVAL   (2)             /* DSFLOW流量统计NV写间隔, 单位(min) */
+#define TAF_DEFAULT_DSFLOW_NV_WR_INTERVAL   (2)             /* DSFLOW????????NV??????, ????(min) */
 
 #define TAF_PS_CAUSE_APS_SECTION_BEGIN      (0x0000)
 #define TAF_PS_CAUSE_SM_SECTION_BEGIN       (0x0080)
@@ -161,7 +161,7 @@ extern "C" {
 #define TAF_PS_CAUSE_XCC_AS_SECTION_BEGIN   (0x0500)
 #define TAF_PS_CAUSE_HSM_AS_SECTION_BEGIN   (0x0600)
 #define TAF_PS_CAUSE_EHSM_CTTF_SECTION_BEGIN (0X0700)
-/* 偏移量0X0800已被占用，ril侧将对0 ~ 255的内部原因值往后偏移0X0800 */
+/* ??????0X0800??????????ril??????0 ~ 255????????????????????0X0800 */
 
 #define TAF_PS_IS_SM_CAUSE_VALID(sm_cause)\
             ( (((sm_cause) + TAF_PS_CAUSE_SM_NW_SECTION_BEGIN) >= TAF_PS_CAUSE_SM_NW_OPERATOR_DETERMINED_BARRING)\
@@ -195,22 +195,22 @@ extern "C" {
 
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 
 /*****************************************************************************
- 枚举名称: TAF_PS_MSG_ID_ENUM
- 枚举说明: PS域接口消息ID
+ ????????: TAF_PS_MSG_ID_ENUM
+ ????????: PS??????????ID
 
- 修改历史      :
-  1.日    期   : 2013年06月18日
-    作    者   : A00165503
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2013??06??18??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_PS_MSG_ID_ENUM
 {
     /*----------------------------------------------------------------------
-       标准命令[0x0000, 0x0099]
+       ????????[0x0000, 0x0099]
     *---------------------------------------------------------------------*/
     /* +CGDCONT */
     ID_MSG_TAF_PS_SET_PRIM_PDP_CONTEXT_INFO_REQ             = TAF_PS_MSG_ID_BASE + 0x0001,  /* _H2ASN_MsgChoice TAF_PS_SET_PRIM_PDP_CONTEXT_INFO_REQ_STRU */
@@ -280,7 +280,7 @@ enum TAF_PS_MSG_ID_ENUM
     ID_MSG_TAF_PS_GET_DYNAMIC_EPS_QOS_INFO_REQ              = TAF_PS_MSG_ID_BASE + 0x001E,  /* _H2ASN_MsgChoice TAF_PS_GET_DYNAMIC_EPS_QOS_INFO_REQ_STRU */
 
     /*----------------------------------------------------------------------
-       私有命令[0x0100, 0x0199]
+       ????????[0x0100, 0x0199]
     *---------------------------------------------------------------------*/
     /* ^NDISCONN/^NDISDUP */
     ID_MSG_TAF_PS_CALL_ORIG_REQ                             = TAF_PS_MSG_ID_BASE + 0x0101,  /* _H2ASN_MsgChoice TAF_PS_CALL_ORIG_REQ_STRU */
@@ -331,15 +331,15 @@ enum TAF_PS_MSG_ID_ENUM
     /* ^CEMODE */
     ID_MSG_TAF_PS_GET_CEMODE_REQ                            = TAF_PS_MSG_ID_BASE + 0x0113,  /* _H2ASN_MsgChoice TAF_PS_CEMODE_REQ_STRU */
 
-    /* 异步接口获取SDF信息 */
+    /* ????????????SDF???? */
     ID_MSG_TAF_PS_GET_CID_SDF_REQ                           = TAF_PS_MSG_ID_BASE + 0x0114,  /* _H2ASN_MsgChoice TAF_SDF_PARA_QUERY_INFO_STRU */
 
-    /* 异步接口获取CID */
+    /* ????????????CID */
     ID_MSG_TAF_PS_GET_UNUSED_CID_REQ                        = TAF_PS_MSG_ID_BASE + 0x0115,  /* _H2ASN_MsgChoice */
 
     ID_MSG_TAF_PS_SET_CQOS_PRI_REQ                          = TAF_PS_MSG_ID_BASE + 0x0116,  /* _H2ASN_MsgChoice TAF_PS_SET_1X_CQOS_PRI_REQ_STRU */
 
-    /* CDMA下，进入DORMANT状态指示 */
+    /* CDMA????????DORMANT???????? */
     ID_MSG_TAF_PS_CALL_ENTER_DORMANT_IND                    = TAF_PS_MSG_ID_BASE + 0x0117,  /* _H2ASN_MsgChoice TAF_PS_CALL_ENTER_DORMANT_IND_STRU */
 
     ID_MSG_TAF_PS_HAI_CHANGE_IND                            = TAF_PS_MSG_ID_BASE + 0x0118,  /* _H2ASN_MsgChoice TAF_PS_HAI_CHANGE_IND_STRU */
@@ -372,13 +372,13 @@ enum TAF_PS_MSG_ID_ENUM
 typedef VOS_UINT32 TAF_PS_MSG_ID_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名称: TAF_PS_EVT_ID_ENUM
- 枚举说明: TAF和APP之间的事件原语
+ ????????: TAF_PS_EVT_ID_ENUM
+ ????????: TAF??APP??????????????
 
- 修改历史      :
-  1.日    期   : 2011年10月19日
-    作    者   : A00165503
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2011??10??19??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_PS_EVT_ID_ENUM
 {
@@ -509,7 +509,7 @@ enum TAF_PS_EVT_ID_ENUM
     /* +CEMODE */
     ID_EVT_TAF_PS_CEMODE_INFO_CNF                           = TAF_PS_EVT_ID_BASE + 0x012C,           /* _H2ASN_MsgChoice TAF_PS_CEMODE_CNF_STRU                      */
 
-    /* 异步接口获取SDF信息 */
+    /* ????????????SDF???? */
     ID_EVT_TAF_PS_GET_CID_SDF_CNF                           = TAF_PS_EVT_ID_BASE + 0x012D,           /* _H2ASN_MsgChoice TAF_PS_SDF_INFO_CNF_STRU                    */
 
     /* ^CQOSPRI */
@@ -533,8 +533,8 @@ enum TAF_PS_EVT_ID_ENUM
     ID_EVT_TAF_PS_GET_CGMTU_VALUE_CNF                       = TAF_PS_EVT_ID_BASE + 0x0137,          /* _H2ASN_MsgChoice TAF_PS_GET_CGMTU_VALUE_CNF_STRU                */
     ID_EVT_TAF_PS_CGMTU_VALUE_CHG_IND                       = TAF_PS_EVT_ID_BASE + 0x0138,          /* _H2ASN_MsgChoice TAF_PS_CGMTU_VALUE_CHG_IND_STRU                */
 
-    /* 其它事件 */
-    /* APS->IMSA通知SRVCC CANCEL */
+    /* ???????? */
+    /* APS->IMSA????SRVCC CANCEL */
     ID_EVT_TAF_PS_SRVCC_CANCEL_NOTIFY_IND                   = TAF_PS_EVT_ID_BASE + 0x0200,           /* _H2ASN_MsgChoice TAF_SRVCC_CANCEL_NOTIFY_IND_STRU */
 
     ID_EVT_TAF_PS_SET_IMS_PDP_CFG_CNF                       = TAF_PS_EVT_ID_BASE + 0x0201,           /* _H2ASN_MsgChoice TAF_PS_SET_IMS_PDP_CFG_CNF_STRU */
@@ -548,18 +548,18 @@ typedef VOS_UINT32 TAF_PS_EVT_ID_ENUM_UINT32;
 
 
 /*****************************************************************************
- 枚举名称: TAF_PS_CAUSE_ENUM
- 枚举说明: TAF上报的PS域呼叫原因值
+ ????????: TAF_PS_CAUSE_ENUM
+ ????????: TAF??????PS????????????
 
- 修改历史      :
-  1.日    期   : 2012年8月23日
-    作    者   : A00165503
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2012??8??23??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_PS_CAUSE_ENUM
 {
     /*----------------------------------------------------------------------
-       TAF上报的内部原因值, 取值范围[0x0000, 0x007F]
+       TAF????????????????, ????????[0x0000, 0x007F]
     *---------------------------------------------------------------------*/
     TAF_PS_CAUSE_SUCCESS                                    = (TAF_PS_CAUSE_APS_SECTION_BEGIN + 0),
     TAF_PS_CAUSE_INVALID_PARAMETER                          = (TAF_PS_CAUSE_APS_SECTION_BEGIN + 1),
@@ -595,7 +595,7 @@ enum TAF_PS_CAUSE_ENUM
     TAF_PS_CAUSE_UNKNOWN                                    = (TAF_PS_CAUSE_APS_SECTION_BEGIN + 127),
 
     /*----------------------------------------------------------------------
-       TAF上报的SM内部原因值, 取值范围[0x0080, 0x00FF]
+       TAF??????SM??????????, ????????[0x0080, 0x00FF]
     *---------------------------------------------------------------------*/
     TAF_PS_CAUSE_SM_CONN_ESTABLISH_MAX_TIME_OUT             = (TAF_PS_CAUSE_SM_SECTION_BEGIN + 1),
     TAF_PS_CAUSE_SM_MAX_TIME_OUT                            = (TAF_PS_CAUSE_SM_SECTION_BEGIN + 2),
@@ -636,9 +636,9 @@ enum TAF_PS_CAUSE_ENUM
     TAF_PS_CAUSE_SM_UNKNOWN                                 = (TAF_PS_CAUSE_SM_SECTION_BEGIN + 127),
 
     /*----------------------------------------------------------------------
-       TAF上报的SM网络原因值, 取值范围[0x0100, 0x01FF]
-       由于3GPP协议已经定义了具体的(E)SM网络原因值, (E)SM上报的取值为协议
-       定义的原因值加上偏移量(0x100)
+       TAF??????SM??????????, ????????[0x0100, 0x01FF]
+       ????3GPP????????????????????(E)SM??????????, (E)SM????????????????
+       ??????????????????????(0x100)
        (1) SM Cause : Refer to TS 24.008 section 10.5.6.6
        (2) ESM Cause: Refer to TS 24.301 section 9.9.4.4
     *---------------------------------------------------------------------*/
@@ -690,7 +690,7 @@ enum TAF_PS_CAUSE_ENUM
     TAF_PS_CAUSE_SM_NW_APN_RESTRICTION_INCOMPATIBLE         = (TAF_PS_CAUSE_SM_NW_SECTION_BEGIN + 112),
 
     /*----------------------------------------------------------------------
-       TAF上报的GMM内部原因值, 取值范围[0x0200, 0x02FF]
+       TAF??????GMM??????????, ????????[0x0200, 0x02FF]
     *---------------------------------------------------------------------*/
     TAF_PS_CAUSE_GMM_GPRS_NOT_SUPPORT                       = (TAF_PS_CAUSE_GMM_SECTION_BEGIN + 1),
     TAF_PS_CAUSE_GMM_FORBID_LA                              = (TAF_PS_CAUSE_GMM_SECTION_BEGIN + 2),
@@ -708,9 +708,9 @@ enum TAF_PS_CAUSE_ENUM
     TAF_PS_CAUSE_GMM_UNKNOWN                                = (TAF_PS_CAUSE_GMM_SECTION_BEGIN + 127),
 
     /*----------------------------------------------------------------------
-       TAF上报的GMM网络原因值, 取值范围[0x0300, 0x03FF]
-       由于3GPP协议已经定义了具体的GMM网络原因值, 平台上报的GMM网络原因值
-       取值为协议定义的原因值加上偏移量(0x100)
+       TAF??????GMM??????????, ????????[0x0300, 0x03FF]
+       ????3GPP????????????????????GMM??????????, ??????????GMM??????????
+       ????????????????????????????????(0x100)
        Gmm Cause: Refer to TS 24.008 section 10.5.5.14
     *---------------------------------------------------------------------*/
     TAF_PS_CAUSE_GMM_NW_IMSI_UNKNOWN_IN_HLR                 = (TAF_PS_CAUSE_GMM_NW_SECTION_BEGIN + 2),
@@ -745,8 +745,8 @@ enum TAF_PS_CAUSE_ENUM
     TAF_PS_CAUSE_GMM_NW_PROTOCOL_ERROR                      = (TAF_PS_CAUSE_GMM_NW_SECTION_BEGIN + 111),
 
     /*----------------------------------------------------------------------
-       TAF上报的CDMA 1X网络原因值, 取值范围[0x400, 0x04FF]
-       取值为协议定义的原因值加上偏移量(0x400)
+       TAF??????CDMA 1X??????????, ????????[0x400, 0x04FF]
+       ????????????????????????????????(0x400)
     *---------------------------------------------------------------------*/
     TAF_PS_CAUSE_XCC_OTHER_SERVICE_IN_TCH                   = (TAF_PS_CAUSE_XCC_SECTION_BEGIN + 1),
     TAF_PS_CAUSE_XCC_CCS_NOT_SUPPORT                        = (TAF_PS_CAUSE_XCC_SECTION_BEGIN + 2),
@@ -774,9 +774,9 @@ enum TAF_PS_CAUSE_ENUM
     TAF_PS_CAUSE_XCC_EMC_CALL_BACK_MODE                     = (TAF_PS_CAUSE_XCC_SECTION_BEGIN + 24),
 
     /*----------------------------------------------------------------------
-       接入层上报原因值对应到PS域，取值范围[0x500, 0x05FF]
-       由于3GPP2协议已经定义了具体的1X网络原因值, 平台上报的1X网络原因值
-       取值为协议定义的原因值加上偏移量(0x500)
+       ??????????????????????PS????????????[0x500, 0x05FF]
+       ????3GPP2????????????????????1X??????????, ??????????1X??????????
+       ????????????????????????????????(0x500)
     *---------------------------------------------------------------------*/
     TAF_PS_CAUSE_XCC_AS_NO_SERVICE                          = (TAF_PS_CAUSE_XCC_AS_SECTION_BEGIN + 1),
     TAF_PS_CAUSE_XCC_AS_MAX_ACCESS_PROBES                   = (TAF_PS_CAUSE_XCC_AS_SECTION_BEGIN + 2),
@@ -895,13 +895,13 @@ typedef VOS_UINT8 TAF_PS_CDATA_BEAR_STATUS_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名称: TAF_PDP_TYPE_ENUM
- 枚举说明: PDP类型
+ ????????: TAF_PDP_TYPE_ENUM
+ ????????: PDP????
 
- 修改历史      :
-  1.日    期   : 2011年10月19日
-    作    者   : A00165503
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2011??10??19??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_PDP_TYPE_ENUM
 {
@@ -916,17 +916,17 @@ typedef VOS_UINT8 TAF_PDP_TYPE_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名称: TAF_PDP_AUTH_TYPE_ENUM
- 枚举说明: 鉴权类型
+ ????????: TAF_PDP_AUTH_TYPE_ENUM
+ ????????: ????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 
-  2.日    期   : 2015年12月9日
-    作    者   : y00322978
-    修改内容   : 枚举值修改
+  2.??    ??   : 2015??12??9??
+    ??    ??   : y00322978
+    ????????   : ??????????
 *****************************************************************************/
 enum TAF_PDP_AUTH_TYPE_ENUM
 {
@@ -942,17 +942,17 @@ typedef VOS_UINT8 TAF_PDP_AUTH_TYPE_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名称: TAF_AUTH_TYPE_ENUM
- 枚举说明: PDP激活时鉴权标志
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+ ????????: TAF_AUTH_TYPE_ENUM
+ ????????: PDP??????????????
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_AUTH_TYPE_ENUM
 {
-    TAF_PDP_ACTIVATE_NO_AUTH            = 0x00,                                 /*PDP激活时不需要鉴权用户*/
-    TAF_PDP_ACTIVATE_AUTH               = 0x01,                                 /*PDP激活时需要鉴权用户*/
+    TAF_PDP_ACTIVATE_NO_AUTH            = 0x00,                                 /*PDP????????????????????*/
+    TAF_PDP_ACTIVATE_AUTH               = 0x01,                                 /*PDP??????????????????*/
 
     TAF_AUTH_BUTT                       = 0xFF
 };
@@ -960,17 +960,17 @@ typedef VOS_UINT8 TAF_AUTH_TYPE_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名称: TAF_PDP_ACTIVE_STATUS_ENUM
- 枚举说明: PDP激活/未激活标志
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+ ????????: TAF_PDP_ACTIVE_STATUS_ENUM
+ ????????: PDP????/??????????
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_PDP_ACTIVE_STATUS_ENUM
 {
-    TAF_PDP_INACTIVE                    = 0x00,                                 /*PDP未激活*/
-    TAF_PDP_ACTIVE                      = 0x01,                                 /*PDP已激活*/
+    TAF_PDP_INACTIVE                    = 0x00,                                 /*PDP??????*/
+    TAF_PDP_ACTIVE                      = 0x01,                                 /*PDP??????*/
 
     TAF_PDP_ACTIVE_BUTT                 = 0xFF
 };
@@ -978,13 +978,13 @@ typedef VOS_UINT8 TAF_PDP_ACTIVE_STATUS_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名称: TAF_GPRS_ACTIVE_TYPE_ENUM
- 枚举说明: D命令GPRS激活类型
+ ????????: TAF_GPRS_ACTIVE_TYPE_ENUM
+ ????????: D????GPRS????????
 
- 修改历史      :
-  1.日    期   : 2011年10月19日
-    作    者   : A00165503
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2011??10??19??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_GPRS_ACTIVE_TYPE_ENUM
 {
@@ -998,13 +998,13 @@ typedef VOS_UINT8 TAF_GPRS_ACTIVE_TYPE_UINT8;
 
 
 /*****************************************************************************
- 结构名称: TAF_L2P_TYPE_ENUM
- 结构说明: L2P类型
+ ????????: TAF_L2P_TYPE_ENUM
+ ????????: L2P????
 
- 修改历史      :
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ????????      :
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 enum TAF_L2P_TYPE_ENUM
 {
@@ -1017,13 +1017,13 @@ typedef VOS_UINT8 TAF_L2P_TYPE_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名称: TAF_PDP_H_COMP_ENUM
- 枚举说明: PDP header compression type
+ ????????: TAF_PDP_H_COMP_ENUM
+ ????????: PDP header compression type
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_PDP_H_COMP_ENUM
 {
@@ -1038,12 +1038,12 @@ typedef VOS_UINT8 TAF_PDP_H_COMP_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名称: TAF_PDP_D_COMP_ENUM
- 枚举说明: PDP data compression type, refer to TS 44.065 (section 6.6.1.1.4)
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+ ????????: TAF_PDP_D_COMP_ENUM
+ ????????: PDP data compression type, refer to TS 44.065 (section 6.6.1.1.4)
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_PDP_D_COMP_ENUM
 {
@@ -1057,13 +1057,13 @@ typedef VOS_UINT8 TAF_PDP_D_COMP_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名称: TAF_UMTS_QOS_TRAFFIC_CLASS_ENUM
- 枚举说明: QOS Traffic Class
+ ????????: TAF_UMTS_QOS_TRAFFIC_CLASS_ENUM
+ ????????: QOS Traffic Class
 
- 修改历史      :
-  1.日    期   : 2011年10月19日
-    作    者   : A00165503
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2011??10??19??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_UMTS_QOS_TRAFFIC_CLASS_ENUM
 {
@@ -1079,11 +1079,11 @@ typedef VOS_UINT8 TAF_UMTS_QOS_TRAFFIC_CLASS_ENUM_UINT8;
 
 
 /*****************************************************************************
- 结构名称: TAF_PF_TRANS_DIRECTION_ENUM
- 结构说明: TFT过滤器方向
- 1.日    期   : 2011年12月18日
-   作    者   : l00198894
-   修改内容   : Added for PS融合
+ ????????: TAF_PF_TRANS_DIRECTION_ENUM
+ ????????: TFT??????????
+ 1.??    ??   : 2011??12??18??
+   ??    ??   : l00198894
+   ????????   : Added for PS????
 *****************************************************************************/
 enum TAF_PF_TRANS_DIRECTION_ENUM
 {
@@ -1098,16 +1098,16 @@ typedef VOS_UINT8 TAF_PF_TRANS_DIRECTION_ENUM_UINT8;
 
 
 /*****************************************************************************
- 结构名    : TAF_DSFLOW_CLEAR_MODE_ENUM
- 结构说明  : DS FLOW流量清除模式定义
- 1.日    期   : 2011年12月14日
-   作    者   : 欧阳飞 00132663
-   修改内容   : 新建
+ ??????    : TAF_DSFLOW_CLEAR_MODE_ENUM
+ ????????  : DS FLOW????????????????
+ 1.??    ??   : 2011??12??14??
+   ??    ??   : ?????? 00132663
+   ????????   : ????
 *****************************************************************************/
 enum TAF_DSFLOW_CLEAR_MODE_ENUM
 {
-    TAF_DSFLOW_CLEAR_TOTAL              = 1,   /*清零所有RABID的流量*/
-    TAF_DSFLOW_CLEAR_WITH_RABID,               /*清零指定RABID的流量*/
+    TAF_DSFLOW_CLEAR_TOTAL              = 1,   /*????????RABID??????*/
+    TAF_DSFLOW_CLEAR_WITH_RABID,               /*????????RABID??????*/
 
     TAF_DSFLOW_CLEAR_BUTT
 };
@@ -1115,12 +1115,12 @@ typedef VOS_UINT8 TAF_DSFLOW_CLEAR_MODE_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名称: TAF_PDP_EMC_IND_ENUM
- 枚举说明: PDP上下文是否为紧急呼
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+ ????????: TAF_PDP_EMC_IND_ENUM
+ ????????: PDP??????????????????
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_PDP_EMC_IND_ENUM
 {
@@ -1133,12 +1133,12 @@ typedef VOS_UINT8 TAF_PDP_EMC_IND_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名称: TAF_PDP_IPV4_ADDR_ALLOC_TYPE_ENUM
- 枚举说明: IPV4类型地址分配类型
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+ ????????: TAF_PDP_IPV4_ADDR_ALLOC_TYPE_ENUM
+ ????????: IPV4????????????????
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_PDP_IPV4_ADDR_ALLOC_TYPE_ENUM
 {
@@ -1151,13 +1151,13 @@ typedef VOS_UINT8 TAF_PDP_IPV4_ADDR_ALLOC_TYPE_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名  : TAF_PDP_PCSCF_DISCOVERY_ENUM
- 枚举说明: P-CSCF DISCOVERY
+ ??????  : TAF_PDP_PCSCF_DISCOVERY_ENUM
+ ????????: P-CSCF DISCOVERY
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_PDP_PCSCF_DISCOVERY_ENUM
 {
@@ -1171,13 +1171,13 @@ typedef VOS_UINT8 TAF_PDP_PCSCF_DISCOVERY_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名  : TAF_PDP_IM_CN_SIG_FLAG_ENUM
- 枚举说明: IMS专有承载标志
+ ??????  : TAF_PDP_IM_CN_SIG_FLAG_ENUM
+ ????????: IMS????????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_PDP_IM_CN_SIG_FLAG_ENUM
 {
@@ -1190,18 +1190,18 @@ typedef VOS_UINT8 TAF_PDP_IM_CN_SIG_FLAG_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名称: TAF_PDP_ANSWER_TYPE_ENUM
- 枚举说明: 应答类型
+ ????????: TAF_PDP_ANSWER_TYPE_ENUM
+ ????????: ????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_PDP_ANSWER_TYPE_ENUM
 {
-    TAF_PDP_ANSWER_TYPE_ACCEPT             = 0x00,             /* 接受呼叫 */
-    TAF_PDP_ANSWER_TYPE_REJECT             = 0x01,             /* 拒绝呼叫 */
+    TAF_PDP_ANSWER_TYPE_ACCEPT             = 0x00,             /* ???????? */
+    TAF_PDP_ANSWER_TYPE_REJECT             = 0x01,             /* ???????? */
 
     TAF_PDP_ANSWER_TYPE_BUTT
 };
@@ -1209,18 +1209,18 @@ typedef VOS_UINT8 TAF_PDP_ANSWER_TYPE_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名称: TAF_PDP_ANSWER_MODE_ENUM
- 枚举说明: 应答模式
+ ????????: TAF_PDP_ANSWER_MODE_ENUM
+ ????????: ????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增枚举
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 enum TAF_PDP_ANSWER_MODE_ENUM
 {
-    TAF_PDP_ANSWER_MODE_MANUAL             = 0x00,             /* 人工应答方式 */
-    TAF_PDP_ANSWER_MODE_AUTO               = 0x01,             /* 自动应答方式 */
+    TAF_PDP_ANSWER_MODE_MANUAL             = 0x00,             /* ???????????? */
+    TAF_PDP_ANSWER_MODE_AUTO               = 0x01,             /* ???????????? */
 
     TAF_PDP_ANSWER_MODE_BUTT
 };
@@ -1228,8 +1228,8 @@ typedef VOS_UINT8 TAF_PDP_ANSWER_MODE_ENUM_UINT8;
 
 #if (FEATURE_ON == FEATURE_IMS)
 /*****************************************************************************
- 结构名称: TAF_SRVCC_CANCEL_NOTIFY_ENUM
- 结构说明: APS->IMSA通知SRVCC CANECL
+ ????????: TAF_SRVCC_CANCEL_NOTIFY_ENUM
+ ????????: APS->IMSA????SRVCC CANECL
 *****************************************************************************/
 enum TAF_SRVCC_CANCEL_NOTIFY_ENUM
 {
@@ -1241,13 +1241,13 @@ typedef VOS_UINT32 TAF_SRVCC_CANCEL_NOTIFY_ENUM_UINT32;
 
 #endif
 
-/* Added by l60609 for L-C互操作项目, 2014-01-06, Begin */
+/* Added by l60609 for L-C??????????, 2014-01-06, Begin */
 /*****************************************************************************
- 枚举名   :TAF_PDP_REQUEST_TYPE_ENUM_UINT8
- 枚举说明 :PDN连接请求类型
- 1.日    期   : 2014年01月08日
-   作    者   : l60609
-   修改内容   : 新建
+ ??????   :TAF_PDP_REQUEST_TYPE_ENUM_UINT8
+ ???????? :PDN????????????
+ 1.??    ??   : 2014??01??08??
+   ??    ??   : l60609
+   ????????   : ????
 *****************************************************************************/
 enum TAF_PDP_REQUEST_TYPE_ENUM
 {
@@ -1258,7 +1258,7 @@ enum TAF_PDP_REQUEST_TYPE_ENUM
     TAF_PDP_REQUEST_TYPE_BUTT
 };
 typedef VOS_UINT8 TAF_PDP_REQUEST_TYPE_ENUM_UINT8;
-/* Added by l60609 for L-C互操作项目, 2014-01-06, End */
+/* Added by l60609 for L-C??????????, 2014-01-06, End */
 
 /** ****************************************************************************
  * Name        : TAF_PS_CDATA_1X_QOS_NON_ASSURED_PRI_ENUM_UINT8
@@ -1277,28 +1277,28 @@ typedef VOS_UINT8 TAF_PS_CDATA_1X_QOS_NON_ASSURED_PRI_ENUM_UINT8;
 
 
 /*****************************************************************************
- 枚举名    : TAF_PS_CDATA_DIAL_MODE_ENUM_UINT32
- 结构说明  : 当前的接入技术
- 1.日    期   : 2015年04月02日
-   作    者   : y00314741
-   修改内容   : 新建
+ ??????    : TAF_PS_CDATA_DIAL_MODE_ENUM_UINT32
+ ????????  : ??????????????
+ 1.??    ??   : 2015??04??02??
+   ??    ??   : y00314741
+   ????????   : ????
 *****************************************************************************/
 enum TAF_PS_CDATA_DIAL_MODE_ENUM
 {
     TAF_PS_CDATA_DIAL_MODE_ASYNC_CALL   = 0x00,
-    TAF_PS_CDATA_DIAL_MODE_RELAY        = 0x01,                                 /* 数据传输模式中继模式 */
-    TAF_PS_CDATA_DIAL_MODE_NETWORK      = 0x02,                                 /* 数据传输模式网络模式  */
+    TAF_PS_CDATA_DIAL_MODE_RELAY        = 0x01,                                 /* ???????????????????? */
+    TAF_PS_CDATA_DIAL_MODE_NETWORK      = 0x02,                                 /* ????????????????????  */
     TAF_PS_CDATA_DIAL_MODE_BUTT
 };
 typedef VOS_UINT32 TAF_PS_CDATA_DIAL_MODE_ENUM_UINT32;
 
 #if (FEATURE_ON == FEATURE_UE_MODE_CDMA)
 /*****************************************************************************
- 枚举名    : TAF_APS_READ_SIM_FILES_CNF_ENUM
- 结构说明  : 用于标记读取USIM文件的回复消息
-1.日    期   : 2015年11月30日
-  作    者   : Y00322978
-  修改内容   : AT&T 支持EONS特性修改
+ ??????    : TAF_APS_READ_SIM_FILES_CNF_ENUM
+ ????????  : ????????????USIM??????????????
+1.??    ??   : 2015??11??30??
+  ??    ??   : Y00322978
+  ????????   : AT&T ????EONS????????
 
 *****************************************************************************/
 enum  TAF_APS_READ_SIM_FILES_CNF_ENUM
@@ -1324,32 +1324,32 @@ typedef VOS_UINT32 TAF_APS_READ_SIM_FILES_CNF_ENUM_UINT32;
 #endif
 
 /*****************************************************************************
-  4 全局变量声明
+  4 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  5 消息头定义
+  5 ??????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 消息定义
+  6 ????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  7 STRUCT定义
+  7 STRUCT????
 *****************************************************************************/
 
 /*****************************************************************************
- 结构名称: TAF_PS_EVT_STRU
- 结构说明: PS域事件结构
+ ????????: TAF_PS_EVT_STRU
+ ????????: PS??????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1361,63 +1361,63 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : TAF_DSFLOW_INFO_STRU
- 结构说明  : DS FLOW连接流量信息结构体定义
- 1.日    期   : 2011年12月14日
-   作    者   : 欧阳飞 00132663
-   修改内容   : 新建
+ ??????    : TAF_DSFLOW_INFO_STRU
+ ????????  : DS FLOW??????????????????????
+ 1.??    ??   : 2011??12??14??
+   ??    ??   : ?????? 00132663
+   ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulDSLinkTime;                           /* DS连接时间 */
-    VOS_UINT32                          ulDSSendFluxLow;                        /* DS发送流量低四个字节 */
-    VOS_UINT32                          ulDSSendFluxHigh;                       /* DS发送流量高四个字节 */
-    VOS_UINT32                          ulDSReceiveFluxLow;                     /* DS接收流量低四个字节 */
-    VOS_UINT32                          ulDSReceiveFluxHigh;                    /* DS接收流量高四个字节 */
+    VOS_UINT32                          ulDSLinkTime;                           /* DS???????? */
+    VOS_UINT32                          ulDSSendFluxLow;                        /* DS?????????????????? */
+    VOS_UINT32                          ulDSSendFluxHigh;                       /* DS?????????????????? */
+    VOS_UINT32                          ulDSReceiveFluxLow;                     /* DS?????????????????? */
+    VOS_UINT32                          ulDSReceiveFluxHigh;                    /* DS?????????????????? */
 
 } TAF_DSFLOW_INFO_STRU;
 
 
 /*****************************************************************************
- 结构名    : TAF_DSFLOW_REPORT_STRU
- 结构说明  : 流量信息上报结构定义
- 1.日    期   : 2011年12月17日
-   作    者   : 欧阳飞 00132663
-   修改内容   : 新建
+ ??????    : TAF_DSFLOW_REPORT_STRU
+ ????????  : ????????????????????
+ 1.??    ??   : 2011??12??17??
+   ??    ??   : ?????? 00132663
+   ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulCurrentSendRate;                      /*当前发送速率*/
-    VOS_UINT32                          ulCurrentReceiveRate;                   /*当前接收速率*/
-    VOS_UINT32                          ulQosSendRate;                          /*QOS协商发送速率*/
-    VOS_UINT32                          ulQosReceiveRate;                       /*QOS协商接收速率*/
-    TAF_DSFLOW_INFO_STRU                stCurrentFlowInfo;                      /*当前连接流量信息*/
+    VOS_UINT32                          ulCurrentSendRate;                      /*????????????*/
+    VOS_UINT32                          ulCurrentReceiveRate;                   /*????????????*/
+    VOS_UINT32                          ulQosSendRate;                          /*QOS????????????*/
+    VOS_UINT32                          ulQosReceiveRate;                       /*QOS????????????*/
+    TAF_DSFLOW_INFO_STRU                stCurrentFlowInfo;                      /*????????????????*/
 
 } TAF_DSFLOW_REPORT_STRU;
 
 
 /*****************************************************************************
- 结构名    : TAF_DSFLOW_QUERY_INFO_STRU
- 结构说明  : DS FLOW 流量查询结构体
- 1.日    期   : 2011年12月14日
-   作    者   : 欧阳飞 00132663
-   修改内容   : 新建
+ ??????    : TAF_DSFLOW_QUERY_INFO_STRU
+ ????????  : DS FLOW ??????????????
+ 1.??    ??   : 2011??12??14??
+   ??    ??   : ?????? 00132663
+   ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    TAF_DSFLOW_INFO_STRU                stCurrentFlowInfo;  /*当前连接流量信息*/
-    TAF_DSFLOW_INFO_STRU                stTotalFlowInfo;    /*累计流量信息*/
+    TAF_DSFLOW_INFO_STRU                stCurrentFlowInfo;  /*????????????????*/
+    TAF_DSFLOW_INFO_STRU                stTotalFlowInfo;    /*????????????*/
 
 } TAF_DSFLOW_QUERY_INFO_STRU;
 
 
 /*****************************************************************************
- 结构名    : TAF_EPS_QOS_STRU
- 结构说明  : EPS QOS 参数结构, 仅提供给LTE使用
- 修改记录  :
- 1.日    期   : 2012年01月04日
-   作    者   : l00198894
-   修改内容   : 新增结构
+ ??????    : TAF_EPS_QOS_STRU
+ ????????  : EPS QOS ????????, ????????LTE????
+ ????????  :
+ 1.??    ??   : 2012??01??04??
+   ??    ??   : l00198894
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1444,36 +1444,36 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : TAF_PDP_AUTH_STRU
- 结构说明  : 鉴权参数结构
- 修改记录  :
- 1.日    期   : 2012年01月04日
-   作    者   : l00198894
-   修改内容   : PS Project，4字节对齐, 扩展用户名, 密码最大长度为255
+ ??????    : TAF_PDP_AUTH_STRU
+ ????????  : ????????????
+ ????????  :
+ 1.??    ??   : 2012??01??04??
+   ??    ??   : l00198894
+   ????????   : PS Project??4????????, ??????????, ??????????????255
 *****************************************************************************/
 typedef struct
 {
-    TAF_AUTH_TYPE_ENUM_UINT8            enAuth;                                   /*目前仅支持是否鉴权，以后扩充为支持哪种鉴权算法*/
+    TAF_AUTH_TYPE_ENUM_UINT8            enAuth;                                   /*??????????????????????????????????????????????*/
 
     VOS_UINT8                           aucReserved[3];
 
-    /* aucUserName[0]放置用户名长度 */
+    /* aucUserName[0]?????????????? */
     VOS_UINT8                           aucUserName[TAF_MAX_PDP_AUTH_USERNAME_LEN + 1];
 
-    /* aucPassword[0]放置密码长度 */
+    /* aucPassword[0]???????????? */
     VOS_UINT8                           aucPassword[TAF_MAX_PDP_AUTH_PASSCODE_LEN + 1];
 
 } TAF_PDP_AUTH_STRU;
 
 
 /*****************************************************************************
- 结构名称: TAF_PDP_APN_STRU
- 结构说明: PDP上下文中APN信息
+ ????????: TAF_PDP_APN_STRU
+ ????????: PDP????????APN????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1484,13 +1484,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_PDP_DNS_STRU
- 结构说明: DNS信息
+ ????????: TAF_PDP_DNS_STRU
+ ????????: DNS????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1505,13 +1505,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_PDP_NBNS_STRU
- 结构说明: NBNS信息
+ ????????: TAF_PDP_NBNS_STRU
+ ????????: NBNS????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1526,13 +1526,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_PDP_GATEWAY_STRU
- 结构说明: 网关地址结构
+ ????????: TAF_PDP_GATEWAY_STRU
+ ????????: ????????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1545,13 +1545,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_PDP_PCSCF_STRU
- 结构说明: P-CSCF地址结构
+ ????????: TAF_PDP_PCSCF_STRU
+ ????????: P-CSCF????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1568,13 +1568,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_PDP_IPV6_PCSCF_STRU
- 结构说明: IPv6 P-CSCF地址结构体
+ ????????: TAF_PDP_IPV6_PCSCF_STRU
+ ????????: IPv6 P-CSCF??????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1591,13 +1591,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_PDP_IPV6_DNS_STRU
- 结构说明: IPv6 DNS地址结构
+ ????????: TAF_PDP_IPV6_DNS_STRU
+ ????????: IPv6 DNS????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1612,13 +1612,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_PDP_ADDR_STRU
- 结构说明: IP地址结构
+ ????????: TAF_PDP_ADDR_STRU
+ ????????: IP????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1631,12 +1631,12 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : TAF_PDP_PRIM_CONTEXT_STRU
- 结构说明  : 主PDP上下文结构
- 修改记录  :
- 1.日    期   : 2012年01月04日
-   作    者   : l00198894
-   修改内容   : PS Project，确保4字节对齐
+ ??????    : TAF_PDP_PRIM_CONTEXT_STRU
+ ????????  : ??PDP??????????
+ ????????  :
+ 1.??    ??   : 2012??01??04??
+   ??    ??   : l00198894
+   ????????   : PS Project??????4????????
 *****************************************************************************/
 typedef struct
 {
@@ -1662,13 +1662,13 @@ typedef struct
 }TAF_PDP_PRIM_CONTEXT_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PDP_AUTHDATA_STRU
- 结构说明: NDIS鉴权参数结构
+ ????????: TAF_PDP_AUTHDATA_STRU
+ ????????: NDIS????????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1680,15 +1680,15 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : TAF_PDP_PF_STRU
- 结构说明  : TFT参数结构表
- 修改记录  :
- 1.日    期   : 2012年01月04日
-   作    者   : l00198894
-   修改内容   : PS Project, 调整为与LTE的TFT表结构一致
- 2.日    期   : 2015年9月28日
-   作    者   : W00316404
-   修改内容   : R11 TFT 协议升级
+ ??????    : TAF_PDP_PF_STRU
+ ????????  : TFT??????????
+ ????????  :
+ 1.??    ??   : 2012??01??04??
+   ??    ??   : l00198894
+   ????????   : PS Project, ????????LTE??TFT??????????
+ 2.??    ??   : 2015??9??28??
+   ??    ??   : W00316404
+   ????????   : R11 TFT ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1718,25 +1718,25 @@ typedef struct
     VOS_UINT16                          usSingleRmtPort;
     VOS_UINT16                          usRmtPortHighLimit;
     VOS_UINT16                          usRmtPortLowLimit;
-    VOS_UINT8                           ucProtocolId;                           /* 协议号 */
+    VOS_UINT8                           ucProtocolId;                           /* ?????? */
     VOS_UINT8                           ucTypeOfService;                        /* TOS */
     VOS_UINT8                           ucTypeOfServiceMask;                    /* TOS Mask */
     VOS_UINT8                           aucReserved[1];
 
-    /* aucRmtIpv4Address[0]为IP地址高字节位
-       aucRmtIpv4Address[3]为低字节位 */
+    /* aucRmtIpv4Address[0]??IP????????????
+       aucRmtIpv4Address[3]?????????? */
     VOS_UINT8                           aucRmtIpv4Address[TAF_IPV4_ADDR_LEN];
 
-    /* aucRmtIpv4Mask[0]为IP地址高字节位 ,
-       aucRmtIpv4Mask[3]为低字节位*/
+    /* aucRmtIpv4Mask[0]??IP???????????? ,
+       aucRmtIpv4Mask[3]??????????*/
     VOS_UINT8                           aucRmtIpv4Mask[TAF_IPV4_ADDR_LEN];
 
-    /* ucRmtIpv6Address[0]为IPv6接口标识高字节位
-       ucRmtIpv6Address[7]为IPv6接口标识低字节位 */
+    /* ucRmtIpv6Address[0]??IPv6????????????????
+       ucRmtIpv6Address[7]??IPv6???????????????? */
     VOS_UINT8                           aucRmtIpv6Address[TAF_IPV6_ADDR_LEN];
 
-    /* ucRmtIpv6Mask[0]为高字节位
-       ucRmtIpv6Mask[7]为低字节位*/
+    /* ucRmtIpv6Mask[0]??????????
+       ucRmtIpv6Mask[7]??????????*/
     VOS_UINT8                           aucRmtIpv6Mask[TAF_IPV6_ADDR_LEN];
 
     VOS_UINT32                          ulFlowLabelType;                        /*FlowLabelType*/
@@ -1750,43 +1750,43 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : TAF_UMTS_QOS_STRU
- 结构说明  : QOS参数结构
- 修改记录  :
- 1.日    期   : 2012年01月04日
-   作    者   : l00198894
-   修改内容   : PS Project，4字节对齐调整
+ ??????    : TAF_UMTS_QOS_STRU
+ ????????  : QOS????????
+ ????????  :
+ 1.??    ??   : 2012??01??04??
+   ??    ??   : l00198894
+   ????????   : PS Project??4????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucTrafficClass;                         /*UMTS承载服务优化类型*/
-    VOS_UINT8                           ucDeliverOrder;                         /*SDU队列是否发送UMTS承载*/
-    VOS_UINT8                           ucDeliverErrSdu;                        /*SDU错误是否发送*/
+    VOS_UINT8                           ucTrafficClass;                         /*UMTS????????????????*/
+    VOS_UINT8                           ucDeliverOrder;                         /*SDU????????????UMTS????*/
+    VOS_UINT8                           ucDeliverErrSdu;                        /*SDU????????????*/
     VOS_UINT8                           aucReserved1[1];
-    VOS_UINT16                          usMaxSduSize;                           /*SDU大小最大值*/
+    VOS_UINT16                          usMaxSduSize;                           /*SDU??????????*/
     VOS_UINT8                           aucReserved2[2];
-    VOS_UINT32                          ulMaxBitUl;                             /*上行最大速率 kbits/s*/
-    VOS_UINT32                          ulMaxBitDl;                             /*下行最大速率 kbits/s*/
+    VOS_UINT32                          ulMaxBitUl;                             /*???????????? kbits/s*/
+    VOS_UINT32                          ulMaxBitDl;                             /*???????????? kbits/s*/
     VOS_UINT8                           ucResidualBer;
-    VOS_UINT8                           ucSduErrRatio;                          /*SDU误码率*/
-    VOS_UINT16                          usTransDelay;                           /*传输延时, 单位毫秒*/
-    VOS_UINT8                           ucTraffHandlePrior;                     /*处理UMTS承载的SDU对比其他承载的SDU*/
+    VOS_UINT8                           ucSduErrRatio;                          /*SDU??????*/
+    VOS_UINT16                          usTransDelay;                           /*????????, ????????*/
+    VOS_UINT8                           ucTraffHandlePrior;                     /*????UMTS??????SDU??????????????SDU*/
     VOS_UINT8                           aucReserved3[1];
     VOS_UINT8                           ucSrcStatisticsDescriptor;
     VOS_UINT8                           ucSignallingIndication;
-    VOS_UINT32                          ulGuarantBitUl;                         /*保证上行传输速率 kbits/s*/
-    VOS_UINT32                          ulGuarantBitDl;                         /*保证下行传输速率 kbits/s*/
+    VOS_UINT32                          ulGuarantBitUl;                         /*???????????????? kbits/s*/
+    VOS_UINT32                          ulGuarantBitDl;                         /*???????????????? kbits/s*/
 }TAF_UMTS_QOS_STRU;
 
 
 /*****************************************************************************
- 结构名称: TAF_PRI_PDP_QUERY_INFO_STRU
- 结构说明: ID_EVT_TAF_PS_GET_PRIM_PDP_CONTEXT_INFO_CNF消息结构
+ ????????: TAF_PRI_PDP_QUERY_INFO_STRU
+ ????????: ID_EVT_TAF_PS_GET_PRIM_PDP_CONTEXT_INFO_CNF????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1798,31 +1798,31 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_TFT_QUREY_INFO_STRU
- 结构说明: ID_EVT_TAF_PS_GET_TFT_INFO_CNF消息结构
+ ????????: TAF_TFT_QUREY_INFO_STRU
+ ????????: ID_EVT_TAF_PS_GET_TFT_INFO_CNF????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
     VOS_UINT8                           ucCid;
-    VOS_UINT8                           ucPfNum;                                /* pf个数 */
+    VOS_UINT8                           ucPfNum;                                /* pf???? */
     VOS_UINT8                           aucReserved[2];
-    TAF_PDP_PF_STRU                     astPfInfo[TAF_MAX_SDF_PF_NUM];          /* pf表 */
+    TAF_PDP_PF_STRU                     astPfInfo[TAF_MAX_SDF_PF_NUM];          /* pf?? */
 
 }TAF_TFT_QUREY_INFO_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_UMTS_QOS_QUERY_INFO_STRU
- 结构说明: QOS查询消息结构
+ ????????: TAF_UMTS_QOS_QUERY_INFO_STRU
+ ????????: QOS????????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1834,13 +1834,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_DNS_QUERY_INFO_STRU
- 结构说明: DNS查询消息结构
+ ????????: TAF_DNS_QUERY_INFO_STRU
+ ????????: DNS????????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1851,13 +1851,13 @@ typedef struct
 }TAF_DNS_QUERY_INFO_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_AUTH_QUERY_INFO_STRU
- 结构说明: 鉴权参数查询
+ ????????: TAF_AUTH_QUERY_INFO_STRU
+ ????????: ????????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1868,13 +1868,13 @@ typedef struct
 }TAF_AUTH_QUERY_INFO_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_AUTHDATA_QUERY_INFO_STRU
- 结构说明: ID_EVT_TAF_PS_GET_AUTHDATA_INFO_CNF鉴权参数查询消息结构
+ ????????: TAF_AUTHDATA_QUERY_INFO_STRU
+ ????????: ID_EVT_TAF_PS_GET_AUTHDATA_INFO_CNF????????????????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1885,28 +1885,28 @@ typedef struct
 }TAF_AUTHDATA_QUERY_INFO_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PDP_TFT_STRU
- 结构说明: TFT信息结构
+ ????????: TAF_PDP_TFT_STRU
+ ????????: TFT????????
 
- 修改历史      :
-  1.日    期   : 2014年06月16日
-    作    者   : f00179208
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2014??06??16??
+    ??    ??   : f00179208
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulPfNum;                                /* pf个数 */
-    TAF_PDP_PF_STRU                     astPf[TAF_MAX_SDF_PF_NUM];              /* pf表 */
+    VOS_UINT32                          ulPfNum;                                /* pf???? */
+    TAF_PDP_PF_STRU                     astPf[TAF_MAX_SDF_PF_NUM];              /* pf?? */
 }TAF_PDP_TFT_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PS_CALL_PDP_ACTIVATE_CNF_STRU
- 结构说明: 主动PDP激活成功返回结果的结构
+ ????????: TAF_PS_CALL_PDP_ACTIVATE_CNF_STRU
+ ????????: ????PDP??????????????????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1948,24 +1948,24 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_PS_CALL_PDP_ACTIVATE_IND_STRU
- 结构说明: 网侧PDP激活上报的结构
+ ????????: TAF_PS_CALL_PDP_ACTIVATE_IND_STRU
+ ????????: ????PDP??????????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef TAF_PS_CALL_PDP_ACTIVATE_CNF_STRU TAF_PS_CALL_PDP_ACTIVATE_IND_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PS_CALL_PDP_ACTIVATE_REJ_STRU
- 结构说明: PDP激活被拒
+ ????????: TAF_PS_CALL_PDP_ACTIVATE_REJ_STRU
+ ????????: PDP????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -1980,37 +1980,37 @@ typedef struct
     TAF_PS_CAUSE_ENUM_UINT32            enCause;
 
     /*----------------------------------------------------------------------
-       enCauseEx存在条件:
-       enPdpType为IPv4/IPv6/PPP.
+       enCauseEx????????:
+       enPdpType??IPv4/IPv6/PPP.
 
-       enCauseEx可能的取值:
+       enCauseEx??????????:
        TAF_PS_CAUSE_SM_NW_PDP_TYPE_IPV4_ONLY_ALLOWED
        TAF_PS_CAUSE_SM_NW_PDP_TYPE_IPV6_ONLY_ALLOWED
        TAF_PS_CAUSE_SM_NW_SINGLE_ADDR_BEARERS_ONLY_ALLOWED
 
-       enCauseEx如何使用:
-       用户发起双栈业务建立请求(IPv4v6), TAF上报了REJECT事件, 如果enPdpType
-       为单栈(IPv4/IPv6), 用户需要根据enCauseEx, 决定是否继续发起业务请求.
+       enCauseEx????????:
+       ????????????????????????(IPv4v6), TAF??????REJECT????, ????enPdpType
+       ??????(IPv4/IPv6), ????????????enCauseEx, ????????????????????????.
 
-       enCauseEx使用事例:
-       用户发起双栈业务建立请求(IPv4v6), 网侧建立IPv4类型承载, 同时携带原因值
-       TAF_PS_CAUSE_SM_NW_SINGLE_ADDR_BEARERS_ONLY_ALLOWED, 由于该承载不满足
-       最小QOS, 被内部去激活, TAF上报REJECT事件, IP类型为IPv4, enCause为
-       QOS_NOT_ACCEPT, enCauseEx为TAF_PS_CAUSE_SM_NW_SINGLE_ADDR_BEARERS_ONLY_ALLOWED,
-       用户需要尝试发起IPv6业务建立请求.
+       enCauseEx????????:
+       ????????????????????????(IPv4v6), ????????IPv4????????, ??????????????
+       TAF_PS_CAUSE_SM_NW_SINGLE_ADDR_BEARERS_ONLY_ALLOWED, ????????????????
+       ????QOS, ????????????, TAF????REJECT????, IP??????IPv4, enCause??
+       QOS_NOT_ACCEPT, enCauseEx??TAF_PS_CAUSE_SM_NW_SINGLE_ADDR_BEARERS_ONLY_ALLOWED,
+       ????????????????IPv6????????????.
     *---------------------------------------------------------------------*/
     TAF_PS_CAUSE_ENUM_UINT32            enCauseEx;
 
 } TAF_PS_CALL_PDP_ACTIVATE_REJ_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PS_CALL_PDP_MANAGE_IND_STRU
- 结构说明: 网侧PDP激活，等待手动应答
+ ????????: TAF_PS_CALL_PDP_MANAGE_IND_STRU
+ ????????: ????PDP??????????????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2037,13 +2037,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_PS_CALL_PDP_MODIFY_CNF_STRU
- 结构说明: 主动MODIFY成功
+ ????????: TAF_PS_CALL_PDP_MODIFY_CNF_STRU
+ ????????: ????MODIFY????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 
 *****************************************************************************/
 typedef struct
@@ -2073,24 +2073,24 @@ typedef struct
 } TAF_PS_CALL_PDP_MODIFY_CNF_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PS_CALL_PDP_MODIFY_IND_STRU
- 结构说明: 网络MODIFY上报
+ ????????: TAF_PS_CALL_PDP_MODIFY_IND_STRU
+ ????????: ????MODIFY????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef TAF_PS_CALL_PDP_MODIFY_CNF_STRU TAF_PS_CALL_PDP_MODIFY_IND_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PS_CALL_PDP_MODIFY_REJ_STRU
- 结构说明: MODIFY被拒
+ ????????: TAF_PS_CALL_PDP_MODIFY_REJ_STRU
+ ????????: MODIFY????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2105,13 +2105,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_PS_CALL_PDP_DEACTIVATE_CNF_STRU
- 结构说明: 主动去激活成功
+ ????????: TAF_PS_CALL_PDP_DEACTIVATE_CNF_STRU
+ ????????: ??????????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2127,25 +2127,25 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_PS_CALL_PDP_DEACTIVATE_IND_STRU
- 结构说明: 网络侧去激活
+ ????????: TAF_PS_CALL_PDP_DEACTIVATE_IND_STRU
+ ????????: ????????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef TAF_PS_CALL_PDP_DEACTIVATE_CNF_STRU TAF_PS_CALL_PDP_DEACTIVATE_IND_STRU;
 
 
 /*****************************************************************************
- 结构名称: TAF_PS_CALL_PDP_PDP_DISCONNECT_IND_STRU
- 结构说明: 断开连接
+ ????????: TAF_PS_CALL_PDP_PDP_DISCONNECT_IND_STRU
+ ????????: ????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2155,11 +2155,11 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : TAF_PS_COMMON_CNF_STRU
- 结构说明  : PS域事件通用结构体
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_COMMON_CNF_STRU
+ ????????  : PS????????????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2170,11 +2170,11 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : TAF_PDP_PRIM_CONTEXT_EXT_STRU
- 结构说明  : +CGDCONT命令参数, 见TS 27.007 section 10.1.1
- 1.日    期 : 2011年10月19日
-   作    者 : A00165503
-   修改内容 : 创建文件
+ ??????    : TAF_PDP_PRIM_CONTEXT_EXT_STRU
+ ????????  : +CGDCONT????????, ??TS 27.007 section 10.1.1
+ 1.??    ?? : 2011??10??19??
+   ??    ?? : A00165503
+   ???????? : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2241,14 +2241,14 @@ typedef struct
 }TAF_PDP_PRIM_CONTEXT_EXT_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PS_SET_PRIM_PDP_CONTEXT_INFO_REQ_STRU
- 结构说明: ID_MSG_TAF_PS_SET_PRIM_PDP_CONTEXT_INFO_REQ、
-           ID_EVT_TAF_PS_SET_PRIM_PDP_CONTEXT_INFO_CNF消息
+ ????????: TAF_PS_SET_PRIM_PDP_CONTEXT_INFO_REQ_STRU
+ ????????: ID_MSG_TAF_PS_SET_PRIM_PDP_CONTEXT_INFO_REQ??
+           ID_EVT_TAF_PS_SET_PRIM_PDP_CONTEXT_INFO_CNF????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2260,13 +2260,13 @@ typedef struct
 typedef TAF_PS_COMMON_CNF_STRU TAF_PS_SET_PRIM_PDP_CONTEXT_INFO_CNF_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_SET_IMS_PDP_CFG_STRU
- 结构说明: ^IMSPDPCFG命令参数
+ ????????: TAF_SET_IMS_PDP_CFG_STRU
+ ????????: ^IMSPDPCFG????????
 
- 修改历史      :
-  1.日    期   : 2015年07月30日
-    作    者   : z00301431
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2015??07??30??
+    ??    ??   : z00301431
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2276,14 +2276,14 @@ typedef struct
 } TAF_IMS_PDP_CFG_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PS_SET_IMS_PDP_CFG_REQ_STRU
- 结构说明: ID_MSG_TAF_PS_SET_IMS_PDP_CFG_REQ
-           ID_EVT_TAF_PS_SET_IMS_PDP_CFG_CNF消息
+ ????????: TAF_PS_SET_IMS_PDP_CFG_REQ_STRU
+ ????????: ID_MSG_TAF_PS_SET_IMS_PDP_CFG_REQ
+           ID_EVT_TAF_PS_SET_IMS_PDP_CFG_CNF????
 
- 修改历史      :
-  1.日    期   : 2015年07月30日
-    作    者   : z00301431
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2015??07??30??
+    ??    ??   : z00301431
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2295,12 +2295,12 @@ typedef struct
 typedef TAF_PS_COMMON_CNF_STRU TAF_PS_SET_IMS_PDP_CFG_CNF_STRU;
 
 /*****************************************************************************
- 结构名称  : TAF_PS_SET_1X_DORMANT_TIMER_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_SET_1X_MAX_NO_DATA_TIME_LEN_REQ消息结构体
+ ????????  : TAF_PS_SET_1X_DORMANT_TIMER_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_SET_1X_MAX_NO_DATA_TIME_LEN_REQ??????????
 
-  1.日    期   : 2015年4月20日
-    作    者   : y00314741
-    修改内容   : 新增结构
+  1.??    ??   : 2015??4??20??
+    ??    ??   : y00314741
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2313,12 +2313,12 @@ typedef struct
 typedef TAF_PS_COMMON_CNF_STRU TAF_PS_SET_1X_DORM_TIMER_CNF_STRU;
 
 /*****************************************************************************
- 结构名称  : TAF_PS_GET_1X_DORM_TIMER_VALUE_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_GET_CGMTU_VALUE_REQ消息结构体
+ ????????  : TAF_PS_GET_1X_DORM_TIMER_VALUE_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_GET_CGMTU_VALUE_REQ??????????
 
-  1.日    期   : 2015年4月20日
-    作    者   : y00314741
-    修改内容   : 新增结构
+  1.??    ??   : 2015??4??20??
+    ??    ??   : y00314741
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2326,12 +2326,12 @@ typedef struct
 }TAF_PS_GET_1X_DORM_TIMER_REQ_STRU;
 
 /*****************************************************************************
- 结构名称  : TAF_PS_GET_CGMTU_VALUE_CNF_STRU
- 结构说明  : ID_EVT_TAF_PS_GET_CGMTU_VALUE_CNF消息结构体
+ ????????  : TAF_PS_GET_CGMTU_VALUE_CNF_STRU
+ ????????  : ID_EVT_TAF_PS_GET_CGMTU_VALUE_CNF??????????
 
-  1.日    期   : 2015年4月20日
-    作    者   : y00314741
-    修改内容   : 新增结构
+  1.??    ??   : 2015??4??20??
+    ??    ??   : y00314741
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2342,13 +2342,13 @@ typedef struct
 }TAF_PS_GET_1X_DORM_TIMER_CNF_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PS_GET_PRIM_PDP_CONTEXT_INFO_REQ_STRU
- 结构说明: ID_MSG_TAF_PS_GET_PRIM_PDP_CONTEXT_INFO_REQ消息
+ ????????: TAF_PS_GET_PRIM_PDP_CONTEXT_INFO_REQ_STRU
+ ????????: ID_MSG_TAF_PS_GET_PRIM_PDP_CONTEXT_INFO_REQ????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2357,13 +2357,13 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_PS_GET_PRIM_PDP_CONTEXT_INFO_REQ_STRU
- 结构说明: ID_MSG_TAF_PS_GET_PRIM_PDP_CONTEXT_INFO_CNF消息
+ ????????: TAF_PS_GET_PRIM_PDP_CONTEXT_INFO_REQ_STRU
+ ????????: ID_MSG_TAF_PS_GET_PRIM_PDP_CONTEXT_INFO_CNF????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2375,7 +2375,7 @@ typedef struct
 } TAF_PS_GET_PRIM_PDP_CONTEXT_INFO_CNF_STRU;
 
 /*****************************************************************************
- 描述 : 针对命令 +CGDSCONT
+ ???? : ???????? +CGDSCONT
  ID   : ID_MSG_TAF_PS_SET_SEC_PDP_CONTEXT_INFO_REQ
         ID_MSG_TAF_PS_SET_SEC_PDP_CONTEXT_INFO_CNF
         ID_MSG_TAF_PS_GET_SEC_PDP_CONTEXT_INFO_REQ
@@ -2383,7 +2383,7 @@ typedef struct
  REQ  : TAF_PS_SET_SEC_PDP_CONTEXT_INFO_REQ_STRU; TAF_PS_GET_SEC_PDP_CONTEXT_INFO_REQ_STRU
  CNF  : TAF_PS_SET_SEC_PDP_CONTEXT_INFO_CNF_STRU; TAF_PS_GET_SEC_PDP_CONTEXT_INFO_CNF_STRU
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 typedef struct
 {
@@ -2403,30 +2403,30 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : TAF_PDP_SEC_CONTEXT_STRU
- 结构说明  : 次PDP上下文结构
- 修改记录  :
- 1.日    期   : 2012年07月24日
-   作    者   : Y00213812
-   修改内容   : 新增结构
+ ??????    : TAF_PDP_SEC_CONTEXT_STRU
+ ????????  : ??PDP??????????
+ ????????  :
+ 1.??    ??   : 2012??07??24??
+   ??    ??   : Y00213812
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucCid;              /* [1，11] */
-    VOS_UINT8                           ucLinkdCid;         /* [1，11] */
-    TAF_PDP_D_COMP_ENUM_UINT8           enPdpDcomp;         /*数据压缩算法*/
-    TAF_PDP_H_COMP_ENUM_UINT8           enPdpHcomp;         /*头压缩算法*/
+    VOS_UINT8                           ucCid;              /* [1??11] */
+    VOS_UINT8                           ucLinkdCid;         /* [1??11] */
+    TAF_PDP_D_COMP_ENUM_UINT8           enPdpDcomp;         /*????????????*/
+    TAF_PDP_H_COMP_ENUM_UINT8           enPdpHcomp;         /*??????????*/
 
 }TAF_PDP_SEC_CONTEXT_STRU;
 
 
 /*****************************************************************************
- 结构名    : TAF_PS_SET_SEC_PDP_CONTEXT_INFO_REQ_STRU
- 结构说明  : 次PDP上下文设置结构
- 修改记录  :
- 1.日    期   : 2012年07月24日
-   作    者   : Y00213812
-   修改内容   : 新增结构
+ ??????    : TAF_PS_SET_SEC_PDP_CONTEXT_INFO_REQ_STRU
+ ????????  : ??PDP??????????????
+ ????????  :
+ 1.??    ??   : 2012??07??24??
+   ??    ??   : Y00213812
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2454,7 +2454,7 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 +CGACT
+ ???? : ???????? +CGACT
  ID   : ID_MSG_TAF_PS_SET_PDP_CONTEXT_STATE_REQ
         ID_MSG_TAF_PS_SET_PDP_STATE_CNF
         ID_MSG_TAF_PS_GET_PDP_CONTEXT_STATE_REQ
@@ -2462,14 +2462,14 @@ typedef struct
  REQ  : TAF_PS_SET_PDP_STATE_REQ_STRU     TAF_PS_GET_PDP_STATE_REQ_STRU
  CNF  : TAF_PS_SET_PDP_STATE_CNF_STRU TAF_PS_GET_PDP_STATE_CNF_STRU
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************
 *****************************************************************************
- 结构名    : TAF_CID_LIST_STRU
- 结构说明  : CID列表结构体
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_CID_LIST_STRU
+ ????????  : CID??????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2477,11 +2477,11 @@ typedef struct
 } TAF_CID_LIST_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_CID_STATE_STRU
- 结构说明  : CID状态结构体
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_CID_STATE_STRU
+ ????????  : CID??????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2491,11 +2491,11 @@ typedef struct
 } TAF_CID_STATE_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_CID_LIST_STATE_STRU
- 结构说明  : CID列表状态结构体
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_CID_LIST_STATE_STRU
+ ????????  : CID??????????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2506,11 +2506,11 @@ typedef struct
 } TAF_CID_LIST_STATE_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_SET_PDP_STATE_REQ_STRU
- 结构说明  : CID状态结构体
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_SET_PDP_STATE_REQ_STRU
+ ????????  : CID??????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2520,17 +2520,17 @@ typedef struct
 } TAF_PS_SET_PDP_STATE_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_CALL_END_REQ_STRU
- 结构说明  : ID_EVT_TAF_PS_SET_PDP_CONTEXT_STATE_CNF事件结构
+ ??????    : TAF_PS_CALL_END_REQ_STRU
+ ????????  : ID_EVT_TAF_PS_SET_PDP_CONTEXT_STATE_CNF????????
 
- 修改历史      :
-  1.日    期   : 2011年08月22日
-    作    者   : A00165503
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2011??08??22??
+    ??    ??   : A00165503
+    ????????   : ????????
 
-  2.日    期   : 2012年8月22日
-    作    者   : A00165503
-    修改内容   : 修改成员
+  2.??    ??   : 2012??8??22??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2555,7 +2555,7 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 +CGTFT
+ ???? : ???????? +CGTFT
  ID   : ID_MSG_L4A_SET_CGTFT_REQ
         ID_MSG_L4A_SET_CGTFT_CNF
         ID_MSG_L4A_READ_CGTFT_REQ
@@ -2563,7 +2563,7 @@ typedef struct
  REQ  : L4A_SET_CGTFT_REQ_STRU;L4A_READ_CGTFT_REQ_STRU;
  CNF  : L4A_SET_CGTFT_CNF_STRU;L4A_READ_CGTFT_CNF_STRU;
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 typedef struct
 {
@@ -2665,7 +2665,7 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 +CGEQREQ
+ ???? : ???????? +CGEQREQ
  ID   :
 
 
@@ -2673,7 +2673,7 @@ typedef struct
  REQ  :
  CNF  :
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 typedef struct
 {
@@ -2724,9 +2724,9 @@ typedef struct
 
     VOS_UINT32                          ulMaxBitUl;         /* 0 : Subscribed value
                                                                1~256000: 1kbps ~ 256000kbps*/
-    VOS_UINT32                          ulMaxBitDl;         /* 同ulMaxBitUl */
-    VOS_UINT32                          ulGtdBitUl;         /* 同ulMaxBitUl */
-    VOS_UINT32                          ulGtdBitDl;         /* 同ulMaxBitUl */
+    VOS_UINT32                          ulMaxBitDl;         /* ??ulMaxBitUl */
+    VOS_UINT32                          ulGtdBitUl;         /* ??ulMaxBitUl */
+    VOS_UINT32                          ulGtdBitDl;         /* ??ulMaxBitUl */
     VOS_UINT8                           ucResidualBer;      /* 0 : subscribed value
                                                                1 : 5*10-2
                                                                2 : 1*10-2
@@ -2769,13 +2769,13 @@ typedef struct
 } TAF_PS_GET_UMTS_QOS_INFO_REQ_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_UMTS_QOS_QUERY_INFO_STRU
- 结构说明: ID_EVT_TAF_PS_GET_UMTS_QOS_INFO_CNF消息结构
+ ????????: TAF_UMTS_QOS_QUERY_INFO_STRU
+ ????????: ID_EVT_TAF_PS_GET_UMTS_QOS_INFO_CNF????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2788,7 +2788,7 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 +CGEQMIN
+ ???? : ???????? +CGEQMIN
  ID   :
 
 
@@ -2796,7 +2796,7 @@ typedef struct
  REQ  :
  CNF  :
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 typedef struct
 {
@@ -2813,13 +2813,13 @@ typedef struct
 } TAF_PS_GET_UMTS_QOS_MIN_INFO_REQ_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_UMTS_QOS_QUERY_INFO_STRU
- 结构说明: ID_EVT_TAF_PS_GET_UMTS_QOS_MIN_INFO_CNF消息结构
+ ????????: TAF_UMTS_QOS_QUERY_INFO_STRU
+ ????????: ID_EVT_TAF_PS_GET_UMTS_QOS_MIN_INFO_CNF????????
 
- 修改历史      :
-  1.日    期   : 2013年07月18日
-    作    者   : Y00213812
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2013??07??18??
+    ??    ??   : Y00213812
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -2832,7 +2832,7 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 +CGEQNEG
+ ???? : ???????? +CGEQNEG
  ID   :
 
 
@@ -2840,7 +2840,7 @@ typedef struct
  REQ  :
  CNF  :
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 typedef struct
 {
@@ -2860,7 +2860,7 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 +CGMOD
+ ???? : ???????? +CGMOD
  ID   :
 
 
@@ -2868,7 +2868,7 @@ typedef struct
  REQ  :
  CNF  :
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 
 typedef struct
@@ -2882,21 +2882,21 @@ typedef TAF_PS_COMMON_CNF_STRU TAF_PS_CALL_MODIFY_CNF_STRU;
 
 
 /*****************************************************************************
- 描述 : 针对命令 +CGANS
+ ???? : ???????? +CGANS
  ID   : ID_MSG_L4A_SET_CGANS_RSP
         ID_MSG_L4A_SET_CGANS_CNF
         ID_MSG_L4A_CGANS_IND
  RSP  : L4A_SET_CGANS_RSP_STRU
  CNF  : L4A_SET_CGANS_CNF_STRU
  IND  : L4A_CGANS_IND_STRU
- 说明 : L4A_CGANS_IND_STRU 是网络发起事件,后续可能不会使用该原语
+ ???? : L4A_CGANS_IND_STRU ??????????????,??????????????????????
 *****************************************************************************/
 typedef struct
 {
     VOS_UINT8                           ucL2P[20];
     VOS_UINT8                           ucCid;
     /* Added by l60609 for V3R3 PPP RPOJECT 2013-06-07, Begin */
-    VOS_UINT8                           ucAnsExtFlg;                            /* 如果是^CGANS命令，为VOS_TRUE。否则为VOS_FALSE */
+    VOS_UINT8                           ucAnsExtFlg;                            /* ??????^CGANS????????VOS_TRUE????????VOS_FALSE */
     VOS_UINT8                           aucReserved[2];
     /* Added by l60609 for V3R3 PPP RPOJECT 2013-06-07, End */
 } TAF_PS_ANSWER_STRU;
@@ -2931,19 +2931,19 @@ typedef TAF_PS_COMMON_CNF_STRU TAF_PS_CALL_HANGUP_CNF_STRU;
 
 
 /*****************************************************************************
- 描述 : 针对命令 +CGPADDR
+ ???? : ???????? +CGPADDR
  ID   :
 
 
  REQ  :
  CNF  :
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 /*****************************************************************************
- 结构名称   : TAF_PDP_ADDR_STRU
- 协议表格   :
- 结构说明   :
+ ????????   : TAF_PDP_ADDR_STRU
+ ????????   :
+ ????????   :
 *****************************************************************************/
 
 typedef struct
@@ -2986,7 +2986,7 @@ typedef struct
 } TAF_PS_GET_PDP_CONTEXT_INFO_REQ_STRU;
 
 /*****************************************************************************
- 描述 : 针对命令 +CGAUTO
+ ???? : ???????? +CGAUTO
  ID   : ID_MSG_L4A_SET_CGAUTO_REQ
         ID_MSG_L4A_SET_CGAUTO_CNF
         ID_MSG_L4A_READ_CGAUTO_REQ
@@ -2994,7 +2994,7 @@ typedef struct
  REQ  : L4A_SET_CGAUTO_REQ_STRU; L4A_READ_CGAUTO_REQ_STRU
  CNF  : L4A_SET_CGAUTO_CNF_STRU; L4A_READ_CGAUTO_CNF_STRU
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 typedef struct
 {
@@ -3020,13 +3020,13 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 +CGCONTRDP
+ ???? : ???????? +CGCONTRDP
  ID   : ID_MSG_L4A_SET_CGCONTRDP_REQ
         ID_MSG_L4A_SET_CGCONTRDP_CNF
  REQ  : L4A_SET_CGCONTRDP_REQ_STRU
  CNF  : L4A_SET_CGCONTRDP_CNF_STRU
  IND  : -
- 说明 : ...
+ ???? : ...
 ******************************************************************************/
 typedef struct
 {
@@ -3096,13 +3096,13 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 +CGSCONTRDP
+ ???? : ???????? +CGSCONTRDP
  ID   : ID_MSG_L4A_SET_CGSCONTRDP_REQ
         ID_MSG_L4A_SET_CGSCONTRDP_CNF
  REQ  : L4A_SET_CGSCONTRDP_REQ_STRU
  CNF  : L4A_SET_CGSCONTRDP_CNF_STRU
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 typedef struct
 {
@@ -3137,13 +3137,13 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 +CGTFTRDP
+ ???? : ???????? +CGTFTRDP
  ID   : ID_MSG_L4A_SET_CGTFTRDP_REQ
         ID_MSG_L4A_SET_CGTFTRDP_CNF
  REQ  : L4A_SET_CGTFTRDP_REQ_STRU
  CNF  : L4A_SET_CGTFTRDP_CNF_STRU
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 typedef struct
 {
@@ -3165,7 +3165,7 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 +CGEQOS
+ ???? : ???????? +CGEQOS
  ID   : ID_MSG_L4A_SET_CGEQOS_REQ
         ID_MSG_L4A_SET_CGEQOS_CNF
         ID_MSG_L4A_READ_CGEQOS_REQ
@@ -3173,7 +3173,7 @@ typedef struct
  REQ  : L4A_SET_CGEQOS_REQ_STRU L4A_READ_CGEQOS_REQ_STRU
  CNF  : L4A_SET_CGEQOS_CNF_STRU L4A_READ_CGEQOS_CNF_STRU
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 typedef struct
 {
@@ -3231,13 +3231,13 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 +CGEQOSRDP
+ ???? : ???????? +CGEQOSRDP
  ID   : ID_MSG_L4A_SET_CGEQOSRDP_REQ
         ID_MSG_L4A_SET_CGEQOSRDP_CNF
  REQ  : L4A_SET_CGEQOSRDP_REQ_STRU
  CNF  : L4A_SET_CGEQOSRDP_CNF_STRU
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 typedef struct
 {
@@ -3259,11 +3259,11 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : TAF_PS_GET_DSFLOW_INFO_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_GET_DSFLOW_INFO_REQ消息结构体, 获取流量信息
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_GET_DSFLOW_INFO_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_GET_DSFLOW_INFO_REQ??????????, ????????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3273,15 +3273,15 @@ typedef struct
 } TAF_PS_GET_DSFLOW_INFO_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_GET_DSFLOW_INFO_CNF_STRU
- 结构说明  : ID_MSG_TAF_PS_GET_DSFLOW_INFO_CNF消息结构体, 获取流量信息
-  1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_GET_DSFLOW_INFO_CNF_STRU
+ ????????  : ID_MSG_TAF_PS_GET_DSFLOW_INFO_CNF??????????, ????????????
+  1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 
-  2.日    期   : 2011年12月23日
-    作    者   : o00132663
-    修改内容   : PS融合项目，流量上报使用新结构
+  2.??    ??   : 2011??12??23??
+    ??    ??   : o00132663
+    ????????   : PS????????????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -3293,17 +3293,17 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 ^DSFLOWCLR
+ ???? : ???????? ^DSFLOWCLR
  ID   :
 
  REQ  :
  CNF  :
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : TAF_DSFLOW_CLEAR_CONFIG_STRU
- 结构说明  : 流量清除配置
+ ??????    : TAF_DSFLOW_CLEAR_CONFIG_STRU
+ ????????  : ????????????
 *****************************************************************************/
 typedef struct
 {
@@ -3313,11 +3313,11 @@ typedef struct
 } TAF_DSFLOW_CLEAR_CONFIG_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_CLEAR_DSFLOW_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_CLEAR_DSFLOW_REQ消息结构体, 清除流量信息
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_CLEAR_DSFLOW_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_CLEAR_DSFLOW_REQ??????????, ????????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3327,43 +3327,43 @@ typedef struct
 } TAF_PS_CLEAR_DSFLOW_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_CLEAR_DSFLOW_CNF_STRU
- 结构说明  : ID_MSG_TAF_PS_CLEAR_DSFLOW_CNF消息结构体, 清除流量信息
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_CLEAR_DSFLOW_CNF_STRU
+ ????????  : ID_MSG_TAF_PS_CLEAR_DSFLOW_CNF??????????, ????????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef TAF_PS_COMMON_CNF_STRU TAF_PS_CLEAR_DSFLOW_CNF_STRU;
 
 
 /*****************************************************************************
- 描述 : 针对命令 ^DSFLOWRPT
+ ???? : ???????? ^DSFLOWRPT
  ID   :
 
  REQ  :
  CNF  :
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : TAF_DSFLOW_REPORT_CONFIG_STRU
- 结构说明  : 流量上报配置结构体
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_DSFLOW_REPORT_CONFIG_STRU
+ ????????  : ??????????????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulRptEnabled;       /* 流量上报开启标记   */
-    VOS_UINT32                          ulTimerLength;      /* 流量上报定时器时长 */
+    VOS_UINT32                          ulRptEnabled;       /* ????????????????   */
+    VOS_UINT32                          ulTimerLength;      /* ?????????????????? */
 } TAF_DSFLOW_REPORT_CONFIG_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_CONFIG_DSFLOW_RPT_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_CONFIG_DSFLOW_RPT_REQ消息结构体, 控制流量上报
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_CONFIG_DSFLOW_RPT_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_CONFIG_DSFLOW_RPT_REQ??????????, ????????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3373,24 +3373,24 @@ typedef struct
 } TAF_PS_CONFIG_DSFLOW_RPT_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_CONFIG_DSFLOW_RPT_CNF_STRU
- 结构说明  : ID_MSG_TAF_PS_CONFIG_DSFLOW_RPT_CNF消息结构体, 控制流量上报
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_CONFIG_DSFLOW_RPT_CNF_STRU
+ ????????  : ID_MSG_TAF_PS_CONFIG_DSFLOW_RPT_CNF??????????, ????????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef TAF_PS_COMMON_CNF_STRU TAF_PS_CONFIG_DSFLOW_RPT_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_DSFLOW_RPT_IND_STRU
- 结构说明  : ID_MSG_TAF_PS_DSFLOW_RPT_IND消息结构体, 流量上报信息
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_DSFLOW_RPT_IND_STRU
+ ????????  : ID_MSG_TAF_PS_DSFLOW_RPT_IND??????????, ????????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 
-  2.日    期   : 2011年12月23日
-    作    者   : o00132663
-    修改内容   : PS融合项目，流量上报结构使用新结构TAF_DSFLOW_REPORT_STRU
+  2.??    ??   : 2011??12??23??
+    ??    ??   : o00132663
+    ????????   : PS????????????????????????????????TAF_DSFLOW_REPORT_STRU
 
 *****************************************************************************/
 typedef struct
@@ -3403,53 +3403,53 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 ^APDSFLOWRPT
+ ???? : ???????? ^APDSFLOWRPT
  ID   :
 
  REQ  :
  CNF  :
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 /*****************************************************************************
- 结构名称  : TAF_APDSFLOW_RPT_CFG_STRU
- 结构说明  : AP流量上报配置结构体
+ ????????  : TAF_APDSFLOW_RPT_CFG_STRU
+ ????????  : AP??????????????????
 
-  1.日    期   : 2015年2月2日
-    作    者   : A00165503
-    修改内容   : 新增结构
+  1.??    ??   : 2015??2??2??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulRptEnabled;       /* 流量上报开启标记   */
-    VOS_UINT32                          ulFluxThreshold;    /* 流量上报门限, 单位KByte */
+    VOS_UINT32                          ulRptEnabled;       /* ????????????????   */
+    VOS_UINT32                          ulFluxThreshold;    /* ????????????, ????KByte */
 } TAF_APDSFLOW_RPT_CFG_STRU;
 
 
 /*****************************************************************************
- 结构名    : TAF_APDSFLOW_REPORT_STRU
- 结构说明  : 流量信息上报结构定义
+ ??????    : TAF_APDSFLOW_REPORT_STRU
+ ????????  : ????????????????????
 
-  1.日    期   : 2015年2月2日
-    作    者   : A00165503
-    修改内容   : 新增结构
+  1.??    ??   : 2015??2??2??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulCurrentTxRate;    /*当前发送速率*/
-    VOS_UINT32                          ulCurrentRxRate;    /*当前接收速率*/
-    TAF_DSFLOW_INFO_STRU                stCurrentFlowInfo;  /*当前连接流量信息*/
-    TAF_DSFLOW_INFO_STRU                stTotalFlowInfo;    /*累计流量信息*/
+    VOS_UINT32                          ulCurrentTxRate;    /*????????????*/
+    VOS_UINT32                          ulCurrentRxRate;    /*????????????*/
+    TAF_DSFLOW_INFO_STRU                stCurrentFlowInfo;  /*????????????????*/
+    TAF_DSFLOW_INFO_STRU                stTotalFlowInfo;    /*????????????*/
 } TAF_APDSFLOW_REPORT_STRU;
 
 
 /*****************************************************************************
- 结构名称  : TAF_PS_CONFIG_APDSFLOW_RPT_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_SET_APDSFLOW_CFG_REQ消息结构体
+ ????????  : TAF_PS_CONFIG_APDSFLOW_RPT_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_SET_APDSFLOW_CFG_REQ??????????
 
-  1.日    期   : 2015年2月2日
-    作    者   : A00165503
-    修改内容   : 新增结构
+  1.??    ??   : 2015??2??2??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3460,23 +3460,23 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称  : TAF_PS_SET_APDSFLOW_RPT_CFG_CNF_STRU
- 结构说明  : ID_EVT_TAF_PS_SET_APDSFLOW_RPT_CFG_CNF消息结构体
+ ????????  : TAF_PS_SET_APDSFLOW_RPT_CFG_CNF_STRU
+ ????????  : ID_EVT_TAF_PS_SET_APDSFLOW_RPT_CFG_CNF??????????
 
-  1.日    期   : 2015年2月2日
-    作    者   : A00165503
-    修改内容   : 新增结构
+  1.??    ??   : 2015??2??2??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef TAF_PS_COMMON_CNF_STRU TAF_PS_SET_APDSFLOW_RPT_CFG_CNF_STRU;
 
 
 /*****************************************************************************
- 结构名称  : TAF_PS_GET_APDSFLOW_RPT_CFG_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_GET_APDSFLOW_RPT_CFG_REQ消息结构体
+ ????????  : TAF_PS_GET_APDSFLOW_RPT_CFG_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_GET_APDSFLOW_RPT_CFG_REQ??????????
 
-  1.日    期   : 2015年2月2日
-    作    者   : A00165503
-    修改内容   : 新增结构
+  1.??    ??   : 2015??2??2??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3485,12 +3485,12 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称  : TAF_PS_GET_APDSFLOW_RPT_CFG_CNF_STRU
- 结构说明  : ID_EVT_TAF_PS_GET_APDSFLOW_RPT_CFG_CNF消息结构体
+ ????????  : TAF_PS_GET_APDSFLOW_RPT_CFG_CNF_STRU
+ ????????  : ID_EVT_TAF_PS_GET_APDSFLOW_RPT_CFG_CNF??????????
 
-  1.日    期   : 2015年2月2日
-    作    者   : A00165503
-    修改内容   : 新增结构
+  1.??    ??   : 2015??2??2??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3502,12 +3502,12 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称  : TAF_PS_APDSFLOW_REPORT_IND_STRU
- 结构说明  : ID_EVT_TAF_PS_APDSFLOW_REPORT_IND消息结构体
+ ????????  : TAF_PS_APDSFLOW_REPORT_IND_STRU
+ ????????  : ID_EVT_TAF_PS_APDSFLOW_REPORT_IND??????????
 
-  1.日    期   : 2015年2月2日
-    作    者   : A00165503
-    修改内容   : 新增结构
+  1.??    ??   : 2015??2??2??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3518,28 +3518,28 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称  : TAF_DSFLOW_NV_WRITE_CFG_STRU
- 结构说明  : 流量写NV配置结构体
+ ????????  : TAF_DSFLOW_NV_WRITE_CFG_STRU
+ ????????  : ??????NV??????????
 
-  1.日    期   : 2015年2月2日
-    作    者   : A00165503
-    修改内容   : 新增结构
+  1.??    ??   : 2015??2??2??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucEnabled;          /* 流量写NV开启标记   */
-    VOS_UINT8                           ucInterval;         /* 流量写NV周期, 单位min */
-    VOS_UINT8                           aucReserved[2];     /* 保留字节 */
+    VOS_UINT8                           ucEnabled;          /* ??????NV????????   */
+    VOS_UINT8                           ucInterval;         /* ??????NV????, ????min */
+    VOS_UINT8                           aucReserved[2];     /* ???????? */
 } TAF_DSFLOW_NV_WRITE_CFG_STRU;
 
 
 /*****************************************************************************
- 结构名称  : TAF_PS_SET_DSFLOW_NV_WRITE_CFG_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_SET_DSFLOW_NV_WRITE_CFG_REQ消息结构体
+ ????????  : TAF_PS_SET_DSFLOW_NV_WRITE_CFG_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_SET_DSFLOW_NV_WRITE_CFG_REQ??????????
 
-  1.日    期   : 2015年2月12日
-    作    者   : A00165503
-    修改内容   : 新增结构
+  1.??    ??   : 2015??2??12??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3550,23 +3550,23 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称  : TAF_PS_SET_DSFLOW_NV_WRITE_CFG_CNF_STRU
- 结构说明  : ID_EVT_TAF_PS_SET_DSFLOW_NV_WRITE_CFG_CNF消息结构体
+ ????????  : TAF_PS_SET_DSFLOW_NV_WRITE_CFG_CNF_STRU
+ ????????  : ID_EVT_TAF_PS_SET_DSFLOW_NV_WRITE_CFG_CNF??????????
 
-  1.日    期   : 2015年2月12日
-    作    者   : A00165503
-    修改内容   : 新增结构
+  1.??    ??   : 2015??2??12??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef TAF_PS_COMMON_CNF_STRU TAF_PS_SET_DSFLOW_NV_WRITE_CFG_CNF_STRU;
 
 
 /*****************************************************************************
- 结构名称  : TAF_PS_GET_DSFLOW_NV_WRITE_CFG_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_GET_DSFLOW_NV_WRITE_CFG_REQ消息结构体
+ ????????  : TAF_PS_GET_DSFLOW_NV_WRITE_CFG_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_GET_DSFLOW_NV_WRITE_CFG_REQ??????????
 
-  1.日    期   : 2015年2月12日
-    作    者   : A00165503
-    修改内容   : 新增结构
+  1.??    ??   : 2015??2??12??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3575,12 +3575,12 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称  : TAF_PS_GET_DSFLOW_NV_WRITE_CFG_CNF_STRU
- 结构说明  : ID_EVT_TAF_PS_GET_DSFLOW_NV_WRITE_CFG_CNF消息结构体
+ ????????  : TAF_PS_GET_DSFLOW_NV_WRITE_CFG_CNF_STRU
+ ????????  : ID_EVT_TAF_PS_GET_DSFLOW_NV_WRITE_CFG_CNF??????????
 
-  1.日    期   : 2015年2月12日
-    作    者   : A00165503
-    修改内容   : 新增结构
+  1.??    ??   : 2015??2??12??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3591,12 +3591,12 @@ typedef struct
 } TAF_PS_GET_DSFLOW_NV_WRITE_CFG_CNF_STRU;
 
 /*****************************************************************************
- 结构名称  : TAF_PS_SET_CTA_INFO_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_SET_1X_MAX_NO_DATA_TIME_LEN_REQ消息结构体
+ ????????  : TAF_PS_SET_CTA_INFO_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_SET_1X_MAX_NO_DATA_TIME_LEN_REQ??????????
 
-  1.日    期   : 2015年4月20日
-    作    者   : c00299063
-    修改内容   : 新增结构
+  1.??    ??   : 2015??4??20??
+    ??    ??   : c00299063
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3607,12 +3607,12 @@ typedef struct
 }TAF_PS_SET_CTA_INFO_REQ_STRU;
 
 /*****************************************************************************
- 结构名称  : TAF_PS_GET_CTA_INFO_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_GET_1X_MAX_NO_DATA_TIME_LEN_REQ消息结构体
+ ????????  : TAF_PS_GET_CTA_INFO_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_GET_1X_MAX_NO_DATA_TIME_LEN_REQ??????????
 
-  1.日    期   : 2015年4月20日
-    作    者   : c00299063
-    修改内容   : 新增结构
+  1.??    ??   : 2015??4??20??
+    ??    ??   : c00299063
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3623,12 +3623,12 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称  : TAF_PS_SET_CTA_INFO_CNF_STRU
- 结构说明  : ID_MSG_TAF_PS_SET_1X_MAX_NO_DATA_TIME_LEN_CNF消息结构体
+ ????????  : TAF_PS_SET_CTA_INFO_CNF_STRU
+ ????????  : ID_MSG_TAF_PS_SET_1X_MAX_NO_DATA_TIME_LEN_CNF??????????
 
-  1.日    期   : 2015年4月20日
-    作    者   : c00299063
-    修改内容   : 新增结构
+  1.??    ??   : 2015??4??20??
+    ??    ??   : c00299063
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3638,12 +3638,12 @@ typedef struct
 }TAF_PS_SET_CTA_INFO_CNF_STRU;
 
 /*****************************************************************************
- 结构名称  : TAF_PS_GET_CTA_INFO_CNF_STRU
- 结构说明  : ID_MSG_TAF_PS_GET_1X_MAX_NO_DATA_TIME_LEN_CNF消息结构体
+ ????????  : TAF_PS_GET_CTA_INFO_CNF_STRU
+ ????????  : ID_MSG_TAF_PS_GET_1X_MAX_NO_DATA_TIME_LEN_CNF??????????
 
-  1.日    期   : 2015年4月20日
-    作    者   : c00299063
-    修改内容   : 新增结构
+  1.??    ??   : 2015??4??20??
+    ??    ??   : c00299063
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3657,12 +3657,12 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称  : TAF_PS_GET_CGMTU_VALUE_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_GET_CGMTU_VALUE_REQ消息结构体
+ ????????  : TAF_PS_GET_CGMTU_VALUE_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_GET_CGMTU_VALUE_REQ??????????
 
-  1.日    期   : 2015年5月24日
-    作    者   : g00261581
-    修改内容   : 新增结构
+  1.??    ??   : 2015??5??24??
+    ??    ??   : g00261581
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3670,12 +3670,12 @@ typedef struct
 }TAF_PS_GET_CGMTU_VALUE_REQ_STRU;
 
 /*****************************************************************************
- 结构名称  : TAF_PS_GET_CGMTU_VALUE_CNF_STRU
- 结构说明  : ID_EVT_TAF_PS_GET_CGMTU_VALUE_CNF消息结构体
+ ????????  : TAF_PS_GET_CGMTU_VALUE_CNF_STRU
+ ????????  : ID_EVT_TAF_PS_GET_CGMTU_VALUE_CNF??????????
 
-  1.日    期   : 2015年5月24日
-    作    者   : g00261581
-    修改内容   : 新增结构
+  1.??    ??   : 2015??5??24??
+    ??    ??   : g00261581
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3684,12 +3684,12 @@ typedef struct
 }TAF_PS_GET_CGMTU_VALUE_CNF_STRU;
 
 /*****************************************************************************
- 结构名称  : TAF_PS_CGMTU_VALUE_CHG_IND_STRU
- 结构说明  : ID_EVT_TAF_PS_CGMTU_VALUE_CHG_IND消息结构体
+ ????????  : TAF_PS_CGMTU_VALUE_CHG_IND_STRU
+ ????????  : ID_EVT_TAF_PS_CGMTU_VALUE_CHG_IND??????????
 
-  1.日    期   : 2015年5月24日
-    作    者   : g00261581
-    修改内容   : 新增结构
+  1.??    ??   : 2015??5??24??
+    ??    ??   : g00261581
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3699,13 +3699,13 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 ^CGAUTH
+ ???? : ???????? ^CGAUTH
  ID   :
 
  REQ  :
  CNF  :
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 typedef struct
 {
@@ -3716,7 +3716,7 @@ typedef struct
 
     VOS_UINT8                           ucCid;
     VOS_UINT8                           ucDefined;          /* 0:undefined, 1:defined */
-    VOS_UINT8                           ucAuth;             /* 目前仅支持是否鉴权，以后扩充为支持哪种鉴权算法*/
+    VOS_UINT8                           ucAuth;             /* ??????????????????????????????????????????????*/
     VOS_UINT8                           aucReserved[1];
     VOS_UINT8                           aucUserName[TAF_MAX_PDP_AUTH_USERNAME_LEN + 1];
     VOS_UINT8                           aucPassWord[TAF_MAX_PDP_AUTH_PASSCODE_LEN + 1];
@@ -3747,13 +3747,13 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 ^CGDNS
+ ???? : ???????? ^CGDNS
  ID   :
 
  REQ  :
  CNF  :
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 typedef struct
 {
@@ -3761,7 +3761,7 @@ typedef struct
     VOS_UINT32                          bitOpSecDnsAddr     : 1;
     VOS_UINT32                          bitOpSpare          : 30;
 
-    VOS_UINT8                           ucCid;              /* [1，11] 如果仅包含此参数，表示删除该Cid的DNS */
+    VOS_UINT8                           ucCid;              /* [1??11] ????????????????????????????Cid??DNS */
     VOS_UINT8                           ucDefined;          /* 0:undefined, 1:defined */
     VOS_UINT8                           aucReserved[2];
     VOS_UINT8                           aucPrimDnsAddr[TAF_IPV4_ADDR_LEN];
@@ -3793,13 +3793,13 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 ^TRIG
+ ???? : ???????? ^TRIG
  ID   :
 
  REQ  :
  CNF  :
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 typedef struct
 {
@@ -3822,13 +3822,13 @@ typedef TAF_PS_COMMON_CNF_STRU TAF_PS_TRIG_GPRS_DATA_CNF_STRU;
 
 
 /*****************************************************************************
- 描述 : 针对命令 ^DWINS
+ ???? : ???????? ^DWINS
  ID   :
 
  REQ  :
  CNF  :
  IND  : -
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 typedef struct
 {
@@ -3842,8 +3842,8 @@ typedef TAF_PS_COMMON_CNF_STRU TAF_PS_CONFIG_NBNS_FUNCTION_CNF_STRU;
 
 
 /*****************************************************************************
- 结构名称  : TAF_PS_DIAL_PARA_STRU
- 结构说明  : 拨号参数
+ ????????  : TAF_PS_DIAL_PARA_STRU
+ ????????  : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3931,11 +3931,11 @@ typedef struct
 } TAF_PS_DIAL_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_CALL_ORIG_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_CALL_ORIG_REQ消息结构
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_CALL_ORIG_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_CALL_ORIG_REQ????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3945,17 +3945,17 @@ typedef struct
 } TAF_PS_CALL_ORIG_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_CALL_END_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_GET_DIAL_PARA_INFO_CNF事件结构
+ ??????    : TAF_PS_CALL_END_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_GET_DIAL_PARA_INFO_CNF????????
 
- 修改历史      :
-  1.日    期   : 2011年08月22日
-    作    者   : A00165503
-    修改内容   : 新增结构
+ ????????      :
+  1.??    ??   : 2011??08??22??
+    ??    ??   : A00165503
+    ????????   : ????????
 
-  2.日    期   : 2012年8月23日
-    作    者   : A00165503
-    修改内容   : 修改成员
+  2.??    ??   : 2012??8??23??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3967,11 +3967,11 @@ typedef struct
 } TAF_PS_CALL_ORIG_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_CALL_END_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_CALL_END_REQ消息结构, 挂断PS CALL
-1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_CALL_END_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_CALL_END_REQ????????, ????PS CALL
+1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -3982,11 +3982,11 @@ typedef struct
 } TAF_PS_CALL_END_REQ_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PS_CALL_END_CNF_STRU
- 结构说明: ID_MSG_TAF_PS_CALL_END_CNF消息结构
-           断开呼叫正常 - enCause为TAF_PS_CAUSE_SUCCESS
-           断开呼叫异常 - enCause为TAF_PS_CAUSE_CID_INVALID
-                          指定的CID没有对应的呼叫实体激活
+ ????????: TAF_PS_CALL_END_CNF_STRU
+ ????????: ID_MSG_TAF_PS_CALL_END_CNF????????
+           ???????????? - enCause??TAF_PS_CAUSE_SUCCESS
+           ???????????? - enCause??TAF_PS_CAUSE_CID_INVALID
+                          ??????CID??????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -3999,21 +3999,21 @@ typedef struct
 } TAF_PS_CALL_END_CNF_STRU;
 
 /*****************************************************************************
- 描述 : 针对命令 ^AUTHDATA
+ ???? : ???????? ^AUTHDATA
  ID   : ID_MSG_TAF_PS_SET_AUTHDATA_INFO_REQ
       : ID_MSG_TAF_PS_SET_AUTHDATA_INFO_CNF
       : ID_MSG_TAF_PS_GET_AUTHDATA_INFO_REQ
       : ID_MSG_TAF_PS_GET_AUTHDATA_INFO_CNF
  REQ  : TAF_PS_SET_AUTHDATA_INFO_REQ_STRU; TAF_PS_GET_AUTHDATA_INFO_REQ_STRU
  CNF  : TAF_PS_SET_AUTHDATA_INFO_CNF_STRU; TAF_PS_GET_AUTHDATA_INFO_CNF_STRU
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : TAF_PDP_AUTHDATA_EXT_STRU
- 结构说明  : 鉴权参数(NDIS)
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PDP_AUTHDATA_EXT_STRU
+ ????????  : ????????(NDIS)
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4034,11 +4034,11 @@ typedef struct
 } TAF_AUTHDATA_EXT_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_SET_AUTHDATA_INFO_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_SET_AUTHDATA_INFO_REQ消息结构体, 设置鉴权参数(NDIS)
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_SET_AUTHDATA_INFO_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_SET_AUTHDATA_INFO_REQ??????????, ????????????(NDIS)
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4048,20 +4048,20 @@ typedef struct
 } TAF_PS_SET_AUTHDATA_INFO_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_SET_AUTHDATA_INFO_CNF_STRU
- 结构说明  : ID_MSG_TAF_PS_SET_AUTHDATA_INFO_CNF消息结构体, 设置鉴权参数(NDIS)
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_SET_AUTHDATA_INFO_CNF_STRU
+ ????????  : ID_MSG_TAF_PS_SET_AUTHDATA_INFO_CNF??????????, ????????????(NDIS)
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef TAF_PS_COMMON_CNF_STRU TAF_PS_SET_AUTHDATA_INFO_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_GET_AUTHDATA_INFO_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_GET_AUTHDATA_INFO_REQ消息结构体, 获取鉴权参数(NDIS)
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_GET_AUTHDATA_INFO_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_GET_AUTHDATA_INFO_REQ??????????, ????????????(NDIS)
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4069,11 +4069,11 @@ typedef struct
 } TAF_PS_GET_AUTHDATA_INFO_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_GET_AUTHDATA_INFO_CNF_STRU
- 结构说明  : ID_EVT_TAF_PS_GET_AUTHDATA_INFO_CNF消息结构体, 获取鉴权参数(NDIS)
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_GET_AUTHDATA_INFO_CNF_STRU
+ ????????  : ID_EVT_TAF_PS_GET_AUTHDATA_INFO_CNF??????????, ????????????(NDIS)
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4086,22 +4086,22 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 针对命令 D
+ ???? : ???????? D
  ID   : ID_MSG_TAF_PS_GET_D_GPRS_ACTIVE_TYPE_REQ
       : ID_EVT_TAF_PS_GET_D_GPRS_ACTIVE_TYPE_CNF
       :
       :
  REQ  : TAF_PS_GET_D_GPRS_ACTIVE_TYPE_REQ_STRU
  CNF  : TAF_PS_GET_D_GPRS_ACTIVE_TYPE_CNF_STRU
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 
 /*****************************************************************************
- 结构名    : TAF_ATD_PARA_STRU
- 结构说明  : D命令拨号参数
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_ATD_PARA_STRU
+ ????????  : D????????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4114,11 +4114,11 @@ typedef struct
 } TAF_ATD_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_CID_GPRS_ACTIVE_TYPE_STRU
- 结构说明  : CID对应的GPRS激活类型
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_CID_GPRS_ACTIVE_TYPE_STRU
+ ????????  : CID??????GPRS????????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4128,11 +4128,11 @@ typedef struct
 } TAF_CID_GPRS_ACTIVE_TYPE_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_GET_D_GPRS_ACTIVE_TYPE_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_GET_D_GPRS_ACTIVE_TYPE_REQ消息结构体, 获取D命令GPRS类型
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_GET_D_GPRS_ACTIVE_TYPE_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_GET_D_GPRS_ACTIVE_TYPE_REQ??????????, ????D????GPRS????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4142,11 +4142,11 @@ typedef struct
 } TAF_PS_GET_D_GPRS_ACTIVE_TYPE_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_GET_D_GPRS_ACTIVE_TYPE_CNF_STRU
- 结构说明  : ID_EVT_TAF_PS_GET_D_GPRS_ACTIVE_TYPE_CNF消息结构体, 获取D命令GPRS类型
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_GET_D_GPRS_ACTIVE_TYPE_CNF_STRU
+ ????????  : ID_EVT_TAF_PS_GET_D_GPRS_ACTIVE_TYPE_CNF??????????, ????D????GPRS????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4158,32 +4158,32 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_PPP_AUTH_PAP_CONTENT_STRU
- 结构说明:
+ ????????: TAF_PPP_AUTH_PAP_CONTENT_STRU
+ ????????:
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usPapReqLen;                            /*request长度: 24.008要求在[3,253]字节*/
-    VOS_UINT8                           aucReserve[2];                          /* 对齐保留 */
+    VOS_UINT16                          usPapReqLen;                            /*request????: 24.008??????[3,253]????*/
+    VOS_UINT8                           aucReserve[2];                          /* ???????? */
     VOS_UINT8                           aucPapReqBuf[TAF_PPP_PAP_REQ_MAX_LEN];  /*request*/
 } TAF_PPP_AUTH_PAP_CONTENT_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PPP_AUTH_CHAP_CONTENT_STRU
- 结构说明:
+ ????????: TAF_PPP_AUTH_CHAP_CONTENT_STRU
+ ????????:
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usChapChallengeLen;                     /*challenge长度: 24.008要求在[3,253]字节*/
-    VOS_UINT16                          usChapResponseLen;                      /*response长度: 24.008要求在[3,253]字节*/
+    VOS_UINT16                          usChapChallengeLen;                     /*challenge????: 24.008??????[3,253]????*/
+    VOS_UINT16                          usChapResponseLen;                      /*response????: 24.008??????[3,253]????*/
     VOS_UINT8                           aucChapChallengeBuf[TAF_PPP_CHAP_CHALLENGE_MAX_LEN];    /*challenge,153B*/
     VOS_UINT8                           aucChapResponseBuf[TAF_PPP_CHAP_RESPONSE_MAX_LEN];      /*response,205B*/
-    VOS_UINT8                           aucReserve[2];                          /* 对齐保留 */
+    VOS_UINT8                           aucReserve[2];                          /* ???????? */
 } TAF_PPP_AUTH_CHAP_CONTENT_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PPP_REQ_AUTH_CONFIG_INFO_STRU
- 结构说明:
+ ????????: TAF_PPP_REQ_AUTH_CONFIG_INFO_STRU
+ ????????:
 *****************************************************************************/
 typedef struct
 {
@@ -4199,19 +4199,19 @@ typedef struct
 } TAF_PPP_REQ_AUTH_CONFIG_INFO_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PPP_REQ_CONFIG_INFO_STRU
- 结构说明:
+ ????????: TAF_PPP_REQ_CONFIG_INFO_STRU
+ ????????:
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usIpcpLen;                              /*Ipcp帧长度*/
-    VOS_UINT8                           aucReserve[2];                          /* 对齐保留 */
-    VOS_UINT8                           aucIpcp[TAF_PPP_IPCP_FRAME_BUF_MAX_LEN];/*Ipcp帧*/
+    VOS_UINT16                          usIpcpLen;                              /*Ipcp??????*/
+    VOS_UINT8                           aucReserve[2];                          /* ???????? */
+    VOS_UINT8                           aucIpcp[TAF_PPP_IPCP_FRAME_BUF_MAX_LEN];/*Ipcp??*/
 } TAF_PPP_REQ_IPCP_CONFIG_INFO_STRU;
 
 /*****************************************************************************
- 结构名称: TAF_PPP_REQ_CONFIG_INFO_STRU
- 结构说明:
+ ????????: TAF_PPP_REQ_CONFIG_INFO_STRU
+ ????????:
 *****************************************************************************/
 typedef struct
 {
@@ -4220,21 +4220,21 @@ typedef struct
 } TAF_PPP_REQ_CONFIG_INFO_STRU;
 
 /*****************************************************************************
- 描述 : 针对PPP拨号
+ ???? : ????PPP????
  ID   : ID_MSG_TAF_PS_PPP_DIAL_ORIG_REQ
       : ID_EVT_TAF_PS_PPP_DIAL_ORIG_CNF
       :
       :
  REQ  : TAF_PS_PPP_DIAL_ORIG_REQ_STRU
  CNF  : TAF_PS_PPP_DIAL_ORIG_CNF_STRU
- 说明 : ...
+ ???? : ...
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : TAF_PS_PPP_DIAL_ORIG_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_PPP_DIAL_ORIG_REQ消息结构体, PPP拨号
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_PPP_DIAL_ORIG_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_PPP_DIAL_ORIG_REQ??????????, PPP????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4247,11 +4247,11 @@ typedef struct
 } TAF_PPP_DIAL_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_PPP_DIAL_ORIG_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_PPP_DIAL_ORIG_REQ消息结构体, PPP拨号
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_PPP_DIAL_ORIG_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_PPP_DIAL_ORIG_REQ??????????, PPP????
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4261,17 +4261,17 @@ typedef struct
 } TAF_PS_PPP_DIAL_ORIG_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_PPP_DIAL_ORIG_CNF_STRU
- 结构说明  : ID_EVT_TAF_PS_PPP_DIAL_ORIG_CNF事件结构
+ ??????    : TAF_PS_PPP_DIAL_ORIG_CNF_STRU
+ ????????  : ID_EVT_TAF_PS_PPP_DIAL_ORIG_CNF????????
 
- 修改历史      :
-  1.日    期   : 2011年10月19日
-    作    者   : A00165503
-    修改内容   : 创建文件
+ ????????      :
+  1.??    ??   : 2011??10??19??
+    ??    ??   : A00165503
+    ????????   : ????????
 
-  2.日    期   : 2012年8月23日
-    作    者   : A00165503
-    修改内容   : 修改成员
+  2.??    ??   : 2012??8??23??
+    ??    ??   : A00165503
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4281,11 +4281,11 @@ typedef struct
 } TAF_PS_PPP_DIAL_ORIG_CNF_STRU;
 
 /*****************************************************************************
-结构名    : TAF_PDP_IPV6_PREFIX_STRU
-结构说明  : IPV6 前缀信息结构
-  1.日    期   : 2011年12月24日
-    作    者   : 陈志敏/c00173809
-    修改内容   : 定义结构
+??????    : TAF_PDP_IPV6_PREFIX_STRU
+????????  : IPV6 ????????????
+  1.??    ??   : 2011??12??24??
+    ??    ??   : ??????/c00173809
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4300,11 +4300,11 @@ typedef struct
 }TAF_PDP_IPV6_PREFIX_STRU;
 
 /*****************************************************************************
-结构名    : TAF_PDP_IPV6_RA_INFO_STRU
-结构说明  : IPV6 RA参数结构
-  1.日    期   : 2011年12月24日
-    作    者   : 陈志敏/c00173809
-    修改内容   : 定义结构
+??????    : TAF_PDP_IPV6_RA_INFO_STRU
+????????  : IPV6 RA????????
+  1.??    ??   : 2011??12??24??
+    ??    ??   : ??????/c00173809
+    ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4316,23 +4316,23 @@ typedef struct
     VOS_UINT32                          ulBitO              :1;
     VOS_UINT32                          ulBitRsv            :22;
 
-    VOS_UINT32                          ulMtu;                                  /* MTU大小 */
-    VOS_UINT32                          ulPrefixNum;                            /* IPV6地址前缀个数 */
-    TAF_PDP_IPV6_PREFIX_STRU            astPrefixList[TAF_MAX_PREFIX_NUM_IN_RA];/* IPV6地址前缀数组 */
+    VOS_UINT32                          ulMtu;                                  /* MTU???? */
+    VOS_UINT32                          ulPrefixNum;                            /* IPV6???????????? */
+    TAF_PDP_IPV6_PREFIX_STRU            astPrefixList[TAF_MAX_PREFIX_NUM_IN_RA];/* IPV6???????????? */
 
 } TAF_PDP_IPV6_RA_INFO_STRU;
 
 
 /*****************************************************************************
-结构名    : TAF_PS_IPV6_INFO_IND_STRU
-结构说明  : ID_EVT_TAF_PS_IPV6_INFO_IND事件结构体
-  1.日    期   : 2011年12月24日
-    作    者   : 陈志敏/c00173809
-    修改内容   : 定义结构
+??????    : TAF_PS_IPV6_INFO_IND_STRU
+????????  : ID_EVT_TAF_PS_IPV6_INFO_IND??????????
+  1.??    ??   : 2011??12??24??
+    ??    ??   : ??????/c00173809
+    ????????   : ????????
 
-  2.日    期   : 2012年6月30日
-    作    者   : A00165503
-    修改内容   : DTS2012062900707: IPv6拨号成功, 应用获取IPv6地址前缀异常
+  2.??    ??   : 2012??6??30??
+    ??    ??   : A00165503
+    ????????   : DTS2012062900707: IPv6????????, ????????IPv6????????????
 *****************************************************************************/
 typedef struct
 {
@@ -4346,11 +4346,11 @@ typedef struct
 } TAF_PS_IPV6_INFO_IND_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_GET_NEGOTIATION_DNS_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_GET_NEGOTIATION_DNS_REQ事件结构体
-   1.日    期   : 2012年02月17日
-     作    者   : l00198894
-     修改内容   : 新增结构
+ ??????    : TAF_PS_GET_NEGOTIATION_DNS_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_GET_NEGOTIATION_DNS_REQ??????????
+   1.??    ??   : 2012??02??17??
+     ??    ??   : l00198894
+     ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4361,11 +4361,11 @@ typedef struct
 } TAF_PS_GET_NEGOTIATION_DNS_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_GET_NEGOTIATION_DNS_CNF_STRU
- 结构说明  : ID_EVT_TAF_PS_GET_NEGOTIATION_DNS_CNF事件结构体
-   1.日    期   : 2012年02月17日
-     作    者   : l00198894
-     修改内容   : 新增结构
+ ??????    : TAF_PS_GET_NEGOTIATION_DNS_CNF_STRU
+ ????????  : ID_EVT_TAF_PS_GET_NEGOTIATION_DNS_CNF??????????
+   1.??    ??   : 2012??02??17??
+     ??    ??   : l00198894
+     ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4379,11 +4379,11 @@ typedef struct
 #if (FEATURE_ON == FEATURE_LTE)
 
 /*****************************************************************************
-结构名    : TAF_PH_LTECS_STRU
-结构说明  : ^LTECS命令LPS返回的信息
-  1.日    期   : 2012年04月22日
-    作    者   : h00135900
-    修改内容   : AT 融合新增结构体说明
+??????    : TAF_PH_LTECS_STRU
+????????  : ^LTECS????LPS??????????
+  1.??    ??   : 2012??04??22??
+    ??    ??   : h00135900
+    ????????   : AT ??????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -4396,11 +4396,11 @@ typedef struct
 }TAF_PH_LTECS_STRU;
 
 /*****************************************************************************
-结构名    : TAF_PH_LTECS_STRU
-结构说明  : ^LTECS命令PS返回的信息
-  1.日    期   : 2012年04月22日
-    作    者   : h00135900
-    修改内容   : AT 融合新增结构体说明
+??????    : TAF_PH_LTECS_STRU
+????????  : ^LTECS????PS??????????
+  1.??    ??   : 2012??04??22??
+    ??    ??   : h00135900
+    ????????   : AT ??????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -4408,11 +4408,11 @@ typedef struct
 }TAF_PS_LTECS_REQ_STRU;
 
 /*****************************************************************************
-结构名    : TAF_PS_LTECS_CNF_STRU
-结构说明  : ^LTECS命令TAF返回给AT 模块的消息格式
-  1.日    期   : 2012年04月22日
-    作    者   : h00135900
-    修改内容   : AT 融合新增结构体说明
+??????    : TAF_PS_LTECS_CNF_STRU
+????????  : ^LTECS????TAF??????AT ??????????????
+  1.??    ??   : 2012??04??22??
+    ??    ??   : h00135900
+    ????????   : AT ??????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -4423,25 +4423,25 @@ typedef struct
 
 
 /*****************************************************************************
-结构名    : TAF_PH_CEMODE_STRU
-结构说明  : ^CEMODE命令PS返回的信息
-  1.日    期   : 2012年04月22日
-    作    者   : h00135900
-    修改内容   : AT 融合新增结构体说明
+??????    : TAF_PH_CEMODE_STRU
+????????  : ^CEMODE????PS??????????
+  1.??    ??   : 2012??04??22??
+    ??    ??   : h00135900
+    ????????   : AT ??????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          enCurrentUeMode;                        /*当前UE模式*/
-    VOS_UINT32                          ulSupportModeCnt;                       /*UE能够支持的模式的个数*/
-    VOS_UINT32                          aenSupportModeList[4];                  /*UE能够支持的模式*/
+    VOS_UINT32                          enCurrentUeMode;                        /*????UE????*/
+    VOS_UINT32                          ulSupportModeCnt;                       /*UE????????????????????*/
+    VOS_UINT32                          aenSupportModeList[4];                  /*UE??????????????*/
 }TAF_PH_CEMODE_STRU;
 
 /*****************************************************************************
-结构名    : TAF_PS_CEMODE_REQ_STRU
-结构说明  : ^CEMODE命令请求消息结构
-  1.日    期   : 2012年04月22日
-    作    者   : h00135900
-    修改内容   : AT 融合新增结构体说明
+??????    : TAF_PS_CEMODE_REQ_STRU
+????????  : ^CEMODE????????????????
+  1.??    ??   : 2012??04??22??
+    ??    ??   : h00135900
+    ????????   : AT ??????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -4449,11 +4449,11 @@ typedef struct
 }TAF_PS_CEMODE_REQ_STRU;
 
 /*****************************************************************************
-结构名    : TAF_PS_CEMODE_CNF_STRU
-结构说明  : ^CEMODE命令回复命令格式
-  1.日    期   : 2012年04月22日
-    作    者   : h00135900
-    修改内容   : AT 融合新增结构体说明
+??????    : TAF_PS_CEMODE_CNF_STRU
+????????  : ^CEMODE????????????????
+  1.??    ??   : 2012??04??22??
+    ??    ??   : h00135900
+    ????????   : AT ??????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -4464,13 +4464,13 @@ typedef struct
 
 
 
-/* DTS2012031901936            : x00126983 2012-3-19 字节对齐 + */
+/* DTS2012031901936            : x00126983 2012-3-19 ???????? + */
 /*****************************************************************************
- 结构名    : TAF_PDP_PROFILE_EXT_STRU
- 结构说明  : ^PDPROFMOD命令参数
- 日    期 : 2012年3月12日
- 作    者 : x00126983
- 修改内容 : 创建文件
+ ??????    : TAF_PDP_PROFILE_EXT_STRU
+ ????????  : ^PDPROFMOD????????
+ ??    ?? : 2012??3??12??
+ ??    ?? : x00126983
+ ???????? : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4501,14 +4501,14 @@ typedef struct
     VOS_UINT8                           aucReserved2[3];
 
 }TAF_PDP_PROFILE_EXT_STRU;
-/* DTS2012031901936            : x00126983 2012-3-19 字节对齐 - */
+/* DTS2012031901936            : x00126983 2012-3-19 ???????? - */
 
 /*****************************************************************************
- 结构名    : TAF_PS_SET_PROFILE_INFO_REQ_STRU
- 结构说明  : ID_MSG_TAF_PS_SET_AUTHDATA_INFO_REQ消息结构体, 设置鉴权参数(NDIS)
- 1.日    期   : 2011年10月19日
-   作    者   : A00165503
-   修改内容   : 创建文件
+ ??????    : TAF_PS_SET_PROFILE_INFO_REQ_STRU
+ ????????  : ID_MSG_TAF_PS_SET_AUTHDATA_INFO_REQ??????????, ????????????(NDIS)
+ 1.??    ??   : 2011??10??19??
+   ??    ??   : A00165503
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4522,8 +4522,8 @@ typedef TAF_PS_COMMON_CNF_STRU TAF_PS_SET_PDP_PROF_INFO_CNF_STRU;
 #endif
 
 /*****************************************************************************
- 结构名称: TAF_GW_AUTH_STRU
- 结构说明: 网关鉴权参数结构体
+ ????????: TAF_GW_AUTH_STRU
+ ????????: ??????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -4540,8 +4540,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_SDF_PARA_STRU
- 结构说明: SDF参数结构
+ ????????: TAF_SDF_PARA_STRU
+ ????????: SDF????????
 *****************************************************************************/
 typedef struct
 {
@@ -4580,8 +4580,8 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名称: TAF_SDF_PARA_QUERY_INFO_STRU
- 结构说明: SDF配置参数查询结构体
+ ????????: TAF_SDF_PARA_QUERY_INFO_STRU
+ ????????: SDF??????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -4591,11 +4591,11 @@ typedef struct
 } TAF_SDF_PARA_QUERY_INFO_STRU;
 
 /*****************************************************************************
-结构名    : TAF_SDF_PARA_QUERY_INFO_STRU
-结构说明  : SDF配置参数异步查询结构体
-  1.日    期   : 2013年07月22日
-    作    者   : Y00213812
-    修改内容   : VoLTE_PhaseI 项目新增
+??????    : TAF_SDF_PARA_QUERY_INFO_STRU
+????????  : SDF??????????????????????
+  1.??    ??   : 2013??07??22??
+    ??    ??   : Y00213812
+    ????????   : VoLTE_PhaseI ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4604,11 +4604,11 @@ typedef struct
 
 
 /*****************************************************************************
-结构名    : TAF_PS_SDF_INFO_CNF_STRU
-结构说明  : SDF配置参数异步查询结构体
-  1.日    期   : 2013年07月22日
-    作    者   : Y00213812
-    修改内容   : VoLTE_PhaseI 项目新增
+??????    : TAF_PS_SDF_INFO_CNF_STRU
+????????  : SDF??????????????????????
+  1.??    ??   : 2013??07??22??
+    ??    ??   : Y00213812
+    ????????   : VoLTE_PhaseI ????????
 *****************************************************************************/
 typedef struct
 {
@@ -4619,40 +4619,40 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : TAF_PS_PDP_QOS_QUERY_PARA_STRU
- 结构说明  : QOS查询参数集，包括QOS参数、MIN QOS参数
- 1.日    期   : 2013年06月29日
-   作    者   : l60609
-   修改内容   : 创建文件
+ ??????    : TAF_PS_PDP_QOS_QUERY_PARA_STRU
+ ????????  : QOS????????????????QOS??????MIN QOS????
+ 1.??    ??   : 2013??06??29??
+   ??    ??   : l60609
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucQosFlag;                              /* 0：Qos表无效，1：Qos表有效 */
-    VOS_UINT8                           ucMinQosFlag;                           /* 0:定义了最小可接受Qos,1:没有最小可接受Qos */
+    VOS_UINT8                           ucQosFlag;                              /* 0??Qos????????1??Qos?????? */
+    VOS_UINT8                           ucMinQosFlag;                           /* 0:????????????????Qos,1:??????????????Qos */
     VOS_UINT8                           aucReserved[2];
 
-    TAF_UMTS_QOS_STRU                   stQos;                                  /* Qos表 */
-    TAF_UMTS_QOS_STRU                   stMinQos;                               /* MINQos表 */
+    TAF_UMTS_QOS_STRU                   stQos;                                  /* Qos?? */
+    TAF_UMTS_QOS_STRU                   stMinQos;                               /* MINQos?? */
 }TAF_PS_PDP_QOS_QUERY_PARA_STRU;
 
 /*****************************************************************************
- 结构名    : TAF_PS_PDP_QOS_SET_PARA_STRU
- 结构说明  : QOS查询参数集，包括QOS参数、MIN QOS参数
- 1.日    期   : 2013年06月29日
-   作    者   : l60609
-   修改内容   : 创建文件
+ ??????    : TAF_PS_PDP_QOS_SET_PARA_STRU
+ ????????  : QOS????????????????QOS??????MIN QOS????
+ 1.??    ??   : 2013??06??29??
+   ??    ??   : l60609
+   ????????   : ????????
 *****************************************************************************/
 typedef struct
 {
-    TAF_UMTS_QOS_EXT_STRU               stQos;                                  /* Qos表 */
-    TAF_UMTS_QOS_EXT_STRU               stMinQos;                               /* MINQos表 */
+    TAF_UMTS_QOS_EXT_STRU               stQos;                                  /* Qos?? */
+    TAF_UMTS_QOS_EXT_STRU               stMinQos;                               /* MINQos?? */
 }TAF_PS_PDP_QOS_SET_PARA_STRU;
 
 
 #if (FEATURE_ON == FEATURE_IMS)
 /*****************************************************************************
- 结构名称: TAF_SRVCC_CANCEL_NOTIFY_IND_STRU
- 结构说明: APS->IMSA通知SRVCC CANECL
+ ????????: TAF_SRVCC_CANCEL_NOTIFY_IND_STRU
+ ????????: APS->IMSA????SRVCC CANECL
 *****************************************************************************/
 typedef struct
 {
@@ -4662,11 +4662,11 @@ typedef struct
 #endif
 
 /******************************************************************************
- 结构名    : TAF_PS_SET_1X_CQOS_PRI_REQ_STRU
- 结构说明  : 配置CDMA QOS请求结构体
-   1.日    期   : 2013年10月15日
-     作    者   : Y00213812
-     修改内容   : CDMA 1X 项目新增
+ ??????    : TAF_PS_SET_1X_CQOS_PRI_REQ_STRU
+ ????????  : ????CDMA QOS??????????
+   1.??    ??   : 2013??10??15??
+     ??    ??   : Y00213812
+     ????????   : CDMA 1X ????????
  *******************************************************************************/
 typedef struct
 {
@@ -4676,11 +4676,11 @@ typedef struct
 }TAF_PS_SET_1X_CQOS_PRI_REQ_STRU;
 
 /******************************************************************************
- 结构名    : TAF_PS_SET_CQOS_PRI_CNF_STRU
- 结构说明  : 配置CDMA QOS结果结构体
-   1.日    期   : 2013年10月15日
-     作    者   : Y00213812
-     修改内容   : CDMA 1X 项目新增
+ ??????    : TAF_PS_SET_CQOS_PRI_CNF_STRU
+ ????????  : ????CDMA QOS??????????
+   1.??    ??   : 2013??10??15??
+     ??    ??   : Y00213812
+     ????????   : CDMA 1X ????????
  *******************************************************************************/
 typedef struct
 {
@@ -4689,11 +4689,11 @@ typedef struct
 }TAF_PS_SET_CQOS_PRI_CNF_STRU;
 
 /** ****************************************************************************
- 结构名    : TAF_PS_CALL_DORMANT_IND_STRU
- 结构说明  : CDMA模式下数据服务进入DORMANT状态结构体
-   1.日    期   : 2013年10月15日
-     作    者   : Y00213812
-     修改内容   : CDMA 1X 项目新增
+ ??????    : TAF_PS_CALL_DORMANT_IND_STRU
+ ????????  : CDMA??????????????????DORMANT??????????
+   1.??    ??   : 2013??10??15??
+     ??    ??   : Y00213812
+     ????????   : CDMA 1X ????????
  *******************************************************************************/
 typedef struct
 {
@@ -4745,12 +4745,12 @@ typedef struct
 typedef TAF_PS_COMMON_CNF_STRU TAF_PS_CDATA_DIAL_MODE_CNF_STRU;
 
 /*****************************************************************************
-结构名    : TAF_PS_CALL_PDP_RABID_CHANGE_IND_STRU
-结构说明  : ID_EVT_TAF_PS_CALL_PDP_RABID_CHANGE_IND事件结构体
+??????    : TAF_PS_CALL_PDP_RABID_CHANGE_IND_STRU
+????????  : ID_EVT_TAF_PS_CALL_PDP_RABID_CHANGE_IND??????????
 
-  1.日    期   : 2016年6月01日
-    作    者   : Y00213812
-    修改内容   : C2L时，rabid变化后需要通知AT
+  1.??    ??   : 2016??6??01??
+    ??    ??   : Y00213812
+    ????????   : C2L????rabid??????????????AT
 *****************************************************************************/
 typedef struct
 {
@@ -4764,7 +4764,7 @@ typedef struct
 }TAF_PS_CALL_PDP_RABID_CHANGE_IND_STRU;
 
 /*****************************************************************************
-  H2ASN顶级消息结构定义
+  H2ASN????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -4800,32 +4800,32 @@ typedef struct
 }TafApsApi_EVT;
 
 /*****************************************************************************
-  8 UNION定义
+  8 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  9 OTHERS定义
+  9 OTHERS????
 *****************************************************************************/
 
 
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_SetPrimPdpContextInfo
- 功能描述  : 设置Primary PDP上下文信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstPdpContextInfo          - Primary PDP上下文信息
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_SetPrimPdpContextInfo
+ ????????  : ????Primary PDP??????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstPdpContextInfo          - Primary PDP??????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_SetPrimPdpContextInfo(
     VOS_UINT32                          ulModuleId,
@@ -4835,16 +4835,16 @@ VOS_UINT32 TAF_PS_SetPrimPdpContextInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetPrimPdpContextInfo
- 功能描述  : 获取Primary PDP上下文信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetPrimPdpContextInfo
+ ????????  : ????Primary PDP??????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetPrimPdpContextInfo(
     VOS_UINT32                          ulModuleId,
@@ -4853,16 +4853,16 @@ VOS_UINT32 TAF_PS_GetPrimPdpContextInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetPdpContextInfo
- 功能描述  : 获取PDP上下文信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetPdpContextInfo
+ ????????  : ????PDP??????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetPdpContextInfo(
     VOS_UINT32                          ulModuleId,
@@ -4870,17 +4870,17 @@ VOS_UINT32 TAF_PS_GetPdpContextInfo(
     VOS_UINT8                           ucOpId
 );
 /*****************************************************************************
- 函 数 名  : TAF_PS_SetSecPdpContextInfo
- 功能描述  : 设置Secondary PDP上下文信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstPdpContextInfo          - Secondary PDP上下文信息
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_SetSecPdpContextInfo
+ ????????  : ????Secondary PDP??????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstPdpContextInfo          - Secondary PDP??????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_SetSecPdpContextInfo(
     VOS_UINT32                          ulModuleId,
@@ -4890,16 +4890,16 @@ VOS_UINT32 TAF_PS_SetSecPdpContextInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetSecPdpContextInfo
- 功能描述  : 获取Secondary PDP上下文信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetSecPdpContextInfo
+ ????????  : ????Secondary PDP??????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetSecPdpContextInfo(
     VOS_UINT32                          ulModuleId,
@@ -4908,17 +4908,17 @@ VOS_UINT32 TAF_PS_GetSecPdpContextInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_SetTftInfo
- 功能描述  : 设置PDP TFT参数
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstTftInfo                 - TFT参数
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_SetTftInfo
+ ????????  : ????PDP TFT????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstTftInfo                 - TFT????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_SetTftInfo(
     VOS_UINT32                          ulModuleId,
@@ -4928,16 +4928,16 @@ VOS_UINT32 TAF_PS_SetTftInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetTftInfo
- 功能描述  : 获取PDP TFT参数
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetTftInfo
+ ????????  : ????PDP TFT????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetTftInfo(
     VOS_UINT32                          ulModuleId,
@@ -4946,17 +4946,17 @@ VOS_UINT32 TAF_PS_GetTftInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_SetUmtsQosInfo
- 功能描述  : 设置UMTS QOS参数信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstUmtsQosInfo             - UMTS QOS参数
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_SetUmtsQosInfo
+ ????????  : ????UMTS QOS????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstUmtsQosInfo             - UMTS QOS????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_SetUmtsQosInfo(
     VOS_UINT32                          ulModuleId,
@@ -4966,16 +4966,16 @@ VOS_UINT32 TAF_PS_SetUmtsQosInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetUmtsQosInfo
- 功能描述  : 获取UMTS QOS参数信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetUmtsQosInfo
+ ????????  : ????UMTS QOS????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetUmtsQosInfo(
     VOS_UINT32                          ulModuleId,
@@ -4984,17 +4984,17 @@ VOS_UINT32 TAF_PS_GetUmtsQosInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_SetUmtsQosMinInfo
- 功能描述  : 设置UMTS MIN QOS参数信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstUmtsQosMinInfo          - UMTS MIN QOS参数
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_SetUmtsQosMinInfo
+ ????????  : ????UMTS MIN QOS????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstUmtsQosMinInfo          - UMTS MIN QOS????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_SetUmtsQosMinInfo(
     VOS_UINT32                          ulModuleId,
@@ -5004,16 +5004,16 @@ VOS_UINT32 TAF_PS_SetUmtsQosMinInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetUmtsQosMinInfo
- 功能描述  : 获取UMTS MIN QOS参数信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetUmtsQosMinInfo
+ ????????  : ????UMTS MIN QOS????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetUmtsQosMinInfo(
     VOS_UINT32                          ulModuleId,
@@ -5022,17 +5022,17 @@ VOS_UINT32 TAF_PS_GetUmtsQosMinInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetDynamicUmtsQosInfo
- 功能描述  : 获取动态UMTS QOS参数信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstCidListInfo             - CID列表
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetDynamicUmtsQosInfo
+ ????????  : ????????UMTS QOS????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstCidListInfo             - CID????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetDynamicUmtsQosInfo(
     VOS_UINT32                          ulModuleId,
@@ -5042,17 +5042,17 @@ VOS_UINT32 TAF_PS_GetDynamicUmtsQosInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_SetPdpContextState
- 功能描述  : 设置指定CID(表)对应的PDP的状态
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstCidListStateInfo        - CID列表状态
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_SetPdpContextState
+ ????????  : ????????CID(??)??????PDP??????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstCidListStateInfo        - CID????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_SetPdpContextState(
     VOS_UINT32                          ulModuleId,
@@ -5062,16 +5062,16 @@ VOS_UINT32 TAF_PS_SetPdpContextState(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetPdpContextState
- 功能描述  : 获取所有已定义CID对应的PDP的状态
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetPdpContextState
+ ????????  : ??????????????CID??????PDP??????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetPdpContextState(
     VOS_UINT32                          ulModuleId,
@@ -5080,17 +5080,17 @@ VOS_UINT32 TAF_PS_GetPdpContextState(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_CallModify
- 功能描述  : 修改PS CALL参数
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             TAF_CID_LIST_STRU          - CID列表
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_CallModify
+ ????????  : ????PS CALL????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             TAF_CID_LIST_STRU          - CID????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_CallModify(
     VOS_UINT32                          ulModuleId,
@@ -5100,17 +5100,17 @@ VOS_UINT32 TAF_PS_CallModify(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_CallAnswer
- 功能描述  : 应答PS CALL
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstAnsInfo                 - PS CALL应答信息
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_CallAnswer
+ ????????  : ????PS CALL
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstAnsInfo                 - PS CALL????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_CallAnswer(
     VOS_UINT32                          ulModuleId,
@@ -5120,16 +5120,16 @@ VOS_UINT32 TAF_PS_CallAnswer(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_CallHangup
- 功能描述  : 挂断PS CALL
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_CallHangup
+ ????????  : ????PS CALL
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_CallHangup(
     VOS_UINT32                          ulModuleId,
@@ -5138,17 +5138,17 @@ VOS_UINT32 TAF_PS_CallHangup(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_CallOrig
- 功能描述  : 发起PS CALL
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstDialParaInfo            - PS CALL参数
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_CallOrig
+ ????????  : ????PS CALL
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstDialParaInfo            - PS CALL????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_CallOrig(
     VOS_UINT32                          ulModuleId,
@@ -5158,17 +5158,17 @@ VOS_UINT32 TAF_PS_CallOrig(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_CallEnd
- 功能描述  : 结束PS CALL
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             stCidListInfo              - CID列表
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_CallEnd
+ ????????  : ????PS CALL
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             stCidListInfo              - CID????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_CallEnd(
     VOS_UINT32                          ulModuleId,
@@ -5178,17 +5178,17 @@ VOS_UINT32 TAF_PS_CallEnd(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetPdpIpAddrInfo
- 功能描述  : 获取指定CID(表)的PDP IP地址信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstCidListInfo             - CID列表
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetPdpIpAddrInfo
+ ????????  : ????????CID(??)??PDP IP????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstCidListInfo             - CID????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetPdpIpAddrInfo(
     VOS_UINT32                          ulModuleId,
@@ -5198,17 +5198,17 @@ VOS_UINT32 TAF_PS_GetPdpIpAddrInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_SetAnsModeInfo
- 功能描述  : 设置PS域呼叫应答模式信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             ulAnsMode                  - 应答模式信息
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_SetAnsModeInfo
+ ????????  : ????PS??????????????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             ulAnsMode                  - ????????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_SetAnsModeInfo(
     VOS_UINT32                          ulModuleId,
@@ -5218,16 +5218,16 @@ VOS_UINT32 TAF_PS_SetAnsModeInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetAnsModeInfo
- 功能描述  : 获取PS域呼叫应答模式信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetAnsModeInfo
+ ????????  : ????PS??????????????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetAnsModeInfo(
     VOS_UINT32                          ulModuleId,
@@ -5236,17 +5236,17 @@ VOS_UINT32 TAF_PS_GetAnsModeInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetDynamicPrimPdpContextInfo
- 功能描述  : 获取指定的已定义CID的动态Primary PDP上下文信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
+ ?? ?? ??  : TAF_PS_GetDynamicPrimPdpContextInfo
+ ????????  : ????????????????CID??????Primary PDP??????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
              ucCid                      - CID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetDynamicPrimPdpContextInfo(
     VOS_UINT32                          ulModuleId,
@@ -5256,17 +5256,17 @@ VOS_UINT32 TAF_PS_GetDynamicPrimPdpContextInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetDynamicSecPdpContextInfo
- 功能描述  : 获取指定的已定义CID的动态Secondary PDP上下文信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
+ ?? ?? ??  : TAF_PS_GetDynamicSecPdpContextInfo
+ ????????  : ????????????????CID??????Secondary PDP??????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
              ucCid                      - CID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetDynamicSecPdpContextInfo(
     VOS_UINT32                          ulModuleId,
@@ -5276,17 +5276,17 @@ VOS_UINT32 TAF_PS_GetDynamicSecPdpContextInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetDynamicTftInfo
- 功能描述  : 获取指定的已定义CID的动态TFT信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
+ ?? ?? ??  : TAF_PS_GetDynamicTftInfo
+ ????????  : ????????????????CID??????TFT????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
              ucCid                      - CID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetDynamicTftInfo(
     VOS_UINT32                          ulModuleId,
@@ -5296,17 +5296,17 @@ VOS_UINT32 TAF_PS_GetDynamicTftInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_SetEpsQosInfo
- 功能描述  : 设置指定CID的EPS QOS参数信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstEpsQosInfo              - EPS QOS参数信息
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_SetEpsQosInfo
+ ????????  : ????????CID??EPS QOS????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstEpsQosInfo              - EPS QOS????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_SetEpsQosInfo(
     VOS_UINT32                          ulModuleId,
@@ -5316,16 +5316,16 @@ VOS_UINT32 TAF_PS_SetEpsQosInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetEpsQosInfo
- 功能描述  : 获取EPS QOS参数信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetEpsQosInfo
+ ????????  : ????EPS QOS????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetEpsQosInfo(
     VOS_UINT32                          ulModuleId,
@@ -5334,17 +5334,17 @@ VOS_UINT32 TAF_PS_GetEpsQosInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetDynamicEpsQosInfo
- 功能描述  : 获取指定的已定义CID的动态EPS QOS参数
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
+ ?? ?? ??  : TAF_PS_GetDynamicEpsQosInfo
+ ????????  : ????????????????CID??????EPS QOS????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
              ucCid                      - CID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetDynamicEpsQosInfo(
     VOS_UINT32                          ulModuleId,
@@ -5354,17 +5354,17 @@ VOS_UINT32 TAF_PS_GetDynamicEpsQosInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetDsFlowInfo
- 功能描述  : 获取数据流量信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstQueryConfigInfo         - DSFLOW查询配置参数
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetDsFlowInfo
+ ????????  : ????????????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstQueryConfigInfo         - DSFLOW????????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetDsFlowInfo(
     VOS_UINT32                          ulModuleId,
@@ -5373,17 +5373,17 @@ VOS_UINT32 TAF_PS_GetDsFlowInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_ClearDsFlowInfo
- 功能描述  : 清除数据流量信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstClearConfigInfo         - 流量清除配置参数信息
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_ClearDsFlowInfo
+ ????????  : ????????????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstClearConfigInfo         - ????????????????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_ClearDsFlowInfo(
     VOS_UINT32                          ulModuleId,
@@ -5393,17 +5393,17 @@ VOS_UINT32 TAF_PS_ClearDsFlowInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_ConfigDsFlowRpt
- 功能描述  : 配置流量上报模式
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstReportConfigInfo        - 流量上报配置参数信息
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_ConfigDsFlowRpt
+ ????????  : ????????????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstReportConfigInfo        - ????????????????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_ConfigDsFlowRpt(
     VOS_UINT32                          ulModuleId,
@@ -5413,17 +5413,17 @@ VOS_UINT32 TAF_PS_ConfigDsFlowRpt(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_SetPdpDnsInfo
- 功能描述  : 设置PDP DNS信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstPdpDnsInfo              - PDP DNS信息
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_SetPdpDnsInfo
+ ????????  : ????PDP DNS????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstPdpDnsInfo              - PDP DNS????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_SetPdpDnsInfo(
     VOS_UINT32                          ulModuleId,
@@ -5433,16 +5433,16 @@ VOS_UINT32 TAF_PS_SetPdpDnsInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetPdpDnsInfo
- 功能描述  : 获取PDP DNS信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetPdpDnsInfo
+ ????????  : ????PDP DNS????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetPdpDnsInfo(
     VOS_UINT32                          ulModuleId,
@@ -5451,17 +5451,17 @@ VOS_UINT32 TAF_PS_GetPdpDnsInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_TrigGprsData
- 功能描述  : 发送上行GPRS数据
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstGprsDataInfo            - GPRS数据信息
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_TrigGprsData
+ ????????  : ????????GPRS????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstGprsDataInfo            - GPRS????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_TrigGprsData(
     VOS_UINT32                          ulModuleId,
@@ -5471,17 +5471,17 @@ VOS_UINT32 TAF_PS_TrigGprsData(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_ConfigNbnsFunction
- 功能描述  : 配置NBNS功能
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             ulEnabled                  - NBNS功能使能标记
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_ConfigNbnsFunction
+ ????????  : ????NBNS????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             ulEnabled                  - NBNS????????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_ConfigNbnsFunction(
     VOS_UINT32                          ulModuleId,
@@ -5491,14 +5491,14 @@ VOS_UINT32 TAF_PS_ConfigNbnsFunction(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetNdisStateInfo
- 功能描述  : 获取NDIS状态信息
- 输入参数  : ulModuleId                 - 填写PID
-             usClientId                 - 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetNdisStateInfo
+ ????????  : ????NDIS????????
+ ????????  : ulModuleId                 - ????PID
+             usClientId                 - ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetNdisStateInfo(
     VOS_UINT32                          ulModuleId,
@@ -5507,17 +5507,17 @@ VOS_UINT32 TAF_PS_GetNdisStateInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_SetAuthDataInfo
- 功能描述  : 设置鉴权参数信息(NDIS)
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstAuthDataInfo            - 鉴权参数
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_SetAuthDataInfo
+ ????????  : ????????????????(NDIS)
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstAuthDataInfo            - ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_SetAuthDataInfo(
     VOS_UINT32                          ulModuleId,
@@ -5527,16 +5527,16 @@ VOS_UINT32 TAF_PS_SetAuthDataInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetAuthDataInfo
- 功能描述  : 获取鉴权参数信息(NDIS)
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetAuthDataInfo
+ ????????  : ????????????????(NDIS)
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetAuthDataInfo(
     VOS_UINT32                          ulModuleId,
@@ -5545,17 +5545,17 @@ VOS_UINT32 TAF_PS_GetAuthDataInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetGprsActiveType
- 功能描述  : 获取D命令GPRS类型(PPP拨号)
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstAtdPara                 - D命令拨号参数
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetGprsActiveType
+ ????????  : ????D????GPRS????(PPP????)
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstAtdPara                 - D????????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetGprsActiveType(
     VOS_UINT32                          ulModuleId,
@@ -5565,18 +5565,18 @@ VOS_UINT32 TAF_PS_GetGprsActiveType(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_PppDialOrig
- 功能描述  : 发起PPP拨号
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
+ ?? ?? ??  : TAF_PS_PppDialOrig
+ ????????  : ????PPP????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
              ucCid                      - CID
-             pstPppReqConfigInfo        - PPP配置参数
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+             pstPppReqConfigInfo        - PPP????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_PppDialOrig(
     VOS_UINT32                          ulModuleId,
@@ -5588,16 +5588,16 @@ VOS_UINT32 TAF_PS_PppDialOrig(
 
 #if(FEATURE_ON == FEATURE_LTE)
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetLteCsInfo
- 功能描述  :
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetLteCsInfo
+ ????????  :
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetLteCsInfo(
     VOS_UINT32                          ulModuleId,
@@ -5606,16 +5606,16 @@ VOS_UINT32 TAF_PS_GetLteCsInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetCemodeInfo
- 功能描述  :
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetCemodeInfo
+ ????????  :
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetCemodeInfo(
     VOS_UINT32                          ulModuleId,
@@ -5624,17 +5624,17 @@ VOS_UINT32 TAF_PS_GetCemodeInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_SetPdpProfInfo
- 功能描述  :
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstPdpProfInfo             - PdpProfile 配置参数
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_SetPdpProfInfo
+ ????????  :
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstPdpProfInfo             - PdpProfile ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_SetPdpProfInfo(
     VOS_UINT32                          ulModuleId,
@@ -5645,18 +5645,18 @@ VOS_UINT32 TAF_PS_SetPdpProfInfo(
 #endif
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetCidSdfParaInfo
- 功能描述  : 获取所有NV项中的SDF配置信息, 支持同步和异步两种方式
-             输出参数非空 --- 同步方式(目前仅支持C核)
-             输出参数为空 --- 异步方式
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : pstSdfQueryInfo            - SDF配置信息
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetCidSdfParaInfo
+ ????????  : ????????NV??????SDF????????, ??????????????????????
+             ???????????? --- ????????(??????????C??)
+             ???????????? --- ????????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : pstSdfQueryInfo            - SDF????????
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetCidSdfParaInfo(
     VOS_UINT32                          ulModuleId,
@@ -5667,16 +5667,16 @@ VOS_UINT32 TAF_PS_GetCidSdfParaInfo(
 
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetUnusedCid
- 功能描述  : 获取空闲未激活的CID
-             输出参数非空 --- 同步方式(目前仅支持C核)
-             输出参数为空 --- 异步方式
- 输入参数  : ulModuleId                 - 填写PID
-             usClientId                 - 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : puCid                      - 空闲未激活CID
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetUnusedCid
+ ????????  : ????????????????CID
+             ???????????? --- ????????(??????????C??)
+             ???????????? --- ????????
+ ????????  : ulModuleId                 - ????PID
+             usClientId                 - ??????ID
+             ucOpId                     - ??????ID
+ ????????  : puCid                      - ??????????CID
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetUnusedCid(
     VOS_UINT32                          ulModuleId,
@@ -5686,17 +5686,17 @@ VOS_UINT32 TAF_PS_GetUnusedCid(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetDynamicDnsInfo
- 功能描述  : 获取指定CID的DNS信息
- 输入参数  : ulModuleId                 - 填写PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
+ ?? ?? ??  : TAF_PS_GetDynamicDnsInfo
+ ????????  : ????????CID??DNS????
+ ????????  : ulModuleId                 - ????PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
              ucCid                      - CID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetDynamicDnsInfo(
     VOS_UINT32                          ulModuleId,
@@ -5712,17 +5712,17 @@ VOS_UINT32 TAF_PS_SetCqosPriInfo(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_SetApDsFlowRptCfg
- 功能描述  : 设置AP流量上报参数
- 输入参数  : ulModuleId                 - PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstRptCfg                  - 配置信息
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_SetApDsFlowRptCfg
+ ????????  : ????AP????????????
+ ????????  : ulModuleId                 - PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstRptCfg                  - ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_SetApDsFlowRptCfg(
     VOS_UINT32                          ulModuleId,
@@ -5732,16 +5732,16 @@ VOS_UINT32 TAF_PS_SetApDsFlowRptCfg(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetApDsFlowRptCfg
- 功能描述  : 获取AP流量上报参数
- 输入参数  : ulModuleId                 - PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetApDsFlowRptCfg
+ ????????  : ????AP????????????
+ ????????  : ulModuleId                 - PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetApDsFlowRptCfg(
     VOS_UINT32                          ulModuleId,
@@ -5750,17 +5750,17 @@ VOS_UINT32 TAF_PS_GetApDsFlowRptCfg(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_SetDsFlowNvWriteCfg
- 功能描述  : 设置流量写NV配置
- 输入参数  : ulModuleId                 - PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
-             pstNvWriteCfg              - 流量写NV配置
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_SetDsFlowNvWriteCfg
+ ????????  : ??????????NV????
+ ????????  : ulModuleId                 - PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+             pstNvWriteCfg              - ??????NV????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_SetDsFlowNvWriteCfg(
     VOS_UINT32                          ulModuleId,
@@ -5770,16 +5770,16 @@ VOS_UINT32 TAF_PS_SetDsFlowNvWriteCfg(
 );
 
 /*****************************************************************************
- 函 数 名  : TAF_PS_GetDsFlowNvWriteCfg
- 功能描述  : 获取流量写NV配置
- 输入参数  : ulModuleId                 - PID
-             usExClientId               - 扩展客户端ID
-                                          A核 : ModemID(高四bit) + 客户端ID
-                                          C核 : 客户端ID
-             ucOpId                     - 操作码ID
- 输出参数  : 无
- 返 回 值  : VOS_OK                     - 成功
-             VOS_ERR                    - 失败
+ ?? ?? ??  : TAF_PS_GetDsFlowNvWriteCfg
+ ????????  : ??????????NV????
+ ????????  : ulModuleId                 - PID
+             usExClientId               - ??????????ID
+                                          A?? : ModemID(????bit) + ??????ID
+                                          C?? : ??????ID
+             ucOpId                     - ??????ID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK                     - ????
+             VOS_ERR                    - ????
 *****************************************************************************/
 VOS_UINT32 TAF_PS_GetDsFlowNvWriteCfg(
     VOS_UINT32                          ulModuleId,

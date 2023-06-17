@@ -67,7 +67,7 @@ extern "C" {
 #endif
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #if (VOS_OS_VER != VOS_WIN32)
 #pragma pack(4)
@@ -77,16 +77,16 @@ extern "C" {
 
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
-/*hujianbo:以下函数与底软定义不一致，将其去掉，改成直接包含DrvInterface.h*/
+/*hujianbo:????????????????????????????????????????????????DrvInterface.h*/
 
 
-/* DHCP选项中最大租约时间长度，单位小时，366天 */
+/* DHCP??????????????????????????????????366?? */
 #define TTF_NDIS_DHCP_MAX_LEASE_HOUR            8784
 
-/*IPV6 MTU NV项默认取值*/
-#define TTF_NDIS_IPV6_MTU_DEFAULT               1500      /*单位为字节*/
+/*IPV6 MTU NV??????????*/
+#define TTF_NDIS_IPV6_MTU_DEFAULT               1500      /*??????????*/
 
 #define Ndis_NvimItem_Read( ulId, pItemData, usItemDataLen ) \
     NDIS_NV_READX( MODEM_ID_0, ulId, (VOS_VOID *)(pItemData), usItemDataLen)
@@ -94,27 +94,27 @@ extern "C" {
 /*ARP*/
 #define ETH_ARP_REQ_TYPE                0x0100      /*ARP Request*/
 #define ETH_ARP_RSP_TYPE                0x0200      /*ARP Reply*/
-#define ETH_ARP_FIXED_MSG_LEN           8           /*ARP固定部分长度*/
+#define ETH_ARP_FIXED_MSG_LEN           8           /*ARP????????????*/
 
 /*IP*/
 /*#define IPPACKET_MIN_LEN                (1500)
  */
-#define IPV4_FIX_HDR_LEN                (20)       /* IPV4固定头长度*/
-#define IPV4_HDR_TTL                    (128)      /* IPV4 头中的TTL字段默认值*/
+#define IPV4_FIX_HDR_LEN                (20)       /* IPV4??????????*/
+#define IPV4_HDR_TTL                    (128)      /* IPV4 ??????TTL??????????*/
 
-#define IP_IPV4_VERSION                 (4)        /* IP V4版本号      */
-#define IP_PROTOCOL_UDP                 (0x11)     /* IP承载协议是UDP  */
-#define IP_PROTOCOL_TCP                 (0x06)     /* IP承载协议是TCP  */
-#define IP_PROTOCOL_ICMP                (0x01)     /* IP承载协议是ICMP */
+#define IP_IPV4_VERSION                 (4)        /* IP V4??????      */
+#define IP_PROTOCOL_UDP                 (0x11)     /* IP??????????UDP  */
+#define IP_PROTOCOL_TCP                 (0x06)     /* IP??????????TCP  */
+#define IP_PROTOCOL_ICMP                (0x01)     /* IP??????????ICMP */
 
-/*DHCP报文目的端口67,定义为网络字节序*/
-#define UDP_DHCP_SERVICE_PORT           (0x4300)   /* DHCP服务的端口号 */
-#define UDP_DHCP_CLIENT_PORT            (0x4400)   /* DHCP Client的端口号*/
+/*DHCP????????????67,????????????????*/
+#define UDP_DHCP_SERVICE_PORT           (0x4300)   /* DHCP???????????? */
+#define UDP_DHCP_CLIENT_PORT            (0x4400)   /* DHCP Client????????*/
 
-/*NDIS上行任务事件*/
+/*NDIS????????????*/
 #define NDIS_UL_EVENT_RECIVE_USB_DATA      (0x0001)
 
-/*NDIS下行任务事件*/
+/*NDIS????????????*/
 #define NDIS_DL_EVENT_RECIVE_ADS_DATA      (0x0002)
 
 /*Userplane huibo begin*/
@@ -123,9 +123,9 @@ extern "C" {
 #define NDIS_ENTITY_IPV6INDEX              (1)
 #define NDIS_ENTITY_IPV4ADDRNUM            (9)
 
-#define NDIS_ENTITY_IPV4                   (0x1)    /*该NDIS实体对应承载支持IPV4*/
-#define NDIS_ENTITY_IPV6                   (0x2)    /*该NDIS实体对应承载支持IPV4*/
-/*NDIS 根据RabId获得Index*/
+#define NDIS_ENTITY_IPV4                   (0x1)    /*??NDIS????????????????IPV4*/
+#define NDIS_ENTITY_IPV6                   (0x2)    /*??NDIS????????????????IPV4*/
+/*NDIS ????RabId????Index*/
 /*#define NDIS_GetIndexByRabId(ucRabId)      ((ucRabId) - MIN_VAL_EPSID)*/
 /*Userplane huibo end*/
 
@@ -133,7 +133,7 @@ extern "C" {
 
 
 #if (VOS_OS_VER != VOS_WIN32)
-    /*单板PID,FID，待定义*/
+    /*????PID,FID????????*/
     #define NDIS_TASK_PID     PS_PID_APP_NDIS
     #define NDIS_TASK_FID     PS_FID_APP_NDIS_PPP_DIPC
 
@@ -159,9 +159,9 @@ extern "C" {
 #define NDIS_MODULE_DL          UE_MODULE_NDIS_DL
 #define NDIS_MODULE_COM          UE_MODULE_NDIS_COM
 
-#define NDIS_L4_AT              0xF030 /* MSP AT的模块ID*/
+#define NDIS_L4_AT              0xF030 /* MSP AT??????ID*/
 
-/*A核监控-关键事件上报事件ID偏移,需保证与PS已有ID值不重复*/
+/*A??????-????????????????ID????,????????PS????ID????????*/
 #define NDIS_OM_KEY_EVENT_BASE_ID         0x11000
 
 
@@ -196,13 +196,13 @@ extern "C" {
 #define NDIS_ERROR_LOG4(ModuleId, String,Para1,Para2,Para3,Para4)
 
 
-/*通过ModemId和BearerID组合成ExBearerID，高2bit为ModemId,低6bit为BearerID*/
+/*????ModemId??BearerID??????ExBearerID????2bit??ModemId,??6bit??BearerID*/
 #define NDIS_FORM_EXBID(ModemId,BearerId)          ((VOS_UINT8)(((ModemId) << 6) | (BearerId)))
 
-/*从扩展ExBearerID中获得ModemId*/
+/*??????ExBearerID??????ModemId*/
 #define NDIS_GET_MODEMID_FROM_EXBID(ExBearerId)    (VOS_UINT16)(((ExBearerId) & 0xC0) >> 6)
 
-/*从扩展ExBearerID中获得BearerID*/
+/*??????ExBearerID??????BearerID*/
 #define NDIS_GET_BID_FROM_EXBID(ExBearerId)      (VOS_UINT8)((ExBearerId) & 0x3F)
 
 #if (defined(CONFIG_BALONG_SPE))
@@ -240,7 +240,7 @@ extern "C" {
 
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 typedef enum
 {
@@ -252,47 +252,47 @@ typedef enum
 
 typedef enum IP_CLASS_TYPE
 {
-    IP_A_CLASS                              = 0x0,/*A类型IP*/
-    IP_B_CLASS                              = 0x1,/*B类型IP*/
-    IP_C_CLASS                              = 0x2,/*C类型IP*/
+    IP_A_CLASS                              = 0x0,/*A????IP*/
+    IP_B_CLASS                              = 0x1,/*B????IP*/
+    IP_C_CLASS                              = 0x2,/*C????IP*/
     IP_CLASS_BUTT
 }IP_CLASS_TYPE_ENUM;
 typedef VOS_UINT32  IP_CLASS_TYPE_UINT32;
 
 /*****************************************************************************
- 结构名    : NDIS_RAB_TYPE_ENUM
- 协议表格  :
- ASN.1描述 :
- 结构说明  : NDIS承载类型枚举
+ ??????    : NDIS_RAB_TYPE_ENUM
+ ????????  :
+ ASN.1???? :
+ ????????  : NDIS????????????
 *****************************************************************************/
 typedef enum
 {
-    NDIS_RAB_NULL     = 0,                /*该承载未激活*/
-    NDIS_RAB_IPV4     = 1,                /*该承载只支持IPV4*/
-    NDIS_RAB_IPV6     = 2,                /*该承载只支持IPV6*/
-    NDIS_RAB_IPV4V6   = 3,                /*该承载同时支持IPV4和IPV6*/
+    NDIS_RAB_NULL     = 0,                /*????????????*/
+    NDIS_RAB_IPV4     = 1,                /*????????????IPV4*/
+    NDIS_RAB_IPV6     = 2,                /*????????????IPV6*/
+    NDIS_RAB_IPV4V6   = 3,                /*??????????????IPV4??IPV6*/
     NDIS_RAB_BUTT
 }NDIS_RAB_TYPE_ENUM;
 typedef VOS_UINT8 NDIS_RAB_TYPE_UINT8;
 
 /*****************************************************************************
-  4 全局变量声明
+  4 ????????????
 *****************************************************************************/
 
 /*****************************************************************************
-  5 消息头定义
+  5 ??????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 消息定义
+  6 ????????
 *****************************************************************************/
 #define NAS_NDIS_MAX_ITEM   11
 /*****************************************************************************
-结构名    : IPV4_CFG_ITEM_STRU
-协议表格  :
-ASN.1描述 :
-结构说明  :
+??????    : IPV4_CFG_ITEM_STRU
+????????  :
+ASN.1???? :
+????????  :
 *****************************************************************************/
 typedef struct
 {
@@ -305,10 +305,10 @@ typedef struct
 } IPV4_CFG_ITEM_STRU;
 
 /*****************************************************************************
-结构名    : IPV6_CFG_ITEM_STRU
-协议表格  :
-ASN.1描述 :
-结构说明  :
+??????    : IPV6_CFG_ITEM_STRU
+????????  :
+ASN.1???? :
+????????  :
 *****************************************************************************/
 typedef struct
 {
@@ -318,10 +318,10 @@ typedef struct
 } IPV6_CFG_ITEM_STRU;
 
 /*****************************************************************************
- 结构名    : NAS_NDIS_ARPCFG_REQ_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : NAS NDIS配置
+ ??????    : NAS_NDIS_ARPCFG_REQ_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : NAS NDIS????
 *****************************************************************************/
 typedef struct
 {
@@ -333,10 +333,10 @@ typedef struct
 }NAS_NDIS_ARPCFG_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : IPV4_ADDR_ITEM_UN
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    : IPV4_ADDR_ITEM_UN
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef union
 {
@@ -345,10 +345,10 @@ typedef union
 } IPV4_ADDR_ITEM_UN;
 
 /*****************************************************************************
-结构名    : IPV6_ADDR_ITEM_UN
-协议表格  :
-ASN.1描述 :
-结构说明  :
+??????    : IPV6_ADDR_ITEM_UN
+????????  :
+ASN.1???? :
+????????  :
 *****************************************************************************/
 typedef union
 {
@@ -357,9 +357,9 @@ typedef union
 } IPV6_ADDR_ITEM_UN;
 
 /*****************************************************************************
-  7 STRUCT定义
+  7 STRUCT????
 *****************************************************************************/
-#if (VOS_OS_VER != VOS_WIN32)   /*单字节对齐*/
+#if (VOS_OS_VER != VOS_WIN32)   /*??????????*/
 #pragma pack(1)
 #else
 #pragma pack(push, 1)
@@ -368,10 +368,10 @@ typedef union
 /*lint -e958*/
 /*lint -e959*/
     /*****************************************************************************
-     结构名    : ARP帧结构
-     协议表格  :
-     ASN.1描述 :
-     结构说明  :
+     ??????    : ARP??????
+     ????????  :
+     ASN.1???? :
+     ????????  :
     *****************************************************************************/
     typedef struct
     {
@@ -393,10 +393,10 @@ typedef union
         VOS_UINT8   aucRev[18];
     }ETH_ARP_FRAME_STRU;
     /*****************************************************************************
-         结构名    :  发给SPE的MAC头
-         协议表格  :
-         ASN.1描述 :
-         结构说明  :
+         ??????    :  ????SPE??MAC??
+         ????????  :
+         ASN.1???? :
+         ????????  :
         *****************************************************************************/
         typedef struct
         {
@@ -406,10 +406,10 @@ typedef union
         }SPE_MAC_ETHER_HEADER_STRU;
 
     /*****************************************************************************
-     结构名    : ETH_IPFIXHDR_STRU
-     协议表格  :
-     ASN.1描述 :
-     结构说明  : IP固定头
+     ??????    : ETH_IPFIXHDR_STRU
+     ????????  :
+     ASN.1???? :
+     ????????  : IP??????
     *****************************************************************************/
     typedef struct
     {
@@ -428,10 +428,10 @@ typedef union
     }ETH_IPFIXHDR_STRU;
 
     /*****************************************************************************
-     结构名    : ETH_UDPHDR_STRU
-     协议表格  :
-     ASN.1描述 :
-     结构说明  : UDP头
+     ??????    : ETH_UDPHDR_STRU
+     ????????  :
+     ASN.1???? :
+     ????????  : UDP??
     *****************************************************************************/
     typedef struct
     {
@@ -442,10 +442,10 @@ typedef union
     }ETH_UDPHDR_STRU;
 
     /*****************************************************************************
-     结构名    : IPV4 UDP包结构
-     协议表格  :
-     ASN.1描述 :
-     结构说明  :
+     ??????    : IPV4 UDP??????
+     ????????  :
+     ASN.1???? :
+     ????????  :
     *****************************************************************************/
     typedef struct
     {
@@ -458,10 +458,10 @@ typedef union
 }ETHFRM_IPV4_PKT_STRU;
 
 /*****************************************************************************
- 结构名    : IPV4 IP包结构
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    : IPV4 IP??????
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
@@ -480,10 +480,10 @@ typedef struct
 
 #if (defined(CONFIG_BALONG_SPE))
 /*****************************************************************************
- 结构名    : NDIS_SPE_MEM_CB_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : SPE MEM CB结构
+ ??????    : NDIS_SPE_MEM_CB_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : SPE MEM CB????
 *****************************************************************************/
 typedef struct
 {
@@ -493,34 +493,34 @@ typedef struct
 #endif
 
 /*****************************************************************************
- 结构名    : NDIS_ARP_PERIOD_TIMER_STRU
- 协议表格  :
- ASN.1描述 :　
- 结构说明  : ARP周期定时器结构体
+ ??????    : NDIS_ARP_PERIOD_TIMER_STRU
+ ????????  :
+ ASN.1???? :??
+ ????????  : ARP????????????????
 *****************************************************************************/
 typedef struct
 {
-    HTIMER                              hTm;                                    /* 定时器指针 */
-    VOS_UINT32                          ulName;                                 /* 定时器名字 */
-    VOS_UINT32                          ulTimerValue;                           /* 定时器时长*/
+    HTIMER                              hTm;                                    /* ?????????? */
+    VOS_UINT32                          ulName;                                 /* ?????????? */
+    VOS_UINT32                          ulTimerValue;                           /* ??????????*/
 }NDIS_ARP_PERIOD_TIMER_STRU;
 
 /*****************************************************************************
- 结构名    : NDIS_IPV4_INFO_STRU包结构
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    : NDIS_IPV4_INFO_STRU??????
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32           ulArpInitFlg;   /*是否已获得UE的ARP映射*/
-    VOS_UINT32           ulArpRepFlg;    /*ARP请求发送后受到Reply标志*/
-    IPV4_ADDR_ITEM_UN    unUeIpInfo;     /*UE IP,源于NAS配置*/
-    IPV4_ADDR_ITEM_UN    unGwIpInfo;     /*GW IP,源于NAS配置*/
-    IPV4_ADDR_ITEM_UN    unNmIpInfo;     /*NetMask,源于NAS配置*/
+    VOS_UINT32           ulArpInitFlg;   /*??????????UE??ARP????*/
+    VOS_UINT32           ulArpRepFlg;    /*ARP??????????????Reply????*/
+    IPV4_ADDR_ITEM_UN    unUeIpInfo;     /*UE IP,????NAS????*/
+    IPV4_ADDR_ITEM_UN    unGwIpInfo;     /*GW IP,????NAS????*/
+    IPV4_ADDR_ITEM_UN    unNmIpInfo;     /*NetMask,????NAS????*/
     VOS_UINT8            aucUeMacAddr[ETH_MAC_ADDR_LEN];
-    VOS_UINT8            aucMacFrmHdr[ETH_MAC_HEADER_LEN]; /*完整以太帧头，便于组包*/
-    NDIS_ARP_PERIOD_TIMER_STRU  stArpPeriodTimer; /*为了同64位操作系统兼容，保持在8字节对齐位置*/
+    VOS_UINT8            aucMacFrmHdr[ETH_MAC_HEADER_LEN]; /*??????????????????????*/
+    NDIS_ARP_PERIOD_TIMER_STRU  stArpPeriodTimer; /*??????64??????????????????????8????????????*/
 
     /*DHCP Server Info*/
     VOS_UINT32           ulIpAssignStatus;
@@ -532,17 +532,17 @@ typedef struct
 } NDIS_IPV4_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : NDIS_ENTITY_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  :
+ ??????    : NDIS_ENTITY_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  :
 *****************************************************************************/
 typedef struct
 {
     NDIS_RAB_TYPE_UINT8             ucRabType;
-    VOS_UINT8                       ucRabId; /*保存的是ExRabId的值*/
-    PS_BOOL_ENUM_UINT8              enUsed;  /*PS_TRUE:该实体被使用，PS_FALSE:该实体空闲*/
-    VOS_UINT8                       ucRev;   /*预留字节*/
+    VOS_UINT8                       ucRabId; /*????????ExRabId????*/
+    PS_BOOL_ENUM_UINT8              enUsed;  /*PS_TRUE:??????????????PS_FALSE:??????????*/
+    VOS_UINT8                       ucRev;   /*????????*/
     UDI_HANDLE                      ulHandle;
     NDIS_IPV4_INFO_STRU             stIpV4Info;
     VOS_INT32                       lSpePort;
@@ -550,44 +550,44 @@ typedef struct
 } NDIS_ENTITY_STRU;
 
 /*****************************************************************************
-结构名    : NDIS_STAT_INFO_STRU
-协议表格  :
-ASN.1描述 :
-结构说明  : NDIS统计量结构
+??????    : NDIS_STAT_INFO_STRU
+????????  :
+ASN.1???? :
+????????  : NDIS??????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32      ulDicardUsbFrmNum;        /*上行丢弃的USB数据包个数*/
-    VOS_UINT32      ulRecvUsbPktSuccNum;      /*上行成功接收到USB的包的个数*/
-    VOS_UINT32      ulSendPktToAdsSucNum;     /*上行发送到ADS成功的个数*/
-    VOS_UINT32      ulDicardAdsPktNum;        /*下行被丢弃的ADS 数据包NUM*/
-    VOS_UINT32      ulRecvAdsPktSuccNum;      /*下行从ADS收到包成功个数*/
-    VOS_UINT32      ulGetIpv6MacFailNum;      /*下行发包时获取IPV6 MAC地址失败个数 */
-    VOS_UINT32      ulDlPktDiffRabNum;        /*下行数据包类型和承载类型不一致个数*/
-    VOS_UINT32      ulAddMacHdrFailNum;       /*添加MAC头失败的统计*/
-    VOS_UINT32      ulDlSendPktFailNum;       /*发送包失败的统计量*/
-    VOS_UINT32      ulDlSendPktSuccNum;       /*下行成功发送数据包至底软的统计量*/
+    VOS_UINT32      ulDicardUsbFrmNum;        /*??????????USB??????????*/
+    VOS_UINT32      ulRecvUsbPktSuccNum;      /*??????????????USB??????????*/
+    VOS_UINT32      ulSendPktToAdsSucNum;     /*??????????ADS??????????*/
+    VOS_UINT32      ulDicardAdsPktNum;        /*????????????ADS ??????NUM*/
+    VOS_UINT32      ulRecvAdsPktSuccNum;      /*??????ADS??????????????*/
+    VOS_UINT32      ulGetIpv6MacFailNum;      /*??????????????IPV6 MAC???????????? */
+    VOS_UINT32      ulDlPktDiffRabNum;        /*??????????????????????????????????*/
+    VOS_UINT32      ulAddMacHdrFailNum;       /*????MAC????????????*/
+    VOS_UINT32      ulDlSendPktFailNum;       /*??????????????????*/
+    VOS_UINT32      ulDlSendPktSuccNum;       /*????????????????????????????????*/
 
-    VOS_UINT32      ulRecvDhcpPktNum;         /*接收到的DHCP包*/
+    VOS_UINT32      ulRecvDhcpPktNum;         /*????????DHCP??*/
 
-    /*ARP 统计信息*/
-    VOS_UINT32      ulRecvArpReq;             /*收到的ARP Request包*/
-    VOS_UINT32      ulRecvArpReply;           /*收到的ARP Reply包*/
-    VOS_UINT32      ulProcArpError;           /*处理ARP失败个数*/
-    VOS_UINT32      ulSendArpReqSucc;         /*发送ARP Request成功包*/
-    VOS_UINT32      ulSendArpReqFail;         /*发送ARP Request失败数*/
-    VOS_UINT32      ulArpReplyNotRecv;        /*ARP请求没有收到Rely的计数*/
-    VOS_UINT32      ulSendArpReply;           /*发送ARP REPLY个数*/
-    VOS_UINT32      ulSendArpDhcpNDFailNum;   /*发送ARP或DHCP或ND包失败个数*/
+    /*ARP ????????*/
+    VOS_UINT32      ulRecvArpReq;             /*??????ARP Request??*/
+    VOS_UINT32      ulRecvArpReply;           /*??????ARP Reply??*/
+    VOS_UINT32      ulProcArpError;           /*????ARP????????*/
+    VOS_UINT32      ulSendArpReqSucc;         /*????ARP Request??????*/
+    VOS_UINT32      ulSendArpReqFail;         /*????ARP Request??????*/
+    VOS_UINT32      ulArpReplyNotRecv;        /*ARP????????????Rely??????*/
+    VOS_UINT32      ulSendArpReply;           /*????ARP REPLY????*/
+    VOS_UINT32      ulSendArpDhcpNDFailNum;   /*????ARP??DHCP??ND??????????*/
 }NDIS_STAT_INFO_STRU;
 
 /*****************************************************************************
-  8 UNION定义
+  8 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  9 OTHERS定义
+  9 OTHERS????
 *****************************************************************************/
 extern NDIS_STAT_INFO_STRU        g_stNdisStatStru;
 #define   NDIS_STAT_UL_DISCARD_USBPKT(n)              (g_stNdisStatStru.ulDicardUsbFrmNum          += (n))
@@ -613,7 +613,7 @@ extern NDIS_STAT_INFO_STRU        g_stNdisStatStru;
 #define   NDIS_STAT_DL_SEND_ARPDHCPPKT_FAIL(n)        (g_stNdisStatStru.ulSendArpDhcpNDFailNum     += (n))
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 extern VOS_UINT32 Ndis_Init( VOS_VOID );
 extern VOS_UINT32 Ndis_ProcArpMsg(ETH_ARP_FRAME_STRU* pstArpMsg, VOS_UINT8 ucRabId);

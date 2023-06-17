@@ -1,19 +1,19 @@
 /******************************************************************************
 
-                  版权所有 (C), 2001-2015, 华为技术有限公司
+                  ???????? (C), 2001-2015, ????????????????
 
  ******************************************************************************
-  文 件 名   : MtaCommInterface.h
-  版 本 号   : 初稿
-  作    者   : zwx247453
-  生成日期   : 2015年11月02日
-  最近修改   :
-  功能描述   : AT, MTA与接入层之间公用的接口头文件
-  函数列表   :
-  修改历史   :
-  1.日    期   : 2015年11月02日
-    作    者   : zwx247453
-    修改内容   : 创建文件
+  ?? ?? ??   : MtaCommInterface.h
+  ?? ?? ??   : ????
+  ??    ??   : zwx247453
+  ????????   : 2015??11??02??
+  ????????   :
+  ????????   : AT, MTA????????????????????????????
+  ????????   :
+  ????????   :
+  1.??    ??   : 2015??11??02??
+    ??    ??   : zwx247453
+    ????????   : ????????
 
  ******************************************************************************/
 
@@ -21,7 +21,7 @@
 #define __MTACOMMINTERFACE_H__
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 
 #ifdef __cplusplus
@@ -33,27 +33,27 @@ extern "C" {
 #pragma pack(4)
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
-/*network monitor GSM临区 上报最大个数 */
+/*network monitor GSM???? ???????????? */
 #define NETMON_MAX_GSM_NCELL_NUM                (6)
 
-/*network monitor UTRAN 临区 上报最大个数 */
+/*network monitor UTRAN ???? ???????????? */
 #define NETMON_MAX_UTRAN_NCELL_NUM              (16)
 
-/*network monitor LTE 临区 上报最大个数 */
+/*network monitor LTE ???? ???????????? */
 #define NETMON_MAX_LTE_NCELL_NUM                (16)
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 /*****************************************************************************
- 枚举名    : MTA_RRC_GSM_BAND_ENUM
- 结构说明  : MTA模块与GAS之间的BAND值枚举
+ ??????    : MTA_RRC_GSM_BAND_ENUM
+ ????????  : MTA??????GAS??????BAND??????
 
-  1.日    期   : 2014年04月25日
-    作    者   : g00261581
-    修改内容   : 新增
+  1.??    ??   : 2014??04??25??
+    ??    ??   : g00261581
+    ????????   : ????
 *****************************************************************************/
 enum MTA_RRC_GSM_BAND_ENUM
 {
@@ -67,12 +67,12 @@ enum MTA_RRC_GSM_BAND_ENUM
 typedef VOS_UINT16 MTA_RRC_GSM_BAND_ENUM_UINT16;
 
 /*****************************************************************************
- 枚举名    : MTA_NETMON_CELL_INFO_TYPE_ENUM
- 结构说明  : MTA模块与接入层间的network monitor 查询小区类型枚举定义
+ ??????    : MTA_NETMON_CELL_INFO_TYPE_ENUM
+ ????????  : MTA????????????????network monitor ????????????????????
 
-  1.日    期   : 2014年11月20日
-    作    者   : j00204253
-    修改内容   : 新增
+  1.??    ??   : 2014??11??20??
+    ??    ??   : j00204253
+    ????????   : ????
 *****************************************************************************/
 enum MTA_NETMON_CELL_TYPE_ENUM
 {
@@ -84,12 +84,12 @@ enum MTA_NETMON_CELL_TYPE_ENUM
 typedef VOS_UINT32 MTA_NETMON_CELL_TYPE_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名    : MTA_NETMON_UTRAN_TYPE_ENUM
- 结构说明  : MTA模块与接入层间的network monitor UTRAN网络类型枚举定义
+ ??????    : MTA_NETMON_UTRAN_TYPE_ENUM
+ ????????  : MTA????????????????network monitor UTRAN????????????????
 
-  1.日    期   : 2014年11月20日
-    作    者   : j00204253
-    修改内容   : 新增
+  1.??    ??   : 2014??11??20??
+    ??    ??   : j00204253
+    ????????   : ????
 *****************************************************************************/
 enum MTA_NETMON_UTRAN_TYPE_ENUM
 {
@@ -100,12 +100,12 @@ enum MTA_NETMON_UTRAN_TYPE_ENUM
 typedef VOS_UINT32 MTA_NETMON_UTRAN_TYPE_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名    : MTA_NETMON_RESULT_ENUM
- 结构说明  : MTA模块与接入层间的network monitor查询结果的枚举
+ ??????    : MTA_NETMON_RESULT_ENUM
+ ????????  : MTA????????????????network monitor??????????????
 
-  1.日    期   : 2014年11月20日
-    作    者   : j00204253
-    修改内容   : 新增
+  1.??    ??   : 2014??11??20??
+    ??    ??   : j00204253
+    ????????   : ????
 *****************************************************************************/
 enum MTA_NETMON_RESULT_ENUM
 {
@@ -116,50 +116,50 @@ enum MTA_NETMON_RESULT_ENUM
 typedef VOS_UINT32 MTA_NETMON_RESULT_ENUM_UINT32;
 
 /*****************************************************************************
-  4 全局变量声明
+  4 ????????????
 *****************************************************************************/
 
 /*****************************************************************************
-  5 消息头定义
+  5 ??????????
 *****************************************************************************/
 
 /*****************************************************************************
-  6 消息定义
+  6 ????????
 *****************************************************************************/
 
 /*****************************************************************************
-  7 STRUCT定义
+  7 STRUCT????
 *****************************************************************************/
 
-/* ========以下是接入层与MTA之间的消息结构体======== */
+/* ========??????????????MTA????????????????======== */
 
-/**************************network monitor查询临区信息结构体部分**********************************************************/
+/**************************network monitor??????????????????????**********************************************************/
 
-/* MTA发给接入层的消息，通用，不区分2G/3G/服务小区/邻区 */
+/* MTA??????????????????????????????2G/3G/????????/???? */
 /*****************************************************************************
- 结构名    : MTA_RRC_NETMON_CELL_QRY_REQ_STRU
- 结构说明  : MTA发送给GSM，查询小区信息(包括服务小区和临区)的消息结构体
+ ??????    : MTA_RRC_NETMON_CELL_QRY_REQ_STRU
+ ????????  : MTA??????GSM??????????????(??????????????????)????????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : j00204253
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : j00204253
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_MSG_HEADER                                     /* 消息头*/              /*_H2ASN_Skip*/
-    VOS_UINT32                          ulMsgName;     /*消息名称*/             /*_H2ASN_Skip*/
-    MTA_NETMON_CELL_TYPE_ENUM_UINT32    enCelltype;    /*0:查询服务小区，1:查询临区*/
+    VOS_MSG_HEADER                                     /* ??????*/              /*_H2ASN_Skip*/
+    VOS_UINT32                          ulMsgName;     /*????????*/             /*_H2ASN_Skip*/
+    MTA_NETMON_CELL_TYPE_ENUM_UINT32    enCelltype;    /*0:??????????????1:????????*/
 }MTA_RRC_NETMON_CELL_QRY_REQ_STRU;
 
 
-/*GSM 临区结构*/
+/*GSM ????????*/
 /*****************************************************************************
- 结构名    : MTA_NETMON_GSM_NCELL_INFO_STRU
- 结构说明  : GSM 临区信息结构体
+ ??????    : MTA_NETMON_GSM_NCELL_INFO_STRU
+ ????????  : GSM ??????????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : j00204253
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : j00204253
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
@@ -167,183 +167,183 @@ typedef struct
     VOS_UINT32                          bitOpCellID   : 1;
     VOS_UINT32                          bitOpLAC      : 1;
     VOS_UINT32                          bitOpSpare    : 29;
-    VOS_UINT32                          ulCellID;       /*小区ID*/
-    VOS_UINT16                          usLAC;          /*位置区码*/
-    VOS_UINT16                          usAfrcn;        /*频点*/
-    VOS_INT16                           sRSSI;          /* 频点的RSSI */
+    VOS_UINT32                          ulCellID;       /*????ID*/
+    VOS_UINT16                          usLAC;          /*????????*/
+    VOS_UINT16                          usAfrcn;        /*????*/
+    VOS_INT16                           sRSSI;          /* ??????RSSI */
     MTA_RRC_GSM_BAND_ENUM_UINT16        enBand;         /* band 0-3 */
-    VOS_UINT8                           ucBsic;         /*小区基站码*/
+    VOS_UINT8                           ucBsic;         /*??????????*/
     VOS_UINT8                           aucReserved[3];
 }MTA_NETMON_GSM_NCELL_INFO_STRU;
 
 
-/*LTE 临区结构,暂时定义的数据结构，根据需要进行调整*/
+/*LTE ????????,????????????????????????????????????*/
 /*****************************************************************************
- 结构名    : MTA_NETMON_LTE_NCELL_INFO_STRU
- 结构说明  : LTE 临区信息结构体
+ ??????    : MTA_NETMON_LTE_NCELL_INFO_STRU
+ ????????  : LTE ??????????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : j00204253
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : j00204253
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulPID;            /*物理小区ID*/
-    VOS_UINT16                          usArfcn;          /*频点*/
-    VOS_INT16                           sRSRP;            /* RSRP参考信号接收功率*/
-    VOS_INT16                           sRSRQ;            /* RSRQ参考信号接收质量*/
+    VOS_UINT32                          ulPID;            /*????????ID*/
+    VOS_UINT16                          usArfcn;          /*????*/
+    VOS_INT16                           sRSRP;            /* RSRP????????????????*/
+    VOS_INT16                           sRSRQ;            /* RSRQ????????????????*/
     VOS_INT16                           sRSSI;            /* Receiving signal strength in dbm */
 }MTA_NETMON_LTE_NCELL_INFO_STRU;
 
 
-/*WCDMA 临区结构*/
+/*WCDMA ????????*/
 /*****************************************************************************
- 结构名    : MTA_NETMON_UTRAN_NCELL_INFO_FDD_STRU
- 结构说明  : WCDMA 临区信息结构体
+ ??????    : MTA_NETMON_UTRAN_NCELL_INFO_FDD_STRU
+ ????????  : WCDMA ??????????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : j00204253
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : j00204253
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usArfcn;          /*频点*/
-    VOS_UINT16                          usPSC;            /*主扰码*/
+    VOS_UINT16                          usArfcn;          /*????*/
+    VOS_UINT16                          usPSC;            /*??????*/
     VOS_INT16                           sECN0;            /*ECN0*/
     VOS_INT16                           sRSCP;            /*RSCP*/
 }MTA_NETMON_UTRAN_NCELL_INFO_FDD_STRU;
 
 
-/*TD_SCDMA 临区结构,暂时定义结构，根据需要继续调整*/
+/*TD_SCDMA ????????,??????????????????????????????*/
 /*****************************************************************************
- 结构名    : MTA_NETMON_UTRAN_NCELL_INFO_TDD_STRU
- 结构说明  : TD_SCDMA 临区信息结构体
+ ??????    : MTA_NETMON_UTRAN_NCELL_INFO_TDD_STRU
+ ????????  : TD_SCDMA ??????????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : j00204253
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : j00204253
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usArfcn;          /*频点*/
-    VOS_UINT16                          usSC;             /*扰码*/
-    VOS_UINT16                          usSyncID;         /*下行导频码*/
+    VOS_UINT16                          usArfcn;          /*????*/
+    VOS_UINT16                          usSC;             /*????*/
+    VOS_UINT16                          usSyncID;         /*??????????*/
     VOS_INT16                           sRSCP;            /*RSCP*/
 }MTA_NETMON_UTRAN_NCELL_INFO_TDD_STRU;
 
 
-/*临区数据结构*/
+/*????????????*/
 /*****************************************************************************
- 结构名    : MTA_NETMON_UTRAN_NCELL_INFO_TDD_STRU
- 结构说明  : network monitor 所有临区信息结构体
+ ??????    : MTA_NETMON_UTRAN_NCELL_INFO_TDD_STRU
+ ????????  : network monitor ??????????????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : j00204253
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : j00204253
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                                ucGsmNCellCnt;      /*GSM 临区个数*/
-    VOS_UINT8                                ucUtranNCellCnt;    /*WCDMA 临区个数*/
-    VOS_UINT8                                ucLteNCellCnt;      /*LTE 临区个数*/
+    VOS_UINT8                                ucGsmNCellCnt;      /*GSM ????????*/
+    VOS_UINT8                                ucUtranNCellCnt;    /*WCDMA ????????*/
+    VOS_UINT8                                ucLteNCellCnt;      /*LTE ????????*/
     VOS_UINT8                                ucReserved;
-    MTA_NETMON_GSM_NCELL_INFO_STRU           astGsmNCellInfo[NETMON_MAX_GSM_NCELL_NUM];          /*GSM 临区数据结构*/
-    MTA_NETMON_UTRAN_TYPE_ENUM_UINT32        enCellMeasTypeChoice;     /* NETMON频率信息类型:FDD,TDD */
+    MTA_NETMON_GSM_NCELL_INFO_STRU           astGsmNCellInfo[NETMON_MAX_GSM_NCELL_NUM];          /*GSM ????????????*/
+    MTA_NETMON_UTRAN_TYPE_ENUM_UINT32        enCellMeasTypeChoice;     /* NETMON????????????:FDD,TDD */
     union
     {
-        MTA_NETMON_UTRAN_NCELL_INFO_FDD_STRU astFddNCellInfo[NETMON_MAX_UTRAN_NCELL_NUM];         /* FDD临区数据结构 */
-        MTA_NETMON_UTRAN_NCELL_INFO_TDD_STRU astTddNCellInfo[NETMON_MAX_UTRAN_NCELL_NUM];         /*  TDD临区数据结构 */
+        MTA_NETMON_UTRAN_NCELL_INFO_FDD_STRU astFddNCellInfo[NETMON_MAX_UTRAN_NCELL_NUM];         /* FDD???????????? */
+        MTA_NETMON_UTRAN_NCELL_INFO_TDD_STRU astTddNCellInfo[NETMON_MAX_UTRAN_NCELL_NUM];         /*  TDD???????????? */
     }u;
-    MTA_NETMON_LTE_NCELL_INFO_STRU           astLteNCellInfo[NETMON_MAX_LTE_NCELL_NUM];      /*LTE 临区数据结构*/
+    MTA_NETMON_LTE_NCELL_INFO_STRU           astLteNCellInfo[NETMON_MAX_LTE_NCELL_NUM];      /*LTE ????????????*/
 }RRC_MTA_NETMON_NCELL_INFO_STRU;
 
 
-/*********************network monitor查询GSM 小区信息部分************************************************/
+/*********************network monitor????GSM ????????????************************************************/
 /*****************************************************************************
- 结构名    : MTA_GRR_NETMON_TA_QRY_REQ_STRU
- 结构说明  : MTA发送给GSM，查询TA的消息结构体
+ ??????    : MTA_GRR_NETMON_TA_QRY_REQ_STRU
+ ????????  : MTA??????GSM??????TA????????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : j00204253
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : j00204253
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_MSG_HEADER                                     /* 消息头 */             /*_H2ASN_Skip*/
-    VOS_UINT32                          ulMsgName;     /* 消息名称 */           /*_H2ASN_Skip*/
+    VOS_MSG_HEADER                                     /* ?????? */             /*_H2ASN_Skip*/
+    VOS_UINT32                          ulMsgName;     /* ???????? */           /*_H2ASN_Skip*/
 }MTA_GRR_NETMON_TA_QRY_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : GRR_MTA_NETMON_TA_QRY_CNF_STRU
- 结构说明  : GAS返回MTA TA查询结果的消息结构体
+ ??????    : GRR_MTA_NETMON_TA_QRY_CNF_STRU
+ ????????  : GAS????MTA TA????????????????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : jumingxuan
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : jumingxuan
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_MSG_HEADER                                          /* 消息头 */        /*_H2ASN_Skip*/
-    VOS_UINT32                          ulMsgName;          /* 消息名称 */      /*_H2ASN_Skip*/
-    MTA_NETMON_RESULT_ENUM_UINT32       enResult;           /* 返回结果 */
-    VOS_UINT16                          usTa;               /* 返回的TA值 */
-    VOS_UINT8                           aucReserved[2];     /* 四字节对齐的保留位 */
+    VOS_MSG_HEADER                                          /* ?????? */        /*_H2ASN_Skip*/
+    VOS_UINT32                          ulMsgName;          /* ???????? */      /*_H2ASN_Skip*/
+    MTA_NETMON_RESULT_ENUM_UINT32       enResult;           /* ???????? */
+    VOS_UINT16                          usTa;               /* ??????TA?? */
+    VOS_UINT8                           aucReserved[2];     /* ?????????????????? */
 }GRR_MTA_NETMON_TA_QRY_CNF_STRU;
 
 /*****************************************************************************
- 结构名    : GRR_MTA_NETMON_SCELL_INFO_STRU
- 结构说明  : MTA发送ID_MTA_GRR_NETMON_CELL_QRY_REQ给GAS，GAS回复的服务小区信息的结构体
+ ??????    : GRR_MTA_NETMON_SCELL_INFO_STRU
+ ????????  : MTA????ID_MTA_GRR_NETMON_CELL_QRY_REQ??GAS??GAS??????????????????????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : w00146666
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : w00146666
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                          ulMcc;              /* 移动国家码 */
-    VOS_UINT32                          ulMnc;              /* 移动网络码 */
-    VOS_UINT32                          ulCellID;           /* 小区ID */
-    VOS_UINT16                          usLac;              /* 位置区码 */
-    VOS_UINT16                          usArfcn;            /* 绝对频点号 */
+    VOS_UINT32                          ulMcc;              /* ?????????? */
+    VOS_UINT32                          ulMnc;              /* ?????????? */
+    VOS_UINT32                          ulCellID;           /* ????ID */
+    VOS_UINT16                          usLac;              /* ???????? */
+    VOS_UINT16                          usArfcn;            /* ?????????? */
     VOS_INT16                           sRssi;              /* Receiving signal strength in dbm */
-    MTA_RRC_GSM_BAND_ENUM_UINT16        enBand;             /* GSM频段(0-3) */
-    VOS_UINT8                           ucBsic;             /* 小区基站码 */
-    VOS_UINT8                           ucRxQuality;        /* IDLE态下或者PS数传态下无效,专用态下填充信道质量值，范围[0,7] ,无效值99*/
-    VOS_UINT8                           aucReserved[2];     /* 四字节对齐的保留位 */
+    MTA_RRC_GSM_BAND_ENUM_UINT16        enBand;             /* GSM????(0-3) */
+    VOS_UINT8                           ucBsic;             /* ?????????? */
+    VOS_UINT8                           ucRxQuality;        /* IDLE????????PS????????????,????????????????????????????[0,7] ,??????99*/
+    VOS_UINT8                           aucReserved[2];     /* ?????????????????? */
 }GRR_MTA_NETMON_SCELL_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : GRR_MTA_NETMON_CELL_INFO_QRY_CNF_STRU
- 结构说明  : MTA发送ID_MTA_GRR_NETMON_CELL_QRY_REQ给GAS，GAS回复消息ID_GRR_MTA_NETMON_CELL_QRY_CNF的结构体
+ ??????    : GRR_MTA_NETMON_CELL_INFO_QRY_CNF_STRU
+ ????????  : MTA????ID_MTA_GRR_NETMON_CELL_QRY_REQ??GAS??GAS????????ID_GRR_MTA_NETMON_CELL_QRY_CNF????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : w00146666
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : w00146666
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER                                                              /*_H2ASN_Skip*/
-    VOS_UINT32                          ulMsgName;      /* 消息名称 */          /*_H2ASN_Skip*/
+    VOS_UINT32                          ulMsgName;      /* ???????? */          /*_H2ASN_Skip*/
     MTA_NETMON_RESULT_ENUM_UINT32       enResult;
-    MTA_NETMON_CELL_TYPE_ENUM_UINT32    enCelltype;     /* 0:查询服务小区，1:查询临区 */
+    MTA_NETMON_CELL_TYPE_ENUM_UINT32    enCelltype;     /* 0:??????????????1:???????? */
     union
     {
-        GRR_MTA_NETMON_SCELL_INFO_STRU  stSCellinfo;    /* GSM下的服务小区信息 */
-        RRC_MTA_NETMON_NCELL_INFO_STRU  stNCellinfo;    /* GSM下的邻区信息 */
+        GRR_MTA_NETMON_SCELL_INFO_STRU  stSCellinfo;    /* GSM???????????????? */
+        RRC_MTA_NETMON_NCELL_INFO_STRU  stNCellinfo;    /* GSM???????????? */
     }u;
 }GRR_MTA_NETMON_CELL_QRY_CNF_STRU;
 
-/******************************network monitor查询UTRAN 小区信息部分****************************************************/
+/******************************network monitor????UTRAN ????????????****************************************************/
 
 
-/*FDD 服务小区信息结构*/
+/*FDD ????????????????*/
 /*****************************************************************************
- 结构名    : MTA_NETMON_UTRAN_SCELL_INFO_FDD_STRU
- 结构说明  : WCDAM服务小区信息结构体
+ ??????    : MTA_NETMON_UTRAN_SCELL_INFO_FDD_STRU
+ ????????  : WCDAM??????????????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : j00204253
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : j00204253
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
@@ -353,54 +353,54 @@ typedef struct
     VOS_UINT32                          ulDrx;          /* Discontinuous reception cycle length */
     VOS_INT16                           sECN0;          /*ECN0*/
     VOS_INT16                           sRSSI;          /* Receiving signal strength in dbm */
-    VOS_INT16                           sRSCP;          /*Received Signal Code Power in dBm，接收信号码功率*/
-    VOS_UINT16                          usPSC;          /*主扰码*/
+    VOS_INT16                           sRSCP;          /*Received Signal Code Power in dBm????????????????*/
+    VOS_UINT16                          usPSC;          /*??????*/
     VOS_UINT16                          usURA;          /* UTRAN Registration Area Identity */
     VOS_UINT8                           aucReserved[2];
 
 } MTA_NETMON_UTRAN_SCELL_INFO_FDD_STRU;
 
 
-/*TDD 服务小区信息结构预留，待确认后填充*/
+/*TDD ??????????????????????????????????*/
 /*****************************************************************************
- 结构名    : MTA_NETMON_UTRAN_SCELL_INFO_TDD_STRU
- 结构说明  :  TD_SCDAM服务小区信息结构体
+ ??????    : MTA_NETMON_UTRAN_SCELL_INFO_TDD_STRU
+ ????????  :  TD_SCDAM??????????????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : j00204253
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : j00204253
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
     VOS_UINT32                          ulDrx;              /* Discontinuous reception cycle length */
-    VOS_UINT16                          usSC;               /*扰码*/
-    VOS_UINT16                          usSyncID;           /*下行导频码*/
+    VOS_UINT16                          usSC;               /*????*/
+    VOS_UINT16                          usSyncID;           /*??????????*/
     VOS_UINT16                          usRac;              /*RAC*/
     VOS_INT16                           sRSCP;              /*RSCP*/
 } MTA_NETMON_UTRAN_SCELL_INFO_TDD_STRU;
 
 
 
- /*UTRAN 服务小区结构*/
+ /*UTRAN ????????????*/
  /*****************************************************************************
-  结构名    : RRC_MTA_NETMON_UTRAN_SCELL_INFO_STRU
-  结构说明  : UTRAN服务小区信息结构体
+  ??????    : RRC_MTA_NETMON_UTRAN_SCELL_INFO_STRU
+  ????????  : UTRAN??????????????????
 
-   1.日    期   : 2014年10月27日
-     作    者   : j00204253
-     修改内容   : 创建
+   1.??    ??   : 2014??10??27??
+     ??    ??   : j00204253
+     ????????   : ????
  *****************************************************************************/
 typedef struct
 {
     VOS_UINT32                                  bitOpCellID  : 1;
     VOS_UINT32                                  bitOpLAC     : 1;
     VOS_UINT32                                  bitOpSpare   : 30;
-    VOS_UINT32                                  ulMcc;                  /*移动国家码*/
-    VOS_UINT32                                  ulMnc;                  /*移动网络码*/
-    VOS_UINT32                                  ulCellID;               /*小区ID*/
-    VOS_UINT16                                  usArfcn;                /*频点*/
-    VOS_UINT16                                  usLAC;                  /*位置区码*/
-    MTA_NETMON_UTRAN_TYPE_ENUM_UINT32           enCellMeasTypeChoice;   /* NETMON频率信息类型:FDD,TDD */
+    VOS_UINT32                                  ulMcc;                  /*??????????*/
+    VOS_UINT32                                  ulMnc;                  /*??????????*/
+    VOS_UINT32                                  ulCellID;               /*????ID*/
+    VOS_UINT16                                  usArfcn;                /*????*/
+    VOS_UINT16                                  usLAC;                  /*????????*/
+    MTA_NETMON_UTRAN_TYPE_ENUM_UINT32           enCellMeasTypeChoice;   /* NETMON????????????:FDD,TDD */
     union
     {
         MTA_NETMON_UTRAN_SCELL_INFO_FDD_STRU    stCellMeasResultsFDD;    /* FDD */
@@ -410,42 +410,42 @@ typedef struct
 
 
 /*****************************************************************************
- 结构名    : RRC_MTA_NETMON_CELL_INFO_QRY_CNF_STRU
- 结构说明  : MTA发送ID_MTA_RRC_NETMON_CELL_QRY_REQ给WAS，WAS回复消息ID_RRC_MTA_NETMON_CELL_QRY_CNF的结构体
+ ??????    : RRC_MTA_NETMON_CELL_INFO_QRY_CNF_STRU
+ ????????  : MTA????ID_MTA_RRC_NETMON_CELL_QRY_REQ??WAS??WAS????????ID_RRC_MTA_NETMON_CELL_QRY_CNF????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : w00146666
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : w00146666
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_MSG_HEADER                                              /* 消息头*/     /*_H2ASN_Skip*/
-    VOS_UINT32                                ulMsgName;        /*消息名称*/    /*_H2ASN_Skip*/
+    VOS_MSG_HEADER                                              /* ??????*/     /*_H2ASN_Skip*/
+    VOS_UINT32                                ulMsgName;        /*????????*/    /*_H2ASN_Skip*/
     MTA_NETMON_RESULT_ENUM_UINT32             enResult;
-    MTA_NETMON_CELL_TYPE_ENUM_UINT32          enCelltype;       /*0:查询服务小区，1:查询临区*/
+    MTA_NETMON_CELL_TYPE_ENUM_UINT32          enCelltype;       /*0:??????????????1:????????*/
     union
     {
-        RRC_MTA_NETMON_UTRAN_SCELL_INFO_STRU  stSCellinfo;      /* UTRAN下的服务小区信息 */
-        RRC_MTA_NETMON_NCELL_INFO_STRU        stNCellinfo;      /* UTRAN下的邻区信息 */
+        RRC_MTA_NETMON_UTRAN_SCELL_INFO_STRU  stSCellinfo;      /* UTRAN???????????????? */
+        RRC_MTA_NETMON_NCELL_INFO_STRU        stNCellinfo;      /* UTRAN???????????? */
     }u;
 }RRC_MTA_NETMON_CELL_INFO_QRY_CNF_STRU;
 
-/*LTE 服务小区结构*/
+/*LTE ????????????*/
 /*****************************************************************************
- 结构名    : MTA_NETMON_EUTRAN_SCELL_INFO_STRU
- 结构说明  : LTE服务小区信息结构体
+ ??????    : MTA_NETMON_EUTRAN_SCELL_INFO_STRU
+ ????????  : LTE??????????????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : j00204253
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : j00204253
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32                                  ulMcc;                  /*移动国家码*/
-    VOS_UINT32                                  ulMnc;                  /*移动网络码*/
-    VOS_UINT32                                  ulCellID;               /*小区ID*/
-    VOS_UINT32                                  ulPID;                  /*物理小区ID*/
-    VOS_UINT16                                  usArfcn;                /*频点*/
+    VOS_UINT32                                  ulMcc;                  /*??????????*/
+    VOS_UINT32                                  ulMnc;                  /*??????????*/
+    VOS_UINT32                                  ulCellID;               /*????ID*/
+    VOS_UINT32                                  ulPID;                  /*????????ID*/
+    VOS_UINT16                                  usArfcn;                /*????*/
     VOS_UINT16                                  usTAC;
     VOS_INT16                                   sRSRP;
     VOS_INT16                                   sRSRQ;
@@ -454,44 +454,44 @@ typedef struct
 } MTA_NETMON_EUTRAN_SCELL_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : MTA_LRRC_NETMON_CELL_QRY_REQ_STRU
- 结构说明  : MTA发送ID_MTA_LRRC_NETMON_CELL_QRY_REQ给LRR消息结构体
+ ??????    : MTA_LRRC_NETMON_CELL_QRY_REQ_STRU
+ ????????  : MTA????ID_MTA_LRRC_NETMON_CELL_QRY_REQ??LRR??????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : w00146666
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : w00146666
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_MSG_HEADER                                  /* 消息头 */                /*_H2ASN_Skip*/
-    VOS_UINT32                          ulMsgName;   /* 消息名称 */             /*_H2ASN_Skip*/
-    MTA_NETMON_CELL_TYPE_ENUM_UINT32    enCelltype;  /* 0：查询服务小区，1：查询临区 */
+    VOS_MSG_HEADER                                  /* ?????? */                /*_H2ASN_Skip*/
+    VOS_UINT32                          ulMsgName;   /* ???????? */             /*_H2ASN_Skip*/
+    MTA_NETMON_CELL_TYPE_ENUM_UINT32    enCelltype;  /* 0????????????????1?????????? */
 }MTA_LRRC_NETMON_CELL_QRY_REQ_STRU;
 
 /*****************************************************************************
- 结构名    : LRRC_MTA_NETMON_CELL_INFO_QRY_CNF_STRU
- 结构说明  : MTA发送ID_MTA_LRRC_NETMON_CELL_QRY_REQ给LRR，WAS回复消息ID_LRRC_MTA_NETMON_CELL_QRY_CNF的结构体
+ ??????    : LRRC_MTA_NETMON_CELL_INFO_QRY_CNF_STRU
+ ????????  : MTA????ID_MTA_LRRC_NETMON_CELL_QRY_REQ??LRR??WAS????????ID_LRRC_MTA_NETMON_CELL_QRY_CNF????????
 
-  1.日    期   : 2014年10月27日
-    作    者   : w00146666
-    修改内容   : 创建
+  1.??    ??   : 2014??10??27??
+    ??    ??   : w00146666
+    ????????   : ????
 *****************************************************************************/
 typedef struct
 {
-    VOS_MSG_HEADER                                              /* 消息头*/     /*_H2ASN_Skip*/
-    VOS_UINT32                                ulMsgName;        /*消息名称*/    /*_H2ASN_Skip*/
+    VOS_MSG_HEADER                                              /* ??????*/     /*_H2ASN_Skip*/
+    VOS_UINT32                                ulMsgName;        /*????????*/    /*_H2ASN_Skip*/
     MTA_NETMON_RESULT_ENUM_UINT32             enResult;
-    MTA_NETMON_CELL_TYPE_ENUM_UINT32          enCelltype;       /*0:查询服务小区，1:查询临区*/
+    MTA_NETMON_CELL_TYPE_ENUM_UINT32          enCelltype;       /*0:??????????????1:????????*/
     union
     {
-        MTA_NETMON_EUTRAN_SCELL_INFO_STRU     stSCellinfo;      /* LTE下的服务小区信息 */
-        RRC_MTA_NETMON_NCELL_INFO_STRU        stNCellinfo;      /* LTE下的邻区信息 */
+        MTA_NETMON_EUTRAN_SCELL_INFO_STRU     stSCellinfo;      /* LTE???????????????? */
+        RRC_MTA_NETMON_NCELL_INFO_STRU        stNCellinfo;      /* LTE???????????? */
     }u;
 }LRRC_MTA_NETMON_CELL_INFO_QRY_CNF_STRU;
 
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 
 #if ((VOS_OS_VER == VOS_WIN32) || (VOS_OS_VER == VOS_NUCLEUS))

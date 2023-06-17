@@ -46,48 +46,13 @@
  *
  */
 
-/*****************************************************************************/
-/*                                                                           */
-/*                Copyright 1999 - 2003, Huawei Tech. Co., Ltd.              */
-/*                           ALL RIGHTS RESERVED                             */
-/*                                                                           */
-/* FileName: vos_Id.c                                                        */
-/*                                                                           */
-/* Author: Yang Xiangqian                                                    */
-/*                                                                           */
-/* Version: 1.0                                                              */
-/*                                                                           */
-/* Date: 2006-10                                                             */
-/*                                                                           */
-/* Description: implement FID&PID                                            */
-/*                                                                           */
-/* Others:                                                                   */
-/*                                                                           */
-/* History:                                                                  */
-/* 1. Date:                                                                  */
-/*    Author:                                                                */
-/*    Modification: Create this file                                         */
-/*                                                                           */
-/* 2. Date: 2006-10                                                          */
-/*    Author: Xu Cheng                                                       */
-/*    Modification: Standardize code                                         */
-/*                                                                           */
-/*****************************************************************************/
-
 #include "vos_Id.h"
 #include "v_iddef.inc"
 #include "v_id.inc"
 #include "v_timer.h"
 #include "v_int.h"
 
-
-
-/*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
-*****************************************************************************/
-/*lint -e767 modify:x51137; review:h59254; cause:print log */
 #define    THIS_FILE_ID        PS_FILE_ID_VOS_ID_C
-/*lint +e767 modify:x51137; review:h59254; */
 
 /* recoed PID info VOS_PID_BUTT comes from v_id.inc */
 VOS_INT                 vos_PidRecordsNumber;
@@ -105,10 +70,6 @@ VOS_FID_CONTROL_BLOCK   vos_FidCtrlBlk[VOS_FID_BUTT];
 /* the map of PRI between FID and Linux */
 VOS_UINT32 vos_FidTaskRealPriority[VOS_PRIORITY_NUM]
     = { 30, 32, 35, 38, 41 ,44, 47, 51, 55, 59, 63, 67, 71, 75 };
-
-
-
-
 
 /* default value of task stack size */
 #define TASK_STACK_SIZE                      32768
@@ -130,8 +91,6 @@ VOS_UINT16      g_usPidInitId;
 
 extern VOS_VOID V_LogRecord(VOS_UINT32 ulIndex, VOS_UINT32 ulValue);
 
-
-/* 自旋锁，用来作querey pid info 的临界资源保护 */
 VOS_SPINLOCK             g_stVosQuereyPidInfoSpinLock;
 
 extern VOS_UINT32 g_ulVosOutsideStep;
@@ -328,7 +287,6 @@ VOS_UINT32 VOS_PidsInitOnePhase( enum VOS_INIT_PHASE_DEFINE InitPhrase)
             /*lint -e534*/
             Print1("# VOS_PidsInitOnePhase Error. Pid 0x%x\r\n",i);
             /*lint +e534*/
-            /*由于PID扩展后,PID已经扩展超过了0xffff，需要扩展*/
             g_ulOmPidInit |= (i & 0xFFFFFF);
             V_LogRecord(9, g_ulOmPidInit);
             ulErrorCounter++;
@@ -1462,5 +1420,3 @@ VOS_VOID VOS_SetPidInfo(VOS_VOID *pBuf, VOS_UINT16 usLen)
     return;
 
 }
-
-

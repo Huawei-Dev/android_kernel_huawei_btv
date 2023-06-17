@@ -51,21 +51,7 @@
 #include <linux/slab.h>
 #include <osl_types.h>
 
-/*****************************************************************************
-* 函 数 名  : mdrv_memcpy
-*
-* 功能描述  : 数据拷贝接口。底层基于汇编实现的最优化接口，目前在v8r1上使用。
-*
-* 输入参数  :  dest : 拷贝的目的地址
-*              src  : 拷贝的源地址
-*             count : 拷贝数据的大小
-* 输出参数  : 无
-* 返 回 值  : 无
-****************************************************************************/
 void * mdrv_memcpy(void * dest, const void * src, unsigned long count)
 {
-    return memcpy(dest,src,count);
+    return memcpy(dest, src, count);
 }
-
-
-

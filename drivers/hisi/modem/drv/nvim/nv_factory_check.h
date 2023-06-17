@@ -46,10 +46,8 @@
  *
  */
 
-
 #ifndef _NV_FACTORY_CHECK_H_
 #define _NV_FACTORY_CHECK_H_
-
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -66,36 +64,31 @@ enum
 
 typedef struct factory_crc_check_info_stru
 {
-    u32 list_nvid;          /*待校验的band列表的nvid*/
-    u32 modem_num;          /*list_nvid是哪个modem的*/
-    u32 valild_band_count;  /*nvid列表中最大有效band数*/
-    u32 valild_nvid_count;  /*单个band中最大有效nvid数*/
-    u32 singal_group_size;  /*单个band结构体占用空间大小 单位:字节*/
-    u32 old_crc_value;      /*旧的CRC校验码*/
+    u32 list_nvid;
+    u32 modem_num;
+    u32 valild_band_count;
+    u32 valild_nvid_count;
+    u32 singal_group_size;
+    u32 old_crc_value;
 }factory_crc_check_info_t;
 
-/*该结构体和product nv def 中的SINGLE_GUC_BAND_NV_ID_STRU和SINGLE_TL_BAND_NV_ID_STRU对应*/
 typedef struct
 {
-    UINT16   uhwTransmitMode;                   /* 配置该组的发送模式*/
-    UINT16   uhwBand;                           /* 该组配置的Band号*/
-    UINT16   uhwEnable;                         /* 是否有效指示位 */
-    UINT16   uhwValidCount;                     /* 指示有效数据的个数 */
-    UINT16  auhwNeedCheckID[0];                 /* 保存需要检查的NV ID */
+    UINT16   uhwTransmitMode;
+    UINT16   uhwBand;
+    UINT16   uhwEnable;
+    UINT16   uhwValidCount;
+    UINT16  auhwNeedCheckID[0];
 }singal_band_nvid_t;
-
 
 u32  nv_check_mode_crc(factory_crc_check_info_t check_info);
 u32  nv_check_factory_nv_status(u32 mode);
 u32  nv_make_single_band_nv_crc(singal_band_nvid_t* check_item_temp, u32 modem_num, u32 valild_nvid_count, u32 *last_crc_value, u32 *gen_crc_value);
-
 
 #ifdef __cplusplus
 #if __cplusplus
 }
 #endif
 #endif
-
-
 
 #endif /*_NV_CRC_H_*/

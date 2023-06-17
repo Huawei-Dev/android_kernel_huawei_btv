@@ -58,7 +58,7 @@ u32 fifo_put_with_header(struct icc_channel_fifo *fifo, u8 *head_buf, u32 head_l
 	char* base_addr       = (char*)((char*)fifo + sizeof(struct icc_channel_fifo)); 
 	u32 buf_len         = fifo->size;
 
-	/*空闲缓冲区大小*/
+	/*??????????????*/
 	if (read > write)
 	{
 		tail_idle_size = (s32)(read - write);
@@ -68,7 +68,7 @@ u32 fifo_put_with_header(struct icc_channel_fifo *fifo, u8 *head_buf, u32 head_l
 		tail_idle_size = (s32)(buf_len - write);
 	}
 
-	/*先填充头部*/
+	/*??????????*/
 	if (tail_idle_size < (s32)head_len)
 	{
 		(void)memcpy_s((void *)(write + base_addr), buf_len, (void *)head_buf, (u32)tail_idle_size);/*lint !e124 */
@@ -83,7 +83,7 @@ u32 fifo_put_with_header(struct icc_channel_fifo *fifo, u8 *head_buf, u32 head_l
 		write          = (tail_idle_size == 0) ? 0 : (write + head_len);
 	}
 
-	/*再填充负载*/
+	/*??????????*/
 	if ( (0 == tail_idle_size) || (tail_idle_size > (s32)data_len) )
 	{
 		(void)memcpy_s((void *)(write + base_addr), buf_len, (void *)data_buf, data_len);/*lint !e124 */
@@ -96,10 +96,10 @@ u32 fifo_put_with_header(struct icc_channel_fifo *fifo, u8 *head_buf, u32 head_l
 		write = data_len - (u32)tail_idle_size;
 	}
 
-	/*确保最后写完不停在缓冲区结束位置*/
+	/*????????????????????????????????*/
 	write = (write == buf_len) ? 0 : write;
 
-	/*更新写指针*/
+	/*??????????*/
 	mb();
 	fifo->write = write;
 
@@ -115,7 +115,7 @@ u32 fifo_get(struct icc_channel_fifo *fifo, u8 *data_buf, u32 data_len, u32 *rea
 	u32 buf_len         = fifo->size;
 	u32 readed_len      = 0;
 
-	/*空闲缓冲区大小*/
+	/*??????????????*/
 	if (*read > write)
 	{
 		total_idle_size = (s32)(buf_len + write - *read);
@@ -145,12 +145,12 @@ u32 fifo_get(struct icc_channel_fifo *fifo, u8 *data_buf, u32 data_len, u32 *rea
 	}
 	else
 	{
-		(void)memcpy_s((void *)data_buf, data_len, (void *)(*read + base_addr), (u32)tail_idle_size);/* [false alarm]:屏蔽Fortify误报 *//*lint !e124 */
+		(void)memcpy_s((void *)data_buf, data_len, (void *)(*read + base_addr), (u32)tail_idle_size);/* [false alarm]:????Fortify???? *//*lint !e124 */
 		(void)memcpy_s((void *)(data_buf + tail_idle_size), data_len, (void *)base_addr, readed_len - (u32)tail_idle_size);/*lint !e124 */
 		*read = readed_len - (unsigned int)tail_idle_size;
 	}
 
-	/*确保最后读完不停在缓冲区结束位置*/
+	/*????????????????????????????????*/
 	*read = (*read >= buf_len) ? (*read - buf_len) : (*read);
 
 	return readed_len;
@@ -158,7 +158,7 @@ u32 fifo_get(struct icc_channel_fifo *fifo, u8 *data_buf, u32 data_len, u32 *rea
 }
 
 
-/*数据包完整性需要保证 */
+/*???????????????????? */
 u32 fifo_get_with_header(struct icc_channel_fifo *fifo, u8 *data_buf, u32 data_buf_len)
 {
 	u32 read_len = 0;
@@ -166,26 +166,26 @@ u32 fifo_get_with_header(struct icc_channel_fifo *fifo, u8 *data_buf, u32 data_b
 	struct icc_channel_packet packet = {0};
 
 	read_len = fifo_get(fifo, (u8 *)&packet, sizeof(packet), &read);
-	if(read_len != sizeof(packet))/*读包头错误*/
+	if(read_len != sizeof(packet))/*??????????*/
 	{
 		icc_print_error("get packet err, read_len:0x%x, packet_size: 0x%x \n", read_len, sizeof(packet));
 		(void)icc_channel_packet_dump(&packet);
 		return (u32)ICC_ERR;
 	}
-	if(data_buf_len < packet.len) /*传入len比实际包的长度小*/
+	if(data_buf_len < packet.len) /*????len????????????????*/
 	{
 		icc_print_error("invalid data_len:0x%x, packet.len: 0x%x \n", data_buf_len, packet.len);
 		return (u32)ICC_ERR;
 	}
 
 	read_len = fifo_get(fifo, data_buf, packet.len, &read);
-	if(read_len != packet.len)   /*读数据错误*/
+	if(read_len != packet.len)   /*??????????*/
 	{
 		icc_print_error("get data err, read_len:0x%x, packet.len: 0x%x \n", read_len, packet.len);
 		return (u32)ICC_ERR;
 	}
 
-	/*更新读指针*/
+	/*??????????*/
 	rmb();
 	fifo->read = read;
 
@@ -193,14 +193,14 @@ u32 fifo_get_with_header(struct icc_channel_fifo *fifo, u8 *data_buf, u32 data_b
 }
 
 
-/* fifo中还有多少空闲空间 */
+/* fifo?????????????????? */
 static u32 fifo_write_space_get(struct icc_channel_fifo* fifo)
 {
     u32 write   = fifo->write;
     u32 read    = fifo->read;
     u32 buf_len = fifo->size;
 
-    /*空闲缓冲区大小*/
+    /*??????????????*/
     if (read > write)
     {
         return (read - write);
@@ -212,7 +212,7 @@ static u32 fifo_write_space_get(struct icc_channel_fifo* fifo)
 }
 
 
-/* fifo中还有多少数据未读取 */
+/* fifo???????????????????? */
 static u32 fifo_read_space_get(struct icc_channel_fifo* fifo)
 {
     u32 write   = fifo->write;
@@ -262,7 +262,7 @@ static s32 data_send(u32 cpuid, u32 channel_id, u8* data, u32 data_len)
 
 	spin_lock_irqsave(&channel->write_lock, flags); /*lint !e123 */
 
-	icc_debug_before_send(&packet);  /* 记录debug信息，将发送任务ID及时间戳放入包头中 */
+	icc_debug_before_send(&packet);  /* ????debug????????????????ID?????????????????? */
 	
 	if((data_len + sizeof(struct icc_channel_packet)) >= fifo_write_space_get(channel->fifo_send))/*lint !e574 */
 	{
@@ -270,7 +270,7 @@ static s32 data_send(u32 cpuid, u32 channel_id, u8* data, u32 data_len)
 		goto err_fifo_full; /*lint !e801 */
 	}
 
-    /* 将包头及负载放入fifo */
+    /* ????????????????fifo */
 	len = fifo_put_with_header(channel->fifo_send, (u8*)&packet, sizeof(struct icc_channel_packet), data, data_len);
 	len -=  sizeof(struct icc_channel_packet);
 	if(data_len != len)
@@ -336,7 +336,7 @@ void handle_channel_recv_data(struct icc_channel *channel)
 	if(GET_FUNC_ID(packet.channel_id) >= channel->func_size)
 	{
 		icc_print_error("skip packet!channel_id:0x%x,task_id:0x%x\n", packet.channel_id, packet.task_id);
-		/* 无效包跳过 */
+		/* ?????????? */
 		(void)fifo_skip(channel->fifo_recv, packet.len + read_len);
 		spin_unlock_irqrestore(&(channel->read_lock), flags); /*lint !e123 */
 		return;
@@ -344,7 +344,7 @@ void handle_channel_recv_data(struct icc_channel *channel)
 
 	vector = &channel->vector[GET_FUNC_ID(packet.channel_id)];
 
-	if(!packet.len) /* 空包，跳过packet */
+	if(!packet.len) /* ??????????packet */
 	{
 		channel->fifo_recv->read = read;
 	}
@@ -367,7 +367,7 @@ void handle_channel_recv(struct icc_channel *channel)
 {
 	u32 read = 0;
 
-	/* 防止快速掉电内存中内容不丢失，造成的对fifo的判断错误 */
+	/* ??????????????????????????????????????fifo?????????? */
 	if(ICC_CHN_MAGIC_SIGN == channel->fifo_recv->magic)
 	{
 		channel->fifo_recv->magic = ICC_CHN_MAGIC_UNSIGN;
@@ -375,7 +375,7 @@ void handle_channel_recv(struct icc_channel *channel)
 	}
 	if (channel->ready_recv)
 	{
-		/* 把fifo中消息全部读走(需要等对方初始化后才能使用) */
+		/* ??fifo??????????????(??????????????????????????) */
 		while(fifo_read_space_get(channel->fifo_recv) >= sizeof(struct icc_channel_packet))
 		{
 			read = channel->fifo_recv->read;
@@ -386,7 +386,7 @@ void handle_channel_recv(struct icc_channel *channel)
 			}
 		}
 
-		/*写回调默认使用子通道0 */
+		/*????????????????????0 */
 		if(fifo_write_space_get(channel->fifo_send) == channel->fifo_send->size && channel->vector->write_cb)
 		{
 			(void)channel->vector->write_cb(channel->id, NULL);
@@ -492,7 +492,7 @@ void icc_ipc_isr(u32 data)
 	}
 }
 
-/* 根据fifo头信息初始化通道 */
+/* ????fifo???????????????? */
 /*lint --e{578} */
 struct icc_channel *icc_channel_init(struct icc_init_info *info, s32 *ret)
 {
@@ -509,20 +509,20 @@ struct icc_channel *icc_channel_init(struct icc_init_info *info, s32 *ret)
 	}
 	(void)memset_s(channel, sizeof(struct icc_channel), 0, sizeof(struct icc_channel));
 
-	channel->id       = info->real_channel_id; /* 直接使用real channel id */
+	channel->id       = info->real_channel_id; /* ????????real channel id */
 	channel->name     = info->name;
 	channel->mode.val = info->mode;
 
-	/* 发送fifo本侧初始化，接收fifo对侧初始化 */
+	/* ????fifo????????????????fifo?????????? */
 	channel->fifo_send = (struct icc_channel_fifo*)(info->send_addr);
 	channel->fifo_recv = (struct icc_channel_fifo*)(info->recv_addr);
 	icc_restore_recv_channel_flag(channel->fifo_recv);
 
 	(void)memset_s(channel->fifo_send, sizeof(struct icc_channel_fifo), 0, sizeof(struct icc_channel_fifo));
 	channel->fifo_send->size  = info->fifo_size;
-	channel->fifo_send->magic = ICC_CHN_MAGIC_SIGN; /* 通知对方本核的该fifo是否初始化完成 */
+	channel->fifo_send->magic = ICC_CHN_MAGIC_SIGN; /* ????????????????fifo?????????????? */
 
-	/* 接收向量初始化 */
+	/* ?????????????? */
 	channel->func_size = info->func_size;
 	channel->vector = (struct icc_channel_vector*)osl_malloc(sizeof(struct icc_channel_vector) * channel->func_size);
 	if (!channel->vector)
@@ -555,7 +555,7 @@ struct icc_channel *icc_channel_init(struct icc_init_info *info, s32 *ret)
 	channel->state           = ICC_CHN_OPENED;
 	channel->ready_recv      = 0;
 
-	/* 私有IPC中断源 */
+	/* ????IPC?????? */
 	if(!channel->mode.union_stru.ipc_shared)
 	{
 		if(ICC_ERR == bsp_ipc_int_connect((IPC_INT_LEV_E)channel->ipc_recv_irq_id, (voidfuncptr)icc_ipc_isr, channel->id))
@@ -570,7 +570,7 @@ struct icc_channel *icc_channel_init(struct icc_init_info *info, s32 *ret)
 		}
 	}
 
-	/* 无任务共享IPC中断 */
+	/* ??????????IPC???? */
 	if((channel->mode.union_stru.ipc_shared) && (channel->mode.union_stru.no_task) && (shared_init_flag == 0))
 	{
 		if(ICC_ERR == bsp_ipc_int_connect((IPC_INT_LEV_E)channel->ipc_recv_irq_id, (voidfuncptr)icc_ipc_isr, ICC_NOTASK_SHAREDIPC_IDX))
@@ -599,16 +599,16 @@ error_channel:
 	return NULL;
 }
 
-/* 获取通道的fifo头信息然后初始化 */
+/* ??????????fifo???????????????? */
 static int icc_channels_node_init(struct device_node *node)
 {
 	int ret = ICC_ERR;
 	const char *ref_type = NULL;
-	struct device_node temp_node = {0};  /* M核上要使用dts必须定义这个变量 */
+	struct device_node temp_node = {0};  /* M??????????dts???????????????? */
 	struct device_node *child_node = &temp_node;  
 	unsigned long last_channel_addr = 0;
-	unsigned long last_ch_fifo_info_size = 0; /* fifo头长度 */
-	unsigned long last_ch_fifo_size = 0;	  /* fifo本身长度，用来存放发送的数据包头+数据体 */
+	unsigned long last_ch_fifo_info_size = 0; /* fifo?????? */
+	unsigned long last_ch_fifo_size = 0;	  /* fifo????????????????????????????????+?????? */
 	struct icc_init_info init_info = {0};
 	struct icc_channel *channel = NULL;
 	struct channel_cfg dts_cfg = {0};
@@ -643,7 +643,7 @@ static int icc_channels_node_init(struct device_node *node)
 		return ICC_ERR;
 	}
 
-	/* 有效的内存类型 */
+	/* ?????????????? */
 	for_each_available_child_of_node(node, child_node)
 	{
 		if (!(of_property_read_u32_array(child_node, "unused", &unused_channel, 1)))
@@ -680,7 +680,7 @@ static int icc_channels_node_init(struct device_node *node)
 
 
 
-		if (1 == dts_cfg.rx_fifo_first) /* 本核上，本通道，先是接收后是发送 */
+		if (1 == dts_cfg.rx_fifo_first) /* ???????????????????????????????? */
 		{
 			init_info.recv_addr = (void*)(last_channel_addr + 2 * last_ch_fifo_info_size + 2 * last_ch_fifo_size);
 			init_info.send_addr = (void*)(init_info.recv_addr + sizeof(struct icc_channel_fifo) + init_info.fifo_size);
@@ -696,7 +696,7 @@ static int icc_channels_node_init(struct device_node *node)
 				goto out; /*lint !e801 */
 			}
 		}
-		else  /* 本核上，本通道，先是发送后是接收 */
+		else  /* ???????????????????????????????? */
 		{
 			init_info.send_addr = (char*)(last_channel_addr + 2 * last_ch_fifo_info_size + 2 * last_ch_fifo_size);
 			init_info.recv_addr = (char*)(init_info.send_addr + sizeof(struct icc_channel_fifo) + init_info.fifo_size);
@@ -722,12 +722,12 @@ static int icc_channels_node_init(struct device_node *node)
 		icc_print_notice("skip %d\n", skip);
 		icc_print_notice("========== channel cfg end============\n");
 
-		if (1 == skip)  /* 只需要地址信息，此通道不初始化 */
+		if (1 == skip)  /* ?????????????????????????????? */
 		{
 			continue ;
 		}
 
-		/* 初始化通道 */
+		/* ?????????? */
 		channel = icc_channel_init(&init_info, &ret);
 		if(NULL == channel)
 		{
@@ -741,7 +741,7 @@ out:
 	return ret;
 }
 
-/* 本核相关所有通道初始化 */
+/* ?????????????????????? */
 int icc_channels_init(void)
 {
 	int ret = 0;
@@ -750,7 +750,7 @@ int icc_channels_init(void)
 	struct device_node *child_node = &temp_node;
 
 	node = of_find_compatible_node(NULL, NULL, ICC_CHANNEL_INIT_COMPITABLE);
-	if (!node)  /* 找不到节点 */
+	if (!node)  /* ?????????? */
 	{
 		icc_print_error("find node err\n");
 		return ICC_ERR;
@@ -778,7 +778,7 @@ s32 bsp_icc_init(void)
 	(void)memset_s(&g_icc_ctrl, sizeof(struct icc_control), 0, sizeof(struct icc_control));
 	g_icc_ctrl.cpu_id = ICC_THIS_CPU;
 
-	/* 不用通道指针置空，指针数组全部 */
+	/* ?????????????????????????????? */
 	(void)memset_s(g_icc_ctrl.channels, (u32)ICC_CHN_ID_MAX * sizeof(struct icc_channel *), 0, (u32)ICC_CHN_ID_MAX * sizeof(struct icc_channel *)); /*lint !e665 */
 	g_icc_ctrl.channel_size = ICC_CHN_ID_MAX;
 	
@@ -941,7 +941,7 @@ s32 bsp_icc_read(u32 channel_id, u8 *buf, u32 buf_len)
 	}
 
 	spin_lock_irqsave(&(g_icc_ctrl.channels[real_channel_id]->read_lock), flags);
-	/*fifo中消息不完整*/
+	/*fifo????????????*/
 	if(fifo_read_space_get(g_icc_ctrl.channels[real_channel_id]->fifo_recv) >= sizeof(struct icc_channel_packet))
 	{
 		read_len = fifo_get_with_header(g_icc_ctrl.channels[real_channel_id]->fifo_recv, buf, buf_len);

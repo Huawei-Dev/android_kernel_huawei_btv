@@ -64,12 +64,12 @@
 #define MSP_UPGRADE_DLOAD_ISO_LEN             (100)
 #define MSP_UPGRADE_DLOAD_PRODUCTID_LEN       (30)
 
-#define L4A_MAX_IPV6_PREFIX_NUM                (6)                             /* 最大IPv6地址前缀数量 */
+#define L4A_MAX_IPV6_PREFIX_NUM                (6)                             /* ????IPv6???????????? */
 
 
 /*****************************************************************************
 
- MSP 内部的消息定义
+ MSP ??????????????
 
 *****************************************************************************/
 
@@ -80,7 +80,7 @@
 
 /*****************************************************************************
 
- MUX相关接口
+ MUX????????
  (0x00010000,0x00010050]
 *****************************************************************************/
 #define ID_MSG_DIAG_CMD_REQ          (0x00010001)
@@ -89,7 +89,7 @@
 
 /*****************************************************************************
 
- AT模块消息接口
+ AT????????????
  [0x00010051,0x00010100)
 *****************************************************************************/
 
@@ -97,7 +97,7 @@
 
 /*****************************************************************************
 
- DIAG 消息接口
+ DIAG ????????
  [0x00010101,0x00010120)
 *****************************************************************************/
 #define ID_MSG_DIAG_DRA_DSP_REQ         (0x00010101)
@@ -107,7 +107,7 @@
 #define ID_MSG_DIAG_SIMMTRANS_REQ       (0x00010107)
 #define ID_MSG_DIAG_SIMMTRANS_CNF       (0x00010108)
 #define ID_MSG_DIAG_SIMMTRANS_IND       (0x00010109)
-#define ID_MSG_DIAG_AT_HSOADDR_IND      (0x0001010A) /* DIAG通知AT主机信息*/
+#define ID_MSG_DIAG_AT_HSOADDR_IND      (0x0001010A) /* DIAG????AT????????*/
 #define ID_MSG_DIAG_AT_HSO_AT_REQ       (0x0001010B) /* DIAG-->AT*/
 #define ID_MSG_AT_DIAG_HSO_AT_CNF       (0x0001010C) /* AT  -->DIAG*/
 #define ID_MSG_AT_DIAG_HSO_AT_IND       (0x0001010D) /* AT  -->DIAG*/
@@ -116,7 +116,7 @@
 
 /*****************************************************************************
 
- 针对POM模块的消息定义
+ ????POM??????????????
  [0x00010121,0x00010140)
 *****************************************************************************/
 #define ID_MSG_SYM_SYSMODE_IND          (0x00010121)
@@ -139,7 +139,7 @@
 
 /*****************************************************************************
 
- 针对FTM模块的消息定义
+ ????FTM??????????????
  [0x00010140,0x00010201)
 *****************************************************************************/
 #define ID_MSG_FTM_SET_TXON_REQ             (0x00010140)
@@ -176,7 +176,7 @@
 #define ID_MSG_FTM_RD_FAGC_CNF              (0x00010164)
 
 
-/*非信令综测start*/
+/*??????????start*/
 #define ID_MSG_FTM_SET_SRXPOW_REQ             (0x000101d3)
 #define ID_MSG_FTM_SET_SRXPOW_CNF             (0x000101d4)
 #define ID_MSG_FTM_RD_SRXPOW_REQ              (0x000101d5)
@@ -185,9 +185,9 @@
 #define ID_MSG_FTM_SET_SRXBLER_REQ             (0x000101db)
 #define ID_MSG_FTM_SET_SRXBLER_CNF             (0x000101dc)
 
-/*非信令综测end*/
+/*??????????end*/
 
-/*一键升级 先弄到FTM里面吧 lkf58113 @ 20111010*/
+/*???????? ??????FTM?????? lkf58113 @ 20111010*/
 #define ID_MSG_FTM_RD_DLOADVER_REQ              (0x000101eb)
 #define ID_MSG_FTM_RD_DLOADVER_CNF              (0x000101ec)
 
@@ -220,10 +220,10 @@
 
 #define ID_MSG_L1A_CT_IND                       (0x00010450)
 
-/*装备*/
+/*????*/
 #define ID_MSG_FTM_SET_TSELRF_REQ               (0x00010950)
 #define ID_MSG_FTM_SET_TSELRF_CNF               (0x00010951)
-/*装备*/
+/*????*/
 #define ID_MSG_FTM_SET_TBAT_REQ                (0x0001095c)
 #define ID_MSG_FTM_SET_TBAT_CNF                (0x0001095d)
 
@@ -343,7 +343,7 @@
 
 /*****************************************************************************
 
- 针对L1A消息接口的消息ID定义 [0x00010450,0x00010500)
+ ????L1A??????????????ID???? [0x00010450,0x00010500)
 *****************************************************************************/
 
 #define RSSI_POW_MAX_NUM        (30)
@@ -351,13 +351,13 @@
 
 /*****************************************************************************
 
- MSP 内部消息参数定义
+ MSP ????????????????
 
 *****************************************************************************/
 
 /*****************************************************************************
 
- MUX相关接口
+ MUX????????
  (0x00010000,0x00010050]
 *****************************************************************************/
 
@@ -365,7 +365,7 @@
 
 /*****************************************************************************
 
- MSM模块的消息参数定义
+ MSM??????????????????
 
 *****************************************************************************/
 
@@ -382,7 +382,7 @@ typedef struct
 }CLIP_SUPPORT_BANDS_STRU;
 
 /******************************************************************************/
-/*一键升级结构体 lkf58113 @20111011*/
+/*?????????????? lkf58113 @20111011*/
 /*DLOADVER*/
 typedef struct
 {
@@ -392,7 +392,7 @@ typedef struct
 typedef struct
 {
     VOS_UINT32 ulErrCode;
-    /*VOS_UINT32 ulLength; 保留，也许以后有用*/
+    /*VOS_UINT32 ulLength; ??????????????????*/
     VOS_CHAR cVer[MSP_UPGRADE_DLOAD_VER_LEN+1];
     VOS_CHAR padding;
 
@@ -401,13 +401,13 @@ typedef struct
 /*DLOADINFO*/
 typedef struct
 {
-    VOS_UINT32 ulReserved; /* 保留字段*/
+    VOS_UINT32 ulReserved; /* ????????*/
 } FTM_RD_DLOADINFO_REQ_STRU;
 
 /*DLOADINFO*/
 typedef struct
 {
-    VOS_UINT32 ulReserved; /* 保留字段*/
+    VOS_UINT32 ulReserved; /* ????????*/
 } FTM_RD_SDLOAD_REQ_STRU;
 
 typedef struct
@@ -420,7 +420,7 @@ typedef struct
 typedef struct
 {
     VOS_UINT32   ulErrCode;
-    /*VOS_UINT32 ulLength; 保留，也许以后有用*/
+    /*VOS_UINT32 ulLength; ??????????????????*/
     VOS_CHAR  szSendSW[MSP_UPGRADE_DLOAD_SOFTWARE_LEN +1];
     VOS_CHAR padding;
     VOS_CHAR  szSendISO[MSP_UPGRADE_DLOAD_ISO_LEN+1];
@@ -435,13 +435,13 @@ typedef struct
 /*AUTHORITYVER*/
 typedef struct
 {
-    VOS_UINT32 ulReserved; /* 保留字段*/
+    VOS_UINT32 ulReserved; /* ????????*/
 } FTM_RD_AUTHORITYVER_REQ_STRU;
 
 typedef struct
 {
     VOS_UINT32 ulErrCode;
-    /*VOS_UINT32 ulLength; 保留，也许以后有用*/
+    /*VOS_UINT32 ulLength; ??????????????????*/
     VOS_CHAR szAuthorityVer[MSP_UPGRADE_DLOAD_VER_LEN +1];
     VOS_CHAR padding;
 
@@ -450,13 +450,13 @@ typedef struct
 /*AUTHORITYID*/
 typedef struct
 {
-    VOS_UINT32 ulReserved; /* 保留字段*/
+    VOS_UINT32 ulReserved; /* ????????*/
 } FTM_RD_AUTHORITYID_REQ_STRU;
 
 typedef struct
 {
     VOS_UINT32 ulErrCode;
-    /*VOS_UINT32 ulLength;保留，也许以后有用*/
+    /*VOS_UINT32 ulLength;??????????????????*/
     VOS_CHAR szAuthorityID[MSP_UPGRADE_DLOAD_VER_LEN +1];
     VOS_CHAR padding0;
     VOS_CHAR szAuthorityType[2];
@@ -467,13 +467,13 @@ typedef struct
 /*BOOTROMVER*/
 typedef struct
 {
-    VOS_UINT32 ulReserved; /* 保留字段*/
+    VOS_UINT32 ulReserved; /* ????????*/
 } FTM_RD_BOOTROMVER_REQ_STRU;
 
 typedef struct
 {
     VOS_UINT32 ulErrCode;
-    /*VOS_UINT32 ulLength; 保留，也许以后有用*/
+    /*VOS_UINT32 ulLength; ??????????????????*/
     VOS_CHAR szSendStr[MSP_UPGRADE_DLOAD_VER_LEN +1];
     VOS_CHAR padding;
 
@@ -482,7 +482,7 @@ typedef struct
 /*NVBACKUP*/
 typedef struct
 {
-    VOS_UINT32 ulReserved; /* 保留字段*/
+    VOS_UINT32 ulReserved; /* ????????*/
 } FTM_SET_NVBACKUP_REQ_STRU;
 
 typedef struct
@@ -495,7 +495,7 @@ typedef struct
 /*NVRESTORE*/
 typedef struct
 {
-    VOS_UINT32 ulReserved; /* 保留字段*/
+    VOS_UINT32 ulReserved; /* ????????*/
 } FTM_SET_NVRESTORE_REQ_STRU;
 
 typedef struct
@@ -520,7 +520,7 @@ typedef struct
 /*RESET*/
 typedef struct
 {
-    VOS_UINT32 ulReserved; /* 保留字段*/
+    VOS_UINT32 ulReserved; /* ????????*/
 } FTM_SET_RESET_REQ_STRU;
 
 typedef struct
@@ -532,7 +532,7 @@ typedef struct
 /*NVRSTSTTS*/
 typedef struct
 {
-    VOS_UINT32 ulReserved; /* 保留字段*/
+    VOS_UINT32 ulReserved; /* ????????*/
 } FTM_SET_NVRSTSTTS_REQ_STRU;
 
 typedef struct
@@ -544,12 +544,12 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : 旨在告诉MUX DIAG 已经丢弃该包数据 TO DO ...
+ ???? : ????????MUX DIAG ???????????????? TO DO ...
  ID   : ID_MSG_SYM_SYSMODE_IND
  REQ  : NA
  CNF  : NA
  IND  : SYM_SYSMODE_IND_STRU
- 说明 :
+ ???? :
 *****************************************************************************/
 typedef enum _POM_SYSMODE_ENUM
 {
@@ -565,14 +565,14 @@ typedef struct
 } SYM_SYSMODE_IND_STRU;
 
 /*****************************************************************************
- 描述 : 定义TMODE切换时相关接口 ^TMODE缠线校准和SYM交互
-        SYM会根据参数设置或者不设置DSP校准
+ ???? : ????TMODE?????????????? ^TMODE??????????SYM????
+        SYM????????????????????????DSP????
  ID   : ID_MSG_SYM_SET_TMODE_REQ,ID_MSG_SYM_SET_TMODE_CNF
         ID_MSG_SYM_RD_TMODE_REQ,ID_MSG_SYM_RD_TMODE_CNF
  REQ  : SYM_SET_TMODE_REQ_STRU,SYM_RD_TMODE_REQ_STRU
  CNF  : SYM_SET_TMODE_CNF_STRU,SYM_RD_TMODE_CNF_STRU
  IND  : NA
- 说明 :
+ ???? :
 *****************************************************************************/
 enum
 {
@@ -584,9 +584,9 @@ enum
     EN_SYM_TMODE_SIGNAL_NOCARD  = 11,
 
     EN_SYM_TMODE_OFFLINE        = 12,
-    EN_SYM_TMODE_F_NONESIGNAL   = 13,   /*TMODE=6改为13*/
+    EN_SYM_TMODE_F_NONESIGNAL   = 13,   /*TMODE=6????13*/
 
-    EN_SYM_TMODE_SYN_NONESIGNAL = 14,   /*LTE 非信令综测*/
+    EN_SYM_TMODE_SYN_NONESIGNAL = 14,   /*LTE ??????????*/
     EN_SYM_TMODE_SET_SLAVE       = 15,
     EN_SYM_TMODE_GU_BT              = 16,
     EN_SYM_TMODE_TDS_FAST_CT        = 17,
@@ -606,7 +606,7 @@ enum
 };
 typedef VOS_UINT32 SYM_TMODE_STA_ENUM;
 
-/* 设置接口*/
+/* ????????*/
 typedef struct
 {
     VOS_UINT8 ucWCDMAIsSet;      /*1,IsSet; 0,notSet;*/
@@ -630,32 +630,32 @@ typedef struct
     VOS_UINT16 usSubPlatForm;
 }AT_PLATFORM_NV_STRU;
 
-/* 设置接口*/
+/* ????????*/
 typedef struct
 {
-    /* 是否添加控制信息待定 TODO: ... (陈文峰/00149739/2010-05-07)*/
+    /* ???????????????????? TODO: ... (??????/00149739/2010-05-07)*/
     SYM_TMODE_ENUM   enTmodeMode;
 } SYM_SET_TMODE_REQ_STRU;
 
 typedef struct
 {
-    /* 是否添加控制信息待定 TODO: ... (陈文峰/00149739/2010-05-07)*/
-    SYM_TMODE_ENUM   enTmodeMode;      /* 返回模式*/
-    SYM_TMODE_STA_ENUM  enSymTmodeSta; /* 返回状态*/
+    /* ???????????????????? TODO: ... (??????/00149739/2010-05-07)*/
+    SYM_TMODE_ENUM   enTmodeMode;      /* ????????*/
+    SYM_TMODE_STA_ENUM  enSymTmodeSta; /* ????????*/
 
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:关闭发射机错误*/
-    /* 2:单板模式错误*/
-    /* 3:没有设置相关信道*/
-    /* 4:打开发射机失败*/
-    /* 5:其它错误*/
-    VOS_UINT32 ulErrCode;                   /* ERR_SUCCESS:成功。OTHER:失败*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:??????????????*/
+    /* 2:????????????*/
+    /* 3:????????????????*/
+    /* 4:??????????????*/
+    /* 5:????????*/
+    VOS_UINT32 ulErrCode;                   /* ERR_SUCCESS:??????OTHER:????*/
 } SYM_SET_TMODE_CNF_STRU;
 
-/* 查询接口*/
+/* ????????*/
 typedef struct
 {
-    VOS_UINT32 ulReserved; /* 保留字段*/
+    VOS_UINT32 ulReserved; /* ????????*/
 } SYM_RD_TMODE_REQ_STRU;
 
 typedef struct
@@ -668,33 +668,33 @@ typedef struct
 typedef SYM_SET_TMODE_CNF_STRU SYM_RD_TMODE_CNF_STRU;
 
 /*****************************************************************************
- 描述 : ^FAGC 读取RSRP接口
+ ???? : ^FAGC ????RSRP????
  ID   : ID_MSG_FTM_RD_FAGC_REQ,ID_MSG_FTM_RD_FAGC_CNF
  REQ  : FTM_RD_FAGC_REQ_STRU
  CNF  : FTM_RD_FAGC_CNF_STRU
  IND  : NA
- 说明 :
+ ???? :
 *****************************************************************************/
 
-/* 读取接口*/
+/* ????????*/
 typedef struct
 {
-    VOS_UINT32 ulReserved; /* 保留字段*/
+    VOS_UINT32 ulReserved; /* ????????*/
 } FTM_RD_FAGC_REQ_STRU;
 
 typedef struct
 {
-    VOS_INT16 sRsrp; /* 功率值*/
+    VOS_INT16 sRsrp; /* ??????*/
     VOS_UINT16 usRsd;
 
-    /* ERR_MSP_SUCCESS 成功*/
-    /* 超时*/
-    /* 未打开*/
+    /* ERR_MSP_SUCCESS ????*/
+    /* ????*/
+    /* ??????*/
     VOS_UINT32 ulErrCode;
 } FTM_RD_FAGC_CNF_STRU;
 
 
- /* 电池校准参数数据结构*/
+ /* ????????????????????*/
  typedef struct
 {
   VOS_UINT16  min_value;
@@ -703,76 +703,76 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : ^F 相关接口
+ ???? : ^F ????????
  ID   : ID_MSG_SYM_ATF_REQ,ID_MSG_SYM_ATF_CNF
  REQ  : SYM_ATF_REQ_STRU,
  CNF  : SYM_ATF_CNF_STRU
  IND  : NA
- 说明 :
+ ???? :
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32 ulFpara; /* 保留字段*/
+    VOS_UINT32 ulFpara; /* ????????*/
 } SYM_ATF_REQ_STRU;
 
 typedef struct
 {
-    VOS_UINT32 ulErrCode;   /* ERR_SUCCESS:成功。OTHER:失败*/
+    VOS_UINT32 ulErrCode;   /* ERR_SUCCESS:??????OTHER:????*/
 } SYM_ATF_CNF_STRU;
 
 
 /*****************************************************************************
 
- FTM模块消息参数定义
+ FTM????????????????
 
 *****************************************************************************/
 
-/* 错误返回类型
- 统一错误码返回
- 没有设置相关信道
+/* ????????????
+ ??????????????
+ ????????????????
  typedef enum _FTM_ERR_ENUM
  {
-      0: 单板模式错误
+      0: ????????????
      EN_FTM_UEMODE_ERR = 0,
 
-      没有设置相关信道
+      ????????????????
      EN_FTM_UNSETCH_ERR,
 
-      打开接收机失败
+      ??????????????
      EN_FTM_RX_OPEN_ERR,
 
-      打开发射机失败
+      ??????????????
      EN_FTM_TX_OPEN_ERR,
 
-      打开发射机失败
+      ??????????????
      EN_FTM_TX_OPEN_ERR,
 
-      其它错误
+      ????????
      EN_FTM_TXON_PA_OPEN,
      EN_FTM_TXON_UNKNOWN = 0xFFFFFFFF
  } FTM_ERR_ENUM;*/
 
 /*****************************************************************************
- 描述 : ^FTXON 非信令下模式下，设置打开发射机
+ ???? : ^FTXON ??????????????????????????????
  ID   : ID_MSG_FTM_SET_TXON_REQ,ID_MSG_FTM_SET_TXON_CNF
         ID_MSG_FTM_RD_TXON_REQ,ID_MSG_FTM_RD_TXON_CNF
  REQ  : FTM_SET_TXON_REQ_STRU,FTM_RD_TXON_REQ_STRU
  CNF  : FTM_SET_TXON_CNF_STRU,FTM_RD_TXON_CNF_STRU
  IND  : NA
- 说明 :
+ ???? :
 *****************************************************************************/
 
-/* TXON开关类型*/
+/* TXON????????*/
 enum
 {
-    /* 0:表示关闭发射机*/
+    /* 0:??????????????*/
     EN_FTM_TXON_CLOSE = 0,
 
-    /* 1:表示打开发射机，包括基带调制和RF发射通道*/
+    /* 1:??????????????????????????????RF????????*/
     EN_FTM_TXON_UL_RFBBP_OPEN,
 
-    /* 2:表示只打开RFIC Transmitter和PA ，*/
-    /* BB调制通道不打开，用于VCTCXO校准*/
+    /* 2:??????????RFIC Transmitter??PA ??*/
+    /* BB????????????????????VCTCXO????*/
     EN_FTM_TXON_RF_PA_OPEN,
     EN_FTM_TXON_UNKNOWN = 0xFFFFFFFF
 };
@@ -801,42 +801,42 @@ typedef struct
 
 typedef struct
 {
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:关闭发射机错误*/
-    /* 2:单板模式错误*/
-    /* 3:没有设置相关信道*/
-    /* 4:打开发射机失败*/
-    /* 5:其它错误*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:??????????????*/
+    /* 2:????????????*/
+    /* 3:????????????????*/
+    /* 4:??????????????*/
+    /* 5:????????*/
     VOS_UINT32 ulErrCode;
 } FTM_SET_TXON_CNF_STRU;
 
 /* READ*/
 typedef struct
 {
-    VOS_UINT32 ulReserved; /* 保留字段*/
+    VOS_UINT32 ulReserved; /* ????????*/
 } FTM_RD_TXON_REQ_STRU;
 
 typedef struct
 {
     FTM_TXON_SWT_ENUM enSwtich;
 
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:关闭发射机错误*/
-    /* 2:单板模式错误*/
-    /* 3:没有设置相关信道*/
-    /* 4:打开发射机失败*/
-    /* 5:其它错误*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:??????????????*/
+    /* 2:????????????*/
+    /* 3:????????????????*/
+    /* 4:??????????????*/
+    /* 5:????????*/
     VOS_UINT32 ulErrCode;
 } FTM_RD_TXON_CNF_STRU;
 
 /*****************************************************************************
- 描述 : ^FCHAN 设置非信令的信道
+ ???? : ^FCHAN ????????????????
  ID   : ID_MSG_FTM_SET_FCHAN_REQ,ID_MSG_FTM_SET_FCHAN_CNF
         ID_MSG_FTM_RD_FCHAN_REQ,ID_MSG_FTM_RD_FCHAN_CNF
  REQ  : FTM_SET_FCHAN_REQ_STRU,FTM_SET_FCHAN_CNF_STRU
  CNF  : FTM_RD_FCHAN_REQ_STRU,FTM_RD_FCHAN_CNF_STRU
  IND  : NA
- 说明 :
+ ???? :
 *****************************************************************************/
 
 enum _FCHAN_MODE_ENUM
@@ -854,7 +854,7 @@ enum _FCHAN_MODE_ENUM
 } ;
 typedef VOS_UINT32 FCHAN_MODE_ENUM;
 
-/* 待确认*/
+/* ??????*/
 #define FTM_AT_FCHAN_BAND    (8)		/* 800M*/
 #define FTM_AT_FCHAN_BAND_MAX (14)
 #define FTM_DSP_FCHAN_BAND   (20)       /* 800M*/
@@ -870,12 +870,12 @@ typedef struct
 
 typedef struct
 {
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:单板模式错误*/
-    /* 2:输入频段信息无法对应*/
-    /* 3:设置信道信息失败*/
-    /* 4:输入频段和信道信息无法组合*/
-    /* 5:其它错误*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:????????????*/
+    /* 2:????????????????????*/
+    /* 3:????????????????*/
+    /* 4:??????????????????????????*/
+    /* 5:????????*/
     FCHAN_MODE_ENUM enFchanMode;
     VOS_UINT32 ulErrCode;
 } FTM_SET_FCHAN_CNF_STRU;
@@ -883,7 +883,7 @@ typedef struct
 /* READ*/
 typedef struct
 {
-    VOS_UINT32 ulReserved; /* 保留字段*/
+    VOS_UINT32 ulReserved; /* ????????*/
 } FTM_RD_FCHAN_REQ_STRU;
 
 #define MSP_FTM_FREQ_VALID   (1)
@@ -895,58 +895,58 @@ typedef struct
     VOS_UINT8 ucBand;
     VOS_UINT8 ucPadding[3]; /* PADDING*/
 
-    /* 装备AT命令新定义, 查询时上行和下行频道设置都需返回*/
+    /* ????AT??????????, ????????????????????????????????*/
     VOS_UINT16 usUlChannel;
     VOS_UINT16 usDlChannel;
 
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:单板模式错误*/
-    /* 2:输入频段信息无法对应*/
-    /* 3:设置信道信息失败*/
-    /* 4:输入频段和信道信息无法组合*/
-    /* 5:其它错误*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:????????????*/
+    /* 2:????????????????????*/
+    /* 3:????????????????*/
+    /* 4:??????????????????????????*/
+    /* 5:????????*/
     VOS_UINT32 ulErrCode;
 } FTM_RD_FCHAN_CNF_STRU;
 
 /*****************************************************************************
- 描述 : ^FVCTCXO 设置VCTCXO的电压值
+ ???? : ^FVCTCXO ????VCTCXO????????
  ID   : ID_MSG_FTM_SET_FVCTCXO_REQ,ID_MSG_FTM_SET_FVCTCXO_CNF
         ID_MSG_FTM_RD_FVCTCXO_REQ,ID_MSG_FTM_RD_FVCTCXO_CNF
  REQ  : FTM_SET_FVCTCXO_REQ_STRU,FTM_RD_FVCTCXO_REQ_STRU
  CNF  : FTM_SET_FVCTCXO_CNF_STRU,FTM_RD_FVCTCXO_CNF_STRU
  IND  : NA
- 说明 :
+ ???? :
 *****************************************************************************/
 
-#define FTM_CALPDDCS_EXECUTING (1) /* IP2校准执行中 */
-#define FTM_CALPDDCS_EXECUTED (0)  /* IP2校准执行完毕 */
+#define FTM_CALPDDCS_EXECUTING (1) /* IP2?????????? */
+#define FTM_CALPDDCS_EXECUTED (0)  /* IP2???????????? */
 
 typedef struct
 {
-    VOS_UINT16 ulPdAutoFlg;  /*具体瞪闲行诺篮盼0～65535*/
-    VOS_UINT16 usRsv;     /*保留字段*/
+    VOS_UINT16 ulPdAutoFlg;  /*??????????????????0??65535*/
+    VOS_UINT16 usRsv;     /*????????*/
 } FTM_SET_F_FCALPDDCS_REQ_STRU;
 typedef struct
 {
-    /*U32_T ulMsgID;	上报消息ID*/
-    VOS_UINT16 usDacCfg;    		/*自校准获得的DAC配置*/
-    VOS_UINT16 usVgaCfg;   	/*自校准获得的VGA配置*/
-    VOS_UINT16 usStatus;	 /*VGA校准异常标志*/
+    /*U32_T ulMsgID;	????????ID*/
+    VOS_UINT16 usDacCfg;    		/*????????????DAC????*/
+    VOS_UINT16 usVgaCfg;   	/*????????????VGA????*/
+    VOS_UINT16 usStatus;	 /*VGA????????????*/
     VOS_UINT16 usRsv;
     /*
-    ERR_SUCCESS(0):成功。
-    526    单板模式错误(比如信令模式)
-    527    没有设置相关信道
-    545    没有打开发射机
-    566    没有打开接收机的快速校准
-    501    未知错误
+    ERR_SUCCESS(0):??????
+    526    ????????????(????????????)
+    527    ????????????????
+    545    ??????????????
+    566    ????????????????????????
+    501    ????????
     */
     VOS_UINT32 ulErrCode;
 } FTM_RD_F_FCALPDDCS_CNF_STRU;
 //SET
 typedef struct
 {
-    VOS_UINT32 ulPdEnbFlg;               /*指示PD是否使能*/
+    VOS_UINT32 ulPdEnbFlg;               /*????PD????????*/
     VOS_UINT16 usDacCfg;
     VOS_UINT16 usVgaCfg;
 }FTM_SET_F_FPDPOWS_REQ_STRU;
@@ -957,19 +957,19 @@ typedef struct
 
 typedef struct
 {
-    VOS_UINT16 ulErrCode;						/* 状态*/
+    VOS_UINT16 ulErrCode;						/* ????*/
     VOS_UINT16 usRsv;
     VOS_UINT16 ausPDDCValue[CT_F_FREQ_LIST_MAX_NUM][RSSI_POW_MAX_NUM];
 }FTM_RD_FQPDDCRES_CNF_STRU;
 
 /*****************************************************************************
- 描述 : RXON 非信令下模式下，设置打开接收机
+ ???? : RXON ??????????????????????????????
  ID   : ID_MSG_FTM_SET_RXON_REQ,ID_MSG_FTM_SET_RXON_CNF
         ID_MSG_FTM_RD_RXON_REQ,ID_MSG_FTM_RD_RXON_CNF
  REQ  : FTM_SET_RXON_REQ_STRU,FTM_RD_RXON_REQ_STRU
  CNF  : FTM_SET_RXON_CNF_STRU,FTM_RD_RXON_CNF_STRU
  IND  : NA
- 说明 :
+ ???? :
 *****************************************************************************/
 #if 0
 #define FTM_RXON_FLG_OPEN           (1)
@@ -977,29 +977,29 @@ typedef struct
 #define FTM_RXON_FLG_UNKNOWN        (0xff)
 #endif
 
-/* RXON开关类型 */
+/* RXON???????? */
 enum
 {
-    EN_FTM_RXON_CLOSE   = 0,         /* 接收机关闭     */
-    EN_FTM_RXON_OPEN    = 1,         /* 接收机打开     */
-    EN_FTM_RXON_UNKNOWN = 0xFFFFFFFF /* 接收机状态未知 */
+    EN_FTM_RXON_CLOSE   = 0,         /* ??????????     */
+    EN_FTM_RXON_OPEN    = 1,         /* ??????????     */
+    EN_FTM_RXON_UNKNOWN = 0xFFFFFFFF /* ?????????????? */
 };
 typedef VOS_UINT32 FTM_RXON_SWT_ENUM;
 
 /* SET*/
 typedef struct
 {
-    /* 0: 表示关闭收双通道*/
-    /* 1: 表示打开收双通道*/
+    /* 0: ????????????????*/
+    /* 1: ????????????????*/
     VOS_UINT32 ulRxSwt;
 } FTM_SET_RXON_REQ_STRU;
 
 typedef struct
 {
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:单板模式错误*/
-    /* 2:没有设置相关信道*/
-    /* 3:打开接收机失败*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:????????????*/
+    /* 2:????????????????*/
+    /* 3:??????????????*/
     VOS_UINT32 ulErrCode;
 } FTM_SET_RXON_CNF_STRU;
 
@@ -1011,26 +1011,26 @@ typedef struct
 
 typedef struct
 {
-    /* 0: 表示关闭收双通道*/
-    /* 1: 表示打开收双通道*/
+    /* 0: ????????????????*/
+    /* 1: ????????????????*/
     VOS_UINT32 ulRxSwt;
 
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:单板模式错误*/
-    /* 2:没有设置相关信道*/
-    /* 3:打开接收机失败*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:????????????*/
+    /* 2:????????????????*/
+    /* 3:??????????????*/
     VOS_UINT32 ulErrCode;
 } FTM_RD_RXON_CNF_STRU;
 
 /*****************************************************************************
- 描述 : ^RFANT 设置RF通道选择
-        配置RX通道。RTT收到该原语后选定需要进行RSSI折算和上报的接收通道
+ ???? : ^RFANT ????RF????????
+        ????RX??????RTT????????????????????????RSSI????????????????????
  ID   : ID_MSG_FTM_SET_RXANT_REQ,ID_MSG_FTM_SET_RXANT_CNF
         ID_MSG_FTM_RD_RXANT_REQ,ID_MSG_FTM_RD_RXANT_CNF
  REQ  : FTM_SET_RXANT_REQ_STRU,FTM_RD_RXANT_REQ_STRU
  CNF  : FTM_SET_RXANT_CNF_STRU,FTM_RD_RXANT_CNF_STRU
  IND  : NA
- 说明 :
+ ???? :
 *****************************************************************************/
 
 #define FTM_RXANT_TYPE_TX          (0)
@@ -1043,7 +1043,7 @@ typedef struct
 #define FTM_RXANT_OPEN_DCHAN      (3)
 #define FTM_RXANT_UNKNOWN         (0xff)
 
-/* for AT^TSELRF  选择射频通路指令*/
+/* for AT^TSELRF  ????????????????*/
 #define FTM_TSELRF_TD    (6)
 
 #define FTM_TSELRF_WIFI           (7)
@@ -1055,25 +1055,25 @@ typedef struct
 /* SET*/
 typedef struct
 {
-    /* 0 发送通道*/
-    /* 1 接收通道*/
+    /* 0 ????????*/
+    /* 1 ????????*/
     VOS_UINT8 ucChanelType;
 
-    /* 0 关闭双通道*/
-    /* 1 只打开通道1*/
-    /* 2 只打开通道2*/
-    /* 3 打开双通道*/
+    /* 0 ??????????*/
+    /* 1 ??????????1*/
+    /* 2 ??????????2*/
+    /* 3 ??????????*/
     VOS_UINT8 ucChanelNo;
     VOS_UINT16 usReserved;
 } FTM_SET_RXANT_REQ_STRU;
 
 typedef struct
 {
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:通道打开失败*/
-    /* 2:通道关闭失败*/
-    /* 3:不支持（如打开通道2的发送通道，DD800项目采用1T2R模式）*/
-    /* 4:其它错误*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:????????????*/
+    /* 2:????????????*/
+    /* 3:??????????????????2????????????DD800????????1T2R??????*/
+    /* 4:????????*/
     VOS_UINT32 ulErrCode;
 } FTM_SET_RXANT_CNF_STRU;
 
@@ -1088,11 +1088,11 @@ typedef struct
     VOS_UINT8 ucChanelNo;
     VOS_UINT8 padding[3];
 
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:通道打开失败*/
-    /* 2:通道关闭失败*/
-    /* 3:不支持（如打开通道2的发送通道，DD800项目采用1T2R模式）*/
-    /* 4:其它错误*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:????????????*/
+    /* 2:????????????*/
+    /* 3:??????????????????2????????????DD800????????1T2R??????*/
+    /* 4:????????*/
     VOS_UINT32 ulErrCode;
 } FTM_RD_RXANT_CNF_STRU;
 
@@ -1111,11 +1111,11 @@ typedef struct
 
 typedef struct
 {
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:通道打开失败*/
-    /* 2:通道关闭失败*/
-    /* 3:不支持（如打开通道2的发送通道，DD800项目采用1T2R模式）*/
-    /* 4:其它错误*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:????????????*/
+    /* 2:????????????*/
+    /* 3:??????????????????2????????????DD800????????1T2R??????*/
+    /* 4:????????*/
     VOS_UINT32 ulErrCode;
 } FTM_SET_TSELRF_CNF_STRU;
 
@@ -1131,11 +1131,11 @@ typedef struct
     VOS_UINT8 ucGroup;
     VOS_UINT16 usRsv;
 
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:通道打开失败*/
-    /* 2:通道关闭失败*/
-    /* 3:不支持（如打开通道2的发送通道，DD800项目采用1T2R模式）*/
-    /* 4:其它错误*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:????????????*/
+    /* 2:????????????*/
+    /* 3:??????????????????2????????????DD800????????1T2R??????*/
+    /* 4:????????*/
     VOS_UINT32 ulErrCode;
 } FTM_RD_TSELRF_CNF_STRU;
 
@@ -1151,11 +1151,11 @@ typedef struct
 
 typedef struct
 {
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:单板模式错误*/
-    /* 2:没有设置相关信道*/
-    /* 3:设置AAGC失败*/
-    /* 4:其它错误*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:????????????*/
+    /* 2:????????????????*/
+    /* 3:????AAGC????*/
+    /* 4:????????*/
     VOS_UINT32 ulErrCode;
 } FTM_SET_FPA_CNF_STRU;
 
@@ -1170,33 +1170,33 @@ typedef struct
 
 typedef struct
 {
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:单板模式错误*/
-    /* 2:没有设置相关信道*/
-    /* 3:设置AAGC失败*/
-    /* 4:其它错误*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:????????????*/
+    /* 2:????????????????*/
+    /* 3:????AAGC????*/
+    /* 4:????????*/
     VOS_UINT32 ulErrCode;
 } FTM_SET_FDAC_CNF_STRU;
 
 /*****************************************************************************
- 描述 : ^FWAVE 非信令下波形设置，单位 0.01db
+ ???? : ^FWAVE ?????????????????????? 0.01db
  ID   : ID_MSG_FTM_SET_FWAVE_REQ ID_MSG_FTM_SET_FWAVE_CNF
         ID_MSG_FTM_RD_FWAVE_REQ  ID_MSG_FTM_RD_FWAVE_CNF
  REQ  : FTM_SET_FWAVE_REQ_STRU,  FTM_RD_FWAVE_REQ_STRU
  CNF  : FTM_SET_FWAVE_CNF_STRU,  FTM_RD_FWAVE_CNF_STRU
  IND  : NA
- 说明 :
+ ???? :
 ******************************************************************************/
 enum _FWAVE_TYPE_ENUM
 {
-    EN_FWAVE_TYPE_CW    = 0, /* 单音         */
-    EN_FWAVE_TYPE_WCDMA,     /*  WCDMA调制波 */
-    EN_FWAVE_TYPE_GSM,       /*  GSM调制波   */
-    EN_FWAVE_TYPE_EDGE,      /*  EDGE调制波  */
-    EN_FWAVE_TYPE_WIFI,      /*  WIFI调制波  */
-    EN_FWAVE_TYPE_LTE,       /*  LTE调制波   */
-    EN_FWAVE_TYPE_CDMA,      /*  CDMA调制波  */
-    EN_FWAVE_TYPE_TDS,       /*  TDS调制波   */
+    EN_FWAVE_TYPE_CW    = 0, /* ????         */
+    EN_FWAVE_TYPE_WCDMA,     /*  WCDMA?????? */
+    EN_FWAVE_TYPE_GSM,       /*  GSM??????   */
+    EN_FWAVE_TYPE_EDGE,      /*  EDGE??????  */
+    EN_FWAVE_TYPE_WIFI,      /*  WIFI??????  */
+    EN_FWAVE_TYPE_LTE,       /*  LTE??????   */
+    EN_FWAVE_TYPE_CDMA,      /*  CDMA??????  */
+    EN_FWAVE_TYPE_TDS,       /*  TDS??????   */
     EN_FWAVE_TYPE_UNKONWN = 0xFFFF
 } ;
 typedef VOS_UINT32 FWAVE_TYPE_ENUM;
@@ -1205,8 +1205,8 @@ typedef VOS_UINT32 FWAVE_TYPE_ENUM;
 // SET
 typedef struct
 {
-    VOS_UINT16 usType; /* 波形类型 */
-    VOS_UINT16 usPower;/* 波形功率  */
+    VOS_UINT16 usType; /* ???????? */
+    VOS_UINT16 usPower;/* ????????  */
 }FTM_SET_FWAVE_REQ_STRU;
 
 typedef struct
@@ -1222,19 +1222,19 @@ typedef struct
 
 typedef struct
 {
-    VOS_UINT16 usType; /* 波形类型 */
-    VOS_UINT16 usPower;/* 波形功率  */
+    VOS_UINT16 usType; /* ???????? */
+    VOS_UINT16 usPower;/* ????????  */
 }FTM_RD_FWAVE_CNF_STRU;
 
 /*****************************************************************************
- 描述 : ^FLNA 配置RFIC的AAGC总增益，用于下行AGC表的校准，单位为dB。
-        RTT收到该原语后将RFIC的总增益立即改为原语指示的增益值
+ ???? : ^FLNA ????RFIC??AAGC????????????????AGC????????????????dB??
+        RTT??????????????RFIC????????????????????????????????
  ID   : ID_MSG_FTM_SET_AAGC_REQ,ID_MSG_FTM_SET_AAGC_CNF
         ID_MSG_FTM_RD_AAGC_REQ,ID_MSG_FTM_RD_AAGC_CNF
  REQ  : FTM_SET_AAGC_REQ_STRU,FTM_RD_AAGC_REQ_STRU
  CNF  : FTM_SET_AAGC_CNF_STRU,FTM_RD_AAGC_CNF_STRU
  IND  : NA
- 说明 :
+ ???? :
 *****************************************************************************/
 
 /* SET*/
@@ -1247,11 +1247,11 @@ typedef struct
 
 typedef struct
 {
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:单板模式错误*/
-    /* 2:没有设置相关信道*/
-    /* 3:设置AAGC失败*/
-    /* 4:其它错误*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:????????????*/
+    /* 2:????????????????*/
+    /* 3:????AAGC????*/
+    /* 4:????????*/
     VOS_UINT32 ulErrCode;
 } FTM_SET_AAGC_CNF_STRU;
 
@@ -1268,11 +1268,11 @@ typedef struct
     VOS_UINT8 ucAggcLvl;
     VOS_UINT8 padding[3];
 
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:单板模式错误*/
-    /* 2:没有设置相关信道*/
-    /* 3:设置AAGC失败*/
-    /* 4:其它错误*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:????????????*/
+    /* 2:????????????????*/
+    /* 3:????AAGC????*/
+    /* 4:????????*/
     VOS_UINT32 ulErrCode;
 } FTM_RD_AAGC_CNF_STRU;
 
@@ -1318,12 +1318,12 @@ typedef struct
 /**********************************************************************************/
 
 /*****************************************************************************
- 结构名    : DRV_AGENT_CBC_GET_CNF_STRU
- 结构说明  : The message struct get cbc state reponse.
+ ??????    : DRV_AGENT_CBC_GET_CNF_STRU
+ ????????  : The message struct get cbc state reponse.
 
-1. 日    期   : 2012年03月01日
-   作    者   : HanJiuping 00122021
-   修改内容   : 新增结构体
+1. ??    ??   : 2012??03??01??
+   ??    ??   : HanJiuping 00122021
+   ????????   : ??????????
 *****************************************************************************/
 typedef struct
 {
@@ -1335,57 +1335,57 @@ typedef struct
 
 
 /*****************************************************************************
- 描述 : ^FRSSI 配置RFIC的AAGC总增益，用于下行AGC表的校准，单位为dB。
-        RTT收到该原语后将RFIC的总增益立即改为原语指示的增益值
+ ???? : ^FRSSI ????RFIC??AAGC????????????????AGC????????????????dB??
+        RTT??????????????RFIC????????????????????????????????
  ID   : ID_MSG_FTM_FRSSI_REQ,ID_MSG_FTM_FRSSI_CNF
 
  REQ  : FTM_FRSSI_REQ_STRU
  CNF  : FTM_FRSSI_CNF_STRU
  IND  : NA
- 说明 :
+ ???? :
 *****************************************************************************/
 typedef struct
 {
-    /* 只使用整型数*/
+    /* ????????????*/
     VOS_UINT32 ulReserved;
 } FTM_FRSSI_REQ_STRU;
 
 typedef struct
 {
-    /* 全部是整型值, 单位1/8dBm, 根据DSP接口, 为正值*/
+    /* ????????????, ????1/8dBm, ????DSP????, ??????*/
     VOS_INT32 lValue1;
     VOS_INT32 lValue2;
     VOS_INT32 lValue3;
     VOS_INT32 lValue4;
 
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:单板模式错误*/
-    /* 2:没有设置相关信道*/
-    /* 3:没有打开接收机*/
-    /* 4:无信号输入或检测不到信号*/
-    /* 5:其它错误*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:????????????*/
+    /* 2:????????????????*/
+    /* 3:??????????????*/
+    /* 4:????????????????????????*/
+    /* 5:????????*/
     VOS_UINT32 ulErrCode;
 } FTM_FRSSI_CNF_STRU;
 
 
 /*****************************************************************************
- 描述 : SYM给FTM发起请求，要求打开非信令模式
+ ???? : SYM??FTM????????????????????????????
 
  ID   : ID_MSG_FTM_OPENCHAN_REQ,ID_MSG_FTM_OPENCHAN_CNF
 
  REQ  : FTM_OPENCHAN_REQ_STRU
  CNF  : FTM_OPENCHAN_CNF_STRU
  IND  : NA
- 说明 :
+ ???? :
 ******************************************************************************/
-/* 非信令下子模式*/
+/* ??????????????*/
 
-/* EN_SYM_TMODE_NONESIGNAL 普通校准*/
-/* EN_SYM_TMODE_F_NONESIGNAL 快速校准*/
+/* EN_SYM_TMODE_NONESIGNAL ????????*/
+/* EN_SYM_TMODE_F_NONESIGNAL ????????*/
 
 typedef struct
 {
-    /* 只使用整型数*/
+    /* ????????????*/
     /* EN_SYM_TMODE_NONESIGNAL*/
     /* EN_SYM_TMODE_F_NONESIGNAL*/
     VOS_UINT8 ucTmodeType;
@@ -1395,29 +1395,29 @@ typedef struct
 
 typedef struct
 {
-    /* ERR_SUCCESS(0):成功。*/
-    /* 1:单板模式错误*/
-    /* 2:没有设置相关信道*/
-    /* 3:没有打开接收机*/
-    /* 4:无信号输入或检测不到信号*/
-    /* 5:其它错误*/
+    /* ERR_SUCCESS(0):??????*/
+    /* 1:????????????*/
+    /* 2:????????????????*/
+    /* 3:??????????????*/
+    /* 4:????????????????????????*/
+    /* 5:????????*/
     VOS_UINT32 ulErrCode;
 } FTM_OPENCHAN_CNF_STRU;
 
 
 /*****************************************************************************
- 描述 : SYM给FTM发起请求，要求打开或者关闭工控
+ ???? : SYM??FTM??????????????????????????????
 
  ID   : ID_MSG_FTM_PHY_POWER_REQ,ID_MSG_FTM_PHY_POWER_CNF
 
  REQ  : FTM_PHY_POWER_REQ_STRU
  CNF  : FTM_PHY_POWER_CNF_STRU
  IND  : NA
- 说明 :
+ ???? :
 *****************************************************************************/
 typedef struct
 {
-    /* 只使用整型数*/
+    /* ????????????*/
     VOS_UINT32 ulReserved;
 } FTM_PHY_POWER_REQ_STRU;
 
@@ -1429,19 +1429,19 @@ typedef struct
 
 /*****************************************************************************
 
- FTM模块快速校准消息参数定义
+ FTM????????????????????????
 
 ******************************************************************************/
 
 
 /*****************************************************************************
- 描述 : ^BANDSW 单板Band切换
+ ???? : ^BANDSW ????Band????
  ID   : ID_MSG_FTM_SET_BANDSW_REQ,ID_MSG_FTM_SET_BANDSW_CNF
         ID_MSG_FTM_RD_BANDSW_REQ,ID_MSG_FTM_RD_BANDSW_CNF
  REQ  : FTM_SET_BANDSW_REQ_STRU,FTM_RD_BANDSW_REQ_STRU
  CNF  : FTM_SET_BANDSW_CNF_STRU,FTM_RD_BANDSW_CNF_STRU
  IND  : NA
- 说明 :
+ ???? :
 ****************************************************************************/
 
 #define FTM_MAX_BAND_NUM 129
@@ -1463,10 +1463,10 @@ typedef struct
 
 typedef struct
 {
-    VOS_UINT32 ulRsv;     /* 保留字段*/
+    VOS_UINT32 ulRsv;     /* ????????*/
 } FTM_RD_LTESCINFO_REQ_STRU;
 
-/*非信令综测start*/
+/*??????????start*/
 /*^SSYNC SET*/
 typedef struct
 {
@@ -1572,11 +1572,11 @@ typedef struct
 
 typedef struct
 {
-    VOS_UINT16 usSwitch;/*非信令下行测试时，上行发射是否打开 0关闭，1打开*/
-    VOS_INT16 sPower; /*非信令下行测试时，上行发射功率，范围-40~23*/
-    VOS_UINT16 usMod;/*非信令下行测试时，上行发射取值范围 0-2 ,0:QPSK,1:16QAM,2:64QAM*/
-	VOS_UINT16 usRBNum; /* 非信令下行测试时，上行发射RB数量，范围1-100*/
-    VOS_UINT16 usRBPos;/*非信令下行测试时，上行发射RB位置，范围0-99*/
+    VOS_UINT16 usSwitch;/*?????????????????????????????????? 0??????1????*/
+    VOS_INT16 sPower; /*????????????????????????????????????-40~23*/
+    VOS_UINT16 usMod;/*?????????????????????????????????? 0-2 ,0:QPSK,1:16QAM,2:64QAM*/
+	VOS_UINT16 usRBNum; /* ??????????????????????????RB??????????1-100*/
+    VOS_UINT16 usRBPos;/*??????????????????????????RB??????????0-99*/
 	VOS_UINT16 usReserved;
 	VOS_UINT32 ulErrCode;
 }FTM_RD_SRXSET_CNF_STRU;
@@ -1695,48 +1695,48 @@ typedef struct
 	VOS_UINT32		    ulStatus;
 }PS_MSP_DPCH_CNF;
 
-/*非信令综测end*/
+/*??????????end*/
 
 
 /*****************************************************************************
 
- DIAG模块消息参数定义
+ DIAG????????????????
 
 *****************************************************************************/
 
 /*****************************************************************************
- 描述 : DIAG为PS和SIMM提供的透明接口
+ ???? : DIAG??PS??SIMM??????????????
  ID   : ID_MSG_DIAG_PSTRANS_REQ,ID_MSG_DIAG_PSTRANS_CNF,ID_MSG_DIAG_PSTRANS_IND
  REQ  : DIAG_PSTRANS_REQ_STRU
  CNF  : DIAG_PSTRANS_CNF_STRU
  IND  : DIAG_PSTRANS_IND_STRU
- 说明 :
+ ???? :
 *****************************************************************************/
 
 typedef struct
 {
-    VOS_UINT32 ulCmdID;     /* 透传命令字*/
-    VOS_UINT32 ulParamSize; /* 透传命令参数的长度*/
-    VOS_UINT8  ucParam[0];  /* 命令参数的数据,对应透传命令的参数*/
+    VOS_UINT32 ulCmdID;     /* ??????????*/
+    VOS_UINT32 ulParamSize; /* ??????????????????*/
+    VOS_UINT8  ucParam[0];  /* ??????????????,??????????????????*/
 } DIAG_PSTRANS_REQ_STRU;
 
 
-/* DIAG<-L4A,SIMM  CNF/IND 数据结构*/
+/* DIAG<-L4A,SIMM  CNF/IND ????????*/
 typedef struct
 {
-    VOS_UINT32 ulCmdID;      /* 透传命令字(CNF) 或者 上报命令ID(IND ID)*/
-    VOS_UINT32 ulParamSize;  /* 命令参数的长度*/
-    VOS_UINT8  ucParam[0];   /* 命令参数的数据 透传内部结构MSP不感知*/
+    VOS_UINT32 ulCmdID;      /* ??????????(CNF) ???? ????????ID(IND ID)*/
+    VOS_UINT32 ulParamSize;  /* ??????????????*/
+    VOS_UINT8  ucParam[0];   /* ?????????????? ????????????MSP??????*/
 } DIAG_PSTRANS_CNF_STRU, DIAG_PSTRANS_IND_STRU;
 
 
 /*****************************************************************************
- 描述 : DIAG为PS和SIMM提供的透明接口
+ ???? : DIAG??PS??SIMM??????????????
  ID   : ID_MSG_DIAG_SIMMTRANS_REQ,ID_MSG_DIAG_SIMMTRANS_CNF,ID_MSG_DIAG_SIMMTRANS_IND
  REQ  : DIAG_SIMMTRANS_REQ_STRU
  CNF  : DIAG_SIMMTRANS_CNF_STRU
  IND  : DIAG_SIMMTRANS_IND_STRU
- 说明 :
+ ???? :
 *****************************************************************************/
 typedef DIAG_PSTRANS_REQ_STRU DIAG_SIMMTRANS_REQ_STRU;
 typedef DIAG_PSTRANS_CNF_STRU DIAG_SIMMTRANS_CNF_STRU;
@@ -1745,20 +1745,20 @@ typedef DIAG_PSTRANS_IND_STRU DIAG_SIMMTRANS_IND_STRU;
 
 /*****************************************************************************
 
- 针对L1A消息接口的消息参数定义 [0x00010450,0x00010500)
+ ????L1A?????????????????????? [0x00010450,0x00010500)
 ******************************************************************************/
 
 /*****************************************************************************
- 描述 : L1A针对FTM的消息接口，存储RTT返回的结构体
+ ???? : L1A????FTM????????????????RTT????????????
  ID   : ID_MSG_L1A_CT_IND
  REQ  : NA
  CNF  : NA
  IND  : SIMM_STATUS_IND_STRU
- 说明 :
+ ???? :
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT32 ulDspId;  /* 存储相关结构体*/
+    VOS_UINT32 ulDspId;  /* ??????????????*/
     VOS_UINT8 aucPadding[0];
 }L1A_CT_IND_STRU;
 
@@ -1769,35 +1769,35 @@ typedef struct
 #define  AT_CALIB_PARAM_APCFREQ          96
 #define  AT_CALIB_PARAM_AGC              32
 #define  AT_CALIB_PARAM_AGCFREQ          32
-#define  FTM_TDS_TX_LEVEL_NUM_MAX        3	 /*TDS TX档位数量*/
-#define  FTM_TDS_RX_LEVEL_NUM_MAX		 16	 /*TDS RX档位数量*/
-#define  FTM_TDS_TX_CAL_POWERNUM_MAX	 80	 /*TDS TX校准功率个数*/
-#define  FTM_TDS_TX_CAL_FREQNUM_MAX		 16	 /*TDS TX校准频点个数*/
-#define  FTM_TDS_RX_CAL_FREQNUM_MAX		 16	 /*TDS RX校准频点个数*/
+#define  FTM_TDS_TX_LEVEL_NUM_MAX        3	 /*TDS TX????????*/
+#define  FTM_TDS_RX_LEVEL_NUM_MAX		 16	 /*TDS RX????????*/
+#define  FTM_TDS_TX_CAL_POWERNUM_MAX	 80	 /*TDS TX????????????*/
+#define  FTM_TDS_TX_CAL_FREQNUM_MAX		 16	 /*TDS TX????????????*/
+#define  FTM_TDS_RX_CAL_FREQNUM_MAX		 16	 /*TDS RX????????????*/
 #define  MAX_SCALIB_DATA_LEN             320
 
 /*****************************************************************************
- 枚举名    : AT_TDS_OPT_TYPE_ENUM
- 枚举说明  : 校准控制操作类型
+ ??????    : AT_TDS_OPT_TYPE_ENUM
+ ????????  : ????????????????
 *****************************************************************************/
 typedef enum
 {
-	AT_CALIB_OP_TYPE_CACHE,    /* "CACHE", 校准数据未发送完，将已接收数据放入数据缓存 */
-	AT_CALIB_OP_TYPE_USE,      /* "USE",  将已缓存的数据写入DHI 并通知DSP 立即加载启用 */
-	AT_CALIB_OP_TYPE_SAVE,     /* "SAVE", 将已缓存的数据写入NANDFLASH 指定位置，释放接收缓存 */
-	AT_CALIB_OP_TYPE_GET,      /* "GET",  查询当前缓存中的指定类型的数据。（读取缓存） */
-	AT_CALIB_OP_TYPE_READ,     /* "READ", 查询NANDFLASH 中的指定类型的数据。（读取NANDFLASH) */
-	AT_CALIB_OP_TYPE_INI,      /* "INI",  初始化缓存中的数据 */
-	AT_CALIB_OP_TYPE_BEGIN,    /* "BEGIN",校准开始 */
-    AT_CALIB_OP_TYPE_END,      /* "END",  校准结束 */
-    AT_CALIB_OP_TYPE_SET,      /* "SET",  设置DSP校准状态 */
+	AT_CALIB_OP_TYPE_CACHE,    /* "CACHE", ?????????????????????????????????????????? */
+	AT_CALIB_OP_TYPE_USE,      /* "USE",  ??????????????????DHI ??????DSP ???????????? */
+	AT_CALIB_OP_TYPE_SAVE,     /* "SAVE", ??????????????????NANDFLASH ?????????????????????? */
+	AT_CALIB_OP_TYPE_GET,      /* "GET",  ???????????????????????????????????????????? */
+	AT_CALIB_OP_TYPE_READ,     /* "READ", ????NANDFLASH ??????????????????????????NANDFLASH) */
+	AT_CALIB_OP_TYPE_INI,      /* "INI",  ?????????????????? */
+	AT_CALIB_OP_TYPE_BEGIN,    /* "BEGIN",???????? */
+    AT_CALIB_OP_TYPE_END,      /* "END",  ???????? */
+    AT_CALIB_OP_TYPE_SET,      /* "SET",  ????DSP???????? */
 	AT_CALIB_OP_TYPE_BUTT
 }AT_TDS_OPT_TYPE_ENUM;
 typedef VOS_UINT32 AT_TDS_OPT_TYPE_ENUM_U32;
 
 /*****************************************************************************
- 枚举名    : AT_TDS_DATA_TYPE_ENUM
- 枚举说明  : 校准控制数据类型
+ ??????    : AT_TDS_DATA_TYPE_ENUM
+ ????????  : ????????????????
 *****************************************************************************/
 typedef enum
 {
@@ -1809,8 +1809,8 @@ typedef enum
 typedef VOS_UINT32 AT_TDS_BAND_TYPE_ENUM_U32;
 
 /*****************************************************************************
- 枚举名    : AT_TDS_DATA_TYPE_ENUM
- 枚举说明  : 校准控制数据类型
+ ??????    : AT_TDS_DATA_TYPE_ENUM
+ ????????  : ????????????????
 *****************************************************************************/
 typedef enum
 {
@@ -1825,18 +1825,18 @@ typedef enum
 typedef VOS_UINT32 AT_TDS_DATA_TYPE_ENUM_U32;
 
 /*****************************************************************************
- 结构名    : AT_SCALIB_SYSTEM_SETTING_STRU
- 结构说明  : 校准控制相关数据结构
+ ??????    : AT_SCALIB_SYSTEM_SETTING_STRU
+ ????????  : ????????????????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16   flag1;  /*启动结束校准*/
-    VOS_UINT16   flag2;  /*档位标志*/
+    VOS_UINT16   flag1;  /*????????????*/
+    VOS_UINT16   flag2;  /*????????*/
 }FTM_SCALIB_APCOFFSET_SETTING_STRU;
 
 /*****************************************************************************
- 结构名    : AT_SCALIB_SYSTEM_SETTING_STRU
- 结构说明  : 校准控制相关数据结构
+ ??????    : AT_SCALIB_SYSTEM_SETTING_STRU
+ ????????  : ????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -1848,17 +1848,17 @@ typedef struct
 	VOS_UINT16  armFile[10];
 	VOS_UINT16  zsp1File[10];
 	VOS_UINT16  zsp2File[10];
-	VOS_UINT16  tdRfTabFlag1;    /*射频表的标志1*/
+	VOS_UINT16  tdRfTabFlag1;    /*????????????1*/
 	VOS_UINT16  reserved;
-	VOS_UINT16  tdApcTab[80];    /*射频自动功率控制表*/
-	VOS_UINT16  tdAgcTab[6];     /*射频自动增益表*/
+	VOS_UINT16  tdApcTab[80];    /*??????????????????*/
+	VOS_UINT16  tdAgcTab[6];     /*??????????????*/
 	VOS_UINT16  tdApcOffset[6];
 	VOS_UINT16  tdApcOffsetFlag;
-	VOS_UINT16  tdAfcOffset;     /*AFC校准步长*/
-	VOS_UINT32  tdDcOffset;      /*直流校准参数*/
+	VOS_UINT16  tdAfcOffset;     /*AFC????????*/
+	VOS_UINT32  tdDcOffset;      /*????????????*/
 	VOS_UINT16  afcAgcDcFlag;
 	VOS_UINT16  reserved1[3];
-    VOS_UINT16  tdRfTabFlag2;     /*射频标的标志2*/
+    VOS_UINT16  tdRfTabFlag2;     /*????????????2*/
 	VOS_UINT16  reserved2[3];
     /* reserved for CQUPT end*/
     /* added at 2012-6-11 begin*/
@@ -1885,7 +1885,7 @@ typedef struct
     /* added at 2012-6-11 end*/
 }FTM_SCALIB_SYSTEM_SETTING_STRU;
 
-/* MAXPOWER NV结构*/
+/* MAXPOWER NV????*/
 typedef struct
 {
     VOS_INT16 asTxMaxPower[FTM_TDS_TX_LEVEL_NUM_MAX];
@@ -1896,35 +1896,35 @@ typedef struct
 
 typedef struct
 {
-    VOS_UINT16       ucPath;         /* 射频通路编号 */
-    VOS_UINT16       ucGroup;        /* path的补充 */
+    VOS_UINT16       ucPath;         /* ???????????? */
+    VOS_UINT16       ucGroup;        /* path?????? */
 }TDS_SET_TSELRF_REQ_STRU;
 
 typedef struct
 {
-    VOS_UINT16       usMode;         /* 模式 */
+    VOS_UINT16       usMode;         /* ???? */
     VOS_UINT16       usBand;         /* band */
-    VOS_UINT16       usFreq;         /* 频点 */
+    VOS_UINT16       usFreq;         /* ???? */
     VOS_UINT16       usRsv;
 }TDS_SET_FCHAN_REQ_STRU;
 
 typedef struct
 {
-    VOS_UINT16       usType;         /* 波形类型,0:单音 */
-    VOS_UINT16       usAmp;          /* 发射的波形的功率 */
+    VOS_UINT16       usType;         /* ????????,0:???? */
+    VOS_UINT16       usAmp;          /* ???????????????? */
 }TDS_SET_FWAVE_REQ_STRU;
 
 
 typedef struct
 {
-    VOS_UINT16       usSwtich;       /* 开关类型,0:close;1:open */
+    VOS_UINT16       usSwtich;       /* ????????,0:close;1:open */
     VOS_UINT16       usRsv;
 }TDS_SET_FTXON_REQ_STRU;
 
 
 typedef struct
 {
-    VOS_UINT16       usSwtich;       /* 开关类型,0:close;1:open */
+    VOS_UINT16       usSwtich;       /* ????????,0:close;1:open */
     VOS_UINT16       usRsv;
 }TDS_SET_FRXON_REQ_STRU;
 
@@ -1942,46 +1942,46 @@ typedef struct
 
 typedef struct
 {
-    VOS_INT32       lValue;         /* RSSI值 */
-    VOS_UINT32      ulErrCode;      /* 错误码 */
+    VOS_INT32       lValue;         /* RSSI?? */
+    VOS_UINT32      ulErrCode;      /* ?????? */
 }TDS_SET_FRSSI_CNF_STRU;
 
 
 /*adde by yangzhi for*/
 /******************************************************************************
-描述:   查询TDS的RF通路，用于^TSELRF
+????:   ????TDS??RF??????????^TSELRF
 ID:     ID_MSG_TDS_FRSSI_REQ,ID_MSG_TDS_FRSSI_CNF
-结构:   ID_MSG_TDS_RD_TSELRF_REQ,ID_MSG_TDS_RD_TSELRF_CNF
+????:   ID_MSG_TDS_RD_TSELRF_REQ,ID_MSG_TDS_RD_TSELRF_CNF
 ******************************************************************************/
 typedef struct
 {
-    VOS_UINT16       usChanelNo;    /* DSP 不用管 */
+    VOS_UINT16       usChanelNo;    /* DSP ?????? */
     VOS_UINT16       usRsv;
-    VOS_UINT32       ulErrCode;      /* 错误码 */
+    VOS_UINT32       ulErrCode;      /* ?????? */
 }TDS_RD_TSELRF_CNF_STRU;
 
 
 /******************************************************************************
-描述:   查询TDS的通道属性，用于^FCHAN
+????:   ????TDS????????????????^FCHAN
 ID:     ID_MSG_TDS_RD_FCHAN_REQ,ID_MSG_TDS_RD_FCHAN_CNF
-结构:
+????:
 ******************************************************************************/
 typedef struct
 {
     FCHAN_MODE_ENUM enFchanMode;
     VOS_UINT16       usBand;
-    VOS_UINT16       usUlFReqValid; /* DSP 不用管 */
-    VOS_UINT16       usDlFreqValid; /* DSP 不用管 */
+    VOS_UINT16       usUlFReqValid; /* DSP ?????? */
+    VOS_UINT16       usDlFreqValid; /* DSP ?????? */
     VOS_UINT16       usUlChannel;
     VOS_UINT16       usDlChannel;
     VOS_UINT16       usRsv;
-    VOS_UINT32       ulErrCode;      /* 错误码 */
+    VOS_UINT32       ulErrCode;      /* ?????? */
 }TDS_RD_FCHAN_CNF_STRU;
 
 /******************************************************************************
-描述:   查询TDS的发射机通道属性，用于^FTXON
+????:   ????TDS??????????????????????^FTXON
 ID:     ID_MSG_TDS_RD_FTXON_REQ,ID_MSG_TDS_RD_FTXON_CNF
-结构:
+????:
 ******************************************************************************/
 typedef struct
 {
@@ -1990,32 +1990,32 @@ typedef struct
 }TDS_RD_FTXON_CNF_STRU;
 
 /******************************************************************************
-描述:   查询TDS的接收机通道属性，用于^FRXON
+????:   ????TDS??????????????????????^FRXON
 ID:     ID_MSG_TDS_RD_FRXON_REQ,ID_MSG_TDS_RD_FRXON_CNF
-结构:
+????:
 ******************************************************************************/
 typedef struct
 {
     VOS_UINT32 ulRxSwt;
     VOS_UINT32 ulErrCode;
 }TDS_RD_FRXON_CNF_STRU;
-#define FTM_STATUS_EXECUTING (0) /* IP2校准执行中 */
-#define FTM_STATUS_EXECUTED (1)  /* IP2校准执行完毕 */
+#define FTM_STATUS_EXECUTING (0) /* IP2?????????? */
+#define FTM_STATUS_EXECUTED (1)  /* IP2???????????? */
 
-/* IP2校准最大频点数 */
+/* IP2?????????????? */
 #define FTM_CALIIP2_MAX_CHAN_NUM (4)
 
-/* DCOC校准AGC档位个数 */
+/* DCOC????AGC???????? */
 #define FTM_CALIDCOCS_AGC_NUM (16)
 
-/* GainState参数最大个数 */
+/* GainState???????????? */
 #define FTM_GAINSTATE_MAX_NUM (60)
 #define FTM_GAINSTATE_MAX_NUM_HI6362 (16*2*3) /* k3v5 */
 
-/* DBB衰减参数最大个数 */
+/* DBB???????????????? */
 #define FTM_DBBATT_MAX_NUM FTM_GAINSTATE_MAX_NUM
 
-/* BB衰减参数最大个数 */
+/* BB???????????????? */
 #define FTM_BBATT_MAX_NUM FTM_GAINSTATE_MAX_NUM
 
 /* AT^FCALIIPS */
@@ -2105,10 +2105,10 @@ typedef struct
 /* AT^FCALIDCOCSMRF */
 typedef struct
 {
-	VOS_UINT16 usChannel;	/* 信道号 */
+	VOS_UINT16 usChannel;	/* ?????? */
 #if (FEATURE_LPHY_RFIC_HI6362 == FEATURE_ON)
     VOS_UINT16 usBand;      /* band   */
-    VOS_UINT16 usRfid;      /* 通道号 */
+    VOS_UINT16 usRfid;      /* ?????? */
 #endif
 	VOS_UINT16 usRsv;
 }FTM_SET_FCALIDCOCSMRF_REQ_STRU;
@@ -2222,16 +2222,16 @@ typedef struct
 
 typedef struct
 {
-    VOS_UINT32 ulMsgId;                  /* 消息标识 */
-    VOS_UINT32 ulDataLen;                /* 数据长度 */
-    VOS_UINT8   cData[0];   /* 数据     */
+    VOS_UINT32 ulMsgId;                  /* ???????? */
+    VOS_UINT32 ulDataLen;                /* ???????? */
+    VOS_UINT8   cData[0];   /* ????     */
 }FTM_PHY_COMM_CMD_SET_REQ_STRU;
 
 typedef struct
 {
-    VOS_UINT32 ulMsgId;                  /* 消息标识 */
-    VOS_UINT32 ulDataLen;                /* 数据长度 */
-    VOS_UINT8   cData[0];   /* 数据     */
+    VOS_UINT32 ulMsgId;                  /* ???????? */
+    VOS_UINT32 ulDataLen;                /* ???????? */
+    VOS_UINT8   cData[0];   /* ????     */
 }PHY_FTM_COMM_CMD_SET_CNF_STRU;
 
 typedef PHY_FTM_COMM_CMD_SET_CNF_STRU PHY_FTM_COMM_CMD_IND_STRU;
@@ -2251,23 +2251,23 @@ typedef struct
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
-    VOS_UINT16                          usClientId;                             /* 客户端ID   */
-    VOS_UINT8                           ucOpId;                                 /* 操作码ID   */
+    VOS_UINT16                          usClientId;                             /* ??????ID   */
+    VOS_UINT8                           ucOpId;                                 /* ??????ID   */
     VOS_UINT8                           aucReserved[1];
-    VOS_UINT32                          ulErrorCode;                            /* 错误码     */
+    VOS_UINT32                          ulErrorCode;                            /* ??????     */
 } L4A_COMM_CNF_STRU;
 #endif
 typedef L4A_COMM_REQ_STRU L4A_READ_LWCLASH_REQ_STRU;
 
 typedef struct
 {
-	VOS_UINT16		 usUlFreq;			/*上行中心频点单位:100Khz*/
-	VOS_UINT16		 usDlFreq;			/*下行中心频点 单位:100Khz*/
-	VOS_UINT16		 usUlBandwidth; 	/*上行带宽 */
-	VOS_UINT16		 usDlBandwidth; 	/*上行带宽 */
-	VOS_UINT8		 enCamped;			/*是否驻留 */
-	VOS_UINT8		 enState;			/*是否为冲突状态 */
-	VOS_UINT8		 usBand;			/*频带指示 */
+	VOS_UINT16		 usUlFreq;			/*????????????????:100Khz*/
+	VOS_UINT16		 usDlFreq;			/*???????????? ????:100Khz*/
+	VOS_UINT16		 usUlBandwidth; 	/*???????? */
+	VOS_UINT16		 usDlBandwidth; 	/*???????? */
+	VOS_UINT8		 enCamped;			/*???????? */
+	VOS_UINT8		 enState;			/*?????????????? */
+	VOS_UINT8		 usBand;			/*???????? */
 	VOS_UINT8		 aucResv[1];
 } L4A_LWCLASH_INFO_STRU;
 
@@ -2276,7 +2276,7 @@ typedef struct
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
-    VOS_UINT16                          usClientId;                             /* 客户端ID */
+    VOS_UINT16                          usClientId;                             /* ??????ID */
     VOS_UINT8                           ucOpId;
     VOS_UINT8		 					aucResv[1];
     VOS_UINT32                          ulErrorCode;
@@ -2289,8 +2289,8 @@ typedef struct
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
-    VOS_UINT16                          usClientId;                             /* 客户端ID */
-    VOS_UINT8                           ucOpId;                                 /* 操作码ID */
+    VOS_UINT16                          usClientId;                             /* ??????ID */
+    VOS_UINT8                           ucOpId;                                 /* ??????ID */
     VOS_UINT8		 					aucResv[1];                                  /* CID      */
 	L4A_LWCLASH_INFO_STRU stLwclashInfo;
 } L4A_READ_LWCLASH_IND_STRU;
@@ -2299,9 +2299,9 @@ typedef L4A_COMM_REQ_STRU L4A_READ_LCACELL_REQ_STRU;
 
 typedef struct
 {
-    VOS_UINT8       ucUlConfigured;     /*CA上行是否被配置，0:未配置，1:已配置*/
-    VOS_UINT8       ucDlConfigured;     /*CA下行是否被配置，0:未配置，1:已配置*/
-    VOS_UINT8       ucActived;          /*SCell是否被激活，0:去激活，1:激活*/
+    VOS_UINT8       ucUlConfigured;     /*CA????????????????0:????????1:??????*/
+    VOS_UINT8       ucDlConfigured;     /*CA????????????????0:????????1:??????*/
+    VOS_UINT8       ucActived;          /*SCell????????????0:????????1:????*/
     VOS_UINT8       ucRsv;
 }L4A_CACELL_INFO_STRU;
 
@@ -2310,7 +2310,7 @@ typedef struct
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
-    VOS_UINT16                          usClientId;                             /* 客户端ID */
+    VOS_UINT16                          usClientId;                             /* ??????ID */
     VOS_UINT8                           ucOpId;
     VOS_UINT8		 					aucResv[1];
     VOS_UINT32                          ulErrorCode;
@@ -2323,8 +2323,8 @@ typedef struct
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
-    VOS_UINT16                          usClientId;                             /* 客户端ID */
-    VOS_UINT8                           ucOpId;                                 /* 操作码ID */
+    VOS_UINT16                          usClientId;                             /* ??????ID */
+    VOS_UINT8                           ucOpId;                                 /* ??????ID */
     VOS_UINT8		 					aucResv[1];                             /* CID      */
 	L4A_CACELL_INFO_STRU                stLcacellInfo[CA_MAX_CELL_NUM];
 } L4A_READ_LCACELL_IND_STRU;
@@ -2333,9 +2333,9 @@ typedef struct
 
 /*begin_added by c64416 for lte wifi 20131013*/
 /******************************************************************************
-描述:   ^ISMCOEX
+????:   ^ISMCOEX
 ID:     
-结构:   
+????:   
 ******************************************************************************/
 #define     L4A_ISMCOEX_BANDWIDTH_NUM       6
 
@@ -2379,10 +2379,10 @@ typedef struct
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
-    VOS_UINT16                          usClientId;                             /* 客户端ID   */
-    VOS_UINT8                           ucOpId;                                 /* 操作码ID   */
+    VOS_UINT16                          usClientId;                             /* ??????ID   */
+    VOS_UINT8                           ucOpId;                                 /* ??????ID   */
     VOS_UINT8                           aucReserved[1];
-    VOS_UINT32                          ulErrorCode;                            /* 错误码     */
+    VOS_UINT32                          ulErrorCode;                            /* ??????     */
 
 	APP_MM_LTE_CS_INFO_STRU				stLtecsInfo;
 } L4A_READ_LTECS_CNF_STRU;
@@ -2402,10 +2402,10 @@ typedef struct
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
-    VOS_UINT16                          usClientId;                             /* 客户端ID   */
-    VOS_UINT8                           ucOpId;                                 /* 操作码ID   */
+    VOS_UINT16                          usClientId;                             /* ??????ID   */
+    VOS_UINT8                           ucOpId;                                 /* ??????ID   */
     VOS_UINT8                           aucReserved[1];
-    VOS_UINT32                          ulErrorCode;                            /* 错误码     */
+    VOS_UINT32                          ulErrorCode;                            /* ??????     */
     RRC_APP_LTE_CELL_INFO_STRU          stLteCelInfo;
 }L4A_READ_CNMR_CNF_STRU;
 
@@ -2425,17 +2425,17 @@ typedef struct
 	VOS_MSG_HEADER																/* _H2ASN_Skip */
 	APS_L4A_MSG_ID_ENUM_UINT32			enMsgId;								/* _H2ASN_Skip */
 
-	VOS_UINT16							usClientId; 							/* 客户端ID   */
-	VOS_UINT8							ucOpId; 								/* 操作码ID   */
+	VOS_UINT16							usClientId; 							/* ??????ID   */
+	VOS_UINT8							ucOpId; 								/* ??????ID   */
 	VOS_UINT8							aucReserved[1];
-	VOS_UINT32							ulErrorCode;							/* 错误码	  */
+	VOS_UINT32							ulErrorCode;							/* ??????	  */
 
 	VOS_INT16 	sRssi;				/* Rssi*/
-	VOS_INT16 	sRsd; 	   			/* 填充字段*/
-	VOS_INT16 	sRsrp;			  	/* 范围：(-141,-44), 99为无效 */
-	VOS_INT16 	sRsrq;			  	/* 范围：(-40, -6) , 99为无效 */
+	VOS_INT16 	sRsd; 	   			/* ????????*/
+	VOS_INT16 	sRsrp;			  	/* ??????(-141,-44), 99?????? */
+	VOS_INT16 	sRsrq;			  	/* ??????(-40, -6) , 99?????? */
 	VOS_INT32  	lSINR;			   	/* SINR	RS_SNR */
-    APP_RRC_CQI_INFO_STRU               stCQI;              /* CQI两个码字 */
+    APP_RRC_CQI_INFO_STRU               stCQI;              /* CQI???????? */
 }L4A_CSQ_INFO_CNF_STRU;
 
 typedef L4A_CSQ_INFO_CNF_STRU L4A_CSQ_INFO_IND_STRU;
@@ -2445,15 +2445,15 @@ typedef struct
     VOS_MSG_HEADER                                                              /* _H2ASN_Skip */
     APS_L4A_MSG_ID_ENUM_UINT32          enMsgId;                                /* _H2ASN_Skip */
 
-    VOS_UINT16                          usClientId;                             /* 客户端ID   */
-    VOS_UINT8                           ucOpId;                                 /* 操作码ID   */
+    VOS_UINT16                          usClientId;                             /* ??????ID   */
+    VOS_UINT8                           ucOpId;                                 /* ??????ID   */
     VOS_UINT8                           aucReserved[1];
-    VOS_UINT32                          ulErrorCode;                            /* 错误码     */
+    VOS_UINT32                          ulErrorCode;                            /* ??????     */
 
     VOS_INT16   sRssi;              /* Rssi*/
     VOS_INT16   sLevel;             /* */
-    VOS_INT16   sRsrp;              /* 范围：(-141,-44), 99为无效 */
-    VOS_INT16   sRsrq;              /* 范围：(-40, -6) , 99为无效 */
+    VOS_INT16   sRsrp;              /* ??????(-141,-44), 99?????? */
+    VOS_INT16   sRsrq;              /* ??????(-40, -6) , 99?????? */
 }AT_ANLEVEL_INFO_CNF_STRU;
 
 
@@ -2491,10 +2491,10 @@ typedef struct
 	VOS_MSG_HEADER																/* _H2ASN_Skip */
 	APS_L4A_MSG_ID_ENUM_UINT32			enMsgId;								/* _H2ASN_Skip */
 
-	VOS_UINT16							usClientId; 							/* 客户端ID   */
-	VOS_UINT8							ucOpId; 								/* 操作码ID   */
+	VOS_UINT16							usClientId; 							/* ??????ID   */
+	VOS_UINT8							ucOpId; 								/* ??????ID   */
 	VOS_UINT8							aucReserved[1];
-	VOS_UINT32							ulErrorCode;							/* 错误码	  */
+	VOS_UINT32							ulErrorCode;							/* ??????	  */
     LRRC_APP_NCELL_LIST_INFO_STRU 		stNcellListInfo;
 } L4A_READ_CELL_INFO_CNF_STRU;
 
@@ -2505,10 +2505,10 @@ typedef struct
 	VOS_MSG_HEADER																/* _H2ASN_Skip */
 	APS_L4A_MSG_ID_ENUM_UINT32			enMsgId;								/* _H2ASN_Skip */
 
-	VOS_UINT16							usClientId; 							/* 客户端ID   */
-	VOS_UINT8							ucOpId; 								/* 操作码ID   */
+	VOS_UINT16							usClientId; 							/* ??????ID   */
+	VOS_UINT8							ucOpId; 								/* ??????ID   */
 	VOS_UINT8							aucReserved[1];
-	VOS_UINT32							ulErrorCode;							/* 错误码	  */
+	VOS_UINT32							ulErrorCode;							/* ??????	  */
     VOS_UINT16                          usMncNum;           /*?? MNC ??*/
     VOS_UINT16                          usMCC;
     VOS_UINT16                          usMNC;
@@ -2521,7 +2521,7 @@ typedef struct
 typedef struct
 {
     VOS_UINT16 Mcc;  /* Mobile Country Code , 0x460*/
-    VOS_UINT16 Mnc;  /* Mobile Network Code ,如果MNC只有两位,则高八位为0x0f*/
+    VOS_UINT16 Mnc;  /* Mobile Network Code ,????MNC????????,??????????0x0f*/
 }L4A_PLMN_ID_STRU;
 
 typedef L4A_COMM_REQ_STRU L4A_SET_LTE_TO_IDLE_REQ_STRU;
@@ -2559,10 +2559,10 @@ typedef struct
 	VOS_MSG_HEADER																/* _H2ASN_Skip */
 	APS_L4A_MSG_ID_ENUM_UINT32			enMsgId;								/* _H2ASN_Skip */
 
-	VOS_UINT16							usClientId; 							/* 客户端ID   */
-	VOS_UINT8							ucOpId; 								/* 操作码ID   */
+	VOS_UINT16							usClientId; 							/* ??????ID   */
+	VOS_UINT8							ucOpId; 								/* ??????ID   */
 	VOS_UINT8							aucReserved[1];
-	VOS_UINT32							ulErrorCode;							/* 错误码	  */
+	VOS_UINT32							ulErrorCode;							/* ??????	  */
 } L4A_AT_CNF_HEADER_STRU;
 
 
@@ -2581,10 +2581,10 @@ typedef struct
 	VOS_MSG_HEADER																/* _H2ASN_Skip */
 	APS_L4A_MSG_ID_ENUM_UINT32			enMsgId;								/* _H2ASN_Skip */
 
-	VOS_UINT16							usClientId; 							/* 客户端ID   */
-	VOS_UINT8							ucOpId; 								/* 操作码ID   */
+	VOS_UINT16							usClientId; 							/* ??????ID   */
+	VOS_UINT8							ucOpId; 								/* ??????ID   */
 	VOS_UINT8							aucReserved;
-	VOS_UINT32							ulErrorCode;							/* 错误码	  */
+	VOS_UINT32							ulErrorCode;							/* ??????	  */
 } L4A_SET_RADVER_CNF_STRU;
 
 

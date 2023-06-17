@@ -67,9 +67,8 @@ typedef struct
 typedef struct
 {
     VOS_UINT32 ulTimeId;
-    VOS_UINT32 ulPara;    /* 对应原来的ulParam2*/
+    VOS_UINT32 ulPara;
 } OSM_MSG_TIMER_STRU;
-
 
 #define HAL_SDMLOG  (VOS_VOID)vos_printf
 #define MSP_MEMCPY(dst,src,count)   VOS_MemCpy(dst,src,count)
@@ -82,4 +81,3 @@ typedef struct
 #endif
 
 #endif /* __OSM_H__*/
-

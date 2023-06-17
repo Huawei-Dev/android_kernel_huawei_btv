@@ -46,16 +46,12 @@
  *
  */
 
-
-
-
 #include "msp_errno.h"
 #include "SCMProc.h"
 #include "diag_common.h"
 #include "msp_service.h"
 
 #define    THIS_FILE_ID        MSP_FILE_ID_MSP_SERVICE_C
-
 
 struct MSP_SERVICE_TABLE
 {
@@ -74,7 +70,6 @@ struct MSP_SERVICE_TABLE g_astMspService[MSP_SID_BUTT] = {
     {MSP_SID_CBT_SERVICE,       VOS_NULL}
 };
 
-
 VOS_UINT32 msp_ServiceProc(SOCP_DECODER_DST_ENUM_U32 enChanID,VOS_UINT8 *pucData, VOS_UINT32 ulSize,VOS_UINT8 *pucRBData, VOS_UINT32 ulRBSize)
 {
     VOS_UINT32 ulRet = ERR_MSP_INVALID_PARAMETER;
@@ -84,7 +79,6 @@ VOS_UINT32 msp_ServiceProc(SOCP_DECODER_DST_ENUM_U32 enChanID,VOS_UINT8 *pucData
 
     diag_PTR(EN_DIAG_PTR_MSP_SERVICE_1);
 
-    /*入参检查*/
     if(pucData == VOS_NULL)
     {
         diag_PTR(EN_DIAG_PTR_MSP_SERVICE_ERR1);
@@ -107,7 +101,6 @@ VOS_UINT32 msp_ServiceProc(SOCP_DECODER_DST_ENUM_U32 enChanID,VOS_UINT8 *pucData
 
     VOS_MemCpy(pData,pucData,ulSize);
 
-    /*回卷指针可能为空*/
     if((VOS_NULL != pucRBData)&&(0 != ulRBSize))
     {
         VOS_MemCpy(pData+ulSize,pucRBData,ulRBSize);
@@ -131,7 +124,6 @@ VOS_UINT32 msp_ServiceProc(SOCP_DECODER_DST_ENUM_U32 enChanID,VOS_UINT8 *pucData
     return ulRet;
 }
 
-
 VOS_VOID msp_ServiceInit(VOS_VOID)
 {
     VOS_UINT32 ret = ERR_MSP_SUCCESS;
@@ -143,7 +135,6 @@ VOS_VOID msp_ServiceInit(VOS_VOID)
     return ;
 }
 
-
 VOS_VOID msp_ServiceProcReg(MSP_SID_TYPE_U32 ulType, MSP_SERVICE_FUNC pServiceFn)
 {
     /* coverity[cond_at_most] */
@@ -154,8 +145,3 @@ VOS_VOID msp_ServiceProcReg(MSP_SID_TYPE_U32 ulType, MSP_SERVICE_FUNC pServiceFn
 
     g_astMspService[ulType].fnService = pServiceFn;
 }
-
-
-
-
-

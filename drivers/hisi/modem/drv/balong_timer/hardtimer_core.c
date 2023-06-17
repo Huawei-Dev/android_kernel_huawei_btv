@@ -46,7 +46,6 @@
  *
  */
 
-/*lint --e{438,537,666,713}*/
 #include <linux/of.h>
 #include <linux/of_address.h>
 #include <linux/of_irq.h>
@@ -206,7 +205,7 @@ static s32 timer_start_ms(struct bsp_hardtimer_control  *timer_ctrl)
 		hardtimer_print_error("bsp_hardtimer_config_init error \n");
 		return BSP_ERROR;
 	}
-	ret = bsp_hardtimer_enable(timer_ctrl->timerId);/* [false alarm]:误报 */
+	ret = bsp_hardtimer_enable(timer_ctrl->timerId);
 	return ret;
 }
 
@@ -220,7 +219,7 @@ static s32 timer_start_us(struct bsp_hardtimer_control  *timer_ctrl)
 		if(timer_ctrl->timeout > TIMER_32K_US_BOUNDARY)
 			timer_ctrl->timeout= timer_clk*timer_ctrl->timeout/1000000;
 		
-		else/* 对于不大于31us的定时，直接往load寄存器写1 */
+		else
 			timer_ctrl->timeout=1;
 	}
 	else
@@ -232,7 +231,7 @@ static s32 timer_start_us(struct bsp_hardtimer_control  *timer_ctrl)
 		hardtimer_print_error("bsp_hardtimer_config_init error \n");
 		return BSP_ERROR;
 	}
-	ret = bsp_hardtimer_enable(timer_ctrl->timerId);/* [false alarm]:误报 */
+	ret = bsp_hardtimer_enable(timer_ctrl->timerId);
 	return ret;
 }
 static s32 timer_start_none(struct bsp_hardtimer_control  *timer_ctrl){
@@ -242,7 +241,7 @@ static s32 timer_start_none(struct bsp_hardtimer_control  *timer_ctrl){
 		hardtimer_print_error("bsp_hardtimer_config_init error \n");
 		return BSP_ERROR;
 	}
-	ret = bsp_hardtimer_enable(timer_ctrl->timerId);/* [false alarm]:误报 */
+	ret = bsp_hardtimer_enable(timer_ctrl->timerId);
 	return ret;
 }
 
@@ -253,7 +252,6 @@ s32 bsp_hardtimer_start(struct bsp_hardtimer_control  *timer_ctrl)
 		hardtimer_print_error("timer_ctrl is NULL \n");
 		return BSP_ERROR;
 	}
-	/*直接操作寄存器*/
 	if(TIMER_UNIT_NONE==timer_ctrl->unit){
 		ret = timer_start_none(timer_ctrl);
 		return ret;
@@ -297,10 +295,9 @@ s32 bsp_hardtimer_free(u32 timer_id)
 	return BSP_OK;
 }
 
-/*获取唤醒源timer的下一个最近到时时间，供低功耗模块使用*/
 u32 get_next_schedule_time(void)
 {
-	u32 i=0,min = 0xffffffff,ret = 0,request_id = 0;/*lint !e123*/
+	u32 i=0,min = 0xffffffff,ret = 0,request_id = 0;
 	for(i=0;i<core_timer_control.wakeup_timer.count;i++)
 	{
 		request_id = core_timer_control.wakeup_timer.request_id[i];
@@ -312,10 +309,10 @@ u32 get_next_schedule_time(void)
 		{
 			(void)bsp_get_timer_rest_time(request_id,TIMER_UNIT_MS,(unsigned int*)&ret);
 		}
-		if(ret<min)/*lint !e123*/
-			min = ret;/*lint !e123*/
+		if(ret<min)
+			min = ret;
 	}
- 	return min;/*lint !e123*/
+ 	return min;
 }
 
 void bsp_timer_driver_register(struct timer_driver  *driver)
@@ -426,7 +423,6 @@ static s32 timer_suspend_noirq(struct device *dev)
 	int i=0;
 	u32 stamp = 0;
 	pr_info("%s +\n", __func__);
-	/*遍历timer，保存sr_flag为1，即为掉电区timer的sysctrl reg和load reg 寄存器值*/
 	for(i=0;i<TIMER_ID_MAX;i++){
 		if(core_timer_control.timer[i].sr_flag && core_timer_control.timer[i].driver->ops->suspend){
 			core_timer_control.timer[i].driver->ops->suspend(&core_timer_control.timer[i]);
@@ -502,7 +498,6 @@ void bsp_timer_show(void){
 		}
 }
 
-/*lint -save -e19*/
 EXPORT_SYMBOL(bsp_hardtimer_int_clear);
 EXPORT_SYMBOL(bsp_hardtimer_int_mask);
 EXPORT_SYMBOL(bsp_hardtimer_int_unmask);
@@ -513,7 +508,3 @@ EXPORT_SYMBOL(bsp_hardtimer_enable);
 EXPORT_SYMBOL(bsp_hardtimer_disable);
 EXPORT_SYMBOL(bsp_hardtimer_free);
 EXPORT_SYMBOL(get_next_schedule_time);
-/*lint -restore +e19*/
-
-
-

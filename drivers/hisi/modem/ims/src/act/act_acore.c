@@ -19,8 +19,8 @@
 #include "mdrv_icc.h"
 
 #define BUFFERSIZE 256
-#define DEVICE_MAJOR 250 /*设置一个主设备号*/
-#define DEVICE_MINOR 0   /*次设备号*/
+#define DEVICE_MAJOR 250 /*????????????????*/
+#define DEVICE_MINOR 0   /*????????*/
 
 //#define VT_AP_CP_CHID  ((ICC_CHN_GUOM0 << 16) || GUOM0_FUNC_ID_VT_AC)
 #define VT_AP_CP_CHID  MDRV_ICC_VT_VOIP
@@ -40,14 +40,14 @@ struct act_cdev_data {
 };
 
 struct act_cdev {
-    struct cdev cdev; /*cdev结构体，与字符设备对应*/
+    struct cdev cdev; /*cdev??????????????????????*/
     wait_queue_head_t inq;
     u32 len;
     struct list_head msg_list;
-    spinlock_t list_lock;//新增一个成员，定义一个spin锁,访问链表时需要加锁
+    spinlock_t list_lock;//??????????????????????spin??,??????????????????
 };
 
-struct act_cdev *act_cdevp     = NULL; /*设备结构体指针*/
+struct act_cdev *act_cdevp     = NULL; /*??????????????*/
 static struct class *act_class = NULL;
 static int act_major = 0;
 
@@ -56,7 +56,7 @@ s32 act_msgProc(u32 channel_id , u32 len, void* context)
 {
     struct act_cdev_data *data = NULL;
     unsigned long flags    = 0;
-    //u8 data[BUFFERSIZE]    = {0};  //声明一个缓冲链表，用于存放数据
+    //u8 data[BUFFERSIZE]    = {0};  //??????????????????????????????
     int ret                = 0;
 
     printk(KERN_INFO "Enter act_msgProc len(%d).\n", len);
@@ -67,7 +67,7 @@ s32 act_msgProc(u32 channel_id , u32 len, void* context)
        return -1;
     }
 
-    //分配链表内存kmalloc，用于存储数据
+    //????????????kmalloc??????????????
     data = (struct act_cdev_data*)kmalloc(sizeof(struct act_cdev_data) + len, GFP_KERNEL);
     if (!data)
     {
@@ -76,18 +76,18 @@ s32 act_msgProc(u32 channel_id , u32 len, void* context)
         return ret;
     }
 
-    //调用bsp_icc_read读取数据到分配的内存中
+    //????bsp_icc_read??????????????????????
     //ret = bsp_icc_read(channel_id, data->data, len);
 	ret = mdrv_icc_read(channel_id, data->data, len);
     data->len = len;
 
-    //获取信号量 spinlock_irq_save(lock)
+    //?????????? spinlock_irq_save(lock)
     spin_lock_irqsave(&(act_cdevp->list_lock), flags);
 
-    //挂接到链表，spinlick_irq_restore释放锁
+    //????????????spinlick_irq_restore??????
     list_add_tail(&(data->msg_list), &(act_cdevp->msg_list));
 
-    //释放信号量
+    //??????????
     spin_unlock_irqrestore(&(act_cdevp->list_lock), flags);
 
     /*
@@ -139,7 +139,7 @@ static int act_release(struct inode *node, struct file *filp)
     unsigned long flags    = NULL;
     int ret = 0;    
     
-    //获取信号量 spinlock_irq_save(lock)
+    //?????????? spinlock_irq_save(lock)
     spin_lock_irqsave(&(act_cdevp->list_lock), flags);
     
     list_for_each_entry_safe(data, temp_data, &(act_cdevp->msg_list), msg_list) 
@@ -148,7 +148,7 @@ static int act_release(struct inode *node, struct file *filp)
         kfree(data);
     }
     
-    //释放信号量
+    //??????????
     spin_unlock_irqrestore(&(act_cdevp->list_lock), flags);
     
     printk(KERN_INFO "Enter act_release.\n");
@@ -179,10 +179,10 @@ static size_t act_read(struct file *filp, char __user *buf, size_t size, loff_t 
 
     printk(KERN_INFO "act_read start read Data(%d).\n", act_cdevp->len);
 
-    //获取信号量 spinlock_irq_save(lock)
+    //?????????? spinlock_irq_save(lock)
     spin_lock_irqsave(&(act_cdevp->list_lock), flags);
    
-    //读取数据链表
+    //????????????
     if (! list_empty(&(act_cdevp->msg_list))) 
     {
         data = list_first_entry(&(act_cdevp->msg_list), struct act_cdev_data, msg_list);
@@ -202,13 +202,13 @@ static size_t act_read(struct file *filp, char __user *buf, size_t size, loff_t 
         }
     }
     
-    //判断链表是否为空 list_empty(act_cdevp->data)；如果是空，false；如果非空，true; 
+    //???????????????? list_empty(act_cdevp->data)????????????false????????????true; 
     if (list_empty(&(act_cdevp->msg_list)))
         hasData = false; //has no data to read
     else
         hasData = true; //has data to read
 
-    //释放信号量
+    //??????????
     spin_unlock_irqrestore(&(act_cdevp->list_lock), flags);
         
     //osl_sem_up(&g_ActSemId);
@@ -347,7 +347,7 @@ static int __init act_cdev_init(void)
        device_create(act_class, NULL, MKDEV(act_major, 0), NULL, "act");
     }
 
-    //初始化
+    //??????
     INIT_LIST_HEAD(&(act_cdevp->msg_list));
 	
 	spin_lock_init(&(act_cdevp->list_lock));

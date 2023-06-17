@@ -118,19 +118,6 @@ dump_product_type_t             g_product_type = DUMP_PRODUCT_BUTT;
 
 dump_reboot_contex_s            g_dump_reboot_contex = {DUMP_CPU_BUTTON,DUMP_REASON_UNDEF};
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_memcpy
-* ¹¦ÄÜÃèÊö  : ¿½±´¼Ä´æÆ÷º¯Êı
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_memcpy(u32 * dst, const u32 * src, u32 len)
 {
     while(len-- > 0)
@@ -138,19 +125,7 @@ void dump_memcpy(u32 * dst, const u32 * src, u32 len)
         *dst++ = *src++;
     }
 }
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_save_file
-* ¹¦ÄÜÃèÊö  : ÓÃÓÚÖ´ĞĞ±£´æÎÄ¼şµÄ¹¦ÄÜ
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
 
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_save_file(char * file_name, void * addr, u32 len)
 {
     int ret = -1;
@@ -185,20 +160,6 @@ void dump_save_file(char * file_name, void * addr, u32 len)
     }
 
 }
-
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_create_dir
-* ¹¦ÄÜÃèÊö  : ´´½¨reset¡.logµÄ±£´æÄ¿Â¼
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 
 int dump_append_file(char * dir, char *filename, void * address, u32 length, u32 max_size)
 {
@@ -289,19 +250,6 @@ out:
     return ret;
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_create_dir
-* ¹¦ÄÜÃèÊö  : ´´½¨cp_logµÄÄ¿Â¼±£Ö¤hidpµÈ¹¤¾ßÄÜ¹»Õı³£µ¼log
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 int dump_create_dir(char *path)
 {
     int fd = -1;
@@ -313,8 +261,8 @@ int dump_create_dir(char *path)
         return BSP_ERROR;
     }
     dump_fetal("path = %s\n", path);
-    /* Èç¹ûÎÄ¼ş¼Ğ²»´æÔÚ£¬´´½¨ĞÂÎÄ¼ş¼Ğ*/
-    fd = bsp_access(path, 0); //F_OK, ¼ì²éÎÄ¼şÊÇ·ñ´æÔÚ
+
+    fd = bsp_access(path, 0);
     if(0 != fd)
     {
         len = strlen(path);
@@ -348,19 +296,6 @@ int dump_create_dir(char *path)
 
     return BSP_OK;
 }
- /*****************************************************************************
-* º¯ Êı Ãû  : dump_show_stack
-* ¹¦ÄÜÃèÊö  : ´òÓ¡µ÷ÓÃÕ»£¬ÓÃÓÚ·ÇarmÒì³£
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 
 void dump_show_stack(void)
 {
@@ -384,19 +319,6 @@ void dump_show_stack(void)
     }
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_product_type_init
-* ¹¦ÄÜÃèÊö  : ³õÊ¼»¯²úÆ·ĞÎÌ¬
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_product_type_init(void)
 {
     struct device_node *node = NULL;
@@ -429,19 +351,6 @@ void dump_product_type_init(void)
     }
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_get_product_type
-* ¹¦ÄÜÃèÊö  : »ñÈ¡dumpµ±Ç°¹¤×÷µÄ²úÆ·ĞÎÌ¬
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 dump_product_type_t dump_get_product_type(void)
 {
     if(DUMP_PHONE == g_product_type)
@@ -454,19 +363,6 @@ dump_product_type_t dump_get_product_type(void)
     }
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : bsp_om_debug_init
-* ¹¦ÄÜÃèÊö  : »ñÈ¡µ±Ç°ĞèÒª±£´æµÄÎÄ¼şÅäÖÃ±í
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 int bsp_om_debug_init(void)
 {
 
@@ -487,19 +383,6 @@ int bsp_om_debug_init(void)
     return BSP_OK;
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_config_init
-* ¹¦ÄÜÃèÊö  : »ñÈ¡µ±Ç°¹¦ÄÜÅäÖÃ
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 s32 dump_config_init(void)
 {
     s32 ret;
@@ -507,7 +390,6 @@ s32 dump_config_init(void)
     ret = bsp_nvm_read(NVID_DUMP, (u8*)&g_dump_cfg, sizeof(NV_DUMP_STRU));
     if (BSP_OK != ret)
     {
-        /*Ê¹ÓÃÄ¬ÈÏÖµ*/
         g_dump_cfg.dump_cfg.Bits.dump_switch     = 0x1;
         g_dump_cfg.dump_cfg.Bits.ARMexc          = 0x1;
         g_dump_cfg.dump_cfg.Bits.stackFlow       = 0x1;
@@ -530,20 +412,6 @@ s32 dump_config_init(void)
     return BSP_OK;
 }
 
-
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_save_modem_sysctrl
-* ¹¦ÄÜÃèÊö  : ±£´æmodemµÄÏµÍ³¿ØÖÆ¼Ä´æÆ÷
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_save_modem_sysctrl(void)
 {
     u32 * field_addr = NULL;
@@ -577,37 +445,11 @@ void modem_wdt_hook(void)
     system_error(DRV_ERRNO_DUMP_CP_WDT, DUMP_REASON_WDT, 0, 0, 0);
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_register_hook
-* ¹¦ÄÜÃèÊö  : ×¢²ámodemÒì³£
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 s32 dump_register_hook(void)
 {
     return bsp_wdt_register_hook(WDT_CCORE_ID,modem_wdt_hook);
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_get_cp_task_name_by_id
-* ¹¦ÄÜÃèÊö  : Í¨¹ıÈÎÎñid²éÕÒÈÎÎñÃû
-*
-* ÊäÈë²ÎÊı  :task_id
-* Êä³ö²ÎÊı  :task_name
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_get_cp_task_name_by_id(u32 task_id, char* task_name)
 {
     dump_task_info_s * temp_task_name = NULL;
@@ -615,8 +457,6 @@ void dump_get_cp_task_name_by_id(u32 task_id, char* task_name)
     u32 task_cnt = 0;
     u32 task_index = 0;
 
-
-    /*CP´æ´¢ÈÎÎñÃûµÄÇøÓò*/
     task_name_table = bsp_dump_get_field_addr(DUMP_CP_ALLTASK_NAME);
     if(NULL == task_name_table)
     {
@@ -626,12 +466,10 @@ void dump_get_cp_task_name_by_id(u32 task_id, char* task_name)
 
     task_cnt = *((u32 *)task_name_table + 3)/4;
 
-    /* Æ«ÒÆ10×Ö½Ú£¬È¥µô¶ÓÁĞÍ· */
     task_name_table += 0x10;
     temp_task_name = (dump_task_info_s *)task_name_table;
     dump_fetal("task_cnt:0x%x\n", task_cnt);
 
-    /*²éÕÒÈÎÎñÃû*/
     for(task_index = 0;task_index < task_cnt; task_index++)
     {
 
@@ -646,19 +484,6 @@ void dump_get_cp_task_name_by_id(u32 task_id, char* task_name)
 
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_save_cp_base_info
-* ¹¦ÄÜÃèÊö  : ±£´æmodem apµÄ»ù±¾ĞÅÏ¢
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_save_cp_base_info(u32 mod_id, u32 arg1, u32 arg2, char *data, u32 length)
 {
     cp_dump_base_info_t* modem_cp_base_info = NULL;
@@ -707,19 +532,7 @@ void dump_save_cp_base_info(u32 mod_id, u32 arg1, u32 arg2, char *data, u32 leng
     dump_fetal("save cp base info finish\n");
     return;
 }
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_save_base_info
-* ¹¦ÄÜÃèÊö  : ±£´æmodem apµÄ»ù±¾ĞÅÏ¢
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
 
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_save_base_info(u32 mod_id, u32 arg1, u32 arg2, char *data, u32 length)
 {
 
@@ -756,7 +569,6 @@ void dump_save_base_info(u32 mod_id, u32 arg1, u32 arg2, char *data, u32 length)
         {
             if(g_mdm_dump_base_info->modId == 0x11000025 || g_mdm_dump_base_info->modId == 0x1100002A)
             {
-                /* AºËVOSÖ»¼ÇÂ¼µÄÈÎÎñµÄpid£¬Ã»ÓĞÈÎÎñµÄtask_structÖ¸Õë£¬²»¼ÇÂ¼ÈÎÎñÃû */
                 g_mdm_dump_base_info->reboot_task = g_mdm_dump_base_info->arg1;
             }
             else
@@ -781,19 +593,6 @@ void dump_save_base_info(u32 mod_id, u32 arg1, u32 arg2, char *data, u32 length)
     return;
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_update_mdm_rst_fail_info
-* ¹¦ÄÜÃèÊö  : ¸üĞÂmodemµ¥¶À¸´Î»Ê§°ÜµÄ»ù±¾ĞÅÏ¢
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_save_momdem_reset_info(u32 modid,char* name)
 {
     u32 len = 0;
@@ -813,19 +612,6 @@ void dump_save_momdem_reset_info(u32 modid,char* name)
     dump_fetal("modem reset fail update base info finish modid= 0x%x\n",modid);
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_base_info_init
-* ¹¦ÄÜÃèÊö  : modem ap»ù±¾ĞÅÏ¢³õÊ¼»¯
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 s32 dump_base_info_init(void)
 {
     if(g_modemap_dump_fileds_addr.base_info_addr != NULL)
@@ -843,19 +629,6 @@ s32 dump_base_info_init(void)
     return BSP_OK;
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_memmap_modem_ddr
-* ¹¦ÄÜÃèÊö  : Ó³Éämodem ddrµÄÄÚ´æ£¬Ö»ÔÚÊÖ»ú°æ±¾ÉÏÊ¹ÓÃ£¬mbbÆ½Ì¨ÉÏÔÚfastbootµ¼³ö
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_memmap_modem_ddr(void)
 {
     dump_product_type_t type = dump_get_product_type();
@@ -877,20 +650,7 @@ void dump_memmap_modem_ddr(void)
     }
     dump_fetal("dump_memmap_modem_ddr finish\n");
 }
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_wait_modem_cp_save_done
-* ¹¦ÄÜÃèÊö  : ±£´æmodem cpµÄÇøÓò
-*
-* ÊäÈë²ÎÊı  : u32 ms  µÈ´ıµÄºÁÃëÊı
-              bool wait ÊÇ·ñÑ­»·µÈ´ı
-* Êä³ö²ÎÊı  :
 
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 s32 dump_wait_modem_cp_save_done(u32 ms,bool wait)
 {
     u32 time_start = 0;
@@ -920,37 +680,12 @@ s32 dump_wait_modem_cp_save_done(u32 ms,bool wait)
 
     return BSP_ERROR;
 }
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_get_rdr_exc_info
-* ¹¦ÄÜÃèÊö  : »ñÈ¡rdrµÄÒì³£±äÁ¿µØÖ·
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 
 void* dump_get_rdr_exc_info(void)
 {
     return &g_rdr_modem_exc_info;
 }
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_save_task
-* ¹¦ÄÜÃèÊö  : ±£´æmodem logµÄÈë¿Úº¯Êı
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
 
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 int dump_save_task(void *data)
 {
     dump_product_type_t type = DUMP_PRODUCT_BUTT;
@@ -1006,19 +741,6 @@ int dump_save_task(void *data)
     return BSP_OK;
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_save_usr_data
-* ¹¦ÄÜÃèÊö  : ±£´æÓÃ»§Êı¾İÇø
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_save_usr_data(char *data, u32 length)
 {
     s32 len =0;
@@ -1045,19 +767,6 @@ void dump_save_usr_data(char *data, u32 length)
     return;
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_wait_for_reboot
-* ¹¦ÄÜÃèÊö  : µÈ´ıÖØÆô
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
  void dump_wait_for_reboot(void)
 {
     /* coverity[no_escape] */
@@ -1066,19 +775,6 @@ void dump_save_usr_data(char *data, u32 length)
     }while(1);
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_save_and_reboot
-* ¹¦ÄÜÃèÊö  : ´¥·¢±£´æÈÎÎñ£¬²¢ÇÒ¸´Î»
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_save_and_reboot(void)
 {
     g_dump_ctrl.dump_task_job = DUMP_TASK_JOB_SAVE_REBOOT;
@@ -1090,37 +786,10 @@ void dump_save_and_reboot(void)
     return;
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_save_arm_regs
-* ¹¦ÄÜÃèÊö  : ±£´æµ±Ç°ÈÎÎñµÄ¼Ä´æÆ÷ĞÅÏ¢
-*
-* ÊäÈë²ÎÊı  : addr ±£´æµØÖ·
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_save_arm_regs(u32 addr)
 {
 }
 
-
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_save_exc_task
-* ¹¦ÄÜÃèÊö  : ±£´æmodemµÄÒì³£ÈÎÎñĞÅÏ¢
-*
-* ÊäÈë²ÎÊı  : addr ±£´æµØÖ·
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_save_exc_task(void)
 {
     struct task_struct *task = get_current();
@@ -1136,7 +805,7 @@ void dump_save_exc_task(void)
 
         if(g_modemap_dump_fileds_addr.task_stack_addr != NULL)
         {
-            memcpy((void * )g_modemap_dump_fileds_addr.task_stack_addr , (const void * )task->stack, (size_t )THREAD_SIZE);/* [false alarm]:ÆÁ±ÎFortify´íÎó */
+            memcpy((void * )g_modemap_dump_fileds_addr.task_stack_addr , (const void * )task->stack, (size_t )THREAD_SIZE);
         }
     }
     else
@@ -1154,20 +823,6 @@ void dump_save_exc_task(void)
     return;
 }
 
-
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_notify_target
-* ¹¦ÄÜÃèÊö  : Í¨Öªmodem cp
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_notify_target(u32 mod_id)
 {
     if(g_dump_reboot_contex.reboot_core == DUMP_CPU_COMM)
@@ -1181,19 +836,6 @@ void dump_notify_target(u32 mod_id)
     }
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_match_rdr_mod_id
-* ¹¦ÄÜÃèÊö  : ½«drvµÄ´íÎóÂë×ª»»ÎªrdrµÄ´íÎóÂë
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 u32 dump_match_rdr_mod_id(u32 drv_mod_id)
 {
     u32 rdr_mod_id = RDR_MODEM_AP_MOD_ID;
@@ -1235,19 +877,6 @@ u32 dump_match_rdr_mod_id(u32 drv_mod_id)
 
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : bsp_dump_save_task_init
-* ¹¦ÄÜÃèÊö  : ´´½¨modem ap ±£´ælog µÄÈÎÎñº¯Êı
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 s32 bsp_dump_save_task_init(void)
 {
     struct task_struct * pid = NULL;
@@ -1276,19 +905,6 @@ s32 bsp_dump_save_task_init(void)
     return BSP_OK;
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : modem_dump_field_init
-* ¹¦ÄÜÃèÊö  : ³õÊ¼»¯modem apĞèÒªÊ¹ÓÃfiled ¿Õ¼ä
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 
 void modem_dump_field_init(void)
 {
@@ -1297,19 +913,6 @@ void modem_dump_field_init(void)
     dump_fetal("modem_dump_field_init finish\n");
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : bsp_dump_get_reboot_contex
-* ¹¦ÄÜÃèÊö  : ÎªaprÌá¹©µÄ½Ó¿ÚÓÃÓÚ»ñÈ¡µ±Ç°µÄÒì³£ºËÒÔ¼°Òì³£Ô­Òò
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void bsp_dump_get_reboot_contex(u32* core ,u32* reason)
 {
     if(core != NULL)
@@ -1322,19 +925,6 @@ void bsp_dump_get_reboot_contex(u32* core ,u32* reason)
     }
 }
 
-/*****************************************************************************
-* º¯ Êı Ãû  : dump_save_log_files
-* ¹¦ÄÜÃèÊö  : ±£´æÈ«²¿µÄmodem logÎÄ¼ş
-*
-* ÊäÈë²ÎÊı  :
-* Êä³ö²ÎÊı  :
-
-* ·µ »Ø Öµ  :
-
-*
-* ĞŞ¸Ä¼ÇÂ¼  : 2016Äê1ÔÂ4ÈÕ17:05:33   lixiaofan  creat
-*
-*****************************************************************************/
 void dump_save_log_files(char * dir_name, DUMP_FILE_CFG_STRU * cfg, dump_product_type_t type)
 {
     char file_name[MODEM_DUMP_FILE_NAME_LENGTH] = {0,};
@@ -1449,4 +1039,3 @@ void dump_save_log_files(char * dir_name, DUMP_FILE_CFG_STRU * cfg, dump_product
     dump_fetal("dump all files save finished\n");
 
 }
-

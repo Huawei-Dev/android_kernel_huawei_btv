@@ -495,7 +495,7 @@ static inline bool of_property_read_bool(const struct device_node *np,
 {
 	struct property *prop = of_find_property(np, propname, NULL);
 
-	return prop ? true : false;/* [false alarm]:ÆÁ±ÎFortify´íÎó */
+	return prop ? true : false;/* [false alarm]:????Fortify???? */
 }
 
 static inline int of_property_read_u8(const struct device_node *np,

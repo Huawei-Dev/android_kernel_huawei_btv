@@ -43,7 +43,7 @@
 #include "PPP/Inc/link.h"
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
 #define    THIS_FILE_ID        PS_FILE_ID_ASYNC_C
 
@@ -124,7 +124,7 @@ async_LayerPush(/*struct bundle *bundle, */struct link *l, struct ppp_mbuf *bp,
   while (wp) {
     sp = PPP_MBUF_CTOP(wp);
     for (cnt = wp->m_len; cnt > 0; cnt--) {
-      fcs = (fcs >> 8) ^ fcstab[(fcs ^ *sp) & 0xff]; /* [false alarm]:移植开源代码 */
+      fcs = (fcs >> 8) ^ fcstab[(fcs ^ *sp) & 0xff]; /* [false alarm]:???????????? */
       async_Encode(l, &cp, *sp++, *proto);
       if (cp >= ep) {
         ppp_m_freem(bp);
@@ -173,7 +173,7 @@ async_TtfMemLayerPush(struct link *l, VOS_UINT8 *pHdr, VOS_UINT16 usHdrLen, PPP_
 
     *cp++ = HDLC_SYN;
 
-    /* 先对PPP头部进行转义 */
+    /* ????PPP???????????? */
     sp = pHdr;
     while (usHdrLen > 0)
     {
@@ -193,10 +193,10 @@ async_TtfMemLayerPush(struct link *l, VOS_UINT8 *pHdr, VOS_UINT16 usHdrLen, PPP_
 
         sp++;
 
-        /*每个字节都进出栈,开销不小*/
+        /*????????????????,????????*/
         /*async_Encode(&l->async, &cp, *sp++, *proto);*/
 
-        /* xbuff大小为 HDLCSIZE=MAX_MRU*2+6,足够大 */
+        /* xbuff?????? HDLCSIZE=MAX_MRU*2+6,?????? */
         usHdrLen--;
     }
 
@@ -229,7 +229,7 @@ async_TtfMemLayerPush(struct link *l, VOS_UINT8 *pHdr, VOS_UINT16 usHdrLen, PPP_
             sp++;
 
             /*async_Encode(&l->async, &cp, *sp++, *proto);*/
-            /* xbuff大小为 HDLCSIZE=MAX_MRU*2+6,足够大 */
+            /* xbuff?????? HDLCSIZE=MAX_MRU*2+6,?????? */
         }
     /*
         wp = wp->pNext;
@@ -245,7 +245,7 @@ async_TtfMemLayerPush(struct link *l, VOS_UINT8 *pHdr, VOS_UINT16 usHdrLen, PPP_
     cnt = cp - l->async.xbuff;
     PPP_MemFree(bp);
 
-    /* 把封装好的PPP帧发往串口 */
+    /* ??????????PPP?????????? */
     PPP_SendPushedData((VOS_UINT16)PPP_LINK_TO_ID(l), (VOS_UINT8 *)(l->async.xbuff), (VOS_UINT16)cnt);
 
     return VOS_NULL_PTR;
@@ -276,7 +276,7 @@ struct ppp_mbuf * Ppp_asyncLayerPush(struct link *l, struct ppp_mbuf *bp, VOS_IN
         sp = PPP_MBUF_CTOP(wp);
         for (cnt = wp->m_len; cnt > 0; cnt--)
         {
-            async_Encode(l, &cp, *sp++, *proto); /* [false alarm]:移植开源代码 */
+            async_Encode(l, &cp, *sp++, *proto); /* [false alarm]:???????????? */
             if (cp >= ep)
             {
                 ppp_m_freem(bp);
@@ -358,7 +358,7 @@ PPP_ZC_STRU *async_Decode(struct async *async, VOS_CHAR c)
 
 
 
-/*该函数已没有调用, 所以直接返回.....对于所有的Pull函数，其中的bp参数都不为空，但对于最底层的，该bp为空*/
+/*????????????????, ????????????.....??????????Pull????????????bp????????????????????????????????bp????*/
 PPP_ZC_STRU *
 async_LayerPull(/*struct bundle *b, */struct link *l, PPP_ZC_STRU *bp,
                 VOS_UINT16 *proto)

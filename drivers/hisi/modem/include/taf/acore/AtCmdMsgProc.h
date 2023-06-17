@@ -50,7 +50,7 @@
 #define __ATCMDMSGPROC_H__
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include  "vos.h"
 #include  "AtTypeDef.h"
@@ -59,11 +59,11 @@
 #include  "TafDrvAgent.h"
 #include  "AtMtaInterface.h"
 #include  "AtInternalMsg.h"
-/* Added by y00213812 for VoLTE_PhaseII 项目, 2013-9-22, begin */
+/* Added by y00213812 for VoLTE_PhaseII ????, 2013-9-22, begin */
 #if (FEATURE_ON == FEATURE_IMS)
 #include  "AtImsaInterface.h"
 #endif
-/* Added by y00213812 for VoLTE_PhaseII 项目, 2013-9-22, end */
+/* Added by y00213812 for VoLTE_PhaseII ????, 2013-9-22, end */
 
 #include  "TafAppMma.h"
 
@@ -81,17 +81,17 @@ extern "C" {
 #pragma pack(4)
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
 #define         TAF_AT_INVALID_MCC          (0xffffffff)
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  4 全局变量声明
+  4 ????????????
 *****************************************************************************/
 
 
@@ -101,64 +101,64 @@ extern VOS_INT8                         g_acATE5DissdPwd[AT_DISSD_PWD_LEN+1];
 
 
 /*****************************************************************************
-  5 消息头定义
+  5 ??????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 消息定义
+  6 ????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  7 STRUCT定义
+  7 STRUCT????
 *****************************************************************************/
-/*消息处理函数指针*/
+/*????????????????*/
 typedef VOS_UINT32 (*pAtProcMsgFromDrvAgentFunc)(VOS_VOID *pMsg);
 
-/*AT与MTA模块间消息处理函数指针*/
+/*AT??MTA??????????????????????*/
 typedef VOS_UINT32 (*AT_MTA_MSG_PROC_FUNC)(VOS_VOID *pMsg);
 
-/* Added by w00167002 for L-C互操作项目, 2014-2-21, begin */
+/* Added by w00167002 for L-C??????????, 2014-2-21, begin */
 
-/*AT与MMA模块间消息处理函数指针*/
+/*AT??MMA??????????????????????*/
 typedef VOS_UINT32 (*AT_MMA_MSG_PROC_FUNC)(VOS_VOID *pMsg);
-/* Added by w00167002 for L-C互操作项目, 2014-2-21, end */
+/* Added by w00167002 for L-C??????????, 2014-2-21, end */
 
 typedef VOS_UINT32 (*AT_XCALL_MSG_PROC_FUNC)(VOS_VOID *pMsg);
 
 /*****************************************************************************
- 结构名    : DRV_AGENT_MSG_PROC_STRU
- 结构说明  : 消息与对应处理函数的结构
+ ??????    : DRV_AGENT_MSG_PROC_STRU
+ ????????  : ????????????????????????
 *****************************************************************************/
-/*lint -e958 -e959 修改人:l60609;原因:64bit*/
+/*lint -e958 -e959 ??????:l60609;????:64bit*/
 typedef struct
 {
     DRV_AGENT_MSG_TYPE_ENUM_UINT32       ulMsgType;
     pAtProcMsgFromDrvAgentFunc           pProcMsgFunc;
 }AT_PROC_MSG_FROM_DRV_AGENT_STRU;
-/*lint +e958 +e959 修改人:l60609;原因:64bit*/
+/*lint +e958 +e959 ??????:l60609;????:64bit*/
 
 /*****************************************************************************
  Structure      : NAS_AT_OUTSIDE_RUNNING_CONTEXT_PART_ST
- Description    : PC回放工程，存储所有AT相关的全局变量，目前仅有短信相关全局变量
+ Description    : PC??????????????????AT????????????????????????????????????????
  Message origin :
  Note:
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                           ucUsed;                                 /* 指示当前索引是否已被使用 */
-    AT_USER_TYPE                        UserType;                               /* 指示当前用户类型 */
-    AT_MODE_TYPE                        Mode;                                   /* 指示当前命令模式，只针对MUX和APP */
-    AT_IND_MODE_TYPE                    IndMode;                                /* 指示当前命令模式，只针对MUX和APP */
-    VOS_UINT16                          usClientId;                             /* 指示当前用户的 */
-    MN_OPERATION_ID_T                   opId;                                   /* Operation ID, 标识本次操作             */
+    VOS_UINT8                           ucUsed;                                 /* ???????????????????????? */
+    AT_USER_TYPE                        UserType;                               /* ???????????????? */
+    AT_MODE_TYPE                        Mode;                                   /* ????????????????????????MUX??APP */
+    AT_IND_MODE_TYPE                    IndMode;                                /* ????????????????????????MUX??APP */
+    VOS_UINT16                          usClientId;                             /* ?????????????? */
+    MN_OPERATION_ID_T                   opId;                                   /* Operation ID, ????????????             */
     VOS_UINT8                           aucReserved[1];
 }NAS_AT_CLIENT_MANAGE_SIMPLE_STRU;
 
 /*****************************************************************************
  Structure      : NAS_AT_SDT_AT_CLIENT_TABLE_STRU
- Description    : PC回放工程，所有AT相关的全局变量通过以下消息结构发送
+ Description    : PC??????????????AT??????????????????????????????????
  Message origin :
 *****************************************************************************/
 typedef struct
@@ -166,7 +166,7 @@ typedef struct
     VOS_MSG_HEADER
     AT_INTER_MSG_ID_ENUM_UINT32             enMsgID;
     VOS_UINT8                               ucType;
-    VOS_UINT8                               aucReserved[3];                     /* 在PACK(1)到PACK(4)调整中定义的保留字节 */
+    VOS_UINT8                               aucReserved[3];                     /* ??PACK(1)??PACK(4)???????????????????? */
     NAS_AT_CLIENT_MANAGE_SIMPLE_STRU        gastAtClientTab[AT_MAX_CLIENT_NUM];
 }NAS_AT_SDT_AT_CLIENT_TABLE_STRU;
 
@@ -178,7 +178,7 @@ typedef struct
     MN_MSG_CSMS_MSG_VERSION_ENUM_U8     g_enAtCsmsMsgVersion;
     AT_CNMI_TYPE_STRU                   gstAtCnmiType;
     AT_CMGF_MSG_FORMAT_ENUM_U8          g_enAtCmgfMsgFormat;
-    VOS_UINT8                           aucReserved[3];                         /* 在PACK(1)到PACK(4)调整中定义的保留字节 */
+    VOS_UINT8                           aucReserved[3];                         /* ??PACK(1)??PACK(4)???????????????????? */
     AT_CGSMS_SEND_DOMAIN_STRU           g_stAtCgsmsSendDomain;
     AT_CSCA_CSMP_INFO_STRU              g_stAtCscaCsmpInfo;
     AT_MSG_CPMS_STRU                    g_stAtCpmsInfo;
@@ -186,50 +186,50 @@ typedef struct
 
 /*****************************************************************************
  Structure      : NAS_AT_SDT_AT_PART_ST
- Description    : PC回放工程，所有AT相关的全局变量通过以下消息结构发送
+ Description    : PC??????????????AT??????????????????????????????????
  Message origin :
 *****************************************************************************/
 typedef struct
 {
     VOS_MSG_HEADER
-    AT_INTER_MSG_ID_ENUM_UINT32             enMsgID; /* 匹配AT_MSG_STRU消息中的ulMsgID  */
-    VOS_UINT8                               ucType;  /* 之前是ucMsgIDs */
-    VOS_UINT8                               aucReserved[3];                     /* 在PACK(1)到PACK(4)调整中定义的保留字节 */
+    AT_INTER_MSG_ID_ENUM_UINT32             enMsgID; /* ????AT_MSG_STRU????????ulMsgID  */
+    VOS_UINT8                               ucType;  /* ??????ucMsgIDs */
+    VOS_UINT8                               aucReserved[3];                     /* ??PACK(1)??PACK(4)???????????????????? */
     NAS_AT_OUTSIDE_RUNNING_CONTEXT_PART_ST  astOutsideCtx[MODEM_ID_BUTT];
 }NAS_AT_SDT_AT_PART_ST;
 
 /*****************************************************************************
- 结构名    : AT_PROC_MSG_FROM_MTA_STRU
- 结构说明  : AT与MTA消息与对应处理函数的结构
+ ??????    : AT_PROC_MSG_FROM_MTA_STRU
+ ????????  : AT??MTA????????????????????????
 *****************************************************************************/
-/*lint -e958 -e959 修改人:l60609;原因:64bit*/
+/*lint -e958 -e959 ??????:l60609;????:64bit*/
 typedef struct
 {
     AT_MTA_MSG_TYPE_ENUM_UINT32         ulMsgType;
     AT_MTA_MSG_PROC_FUNC                pProcMsgFunc;
 }AT_PROC_MSG_FROM_MTA_STRU;
-/*lint +e958 +e959 修改人:l60609;原因:64bit*/
+/*lint +e958 +e959 ??????:l60609;????:64bit*/
 
-/* Added by w00167002 for L-C互操作项目, 2014-2-21, begin */
+/* Added by w00167002 for L-C??????????, 2014-2-21, begin */
 /*****************************************************************************
- 结构名    : AT_PROC_MSG_FROM_MTA_STRU
- 结构说明  : AT与MTA消息与对应处理函数的结构
+ ??????    : AT_PROC_MSG_FROM_MTA_STRU
+ ????????  : AT??MTA????????????????????????
 *****************************************************************************/
-/*lint -e958 -e959 修改人:l60609;原因:64bit*/
+/*lint -e958 -e959 ??????:l60609;????:64bit*/
 typedef struct
 {
     VOS_UINT32                          ulMsgName;
     AT_MMA_MSG_PROC_FUNC                pProcMsgFunc;
 }AT_PROC_MSG_FROM_MMA_STRU;
-/*lint +e958 +e959 修改人:l60609;原因:64bit*/
-/* Added by w00167002 for L-C互操作项目, 2014-2-21, end */
+/*lint +e958 +e959 ??????:l60609;????:64bit*/
+/* Added by w00167002 for L-C??????????, 2014-2-21, end */
 
 
 /*****************************************************************************
- 结构名    : AT_PROC_MSG_FROM_CALL_STRU
- 结构说明  : AT与XCALL消息与对应处理函数的结构
+ ??????    : AT_PROC_MSG_FROM_CALL_STRU
+ ????????  : AT??XCALL????????????????????????
 *****************************************************************************/
-/*lint -e958 -e959 修改人:l60609;原因:64bit*/
+/*lint -e958 -e959 ??????:l60609;????:64bit*/
 typedef struct
 {
     TAF_CCA_MSG_TYPE_ENUM_UINT32        ulMsgName;
@@ -237,29 +237,29 @@ typedef struct
 }AT_PROC_MSG_FROM_CALL_STRU;
 
 /*****************************************************************************
- 结构名    : AT_PROC_MSG_FROM_XPDS_STRU
- 结构说明  : AT与XPDS消息与对应处理函数的结构
+ ??????    : AT_PROC_MSG_FROM_XPDS_STRU
+ ????????  : AT??XPDS????????????????????????
 *****************************************************************************/
-/*lint -e958 -e959 修改人:l60609;原因:64bit*/
+/*lint -e958 -e959 ??????:l60609;????:64bit*/
 typedef struct
 {
     AT_XPDS_MSG_TYPE_ENUM_UINT32        ulMsgType;
     AT_MMA_MSG_PROC_FUNC                pProcMsgFunc;
 }AT_PROC_MSG_FROM_XPDS_STRU;
-/*lint +e958 +e959 修改人:l60609;原因:64bit*/
+/*lint +e958 +e959 ??????:l60609;????:64bit*/
 
 /*****************************************************************************
-  8 UNION定义
+  8 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  9 OTHERS定义
+  9 OTHERS????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 /* Modified by l60609 for DSDA Phase III, 2013-3-5, Begin */
 VOS_UINT32 AT_FormatAtiCmdQryString(
@@ -392,11 +392,11 @@ VOS_UINT32 AT_RcvDrvAgentAntStateIndRsp(VOS_VOID *pMsg);
 VOS_VOID  AT_ReadSystemAppConfigNV(VOS_VOID);
 
 
-/* Modified by w00167002 for L-C互操作项目, 2014-2-21, begin */
+/* Modified by w00167002 for L-C??????????, 2014-2-21, begin */
 VOS_UINT32 AT_RcvMmaOmMaintainInfoInd(
     VOS_VOID                           *pstMsg
 );
-/* Modified by w00167002 for L-C互操作项目, 2014-2-21, end */
+/* Modified by w00167002 for L-C??????????, 2014-2-21, end */
 VOS_UINT32 AT_RcvDrvAgentSetMaxLockTmsRsp(VOS_VOID *pMsg);
 
 VOS_UINT32 AT_RcvDrvAgentSetApSimstRsp(VOS_VOID *pMsg);
@@ -439,10 +439,10 @@ VOS_UINT32 AT_RcvMtaWrrFreqLockQryCnf( VOS_VOID *pMsg );
 VOS_UINT32 AT_RcvMtaWrrRrcVersionSetCnf( VOS_VOID *pMsg );
 VOS_UINT32 AT_RcvMtaWrrRrcVersionQryCnf( VOS_VOID *pMsg );
 
-/* Added by w00176964 for V7R1C50_DCM接入禁止小区信息上报, 2012-12-11, begin */
+/* Added by w00176964 for V7R1C50_DCM????????????????????, 2012-12-11, begin */
 VOS_UINT32 AT_RcvMmaAcInfoQueryCnf(VOS_VOID *pstMsg);
 
-/* Added by w00176964 for V7R1C50_DCM接入禁止小区信息上报, 2012-12-11, end */
+/* Added by w00176964 for V7R1C50_DCM????????????????????, 2012-12-11, end */
 
 /* Modified by l60609 for DSDA Phase III, 2013-2-26, Begin */
 extern VOS_VOID AT_ReadWasCapabilityNV(VOS_VOID);
@@ -473,7 +473,7 @@ VOS_UINT32 AT_RcvHifiResetEndInd(
 extern VOS_UINT32 At_PidInit(enum VOS_INIT_PHASE_DEFINE enPhase);
 #endif
 
-/* Added by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-1, begin */
+/* Added by s00217060 for ????????AT??????????????C??, 2013-4-1, begin */
 VOS_UINT32 AT_RcvMtaQryCurcCnf(VOS_VOID *pstMsg);
 VOS_UINT32 AT_RcvMtaSetUnsolicitedRptCnf(VOS_VOID *pstMsg);
 VOS_UINT32 AT_RcvMtaQryUnsolicitedRptCnf(VOS_VOID *pstMsg);
@@ -482,24 +482,24 @@ VOS_UINT32 AT_ProcMtaUnsolicitedRptQryCnf(
     VOS_VOID                               *pstMsg
 );
 
-/* Added by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-1, end */
+/* Added by s00217060 for ????????AT??????????????C??, 2013-4-1, end */
 VOS_UINT32 AT_RcvMmaCerssiInfoQueryCnf(VOS_VOID *pstMsg);
 
 /*****************************************************************************
- 函 数 名  : AT_RcvMtaImeiVerifyQryCnf
- 功能描述  : 收到IMEI校验查询的处理
- 输入参数  : pstMsg
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
+ ?? ?? ??  : AT_RcvMtaImeiVerifyQryCnf
+ ????????  : ????IMEI??????????????
+ ????????  : pstMsg
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvMtaImeiVerifyQryCnf(VOS_VOID *pstMsg);
 /*****************************************************************************
- 函 数 名  : AT_RcvMtaCgsnQryCnf
- 功能描述  : 收到UE信息上报的处理
- 输入参数  : pstMsg
- 输出参数  : 无
- 返 回 值  : VOS_UINT32
+ ?? ?? ??  : AT_RcvMtaCgsnQryCnf
+ ????????  : ????UE??????????????
+ ????????  : pstMsg
+ ????????  : ??
+ ?? ?? ??  : VOS_UINT32
 
 *****************************************************************************/
 VOS_UINT32 AT_RcvMtaCgsnQryCnf(VOS_VOID *pstMsg);
@@ -542,9 +542,9 @@ VOS_VOID AT_RcvSwitchCmdModeMsg(VOS_UINT8 ucIndex);
 
 VOS_VOID AT_RcvWaterLowMsg(VOS_UINT8 ucIndex);
 
-/* Added by l00198894 for 新增+ECID命令, 2013-12-09, begin */
+/* Added by l00198894 for ????+ECID????, 2013-12-09, begin */
 VOS_UINT32 AT_RcvMtaEcidSetCnf(VOS_VOID *pMsg);
-/* Added by l00198894 for 新增+ECID命令, 2013-12-09, end */
+/* Added by l00198894 for ????+ECID????, 2013-12-09, end */
 
 VOS_UINT32 AT_RcvMtaMipiInfoCnf(
     VOS_VOID                           *pMsg
@@ -555,7 +555,7 @@ VOS_UINT32 AT_RcvMtaMipiInfoInd(
 );
 
 
-/* Added by w00167002 for L-C互操作项目, 2014-2-18, begin */
+/* Added by w00167002 for L-C??????????, 2014-2-18, begin */
 
 VOS_UINT32 AT_RcvMmaSysCfgSetCnf(
     VOS_VOID                           *pMsg
@@ -567,7 +567,7 @@ VOS_UINT32 AT_RcvMmaPhoneModeSetCnf(
 VOS_UINT32 AT_RcvMmaDetachCnf(
     VOS_VOID                           *pMsg
 );
-/* Added by w00167002 for L-C互操作项目, 2014-2-18, end */
+/* Added by w00167002 for L-C??????????, 2014-2-18, end */
 
 VOS_UINT32 AT_RcvMmaAttachCnf(
     VOS_VOID                           *pstMsg

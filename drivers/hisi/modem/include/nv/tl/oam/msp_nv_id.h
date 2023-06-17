@@ -61,9 +61,9 @@ extern "C" {
 typedef enum
 {
     NV_ID_MSP_IMEI                       = 0,
-    NV_ID_MSP_CALIBRATED_TIME            = 5,/*保留*/
+    NV_ID_MSP_CALIBRATED_TIME            = 5,/*????*/
     NV_ID_MSP_SERIAL_NUMBER              = 6,
-    NV_ID_MSP_LOGFILE_MAX_SIZE           = 8,/*保留*/
+    NV_ID_MSP_LOGFILE_MAX_SIZE           = 8,/*????*/
     NV_ID_MSP_WATCHDOG_FLAG              = 9,
     NV_ID_MSP_KICKDOG_TIME               = 11,
     NV_ID_MSP_SCHEDULE_WATCHDOG_TIME     = 12,
@@ -130,7 +130,7 @@ typedef enum
     NV_ID_END    = 0XFFFF
 }NV_ID_MSP_ENUM;
 
-/*为保证编译通过移入老版本，后续增加请增加到上面的定义中*/
+/*??????????????????????????????????????????????????????*/
 /*******************************NV ID START**************************************/
 typedef enum
 {

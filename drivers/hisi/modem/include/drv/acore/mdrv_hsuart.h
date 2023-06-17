@@ -49,19 +49,13 @@
 #ifndef    _DRV_HSUART_H_
 #define    _DRV_HSUART_H_
 
-
 #ifdef __cplusplus
 extern "C" 
 { 
-#endif /* __cplusplus */
+#endif
 
-/**************************************************************************
-  头文件包含                            
-**************************************************************************/
 #include "mdrv_udi.h"
-/**************************************************************************
-  宏定义 
-**************************************************************************/
+
 #define UART_IOCTL_SET_WRITE_CB      		0x7F001000
 #define UART_IOCTL_SET_READ_CB       		0x7F001001
 #define UART_IOCTL_SET_EVT_CB        		0x7F001002
@@ -90,17 +84,14 @@ extern "C"
 
 #define UART_A_SHELL  (0x5A5A5A5A)
 #define UART_C_SHELL  (0xA5A5A5A5)
-/**************************************************************************
-  枚举定义
-**************************************************************************/
+
 enum MEM_TYPE_ENUM
 {
-    MEM_TYPE_SYS_DEFINED = 0,            /* 数据块由Linux系统提供*/
-    MEM_TYPE_USER_DEFINED,               /* 数据块由用户管理的内存提供*/
+    MEM_TYPE_SYS_DEFINED = 0,
+    MEM_TYPE_USER_DEFINED,
     MEM_TYPE_BUTT
  };
 
-/* UART数据位长*/
 typedef enum
 {
     WLEN_5_BITS,
@@ -110,7 +101,6 @@ typedef enum
     WLEN_MAX,
 }UART_WLEN_ENUM;
 
-/* UART停止位长*/
 typedef enum
 {
     STP2_OFF,
@@ -118,14 +108,13 @@ typedef enum
     STP2_MAX,
 }uart_stp2_enum;
 
-/* UART校验方式*/
 typedef enum
 {
     PARITY_NO_CHECK,
     PARITY_CHECK_ODD,
     PARITY_CHECK_EVEN,
-    PARITY_CHECK_MARK,        /*校验位始终为1*/
-    PARITY_CHECK_SPACE,       /*校验位始终为0*/
+    PARITY_CHECK_MARK,
+    PARITY_CHECK_SPACE,
     PARITY_CHECK_MAX,
 }uart_parity_enum;
 
@@ -135,9 +124,6 @@ typedef enum tagwater_level
 	LOW_LEVEL,
 }water_level;
 
-/**************************************************************************
-  STRUCT定义
-**************************************************************************/
 typedef void (*hsuart_free_cb_t)(char* pBuff);
 typedef void (*hsuart_read_cb_t)(void);
 typedef void (*hsuart_msc_read_cb_t)(MODEM_MSC_STRU* pModemMsc);
@@ -150,23 +136,20 @@ typedef struct tagUART_READ_BUFF_INFO
     unsigned int u32BuffNum;
 }hsuart_read_buff_info;
 
-/* 流控开关结构 */
 typedef union
 {
    unsigned int      value;
     struct
     {
-		unsigned int  reserved1 : 14;/* bit[0-13] : reversed */
-		unsigned int  rtsen         : 1;/* bit[14] : rts enable, up stream flow ctrl  */
- 		unsigned int  ctsen         : 1;/* bit[15] : cts enable, down stream flow ctrl */
- 		unsigned int  reserved2 : 16;/* bit[16-31] : reversed */
+		unsigned int  reserved1 : 14;
+		unsigned int  rtsen         : 1;
+ 		unsigned int  ctsen         : 1;
+ 		unsigned int  reserved2 : 16;
     } reg;
 }uart_flow_ctrl_union;
 
 
 #ifdef __cplusplus
-} /* allow C++ to use these headers */
-#endif /* __cplusplus */
-
+}
 #endif
-
+#endif

@@ -46,8 +46,6 @@
  *
  */
 
-/*lint --e{533,750}*/
-/*lint -save -e537*/
 #include <linux/kernel.h>
 #include <linux/sched.h>
 #include <linux/syscalls.h>
@@ -67,7 +65,6 @@
 #include <linux/rcupdate.h>
 #include <linux/hrtimer.h>
 #include <linux/kthread.h>
-/*lint -restore*/
 
 #include "drv_comm.h"
 #include "osl_types.h"
@@ -80,8 +77,6 @@
 
 #include "mdrv_rfile_common.h"
 
-
-
 #define rfile_print_info        printk
 
 typedef  struct semaphore       rfile_sem_id;
@@ -91,45 +86,43 @@ typedef  struct semaphore       rfile_sem_id;
 #define Rfile_Free(ptr)         kfree(ptr)
 
 
-#define RFILE_TIMEOUT_MAX           (2000)           /* 最长等待2s */
+#define RFILE_TIMEOUT_MAX           (2000)
 
 typedef struct
 {
-    void *      context;        /* 0x00: WRS defined context */
-    void *      magic;          /* 0x04: magic. Used in HANDLE_VERIFY() */
-    u16         attributes;     /* 0x08: attribute bit set */
-    s8          type;           /* 0x0a: enum windObjClassType */
-    u8          contextType;    /* 0x0b: enum handleContextType */
+    void *      context;
+    void *      magic;
+    u16         attributes;
+    s8          type;
+    u8          contextType;
 } RFILE_HANDLE;
 
-typedef struct           /* stdio buffers */
+typedef struct
 {
-    u8 *            _base;      /* base address of {std,unget,line} buffer */
-    int             _size;      /* size of the buffer */
+    u8 *            _base;
+    int             _size;
 } RFILE_SBUF;
 
 typedef struct
 {
-    RFILE_HANDLE    handle;     /* file pointer handle managemet */
-    u8 *            _p;         /* current position in (some) buffer */
-    int             _r;         /* read space left for getc() */
-    int             _w;         /* write space left for putc() */
-    short           _flags;     /* flags, below;this FILE is free if 0*/
-    short           _file;      /* fileno, if Unix descriptor, else -1*/
-    RFILE_SBUF      _bf;        /* buffer (at least 1 byte,if !NULL) */
-    int             _lbfsize;   /* 0 or -_bf._size, for inline putc */
-    RFILE_SBUF      _ub;        /* ungetc buffer */
-    u8 *            _up;        /* old _p if _p is doing ungetc data */
-    int             _ur;        /* old _r if _r counting ungetc data */
-    u8              _ubuf[3];   /* guarantee an ungetc() buffer */
-    u8              _nbuf[1];   /* guarantee a getc() buffer */
-    RFILE_SBUF      _lb;        /* buffer for fgetline() */
-    int             _blksize;   /* stat.st_blksize (may be!=_bf._size)*/
-    int             _offset;    /* current lseek offset */
-    int             taskId;     /* task that owns this file pointer */
+    RFILE_HANDLE    handle;
+    u8 *            _p;
+    int             _r;
+    int             _w;
+    short           _flags;
+    short           _file;
+    RFILE_SBUF      _bf;
+    int             _lbfsize;
+    RFILE_SBUF      _ub;
+    u8 *            _up;
+    int             _ur;
+    u8              _ubuf[3];
+    u8              _nbuf[1];
+    RFILE_SBUF      _lb;
+    int             _blksize;
+    int             _offset;
+    int             taskId;
 } RFILE_FILE;
-
-//extern struct bsp_rfile_main_stru g_stRfileMain;
 
 #define RFILE_INVALID_ERROR_NO      0xa5a5a5a5
 
@@ -140,7 +133,6 @@ unsigned long mdrv_file_get_errno()
 {
     if(RFILE_INVALID_ERROR_NO == g_err)
     {
-//        return (unsigned long)(g_stRfileMain.errorno);
         return 1;
     }
     else
@@ -181,8 +173,6 @@ int rfile_getmode(const char *mode, int *flag)
         return (0);
     }
 
-    /* [rwa]\+ or [rwa]b\+ means read and write */
-
     if ((*mode == '+') || (*mode == 'b' && mode[1] == '+'))
     {
         ret = 0x0010;
@@ -191,17 +181,15 @@ int rfile_getmode(const char *mode, int *flag)
 
     *flag = m | o;
 
-    /* check for garbage in second character */
     if ((*mode != '+') && (*mode != 'b') && (*mode != '\0'))
     {
         bsp_trace(BSP_LOG_LEVEL_ERROR, BSP_MODU_RFILE, "[%s]:1. mode:%c.\n", __FUNCTION__, *mode);
         return (0);
     }
 
-    /* check for garbage in third character */
     if (*mode++ == '\0')
     {
-        return (ret);           /* no third char */
+        return (ret);
     }
 
     if ((*mode != '+') && (*mode != 'b') && (*mode != '\0'))
@@ -210,10 +198,9 @@ int rfile_getmode(const char *mode, int *flag)
         return (0);
     }
 
-    /* check for garbage in fourth character */
     if (*mode++ == '\0')
     {
-        return (ret);           /* no fourth char */
+        return (ret);
     }
 
     if (*mode != '\0')
@@ -267,7 +254,7 @@ int rfile_stdioFpDestroy(RFILE_FILE *fp)
     /* fclose() deallocates any buffers associated with the file pointer */
 
     fp->handle.magic        = 0;
-    fp->handle.type         = -1;      /* bad handle */
+    fp->handle.type         = -1;
 
     /* deallocate file pointer */
 
@@ -276,8 +263,6 @@ int rfile_stdioFpDestroy(RFILE_FILE *fp)
     return 0;
 }
 
-
-/*文件系统接口*/
 void *mdrv_file_open(const char *path, const char *mode)
 {
     int ret;
@@ -291,7 +276,6 @@ void *mdrv_file_open(const char *path, const char *mode)
         return 0;
     }
 
-    /* 将字符串参数转换成整数 */
     flags = rfile_getmode(mode, &oflags);
     if(0 == flags)
     {
@@ -314,7 +298,7 @@ void *mdrv_file_open(const char *path, const char *mode)
     {
         bsp_trace(BSP_LOG_LEVEL_ERROR, BSP_MODU_RFILE,
             "[%s] bsp_open failed,path=%s, ret = %x.\n", __FUNCTION__, path, ret);
-        ret = rfile_stdioFpDestroy (fp);      /* destroy file pointer */
+        ret = rfile_stdioFpDestroy (fp);
         g_err = (u32)ret;
         return 0;
     }
@@ -325,7 +309,6 @@ void *mdrv_file_open(const char *path, const char *mode)
     return (void*)fp;
 }
 
-/*lint -save -e732*/
 int mdrv_file_close(void *fp)
 {
     int ret;
@@ -424,7 +407,6 @@ long mdrv_file_tell(void *stream)
 
     return bsp_tell(((RFILE_FILE*)stream)->_file);
 }
-/*lint -restore*/
 
 int mdrv_file_remove(const char *pathname)
 {
@@ -480,7 +462,6 @@ DRV_DIR_S *rfile_stdioDirCreate (void)
     return (dir);
 }
 
-
 int rfile_stdioDirDestroy(DRV_DIR_S *dir)
 {
     if(NULL == dir)
@@ -493,7 +474,6 @@ int rfile_stdioDirDestroy(DRV_DIR_S *dir)
 
     return 0;
 }
-
 
 DRV_DIR_S* mdrv_file_opendir(const char *dirName)
 {
@@ -536,9 +516,9 @@ struct rfile_dirent_info
 {
     DRV_DIR_S        *phandle;
     RFILE_DIRENT_STRU   *pdirent;
-    int                 len;        /* 总长度 */
-    int                 ptr;        /* 当前偏移 */
-    struct list_head    stlist;     /* 链表节点 */
+    int                 len;
+    int                 ptr;
+    struct list_head    stlist;
 };
 
 struct rfile_adp_ctrl
@@ -557,7 +537,6 @@ void adp_rfile_init()
 
 }
 
-/*lint -save -e564 -e830*/
 struct rfile_dirent_info * adp_get_node(DRV_DIR_S *dirp)
 {
     int ret;
@@ -593,7 +572,7 @@ struct rfile_dirent_info * adp_get_node(DRV_DIR_S *dirp)
 
     return pstDirent;
 }
-/*lint -restore*/
+
 int adp_add_node(struct rfile_dirent_info *pdirent_list)
 {
     int ret;
@@ -611,7 +590,6 @@ int adp_add_node(struct rfile_dirent_info *pdirent_list)
     return 0;
 }
 
-/*lint -save -e438 -e830*/
 void adp_del_node(DRV_DIR_S *dirp)
 {
     int ret;
@@ -646,9 +624,6 @@ void adp_del_node(DRV_DIR_S *dirp)
 
     return ;
 }
-/*lint -restore*/
-
-/*lint -save -e64 -e813 -e438 -e830 -e958 -e529*/
 
 DRV_DIRENT_S* mdrv_file_readdir(DRV_DIR_S *dirp)
 {
@@ -791,7 +766,6 @@ int mdrv_file_get_stat(const char *path, DRV_STAT_S*buf)
         buf->st_blocks = (unsigned long)ststat.blocks;
         buf->st_attrib = 0;
     }
-
     return ret;
 }
 
@@ -799,7 +773,6 @@ int mdrv_file_access(const char *path, int amode)
 {
     return bsp_access((s8*)path, amode);
 }
-
 
 int mdrv_file_rename(const char *oldname, const char *newname)
 {
@@ -905,7 +878,6 @@ int xcopy_filecopy(const char *source,const char *dest)
 
         return -1;
     }
-
     return 0;
 }
 
@@ -934,10 +906,10 @@ int xcopy_sourcedest(const char *source,const char *dest)
 
     ret = bsp_stat((s8*)dest, &d_stat);
 
-    if(ret < 0) /* 目标文件或目录不存在 */
+    if(ret < 0)
     {
         /* coverity[uninit_use] */
-        if(S_ISDIR(s_stat.mode))    /* 源是目录 */
+        if(S_ISDIR(s_stat.mode))
         {
             ret = bsp_mkdir((s8*)dest, 0775);
             if(0 != ret)
@@ -946,7 +918,7 @@ int xcopy_sourcedest(const char *source,const char *dest)
                 return ret;
             }
         }
-        else        /* 源是文件 */
+        else
         {
             /* coverity[example_assign] */
             pfile = bsp_open((const s8*)dest, (RFILE_CREAT|RFILE_RDWR), 0664);  /* TODO: mode */
@@ -958,16 +930,15 @@ int xcopy_sourcedest(const char *source,const char *dest)
             }
         }
 
-        /* 递归调用 */
         xcopy_sourcedest(source, dest);
     }
-    else    /* 目标文件或目录存在 */
+    else
     {
         /* coverity[uninit_use] */
-        if(S_ISDIR(s_stat.mode))    /* 源是目录 */
+        if(S_ISDIR(s_stat.mode))
         {
             /* coverity[uninit_use] */
-            if(!S_ISDIR(d_stat.mode))   /* 目标不是目录 */
+            if(!S_ISDIR(d_stat.mode))
             {
                 bsp_trace(BSP_LOG_LEVEL_ERROR, BSP_MODU_RFILE, "[%s] src is dir,dest is file.\n", __FUNCTION__);
                 return -1;
@@ -980,7 +951,7 @@ int xcopy_sourcedest(const char *source,const char *dest)
                 return -1;
             }
 
-            pdirent = Rfile_Malloc(RFILE_DIRENT_LEN);  /* 缓存子目录的名称 */
+            pdirent = Rfile_Malloc(RFILE_DIRENT_LEN);
             if(NULL == pdirent)
             {
                 bsp_trace(BSP_LOG_LEVEL_ERROR, BSP_MODU_RFILE, "[%s] malloc failed.\n", __FUNCTION__);
@@ -1048,7 +1019,6 @@ int xcopy_sourcedest(const char *source,const char *dest)
                         /* coverity[secure_coding] */
                         strcat(psubdir_d, (char*)pstDirent->d_name);
 
-                        /* 递归调用 */
                         xcopy_sourcedest(psubdir_s, psubdir_d);
 
                         Rfile_Free(psubdir_s);
@@ -1060,10 +1030,10 @@ int xcopy_sourcedest(const char *source,const char *dest)
 
             Rfile_Free(pdirent);
         }
-        else        /* 源是文件 */
+        else
         {
             /* coverity[uninit_use] */
-            if(S_ISDIR(d_stat.mode))   /* 目标是目录 */
+            if(S_ISDIR(d_stat.mode))
             {
                 bsp_trace(BSP_LOG_LEVEL_ERROR, BSP_MODU_RFILE, "[%s] src is file,dest is dir.\n", __FUNCTION__);
                 return -1;
@@ -1120,7 +1090,7 @@ int xdelete_source(const char *source)
     }
 
     /* coverity[uninit_use] */
-    if(S_ISDIR(s_stat.mode))    /* 源是目录 */
+    if(S_ISDIR(s_stat.mode))
     {
         dir = bsp_opendir((s8*)source);
         if(dir < 0)
@@ -1129,7 +1099,7 @@ int xdelete_source(const char *source)
             return -1;
         }
 
-        pdirent = Rfile_Malloc(RFILE_DIRENT_LEN);  /* 缓存子目录的名称 */
+        pdirent = Rfile_Malloc(RFILE_DIRENT_LEN);
         if(NULL == pdirent)
         {
             bsp_trace(BSP_LOG_LEVEL_ERROR, BSP_MODU_RFILE, "[%s] malloc failed.\n", __FUNCTION__);
@@ -1179,7 +1149,6 @@ int xdelete_source(const char *source)
                     /* coverity[secure_coding] */
                     strcat(psubdir_s, (char*)pstDirent->d_name);
 
-                    /* 递归调用 */
                     xdelete_source(psubdir_s);
 
                     Rfile_Free(psubdir_s);
@@ -1193,7 +1162,7 @@ int xdelete_source(const char *source)
 
         bsp_rmdir((s8*)source);
     }
-    else        /* 源是文件 */
+    else
     {
         bsp_remove((const s8 *)source);
     }
@@ -1218,8 +1187,5 @@ int mdrv_file_xdelete(const char *source)
 
     return 0;
 }
-/*lint -restore*/
+
 EXPORT_SYMBOL(mdrv_file_remove);
-
-
-

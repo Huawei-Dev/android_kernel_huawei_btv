@@ -44,7 +44,7 @@
 #include "PPP/Inc/link.h"
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
 #define    THIS_FILE_ID        PS_FILE_ID_HDLC_C
 
@@ -116,7 +116,7 @@ HdlcFcsBuf(VOS_UINT16 fcs, struct ppp_mbuf *m)
   pos = PPP_MBUF_CTOP(m);
   end = pos + m->m_len;
   while (len--) {
-    fcs = (fcs >> 8) ^ fcstab[(fcs ^ *pos++) & 0xff]; /* [false alarm]:移植开源代码 */
+    fcs = (fcs >> 8) ^ fcstab[(fcs ^ *pos++) & 0xff]; /* [false alarm]:???????????? */
     if (pos == end && len) {
       m = m->m_next;
       pos = PPP_MBUF_CTOP(m);

@@ -48,24 +48,24 @@
 
 /******************************************************************************
 
-                  版权所有 (C), 2001-2011, 华为技术有限公司
+                  ???????? (C), 2001-2011, ????????????????
 
  ******************************************************************************
-  文 件 名      : Om.c
-  版 本 号      : 初稿
-  作    者      : 甘兰47350
-  生成日期      : 2008年5月3日
-  最近修改      :
-  功能描述      : 该C文件给出了OM模块的实现
-  函数列表      :
-  修改历史      :
-  1.日    期    : 2008年5月3日
-    作    者    : 甘兰47350
-    修改内容    : 创建文件
+  ?? ?? ??      : Om.c
+  ?? ?? ??      : ????
+  ??    ??      : ????47350
+  ????????      : 2008??5??3??
+  ????????      :
+  ????????      : ??C??????????OM??????????
+  ????????      :
+  ????????      :
+  1.??    ??    : 2008??5??3??
+    ??    ??    : ????47350
+    ????????    : ????????
 
 ******************************************************************************/
 /*****************************************************************************
-  1 头文件包含
+  1 ??????????
 *****************************************************************************/
 #include "NVIM_Interface.h"
 #include "TafNvInterface.h"
@@ -80,7 +80,7 @@
 
 
 
-/*lint -e767 修改人：甘兰47350；检视人：李霄46160；原因简述：LOG方案设计需要*/
+/*lint -e767 ????????????47350??????????????46160????????????LOG????????????*/
 #define    THIS_FILE_ID        PS_FILE_ID_APP_CBT_FUNC_C
 
 
@@ -95,17 +95,17 @@ extern VOS_UINT32 OM_IsAcpuAuthNv(VOS_UINT16 usNvId);
                    APP->OM:
                     struct
                     {
-                         ulCount               32         要读取的NV项个数
-                         ausNvItemId[n]     n*16          要读取的NV项ID数组，其中n= usCount
+                         ulCount               32         ????????NV??????
+                         ausNvItemId[n]     n*16          ????????NV??ID??????????n= usCount
                     }
                    OM->APP:
                     struct
                     {
                          ulErrorCode           32
-                         ulCount               32       返回的NV项个数
-                         NvItem1Id         16       第一项NV的Id编号
-                         NvItem1Len        16       第一项NV的长度，以Byte为单位
-                         NvItem1Data[n1]       n1*16    第一项NV的数据
+                         ulCount               32       ??????NV??????
+                         NvItem1Id         16       ??????NV??Id????
+                         NvItem1Len        16       ??????NV??????????Byte??????
+                         NvItem1Data[n1]       n1*16    ??????NV??????
                     }
  Input           : pstAppToOmMsg  - The input msg received from APP side.
                    usReturnPrimId - The value of the returned PrimId.
@@ -228,13 +228,13 @@ VOS_UINT32 CBT_AcpuReadNv(CBT_UNIFORM_MSG_STRU *pstAppToCbtMsg, VOS_UINT16 usRet
                   APP->OM:
                   struct
                   {
-                        ulCount 32             要读取的NV项个数
-                        NvItem1Id   16         第一项NV的Id编号
-                        NvItem1Len  16         第一项NV的长度，以Byte为单位
-                        NvItem1Data[n1] n1*16  第一项NV的数据
+                        ulCount 32             ????????NV??????
+                        NvItem1Id   16         ??????NV??Id????
+                        NvItem1Len  16         ??????NV??????????Byte??????
+                        NvItem1Data[n1] n1*16  ??????NV??????
                   }
                   OM->APP:
-                  ulErrorCode   32      请参见"表65 UlErrorCode定义表"
+                  ulErrorCode   32      ??????"??65 UlErrorCode??????"
 
  Input           : pstAppToOmMsg  - The input msg received from APP side.
                    usReturnPrimId - The value of the returned PrimId.
@@ -283,7 +283,7 @@ VOS_UINT32 CBT_AcpuWriteNv(CBT_UNIFORM_MSG_STRU *pstAppToCbtMsg, VOS_UINT16 usRe
 
             return VOS_ERR;
         }
-        /*由于返回的usNvLen以byte为单位，所以需要除以指针指向类型的大小*/
+        /*??????????usNvLen??byte??????????????????????????????????????*/
         pusAppToCbtPara += (usNvLen/sizeof(VOS_UINT16));
     }
 
@@ -306,7 +306,7 @@ VOS_UINT32 CBT_AcpuEstablishProc(CBT_UNIFORM_MSG_STRU * pstAppToCbtMsg)
     MsgBlock                   *pMsg;
     VOS_UINT32                  ulTotalSize = 0;
 
-    /* 先断开链路 */
+    /* ?????????? */
     g_stAcpuCbtCtrlInfo.ulCbtSwitchOnOff = CBT_STATE_IDLE;
     g_ulCbtMsgSN                         = 0;
 
@@ -321,10 +321,10 @@ VOS_UINT32 CBT_AcpuEstablishProc(CBT_UNIFORM_MSG_STRU * pstAppToCbtMsg)
     }
 
     pstCbtToAppEstablish = (CBT_ESTABLISH_IND_STRU *)pstCbtToAppMsg->aucPara;
-    /* 以兼容校准工具，建链成功回复状态字0x02 */
+    /* ??????????????????????????????????0x02 */
     pstCbtToAppEstablish->ulResult = 0x0002;
 
-    /* 调用底软接口获取芯片类型 */
+    /* ???????????????????????? */
     pstVerInfo = mdrv_ver_get_info();
     if(VOS_NULL_PTR == pstVerInfo)
     {
@@ -335,21 +335,21 @@ VOS_UINT32 CBT_AcpuEstablishProc(CBT_UNIFORM_MSG_STRU * pstAppToCbtMsg)
     pstCbtToAppEstablish->ulChipId = (VOS_UINT32)(pstVerInfo->stproductinfo.chip_id);
 
     /*lint -e419 -e416 -e534 */
-    VOS_MemSet(pstCbtToAppEstablish->ausReserve, 0, CBT_EST_IND_RSV_LEN);    /*预留字段，暂时赋值为全0*/
+    VOS_MemSet(pstCbtToAppEstablish->ausReserve, 0, CBT_EST_IND_RSV_LEN);    /*??????????????????????0*/
     /*lint +e419 +e416 +e534 */
 
     pstCbtToAppMsg->ulMsgLength = ulTotalSize - CBT_MSG_HEAD_EX_LENGTH;
-    /* 给工具回复建链成功状态 */
+    /* ?????????????????????? */
     CBT_AcpuSendContentChannel(pstAppToCbtMsg->stMsgHeader.stModemSsid, pstAppToCbtMsg->stCompMode, OM_APP_ESTABLISH_CNF, pstCbtToAppMsg);
 
     if (VOS_OK != VOS_MemFree(ACPU_PID_CBT, pstCbtToAppMsg))
     {
     }
 
-    /* 激活链路 */
+    /* ???????? */
     g_stAcpuCbtCtrlInfo.ulCbtSwitchOnOff = CBT_STATE_ACTIVE;
 
-    /* 通知CCPU链路状态 */
+    /* ????CCPU???????? */
     pMsg = (MsgBlock *)VOS_AllocMsg(PC_PID_TOOL, sizeof(CBT_UNIFORM_MSG_STRU));
 
     if (VOS_NULL_PTR == pMsg)
@@ -461,7 +461,7 @@ VOS_VOID CBT_AppMsgProc(MsgBlock* pMsg)
     {
         pstCbtMsg = (CBT_CTOA_MSG_STRU *)pMsg;
 
-        if (OM_CBT_SEND_DATA_REQ == pstCbtMsg->usPrimId)/* C核发过来的校准数据 */
+        if (OM_CBT_SEND_DATA_REQ == pstCbtMsg->usPrimId)/* C?????????????????? */
         {
             /*lint -e534*/
             CBT_AcpuSendData((CBT_UNIFORM_MSG_STRU *)(pstCbtMsg->aucData), pstCbtMsg->usLen);
@@ -529,7 +529,7 @@ VOS_UINT32 CBTAppFidInit(enum VOS_INIT_PHASE_DEFINE ip)
             /*lint -e534*/
             CBT_AcpuInit();
             /*lint +e534*/
-            /* CBT自处理任务创建 */
+            /* CBT?????????????? */
             if (VOS_OK != CBTSCM_SoftDecodeReqRcvTaskInit())
             {
                 return VOS_ERR;

@@ -137,7 +137,7 @@ do {							\
 }
 
 /*
-*参数类型
+*????????
 *spinlock_t *  __specific_lock,
 *unsigned long __specific_flags
 */
@@ -150,7 +150,7 @@ do { \
 	} while (0)
 
 /*
-*参数类型
+*????????
 *spinlock_t *  __specific_lock,
 *unsigned long __specific_flags
 */

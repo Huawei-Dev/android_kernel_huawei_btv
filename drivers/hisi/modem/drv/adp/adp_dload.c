@@ -48,105 +48,26 @@
 
 #include "mdrv_dload.h"
 
-/*lint --e{715,818}*/
-
-/*****************************************************************************
-* 函 数 名  : mdrv_dload_set_curmode
-*
-* 功能描述  : 设置当前工作模式
-*
-* 输入参数  : void
-* 输出参数  : DLOAD_MODE_NORMAL     :正常模式
-*             DLOAD_MODE_DATA       :数据模式
-*             DLOAD_MODE_DOWNLOAD   :下载模式
-*
-* 返 回 值  : 无
-*
-* 其它说明  : AT模块调用
-*             正常模式支持的有:
-*                 BSP_DLOAD_GetCurMode(DLOAD_MODE_DOWNLOAD)
-*             下载模式支持的有:
-*                 BSP_DLOAD_GetCurMode(DLOAD_MODE_DATA)
-*
-*****************************************************************************/
 void mdrv_dload_set_curmode(DLOAD_MODE_E eDloadMode)
 {
 	return ;
 }
 
-/*****************************************************************************
-* 函 数 名  : BSP_DLOAD_GetCurMode
-*
-* 功能描述  : 获取当前工作模式
-*
-* 输入参数  : void
-* 输出参数  : 无
-*
-* 返 回 值  : DLOAD_MODE_NORMAL     :正常模式
-*             DLOAD_MODE_DATA       :数据模式
-*             DLOAD_MODE_DOWNLOAD   :下载模式
-*
-* 其它说明  : 无
-*
-*****************************************************************************/
 DLOAD_MODE_E mdrv_dload_get_curmode(void)
 {
 	return DLOAD_MODE_MAX;
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_dload_set_softload
-*
-* 功能描述  : 设置启动标志
-*
-* 输入参数  : BSP_BOOL bSoftLoad  :
-*             BSP_FALSE :从vxWorks启动
-*             BSP_TRUE  :从bootrom启动
-* 输出参数  : 无
-*
-* 返 回 值  : 无
-*
-* 其它说明  : 无
-*
-*****************************************************************************/
 void mdrv_dload_set_softload (int bSoftLoad)
 {
 	return ;
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_dload_get_softload
-*
-* 功能描述  : 获取启动标志
-*
-* 输入参数  : void
-* 输出参数  : 无
-*
-* 返 回 值  : BSP_TRUE  :从bootrom启动
-*             BSP_FALSE :从vxWorks启动
-*
-* 其它说明  : 无
-*
-*****************************************************************************/
 int mdrv_dload_get_softload (void)
 {
 	return 0;
 }
 
-/*****************************************************************************
-* 函 数 名  : mdrv_dload_get_info
-*
-* 功能描述  : 返回升级版本信息
-*
-* 输入参数  : 无
-* 输出参数  : 无
-*
-* 返 回 值  : 不为空 返回升级版本信息
-                    为空 返回失败
-*
-* 其它说明  : 无
-*
-*****************************************************************************/
 DLOAD_VER_INFO_S * mdrv_dload_get_info(void)
 {
 	return (void*)0;

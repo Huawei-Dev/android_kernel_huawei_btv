@@ -50,7 +50,7 @@
 #define __DMS_H__
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 
 #include "mdrv.h"
@@ -65,7 +65,7 @@ extern "C" {
 
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
 
 #define DMS_LOG_STATIC_BUF_NUM          (16)
@@ -75,7 +75,7 @@ extern "C" {
 #define NVE_READ_OPERATE                (1)
 #define NVE_WRITE_OPERATE               (0)
 
-/* 通道断开连接通知机制
+/* ????????????????????
  */
 #define DMS_DISNNECT                    (0)
 #define DMS_CONNECT                     (1)
@@ -86,10 +86,10 @@ extern "C" {
 
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 
-/* 以下的枚举值不能随便修改*/
+/* ????????????????????????*/
 typedef enum
 {
     DMS_PHY_BEAR_BEGIN                 = 0,
@@ -138,8 +138,8 @@ enum PDP_STATUS_ENUM
 typedef VOS_UINT32 PDP_STATUS_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名称: DMS_CHAN_EVT_ENUM
- 枚举说明: 通道事件枚举
+ ????????: DMS_CHAN_EVT_ENUM
+ ????????: ????????????
 *****************************************************************************/
 enum DMS_CHAN_EVT_ENUM
 {
@@ -151,8 +151,8 @@ enum DMS_CHAN_EVT_ENUM
 typedef VOS_UINT32 DMS_CHAN_EVT_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名称: DMS_OM_CHAN_ENUM
- 枚举说明: 通道类型枚举
+ ????????: DMS_OM_CHAN_ENUM
+ ????????: ????????????
 *****************************************************************************/
 enum DMS_OM_CHAN_ENUM
 {
@@ -166,27 +166,27 @@ typedef VOS_UINT32 DMS_OM_CHAN_ENUM_UINT32;
 
 
 /*****************************************************************************
-  4 STRUCT定义
+  4 STRUCT????
 *****************************************************************************/
 
 typedef struct
 {
-    VOS_UINT32                          ulCalledNum;  /* 调用次数或者消息次数,或者表明该函数是否被调用 */
+    VOS_UINT32                          ulCalledNum;  /* ????????????????????,???????????????????????? */
 
-    VOS_UINT32                          ulRserved1;   /* 表明该位置或者其他,HAL_DIAG_SYS_DEBUG_ENUM决定 */
+    VOS_UINT32                          ulRserved1;   /* ??????????????????,HAL_DIAG_SYS_DEBUG_ENUM???? */
 
-    VOS_UINT32                          ulRserved2;   /* 表明特殊含义或者其他,HAL_DIAG_SYS_DEBUG_ENUM决定 */
+    VOS_UINT32                          ulRserved2;   /* ????????????????????,HAL_DIAG_SYS_DEBUG_ENUM???? */
 
-    VOS_UINT32                          ulRserved3;   /* 表明特殊含义或者其他,HAL_DIAG_SYS_DEBUG_ENUM决定 */
+    VOS_UINT32                          ulRserved3;   /* ????????????????????,HAL_DIAG_SYS_DEBUG_ENUM???? */
 
-    VOS_UINT32                          ulRtcTime;    /* 表明最近执行过的时间 */
+    VOS_UINT32                          ulRtcTime;    /* ???????????????????? */
 } DMS_DEBUG_INFO_TBL_STRU;
 
 
 typedef struct
 {
-    VOS_INT32                           lOperatRet;         /* 0:读取成功  -1:读取失败 */
-    VOS_UINT32                          ulNvValue;          /* 0:无atserver 1:有atserver */
+    VOS_INT32                           lOperatRet;         /* 0:????????  -1:???????? */
+    VOS_UINT32                          ulNvValue;          /* 0:??atserver 1:??atserver */
 } DMS_DEBUG_AT_SERV_NV_STRU;
 
 
@@ -206,11 +206,11 @@ typedef struct
 } DMS_STATIC_BUF_STRU;
 
 
-/* PDP状态上报函数使用的结构体 */
+/* PDP???????????????????????? */
 typedef struct
 {
-    VOS_UINT32                       ulSpeed;             /* 连接速度，单位bps */
-    PDP_STATUS_ENUM_UINT32           enActiveSatus;       /* 激活结果，0为成功，其他为失败 */
+    VOS_UINT32                       ulSpeed;             /* ??????????????bps */
+    PDP_STATUS_ENUM_UINT32           enActiveSatus;       /* ??????????0?????????????????? */
 } NAS_PRO_STRU;
 
 
@@ -222,22 +222,22 @@ typedef int (*USB_NAS_BRK)(void);
 
 typedef int (*USB_NAS_AT_CMD_RECV)(unsigned char *pBuff, unsigned short usLen);
 
-/* 获取当前网络模式CDMA/WCDMA */
+/* ????????????????CDMA/WCDMA */
 typedef unsigned long (*USB_NAS_GET_WWAN_MODE)(void);
 
 typedef int  (*pComRecv)(unsigned char  uPortNo, unsigned char* pData, unsigned short uslength);
 /*****************************************************************************
-  5 UNION定义
+  5 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 全局变量声明
+  6 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  7 函数声明
+  7 ????????
 *****************************************************************************/
 
 #define DMS_COM_STATUS_CALLBACK_REGI(uPortNo,pCallback)   NULL
@@ -294,11 +294,11 @@ extern DMS_READ_DATA_PFN DMS_GetDataReadFun(VOS_VOID);
 extern VOS_VOID DMS_SetConnStaCB(DMS_CONNECT_STA_PFN pfnReg);
 
 /*****************************************************************************
- 函 数 名  : DMS_GetHsicPortStatus
- 功能描述  : 获取HSIC口打开状态
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 0-未打开状态;1-打开状态
+ ?? ?? ??  : DMS_GetHsicPortStatus
+ ????????  : ????HSIC??????????
+ ????????  : ??
+ ????????  : ??
+ ?? ?? ??  : 0-??????????;1-????????
  ****************************************************************************/
 extern VOS_UINT32 DMS_GetHsicPortStatus(VOS_VOID);
 
@@ -309,35 +309,35 @@ typedef VOS_UINT32 (*DMS_OM_CHAN_DATA_READ_CB_FUNC)(DMS_OM_CHAN_ENUM_UINT32 enCh
 typedef VOS_VOID (*DMS_OM_CHAN_EVENT_CB_FUNC)(DMS_OM_CHAN_ENUM_UINT32 enChan, DMS_CHAN_EVT_ENUM_UINT32 enEvt);
 
 /*****************************************************************************
- 函 数 名  : DMS_RegOmChanDataReadCB
- 功能描述  : 注册OM通道数据接收回调
- 输入参数  : enChan --- 逻辑通道
-             pFunc  --- 函数指针
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
+ ?? ?? ??  : DMS_RegOmChanDataReadCB
+ ????????  : ????OM????????????????
+ ????????  : enChan --- ????????
+             pFunc  --- ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
 *****************************************************************************/
 VOS_UINT32 DMS_RegOmChanDataReadCB(DMS_OM_CHAN_ENUM_UINT32 enChan, DMS_OM_CHAN_DATA_READ_CB_FUNC pFunc);
 
 
 /*****************************************************************************
- 函 数 名  : DMS_RegOmChanEventCB
- 功能描述  : 注册OM通道事件接收回调
- 输入参数  : enChan --- 逻辑通道
-             pFunc  --- 函数指针
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
+ ?? ?? ??  : DMS_RegOmChanEventCB
+ ????????  : ????OM????????????????
+ ????????  : enChan --- ????????
+             pFunc  --- ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
 *****************************************************************************/
 VOS_UINT32 DMS_RegOmChanEventCB(DMS_OM_CHAN_ENUM_UINT32 enChan, DMS_OM_CHAN_EVENT_CB_FUNC pFunc);
 
 
 /*****************************************************************************
- 函 数 名  : DMS_WriteOmData
- 功能描述  : 写OM通道数据
- 输入参数  : enChan   --- 逻辑通道
-             pucData  --- 数据地址
-             ulLength --- 数据长度
- 输出参数  : 无
- 返 回 值  : VOS_ERR/VOS_OK
+ ?? ?? ??  : DMS_WriteOmData
+ ????????  : ??OM????????
+ ????????  : enChan   --- ????????
+             pucData  --- ????????
+             ulLength --- ????????
+ ????????  : ??
+ ?? ?? ??  : VOS_ERR/VOS_OK
 *****************************************************************************/
 VOS_UINT32 DMS_WriteOmData(DMS_OM_CHAN_ENUM_UINT32 enChan, VOS_UINT8 *pucData, VOS_UINT32 ulLength);
 
@@ -346,7 +346,7 @@ VOS_UINT8 DMS_GetModemStatus(MODEM_ID_ENUM_UINT16 enModemId);
 VOS_VOID DMS_InitModemStatus(VOS_VOID);
 
 /*****************************************************************************
-  8 OTHERS定义
+  8 OTHERS????
 *****************************************************************************/
 
 

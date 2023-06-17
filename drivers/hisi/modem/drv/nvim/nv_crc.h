@@ -46,10 +46,8 @@
  *
  */
 
-
 #ifndef _NV_CRC_H_
 #define _NV_CRC_H_
-
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -64,7 +62,6 @@ extern "C" {
 #define NV_RESUME_BAKUP            (0x2)
 #define NV_RESUME_DEFAULT          (0x4)
 
-/*是否进行CRC校验标志*/
 #define NV_DATA4K_CRC_CHECK_YES    (((struct nv_ctrl_file_info_stru*)NV_GLOBAL_CTRL_INFO_ADDR)->crc_mark.bits.data_crc)
 #define NV_CTRL_CRC_CHECK_YES      (((struct nv_ctrl_file_info_stru*)NV_GLOBAL_CTRL_INFO_ADDR)->crc_mark.bits.ctrl_crc)
 #define NV_ITEM_CRC_CHECK_YES      (((struct nv_ctrl_file_info_stru*)NV_GLOBAL_CTRL_INFO_ADDR)->crc_mark.bits.item_crc)
@@ -86,14 +83,10 @@ u32  nv_crc_make_ctrl_section(void);
 u32  nv_crc_make_data_section(void);
 u32  nv_crc_make_ddr(void);
 
-
-
 #ifdef __cplusplus
 #if __cplusplus
 }
 #endif
 #endif
-
-
 
 #endif /*_NV_CRC_H_*/

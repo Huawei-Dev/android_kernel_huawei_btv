@@ -50,7 +50,7 @@
 #define _ATTAFAGENTINTERFACE_H_
 
 /*****************************************************************************
-  1 头文件包含
+  1 ??????????
 *****************************************************************************/
 #include  "vos.h"
 #include  "TafAgentInterface.h"
@@ -64,24 +64,24 @@ extern "C" {
 #endif
 
 /*****************************************************************************
-  2 全局变量定义
+  2 ????????????
 *****************************************************************************/
 
 
 
 /*****************************************************************************
-  3 函数实现
+  3 ????????
 *****************************************************************************/
 
 /*****************************************************************************
- 函 数 名  : TAF_AGENT_FindCidForDial
- 功能描述  : 通过同步机制获取用于拨号的CID
- 输入参数  : pCid    - CID
- 输出参数  : 无
- 返 回 值  : VOS_OK  - 成功
-             VOS_ERR - 失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_AGENT_FindCidForDial
+ ????????  : ??????????????????????????CID
+ ????????  : pCid    - CID
+ ????????  : ??
+ ?? ?? ??  : VOS_OK  - ????
+             VOS_ERR - ????
+ ????????  :
+ ????????  :
 *****************************************************************************/
 VOS_UINT32 TAF_AGENT_FindCidForDial(
     MN_CLIENT_ID_T                      usClientId,
@@ -90,15 +90,15 @@ VOS_UINT32 TAF_AGENT_FindCidForDial(
 
 
 /*****************************************************************************
- 函 数 名  : TAF_AGENT_SetPdpCidPara
- 功能描述  : 设置指定CID的参数
- 输入参数  : usClientId    - 客户端ID
-             pstPdpPriPara - PDP上下文参数
- 输出参数  : 无
- 返 回 值  : VOS_OK        - 成功
-             VOS_ERR       - 失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : TAF_AGENT_SetPdpCidPara
+ ????????  : ????????CID??????
+ ????????  : usClientId    - ??????ID
+             pstPdpPriPara - PDP??????????
+ ????????  : ??
+ ?? ?? ??  : VOS_OK        - ????
+             VOS_ERR       - ????
+ ????????  :
+ ????????  :
 *****************************************************************************/
 VOS_UINT32 TAF_AGENT_SetPdpCidPara(
     MN_CLIENT_ID_T                      usClientId,
@@ -107,14 +107,14 @@ VOS_UINT32 TAF_AGENT_SetPdpCidPara(
 
 
 /*****************************************************************************
- 函 数 名  : TAF_AGENT_GetPdpCidPara
- 功能描述  : 查询指定CID的参数
- 输入参数  : pstPdpPriPara - PDP上下文参数
+ ?? ?? ??  : TAF_AGENT_GetPdpCidPara
+ ????????  : ????????CID??????
+ ????????  : pstPdpPriPara - PDP??????????
              ucCid         - CID
- 返 回 值  : VOS_OK        - 成功
-             VOS_ERR       - 失败
- 调用函数  :
- 被调函数  :
+ ?? ?? ??  : VOS_OK        - ????
+             VOS_ERR       - ????
+ ????????  :
+ ????????  :
 *****************************************************************************/
 VOS_UINT32 TAF_AGENT_GetPdpCidPara(
     TAF_PDP_PRIM_CONTEXT_STRU          *pstPdpPriPara,
@@ -124,16 +124,16 @@ VOS_UINT32 TAF_AGENT_GetPdpCidPara(
 
 
 /*****************************************************************************
- 函 数 名  : TAF_AGENT_GetCallInfo
- 功能描述  : 获取通话信息同步API
- 输入参数  : usClientId
+ ?? ?? ??  : TAF_AGENT_GetCallInfo
+ ????????  : ????????????????API
+ ????????  : usClientId
              pucNumOfCalls
              pstCallInfos
- 输出参数  : 无
- 返 回 值  : VOS_OK  - 成功
-             VOS_ERR - 失败
- 调用函数  :
- 被调函数  :
+ ????????  : ??
+ ?? ?? ??  : VOS_OK  - ????
+             VOS_ERR - ????
+ ????????  :
+ ????????  :
 *****************************************************************************/
 VOS_UINT32 TAF_AGENT_GetCallInfoReq(
     MN_CLIENT_ID_T                      usClientId,
@@ -142,12 +142,12 @@ VOS_UINT32 TAF_AGENT_GetCallInfoReq(
 );
 
 
-/* Added by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-2, begin */
+/* Added by s00217060 for ????????AT??????????????C??, 2013-4-2, begin */
 VOS_UINT32 TAF_AGENT_GetSysMode(
     VOS_UINT16                                 usClientId,
     TAF_AGENT_SYS_MODE_STRU                   *pstSysMode
 );
-/* Added by s00217060 for 主动上报AT命令控制下移至C核, 2013-4-2, end */
+/* Added by s00217060 for ????????AT??????????????C??, 2013-4-2, end */
 
 extern VOS_VOID TAF_AGENT_ClearAllSem(VOS_VOID);
 

@@ -52,18 +52,18 @@ File name   : SI_SIM.h
 Author      : H59254
 Version     : V200R001
 Date        : 2008-10-18
-Description : SIM卡的头文件
+Description : SIM??????????
 History     :
 History     :
-1.日    期  : 2008年10月18日
-  作    者  : H59254
-  修改内容  : Create
+1.??    ??  : 2008??10??18??
+  ??    ??  : H59254
+  ????????  : Create
 ************************************************************************/
 #ifndef __SI_STK_H__
 #define __SI_STK_H__
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "vos.h"
 
@@ -102,7 +102,7 @@ extern "C" {
 
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
 
 typedef VOS_UINT32 (*TLV2DS)(VOS_UINT8 *pDes,VOS_UINT8 *pSrc);
@@ -132,9 +132,9 @@ typedef VOS_UINT32 (*DS2TLV)(VOS_UINT8 Tag,VOS_UINT8 *pDes,VOS_UINT8 *pSrc,VOS_U
 
 #define SI_TAGNOTFOUND                          (0xFFFFFFFF)
 
-#define STK_DATA_TAG_MASK                       (0x80) /*按照协议,Data Tag的最高bit可以是1*/
+#define STK_DATA_TAG_MASK                       (0x80) /*????????,Data Tag??????bit??????1*/
 
-#define STK_POROTECT_TIME_LEN                   (20)  /*默认20秒超时*/
+#define STK_POROTECT_TIME_LEN                   (20)  /*????20??????*/
 
 #define STK_IND_TIME_LEN                        (5000)
 
@@ -148,7 +148,7 @@ typedef VOS_UINT32 (*DS2TLV)(VOS_UINT8 Tag,VOS_UINT8 *pDes,VOS_UINT8 *pSrc,VOS_U
 
 #define STK_TIMER_MAX_NUM                       (9)
 
-/*返回的TR数据长度，按照结果只有一个字节计算*/
+/*??????TR??????????????????????????????????*/
 #define STK_TERMINAL_RSP_LEN                    (12)
 
 #define STK_LOCAL_INFO_2G                       (9)
@@ -189,7 +189,7 @@ typedef VOS_UINT32 (*DS2TLV)(VOS_UINT8 Tag,VOS_UINT8 *pDes,VOS_UINT8 *pSrc,VOS_U
 
 #define STK_NV_ENABLED                          (0x0101)
 
-/*profile 特别bit*/
+/*profile ????bit*/
 #define SI_STK_LOCALINFO_NETINFO                (30)
 #define SI_STK_LOCALINFO_NMR                    (31)
 #define SI_STK_GET_READER_STATUS                (51)
@@ -204,22 +204,22 @@ typedef VOS_UINT32 (*DS2TLV)(VOS_UINT8 Tag,VOS_UINT8 *pDes,VOS_UINT8 *pSrc,VOS_U
 
 #define STK_OPID_VALUE                          STK_SEND_SMS_OP_ID
 
-/* NAS支持最大呼叫数 */
+/* NAS?????????????? */
 #define STK_CALL_MAX_NUM                        (7)
 
-/* 定义parse字符 */
+/* ????parse???? */
 #define STK_PAUSE_CHAR                          (0x0c)
 
-/* 挂断所有呼叫的ID */
+/* ??????????????ID */
 #define STK_ALL_CALL_ID                         (0)
 
-/* DURATION定时器默认时长，等待NAS回复CONNECT消息 */
+/* DURATION????????????????????NAS????CONNECT???? */
 #define STK_SETUP_CALL_DURATION_DEFAULT         (60)
 
-/* 发送DTMF时暂停的时间长度，单位为MS */
+/* ????DTMF????????????????????????MS */
 #define STK_SEND_DTMF_PAUSE_TIME                (3000)
 
-/* STK重试呼叫的最大次数 */
+/* STK?????????????????? */
 #define STK_RECALL_TIME_MAX						(3)
 
 #define STK_BURSTDTMF_LEN                       (150)
@@ -242,12 +242,12 @@ typedef VOS_UINT32 (*DS2TLV)(VOS_UINT8 Tag,VOS_UINT8 *pDes,VOS_UINT8 *pSrc,VOS_U
 
 #define STK_NMR_TIMER_STOP                                  VOS_StopRelTimer(&gstSTKNMRTimer)
 
-/* Modified by w00184875 for V7R1C51 STK与AP对接, 2012-05-07, begin */
+/* Modified by w00184875 for V7R1C51 STK??AP????, 2012-05-07, begin */
 #define STK_GETTA_TIMER_START                               VOS_StartRelTimer(&gstSTKGetTATimer, MAPS_STK_PID,\
                                                                             5000, STK_GETTA_TIMER_NAME, 0,VOS_RELTIMER_NOLOOP, VOS_TIMER_PRECISION_5)
 
 #define STK_GETTA_TIMER_STOP                                VOS_StopRelTimer(&gstSTKGetTATimer)
-/* Modified by w00184875 for V7R1C51 STK与AP对接, 2012-05-07, end */
+/* Modified by w00184875 for V7R1C51 STK??AP????, 2012-05-07, end */
 
 #define STK_IND_TIMER_START(ulLength)                       VOS_StartRelTimer(&gstSTKINDTimer, MAPS_STK_PID,\
                                                                             ulLength, STK_IND_TIMER_NAME, 0,VOS_RELTIMER_NOLOOP, VOS_TIMER_PRECISION_5)
@@ -283,7 +283,7 @@ typedef VOS_UINT32 (*DS2TLV)(VOS_UINT8 Tag,VOS_UINT8 *pDes,VOS_UINT8 *pSrc,VOS_U
 
 #define STK_ARRAYSIZE(array)                (sizeof(array)/sizeof(array[0]))
 
-/* 检查TAF回复的PS_USIM_ENVELOPE_CNF_STRU消息中，ucDataType的合法性 */
+/* ????TAF??????PS_USIM_ENVELOPE_CNF_STRU????????ucDataType???????? */
 #define STK_IS_TAF_ENVELOPE_CNF_DATATYPE_VALID(ucDataType)   ( (SI_STK_ENVELOPE_PPDOWN == ucDataType)   \
                                                              ||(SI_STK_ENVELOPE_CBDOWN == ucDataType)   \
                                                              ||(SI_STK_ENVELOPE_CALLCRTL == ucDataType) \
@@ -291,7 +291,7 @@ typedef VOS_UINT32 (*DS2TLV)(VOS_UINT8 Tag,VOS_UINT8 *pDes,VOS_UINT8 *pSrc,VOS_U
                                                              ||(SI_STK_ENVELOPE_USSDDOWN == ucDataType)  )
 
 /*******************************************************************************
-  3 枚举定义
+  3 ????????
 *******************************************************************************/
 enum SI_STK_TIMERNAME
 {
@@ -318,19 +318,19 @@ typedef VOS_UINT32 SI_STK_TIMERNAME_UINT32;
 
 enum SI_STK_CMD_PROC_STATUS
 {
-    SI_STK_NORMAL_CNF                = 0,   /*正常回复*/
-    SI_STK_WAITING_CNF               = 1,   /*等待回复*/
-    SI_STK_TIMEOUT_CNF               = 2,   /*超时回复*/
+    SI_STK_NORMAL_CNF                = 0,   /*????????*/
+    SI_STK_WAITING_CNF               = 1,   /*????????*/
+    SI_STK_TIMEOUT_CNF               = 2,   /*????????*/
     SI_STK_BUTT
 };
 typedef VOS_UINT32 SI_STK_CMD_PROC_STATUS_UINT32;
 
 enum SI_STK_TAG_TYPE
 {
-    SI_TAG_TYPE_NULL                = 0,   /*数据结构不确定*/
-    SI_TAG_TYPE_LV                  = 1,   /*LV 数据结构*/
-    SI_TAG_TYPE_TLV                 = 2,   /*TLV数据结构*/
-    SI_TAG_TYPE_V                   = 3,   /*V 数据结构*/
+    SI_TAG_TYPE_NULL                = 0,   /*??????????????*/
+    SI_TAG_TYPE_LV                  = 1,   /*LV ????????*/
+    SI_TAG_TYPE_TLV                 = 2,   /*TLV????????*/
+    SI_TAG_TYPE_V                   = 3,   /*V ????????*/
     SI_TAG_BUTT
 };
 typedef VOS_UINT8 SI_STK_TAG_TYPE_UINT8;
@@ -513,7 +513,7 @@ enum SI_STK_STR_CHANGEMODE_ENUM
 typedef VOS_UINT32 SI_STK_STR_CHANGEMODE_ENUM_UINT32;
 
 
-/* 沃达丰Dual IMSI 切换定制需求 */
+/* ??????Dual IMSI ???????????? */
 enum SI_STK_IMSICHG_STATE_ENUM
 {
     SI_STK_IMSICHG_NULL             = 0x00,
@@ -524,50 +524,50 @@ enum SI_STK_IMSICHG_STATE_ENUM
 typedef VOS_UINT32 SI_STK_IMSICHG_STATE_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名    : SI_STK_DTMF_SEND_ENUM_UINT32
- 枚举说明  : STK模块记录的DTMF SEND状态
+ ??????    : SI_STK_DTMF_SEND_ENUM_UINT32
+ ????????  : STK??????????DTMF SEND????
 *****************************************************************************/
 enum SI_STK_DTMF_SEND_ENUM
 {
-    SI_STK_DTMF_SEND_OK             = 0,    /* 当前发送数据成功 */
-    SI_STK_DTMF_SEND_ERR            = 1,    /* 当前发送数据失败 */
-    SI_STK_DTMF_SEND_FINISH         = 2,    /* 当前发送数据完成 */
-    SI_STK_DTMF_SEND_REJECT         = 3,    /* 当前发送数据被拒 */
+    SI_STK_DTMF_SEND_OK             = 0,    /* ???????????????? */
+    SI_STK_DTMF_SEND_ERR            = 1,    /* ???????????????? */
+    SI_STK_DTMF_SEND_FINISH         = 2,    /* ???????????????? */
+    SI_STK_DTMF_SEND_REJECT         = 3,    /* ???????????????? */
     SI_STK_DTMF_SEND_BUTT,
 };
 typedef VOS_UINT32 SI_STK_DTMF_SEND_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名    : SI_STK_CALL_STATUS_ENUM
- 枚举说明  : STK模块记录的当前呼叫状态
+ ??????    : SI_STK_CALL_STATUS_ENUM
+ ????????  : STK??????????????????????
 *****************************************************************************/
 enum SI_STK_CALL_ID_STATUS_ENUM
 {
-    SI_STK_CALL_ID_STATUS_IDLE          =   0x5A,           /* 当前处于空闲状态 */
-    SI_STK_CALL_ID_STATUS_BUSY          =   0xA5,           /* 当前处于呼叫状态(包括DTMF发送过程中) */
+    SI_STK_CALL_ID_STATUS_IDLE          =   0x5A,           /* ???????????????? */
+    SI_STK_CALL_ID_STATUS_BUSY          =   0xA5,           /* ????????????????(????DTMF??????????) */
     SI_STK_CALL_ID_STATUS_BUTT,
 };
 typedef VOS_UINT8 SI_STK_CALL_ID_STATUS_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : SI_STK_CALL_STATUS_ENUM
- 枚举说明  : STK模块记录的当前呼叫状态
+ ??????    : SI_STK_CALL_STATUS_ENUM
+ ????????  : STK??????????????????????
 *****************************************************************************/
 enum SI_STK_CALL_STATUS_ENUM
 {
-    SI_STK_CALL_STATUS_WAIT_IDLE        =   0,              /* 当前处于空闲状态,当前无SETUP CALL主动命令，不处理NAS消息 */
-    SI_STK_CALL_STATUS_WAIT_CONNECT     =   1,              /* 当前处于等待CONNECT消息 */
-    SI_STK_CALL_STATUS_WAIT_DISCONNECT  =   2,              /* 当前处于等待DISCONNECT消息 */
-    SI_STK_CALL_STATUS_WAIT_HOLD        =   3,              /* 当前处于HOLD消息 */
-    SI_STK_CALL_STATUS_SEND_DTMF        =   4,              /* 当前处于发送DTMF过程中 */
-    SI_STK_CALL_STATUS_WAIT_DURTIMEROUT = 	5,              /* 当前处于等待Duration超时过程中 */
+    SI_STK_CALL_STATUS_WAIT_IDLE        =   0,              /* ????????????????,??????SETUP CALL????????????????NAS???? */
+    SI_STK_CALL_STATUS_WAIT_CONNECT     =   1,              /* ????????????CONNECT???? */
+    SI_STK_CALL_STATUS_WAIT_DISCONNECT  =   2,              /* ????????????DISCONNECT???? */
+    SI_STK_CALL_STATUS_WAIT_HOLD        =   3,              /* ????????HOLD???? */
+    SI_STK_CALL_STATUS_SEND_DTMF        =   4,              /* ????????????DTMF?????? */
+    SI_STK_CALL_STATUS_WAIT_DURTIMEROUT = 	5,              /* ????????????Duration?????????? */
     SI_STK_CALL_STATUS_BUTT,
 };
 typedef VOS_UINT32 SI_STK_CALL_STATUS_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名    : SI_STK_SETUP_CALL_COMMAND_QUALIFIER
- 枚举说明  : SETUP CALL主动命令的CQ值
+ ??????    : SI_STK_SETUP_CALL_COMMAND_QUALIFIER
+ ????????  : SETUP CALL??????????CQ??
 *****************************************************************************/
 enum SI_STK_SETUP_CALL_COMMAND_QUALIFIER_ENUM
 {
@@ -582,11 +582,11 @@ enum SI_STK_SETUP_CALL_COMMAND_QUALIFIER_ENUM
 typedef VOS_UINT8 SI_STK_SETUP_CALL_COMMAND_QUALIFIER_ENUM_UINT8;
 
 /*****************************************************************************
- 枚举名    : SI_STK_SEARCH_MODE_ENUM_UINT8
- 结构说明  : 搜网模式
- 1.日    期: 2013年7月12日
-   作    者: H59254
-   修改内容: 新增
+ ??????    : SI_STK_SEARCH_MODE_ENUM_UINT8
+ ????????  : ????????
+ 1.??    ??: 2013??7??12??
+   ??    ??: H59254
+   ????????: ????
 *****************************************************************************/
 enum SI_STK_SEARCH_MODE_ENUM
 {
@@ -596,26 +596,26 @@ enum SI_STK_SEARCH_MODE_ENUM
 };
 
 /*****************************************************************************
- 枚举名    : SI_STK_HOOK_MSG_NAME_ENUM_UINT32
- 结构说明  : 钩包消息类型
- 1.日    期: 2013年7月12日
-   作    者: H59254
-   修改内容: 新增
+ ??????    : SI_STK_HOOK_MSG_NAME_ENUM_UINT32
+ ????????  : ????????????
+ 1.??    ??: 2013??7??12??
+   ??    ??: H59254
+   ????????: ????
 *****************************************************************************/
 enum SI_STK_HOOK_MSG_NAME_ENUM
 {
-     STK_TAF_CS_SERVICE_STATUS          = 0xFF00,    /* CS服务状态勾包 */
-     STK_TAF_CBS_DCS                    = 0xFF01,    /* USSD DCS编码钩包 */
+     STK_TAF_CS_SERVICE_STATUS          = 0xFF00,    /* CS???????????? */
+     STK_TAF_CBS_DCS                    = 0xFF01,    /* USSD DCS???????? */
 
 };
 typedef VOS_UINT32 SI_STK_HOOK_MSG_NAME_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名    : SI_STK_TEXT_STRING_DCS_ENUM_UINT8
- 结构说明  : TEXT STRING数据结构的编码方式
- 1.日    期: 2013年7月12日
-   作    者: H59254
-   修改内容: 新增
+ ??????    : SI_STK_TEXT_STRING_DCS_ENUM_UINT8
+ ????????  : TEXT STRING??????????????????
+ 1.??    ??: 2013??7??12??
+   ??    ??: H59254
+   ????????: ????
 *****************************************************************************/
 enum SI_STK_TEXT_STRING_DCS_ENUM
 {
@@ -626,12 +626,12 @@ enum SI_STK_TEXT_STRING_DCS_ENUM
 };
 typedef VOS_UINT8 SI_STK_TEXT_STRING_DCS_ENUM_UINT8;
 
-/*C+L新增，电信要求Event需要能够重发，仅为此项目专用，不能扩展 */
+/*C+L??????????????Event?????????????????????????????????????? */
 enum SI_STK_ENVELOPE_RESENT_FLAG
 {
     SI_STK_ENVELOPE_SENT_ONETIME        = 0,
-    SI_STK_ENVELOPE_LOCI_RESEND         = 1,    /*本地事件需要重发*/
-    SI_STK_ENVELOPE_ACC_RESEND          = 2,    /*接入技术改变需要重发*/
+    SI_STK_ENVELOPE_LOCI_RESEND         = 1,    /*????????????????*/
+    SI_STK_ENVELOPE_ACC_RESEND          = 2,    /*????????????????????*/
     SI_STK_ENVELOPE_RESENT_BUTT
 };
 typedef VOS_UINT32 SI_STK_ENVELOPE_RESENT_FLAG_UINT32;
@@ -645,7 +645,7 @@ enum SI_STK_CALLSTATE_FLAG
 typedef VOS_UINT8 SI_STK_CALLSTATE_FLAG_UINT8;
 
 /*****************************************************************************
-  4 单一数据结构定义
+  4 ????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -704,57 +704,57 @@ typedef struct
 
 typedef struct
 {
-    VOS_UINT8                       ucDataTag;  /*用于存放Tag的值*/
-    SI_STK_TAG_TYPE_UINT8           ucTagType;  /*用于指示Tag的编解码类型*/
-    VOS_UINT8                       ucSTRULen;  /*用于表明数据结构的大小*/
-    VOS_UINT8                       ucValueLen; /*用于指明当前V型数据实际大小*/
+    VOS_UINT8                       ucDataTag;  /*????????Tag????*/
+    SI_STK_TAG_TYPE_UINT8           ucTagType;  /*????????Tag????????????*/
+    VOS_UINT8                       ucSTRULen;  /*??????????????????????*/
+    VOS_UINT8                       ucValueLen; /*????????????V??????????????*/
 }SI_STK_DATADECODE_STRU;
 
 typedef struct
 {
-    VOS_UINT32                      ulCmdType;   /*存放STK命令的类型*/
-    VOS_UINT32                      ulTagLen;    /*存放编解码的列表长度*/
-    VOS_UINT8                       *pucTagList; /*存放编解码列表地址*/
+    VOS_UINT32                      ulCmdType;   /*????STK??????????*/
+    VOS_UINT32                      ulTagLen;    /*????????????????????*/
+    VOS_UINT8                       *pucTagList; /*??????????????????*/
 }SI_STK_TAGLIST_STRU;
 
 /*****************************************************************************
- 结构名    : SI_STK_CALL_STATUS_STRU
- 结构说明  : STK模块呼叫状态表结构
+ ??????    : SI_STK_CALL_STATUS_STRU
+ ????????  : STK??????????????????
 *****************************************************************************/
 typedef struct
 {
-    MN_CALL_ID_T                        callId;         /* 呼叫ID */
-    SI_STK_CALL_ID_STATUS_ENUM_UINT8    enStatus;       /* 呼叫状态 */
+    MN_CALL_ID_T                        callId;         /* ????ID */
+    SI_STK_CALL_ID_STATUS_ENUM_UINT8    enStatus;       /* ???????? */
     TAF_CALL_VOICE_DOMAIN_ENUM_UINT8    enVoiceDomain;  /* VOICE DOMAIN */
     VOS_UINT8                           ucRsv;
 }SI_STK_CALL_STATUS_STRU;
 
 /*****************************************************************************
- 结构名    : SI_STK_SETUP_CALL_DTMF_INFO_STRU
- 结构说明  : STK模块SETUP CALL中DTMF控制结构
+ ??????    : SI_STK_SETUP_CALL_DTMF_INFO_STRU
+ ????????  : STK????SETUP CALL??DTMF????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT8                          *pucDtmfCharacter;           /* DTMF字符串 */
-    VOS_UINT32                          ulDtmfCharacterRemain;      /* 待发送的DTMF字符串 */
-    VOS_UINT32                          ulDtmfCharacterCurrSnd;     /* 当前发送DTMF字符 */
+    VOS_UINT8                          *pucDtmfCharacter;           /* DTMF?????? */
+    VOS_UINT32                          ulDtmfCharacterRemain;      /* ????????DTMF?????? */
+    VOS_UINT32                          ulDtmfCharacterCurrSnd;     /* ????????DTMF???? */
 }SI_STK_SETUP_CALL_DTMF_INFO_STRU;
 
 /*****************************************************************************
- 结构名    : SI_STK_SETUP_CALL_CTRL_STRU
- 结构说明  : STK模块呼叫控制结构
+ ??????    : SI_STK_SETUP_CALL_CTRL_STRU
+ ????????  : STK????????????????
 *****************************************************************************/
 typedef struct
 {
-    SI_STK_CALL_STATUS_ENUM_UINT32      enCallStatus;                                       /* SETUP CALL主动命令处理状态 */
-    SI_STK_CALL_STATUS_STRU             astStkCallStatusTable[STK_CALL_MAX_NUM];            /* STK模块呼叫状态表 */
-    MN_CALL_ID_T                        ucSetupCallId;                                      /* SETUP CALL发起呼叫的ID，由NAS分配 */
-    VOS_UINT8                           ucRecallTime;                                       /* 重新呼叫的次数 */
+    SI_STK_CALL_STATUS_ENUM_UINT32      enCallStatus;                                       /* SETUP CALL???????????????? */
+    SI_STK_CALL_STATUS_STRU             astStkCallStatusTable[STK_CALL_MAX_NUM];            /* STK?????????????? */
+    MN_CALL_ID_T                        ucSetupCallId;                                      /* SETUP CALL??????????ID????NAS???? */
+    VOS_UINT8                           ucRecallTime;                                       /* ?????????????? */
 }SI_STK_SETUP_CALL_CTRL_STRU;
 
 /*****************************************************************************
- 结构名    : SI_STK_CBP_SETUP_EVENT_LIST_STRU
- 结构说明  : L+C共SIM卡功能保存EVENT LIST
+ ??????    : SI_STK_CBP_SETUP_EVENT_LIST_STRU
+ ????????  : L+C??SIM??????????EVENT LIST
 *****************************************************************************/
 typedef struct
 {
@@ -768,9 +768,9 @@ typedef VOS_UINT32 (*pfSATCmdPro)(SI_STK_DATA_INFO_STRU *pEvent);
 
 typedef struct
 {
-    SI_STK_CMD_TYPE                 ulCmdType;  /*处理消息类型*/
-    pfSATCmdDecode                  pfDecodeFun;/*对应解码函数*/
-    pfSATCmdPro                     pfProcFun;  /*对应处理函数*/
+    SI_STK_CMD_TYPE                 ulCmdType;  /*????????????*/
+    pfSATCmdDecode                  pfDecodeFun;/*????????????*/
+    pfSATCmdPro                     pfProcFun;  /*????????????*/
 }SI_STK_CMDHANDLE_LIST_STRU;
 
 typedef struct
@@ -809,31 +809,31 @@ typedef struct
     VOS_UINT8                       aucPWD[4];
 }SI_STK_SS_PWD_REQ_STRU;
 
-/* 沃达丰Dual IMSI 切换定制需求 */
+/* ??????Dual IMSI ???????????? */
 typedef struct
 {
-    SI_STK_IMSICHG_STATE_ENUM_UINT32 enIMSIChgState;   /* 沃达丰IMSI切换定制需求状态记录 */
-    VOS_UINT32                       ulCurImsiSign;    /* 取值0,1，与两个IMSI相对应 */
-    VOS_UINT8                        aucOldImsi[9];    /* 切换前的IMSI */
-    VOS_UINT8                        ucOldItemId;      /* 上一次选择的ITEM ID */
-    VOS_UINT8                        ucTryFlag;        /* 记录是否已尝试过一次切换 */
-    VOS_UINT8                        ucCycleFlag;      /* 标记是否在状态机中轮转 */
+    SI_STK_IMSICHG_STATE_ENUM_UINT32 enIMSIChgState;   /* ??????IMSI???????????????????? */
+    VOS_UINT32                       ulCurImsiSign;    /* ????0,1????????IMSI?????? */
+    VOS_UINT8                        aucOldImsi[9];    /* ????????IMSI */
+    VOS_UINT8                        ucOldItemId;      /* ????????????ITEM ID */
+    VOS_UINT8                        ucTryFlag;        /* ???????????????????????? */
+    VOS_UINT8                        ucCycleFlag;      /* ?????????????????????? */
 }SI_STK_IMSICHG_CTRL_STRU;
 
 typedef  VOS_UINT32 (*STKIMSIPROC)(PS_SI_MSG_STRU *pMsg);
 
-/* IMSI 切换定制需求状态机结构 */
+/* IMSI ?????????????????????? */
 typedef struct
 {
-    SI_STK_IMSICHG_STATE_ENUM_UINT32 enIMSIChgState;   /* 沃达丰IMSI切换定制需求状态记录 */
-    STKIMSIPROC                      pIMSIChgProc;     /* 沃达丰IMSI切换定制需求对应状态处理函数 */
+    SI_STK_IMSICHG_STATE_ENUM_UINT32 enIMSIChgState;   /* ??????IMSI???????????????????? */
+    STKIMSIPROC                      pIMSIChgProc;     /* ??????IMSI???????????????????????????? */
 }SI_STK_IMSICHG_PROC_STRU;
 
-/* 缓存下发的Envelope命令 */
+/* ??????????Envelope???? */
 typedef struct
 {
-    VOS_UINT32                       ulCmdLen;        /* Envelope命令长度 */
-    VOS_UINT8                        aucCmdData[SI_STK_DATA_MAX_LEN]; /* Envelope命令内容 */
+    VOS_UINT32                       ulCmdLen;        /* Envelope???????? */
+    VOS_UINT8                        aucCmdData[SI_STK_DATA_MAX_LEN]; /* Envelope???????? */
 }SI_STK_ENVELOPE_CMD_STRU;
 
 typedef struct
@@ -861,7 +861,7 @@ typedef struct
     VOS_UINT8                       aucEvent[4];
 }SI_STK_TAFCNF_MSG_STRU;
 
-/* 内部事件记录结构声明*/
+/* ????????????????????*/
 typedef struct
 {
     VOS_UINT32                      OP_MTCall:1;
@@ -881,11 +881,11 @@ typedef struct
 }STK_CS_SERVICE_STRU;
 
 /*****************************************************************************
- 枚举名    : STK_CBS_DCS_STRU
- 结构说明  : NAS DCS解码函数钩包函数
- 1.日    期: 2013年7月12日
-   作    者: H59254
-   修改内容: 新增
+ ??????    : STK_CBS_DCS_STRU
+ ????????  : NAS DCS????????????????
+ 1.??    ??: 2013??7??12??
+   ??    ??: H59254
+   ????????: ????
 *****************************************************************************/
 typedef struct
 {
@@ -898,8 +898,8 @@ typedef struct
 #if (OSA_CPU_CCPU == VOS_OSA_CPU)
 typedef struct
 {
-    NAS_STK_UPDATE_TYPE_ENUM_UINT8          enOrigType;     /* MM子层传递给STK的原始type */
-    SI_STK_UPDATE_ATTACH_TYPE_ENUM_UINT8    enDestType;     /* 根据31111 8.92  Update/Attach Type，原始type所映射到的目的type */
+    NAS_STK_UPDATE_TYPE_ENUM_UINT8          enOrigType;     /* MM??????????STK??????type */
+    SI_STK_UPDATE_ATTACH_TYPE_ENUM_UINT8    enDestType;     /* ????31111 8.92  Update/Attach Type??????type??????????????type */
     VOS_UINT16                              usRsv;
 }STK_UPDATA_ATTACH_TYPE_TRANSFER_STRU;
 #endif
@@ -913,8 +913,8 @@ typedef struct
 }STK_EVENTDATA_RESEND_STRU;
 
 /*****************************************************************************
- 结构名    : SI_STK_CARDINFO_STRU
- 结构说明  : STK模块保存USIM卡信息数据结构
+ ??????    : SI_STK_CARDINFO_STRU
+ ????????  : STK????????USIM??????????????
 *****************************************************************************/
 typedef struct
 {
@@ -955,31 +955,31 @@ typedef struct
 }STK_PLMN_ID_STRU;
 
 /*****************************************************************************
- 结构名    : SI_STK_SYS_INFO_STRU
- 结构说明  : STK模块维护的系统信息字段结构
+ ??????    : SI_STK_SYS_INFO_STRU
+ ????????  : STK??????????????????????????
 *****************************************************************************/
 #if (OSA_CPU_CCPU == VOS_OSA_CPU)
 typedef struct
 {
-    SI_STK_ACCESS_TECH_ENUM_UINT8       enCurRat;       /* 接入技术 */
-    SI_STK_SEARCH_MODE_ENUM_UINT8       enSrchMode;     /* 搜网模式 */
-    NAS_STK_UTRAN_MODE_ENUM_UINT8       enUtranMode;    /* TDD或FDD模式 */
+    SI_STK_ACCESS_TECH_ENUM_UINT8       enCurRat;       /* ???????? */
+    SI_STK_SEARCH_MODE_ENUM_UINT8       enSrchMode;     /* ???????? */
+    NAS_STK_UTRAN_MODE_ENUM_UINT8       enUtranMode;    /* TDD??FDD???? */
     VOS_UINT8                           ucRsv;
-    VOS_UINT32                          ulCellId;       /* 小区ID */
+    VOS_UINT32                          ulCellId;       /* ????ID */
     STK_PLMN_ID_STRU                    stCurPlmnId;    /* PLMN */
     VOS_UINT16                          usLac;
 }SI_STK_SYS_INFO_STRU;
 #endif
 /*****************************************************************************
- 结构名    : SI_STK_NAS_INFO_STRU
- 结构说明  : STK模块维护的NAS信息字段结构
+ ??????    : SI_STK_NAS_INFO_STRU
+ ????????  : STK??????????NAS????????????
 *****************************************************************************/
 #if (OSA_CPU_CCPU == VOS_OSA_CPU)
 
 typedef struct
 {
     VOS_UINT32                          ulEventMsgFlag;
-    /* 使用STK自定义的服务状态，不使用NAS消息中的值，在更新时需要转换 */
+    /* ????STK????????????????????????NAS???????????????????????????? */
     SI_STK_SERVICE_STATUS_ENUM_UINT32   enServiceStatus;
     SI_STK_SERVICE_STATUS_ENUM_UINT32   enCsServiceStatus;
     SI_STK_SYS_INFO_STRU                stSysInfo;
@@ -987,13 +987,13 @@ typedef struct
 
 typedef struct
 {
-    /* 使用STK自定义的服务状态，不使用NAS消息中的值，在更新时需要转换 */
+    /* ????STK????????????????????????NAS???????????????????????????? */
     SI_STK_SERVICE_STATUS_ENUM_UINT32   enServiceStatus;
     MMA_STK_1X_SYS_INFO_STRU            stSysInfo;
 }SI_STK_CDMANAS_SYSINFO_STRU;
 #endif
 /*****************************************************************************
-  6 全局变量声明
+  6 ????????????
 *****************************************************************************/
 extern VOS_UINT8                        g_ucSendSSType;
 
@@ -1005,9 +1005,9 @@ extern SI_STK_DATA_INFO_STRU            gstUsatCmdDecode;
 
 extern HTIMER                           gstSTKProtectTimer;
 
-/* Modified by w00184875 for V7R1C51 STK与AP对接, 2012-05-07, begin */
+/* Modified by w00184875 for V7R1C51 STK??AP????, 2012-05-07, begin */
 extern HTIMER                           gstSTKGetTATimer;
-/* Modified by w00184875 for V7R1C51 STK与AP对接, 2012-05-07, end */
+/* Modified by w00184875 for V7R1C51 STK??AP????, 2012-05-07, end */
 
 extern HTIMER                           gstSTKINDTimer;
 
@@ -1031,11 +1031,11 @@ extern SI_STK_TIMER_STRU                gstSTKTimer[STK_TIMER_MAX_NUM];
 
 extern SI_SAT_SetUpMenu_DATA_STRU       gstSetUpMenuData;
 
-extern SI_STK_IMSICHG_CTRL_STRU         gstSTKIMSIChgCtrl;/* IMSI切换控制变量 */
+extern SI_STK_IMSICHG_CTRL_STRU         gstSTKIMSIChgCtrl;/* IMSI???????????? */
 
-extern SI_STK_IMSICHG_MATCH_STRU        gstSTKIMSIMatch; /* NV项读出的IMSI切换匹配码流 */
+extern SI_STK_IMSICHG_MATCH_STRU        gstSTKIMSIMatch; /* NV????????IMSI???????????? */
 
-extern SI_STK_ENVELOPE_CMD_STRU         gstSTKEnvelopeCmd; /* 缓存Envelope命令 */
+extern SI_STK_ENVELOPE_CMD_STRU         gstSTKEnvelopeCmd; /* ????Envelope???? */
 
 extern VOS_SEM                          gulSTKApiSmId;
 
@@ -1057,9 +1057,9 @@ extern VOS_UINT16                       gusSTKSMSIndEnable;
 
 extern VOS_UINT8                        *g_pucSTKSndCodeAddr;
 
-/* Modified by w00184875 for V7R1C51 STK与AP对接, 2012-05-07, begin */
+/* Modified by w00184875 for V7R1C51 STK??AP????, 2012-05-07, begin */
 extern SI_STK_CMD_PROC_STATUS_UINT32    g_enTACmdStatus;
-/* Modified by w00184875 for V7R1C51 STK与AP对接, 2012-05-07, end */
+/* Modified by w00184875 for V7R1C51 STK??AP????, 2012-05-07, end */
 
 extern SI_STK_SETUP_CALL_CTRL_STRU      g_stStkSetupCallCtrl;
 
@@ -1081,7 +1081,7 @@ extern VOS_BOOL                         g_bSTKAttResetFlag;
 
 extern SI_STK_CALLSTATE_STRU            g_stSTKCallState;
 
-#if (VOS_WIN32 == VOS_OS_VER) /* UT工程编译不过,通过编译宏区分 */
+#if (VOS_WIN32 == VOS_OS_VER) /* UT????????????,?????????????? */
 extern MN_MSG_RAW_TS_DATA_STRU            *f_pstStkMsgRawTsDataInfo;
 extern MN_MSG_SEND_PARM_STRU              *f_pstSendDirectParm;
 #endif
@@ -1108,7 +1108,7 @@ extern VOS_UINT8                           g_ucIsRatCdma;
 #endif
 
 /*****************************************************************************
-  6 函数声明
+  6 ????????
 *****************************************************************************/
 
 /* STKComm.c */
@@ -1180,229 +1180,229 @@ extern VOS_VOID STK_InitGobal(VOS_VOID);
 extern VOS_VOID STK_ResetGlobalValue(VOS_VOID);
 
 /*****************************************************************************
-函 数 名  : STK_InitCallGobal
-功能描述  : 初时化与呼叫相关的全局变量的内容
-输入参数  : 无
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : STK_InitCallGobal
+????????  : ????????????????????????????????
+????????  : ??
+????????  : ??
+?? ?? ??  : ??
 History     :
-1.日    期  : 2012年9月13日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2012??9??13??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 extern VOS_VOID STK_InitCallGobal(VOS_VOID);
 
 /*****************************************************************************
-函 数 名  : STK_GetCsSvcStatus
-功能描述  : 获取当前CS域服务状态
-输入参数  : 无
-输出参数  : 无
-返 回 值  : 当前服务状态
+?? ?? ??  : STK_GetCsSvcStatus
+????????  : ????????CS??????????
+????????  : ??
+????????  : ??
+?? ?? ??  : ????????????
 History     :
-1.日    期  : 2013年07月11日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2013??07??11??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 extern VOS_UINT32 STK_GetCsSvcStatus(VOS_VOID);
 
 /*****************************************************************************
-函 数 名  : STK_GetSvcStatus
-功能描述  : 获取当前服务状态
-输入参数  : 无
-输出参数  : 无
-返 回 值  : 服务状态
+?? ?? ??  : STK_GetSvcStatus
+????????  : ????????????????
+????????  : ??
+????????  : ??
+?? ?? ??  : ????????
 History     :
-1.日    期  : 2013年07月11日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2013??07??11??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 extern VOS_UINT32 STK_GetSvcStatus(VOS_VOID);
 
 /*****************************************************************************
-函 数 名  : STK_UpdateCsSvcStatus
-功能描述  : 更新当前CS域服务状态
-输入参数  : enCsServiceStatus:CS域服务状态
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : STK_UpdateCsSvcStatus
+????????  : ????????CS??????????
+????????  : enCsServiceStatus:CS??????????
+????????  : ??
+?? ?? ??  : ??
 History     :
-1.日    期  : 2013年07月11日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2013??07??11??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 #if (OSA_CPU_CCPU == VOS_OSA_CPU)
 extern VOS_VOID STK_UpdateCsSvcStatus(NAS_STK_SERVICE_STATUS_ENUM_UINT8 enCsServiceStatus);
 #endif
 /*****************************************************************************
-函 数 名  : STK_UpdateSvcStatus
-功能描述  : 更新当前服务状态
-输入参数  : enServiceStatus:服务状态
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : STK_UpdateSvcStatus
+????????  : ????????????????
+????????  : enServiceStatus:????????
+????????  : ??
+?? ?? ??  : ??
 History     :
-1.日    期  : 2014年01月15日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2014??01??15??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 #if (OSA_CPU_CCPU == VOS_OSA_CPU)
 extern VOS_VOID STK_UpdateSvcStatus(NAS_STK_SERVICE_STATUS_ENUM_UINT8 enServiceStatus);
 #endif
 /*****************************************************************************
-函 数 名  : STK_GetSysInfo
-功能描述  : 更新当前系统状态
-输入参数  : pstSysInfo:CS域系统信息
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : STK_GetSysInfo
+????????  : ????????????????
+????????  : pstSysInfo:CS??????????
+????????  : ??
+?? ?? ??  : ??
 History     :
-1.日    期  : 2013年07月11日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2013??07??11??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 #if (OSA_CPU_CCPU == VOS_OSA_CPU)
 extern VOS_VOID STK_GetSysInfo(SI_STK_SYS_INFO_STRU *pstSysInfo);
 #endif
 /*****************************************************************************
-函 数 名  : STK_UpdateSysInfo
-功能描述  : 更新当前系统状态
-输入参数  : pstSysInfo:CS域系统信息
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : STK_UpdateSysInfo
+????????  : ????????????????
+????????  : pstSysInfo:CS??????????
+????????  : ??
+?? ?? ??  : ??
 History     :
-1.日    期  : 2013年07月11日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2013??07??11??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 #if (OSA_CPU_CCPU == VOS_OSA_CPU)
 extern VOS_VOID STK_UpdateSysInfo(NAS_STK_SYS_INFO_STRU *pstSysInfo);
 #endif
 /*****************************************************************************
-函 数 名  : STK_GetCurRat
-功能描述  : 获取当前接入技术
-输入参数  : 无
-输出参数  : 无
-返 回 值  : 接入技术
+?? ?? ??  : STK_GetCurRat
+????????  : ????????????????
+????????  : ??
+????????  : ??
+?? ?? ??  : ????????
 History     :
-1.日    期  : 2013年07月11日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2013??07??11??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 extern VOS_UINT8 STK_GetCurRat(VOS_VOID);
 
 /*****************************************************************************
-函 数 名  : STK_UpdateCurRat
-功能描述  : 更新当前接入技术
-输入参数  : 无
-输出参数  : 无
-返 回 值  : 接入技术
+?? ?? ??  : STK_UpdateCurRat
+????????  : ????????????????
+????????  : ??
+????????  : ??
+?? ?? ??  : ????????
 History     :
-1.日    期  : 2013年07月11日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2013??07??11??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 extern VOS_VOID STK_UpdateCurRat(TAF_MMA_RAT_TYPE_ENUM_UINT8 ucRat);
 
 /*****************************************************************************
-函 数 名  : STK_GetSearchMode
-功能描述  : 获取当前搜网模式
-输入参数  : 无
-输出参数  : 无
-返 回 值  : 搜网模式
+?? ?? ??  : STK_GetSearchMode
+????????  : ????????????????
+????????  : ??
+????????  : ??
+?? ?? ??  : ????????
 History     :
-1.日    期  : 2013年07月11日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2013??07??11??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 extern VOS_UINT8 STK_GetSearchMode(VOS_VOID);
 
 /*****************************************************************************
-函 数 名  : STK_UpdateSearchMode
-功能描述  : 更新当前搜网模式
-输入参数  : 当前搜网模式
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : STK_UpdateSearchMode
+????????  : ????????????????
+????????  : ????????????
+????????  : ??
+?? ?? ??  : ??
 History     :
-1.日    期  : 2013年07月11日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2013??07??11??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 extern VOS_VOID STK_UpdateSearchMode(VOS_UINT8 ucSearchMode);
 
 /*****************************************************************************
-函 数 名  : STK_ProfileInit
-功能描述  : 初始化时PROFILE内容初始化
-输入参数  : 无
-输出参数  : ppucProfile:Profile内容
-            pucProfileLen:Profile长度
-返 回 值  : 无
+?? ?? ??  : STK_ProfileInit
+????????  : ????????PROFILE??????????
+????????  : ??
+????????  : ppucProfile:Profile????
+            pucProfileLen:Profile????
+?? ?? ??  : ??
 History     :
-1.日    期  : 2013年07月11日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2013??07??11??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 extern VOS_VOID STK_GetProfileInfo(VOS_UINT8 **ppucProfile, VOS_UINT8 *pucProfileLen);
 
 /*****************************************************************************
-函 数 名  : STK_ProfileInit
-功能描述  : 初始化时PROFILE内容初始化
-输入参数  : pstSTKProfileContent:Profile全局结构指针
-            enPhyType:卡物理类型
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : STK_ProfileInit
+????????  : ????????PROFILE??????????
+????????  : pstSTKProfileContent:Profile????????????
+            enPhyType:??????????
+????????  : ??
+?? ?? ??  : ??
 History     :
-1.日    期  : 2013年07月11日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2013??07??11??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 extern VOS_VOID STK_ProfileInit(USIMM_STK_CFG_STRU *pstSTKProfileContent, USIMM_PHYCARD_TYPE_ENUM_UINT32 enPhyType);
 
 /*****************************************************************************
-函 数 名  : STK_ClearPauseCharGobal
-功能描述  : 清除pause字符相关全局变量
-输入参数  : 无
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : STK_ClearPauseCharGobal
+????????  : ????pause????????????????
+????????  : ??
+????????  : ??
+?? ?? ??  : ??
 History     :
-1.日    期  : 2012年9月19日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2012??9??19??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 extern VOS_VOID STK_ClearPauseCharGobal(VOS_VOID);
 
 /*****************************************************************************
-函 数 名  : STK_ClearPauseCharGobal
-功能描述  : SETUP CALL全局变量中呼叫状态机设置
-输入参数  : enCallStatus:重置的呼叫状态
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : STK_ClearPauseCharGobal
+????????  : SETUP CALL????????????????????????
+????????  : enCallStatus:??????????????
+????????  : ??
+?? ?? ??  : ??
 History     :
-1.日    期  : 2012年9月19日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2012??9??19??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 extern VOS_VOID STK_CallStateMachineSet(SI_STK_CALL_STATUS_ENUM_UINT32 enCallStatus);
 
 /*****************************************************************************
-函 数 名  : STK_SetCallCleanGobal
-功能描述  : SETUP CALL全局变量清除
-输入参数  : 无
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : STK_SetCallCleanGobal
+????????  : SETUP CALL????????????
+????????  : ??
+????????  : ??
+?? ?? ??  : ??
 History     :
-1.日    期  : 2012年9月19日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2012??9??19??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 extern VOS_VOID STK_SetCallCleanGobal(VOS_VOID);
 
 /*****************************************************************************
-函 数 名  : STK_CLCfgInit
-功能描述  : L+C共SIM卡功能状态初始化
-输入参数  : 无
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : STK_CLCfgInit
+????????  : L+C??SIM????????????????
+????????  : ??
+????????  : ??
+?? ?? ??  : ??
 History     :
-1.日    期  : 2013年12月19日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2013??12??19??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 extern VOS_VOID STK_CLCfgInit(VOS_VOID);
 
@@ -1506,79 +1506,79 @@ extern VOS_UINT32 SI_STK_GetRecMMCPID(VOS_UINT32 *pulTAFPid);
 extern VOS_VOID SI_STK_EventDownComptiable(VOS_VOID);
 
 /*****************************************************************************
-函 数 名  : SI_STK_TRCnfMsgProc
-功能描述  : 用于处理回复的 Terminal Response 消息
-输入参数  : pMsg:消息内容
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : SI_STK_TRCnfMsgProc
+????????  : ?????????????? Terminal Response ????
+????????  : pMsg:????????
+????????  : ??
+?? ?? ??  : ??
 *****************************************************************************/
 extern VOS_VOID SI_STK_TRCnfMsgProc(PS_SI_MSG_STRU *pMsg);
 
 /*****************************************************************************
-函 数 名  : SI_STK_TerminalResponseCnfProc
-功能描述  : 用于处理回复的 Terminal Response 消息
-输入参数  : pMsg:消息内容
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : SI_STK_TerminalResponseCnfProc
+????????  : ?????????????? Terminal Response ????
+????????  : pMsg:????????
+????????  : ??
+?? ?? ??  : ??
 *****************************************************************************/
 extern VOS_VOID SI_STK_TerminalResponseCnfProc(PS_SI_MSG_STRU *pMsg);
 
 /*****************************************************************************
-函 数 名  : SI_STK_CbpTrCnfMsgProc
-功能描述  : 用于处理VIA下发的Terminal Response消息的CNF消息
-输入参数  : pMsg:消息内容
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : SI_STK_CbpTrCnfMsgProc
+????????  : ????????VIA??????Terminal Response??????CNF????
+????????  : pMsg:????????
+????????  : ??
+?? ?? ??  : ??
 *****************************************************************************/
 extern VOS_VOID SI_STK_CbpTrCnfMsgProc(PS_SI_MSG_STRU *pMsg);
 
 /*****************************************************************************
-函 数 名  : SI_STK_CbpTRDataReqProc
-功能描述  : 透传VIA下发的Terminal Response数据
-输入参数  : STKReqMsg:外部下发的消息请求
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : SI_STK_CbpTRDataReqProc
+????????  : ????VIA??????Terminal Response????
+????????  : STKReqMsg:??????????????????
+????????  : ??
+?? ?? ??  : ??
 *****************************************************************************/
 extern VOS_VOID SI_STK_CbpTRDataReqProc(SI_STK_REQ_STRU *STKReqMsg);
 
 /*****************************************************************************
-函 数 名  : SI_STK_ViaTRCnfProc
-功能描述  : 将VIA下发Terminal Response的处理结果回复给CSIM Agent
-输入参数  : ulErrorCode:TR下发的处理结果
-            ucSW1:状态字1
-            ucSW2:状态字2
-输出参数  : 无
-返 回 值  : 无
+?? ?? ??  : SI_STK_ViaTRCnfProc
+????????  : ??VIA????Terminal Response????????????????CSIM Agent
+????????  : ulErrorCode:TR??????????????
+            ucSW1:??????1
+            ucSW2:??????2
+????????  : ??
+?? ?? ??  : ??
 *****************************************************************************/
 extern VOS_VOID SI_STK_CbpTRCnfProc(VOS_UINT32 ulErrorCode, VOS_UINT8 ucSW1, VOS_UINT8 ucSW2);
 
 /*****************************************************************************
-函 数 名  :SI_STK_RefreshCallInServiceProc
-功能描述  :Refresh命令当UE在呼叫状态的处理函数
-输入参数  :pCmdData:主动命令内容
-输出参数  :
-返 回 值  :
-调用函数  : 无
-被调函数  : 外部接口
+?? ?? ??  :SI_STK_RefreshCallInServiceProc
+????????  :Refresh??????UE????????????????????
+????????  :pCmdData:????????????
+????????  :
+?? ?? ??  :
+????????  : ??
+????????  : ????????
 History     :
-1.日    期  : 2012年09月13日
-  作    者  : h59254
-  修改内容  : Create
+1.??    ??  : 2012??09??13??
+  ??    ??  : h59254
+  ????????  : Create
 *****************************************************************************/
 extern VOS_UINT32 SI_STK_RefreshCallInServiceProc(SI_STK_DATA_INFO_STRU *pCmdData);
 
 /*****************************************************************************
-函 数 名  : SI_STK_CmdIndTimeOutProc
-功能描述  : 主动命令上报超时处理函数
-输入参数  : 无
-输出参数  : 无
-返 回 值  : VOS_UINT32函数执行结果
- 调用函数  : 无
-被调函数  : 外部接口
+?? ?? ??  : SI_STK_CmdIndTimeOutProc
+????????  : ????????????????????????
+????????  : ??
+????????  : ??
+?? ?? ??  : VOS_UINT32????????????
+ ????????  : ??
+????????  : ????????
 History     :
-1.日    期  : 2009年07月10日
-  作    者  : z00100318
-  修改内容  : Create
+1.??    ??  : 2009??07??10??
+  ??    ??  : z00100318
+  ????????  : Create
 *****************************************************************************/
 extern VOS_VOID SI_STK_CmdIndTimeOutProc(VOS_VOID);
 
@@ -1611,10 +1611,10 @@ extern VOS_VOID SI_STK_TAFMsgProc(PS_SI_MSG_STRU *pMsg);
 
 /*****************************************************************************
  Prototype      : SI_STK_MtCallEventDownload
- Description    : TAF发送给STK的MT消息处理函数
- Input          : pstMsg:接收消息
- Output         : 无
- Return Value   : 无
+ Description    : TAF??????STK??MT????????????
+ Input          : pstMsg:????????
+ Output         : ??
+ Return Value   : ??
  History        : ---
   1.Date        : 2013-07-12
     Author      : H59254
@@ -1625,10 +1625,10 @@ extern VOS_VOID SI_STK_MtCallEventDownload(NAS_STK_MT_CALL_EVENT_STRU *pstMsg);
 #endif
 /*****************************************************************************
  Prototype      : SI_STK_CallConnectEventDownload
- Description    : TAF发送给STK的Call Connect消息处理函数
- Input          : pstMsg:接收消息
- Output         : 无
- Return Value   : 无
+ Description    : TAF??????STK??Call Connect????????????
+ Input          : pstMsg:????????
+ Output         : ??
+ Return Value   : ??
  History        : ---
   1.Date        : 2013-07-12
     Author      : H59254
@@ -1639,10 +1639,10 @@ extern VOS_VOID SI_STK_CallConnectEventDownload(NAS_STK_CALL_CONNECT_EVENT_STRU 
 #endif
 /*****************************************************************************
  Prototype      : SI_STK_CallDisconnectEventDownload
- Description    : TAF发送给STK的Call Disconnect消息处理函数
- Input          : pstMsg:接收消息
- Output         : 无
- Return Value   : 无
+ Description    : TAF??????STK??Call Disconnect????????????
+ Input          : pstMsg:????????
+ Output         : ??
+ Return Value   : ??
  History        : ---
   1.Date        : 2013-07-12
     Author      : H59254
@@ -1653,10 +1653,10 @@ extern VOS_VOID SI_STK_CallDisconnectEventDownload(NAS_STK_CALL_DISC_EVENT_STRU 
 #endif
 /*****************************************************************************
  Prototype      : SI_STK_LocationStatusEventDownload
- Description    : TAF发送给STK的Location Status事件下载处理函数
- Input          : 无
- Output         : 无
- Return Value   : 无
+ Description    : TAF??????STK??Location Status????????????????
+ Input          : ??
+ Output         : ??
+ Return Value   : ??
  History        : ---
   1.Date        : 2013-07-12
     Author      : H59254
@@ -1666,10 +1666,10 @@ extern VOS_VOID SI_STK_LocationStatusEventDownload(VOS_VOID);
 
 /*****************************************************************************
  Prototype      : SI_STK_AccessTechChangeEventDownload
- Description    : TAF发送给STK的Access Technology Change消息处理函数
- Input          : 无
- Output         : 无
- Return Value   : 无
+ Description    : TAF??????STK??Access Technology Change????????????
+ Input          : ??
+ Output         : ??
+ Return Value   : ??
  History        : ---
   1.Date        : 2013-07-12
     Author      : H59254
@@ -1679,10 +1679,10 @@ extern VOS_VOID SI_STK_AccessTechChangeEventDownload(VOS_VOID);
 
 /*****************************************************************************
  Prototype      : SI_STK_NetworkSearchModeChangeEventDownload
- Description    : TAF发送给STK的Network Search Mode Change消息处理函数
- Input          : 无
- Output         : 无
- Return Value   : 无
+ Description    : TAF??????STK??Network Search Mode Change????????????
+ Input          : ??
+ Output         : ??
+ Return Value   : ??
  History        : ---
   1.Date        : 2013-07-12
     Author      : H59254
@@ -1695,10 +1695,10 @@ extern VOS_VOID SI_STK_NetworkRejectionEventDownload(NAS_STK_NETWORK_REJECTION_E
 #endif
 /*****************************************************************************
  Prototype      : SI_STK_UpdateLocationInfo
- Description    : NAS发送location status消息后同步更新系统信息
- Input          : pstLocStatusEvent:接收消息
- Output         : 无
- Return Value   : 无
+ Description    : NAS????location status??????????????????????
+ Input          : pstLocStatusEvent:????????
+ Output         : ??
+ Return Value   : ??
  History        : ---
   1.Date        : 2013-07-12
     Author      : H59254
@@ -1710,10 +1710,10 @@ extern VOS_VOID SI_STK_UpdateLocationInfo(NAS_STK_LOC_STATUS_EVENT_INFO_STRU   *
 
 /*****************************************************************************
  Prototype      : SI_STK_TransferUpdateAttachType
- Description    : 将GMM MM被拒原因值转换成STK事件下载需要的原因值
- Input          : ucNasType:GMM MM被拒原因值
- Output         : pucType:STK事件下载需要的原因值
- Return Value   : 无
+ Description    : ??GMM MM????????????????STK????????????????????
+ Input          : ucNasType:GMM MM??????????
+ Output         : pucType:STK????????????????????
+ Return Value   : ??
  History        : ---
   1.Date        : 2013-07-12
     Author      : H59254
@@ -1724,10 +1724,10 @@ extern VOS_VOID SI_STK_TransferUpdateAttachType(VOS_UINT8 *pucType, NAS_STK_UPDA
 #endif
 /*****************************************************************************
  Prototype      : SI_STK_LociInfoIndMsgProc
- Description    : ID_NAS_STK_LOCATION_INFO_IND消息的处理
- Input          : pstLociInfo:消息内容的指针
- Output         : 无
- Return Value   : 无
+ Description    : ID_NAS_STK_LOCATION_INFO_IND??????????
+ Input          : pstLociInfo:??????????????
+ Output         : ??
+ Return Value   : ??
  History        : ---
   1.Date        : 2013-07-25
     Author      : H59254

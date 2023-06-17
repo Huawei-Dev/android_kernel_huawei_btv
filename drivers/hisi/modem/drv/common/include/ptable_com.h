@@ -64,75 +64,61 @@ extern "C"
 #define NAND_OK                         0
 #define NAND_ERROR                      1
 
-/* 镜像区域 */
 typedef enum IMAGE_TYPE
 {
-    /*一、产品线静态文件下载方式，涉及产品线修改，暂保留静态下载方式*/
-    IMAGE_SFS_START            = 0x0,        /*静态文件 开始 */
+    IMAGE_SFS_START            = 0x0,
     IMAGE_CDROMISOVER          = 0x1,
     IMAGE_WEBUIVER             = 0x2,
     IMAGE_CFDNVTable           = 0x3,
-    ZSP_FILE_ADDR              = 0x4,       /*[锁定值],乒乓Bootrom合入，增加了BOOTROM_BACK枚举，
-                                                为兼容之前的打包工具定义的ZSP文件头地址*/
-    ISO_FILE_ADDR              = 0x5,       /*[锁定值],乒乓Bootrom合入，增加了BOOTROM_BACK枚举，
-                                                为兼容之前的打包工具定义的ZSP文件头地址*/
-    IMAGE_SFS_TOP              = 0x50,      /*静态文件结束*/
-
-    /* 二、动态文件类型映像 */
-    IMAGE_DFS_START            = 0x64,      /*100*//*动态文件开始*/
-
-    IMAGE_DYN_WEBUI            = 0x65,      /*101*//*产品线动态文件类型映像*/
-    IMAGE_DYN_FS               = 0x66,      /*102*//*低软动态文件类型映像*/
-
-    IMAGE_DFS_TOP              = 0xfe,      /*动态文件结束*/
-
-    /* 三 、flash分区映像类型 , 这个分区包含所有需要下载升级的映像标志 */
-    IMAGE_PART_START           = 0xFF,      /*静态文件 开始 */
-
-    IMAGE_PTABLE               = 0x100,     /* 分区表 镜像标志*/
-    IMAGE_M3BOOT               = 0x101,     /* M3 BOOT */
-    IMAGE_FASTBOOT             = 0x102,     /* FASTBOOT镜像 区 */
-    IMAGE_NVBACKLTE            = 0x103,     /* NV 备份 镜像区*/
-    IMAGE_NVIMG                = 0x104,     /* 工作NV 区 */
-    IMAGE_NVDLD                = 0x105,     /* 下载NV 区 */
-    IMAGE_NVFACTORY            = 0x106,     /* 工厂NV 区 */
-    IMAGE_KERNEL               = 0x107,     /* Kernel 分区 */
-    IMAGE_KERNELBK             = 0x108,     /* Kernel 备份分区*/
-    IMAGE_M3IMAGE              = 0x109,     /* M3 FIRMWARE 分区*/
-    IMAGE_LOGO                 = 0x10C,     /* LOGO 分区 */
-    IMAGE_OEMINFO              = 0x10D,     /* OEMONFO 镜像 区 */
-    IMAGE_SYSTEM               = 0x10E,     /* SYSTEM.IMG 镜像 区 */
-    IMAGE_DTS                  = 0x10F,     /* SYSTEM.IMG 镜像 区 */
-    IMAGE_OM                   = 0x110,     /* 存放可维可测数据 */
-    IMAGE_APP                  = 0x111,     /* APP.IMG 镜像 区 */
-    IMAGE_WEBUI                = 0x112,     /* WEBUI 镜像 区 */
-    IMAGE_RESERVE1             = 0x113,     /* 预留1 镜像 区 */
-    IMAGE_RESERVE2             = 0x114,     /* 预留2 镜像 区 */
-    IMAGE_RESERVE3             = 0x115,     /* 预留3 镜像 区 */
-    IMAGE_USERDATA             = 0x116,     /* userdata 镜像 区 */
-    IMAGE_ONLINE               = 0x117,     /* ONLINE 在线升级 镜像 区 */
-    IMAGE_CDROMISO             = 0x118,     /* CDROMISO 后台 镜像区*/
-    IMAGE_CACHE                = 0x119,     /* CACHE 镜像 区 */
-    IMAGE_RECOVERY_A           = 0x11A,     /* RECOVERY镜像 区  */
-    IMAGE_RECOVERY_B           = 0x11B,     /* RECOVERY镜像 区  */
-    IMAGE_MISC                 = 0x11C,     /* MISC 镜像 区 */
-    IMAGE_MULTI_CARRIER        = 0x11D,     /* multicarrier 镜像 区 */
-	IMAGE_HIFI				   = 0x11e, 	/* HIFI 镜像 区 */
-	IMAGE_TEEOS				   = 0x120, 	/* TEEOS 镜像 区 */
-	IMAGE_MODEM_FW			   = 0x121, 	/* modem_fw 镜像 区 */
-    IMAGE_SEC_STORAGE          = 0x122,     /* 安全存储分区 */
-
-
-    IMAGE_PART_TOP             = 0x200      /* 分区表索引 结束*/
-
+    ZSP_FILE_ADDR              = 0x4,
+    ISO_FILE_ADDR              = 0x5,
+    IMAGE_SFS_TOP              = 0x50,
+    IMAGE_DFS_START            = 0x64,
+    IMAGE_DYN_WEBUI            = 0x65,
+    IMAGE_DYN_FS               = 0x66,
+    IMAGE_DFS_TOP              = 0xfe,
+    IMAGE_PART_START           = 0xFF,
+    IMAGE_PTABLE               = 0x100,
+    IMAGE_M3BOOT               = 0x101,
+    IMAGE_FASTBOOT             = 0x102,
+    IMAGE_NVBACKLTE            = 0x103,
+    IMAGE_NVIMG                = 0x104,
+    IMAGE_NVDLD                = 0x105,
+    IMAGE_NVFACTORY            = 0x106,
+    IMAGE_KERNEL               = 0x107,
+    IMAGE_KERNELBK             = 0x108,
+    IMAGE_M3IMAGE              = 0x109,
+    IMAGE_LOGO                 = 0x10C,
+    IMAGE_OEMINFO              = 0x10D,
+    IMAGE_SYSTEM               = 0x10E,
+    IMAGE_DTS                  = 0x10F,
+    IMAGE_OM                   = 0x110,
+    IMAGE_APP                  = 0x111,
+    IMAGE_WEBUI                = 0x112,
+    IMAGE_RESERVE1             = 0x113,
+    IMAGE_RESERVE2             = 0x114,
+    IMAGE_RESERVE3             = 0x115,
+    IMAGE_USERDATA             = 0x116,
+    IMAGE_ONLINE               = 0x117,
+    IMAGE_CDROMISO             = 0x118,
+    IMAGE_CACHE                = 0x119,
+    IMAGE_RECOVERY_A           = 0x11A,
+    IMAGE_RECOVERY_B           = 0x11B,
+    IMAGE_MISC                 = 0x11C,
+    IMAGE_MULTI_CARRIER        = 0x11D,
+	IMAGE_HIFI				   = 0x11e,
+	IMAGE_TEEOS				   = 0x120,
+	IMAGE_MODEM_FW			   = 0x121,
+    IMAGE_SEC_STORAGE          = 0x122,
+    IMAGE_PART_TOP             = 0x200
 }IMAGE_TYPE_E;
 
 #define PTABLE_IMAGE_TYPE_MASK          (0x7)
 
 typedef enum FALSH_DATA_TYPE
 {
-    DATA_NORMAL                 = 0,    /*表示此分区映象为普通二进制数据,不占用sp*/
-    DATA_YAFFS                  = 1     /*表示此分区映象为yaffs映象,占用spare区*/
+    DATA_NORMAL                 = 0,
+    DATA_YAFFS                  = 1
 }FLASH_DATA_TYPE_E;
 
 #define PTABLE_VALIDITY_OFFSET          (0x3)
@@ -140,8 +126,8 @@ typedef enum FALSH_DATA_TYPE
 
 typedef enum FALSH_DATA_VALIDITY
 {
-    DATA_VALID                 = 0,    /*表示此分区映象数据完整有效,可以使用(默认)*/
-    DATA_INVALID               = 1     /*表示此分区映象数据可能不完整,不可以使用*/
+    DATA_VALID                 = 0,
+    DATA_INVALID               = 1
 }FALSH_DATA_VALIDITY_E;
 
 /*----------------------- |  0 byte
@@ -185,10 +171,8 @@ typedef struct ST_PART_TBL
 /*should move table head space*/
 #define  PTABLE_PARTITION_MAX ((SHM_SIZE_PTABLE - PTABLE_HEAD_SIZE) / sizeof(struct ST_PART_TBL))
 
-/*尾部填充数据，使得编译出来的镜像正好占用DDRPTABLE_RAM_TABLE_SIZE的剩余空间*/
 #define PTABLE_TAIL_SIZE   (SHM_SIZE_PTABLE - (PTABLE_PARTITION_MAX) * sizeof(struct ST_PART_TBL) - PTABLE_HEAD_SIZE)
 #define PTABLE_TAIL_STR     "pTableTail"
-
 
 typedef void (*funcptr)(void);
 
@@ -197,7 +181,7 @@ extern struct ST_PART_TBL ptable_product[];
 extern unsigned int ptable_get_validity(struct ST_PART_TBL * ptable);
 extern struct ST_PART_TBL * ptable_get_ram_data(void);
 
-#define PART_TABLE_NAND_OFFSET      (FLASH_PTABLE_OFFSET)   /*分区表在flash存储空间的偏移值*/
+#define PART_TABLE_NAND_OFFSET      (FLASH_PTABLE_OFFSET)
 
 #endif /* __ASSEMBLY__ */
 
@@ -208,14 +192,8 @@ extern struct ST_PART_TBL * ptable_get_ram_data(void);
 #define PTABLE_FASTBOOT_ENTRY           (FASTBOOT_DDR_ENTRY)
 #define PTABLE_MODEM_CCORE_ENTRY      (MCORE_TEXT_START_ADDR)
 
-
 #define PTABLE_VER_STR                   PRODUCT_CFG_PTABLE_VER_NAME
 #define PTABLE_VER_ID_STR      	         PRODUCT_CFG_PTABLE_VER_ID
-
-
-/***********************************************************************
- * FLASH空间分配
- ***********************************************************************/
 
 /* M3boot */
 #define PTABLE_M3_BOOT_START            (0)

@@ -50,7 +50,7 @@
 #define __DMS_CORE_H__
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 
 #include "dms.h"
@@ -105,16 +105,16 @@ extern "C" {
 
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
 
 #define DMS_WRT_SLEEP_TIME              (50)
 #define DMS_RD_SLEEP_TIME               (50)
 #define DMS_RD_BUF_LEN                  (1024)
 
-/*lint -e960 修改人:l60609;原因:64bit*/
+/*lint -e960 ??????:l60609;????:64bit*/
 #define DMS_VFILE_CRT_LEVEL             (0770)
-/*lint +e960 修改人:l60609;原因:64bit*/
+/*lint +e960 ??????:l60609;????:64bit*/
 
 #define DMS_TEST_MODE                   (0)
 #define DMS_NORMAL_MODE                 (1)
@@ -125,7 +125,7 @@ extern "C" {
 #define DMS_UL_DATA_BUFF_SIZE           (1024)
 #define DMS_UL_DATA_BUFF_NUM            (16)
 
-/* slice 值为64bit, 直接用FFFFFFFFFFFFFFFF表示,16个字符+1个结束符 */
+/* slice ????64bit, ??????FFFFFFFFFFFFFFFF????,16??????+1???????? */
 #define DMS_GET_SLICE_FILE_LEN          (17)
 
 #if (VOS_OS_VER == VOS_LINUX)
@@ -179,10 +179,10 @@ extern "C" {
 #define DMS_GET_NLK_PHY_BEAR(chan)              (g_stDmsNlkEntity.astOmChanProp[chan].enPhyBear)
 #define DMS_GET_NLK_MSG_TYPE(chan)              (g_stDmsNlkEntity.astOmChanProp[chan].enMsgType)
 
-/* netlink 套接字事件统计 */
+/* netlink ?????????????? */
 #define DMS_DBG_NLK_CREATE_SOCK_FAIL_NUM(n)     (g_stDmsMntnNlkStats.ulCreatSockFailNum += (n))
 
-/* netlink 上行事件统计 */
+/* netlink ???????????? */
 #define DMS_DBG_NLK_UL_TOTAL_MSG_NUM(n)         (g_stDmsMntnNlkStats.ulUlTotalMsgNum += (n))
 #define DMS_DBG_NLK_UL_ERR_MSG_NUM(n)           (g_stDmsMntnNlkStats.ulUlErrMsgNum += (n))
 #define DMS_DBG_NLK_UL_UNSUPPORT_INPUT_LOG_NUM(n) (g_stDmsMntnNlkStats.ulUlUnSupportInputLogNum+= (n))
@@ -191,7 +191,7 @@ extern "C" {
 #define DMS_DBG_NLK_UL_SEND_MSG_NUM(type,n)     (g_stDmsMntnNlkStats.aulUlSendMsgNum[type] += (n))
 #define DMS_DBG_NLK_UL_FREE_MSG_NUM(type,n)     (g_stDmsMntnNlkStats.aulUlFreeMsgNum[type] += (n))
 
-/* netlink 下行事件统计 */
+/* netlink ???????????? */
 #define DMS_DBG_NLK_DL_TOTAL_PKT_NUM(n)         (g_stDmsMntnNlkStats.ulDlTotalPktNum += (n))
 #define DMS_DBG_NLK_DL_ERR_PARA_PKT_NUM(n)      (g_stDmsMntnNlkStats.ulDlErrParaPktNum += (n))
 #define DMS_DBG_NLK_DL_ERR_CHAN_PKT_NUM(n)      (g_stDmsMntnNlkStats.ulDlErrChanPktNum += (n))
@@ -210,7 +210,7 @@ extern "C" {
 #define DMS_MODEM_STATUS_FILE_LEN               (3)
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 
 typedef enum
@@ -286,42 +286,42 @@ typedef enum
 } DMS_SDM_MSG_ID_ENUM;
 
 /*****************************************************************************
- 枚举名称: DMS_NLK_MSG_TYPE_ENUM
- 枚举说明: netlink消息类型
+ ????????: DMS_NLK_MSG_TYPE_ENUM
+ ????????: netlink????????
 *****************************************************************************/
 enum DMS_NLK_MSG_TYPE_ENUM
 {
-    DMS_NLK_MSG_TYPE_LTE_CFG            = 0,                /* TL配置 */
-    DMS_NLK_MSG_TYPE_LTE_CTRL,                              /* TL命令 */
-    DMS_NLK_MSG_TYPE_LTE_DATA,                              /* TL数据 */
-    DMS_NLK_MSG_TYPE_GU_CFG,                                /* GU配置 */
-    DMS_NLK_MSG_TYPE_GU_DATA,                               /* GU数据 */
+    DMS_NLK_MSG_TYPE_LTE_CFG            = 0,                /* TL???? */
+    DMS_NLK_MSG_TYPE_LTE_CTRL,                              /* TL???? */
+    DMS_NLK_MSG_TYPE_LTE_DATA,                              /* TL???? */
+    DMS_NLK_MSG_TYPE_GU_CFG,                                /* GU???? */
+    DMS_NLK_MSG_TYPE_GU_DATA,                               /* GU???? */
 
     DMS_NLK_MSG_TYPE_BUTT
 };
 typedef VOS_UINT32 DMS_NLK_MSG_TYPE_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名称: DMS_NLK_CFG_TYPE_ENUM
- 枚举说明: netlink配置类型
+ ????????: DMS_NLK_CFG_TYPE_ENUM
+ ????????: netlink????????
 *****************************************************************************/
 enum DMS_NLK_CFG_TYPE_ENUM
 {
-    DMS_NLK_CFG_TYPE_OPEN               = 0,                /* 建立netlink */
-    DMS_NLK_CFG_TYPE_CLOSE,                                 /* 关闭netlink */
+    DMS_NLK_CFG_TYPE_OPEN               = 0,                /* ????netlink */
+    DMS_NLK_CFG_TYPE_CLOSE,                                 /* ????netlink */
 
     DMS_NLK_CFG_TYPE_BUTT
 };
 typedef VOS_UINT32 DMS_NLK_CFG_TYPE_ENUM_UINT32;
 
 /*****************************************************************************
- 枚举名称: DMS_NLK_PHY_BEAR_ENUM
- 枚举说明: netlink通道类型
+ ????????: DMS_NLK_PHY_BEAR_ENUM
+ ????????: netlink????????
 *****************************************************************************/
 enum DMS_NLK_PHY_BEAR_ENUM
 {
-    DMS_NLK_PHY_BEAR_LTE                = 0,                /* LTE通道 */
-    DMS_NLK_PHY_BEAR_GU,                                    /* GU通道  */
+    DMS_NLK_PHY_BEAR_LTE                = 0,                /* LTE???? */
+    DMS_NLK_PHY_BEAR_GU,                                    /* GU????  */
 
     DMS_NLK_PHY_BEAR_BUTT
 };
@@ -329,10 +329,10 @@ typedef VOS_UINT32 DMS_NLK_PHY_BEAR_ENUM_UINT32;
 
 
 /*****************************************************************************
-  4 STRUCT定义
+  4 STRUCT????
 *****************************************************************************/
 
-/* 最后使能的逻辑通道和物理通道的对应关系
+/* ??????????????????????????????????????
  */
 typedef struct
 {
@@ -340,14 +340,14 @@ typedef struct
     VOS_UINT8                           aucReserved[4];
 } DMS_LOGIC_PHY_MATCH_STRU;
 
-/* 物理通道所对应的逻辑属性结构体
+/* ??????????????????????????????
  */
 typedef struct
 {
     UDI_HANDLE                          lPortHandle;
     DMS_LOGIC_CHAN_ENUM                 enLogicChan;
     VOS_UINT8                           ucChanStat;
-    VOS_UINT8                           ucHdlcFlag;         /*0 标示非HDLC数据，1表示是HDLC数据*/
+    VOS_UINT8                           ucHdlcFlag;         /*0 ??????HDLC??????1??????HDLC????*/
     VOS_UINT8                           aucReserved[6];
 } DMS_PHY_BEAR_PROPERTY_STRU;
 
@@ -369,8 +369,8 @@ typedef struct
 } DMS_MAIN_INFO;
 
 /*****************************************************************************
- 结构名称: DMS_NLK_CFG_STRU
- 结构说明: netlink 配置结构
+ ????????: DMS_NLK_CFG_STRU
+ ????????: netlink ????????
 *****************************************************************************/
 typedef struct
 {
@@ -379,8 +379,8 @@ typedef struct
 } DMS_NLK_CFG_STRU;
 
 /*****************************************************************************
- 结构名称: DMS_NLK_PAYLOAD_STRU
- 结构说明: netlink 透明数据结构
+ ????????: DMS_NLK_PAYLOAD_STRU
+ ????????: netlink ????????????
 *****************************************************************************/
 typedef struct
 {
@@ -390,8 +390,8 @@ typedef struct
 } DMS_NLK_PAYLOAD_STRU;
 
 /*****************************************************************************
- 结构名称: DMS_NLK_PHY_BEAR_PROPERTY_STRU
- 结构说明: netlink 物理承载属性结构
+ ????????: DMS_NLK_PHY_BEAR_PROPERTY_STRU
+ ????????: netlink ????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -400,8 +400,8 @@ typedef struct
 } DMS_NLK_PHY_BEAR_PROPERTY_STRU;
 
 /*****************************************************************************
- 结构名称: DMS_NLK_OM_CHAN_PROPERTY_STRU
- 结构说明: netlink 逻辑通道属性结构
+ ????????: DMS_NLK_OM_CHAN_PROPERTY_STRU
+ ????????: netlink ????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -412,8 +412,8 @@ typedef struct
 } DMS_NLK_OM_CHAN_PROPERTY_STRU;
 
 /*****************************************************************************
- 结构名称: DMS_NLK_ENTITY_STRU
- 结构说明: netlink 上下文结构
+ ????????: DMS_NLK_ENTITY_STRU
+ ????????: netlink ??????????
 *****************************************************************************/
 typedef struct
 {
@@ -425,8 +425,8 @@ typedef struct
 } DMS_NLK_ENTITY_STRU;
 
 /*****************************************************************************
- 结构名称: DMS_MNTN_NLK_STATS_STRU
- 结构说明: netlink 可维可测结构
+ ????????: DMS_MNTN_NLK_STATS_STRU
+ ????????: netlink ????????????
 *****************************************************************************/
 typedef struct
 {
@@ -457,12 +457,12 @@ typedef struct
 
 
 /*****************************************************************************
-  5 UNION定义
+  5 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 全局变量声明
+  6 ????????????
 *****************************************************************************/
 
 extern VOS_UINT32                       g_ulDmsDebugLevel;
@@ -477,7 +477,7 @@ extern VOS_UINT8                       g_ucDmsPrintModemLogType;
 
 
 /*****************************************************************************
-  7 函数声明
+  7 ????????
 *****************************************************************************/
 
 extern VOS_VOID DMS_Debug(DMS_SDM_MSG_ID_ENUM ulType,VOS_UINT32 ulRserved1, VOS_UINT32 ulRserved2, VOS_UINT32 ulRserved3);
@@ -543,7 +543,7 @@ ssize_t DMS_ReadModemStatusFile(
 );
 
 /*****************************************************************************
-  8 OTHERS定义
+  8 OTHERS????
 *****************************************************************************/
 
 

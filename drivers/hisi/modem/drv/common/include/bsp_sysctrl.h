@@ -56,9 +56,9 @@ typedef enum tagBSP_SYSCTRL_INDEX
     sysctrl_ao = 0x0,
     sysctrl_pd,
     sysctrl_mdm,
-    sysctrl_ap_peri, /*pctrl*/
+    sysctrl_ap_peri,
     sysctrl_ap_pericrg,
-    sysctrl_reservel,/*预留系统控制器*/
+    sysctrl_reservel,
     sysctrl_reserve2,
     sysctrl_reserve3,
     sysctrl_reserve4,
@@ -94,15 +94,6 @@ static inline void* bsp_sysctrl_addr_phy_byindex(BSP_SYSCTRL_INDEX index){
 
 void system_status_init(void);
 
-/*****************************************************************************
-* 函 数 名  : get_system_status
-* 功能描述  : 判断芯片当前状态
-* 输入参数  : 无
-* 输出参数  : 无
-* 返 回 值  : 1:  系统没有掉电情况下发生过重启
-*             0:  掉电重启
-*            -1:  没有初始化、或芯片不支持该功能、或魔数被其他组件误改
-*****************************************************************************/
 int get_system_status(void);
 
 #ifndef __KERNEL__
@@ -114,4 +105,3 @@ static inline int dt_sysctrl_init(void) {};
 #endif
 
 #endif
-

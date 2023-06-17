@@ -83,7 +83,7 @@ static int modem_sysboot_start_init(void *data)
     u64 jiffies_old = 0,jiffies_new=0;
     u64 jiffies_time=0;
     printk(KERN_ERR "modem_sysboot_start_init start\n");
-    /*此任务等待被唤醒*/
+    /*????????????????*/
     wait_for_completion(&modem_sysboot_start_complete);
     printk(KERN_ERR "modem_sysboot_start_init \n");
 
@@ -92,7 +92,7 @@ static int modem_sysboot_start_init(void *data)
         ssleep(60);
     }
 
-    /*如果是recovery down模式时不能解复位modem*/
+    /*??????recovery down????????????????modem*/
     if(!bsp_need_loadmodem())
 	{
         printk(KERN_ERR "upload or charge mode, will not start modem.\n");
@@ -129,7 +129,7 @@ static int modem_sysboot_start_init(void *data)
         printk(KERN_ERR "%s his_load_image_start_up fail ",__func__);
     }
 
-    /*只在MBB平台上需要发送复位请求中断*/
+    /*????MBB??????????????????????????*/
     ret = bsp_load_notify_ccpu_start();
     if (ret)
     {

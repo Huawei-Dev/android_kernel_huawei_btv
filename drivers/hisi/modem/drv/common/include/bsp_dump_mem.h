@@ -114,8 +114,6 @@ extern "C" {
 #define printk  SRE_Printf
 #endif
 
-
-
 /* area number supported by dump */
 #define DUMP_AREA_MAX_NUM   8   
 
@@ -163,7 +161,6 @@ typedef enum
 
 #ifndef __ASSEMBLY__
 
-/*头部接口要与rdr_area.h中定义格式相同*/
 #define DUMP_GLOBALE_TOP_HEAD_MAGIC          (0x44656164)
 struct dump_global_top_head_s {
 	u32 magic;
@@ -216,7 +213,7 @@ typedef struct _dump_area_head_s
     u32 magic_num;  
     u32 field_num;   
     u8  name[8]; 
-    u8  version[16]; /* cp 区域的0-3字节用例表示cp log是否保存完成，12-16字节用来表示当前是否在通话 */
+    u8  version[16];
 }dump_area_head_t;
 
 /* field map */
@@ -299,4 +296,3 @@ static u32 inline bsp_dump_mem_map(void)
 #endif
 
 #endif /* _BSP_DUMP_MEM_H */
-
