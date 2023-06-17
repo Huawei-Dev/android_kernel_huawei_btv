@@ -110,7 +110,6 @@ typedef int*                BSP_PBOOL;
 typedef void*               BSP_PVOID;
 typedef int*                BSP_PSTATUS;
 typedef BSP_S32             STATUS;
-typedef BSP_S32             UDI_HANDLE;
 
 #ifndef BSP_CONST
 #define BSP_CONST           const
@@ -153,7 +152,6 @@ typedef BSP_S32             UDI_HANDLE;
 #endif
 
 typedef int (*PWRCTRLFUNCPTRVOID)(void);
-typedef unsigned int (*PWRCTRLFUNCPTR)(unsigned int arg);     /* ptr to function returning int */
 
 #ifdef __OS_VXWORKS__
 #ifndef INLINE
