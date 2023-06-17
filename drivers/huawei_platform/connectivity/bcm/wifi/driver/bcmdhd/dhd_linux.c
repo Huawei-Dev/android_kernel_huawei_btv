@@ -5477,7 +5477,7 @@ dhd_allocate_if(dhd_pub_t *dhdpub, int ifidx, char *name,
 
 	ASSERT(dhdinfo && (ifidx < DHD_MAX_IFS));
 	if (NULL == dhdinfo)
-		return;
+		return NULL;
 
 	ifp = dhdinfo->iflist[ifidx];
 
@@ -6452,7 +6452,7 @@ dhd_bus_start(dhd_pub_t *dhdp)
 
 	ASSERT(dhd);
 	if (NULL == dhd)
-		return;
+		return -1;
 
 	DHD_TRACE(("Enter %s:\n", __FUNCTION__));
 #ifdef HW_WIFI_DMD_LOG
@@ -8362,13 +8362,13 @@ dhd_register_if(dhd_pub_t *dhdp, int ifidx, bool need_rtnl_lock)
 
 	ASSERT(dhd && dhd->iflist[ifidx]);
 	if (NULL == dhd)
-                return;
+                return NULL;
 
 	ifp = dhd->iflist[ifidx];
 	net = ifp->net;
 	ASSERT(net && (ifp->idx == ifidx));
 	if (NULL == net)
-		return;
+		return NULL;
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 31))
 	ASSERT(!net->open);

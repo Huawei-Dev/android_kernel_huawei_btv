@@ -17304,7 +17304,7 @@ static s32 wl_create_event_handler(struct bcm_cfg80211 *cfg)
 	int ret = 0;
 	WL_DBG(("Enter \n"));
 	if(NULL == cfg)
-		return;
+		return 0;
 
 	/* Do not use DHD in cfg driver */
 	cfg->event_tsk.thr_pid = -1;

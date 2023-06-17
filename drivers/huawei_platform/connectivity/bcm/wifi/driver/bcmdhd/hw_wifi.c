@@ -1722,7 +1722,7 @@ int hw_get_filter_pkg_stat(hw_wifi_filter_item *list, int max_count, int* count)
 
 exit:
     MFREE(hw_dhd_pub_t->osh, iovbuf, WLC_IOCTL_MAXLEN);
-    return;
+    return ret;
 }
 #endif
 #ifdef HW_LP_OVERSEA
