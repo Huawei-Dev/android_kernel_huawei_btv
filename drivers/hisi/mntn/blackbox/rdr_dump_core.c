@@ -361,12 +361,11 @@ bool need_save_dfxbuffer2file(u64 reboot_type, u64 bootup_keypoint)
 		return false;
 	}
 
-	if (REBOOT_REASON_LABEL8 <= reboot_type
-	    && REBOOT_REASON_LABEL9 > reboot_type) {
-		BB_PRINT_ERR("%s():%d:reboot_type is [0x%llx]\n",
-			__func__, __LINE__, reboot_type);
-		return false;
-	}
+        if (reboot_type == REBOOT_REASON_LABEL8) {
+            BB_PRINT_ERR("%s():%d:reboot_type is [0x%llx]\n",
+                 __func__, __LINE__, reboot_type);
+                return false;
+        }
 
 	return true;
 }
