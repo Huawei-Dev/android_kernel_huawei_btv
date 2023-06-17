@@ -290,7 +290,7 @@ MAILBOX_EXTERN int mailbox_init_platform(void)
             init_waitqueue_head(&local_proc->wait);
                 
             /* 创建邮箱收数据处理任务*/
-            task = kthread_run(mailbox_receive_task, (void*)local_proc, local_proc->proc_name);
+            task = kthread_run(mailbox_receive_task, (void*)local_proc, "%s", local_proc->proc_name);
             if (IS_ERR(task)) {
                 return mailbox_logerro_p1(MAILBOX_ERR_LINUX_TASK_CREATE, proc_id);
             }
