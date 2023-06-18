@@ -29,13 +29,19 @@
 /* traffic flow wait timeout */
 #define BST_FLOW_WAIT_TIMEOUT			(50)
 
-/* declare these functions to call the system update flow function */
-extern void bastet_update_if_tag_stat(const char *ifname,
-			uid_t uid, const struct sock *sk,
-			enum ifs_tx_rx direction, int proto, int bytes);
-extern int bastet_update_total_bytes(const char *dev_name,
-			int proto, unsigned long tx_bytes,
-			unsigned long rx_bytes);
+// Dummy functions since xt_qtaguid got deprecated by Google in favor of eBPF.
+void bastet_update_if_tag_stat(const char *ifname, uid_t uid,
+                                        const struct sock *sk,
+                                        enum ifs_tx_rx direction,
+                                        int proto, int bytes)
+{
+    return;
+}
+int bastet_update_total_bytes(const char *dev_name, int proto,
+                                unsigned long tx_bytes, unsigned long rx_bytes)
+{
+    return 0;
+}
 
 /* declare and define traffic flow parameter */
 static wait_queue_head_t bastet_flow_queue;
