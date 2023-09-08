@@ -27,6 +27,7 @@ source "drivers/huawei_platform/touthscreen/Kconfig"
 source "drivers/huawei_platform/usb/Kconfig"
 source "drivers/huawei_platform/vibrator/Kconfig"
 source "drivers/huawei_platform/voltage_detection/Kconfig"
+source "drivers/huawei_platform/emcom/Kconfig"
 
 endif #HUAWEI_PLATFORM
 

@@ -92,6 +92,7 @@ typedef enum {
 	BST_IND_FG_KEY_MSG,
 	BST_IND_FG_UID_SOCK_CHG,
 	BST_IND_HB_REPLY_RECV,
+	BST_IND_RRC_KEEP,
 } bst_ind_type;
 
 typedef enum {

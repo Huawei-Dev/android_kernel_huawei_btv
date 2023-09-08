@@ -22,3 +22,4 @@ obj-$(CONFIG_HUAWEI_TS)			+= touthscreen/
 obj-y						+= usb/
 obj-$(CONFIG_HUAWEI_VIBRATOR)			+= vibrator/
 obj-$(CONFIG_HW_VOLTAGE_DETECTION)		+= voltage_detection/
+obj-$(CONFIG_HUAWEI_EMCOM) += emcom/
