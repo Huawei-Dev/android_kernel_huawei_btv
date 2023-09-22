@@ -600,7 +600,7 @@ begin_test:
 	}
 
 end_test:
-	if (!test_result0) {
+	if (!test_result0) {
 		/* test OK*/
 		strcat(ts_test->test_result, "-1P");
 		
@@ -609,7 +609,7 @@ end_test:
 		GTP_ERROR("RawCap test:NG");
 	}
 
-	if (!test_result1) {
+	if (!test_result1) {
 		/* test OK*/
 		strcat(ts_test->test_result, "-2P");
 	} else {

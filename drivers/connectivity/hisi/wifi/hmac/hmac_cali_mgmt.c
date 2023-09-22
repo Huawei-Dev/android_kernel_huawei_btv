@@ -248,7 +248,7 @@ oal_uint32  hmac_save_cali_event(frw_event_mem_stru *pst_event_mem)
 
     pst_pay_load  = (hal_cali_hal2hmac_payload_stru *)OAL_NETBUF_DATA(pst_cali_save_event->pst_netbuf);
     pst_update_cali_channel = &pst_cali_data->st_cali_update_info;
-    //pst_update_cali_channel->ul_cali_time = 0;
+    //pst_update_cali_channel->ul_cali_time = 0;
 
     //OAL_IO_PRINT("pst_update_cali_channel->ul_cali_time %d : \r\n", pst_update_cali_channel->ul_cali_time);
     ul_netbuf_len = OAL_NETBUF_LEN(pst_cali_save_event->pst_netbuf);

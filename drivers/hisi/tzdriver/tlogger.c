@@ -1,4 +1,4 @@
-﻿
+
 /*******************************************************************************
  * This source code has been made available to you by HUAWEI on an
  * AS-IS basis. Anyone receiving this source code is licensed under HUAWEI

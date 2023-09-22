@@ -1,4 +1,4 @@
-﻿/*************************************************************************/ /*!
+/*************************************************************************/ /*!
 @File           pvdec_int.c
 @Title          Low-level PVDEC interface component
 @Copyright      Copyright (c) Imagination Technologies Ltd. All Rights Reserved

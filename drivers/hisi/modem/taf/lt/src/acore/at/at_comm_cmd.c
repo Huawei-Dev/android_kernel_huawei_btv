@@ -141,14 +141,14 @@ VOS_UINT32 Calc_CRC32(VOS_UINT8 *Packet, VOS_UINT32 dwLength)
     return CRC32;
 }
 
-/*****************************************************************************
+/*****************************************************************************
  函 数 名  : atSetLTCommCmdPara
- 功能描述  : 发送通用AT命令到TL C核
+ 功能描述  : 发送通用AT命令到TL C核
  输入参数  : ucClientId Client ID
-             ulTmode 模式
+             ulTmode 模式
  输出参数  : 无
  返 回 值  : 成功返回AT_OK，失败返回AT_ERROR
-*****************************************************************************/
+*****************************************************************************/
 
 VOS_UINT32 atSetLTCommCmdPara(VOS_UINT8 ucClientId)
 {
@@ -255,14 +255,14 @@ VOS_UINT32 atSetLTCommCmdPara(VOS_UINT8 ucClientId)
     return AT_ERROR;
 }
 
-/*****************************************************************************
+/*****************************************************************************
  函 数 名  : atSetLTCommCmdParaCnfProc
  功能描述  : 通用命令返回处理函数
  输入参数  : ucClientId Client ID
              pMsgBlock 消息内容
  输出参数  : 无
  返 回 值  : 成功返回AT_OK，失败返回AT_ERROR
-*****************************************************************************/
+*****************************************************************************/
 
 VOS_UINT32 atSetLTCommCmdParaCnfProc(VOS_UINT8 ucClientId, VOS_VOID *pMsgBlock)
 {
@@ -299,13 +299,13 @@ VOS_UINT32 atSetLTCommCmdParaCnfProc(VOS_UINT8 ucClientId, VOS_VOID *pMsgBlock)
     return AT_FW_CLIENT_STATUS_READY;
 }
 
-/*****************************************************************************
+/*****************************************************************************
  函 数 名  : atQryLTCommCmdPara
- 功能描述  : 发送通用AT命令查询到TL C核
+ 功能描述  : 发送通用AT命令查询到TL C核
  输入参数  : ucClientId Client ID
  输出参数  : 无
  返 回 值  : 成功返回AT_OK，失败返回AT_ERROR
-*****************************************************************************/
+*****************************************************************************/
 
 VOS_UINT32 atQryLTCommCmdPara(VOS_UINT8 ucClientId)
 {
@@ -324,14 +324,14 @@ VOS_UINT32 atQryLTCommCmdPara(VOS_UINT8 ucClientId)
     return AT_ERROR;
 }
 
-/*****************************************************************************
+/*****************************************************************************
  函 数 名  : atQryLTCommCmdParaCnfProc
  功能描述  : 通用AT命令查询返回处理函数
  输入参数  : ucClientId Client ID
              pMsgBlock 消息内容
  输出参数  : 无
  返 回 值  : 成功返回AT_OK，失败返回AT_ERROR
-*****************************************************************************/
+*****************************************************************************/
 
 VOS_UINT32 atQryLTCommCmdParaCnfProc(VOS_UINT8 ucClientId, VOS_VOID *pMsgBlock)
 {

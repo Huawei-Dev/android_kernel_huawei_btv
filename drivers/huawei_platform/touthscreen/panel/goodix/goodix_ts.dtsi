@@ -58,7 +58,7 @@ touchscreen {
 			y_max_mt = <1920>;
 			x_max_mt = <1080>;
 			raw_data_limit = <2300 1000  300>;     /*rawdata-max*/ 
-			shortciurt_threshold = <10 800 800 800 500 500 31>;
+			shortciurt_threshold = <10 800 800 800 500 500 31>;
 			normal_config = [45 00 fe f4 a5 a6 ...];
 			glove_config = [45 00 fe f4 a5 a6 ...];
 			holster_config = [45 00 fe f4 a5 a6 ...];
@@ -70,7 +70,7 @@ touchscreen {
 			y_max_mt = <1920>;
 			x_max_mt = <1080>;
 			raw_data_limit = <2300 1000  300>;     /*rawdata-max*/ 
-			shortciurt_threshold = <10 800 800 800 500 500 31>;
+			shortciurt_threshold = <10 800 800 800 500 500 31>;
 			normal_config = [45 00 fe f4 a5 a6 ...];
 			glove_config = [45 00 fe f4 a5 a6 ...];
 			holster_config = [45 00 fe f4 a5 a6 ...];

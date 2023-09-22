@@ -102,7 +102,7 @@ void dump_save_momdem_reset_info(u32 modid,char* name);
 s32 dump_base_info_init(void);
 u32 dump_match_rdr_mod_id(u32 drv_mod_id);
 void dump_wait_for_reboot(void);
-s32 dump_register_hook(void);
+s32 dump_register_hook(void);
 void dump_init_done(void);
 int bsp_om_debug_init(void);
 s32 dump_config_init(void);

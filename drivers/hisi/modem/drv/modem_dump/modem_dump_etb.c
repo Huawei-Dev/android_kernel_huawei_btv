@@ -328,7 +328,7 @@ s32 dump_get_sysctrl_status(void)
 *
 *****************************************************************************/
 s32 dump_coresight_memmap(void)
-{  
+{  
 
     struct device_node* cs_node = NULL;
     unsigned int reg_data[2] = {0,};

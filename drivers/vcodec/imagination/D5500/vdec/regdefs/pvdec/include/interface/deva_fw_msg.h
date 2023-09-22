@@ -1,4 +1,4 @@
-﻿/*************************************************************************/ /*!
+/*************************************************************************/ /*!
 @File           /home/jenkins/builds/workspace/PKG_PVRVIDEO_REL_6.1.0/D5500_VXE384/img/vdec/regdefs/pvdec/include/interface/deva_fw_msg.h
 @Title          
 @Copyright      Copyright (c) Imagination Technologies Ltd. All Rights Reserved
