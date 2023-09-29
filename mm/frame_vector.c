@@ -31,7 +31,7 @@
  * This function takes care of grabbing mmap_sem as necessary.
  */
 int get_vaddr_frames(unsigned long start, unsigned int nr_frames,
-		     unsigned int gup_flags, struct frame_vector *vec)
+		     bool write, bool force, struct frame_vector *vec)
 {
 	struct mm_struct *mm = current->mm;
 	struct vm_area_struct *vma;
@@ -56,7 +56,7 @@ int get_vaddr_frames(unsigned long start, unsigned int nr_frames,
 		vec->got_ref = true;
 		vec->is_pfns = false;
 		ret = get_user_pages_locked(current, mm, start, nr_frames,
-			gup_flags, (struct page **)(vec->ptrs), &locked);
+			write, force, (struct page **)(vec->ptrs), &locked);
 		goto out;
 	}
 

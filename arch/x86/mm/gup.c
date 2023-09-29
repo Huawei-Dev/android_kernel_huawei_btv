@@ -390,7 +390,7 @@ slow_irqon:
 
 		ret = get_user_pages_unlocked(current, mm, start,
 					      (end - start) >> PAGE_SHIFT,
-					      pages, write ? FOLL_WRITE : 0);
+					      write, 0, pages);
 
 		/* Have to be a bit careful with return values */
 		if (nr > 0) {

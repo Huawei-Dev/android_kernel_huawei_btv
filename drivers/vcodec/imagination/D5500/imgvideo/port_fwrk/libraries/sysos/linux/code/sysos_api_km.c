@@ -1131,7 +1131,7 @@ IMG_UINT64 SYSOSKM_CpuUmAddrToCpuPAddr(
     int            ret;
 
     down_read(&current->mm->mmap_sem);
-    ret = get_user_pages(current, current->mm, (unsigned long)pvCpuUmAddr & PAGE_MASK, 1, 0, pg, NULL);
+    ret = get_user_pages(current, current->mm, (unsigned long)pvCpuUmAddr & PAGE_MASK, 1, 0, 0, pg, NULL);
     up_read(&current->mm->mmap_sem);
     if(ret <= 0)
     {
@@ -1575,7 +1575,7 @@ IMG_RESULT SYSOSKM_CpuUmAddrToCpuPAddrArray(
 
     down_write(&current->mm->mmap_sem);
     ret = get_user_pages(current, current->mm, umAddr,
-                         numPages, 1, pages, vmas);
+                         numPages, 1, 0, pages, vmas);
 
 #if defined(__i386__) || defined(__x86_64__)
     /* Set memory as uncached */

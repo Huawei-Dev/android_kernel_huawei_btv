@@ -150,7 +150,7 @@ static int usnic_uiom_get_pages(unsigned long addr, size_t size, int writable,
 		ret = get_user_pages(current, current->mm, cur_base,
 					min_t(unsigned long, npages,
 					PAGE_SIZE / sizeof(struct page *)),
-					gup_flags, page_list, NULL);
+					1, !writable, page_list, NULL);
 
 		if (ret < 0)
 			goto out;
