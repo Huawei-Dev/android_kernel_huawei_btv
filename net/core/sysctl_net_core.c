@@ -429,15 +429,6 @@ static struct ctl_table netns_core_table[] = {
 		.extra1		= &zero,
 		.proc_handler	= proc_dointvec_minmax
 	},
-	{
-		.procname	= "max_skb_frags",
-		.data		= &sysctl_max_skb_frags,
-		.maxlen		= sizeof(int),
-		.mode		= 0644,
-		.proc_handler	= proc_dointvec_minmax,
-		.extra1		= &one,
-		.extra2		= &max_skb_frags,
-	},
 	{ }
 };
 
