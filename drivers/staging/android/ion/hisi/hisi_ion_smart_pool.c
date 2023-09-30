@@ -29,6 +29,7 @@
 #include <linux/sizes.h>
 #include <linux/module.h>
 #include <linux/kthread.h>
+#include <linux/kernel.h>
 
 #include "ion.h"
 #include "hisi_ion_smart_pool.h"
@@ -41,17 +42,15 @@
 static bool smart_pool_enable = true;
 static int smart_pool_alloc_size;
 
-struct task_struct *smart_pool_thread;
+static struct task_struct *smart_pool_thread;
 static wait_queue_head_t smart_pool_wait;
 static unsigned int smart_pool_wait_flag;
 
-int smart_pool_water_mark = 24 * 64 * 4;
+static int smart_pool_water_mark = 24 * 64 * 4;
 
-static unsigned int smart_pool_orders[] = {8, 4, 0};
+static const unsigned int smart_pool_orders[] = {8, 4, 0};
 
 static const int smart_pool_num_orders = ARRAY_SIZE(smart_pool_orders);
-
-#define SMART_POOL_MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 bool ion_smart_is_graphic_buffer(struct ion_buffer *buffer)
 {
@@ -222,7 +221,7 @@ void ion_smart_pool_wakeup_process(void)
 	wake_up_interruptible(&smart_pool_wait);
 }
 
-void ion_smart_pool_all_free(struct ion_smart_pool *pool, gfp_t gfp_mask,
+static void ion_smart_pool_all_free(struct ion_smart_pool *pool, gfp_t gfp_mask,
 			     int nr_to_scan)
 {
 	int i;
@@ -278,7 +277,7 @@ int ion_smart_pool_shrink(struct ion_smart_pool *smart_pool,
 
 	nr_max_free = sp_pool_total_pages(smart_pool) -
 	    (smart_pool_water_mark + LOWORDER_WATER_MASK);
-	nr_to_free = SMART_POOL_MIN(nr_max_free, nr_to_scan);
+	nr_to_free = min(nr_max_free, nr_to_scan);
 
 	if (nr_to_free <= 0)
 		return 0;
@@ -337,10 +336,11 @@ free_heap:
 	return NULL;
 }
 
+#ifdef HISI_SMARTPOOL_DEBUG
 module_param_named(debug_smart_pool_enable, smart_pool_enable, bool, 0644);
 MODULE_PARM_DESC(debug_smart_pool_enable, "enable smart pool");
 
 module_param_named(debug_smart_pool_alloc_size, smart_pool_alloc_size, int,
 		0644);
 MODULE_PARM_DESC(debug_smart_pool_alloc_size, "alloc size from smartpool");
-/*lint -restore*/
+#endif

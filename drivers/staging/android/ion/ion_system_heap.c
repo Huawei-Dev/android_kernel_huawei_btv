@@ -37,7 +37,7 @@
 #include "hisi/hisi_ion_scene_pool.h"
 #endif
 
-static gfp_t high_order_gfp_flags = (GFP_USER | __GFP_NOWARN |
+static gfp_t high_order_gfp_flags = (GFP_USER | __GFP_ZERO | __GFP_NOWARN |
 				     __GFP_NORETRY) & ~__GFP_DIRECT_RECLAIM;
 static gfp_t low_order_gfp_flags  = GFP_USER;
 
@@ -479,7 +479,7 @@ static int ion_system_heap_debug_show(struct ion_heap *heap, struct seq_file *s,
 	if (sys_heap->scene_pool) {
 		ion_scene_pool_debug_show_total(s, sys_heap->scene_pool);
 
-		for (i = 0; i < NUM_ORDERS; i++) {/*lint !e574*/
+		for (i = 0; i < NUM_ORDERS; i++) {
 			struct ion_page_pool *pool =
 				sys_heap->scene_pool->pools[i];
 
@@ -583,12 +583,18 @@ struct ion_heap *ion_system_heap_create(struct ion_platform_heap *unused)
 
 	return &heap->heap;
 
-#ifdef CONFIG_HISI_SMARTPOOL_OPT
 #ifdef CONFIG_HISI_SPECIAL_SCENE_POOL
+#ifdef CONFIG_HISI_SMARTPOOL_OPT
 detroy_smart_pool:
 	ion_scene_pool_destroy(heap->scene_pool);
 	heap->scene_pool = NULL;
+#else
+destroy_pools:
+	ion_system_heap_destroy_pools(heap->cached_pools);
 #endif
+#endif
+
+#ifdef CONFIG_HISI_SMARTPOOL_OPT
 destroy_pools:
 	ion_system_heap_destroy_pools(heap->cached_pools);
 #endif

@@ -132,7 +132,11 @@ static int seccm_create_pool(
 
 	ion_sec_dbg("into %s\n", __func__);
 
-	seccm_heap->flag = flag;
+	if (flag & ION_FLAG_SECURE_BUFFER)
+		seccm_heap->flag = ION_FLAG_SECURE_BUFFER;
+	else
+		seccm_heap->flag = 0;
+
 	cma_base = cma_get_base(seccm_heap->cma);
 	cma_size = cma_get_size(seccm_heap->cma);
 	seccm_heap->pool = gen_pool_create(12, -1);
@@ -201,6 +205,8 @@ static int seccm_create_pool(
 			sec_cfg.sec_port = seccm_heap->attr;
 			hisi_sec_ddr_set(&sec_cfg, (int)seccm_heap->protect_id);
 		}
+		else
+			memset(page_address(pg), 0x0, per_alloc_sz); /* unsafe_function_ignore: memset  */
 		nr--;
 	}
 
@@ -269,7 +275,9 @@ static void seccm_add_pool(struct ion_seccm_heap *seccm_heap)
 			sec_cfg.sec_port = seccm_heap->attr;
 			hisi_sec_ddr_set(&sec_cfg, (int)seccm_heap->protect_id);
 		}
-		nr--;
+		else
+			memset(page_address(pg), 0x0, per_alloc_sz); /* unsafe_function_ignore: memset  */
+		nr--; 
 	}
 
 	ion_sec_dbg("out %s %llu MB memory bitmap 0x%llx\n", __func__,
@@ -339,7 +347,7 @@ static ion_phys_addr_t seccm_alloc(struct ion_heap *heap,
 	struct ion_seccm_heap *seccm_heap =
 		container_of(heap, struct ion_seccm_heap, heap);
 
-	ion_sec_dbg("into %s\n", __func__);
+	ion_sec_dbg("into %s %d %lx\n", __func__, heap->id, size);
 
 	mutex_lock(&seccm_heap->mutex);
 
@@ -352,7 +360,14 @@ static ion_phys_addr_t seccm_alloc(struct ion_heap *heap,
 	if (!seccm_heap->pool &&
 	    seccm_create_pool(seccm_heap, flag)) {
 		pr_err("seccm_create_pool is failed\n");
-		return 0;
+		offset = 0;
+		goto err;
+	}
+
+	if (seccm_heap->flag != (flag & ION_FLAG_SECURE_BUFFER)) {
+		pr_err("seccm_heap->flag is not same\n");
+		offset = 0;
+		goto err;
 	}
 
 	offset = gen_pool_alloc(seccm_heap->pool, size);
@@ -367,9 +382,10 @@ static ion_phys_addr_t seccm_alloc(struct ion_heap *heap,
 		if (!seccm_heap->alloc_size)
 			seccm_destroy_pool(seccm_heap);
 
+err:
 	mutex_unlock(&seccm_heap->mutex);
 
-	ion_sec_dbg("out %s\n", __func__);
+	ion_sec_dbg("out %s %lx\n", __func__, offset);
 	return offset;
 }
 
@@ -379,7 +395,7 @@ static void seccm_free(struct ion_heap *heap, ion_phys_addr_t addr,
 	struct ion_seccm_heap *seccm_heap =
 		container_of(heap, struct ion_seccm_heap, heap);
 
-	ion_sec_dbg("into %s\n", __func__);
+	ion_sec_dbg("into %s  %d %lx\n", __func__, heap->id, addr);
 
 	mutex_lock(&seccm_heap->mutex);
 
@@ -406,6 +422,12 @@ static int ion_seccm_heap_allocate(struct ion_heap *heap,
 
 	if (align > PAGE_SIZE)
 		return -EINVAL;
+
+	if ((heap->id == ION_MISC_HEAP_ID) &&
+	    (flags & ION_FLAG_SECURE_BUFFER)) {
+		pr_err("%s:unsec heap could not alloc sec mem!\n", __func__);
+		return -EINVAL;
+	}
 
 	table = kzalloc(sizeof(*table), GFP_KERNEL);
 	if (!table)
@@ -444,6 +466,9 @@ static void ion_seccm_heap_free(struct ion_buffer *buffer)
 
 	ion_sec_dbg("into %s size 0x%lx heap id %u\n", __func__,
 		    buffer->size, heap->id);
+
+	if (!(buffer->flags & ION_FLAG_SECURE_BUFFER))
+		(void)ion_heap_buffer_zero(buffer);
 
 	seccm_free(heap, paddr, buffer->size);
 	sg_free_table(table);

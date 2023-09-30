@@ -55,7 +55,7 @@ int hisi_ion_memory_info(bool verbose)
 #endif
 	if (!verbose)
 		return 0;
-	down_read(&dev->lock);
+	down_read(&dev->client_lock);
 	for (n = rb_first(&dev->clients); n; n = rb_next(n)) {
 		struct ion_client *client = rb_entry(n,
 				struct ion_client, node);
@@ -74,7 +74,8 @@ int hisi_ion_memory_info(bool verbose)
 				client->name, client->pid, size);
 		}
 	}
-	up_read(&dev->lock);
+	up_read(&dev->client_lock);
+	pr_info("orphaned allocations (info is from last known client):\n");
 	mutex_lock(&dev->buffer_lock);
 	for (n = rb_first(&dev->buffers); n; n = rb_next(n)) {
 		struct ion_buffer *buffer = rb_entry(n, struct ion_buffer,

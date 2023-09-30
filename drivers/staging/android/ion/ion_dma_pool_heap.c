@@ -27,6 +27,7 @@
 #include <linux/slab.h>
 #include <linux/vmalloc.h>
 #include <linux/time.h>
+#include <linux/of_fdt.h>
 #include <linux/of_reserved_mem.h>
 #include <linux/dma-contiguous.h>
 #include <linux/cma.h>
@@ -58,6 +59,37 @@ struct ion_dma_pool_heap {
 struct cma *ion_dma_camera_cma;
 static struct ion_dma_pool_heap *ion_dma_camera_heap;
 static DECLARE_WORK(ion_pre_alloc_wk, pre_alloc_wk_func);
+
+struct cma *hisi_camera_pool;
+
+static int  hisi_camera_pool_set_up(struct reserved_mem *rmem)
+{
+	phys_addr_t align = PAGE_SIZE << max(MAX_ORDER - 1, pageblock_order);
+	phys_addr_t mask = align - 1;
+	unsigned long node = rmem->fdt_node;
+	struct cma *cma;
+	int err;
+
+	if (!of_get_flat_dt_prop(node, "reusable", NULL) ||
+	    of_get_flat_dt_prop(node, "no-map", NULL))
+		return -EINVAL;
+
+	if ((rmem->base & mask) || (rmem->size & mask)) {
+		pr_err("Reserved memory: incorrect alignment of CMA region\n");
+		return -EINVAL;
+	}
+	err = cma_init_reserved_mem(rmem->base, rmem->size, 0, &cma);
+	if (err) {
+		pr_err("Reserved memory: unable to setup CMA region\n");
+		return err;
+	}
+
+	hisi_camera_pool = cma;
+
+	return 0;
+}
+
+RESERVEDMEM_OF_DECLARE(hisi_camera_pool, "hisi-camera-pool", hisi_camera_pool_set_up);
 
 void ion_register_dma_camera_cma(void *p)
 {
@@ -116,13 +148,10 @@ static void pre_alloc_wk_func(struct work_struct *work)
 	if (!ion_dma_camera_heap)
 		return;
 
-	page = cma_alloc(ion_dma_camera_cma, PREALLOC_CNT, PREALLOC_ALIGN);/*lint !e838*/
+	page = cma_alloc(ion_dma_camera_cma, PREALLOC_CNT, PREALLOC_ALIGN);
 	if (page) {
 		addr = page_to_phys(page);
-		memset(phys_to_virt(addr), 0x0, PREALLOC_CNT * PAGE_SIZE);
-		gen_pool_free(ion_dma_camera_heap->pool,
-			      page_to_phys(page),
-			      PREALLOC_CNT * PAGE_SIZE);
+		memset(phys_to_virt(addr), 0x0, PREALLOC_CNT * PAGE_SIZE); /* unsafe_function_ignore: memset  */
 #ifdef CONFIG_HISI_KERNELDUMP
 		t_page = page;
 		for (k = 0; k < (int)PREALLOC_CNT; k++) {
@@ -130,6 +159,9 @@ static void pre_alloc_wk_func(struct work_struct *work)
 			t_page++;
 		}
 #endif
+		gen_pool_free(ion_dma_camera_heap->pool,
+			      page_to_phys(page),
+			      PREALLOC_CNT * PAGE_SIZE);
 
 #ifdef ION_DMA_POOL_DEBUG
 		t_ns = ktime_to_ns(ktime_sub(ktime_get(), t1));
@@ -139,14 +171,14 @@ static void pre_alloc_wk_func(struct work_struct *work)
 		return;
 	}
 	ion_clean_dma_camera_cma();
-}/*lint !e715*/
+}
 
 static ion_phys_addr_t ion_dma_pool_allocate(struct ion_heap *heap,
 				      unsigned long size,
 				      unsigned long align)
 {
 	struct ion_dma_pool_heap *dma_pool_heap =
-		container_of(heap, struct ion_dma_pool_heap, heap);/*lint !e826*/
+		container_of(heap, struct ion_dma_pool_heap, heap);
 
 
 	unsigned long offset = gen_pool_alloc(dma_pool_heap->pool, size);
@@ -155,25 +187,26 @@ static ion_phys_addr_t ion_dma_pool_allocate(struct ion_heap *heap,
 			schedule_work(&ion_pre_alloc_wk);
 		return (ion_phys_addr_t)-1L;
 	}
-	atomic64_add(size, &dma_pool_heap->alloc_size);/*lint !e713*/
+	atomic64_add(size, &dma_pool_heap->alloc_size);
 	return offset;
-}/*lint !e715*/
+}
 
 static void ion_dma_pool_free(struct ion_heap *heap, ion_phys_addr_t addr,
 		       unsigned long size)
 {
 	struct ion_dma_pool_heap *dma_pool_heap =
-		container_of(heap, struct ion_dma_pool_heap, heap);/*lint !e826*/
+		container_of(heap, struct ion_dma_pool_heap, heap);
 
 	if (addr == (ion_phys_addr_t)-1L)
 		return;
 
-	atomic64_sub(size, &dma_pool_heap->alloc_size);/*lint !e713*/
+	atomic64_sub(size, &dma_pool_heap->alloc_size);
+	
+	memset(phys_to_virt(addr), 0x0, size); /* unsafe_function_ignore: memset  */
 
 	if (heap->id == ION_CAMERA_DAEMON_HEAP_ID) {
-		memset(phys_to_virt(addr), 0x0, size);
 		if (ion_dma_camera_cma
-		    && (!cma_release(ion_dma_camera_cma,  phys_to_page(addr), size / PAGE_SIZE)))/*lint !e712 !e747*/
+		    && (!cma_release(ion_dma_camera_cma,  phys_to_page(addr), size / PAGE_SIZE)))
 			pr_err("cma release failed\n");
 		if (atomic64_sub_and_test(0L, &dma_pool_heap->alloc_size))
 			ion_clean_dma_camera_cma();
@@ -193,7 +226,7 @@ static int ion_dma_pool_heap_phys(struct ion_heap *heap,
 	*addr = paddr;
 	*len = buffer->size;
 	return 0;
-}/*lint !e715*/
+}
 
 static int ion_dma_pool_heap_allocate(struct ion_heap *heap,
 				      struct ion_buffer *buffer,
@@ -230,7 +263,7 @@ err_free_table:
 err_free:
 	kfree(table);
 	return ret;
-}/*lint !e715*/
+}
 
 static void ion_dma_pool_heap_free(struct ion_buffer *buffer)
 {
@@ -255,12 +288,12 @@ static struct sg_table *ion_dma_pool_heap_map_dma(struct ion_heap *heap,
 						  struct ion_buffer *buffer)
 {
 	return buffer->priv_virt;
-}/*lint !e715*/
+}
 
 static void ion_dma_pool_heap_unmap_dma(struct ion_heap *heap,
 					struct ion_buffer *buffer)
 {
-}/*lint !e715*/
+}
 
 static void ion_dma_pool_heap_buffer_zero(struct ion_buffer *buffer)
 {
@@ -279,12 +312,15 @@ static struct ion_heap_ops dma_pool_heap_ops = {
 	.map_iommu = ion_heap_map_iommu,
 	.unmap_iommu = ion_heap_unmap_iommu,
 	.buffer_zero = ion_dma_pool_heap_buffer_zero,
-};/*lint !e785*/
+};
 
 static struct ion_heap *ion_dynamic_dma_pool_heap_create(struct ion_platform_heap *heap_data)
 {
 	struct ion_dma_pool_heap *dma_pool_heap =
 				kzalloc(sizeof(struct ion_dma_pool_heap), GFP_KERNEL);
+				
+	if(!dma_pool_heap)
+		return ERR_PTR(-ENOMEM);
 
 	dma_pool_heap->heap.ops = &dma_pool_heap_ops;
 	dma_pool_heap->heap.type = ION_HEAP_TYPE_DMA_POOL;
@@ -318,25 +354,23 @@ pool_create_err:
 alloc_err:
 	kfree(dma_pool_heap);
 
-	return ERR_PTR(-ENOMEM);/*lint !e747*/
-}/*lint !e715*/
+	return ERR_PTR(-ENOMEM);
+}
 
-struct ion_heap *ion_static_dma_pool_heap_create(struct ion_platform_heap *heap_data)/*lint !e715*/
+struct ion_heap *ion_static_dma_pool_heap_create(struct ion_platform_heap *heap_data)
 {
 	struct ion_dma_pool_heap *dma_pool_heap;
 	int ret, k;
-	struct device *dev;
 	struct page *page, *t_page;
 	size_t size;
 
-	dev = (struct device *)heap_data->priv;
-	if (of_reserved_mem_device_init(dev))
-		return ERR_PTR(-ENOMEM);/*lint !e747*/
+	if (!hisi_camera_pool)
+		return ERR_PTR(-ENOMEM);
 
-	size = cma_get_size(dev_get_cma_area(dev));
-	page = dma_alloc_from_contiguous(dev, size >> PAGE_SHIFT, 0);
+	size = cma_get_size(hisi_camera_pool);
+	page = cma_alloc(hisi_camera_pool, size >> PAGE_SHIFT, 0);
 	if (!page)
-		return ERR_PTR(-ENOMEM);/*lint !e747*/
+		return ERR_PTR(-ENOMEM);
 
 #ifdef CONFIG_HISI_KERNELDUMP
 		t_page = page;
@@ -350,16 +384,16 @@ struct ion_heap *ion_static_dma_pool_heap_create(struct ion_platform_heap *heap_
 
 	ret = ion_heap_pages_zero(page, size, pgprot_writecombine(PAGE_KERNEL));
 	if (ret)
-		return ERR_PTR(ret);/*lint !e747*/
+		return ERR_PTR(ret);
 
 	dma_pool_heap = kzalloc(sizeof(struct ion_dma_pool_heap), GFP_KERNEL);
 	if (!dma_pool_heap)
-		return ERR_PTR(-ENOMEM);/*lint !e747*/
+		return ERR_PTR(-ENOMEM);
 
 	dma_pool_heap->pool = gen_pool_create(PAGE_SHIFT, -1);
 	if (!dma_pool_heap->pool) {
 		kfree(dma_pool_heap);
-		return ERR_PTR(-ENOMEM);/*lint !e747*/
+		return ERR_PTR(-ENOMEM);
 	}
 
 	dma_pool_heap->base = page_to_phys(page);
@@ -369,7 +403,6 @@ struct ion_heap *ion_static_dma_pool_heap_create(struct ion_platform_heap *heap_
 	dma_pool_heap->heap.ops = &dma_pool_heap_ops;
 	dma_pool_heap->heap.type = ION_HEAP_TYPE_DMA_POOL;
 	dma_pool_heap->heap.flags = ION_HEAP_FLAG_DEFER_FREE;
-	dma_pool_heap->dev = dev;
 	atomic64_set(&dma_pool_heap->alloc_size, 0);
 
 	heap_data->size = size;
@@ -378,7 +411,7 @@ struct ion_heap *ion_static_dma_pool_heap_create(struct ion_platform_heap *heap_
 	return &dma_pool_heap->heap;
 }
 
-struct ion_heap *ion_dma_pool_heap_create(struct ion_platform_heap *heap_data)/*lint !e715*/
+struct ion_heap *ion_dma_pool_heap_create(struct ion_platform_heap *heap_data)
 {
 	if (heap_data->id == ION_CAMERA_DAEMON_HEAP_ID)
 		return ion_dynamic_dma_pool_heap_create(heap_data);
@@ -390,25 +423,27 @@ struct ion_heap *ion_dma_pool_heap_create(struct ion_platform_heap *heap_data)/*
 static void ion_dynamic_dma_pool_heap_destroy(struct ion_heap *heap)
 {
 	struct ion_dma_pool_heap *dma_pool_heap =
-	     container_of(heap, struct  ion_dma_pool_heap, heap);/*lint !e826*/
+	     container_of(heap, struct  ion_dma_pool_heap, heap);
 	kfree(dma_pool_heap);
 	dma_pool_heap = NULL;
-}/*lint !e438*/
+}
 
-void ion_static_dma_pool_heap_destroy(struct ion_heap *heap)/*lint !e438*/
+void ion_static_dma_pool_heap_destroy(struct ion_heap *heap)
 {
 	struct ion_dma_pool_heap *dma_pool_heap =
-	     container_of(heap, struct  ion_dma_pool_heap, heap);/*lint !e826*/
+	     container_of(heap, struct  ion_dma_pool_heap, heap);
 	size_t size = dma_pool_heap->size;
 	struct page *page = phys_to_page(dma_pool_heap->base);
 
 	gen_pool_destroy(dma_pool_heap->pool);
-	dma_release_from_contiguous(dma_pool_heap->dev, page, (int)(size >> PAGE_SHIFT));
+	if (hisi_camera_pool)
+		if (!cma_release(hisi_camera_pool, page, (int)(size >> PAGE_SHIFT)))
+			pr_err("cma release failed\n");
 	kfree(dma_pool_heap);
 	dma_pool_heap = NULL;
-}/*lint !e438*/
+}
 
-void ion_dma_pool_heap_destroy(struct ion_heap *heap)/*lint !e438*/
+void ion_dma_pool_heap_destroy(struct ion_heap *heap)
 {
 	if (heap->id == ION_CAMERA_DAEMON_HEAP_ID)
 		ion_dynamic_dma_pool_heap_destroy(heap);
