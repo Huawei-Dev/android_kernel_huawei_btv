@@ -34,11 +34,10 @@ MALI_ERROR_INJECT_ON ?= 0
 MALI_MOCK_TEST ?= 0
 MALI_COVERAGE ?= 0
 MALI_INSTRUMENTATION_LEVEL ?= 0
-MALI_GMC ?= 1
 MALI_GMC_COMPRESS_SIZE ?= 20
 
-ifeq ($(CONFIG_GPU_GMC_GENERIC),)
-MALI_GMC = 0
+ifeq ($(CONFIG_GPU_GMC_GENERIC),y)
+MALI_GMC = 1
 endif
 
 # This workaround is for what seems to be a compiler bug we observed in

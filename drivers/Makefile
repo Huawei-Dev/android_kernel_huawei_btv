@@ -54,6 +54,8 @@ obj-y				+= char/
 # iommu/ comes before gpu as gpu are using iommu controllers
 obj-$(CONFIG_IOMMU_SUPPORT)	+= iommu/
 
+obj-$(CONFIG_GPU_GMC_GENERIC)	+= gpu/gmc/
+
 # gpu/ comes after char for AGP vs DRM startup and after iommu
 obj-y				+= gpu/drm/ gpu/host1x/ gpu/ipu-v3/ gpu/vga/
 obj-$(CONFIG_MALI_MIDGARD)	+= gpu/arm/
