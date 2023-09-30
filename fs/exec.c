@@ -206,7 +206,8 @@ static struct page *get_arg_page(struct linux_binprm *bprm, unsigned long pos,
 
 	if (write) {
 		unsigned long size = bprm->vma->vm_end - bprm->vma->vm_start;
-		unsigned long ptr_size, limit;
+		unsigned long ptr_size;
+		struct rlimit *rlim;
 
 		/*
 		 * Since the stack will hold pointers to the strings, we
@@ -242,9 +243,8 @@ static struct page *get_arg_page(struct linux_binprm *bprm, unsigned long pos,
 		 *  - the program will have a reasonable amount of stack left
 		 *    to work from.
 		 */
-		limit = _STK_LIM / 4 * 3;
-		limit = min(limit, rlimit(RLIMIT_STACK) / 4);
-		if (size > limit)
+		rlim = current->signal->rlim;
+		if (size > READ_ONCE(rlim[RLIMIT_STACK].rlim_cur) / 4)
 			goto fail;
 	}
 
