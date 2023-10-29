@@ -2309,7 +2309,7 @@ OAL_STATIC oal_int32 hwifi_config_host_global_ini_param(oal_void)
         pst_cfg_hmac_vap = (hmac_vap_stru *)mac_res_get_hmac_vap(0);
         if (OAL_PTR_NULL == pst_cfg_hmac_vap)
         {
-            OAM_WARNING_LOG0(0, OAM_SF_ANY, "{hwifi_config_host_global_ini_param::pst_cfg_hmac_vap is null¡£}\r\n");
+            OAM_WARNING_LOG0(0, OAM_SF_ANY, "{hwifi_config_host_global_ini_param::pst_cfg_hmac_vap is null!}\r\n");
             return -OAL_EFAUL;
         }
 
