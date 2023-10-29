@@ -671,11 +671,6 @@ static ssize_t hifi_debug_level_store(struct file *file, const char __user *buf,
 	g_om_data.debug_level = hifi_get_debug_level_num(level_str[0]);
 	return size;
 }
-static const struct file_operations hifi_debug_proc_ops = {
-	.owner = THIS_MODULE,
-	.read  = hifi_debug_level_show,
-	.write = hifi_debug_level_store,
-};
 
 static int hifi_send_str_todsp(const char* cmd_str, size_t size)
 {
@@ -804,12 +799,6 @@ static ssize_t hifi_dsp_fault_inject_store(struct file *file, const char __user 
 	return size;
 }
 
-static const struct file_operations hifi_dspfaultinject_proc_ops = {
-	.owner = THIS_MODULE,
-	.read  = hifi_dsp_fault_inject_show,
-	.write = hifi_dsp_fault_inject_store,
-};
-
 #define RESET_OPTION_LEN 100
 
 static ssize_t hifi_dsp_reset_option_show(struct file *file, char __user *buf,
@@ -859,15 +848,6 @@ static ssize_t hifi_dsp_reset_option_store(struct file *file, const char __user 
 	return size;
 }
 
-
-
-static const struct file_operations hifi_reset_option_proc_ops = {
-	.owner = THIS_MODULE,
-	.read  = hifi_dsp_reset_option_show,
-	.write = hifi_dsp_reset_option_store,
-};
-
-
 static ssize_t hifi_dsp_dump_log_show(struct file *file, char __user *buf,
 		size_t size, loff_t *ppos)
 {
@@ -894,13 +874,6 @@ static ssize_t hifi_dsp_dump_log_show(struct file *file, char __user *buf,
 
 	return ret;
 }
-
-static const struct file_operations hifi_dspdumplog_proc_ops = {
-	.owner = THIS_MODULE,
-	.read  = hifi_dsp_dump_log_show,
-};
-
-
 
 static void hifi_create_procfs(void)
 {
