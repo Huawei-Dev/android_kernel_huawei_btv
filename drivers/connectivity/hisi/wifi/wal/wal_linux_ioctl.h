@@ -293,7 +293,7 @@ extern oal_int32  wal_cfg_vap_h2d_event(oal_net_device_stru *pst_net_dev);
 #ifdef _PRE_PLAT_FEATURE_CUSTOMIZE
 extern oal_uint32 hwifi_config_init_dts_main(oal_net_device_stru *pst_cfg_net_dev);
 extern oal_int32 wal_set_custom_process_func(custom_cali_func p_fun);
-extern oal_bool_enum hwifi_config_init_nvram_main(oal_net_device_stru * pst_cfg_net_dev);
+extern oal_int32 hwifi_config_init_nvram_main(oal_net_device_stru * pst_cfg_net_dev);
 
 extern oal_uint32 wal_custom_cali(oal_void);
 extern oal_void hwifi_config_init_force(oal_void);
