@@ -3200,7 +3200,7 @@ OAL_STATIC oal_void hwifi_config_init_ini_main(oal_net_device_stru *pst_cfg_net_
     修改内容   : 新生成函数
 
 *****************************************************************************/
-oal_bool_enum hwifi_config_init_nvram_main(oal_net_device_stru *pst_cfg_net_dev)
+oal_int32 hwifi_config_init_nvram_main(oal_net_device_stru *pst_cfg_net_dev)
 {
     /* nvram 参数结构体 */
     struct nvram_params_stru
