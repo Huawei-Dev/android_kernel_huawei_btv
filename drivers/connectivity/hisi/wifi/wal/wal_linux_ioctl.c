@@ -15301,7 +15301,7 @@ oal_int32 wal_deinit_wlan_vap(oal_net_device_stru *pst_net_dev)
  函 数 名  : wal_get_mac_addr
  功能描述  : 初始化mac地址
  输入参数  : 无
- 输出参数  : uint8 *buf
+ 输出参数  : unsigned char *buf
  返 回 值  : oal_uint32
  调用函数  :
  被调函数  :

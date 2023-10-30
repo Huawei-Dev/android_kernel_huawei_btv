@@ -22,8 +22,8 @@
   5 EXTERN FUNCTION
 *****************************************************************************/
 
-extern int32 sdio_patch_writesb(uint8* buf, uint32 len);
-extern int32 sdio_patch_readsb(uint8* buf, uint32 len, uint32 timeout);
+extern int sdio_patch_writesb(unsigned char* buf, unsigned int len);
+extern int sdio_patch_readsb(unsigned char* buf, unsigned int len, unsigned int timeout);
 
 #endif
 

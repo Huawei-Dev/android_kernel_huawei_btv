@@ -11,14 +11,12 @@
 #include <linux/of.h>
 #include <linux/of_gpio.h>
 #endif
-    /*lint -e322*//*lint -e7*/
 #include <linux/clk.h>
 #include <linux/interrupt.h>
 #include <linux/platform_device.h>
 #include <linux/timer.h>
 #include <linux/delay.h>
 #include <linux/pinctrl/consumer.h>
-    /*lint +e322*//*lint +e7*/
 
 #include "board.h"
 #include "plat_debug.h"
@@ -35,10 +33,10 @@
  Function Definition
 ***
 **************************************************************************/
-int32 hi1103_get_board_gpio(void)
+int hi1103_get_board_gpio(void)
 {
-    int32 ret = BOARD_FAIL;
-    int32 physical_gpio = 0;
+    int ret = BOARD_FAIL;
+    int physical_gpio = 0;
 
     /*bfgn power*/
     ret = get_board_gpio(DTS_NODE_HI110X, DTS_PROP_GPIO_BFGX_POWEN_ON_ENABLE, &physical_gpio);
@@ -86,10 +84,10 @@ void hi1103_free_board_power_gpio(void)
     gpio_free(g_board_info.wlan_power_on_enbale);
 }
 
-int32 hi1103_board_wakeup_gpio_init(void)
+int hi1103_board_wakeup_gpio_init(void)
 {
-    int32 ret = BOARD_FAIL;
-    int32 physical_gpio = 0;
+    int ret = BOARD_FAIL;
+    int physical_gpio = 0;
 
     /*wifi wake host gpio request*/
     ret = get_board_gpio(DTS_NODE_HI110X_WIFI, DTS_PROP_GPIO_WLAN_WAKEUP_HOST, &physical_gpio);

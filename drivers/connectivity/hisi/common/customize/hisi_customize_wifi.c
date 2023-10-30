@@ -31,11 +31,11 @@ extern "C" {
 /*
  * 2 Global Variable Definition
  */
-int32 g_al_host_init_params[WLAN_CFG_INIT_BUTT] = {0};      /* ini定制化参数数组 */
-int32 g_al_dts_params[WLAN_CFG_DTS_BUTT] = {0};             /* dts定制化参数数组 */
-uint8 g_auc_nv_params[NUM_OF_NV_PARAMS] = {0};              /* nv定制化参数数组 */
-int8 g_ac_country_code[COUNTRY_CODE_LEN] = "00";
-uint8 g_auc_wifimac[MAC_LEN] = {0x00,0x00,0x00,0x00,0x00,0x00};
+int g_al_host_init_params[WLAN_CFG_INIT_BUTT] = {0};      /* ini定制化参数数组 */
+int g_al_dts_params[WLAN_CFG_DTS_BUTT] = {0};             /* dts定制化参数数组 */
+unsigned char g_auc_nv_params[NUM_OF_NV_PARAMS] = {0};              /* nv定制化参数数组 */
+char g_ac_country_code[COUNTRY_CODE_LEN] = "00";
+unsigned char g_auc_wifimac[MAC_LEN] = {0x00,0x00,0x00,0x00,0x00,0x00};
 
 /*
  * 定制化结构体
@@ -652,7 +652,7 @@ OAL_STATIC oal_void host_params_init_first(oal_void)
 OAL_STATIC regdomain_enum hwifi_get_regdomain_from_country_code(const countrycode_t country_code)
 {
     regdomain_enum  en_regdomain = REGDOMAIN_COMMON;
-    int32           table_idx = 0;
+    int           table_idx = 0;
 
     while (g_ast_country_info_table[table_idx].en_regdomain != REGDOMAIN_COUNT)
     {
@@ -685,7 +685,7 @@ OAL_STATIC regdomain_enum hwifi_get_regdomain_from_country_code(const countrycod
     修改内容   : 新生成函数
 
 *****************************************************************************/
-int32 hwifi_is_regdomain_changed(const countrycode_t country_code_old, const countrycode_t country_code_new)
+int hwifi_is_regdomain_changed(const countrycode_t country_code_old, const countrycode_t country_code_new)
 {
     return hwifi_get_regdomain_from_country_code(country_code_old) != hwifi_get_regdomain_from_country_code(country_code_new);
 }
@@ -705,10 +705,10 @@ int32 hwifi_is_regdomain_changed(const countrycode_t country_code_old, const cou
     修改内容   : 新生成函数
 
 *****************************************************************************/
-OAL_STATIC int32 hwifi_get_plat_tag_from_country_code(const countrycode_t country_code)
+OAL_STATIC int hwifi_get_plat_tag_from_country_code(const countrycode_t country_code)
 {
     regdomain_enum  en_regdomain;
-    int32           table_idx = 0;
+    int           table_idx = 0;
 
     en_regdomain = hwifi_get_regdomain_from_country_code(country_code);
 
@@ -743,11 +743,11 @@ OAL_STATIC int32 hwifi_get_plat_tag_from_country_code(const countrycode_t countr
     修改内容   : 新生成函数
 
 *****************************************************************************/
-int32 hwifi_fetch_ori_caldata(uint8* auc_caldata, int32 l_nvm_len)
+int hwifi_fetch_ori_caldata(unsigned char* auc_caldata, int l_nvm_len)
 {
-    int32 l_ret = INI_FAILED;
-    int32 l_cfg_id;
-    int32 aul_nvram_params[NVRAM_PARAMS_INDEX_BUTT]={0};
+    int l_ret = INI_FAILED;
+    int l_cfg_id;
+    int aul_nvram_params[NVRAM_PARAMS_INDEX_BUTT]={0};
 
     if (l_nvm_len != HISI_CUST_NVRAM_LEN)
     {
@@ -788,13 +788,13 @@ int32 hwifi_fetch_ori_caldata(uint8* auc_caldata, int32 l_nvm_len)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-OAL_STATIC int32 hwifi_config_init_nvram(void)
+OAL_STATIC int hwifi_config_init_nvram(void)
 {
     OAL_STATIC oal_bool_enum en_nvm_initialed = OAL_FALSE;  /* 是否为第一次初始化，如果是国家码更新调用的本接口，则不再去nvm读取参数 */
-    int32 l_ret = INI_FAILED;
-    int32 l_cfg_id;
-    int32 aul_nvram_params[NVRAM_PARAMS_INDEX_BUTT]={0};
-    int32 l_plat_tag;
+    int l_ret = INI_FAILED;
+    int l_cfg_id;
+    int aul_nvram_params[NVRAM_PARAMS_INDEX_BUTT]={0};
+    int l_plat_tag;
 
     oal_memset(g_auc_nv_params, 0x00, sizeof(g_auc_nv_params));
 
@@ -862,15 +862,15 @@ OAL_STATIC int32 hwifi_config_init_nvram(void)
     修改内容   : 增加tag用于判断ini和dts
 
 *****************************************************************************/
-int32 hwifi_config_init(int32 cus_tag)
+int hwifi_config_init(int cus_tag)
 {
-    int32               l_cfg_id;
-    int32               l_ret = INI_FAILED;
-    int32               l_ori_val;
+    int               l_cfg_id;
+    int               l_ret = INI_FAILED;
+    int               l_ori_val;
     wlan_cfg_cmd*       pgast_wifi_config;
-    int32*              pgal_params;
-    int32               l_cfg_value = 0;
-    int32               l_wlan_cfg_butt;
+    int*              pgal_params;
+    int               l_cfg_value = 0;
+    int               l_wlan_cfg_butt;
 
     switch (cus_tag)
     {
@@ -976,11 +976,11 @@ OAL_STATIC int char2byte( char* strori, char* outbuf )
     修改内容   : 新生成函数
 
 *****************************************************************************/
-int32 hwifi_get_mac_addr(uint8 *puc_buf)
+int hwifi_get_mac_addr(unsigned char *puc_buf)
 {
     struct hisi_nve_info_user st_info;
-    int32 l_ret = -1;
-    int32 l_sum = 0;
+    int l_ret = -1;
+    int l_sum = 0;
 
     if (NULL == puc_buf)
     {
@@ -1045,10 +1045,10 @@ int32 hwifi_get_mac_addr(uint8 *puc_buf)
     修改内容   : 增加tag用于判断ini和dts
 
 *****************************************************************************/
-int32 hwifi_get_init_value(int32 cus_tag, int32 cfg_id)
+int hwifi_get_init_value(int cus_tag, int cfg_id)
 {
-    int32*              pgal_params = OAL_PTR_NULL;
-    int32               l_wlan_cfg_butt;
+    int*              pgal_params = OAL_PTR_NULL;
+    int               l_wlan_cfg_butt;
 
     if (CUS_TAG_INI == cus_tag)
     {
@@ -1089,9 +1089,9 @@ int32 hwifi_get_init_value(int32 cus_tag, int32 cfg_id)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-int8* hwifi_get_country_code(void)
+char* hwifi_get_country_code(void)
 {
-    int32 l_ret;
+    int l_ret;
 
     if (g_ac_country_code[0] != '0' && g_ac_country_code[1] != '0')
     {
@@ -1127,7 +1127,7 @@ int8* hwifi_get_country_code(void)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-void hwifi_set_country_code(int8* country_code, const uint32 len)
+void hwifi_set_country_code(char* country_code, const unsigned int len)
 {
     if (OAL_PTR_NULL == country_code || len != COUNTRY_CODE_LEN)
     {
@@ -1156,7 +1156,7 @@ void hwifi_set_country_code(int8* country_code, const uint32 len)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-uint8* hwifi_get_nvram_params(void)
+unsigned char* hwifi_get_nvram_params(void)
 {
     return g_auc_nv_params;
 }
@@ -1177,9 +1177,9 @@ uint8* hwifi_get_nvram_params(void)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-int32 hwifi_atcmd_update_host_nv_params(void)
+int hwifi_atcmd_update_host_nv_params(void)
 {
-    int32 l_ret = INI_FAILED;
+    int l_ret = INI_FAILED;
 
     oal_memset(g_auc_nv_params, 0x00, sizeof(g_auc_nv_params));
 

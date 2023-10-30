@@ -1,8 +1,3 @@
-
-
-/*****************************************************************************
-  1 头文件包含
-*****************************************************************************/
 #include <linux/delay.h>
 #include <linux/rtc.h>
 #include <linux/tty.h>
@@ -21,15 +16,12 @@
 #include "oal_hcc_host_if.h"
 #include "oal_ext_if.h"
 
-/*****************************************************************************
-  3 全局变量定义
-*****************************************************************************/
 struct st_exception_info *g_pst_exception_info = NULL;
 struct sdio_dump_bcpu_buff st_bcpu_dump_buff = {NULL, 0, 0};
 oal_netbuf_stru*       st_bcpu_dump_netbuf = NULL;
 
 
-uint8 *g_bfgx_mem_file_name[BFGX_MEM_DUMP_BLOCK_COUNT] =
+unsigned char *g_bfgx_mem_file_name[BFGX_MEM_DUMP_BLOCK_COUNT] =
                             {
                                 "plat_nfc_stack",
                                 "fgb_stack",
@@ -37,7 +29,7 @@ uint8 *g_bfgx_mem_file_name[BFGX_MEM_DUMP_BLOCK_COUNT] =
                             };
 
 struct st_exception_mem_info g_pst_bfgx_mem_dump[BFGX_MEM_DUMP_BLOCK_COUNT] = {{0},{0},{0}};
-uint32 g_recvd_block_count = 0;
+unsigned int g_recvd_block_count = 0;
 
 #define WIFI_PUB_REG_BLOCKS      (12)
 #define WIFI_PRIV_REG_BLOCKS     (9)
@@ -190,13 +182,13 @@ struct st_uart_dump_wifi_info g_uart_read_wifi_mem_info[UART_WIFI_MEM_DUMP_BOTTO
 };
 
 struct st_exception_mem_info g_pst_uart_wifi_mem_dump[UART_WIFI_MEM_DUMP_BOTTOM] = {{0},{0},{0}};
-uint32 g_recvd_wifi_block_index = UART_WIFI_MEM_DUMP_BOTTOM;
+unsigned int g_recvd_wifi_block_index = UART_WIFI_MEM_DUMP_BOTTOM;
 
 struct st_bfgx_reset_cmd g_ast_bfgx_reset_msg[BFGX_BUTT] =
 {
     {BT_RESET_CMD_LEN,   {0x04,0xff,0x01,0xc7}},
     {FM_RESET_CMD_LEN,   {0xfb}},
-    {GNSS_RESET_CMD_LEN, {0xa1, 0xb4, 0xc7, 0x51, GNSS_SEPER_TAG_LAST}},/*seperate_tag = GNSS_SEPER_TAG_LAST，DTS2016011204428*/
+    {GNSS_RESET_CMD_LEN, {0xa1, 0xb4, 0xc7, 0x51, GNSS_SEPER_TAG_LAST}},
     {IR_RESET_CMD_LEN,   {0}},
     {NFC_RESET_CMD_LEN,  {0}},
 };
@@ -217,7 +209,6 @@ exception_bcpu_dump_msg g_sdio_read_bcpu_mem_info[BFGX_SHARE_RAM_NUM] =
 };
 exception_bcpu_dump_msg g_sdio_read_bcpu_priv_reg_info[BFGX_PRIV_REG_NUM] =
 {
-	/*私有寄存器只能拷贝2个*/
     //{GNSS_SUB_FILE_NAME,             BFGX_GNSS_SUB_ADDR,             ALIGN_2_BYTE, BFGX_GNSS_SUB_LEN},
     {B_CTL_WDT_TIMER_UART_FILE_NAME, BFGX_B_CTL_WDT_TIMER_UART_ADDR, ALIGN_2_BYTE, BFGX_B_CTL_WDT_TIMER_UART_LEN},
     {IR_SUB_FILE_NAME,               BFGX_IR_SUB_ADDR,               ALIGN_2_BYTE, BFGX_IR_SUB_LEN},
@@ -244,49 +235,31 @@ exception_bcpu_dump_msg g_sdio_read_all[BFGX_PUB_REG_NUM + BFGX_SHARE_RAM_NUM + 
     //{B_DMA_CFG_FILE_NAME,            BFGX_B_DMA_CFG_ADDR,            ALIGN_2_BYTE, BFGX_B_DMA_CFG_LEN},
 };
 
-uint8  g_plat_beatTimer_timeOut_reset_cfg = 0;
+unsigned char  g_plat_beatTimer_timeOut_reset_cfg = 0;
 extern struct oal_sdio* oal_alloc_sdio_stru(oal_void);
 
-/*****************************************************************************
-  2 函数实现
-*****************************************************************************/
-void  bfgx_beat_timer_expire(uint64 data);
-int32 get_exception_info_reference(struct st_exception_info **exception_data);
-int32 plat_exception_handler(uint32 subsys_type, uint32 thread_type, uint32 exception_type);
+void  bfgx_beat_timer_expire(unsigned long data);
+int get_exception_info_reference(struct st_exception_info **exception_data);
+int plat_exception_handler(unsigned int subsys_type, unsigned int thread_type, unsigned int exception_type);
 void  plat_exception_reset_work(struct work_struct *work);
-int32 wifi_exception_handler(void);
-int32 wifi_subsystem_reset(void);
-int32 wifi_system_reset(void);
-int32 wifi_status_recovery(void);
-int32 wifi_exception_mem_dump(struct st_wifi_dump_mem_info *pst_mem_dump_info, uint32 count, oal_int32 excep_type);
-int32 bfgx_exception_handler(void);
-int32 bfgx_subthread_reset(void);
-int32 bfgx_subsystem_reset(void);
-int32 bfgx_system_reset(void);
-int32 bfgx_recv_dev_mem(uint8 *buf_ptr, uint16 count);
-int32 bfgx_store_stack_mem_to_file(void);
+int wifi_exception_handler(void);
+int wifi_subsystem_reset(void);
+int wifi_system_reset(void);
+int wifi_status_recovery(void);
+int wifi_exception_mem_dump(struct st_wifi_dump_mem_info *pst_mem_dump_info, unsigned int count, oal_int32 excep_type);
+int bfgx_exception_handler(void);
+int bfgx_subthread_reset(void);
+int bfgx_subsystem_reset(void);
+int bfgx_system_reset(void);
+int bfgx_recv_dev_mem(unsigned char *buf_ptr, unsigned short count);
+int bfgx_store_stack_mem_to_file(void);
 void  bfgx_dump_stack(void);
-int32 bfgx_status_recovery(void);
-int32 plat_bfgx_exception_rst_register(struct ps_plat_s *data);
-int32 plat_exception_reset_init(void);
-int32 plat_exception_reset_exit(void);
+int bfgx_status_recovery(void);
+int plat_bfgx_exception_rst_register(struct ps_plat_s *data);
+int plat_exception_reset_init(void);
+int plat_exception_reset_exit(void);
 
-/*****************************************************************************
- 函 数 名  : plat_dfr_cfg_set
- 功能描述  : dfr全局配置
- 输入参数  : uint64 arg
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年11月25日
-    作    者   : c00351912
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-void plat_dfr_cfg_set(uint64 arg)
+void plat_dfr_cfg_set(unsigned long arg)
 {
     struct st_exception_info *pst_exception_data = NULL;
 
@@ -302,22 +275,7 @@ void plat_dfr_cfg_set(uint64 arg)
     PS_PRINT_INFO("plat dfr cfg set value = %ld\n", arg);
 }
 
-/*****************************************************************************
- 函 数 名  : plat_beatTimer_timeOut_reset_cfg_set
- 功能描述  : beat_timer全局配置
- 输入参数  : uint64 arg，没有使用。
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年11月25日
-    作    者   : c00351912
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-void plat_beatTimer_timeOut_reset_cfg_set(uint64 arg)
+void plat_beatTimer_timeOut_reset_cfg_set(unsigned long arg)
 {
     g_plat_beatTimer_timeOut_reset_cfg = arg ? (PLAT_EXCEPTION_ENABLE) : (PLAT_EXCEPTION_DISABLE);
     PS_PRINT_INFO("plat beat timer timeOut reset cfg set value = %ld\n", arg);
@@ -326,7 +284,7 @@ void plat_beatTimer_timeOut_reset_cfg_set(uint64 arg)
 /*****************************************************************************
  * Prototype    : mod_beat_timer
  * Description  :
- * input        : uint8
+ * input        : unsigned char
  * output       : no
  * Calls        :
  * Called By    :
@@ -336,7 +294,7 @@ void plat_beatTimer_timeOut_reset_cfg_set(uint64 arg)
  *     Author       : wx145522
  *     Modification : Created function
 *****************************************************************************/
-int32 mod_beat_timer(uint8 on)
+int mod_beat_timer(unsigned char on)
 {
     struct st_exception_info *pst_exception_data = NULL;
 
@@ -362,22 +320,7 @@ int32 mod_beat_timer(uint8 on)
     return 0;
 }
 
-/***********************************************************************************
- 函 数 名  : bfgx_beat_timer_expire
- 功能描述  : bfgx心跳超时处理函数，该函数运行在软中断上下文中，不能有引起睡眠的操作
- 输入参数  : uint64 data，不需要。加上是为了遵守内核的函数声明
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-***********************************************************************************/
-void bfgx_beat_timer_expire(uint64 data)
+void bfgx_beat_timer_expire(unsigned long data)
 {
     struct ps_core_s *ps_core_d = NULL;
     struct st_exception_info *pst_exception_data = NULL;
@@ -399,7 +342,6 @@ void bfgx_beat_timer_expire(uint64 data)
 
     ps_core_d = pst_exception_data->ps_plat_d->core_data;
 
-    /*bfgx睡眠时，没有心跳消息上报*/
     if (BFGX_SLEEP == ps_core_d->ps_pm->bfgx_dev_state_get())
     {
         PS_PRINT_INFO("bfgx has sleep!\n");
@@ -454,22 +396,7 @@ void bfgx_beat_timer_expire(uint64 data)
     return;
 }
 
-/*****************************************************************************
- 函 数 名  : get_exception_info_reference
- 功能描述  : 获得保存异常信息的全局变量
- 输入参数  : st_exception_info **exception结构体指针，保存全局变量地址的指针
- 输出参数  : 无
- 返 回 值  : 成功返回0，否则返回-1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 get_exception_info_reference(struct st_exception_info **exception_data)
+int get_exception_info_reference(struct st_exception_info **exception_data)
 {
     if (NULL == exception_data)
     {
@@ -489,9 +416,9 @@ int32 get_exception_info_reference(struct st_exception_info **exception_data)
     return EXCEPTION_SUCCESS;
 }
 
-int32 uart_reset_wcpu(void)
+int uart_reset_wcpu(void)
 {
-    uint64 timeleft;
+    unsigned long timeleft;
     struct ps_core_s *ps_core_d = NULL;
     struct st_exception_info *pst_exception_data = NULL;
 
@@ -550,27 +477,10 @@ int32 uart_reset_wcpu(void)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : plat_power_fail_exception_info_set
- 功能描述  : bfgx open失败时，调用该函数设置exception info
- 输入参数  : subsys_type:调用异常处理的子系统，WIFI或者BFGX
-             thread_type:子系统中的子线程
-             exception_type:异常的类型
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年11月25日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 plat_power_fail_exception_info_set(uint32 subsys_type, uint32 thread_type, uint32 exception_type)
+int plat_power_fail_exception_info_set(unsigned int subsys_type, unsigned int thread_type, unsigned int exception_type)
 {
     struct st_exception_info *pst_exception_data = NULL;
-    uint64 flag;
+    unsigned long flag;
 
     if (subsys_type >= SUBSYS_BOTTOM)
     {
@@ -612,7 +522,6 @@ int32 plat_power_fail_exception_info_set(uint32 subsys_type, uint32 thread_type,
         pst_exception_data->thread_type   = thread_type;
         pst_exception_data->excetion_type = exception_type;
 
-        /*当前异常没有处理完成之前，不允许处理新的异常*/
         atomic_set(&pst_exception_data->is_reseting_device, PLAT_EXCEPTION_RESET_BUSY);
     }
     else
@@ -623,7 +532,6 @@ int32 plat_power_fail_exception_info_set(uint32 subsys_type, uint32 thread_type,
         return -EXCEPTION_FAIL;
     }
 
-    /*增加统计信息*/
     if (SUBSYS_WIFI == subsys_type)
     {
         pst_exception_data->wifi_exception_cnt += 1;
@@ -638,21 +546,6 @@ int32 plat_power_fail_exception_info_set(uint32 subsys_type, uint32 thread_type,
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : plat_power_fail_process_done
- 功能描述  : bfgx open失败时，异常处理完成
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年11月25日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
 void plat_power_fail_process_done(void)
 {
     struct st_exception_info *pst_exception_data = NULL;
@@ -671,27 +564,10 @@ void plat_power_fail_process_done(void)
     return;
 }
 
-/*****************************************************************************
- 函 数 名  : plat_exception_handler
- 功能描述  : 平台host异常处理总入口函数，填充异常信息，并触发异常处理work
- 输入参数  : subsys_type:调用异常处理的子系统，WIFI或者BFGX
-             thread_type:子系统中的子线程
-             exception_type:异常的类型
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 plat_exception_handler(uint32 subsys_type, uint32 thread_type, uint32 exception_type)
+int plat_exception_handler(unsigned int subsys_type, unsigned int thread_type, unsigned int exception_type)
 {
     struct st_exception_info *pst_exception_data = NULL;
-    uint64 flag;
+    unsigned long flag;
 
     if (subsys_type >= SUBSYS_BOTTOM)
     {
@@ -725,7 +601,6 @@ int32 plat_exception_handler(uint32 subsys_type, uint32 thread_type, uint32 exce
         return EXCEPTION_SUCCESS;
     }
 
-    /*这里只能用spin lock，因为该函数会被心跳超时函数调用，心跳超时函数属于软中断，不允许睡眠*/
     spin_lock_irqsave(&pst_exception_data->exception_spin_lock, flag);
     if (PLAT_EXCEPTION_RESET_IDLE == atomic_read(&pst_exception_data->is_reseting_device))
     {
@@ -733,7 +608,6 @@ int32 plat_exception_handler(uint32 subsys_type, uint32 thread_type, uint32 exce
         pst_exception_data->thread_type   = thread_type;
         pst_exception_data->excetion_type = exception_type;
 
-        /*当前异常没有处理完成之前，不允许处理新的异常*/
         atomic_set(&pst_exception_data->is_reseting_device, PLAT_EXCEPTION_RESET_BUSY);
     }
     else
@@ -752,7 +626,6 @@ int32 plat_exception_handler(uint32 subsys_type, uint32 thread_type, uint32 exce
         return EXCEPTION_SUCCESS;
     }
 
-    /*触发异常处理worker*/
     queue_work(pst_exception_data->plat_exception_rst_workqueue, &pst_exception_data->plat_exception_rst_work);
 
     return EXCEPTION_SUCCESS;
@@ -760,25 +633,9 @@ int32 plat_exception_handler(uint32 subsys_type, uint32 thread_type, uint32 exce
 
 EXPORT_SYMBOL(plat_exception_handler);
 
-/*****************************************************************************
- 函 数 名  : plat_exception_reset_work
- 功能描述  : 平台host异常处理work，判断产生异常的系统，调用相应的处理函数。
-             这个函数会获取mutex，以避免并发处理。
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
 void plat_exception_reset_work(struct work_struct *work)
 {
-	int32  ret = -EXCEPTION_FAIL;
+	int  ret = -EXCEPTION_FAIL;
 	struct st_exception_info *pst_exception_data = NULL;
 	struct pm_drv_data *pm_data = pm_get_drvdata();
 
@@ -825,27 +682,10 @@ void plat_exception_reset_work(struct work_struct *work)
 	return;
 }
 
-/*****************************************************************************
- 函 数 名  : wifi_exception_handler
- 功能描述  : wifi异常处理入口函数，判断BFGN是否打开，如果打开则调用单系统复位流程，
-             BFGN没开则调用全系统复位流程(单系统复位需要用到uart)。如果单系统复位
-             失败，则会进行全系统复位。
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 wifi_exception_handler(void)
+int wifi_exception_handler(void)
 {
-	int32 ret = -EXCEPTION_FAIL;
-	uint32 exception_type;
+	int ret = -EXCEPTION_FAIL;
+	unsigned int exception_type;
 	struct st_exception_info *pst_exception_data = NULL;
 
     get_exception_info_reference(&pst_exception_data);
@@ -857,7 +697,6 @@ int32 wifi_exception_handler(void)
 
 	exception_type = pst_exception_data->excetion_type;
 
-	/*如果bfgx已经打开，执行wifi子系统复位流程，否则执行wifi全系统复位流程*/
 	if (!bfgx_is_shutdown())
 	{
 	    PS_PRINT_INFO("bfgx is opened, start wifi subsystem reset!\n");
@@ -893,22 +732,7 @@ int32 wifi_exception_handler(void)
 	return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : wifi_subsystem_reset
- 功能描述  : wifi子系统复位，通过uart复位解复位WCPU,重新加载wifi firmware
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 wifi_subsystem_reset(void)
+int wifi_subsystem_reset(void)
 {
 	struct pm_drv_data *pm_data = pm_get_drvdata();
 
@@ -948,25 +772,9 @@ int32 wifi_subsystem_reset(void)
 	return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : wifi_system_reset
- 功能描述  : wifi全系统复位，对device重新上电，bfgn和wifi firmware重新加载，
- 			 恢复全系统复位前bfgn的业务
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 wifi_system_reset(void)
+int wifi_system_reset(void)
 {
-    uint64 timeleft;
+    unsigned long timeleft;
     struct ps_core_s *ps_core_d = NULL;
     struct pm_drv_data *pm_data = pm_get_drvdata();
 
@@ -983,7 +791,6 @@ int32 wifi_system_reset(void)
         return -EXCEPTION_FAIL;
     }
 
-    /*重新上电，firmware重新加载*/
     hcc_disable(hcc_get_default_handler(), OAL_TRUE);
     wlan_pm_init_device_ready(pm_data->pst_wlan_pm_info);
     oal_wlan_gpio_intr_enable(oal_get_sdio_default_handler(), OAL_FALSE);
@@ -1054,7 +861,6 @@ int32 wifi_system_reset(void)
 
         bfgx_pm_feature_set();
 
-        /*恢复bfgx业务状态*/
         if (EXCEPTION_SUCCESS != bfgx_status_recovery())
         {
             PS_PRINT_ERR("bfgx status revocery failed!\n");
@@ -1065,23 +871,7 @@ int32 wifi_system_reset(void)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : wifi_status_recovery
- 功能描述  : 全系统复位以后，恢复wifi业务函数
- 输入参数  : st_exception_info *exception结构体指针，保存了异常产生的系统wifi
-             还是BFGN，对于BFGN还保存了产生异常的子业务，以及异常的类型
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 wifi_status_recovery(void)
+int wifi_status_recovery(void)
 {
     struct st_exception_info *pst_exception_data = NULL;
 
@@ -1111,25 +901,10 @@ int32 wifi_status_recovery(void)
 	return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : wifi_open_bcpu_set
- 功能描述  :
- 输入参数  :
- 输出参数  :
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年9月8日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 wifi_open_bcpu_set(uint8 enable)
+int wifi_open_bcpu_set(unsigned char enable)
 {
     struct st_exception_info *pst_exception_data = NULL;
-    uint64 timeleft;
+    unsigned long timeleft;
     struct ps_core_s *ps_core_d = NULL;
     struct pm_drv_data *pm_data = pm_get_drvdata();
 
@@ -1200,26 +975,10 @@ int32 wifi_open_bcpu_set(uint8 enable)
 
 EXPORT_SYMBOL(wifi_open_bcpu_set);
 
-/*****************************************************************************
- 函 数 名  : wifi_exception_mem_dump
- 功能描述  : 全系统复位，firmware重新加载的时候，导出device指定地址的内存
- 输入参数  : pst_mem_dump_info  : 需要读取的内存信息
-             count              : 需要读取的内存块个数
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 wifi_exception_mem_dump(struct st_wifi_dump_mem_info *pst_mem_dump_info, uint32 count, oal_int32 excep_type)
+int wifi_exception_mem_dump(struct st_wifi_dump_mem_info *pst_mem_dump_info, unsigned int count, oal_int32 excep_type)
 {
-    int32 ret;
-    uint64 timeleft;
+    int ret;
+    unsigned long timeleft;
     struct st_exception_info *pst_exception_data = NULL;
     struct ps_core_s *ps_core_d = NULL;
     struct pm_drv_data *pm_data = pm_get_drvdata();
@@ -1318,22 +1077,7 @@ int32 wifi_exception_mem_dump(struct st_wifi_dump_mem_info *pst_mem_dump_info, u
 
 EXPORT_SYMBOL(wifi_exception_mem_dump);
 
-/*****************************************************************************
- 函 数 名  : wifi_exception_work_submit
- 功能描述  : 异常恢复动作触发接口
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  :
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年10月23日
-    作    者   : z00273164
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 wifi_exception_work_submit(uint32 wifi_excp_type)
+int wifi_exception_work_submit(unsigned int wifi_excp_type)
 {
     struct st_exception_info *pst_exception_data = NULL;
 
@@ -1386,23 +1130,7 @@ oal_workqueue_stru* wifi_get_exception_workqueue(oal_void)
 }
 EXPORT_SYMBOL(wifi_get_exception_workqueue);
 
-/*****************************************************************************
- 函 数 名  : wifi_exception_mem_dump
- 功能描述  : 全系统复位，firmware重新加载的时候，导出device指定地址的内存
- 输入参数  : pst_mem_dump_info  : 需要读取的内存信息
-             count              : 需要读取的内存块个数
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 prepare_to_recv_bfgx_stack(uint32 len)
+int prepare_to_recv_bfgx_stack(unsigned int len)
 {
     if (g_recvd_block_count > BFGX_MEM_DUMP_BLOCK_COUNT - 1)
     {
@@ -1412,7 +1140,7 @@ int32 prepare_to_recv_bfgx_stack(uint32 len)
 
     if (NULL == g_pst_bfgx_mem_dump[g_recvd_block_count].exception_mem_addr)
     {
-        g_pst_bfgx_mem_dump[g_recvd_block_count].exception_mem_addr = (uint8 *)OS_KMALLOC_GFP(len);
+        g_pst_bfgx_mem_dump[g_recvd_block_count].exception_mem_addr = (unsigned char *)OS_KMALLOC_GFP(len);
         if (NULL == g_pst_bfgx_mem_dump[g_recvd_block_count].exception_mem_addr)
         {
             PS_PRINT_ERR("prepare mem to recv bfgx stack failed\n");
@@ -1430,9 +1158,9 @@ int32 prepare_to_recv_bfgx_stack(uint32 len)
     return EXCEPTION_SUCCESS;
 }
 
-int32 free_bfgx_stack_dump_mem(void)
+int free_bfgx_stack_dump_mem(void)
 {
-    uint32 i = 0;
+    unsigned int i = 0;
 
     for (i = 0; i < BFGX_MEM_DUMP_BLOCK_COUNT; i++)
     {
@@ -1451,25 +1179,10 @@ int32 free_bfgx_stack_dump_mem(void)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : bfgx_exception_handler
- 功能描述  : bfgx异常处理入口函数，根据异常类型，调用不同的处理函数
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 bfgx_exception_handler(void)
+int bfgx_exception_handler(void)
 {
-	int32  ret = -EXCEPTION_FAIL;
-	uint32 exception_type;
+	int  ret = -EXCEPTION_FAIL;
+	unsigned int exception_type;
     struct st_exception_info *pst_exception_data = NULL;
     struct pm_drv_data *pm_data = pm_get_drvdata();
 
@@ -1491,14 +1204,12 @@ int32 bfgx_exception_handler(void)
     /* we do NOT need bfg timer anymore */
     del_timer_sync(&pm_data->bfg_timer);
 
-	/*ioctl下来的异常执行线程复位流程*/
 	if (exception_type == TIMER_TIMEOUT || exception_type == ARP_TIMEOUT)
 	{
 		ret = bfgx_subthread_reset();
 	}
 	else
 	{
-        /*异常恢复之前，尝试用平台命令读栈，不能保证一定成功，因为此时uart可能不通*/
         bfgx_dump_stack();
 
         if (LAST_WORD == exception_type)
@@ -1519,26 +1230,10 @@ int32 bfgx_exception_handler(void)
 	return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : bfgx_subthread_reset
- 功能描述  : bfgx子线程复位函数，通过uart下发复位子线程命令，并等待复位
-             成功ACK，收到ACK，异常处理完成，否则进入BFGX子系统复位流程
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 bfgx_subthread_reset(void)
+int bfgx_subthread_reset(void)
 {
-	int32  ret = -EXCEPTION_FAIL;
-	uint32 subsys, subthread;
+	int  ret = -EXCEPTION_FAIL;
+	unsigned int subsys, subthread;
     struct st_exception_info *pst_exception_data = NULL;
 
     get_exception_info_reference(&pst_exception_data);
@@ -1550,10 +1245,6 @@ int32 bfgx_subthread_reset(void)
 
     subsys    = pst_exception_data->subsys_type;
     subthread = pst_exception_data->thread_type;
-
-	/*uart 发送复位子业务命令*/
-
-	/*等待子业务复位成功ACK*/
 
 	if (EXCEPTION_SUCCESS != ret)
 	{
@@ -1570,9 +1261,9 @@ int32 bfgx_subthread_reset(void)
 	return EXCEPTION_SUCCESS;
 }
 
-int32 wifi_reset_bfgx(void)
+int wifi_reset_bfgx(void)
 {
-    uint64 timeleft;
+    unsigned long timeleft;
     struct pm_drv_data *pm_data = pm_get_drvdata();
 
     if (NULL == pm_data)
@@ -1608,24 +1299,7 @@ int32 wifi_reset_bfgx(void)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : __bfgx_subsystem_reset
- 功能描述  : bfgx子系统复位函数，进入该函数，说明wifi已开，通过sdio下发复位
-             解复位BCPU命令，进行bfgx子系统复位。子系统复位完成以后需要恢复
-             复位前bfgin的业务
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 __bfgx_subsystem_reset(void)
+int __bfgx_subsystem_reset(void)
 {
     struct ps_core_s *ps_core_d = NULL;
     struct pm_drv_data *pm_data = pm_get_drvdata();
@@ -1683,25 +1357,7 @@ int32 __bfgx_subsystem_reset(void)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : bfgx_subsystem_reset
- 功能描述  : bfgx子系统复位函数，如果wifi打开，则通过sdio下发复位解复位BCPU命令，
-             进行bfgx子系统复位，wifi没开，进入bfgx全系统复位流程。如果子系统
-             复位不能将异常恢复也会进入全系统复位流程。子系统复位完成以后需要
-             恢复复位前bfgin的业务
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 bfgx_subsystem_reset(void)
+int bfgx_subsystem_reset(void)
 {
 	if (!wlan_is_shutdown())
 	{
@@ -1721,9 +1377,9 @@ int32 bfgx_subsystem_reset(void)
 	}
 }
 
-int32 bfgx_power_reset(void)
+int bfgx_power_reset(void)
 {
-    uint64 timeleft;
+    unsigned long timeleft;
     struct ps_core_s *ps_core_d = NULL;
     struct pm_drv_data *pm_data = pm_get_drvdata();
 
@@ -1781,23 +1437,7 @@ int32 bfgx_power_reset(void)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : bfgx_system_reset
- 功能描述  : bfgin全系统复位函数，对device重新上电，wifi和bfgin firmware重新
-             加载，恢复wifi，恢复bfgin业务。
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 bfgx_system_reset(void)
+int bfgx_system_reset(void)
 {
 	struct st_exception_info *pst_exception_data = NULL;
 
@@ -1817,7 +1457,6 @@ int32 bfgx_system_reset(void)
         }
     }
 
-    /*重新上电，firmware重新加载*/
     if (EXCEPTION_SUCCESS != bfgx_power_reset())
     {
         PS_PRINT_ERR("bfgx power reset failed!\n");
@@ -1842,26 +1481,10 @@ int32 bfgx_system_reset(void)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : bfgx_recv_dev_mem
- 功能描述  : 接收bfgx异常时，device上报的栈内存
- 输入参数  : buf_ptr :uart接收到的占内存bufer首地址
-             count   :buffer长度
- 输出参数  : 0表示成功，-1表示失败
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 bfgx_recv_dev_mem(uint8 *buf_ptr, uint16 count)
+int bfgx_recv_dev_mem(unsigned char *buf_ptr, unsigned short count)
 {
     struct st_exception_mem_info *pst_mem_info = NULL;
-    uint32 offset = 0;
+    unsigned int offset = 0;
 
     if (NULL == buf_ptr)
     {
@@ -1899,26 +1522,11 @@ int32 bfgx_recv_dev_mem(uint8 *buf_ptr, uint16 count)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : bfgx_store_stack_mem_to_file
- 功能描述  : 将接收到的bfgx内存保存到文件中
- 输入参数  : 无
- 输出参数  : 0表示成功，-1表示失败
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 bfgx_store_stack_mem_to_file(void)
+int bfgx_store_stack_mem_to_file(void)
 {
     OS_KERNEL_FILE_STRU *fp;
     char filename[100] = {0};
-    uint32 i;
+    unsigned int i;
     mm_segment_t fs;
     struct st_exception_mem_info *pst_mem_info = NULL;
 
@@ -1936,7 +1544,6 @@ int32 bfgx_store_stack_mem_to_file(void)
 #else
         snprintf(filename, sizeof(filename),"/data/memdump/%s_%s.bin", UART_STORE_BFGX_STACK, pst_mem_info->file_name);
 #endif
-        /*打开文件，准备保存接收到的内存*/
         fp = filp_open(filename, O_RDWR | O_CREAT, 0664);
         if (IS_ERR_OR_NULL(fp))
         {
@@ -1944,7 +1551,6 @@ int32 bfgx_store_stack_mem_to_file(void)
             continue;
         }
 
-        /*将接收到的内存写入到文件中*/
         fs = get_fs();
         set_fs(KERNEL_DS);
         //l_ret = vfs_llseek(fp, 0, SEEK_END);
@@ -1963,25 +1569,10 @@ int32 bfgx_store_stack_mem_to_file(void)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : bfgx_dump_stack
- 功能描述  : 心跳超时时，尝试通过uart读栈，不保证一定能成功，因为此时uart可能不通
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 无
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
 void bfgx_dump_stack(void)
 {
-    uint64 timeleft;
-    uint32 exception_type;
+    unsigned long timeleft;
+    unsigned int exception_type;
     struct ps_core_s *ps_core_d = NULL;
     struct st_exception_info *pst_exception_data = NULL;
 
@@ -2008,14 +1599,12 @@ void bfgx_dump_stack(void)
 
     INIT_COMPLETION(pst_exception_data->wait_read_bfgx_stack);
 
-    /*心跳超时需要host主动发命令去读内存，临终遗言只需要等待device将内存上报上来*/
     if (exception_type == BEAT_HEART_TIMEOUT)
     {
         ps_uart_state_pre(ps_core_d->tty);
         ps_tx_sys_cmd(ps_core_d, SYS_MSG, SYS_CFG_READ_STACK);
     }
 
-    /*等待读栈操作完成*/
     timeleft = wait_for_completion_timeout(&pst_exception_data->wait_read_bfgx_stack, msecs_to_jiffies(WAIT_BFGX_READ_STACK_TIME));
     if (!timeleft)
     {
@@ -2034,10 +1623,10 @@ void bfgx_dump_stack(void)
     return;
 }
 
-int32 prepare_to_recv_wifi_mem(void)
+int prepare_to_recv_wifi_mem(void)
 {
-    uint32 malloc_mem_len;
-    uint32 index;
+    unsigned int malloc_mem_len;
+    unsigned int index;
 
     PS_PRINT_INFO("%s\n", __func__);
 
@@ -2051,7 +1640,7 @@ int32 prepare_to_recv_wifi_mem(void)
     if (NULL == g_pst_uart_wifi_mem_dump[index].exception_mem_addr)
     {
         malloc_mem_len = g_uart_read_wifi_mem_info[index].total_size;
-        g_pst_uart_wifi_mem_dump[index].exception_mem_addr = (uint8 *)OS_VMALLOC_GFP(malloc_mem_len);
+        g_pst_uart_wifi_mem_dump[index].exception_mem_addr = (unsigned char *)OS_VMALLOC_GFP(malloc_mem_len);
         if (NULL == g_pst_uart_wifi_mem_dump[index].exception_mem_addr)
         {
             PS_PRINT_ERR("prepare mem to recv wifi mem failed\n");
@@ -2069,9 +1658,9 @@ int32 prepare_to_recv_wifi_mem(void)
     return EXCEPTION_SUCCESS;
 }
 
-int32 free_uart_read_wifi_mem(void)
+int free_uart_read_wifi_mem(void)
 {
-    uint32 index;
+    unsigned int index;
 
     PS_PRINT_INFO("%s\n", __func__);
 
@@ -2096,11 +1685,11 @@ int32 free_uart_read_wifi_mem(void)
     return EXCEPTION_SUCCESS;
 }
 
-int32 uart_recv_wifi_mem(uint8 *buf_ptr, uint16 count)
+int uart_recv_wifi_mem(unsigned char *buf_ptr, unsigned short count)
 {
     struct st_exception_mem_info *pst_mem_info = NULL;
-    uint32 offset = 0;
-    uint32 index;
+    unsigned int offset = 0;
+    unsigned int index;
 
     if (NULL == buf_ptr)
     {
@@ -2140,17 +1729,17 @@ int32 uart_recv_wifi_mem(uint8 *buf_ptr, uint16 count)
     return EXCEPTION_SUCCESS;
 }
 
-int32 __store_wifi_mem_to_file(void)
+int __store_wifi_mem_to_file(void)
 {
     OS_KERNEL_FILE_STRU *fp;
     char filename[100] = {0};
     mm_segment_t fs;
-    uint32 index;
-    uint32 i;
-    uint32 block_count;
-    uint8 *block_file_name;
-    uint32 block_size;
-    uint32 offset = 0;
+    unsigned int index;
+    unsigned int i;
+    unsigned int block_count;
+    unsigned char *block_file_name;
+    unsigned int block_size;
+    unsigned int offset = 0;
     struct st_exception_mem_info *pst_mem_info = NULL;
 
 #ifdef PLATFORM_DEBUG_ENABLE
@@ -2189,7 +1778,6 @@ int32 __store_wifi_mem_to_file(void)
 #else
         snprintf(filename, sizeof(filename),"/data/memdump/%s_%s.bin", UART_STORE_WIFI_MEM, block_file_name);
 #endif
-        /*打开文件，准备保存接收到的内存*/
         fp = filp_open(filename, O_RDWR | O_CREAT, 0664);
         if (IS_ERR_OR_NULL(fp))
         {
@@ -2197,7 +1785,6 @@ int32 __store_wifi_mem_to_file(void)
             return -EXCEPTION_FAIL;
         }
 
-        /*将接收到的内存写入到文件中*/
         fs = get_fs();
         set_fs(KERNEL_DS);
         //l_ret = vfs_llseek(fp, 0, SEEK_END);
@@ -2252,9 +1839,9 @@ void store_wifi_mem_to_file(void)
     return;
 }
 
-int32 uart_halt_wcpu(void)
+int uart_halt_wcpu(void)
 {
-    uint64 timeleft;
+    unsigned long timeleft;
     struct ps_core_s *ps_core_d = NULL;
     struct st_exception_info *pst_exception_data = NULL;
 
@@ -2290,23 +1877,7 @@ int32 uart_halt_wcpu(void)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : exception_bcpu_dump_recv
- 功能描述  : 回调数据处理函数
-
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年12月25日
-    作    者   : c00351912
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 exception_bcpu_dump_recv(uint8* str, oal_netbuf_stru* netbuf)
+int exception_bcpu_dump_recv(unsigned char* str, oal_netbuf_stru* netbuf)
 {
     exception_bcpu_dump_header*      cmd_header={0};
     struct st_exception_info *pst_exception_data = NULL;
@@ -2334,23 +1905,7 @@ int32 exception_bcpu_dump_recv(uint8* str, oal_netbuf_stru* netbuf)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  :  free_buffer_and_netbuf()
- 功能描述  : 释放数据空间
-
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年12月25日
-    作    者   : c00351912
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32  free_buffer_and_netbuf(void)
+int  free_buffer_and_netbuf(void)
 {
     if (NULL != st_bcpu_dump_buff.mem_addr)
     {
@@ -2367,26 +1922,10 @@ int32  free_buffer_and_netbuf(void)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : sdio_halt_bcpu
- 功能描述  : sdio send halt bcpu cmd
-
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年12月25日
-    作    者   : c00351912
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 sdio_halt_bcpu(void)
+int sdio_halt_bcpu(void)
 {
-    int32  ret;
-    uint64 timeleft;
+    int  ret;
+    unsigned long timeleft;
     int i;
     struct wlan_pm_s    *pst_wlan_pm = wlan_pm_get_drv();
 
@@ -2412,7 +1951,6 @@ int32 sdio_halt_bcpu(void)
     ret =  oal_sdio_send_msg(pst_wlan_pm->pst_sdio,H2D_MSG_HALT_BCPU);
     if(0 == ret)
     {
-        /*等待device执行命令*/
         timeleft = wait_for_completion_timeout(&pst_wlan_pm->st_halt_bcpu_done,msecs_to_jiffies(WLAN_HALT_BCPU_TIMEOUT));
         if(0 == timeleft)
         {
@@ -2426,25 +1964,8 @@ int32 sdio_halt_bcpu(void)
     return OAL_SUCC;
 }
 
-/*****************************************************************************
- 函 数 名  : allocate_data_save_buffer
- 功能描述  : 分配存储数据buffer
-
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年12月25日
-    作    者   : c00351912
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 allocate_data_save_buffer(uint32 len)
+int allocate_data_save_buffer(unsigned int len)
 {
-    //临时buff配置,用于传送数据
     st_bcpu_dump_buff.mem_addr = OS_VMALLOC_GFP(len);
     if (NULL == st_bcpu_dump_buff.mem_addr)
     {
@@ -2456,23 +1977,7 @@ int32 allocate_data_save_buffer(uint32 len)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : allocate_send_netbuf
- 功能描述  : 分配netbuf
-
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年12月25日
-    作    者   : c00351912
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 allocate_send_netbuf(uint32 len)
+int allocate_send_netbuf(unsigned int len)
 {
     st_bcpu_dump_netbuf  = hcc_netbuf_alloc(len);
     if (NULL == st_bcpu_dump_netbuf)
@@ -2484,55 +1989,21 @@ int32 allocate_send_netbuf(uint32 len)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : dump_header_init
- 功能描述  : 初始化命令CMD
-
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年12月25日
-    作    者   : c00351912
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 dump_header_init(exception_bcpu_dump_header* header, uint32 align_type, uint32 addr, uint32 send_len)
+int dump_header_init(exception_bcpu_dump_header* header, unsigned int align_type, unsigned int addr, unsigned int send_len)
 {
-    /*cmd 初始化*/
     header->align_type = align_type;
     header->start_addr = addr;
     header->men_len    = send_len;
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : init_hcc_head_and_send
- 功能描述  : 初始化hcc发送header
-
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年12月25日
-    作    者   : c00351912
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 init_hcc_head_and_send(struct hcc_transfer_param st_hcc_transfer_param,
-                                         struct st_exception_info* pst_exception_data, uint32 wait_time)
+int init_hcc_head_and_send(struct hcc_transfer_param st_hcc_transfer_param,
+                                         struct st_exception_info* pst_exception_data, unsigned int wait_time)
 {
-    uint64 timeleft;
-    //发送
+    unsigned long timeleft;
+
     INIT_COMPLETION(pst_exception_data->wait_sdio_d2h_dump_ack);
     hcc_tx(hcc_get_default_handler(), st_bcpu_dump_netbuf, &st_hcc_transfer_param);
-    /*等待SDIO读数据完成*/
     timeleft = wait_for_completion_timeout(&pst_exception_data->wait_sdio_d2h_dump_ack, msecs_to_jiffies(wait_time));
     if (!timeleft)
     {
@@ -2545,34 +2016,18 @@ int32 init_hcc_head_and_send(struct hcc_transfer_param st_hcc_transfer_param,
      return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : sdio_get_and_save_data
- 功能描述  : sdio send cmd save data
-
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年12月25日
-    作    者   : c00351912
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 sdio_get_and_save_data(exception_bcpu_dump_msg* sdio_read_info, uint32 count)
+int sdio_get_and_save_data(exception_bcpu_dump_msg* sdio_read_info, unsigned int count)
 {
-    uint32 header_len;
-    uint32 netbuf_len;
-    uint32 send_len;
-    uint32 index;
-    uint32 i = 0;
-    uint32 buffer_len;
-    uint32 send_total_len;
-    uint32 align_type;
-    int32  error = EXCEPTION_SUCCESS;
-    int8 filename[100] = {0};
+    unsigned int header_len;
+    unsigned int netbuf_len;
+    unsigned int send_len;
+    unsigned int index;
+    unsigned int i = 0;
+    unsigned int buffer_len;
+    unsigned int send_total_len;
+    unsigned int align_type;
+    int  error = EXCEPTION_SUCCESS;
+    char filename[100] = {0};
 
     mm_segment_t fs = {0};
     OS_KERNEL_FILE_STRU *fp = {0};
@@ -2605,7 +2060,7 @@ int32 sdio_get_and_save_data(exception_bcpu_dump_msg* sdio_read_info, uint32 cou
 #else
         snprintf(filename, sizeof(filename),"/data/memdump/%s_%s.bin", SDIO_STORE_BFGX_REGMEM, sdio_read_info[i].file_name);
 #endif
-        /*准备文件空间*/
+
         fp = filp_open(filename, O_RDWR | O_CREAT, 0664);
         if (IS_ERR_OR_NULL(fp))
         {
@@ -2674,7 +2129,6 @@ int32 sdio_get_and_save_data(exception_bcpu_dump_msg* sdio_read_info, uint32 cou
 
             oal_memcopy(oal_netbuf_put(st_bcpu_dump_netbuf, netbuf_len), &dump_header, sizeof(exception_bcpu_dump_header));
 
-            //发送
             if (EXCEPTION_SUCCESS != init_hcc_head_and_send(st_hcc_transfer_param, pst_exception_data, WIFI_DUMP_BCPU_TIMEOUT))
             {
                 error = -EXCEPTION_FAIL;
@@ -2699,23 +2153,7 @@ exit:
     return error;
 }
 
-/*****************************************************************************
- 函 数 名  : debug_sdio_read_bfgx_reg_and_mem
- 功能描述  : sdio read bfgx reg and mem
-
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年12月25日
-    作    者   : c00351912
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 debug_sdio_read_bfgx_reg_and_mem(uint32 which_mem)
+int debug_sdio_read_bfgx_reg_and_mem(unsigned int which_mem)
 {
     struct ps_core_s *ps_core_d = NULL;
     struct st_exception_info *pst_exception_data = NULL;
@@ -2760,7 +2198,6 @@ int32 debug_sdio_read_bfgx_reg_and_mem(uint32 which_mem)
         PS_PRINT_INFO("wifi is open!\n");
     }
 
-    //去能exception设置,halt bcpu不引发DFR
     pst_exception_data->exception_reset_enable = PLAT_EXCEPTION_DISABLE;
 
     plat_wait_last_rotate_finish();
@@ -2791,7 +2228,6 @@ int32 debug_sdio_read_bfgx_reg_and_mem(uint32 which_mem)
 
     PS_PRINT_INFO("dump complete, recovery begin\n");
 
-    //使能DFR, recovery
     pst_exception_data->exception_reset_enable = PLAT_EXCEPTION_ENABLE;
     plat_exception_handler(SUBSYS_BFGX, BFGX_THREAD_BOTTOM, SDIO_DUMP_BCPU);
 
@@ -2799,9 +2235,9 @@ int32 debug_sdio_read_bfgx_reg_and_mem(uint32 which_mem)
 }
 
 
-int32 uart_read_wifi_mem(uint32 which_mem)
+int uart_read_wifi_mem(unsigned int which_mem)
 {
-    uint64 timeleft;
+    unsigned long timeleft;
     struct ps_core_s *ps_core_d = NULL;
     struct st_exception_info *pst_exception_data = NULL;
 
@@ -2851,10 +2287,10 @@ int32 uart_read_wifi_mem(uint32 which_mem)
     return EXCEPTION_SUCCESS;
 }
 
-int32 debug_uart_read_wifi_mem(uint32 ul_lock)
+int debug_uart_read_wifi_mem(unsigned int ul_lock)
 {
-    uint32 i;
-    uint32 read_mem_succ_count = 0;
+    unsigned int i;
+    unsigned int read_mem_succ_count = 0;
     struct ps_core_s *ps_core_d = NULL;
     struct pm_drv_data *pm_data = pm_get_drvdata();
 
@@ -2932,9 +2368,9 @@ int32 debug_uart_read_wifi_mem(uint32 ul_lock)
 
 }
 
-int32 bfgx_reset_cmd_send(uint32 subsys)
+int bfgx_reset_cmd_send(unsigned int subsys)
 {
-    int32 ret;
+    int ret;
     struct ps_core_s *ps_core_d = NULL;
     struct st_bfgx_data *pst_bfgx_data = NULL;
 
@@ -2960,25 +2396,9 @@ int32 bfgx_reset_cmd_send(uint32 subsys)
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : bfgx_status_recovery
- 功能描述  : 全系统复位以后，恢复bfgin业务函数
- 输入参数  : st_exception_info *exception结构体指针，保存了异常产生的系统wifi
-             还是BFGN，对于BFGN还保存了产生异常的子业务，以及异常的类型
- 输出参数  : 无
- 返 回 值  : 异常处理成功返回0，否则返回1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 bfgx_status_recovery(void)
+int bfgx_status_recovery(void)
 {
-    uint32 i;
+    unsigned int i;
     struct st_exception_info *pst_exception_data = NULL;
     struct ps_core_s *ps_core_d = NULL;
     struct st_bfgx_data *pst_bfgx_data = NULL;
@@ -3030,33 +2450,17 @@ int32 bfgx_status_recovery(void)
 
     post_to_visit_node(ps_core_d);
 
-    /*仅调试使用*/
     PS_PRINT_INFO("exception: set debug beat flag to 1\n");
     pst_exception_data->debug_beat_flag = 1;
 
     return EXCEPTION_SUCCESS;
 }
 
-/*****************************************************************************
- 函 数 名  : is_bfgx_exception
- 功能描述  : 判断bfgx是否发生了ecxception
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 0没有异常，1发生异常
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 is_bfgx_exception(void)
+int is_bfgx_exception(void)
 {
     struct st_exception_info *pst_exception_data = NULL;
-    int32 is_exception;
-    uint64 flag;
+    int is_exception;
+    unsigned long flag;
 
     get_exception_info_reference(&pst_exception_data);
     if (NULL == pst_exception_data)
@@ -3079,22 +2483,7 @@ int32 is_bfgx_exception(void)
     return is_exception;
 }
 
-/*****************************************************************************
- 函 数 名  : plat_bfgx_exception_rst_register
- 功能描述  :
- 输入参数  :
- 输出参数  :
- 返 回 值  :
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 plat_bfgx_exception_rst_register(struct ps_plat_s *data)
+int plat_bfgx_exception_rst_register(struct ps_plat_s *data)
 {
 	struct st_exception_info *pst_exception_data = NULL;
 
@@ -3118,22 +2507,7 @@ int32 plat_bfgx_exception_rst_register(struct ps_plat_s *data)
 
 EXPORT_SYMBOL_GPL(plat_bfgx_exception_rst_register);
 
-/*****************************************************************************
- 函 数 名  : plat_wifi_exception_rst_register
- 功能描述  :
- 输入参数  :
- 输出参数  :
- 返 回 值  :
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 plat_wifi_exception_rst_register(void *data)
+int plat_wifi_exception_rst_register(void *data)
 {
 	struct st_exception_info *pst_exception_data = NULL;
 	struct st_wifi_dfr_callback *pst_wifi_callback = NULL;
@@ -3151,7 +2525,6 @@ int32 plat_wifi_exception_rst_register(void *data)
         return -EXCEPTION_FAIL;
     }
 
-    /*wifi异常回调函数注册*/
     pst_wifi_callback = (struct st_wifi_dfr_callback *)data;
     pst_exception_data->wifi_callback = pst_wifi_callback;
 
@@ -3160,22 +2533,7 @@ int32 plat_wifi_exception_rst_register(void *data)
 
 EXPORT_SYMBOL_GPL(plat_wifi_exception_rst_register);
 
-/*****************************************************************************
- 函 数 名  : plat_exception_reset_init
- 功能描述  : 平台异常处理模块初始化函数
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 成功返回0，否则返回-1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 plat_exception_reset_init(void)
+int plat_exception_reset_init(void)
 {
     struct st_exception_info *p_exception_data = NULL;
     struct st_wifi_dfr_callback *pst_wifi_callback = NULL;
@@ -3208,7 +2566,6 @@ int32 plat_exception_reset_init(void)
     atomic_set(&p_exception_data->bfgx_beat_flag, BFGX_NOT_RECV_BEAT_INFO);
     atomic_set(&p_exception_data->is_reseting_device, PLAT_EXCEPTION_RESET_IDLE);
 
-    /*初始化异常处理workqueue和work*/
     p_exception_data->plat_exception_rst_workqueue = create_singlethread_workqueue("plat_exception_reset_queue");
     if(NULL == p_exception_data->plat_exception_rst_workqueue)
     {
@@ -3221,21 +2578,17 @@ int32 plat_exception_reset_init(void)
     INIT_WORK(&p_exception_data->plat_exception_rst_work, plat_exception_reset_work);
     INIT_WORK(&p_exception_data->uart_store_wifi_mem_to_file_work, store_wifi_mem_to_file_work);
 
-    /*初始化心跳timer*/
     init_timer(&p_exception_data->bfgx_beat_timer);
     p_exception_data->bfgx_beat_timer.function = bfgx_beat_timer_expire;
     p_exception_data->bfgx_beat_timer.expires  = jiffies + BFGX_BEAT_TIME*HZ;
     p_exception_data->bfgx_beat_timer.data     = 0;
 
-    /*初始化异常处理自旋锁*/
     spin_lock_init(&p_exception_data->exception_spin_lock);
 
-    /*初始化bfgx读栈完成量*/
     init_completion(&p_exception_data->wait_read_bfgx_stack);
-    /*初始化sdio读取bcpu完成量*/
+
     init_completion(&p_exception_data->wait_sdio_d2h_dump_ack);
 
-    /*调试使用的变量初始化*/
     p_exception_data->debug_beat_flag          = 1;
     p_exception_data->wifi_open_bcpu_enable    = false;
 
@@ -3244,7 +2597,6 @@ int32 plat_exception_reset_init(void)
 
     g_pst_exception_info = p_exception_data;
 
-    /*初始化dump文件轮替模块*/
     plat_exception_dump_file_rotate_init();
 
     PS_PRINT_SUC("plat exception reset init success\n");
@@ -3254,22 +2606,7 @@ int32 plat_exception_reset_init(void)
 
 EXPORT_SYMBOL_GPL(plat_exception_reset_init);
 
-/*****************************************************************************
- 函 数 名  : plat_exception_reset_exit
- 功能描述  : 平台异常处理模块退出清理函数
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : 成功返回0，否则返回-1
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2015年4月15日
-    作    者   : z00299054
-    修改内容   : 新生成函数
-
-*****************************************************************************/
-int32 plat_exception_reset_exit(void)
+int plat_exception_reset_exit(void)
 {
     struct st_exception_info *p_exception_data = NULL;
 

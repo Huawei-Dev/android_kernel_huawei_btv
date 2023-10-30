@@ -28,9 +28,9 @@
 #define CUST_PATH_COMM             "/data/cust"     /*某运营商在所有产品的相同配置*/
 /* mutex for open ini file */
 struct mutex        file_mutex;
-int8 g_ini_file_name[INI_FILE_PATH_LEN] = {0};
-int8 g_ini_spec_file_name[INI_FILE_PATH_LEN] = {0};
-int8 g_ini_comm_file_name[INI_FILE_PATH_LEN] = {0};
+char g_ini_file_name[INI_FILE_PATH_LEN] = {0};
+char g_ini_spec_file_name[INI_FILE_PATH_LEN] = {0};
+char g_ini_comm_file_name[INI_FILE_PATH_LEN] = {0};
 #define INI_FILE_PATH           (g_ini_file_name)
 
 INI_BOARD_VERSION_STRU g_board_version = {{0}};
@@ -40,11 +40,11 @@ INI_PARAM_VERSION_STRU g_param_version = {{0}};
  * 3 Function Definition
  */
 
-static int32 ko_read_line(INI_FILE *fp, char *addr)
+static int ko_read_line(INI_FILE *fp, char *addr)
 {
-    int32 l_ret;
-    int8  auc_tmp[MAX_READ_LINE_NUM] = {0};
-    int32 cnt = 0;
+    int l_ret;
+    char  auc_tmp[MAX_READ_LINE_NUM] = {0};
+    int cnt = 0;
 
     l_ret = kernel_read(fp, fp->f_pos, auc_tmp, MAX_READ_LINE_NUM);
     if (0 > l_ret)
@@ -81,7 +81,7 @@ static int32 ko_read_line(INI_FILE *fp, char *addr)
 }
 
 
-static INI_FILE * ini_file_open(int8 * filename, int8 * para)
+static INI_FILE * ini_file_open(char * filename, char * para)
 {
     INI_FILE * fp;
 
@@ -95,7 +95,7 @@ static INI_FILE * ini_file_open(int8 * filename, int8 * para)
 }
 
 
-static int32 ini_file_close(INI_FILE *fp)
+static int ini_file_close(INI_FILE *fp)
 {
     filp_close(fp, NULL);
     fp = NULL;
@@ -103,7 +103,7 @@ static int32 ini_file_close(INI_FILE *fp)
 }
 
 
-static bool ini_file_exist(int8 *file_path)
+static bool ini_file_exist(char *file_path)
 {
     INI_FILE *fp = NULL;
 
@@ -128,17 +128,17 @@ static bool ini_file_exist(int8 *file_path)
 }
 
 
-static int32 ini_file_seek(INI_FILE *fp, long fp_pos)
+static int ini_file_seek(INI_FILE *fp, long fp_pos)
 {
     fp->f_pos += fp_pos;
     return INI_SUCC;
 }
 
 
-static int32 ini_readline_func(INI_FILE *fp, int8 * rd_buf)
+static int ini_readline_func(INI_FILE *fp, char * rd_buf)
 {
-    int8 auc_tmp[MAX_READ_LINE_NUM];
-    int32 l_ret;
+    char auc_tmp[MAX_READ_LINE_NUM];
+    int l_ret;
 
     memset(auc_tmp, 0, MAX_READ_LINE_NUM);
     l_ret = ko_read_line(fp, auc_tmp);
@@ -159,11 +159,11 @@ static int32 ini_readline_func(INI_FILE *fp, int8 * rd_buf)
 }
 
 
-int32 ini_check_str(INI_FILE *fp, int8 * auc_tmp, int8 * puc_var)
+int ini_check_str(INI_FILE *fp, char * auc_tmp, char * puc_var)
 {
-    uint16 auc_len;
-    uint16 curr_var_len;
-    uint16 search_var_len;
+    unsigned short auc_len;
+    unsigned short curr_var_len;
+    unsigned short search_var_len;
 
     if ((NULL == fp)||(NULL == puc_var)||('\0' == puc_var[0]))
     {
@@ -222,9 +222,9 @@ int32 ini_check_str(INI_FILE *fp, int8 * auc_tmp, int8 * puc_var)
 }
 
 
-static int32 ini_check_value(int8 *puc_value)
+static int ini_check_value(char *puc_value)
 {
-    uint32 ul_len;
+    unsigned int ul_len;
 
     ul_len = strlen(puc_value);
     if (ul_len < 2)
@@ -256,11 +256,11 @@ static int32 ini_check_value(int8 *puc_value)
 }
 
 
-static int32 ini_find_modu(INI_FILE *fp, int32 tag_index, int8 * puc_var, int8 *puc_value)
+static int ini_find_modu(INI_FILE *fp, int tag_index, char * puc_var, char *puc_value)
 {
-    int8 auc_tmp[MAX_READ_LINE_NUM];
-    int8 auc_modu[INI_STR_MODU_LEN];
-    int32 ret;
+    char auc_tmp[MAX_READ_LINE_NUM];
+    char auc_modu[INI_STR_MODU_LEN];
+    int ret;
 
     switch (tag_index)
     {
@@ -353,10 +353,10 @@ static int32 ini_find_modu(INI_FILE *fp, int32 tag_index, int8 * puc_var, int8 *
 }
 
 
-static int32 ini_find_var(INI_FILE *fp, int32 tag_index, int8 * puc_var, int8 *puc_value, uint32 size)
+static int ini_find_var(INI_FILE *fp, int tag_index, char * puc_var, char *puc_value, unsigned int size)
 {
-    int32 ret;
-    int8 auc_tmp[MAX_READ_LINE_NUM] = {0};
+    int ret;
+    char auc_tmp[MAX_READ_LINE_NUM] = {0};
     size_t search_var_len;
 
     /* find the modu of var, such as [HOST_WIFI_NORMAL] of wifi moduler*/
@@ -402,8 +402,8 @@ static int32 ini_find_var(INI_FILE *fp, int32 tag_index, int8 * puc_var, int8 *p
 void print_device_version(void)
 {
     INI_FILE *fp = NULL;
-    int8  version_buff[INI_VERSION_STR_LEN] = {0};
-    int32 l_ret;
+    char  version_buff[INI_VERSION_STR_LEN] = {0};
+    int l_ret;
 
     INI_MUTEX_LOCK(&file_mutex);
 
@@ -458,11 +458,11 @@ open_ini_file_fail:
     return;
 }
 
-int32 find_download_channel(uint8* buff,int8 * puc_var)
+int find_download_channel(unsigned char* buff,char * puc_var)
 {
     INI_FILE *fp = NULL;
-    int8  version_buff[DOWNLOAD_CHANNEL_LEN] = {0};
-    int32 l_ret;
+    char  version_buff[DOWNLOAD_CHANNEL_LEN] = {0};
+    int l_ret;
 
     INI_MUTEX_LOCK(&file_mutex);
     INI_INFO("ini file_name is %s", INI_FILE_PATH);
@@ -501,7 +501,7 @@ open_ini_file_fail:
 
 }
 
-int32 ini_find_var_value_by_path(int8* path, int32 tag_index, int8 * puc_var, int8* puc_value, uint32 size)
+int ini_find_var_value_by_path(char* path, int tag_index, char * puc_var, char* puc_value, unsigned int size)
 {
     INI_FILE *fp = NULL;
 
@@ -509,7 +509,7 @@ int32 ini_find_var_value_by_path(int8* path, int32 tag_index, int8 * puc_var, in
     struct timeval tv[2];
 #endif
 
-    int32 l_ret;
+    int l_ret;
 
     if (NULL == puc_var || '\0' == puc_var[0] || NULL == puc_value)
     {
@@ -561,7 +561,7 @@ int32 ini_find_var_value_by_path(int8* path, int32 tag_index, int8 * puc_var, in
 }
 
 
-int32 ini_find_var_value(int32 tag_index, int8 * puc_var, int8* puc_value, uint32 size)
+int ini_find_var_value(int tag_index, char * puc_var, char* puc_value, unsigned int size)
 {
     /* read spec if exist */
     if (ini_file_exist(g_ini_spec_file_name))
@@ -591,12 +591,12 @@ int32 ini_find_var_value(int32 tag_index, int8 * puc_var, int8* puc_value, uint3
 }
 
 
-int32 get_ini_file_name_from_dts(int8 *dts_prop, int8 *prop_value, uint32 size)
+int get_ini_file_name_from_dts(char *dts_prop, char *prop_value, unsigned int size)
 {
-    int32  ret = 0;
+    int  ret = 0;
     struct device_node *np;
-    int32  len;
-    int8   out_str[HISI_CUST_NVRAM_LEN] = {0};
+    int  len;
+    char   out_str[HISI_CUST_NVRAM_LEN] = {0};
 
     np = of_find_compatible_node(NULL, NULL, CUST_COMP_NODE);
     if (NULL == np)
@@ -629,11 +629,11 @@ int32 get_ini_file_name_from_dts(int8 *dts_prop, int8 *prop_value, uint32 size)
 }
 
 
-int32 read_conf_from_nvram(int8 * name, int8 * pc_out, uint32 size)
+int read_conf_from_nvram(char * name, char * pc_out, unsigned int size)
 {
     struct hisi_nve_info_user  info;
-    uint32 len = 0;
-    int32 ret = -1;
+    unsigned int len = 0;
+    int ret = -1;
 
     memset(&info, 0, sizeof(info));
     strncpy(info.nv_name, HISI_CUST_NVRAM_NAME, strlen(HISI_CUST_NVRAM_NAME) - 1);
@@ -657,10 +657,10 @@ int32 read_conf_from_nvram(int8 * name, int8 * pc_out, uint32 size)
 }
 
 
-int32 write_conf_to_nvram(int8 * name, int8 * pc_arr)
+int write_conf_to_nvram(char * name, char * pc_arr)
 {
     struct hisi_nve_info_user  info;
-    int32 ret = -1;
+    int ret = -1;
 
     memset(&info, 0, sizeof(info));
     strncpy(info.nv_name, HISI_CUST_NVRAM_NAME, strlen(HISI_CUST_NVRAM_NAME) - 1);
@@ -680,9 +680,9 @@ int32 write_conf_to_nvram(int8 * name, int8 * pc_arr)
 }
 
 
-int32 get_cust_conf_string(int32 tag_index, int8 * puc_var, int8* puc_value, uint32 size)
+int get_cust_conf_string(int tag_index, char * puc_var, char* puc_value, unsigned int size)
 {
-    int32 ret = 0;
+    int ret = 0;
 
     if (CUST_MODU_NVRAM == tag_index)
     {
@@ -702,9 +702,9 @@ int32 get_cust_conf_string(int32 tag_index, int8 * puc_var, int8* puc_value, uin
 }
 
 
-int32 set_cust_conf_string(int32 tag_index, int8 * name, int8 * var)
+int set_cust_conf_string(int tag_index, char * name, char * var)
 {
-    int32 ret = INI_FAILED;
+    int ret = INI_FAILED;
 
     if (tag_index != CUST_MODU_NVRAM)
     {
@@ -718,10 +718,10 @@ int32 set_cust_conf_string(int32 tag_index, int8 * name, int8 * var)
 }
 
 
-int32 get_cust_conf_int32(int32 tag_index, int8 * puc_var, int32* puc_value)
+int get_cust_conf_int32(int tag_index, char * puc_var, int* puc_value)
 {
-    int32 ret = 0;
-    int8  out_str[INI_READ_VALUE_LEN] = {0};
+    int ret = 0;
+    char  out_str[INI_READ_VALUE_LEN] = {0};
 
     ret = ini_find_var_value(tag_index, puc_var, out_str, sizeof(out_str));
     if (ret < 0)
@@ -753,8 +753,8 @@ int32 get_cust_conf_int32(int32 tag_index, int8 * puc_var, int32* puc_value)
 
 int ini_cfg_init(void)
 {
-    int32 ret;
-    int8 auc_dts_ini_path[INI_FILE_PATH_LEN]  = {0};
+    int ret;
+    char auc_dts_ini_path[INI_FILE_PATH_LEN]  = {0};
 
     INI_INFO("hi110x ini config search init!\n");
 

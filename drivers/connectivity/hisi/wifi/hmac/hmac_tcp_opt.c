@@ -744,7 +744,7 @@ oal_bool_enum_uint8 hmac_judge_tx_netbuf_is_tcp_ack(oal_ether_header_stru *ps_et
  输入参数  : struct oal_netbuf_stru *skb
              struct hcc_handler *hcc
              oal_uint16 *p_us_index
-             uint8 dir
+             unsigned char dir
  输出参数  : 无
  返 回 值  : oal_uint32
  调用函数  :
@@ -794,7 +794,7 @@ oal_tcp_ack_type_enum_uint8  hmac_tcp_opt_rx_get_tcp_ack(oal_netbuf_stru *skb, h
  输入参数  : struct oal_netbuf_stru *skb
              struct hcc_handler *hcc
              oal_uint16*p_us_index
-             uint8 dir
+             unsigned char dir
  输出参数  : 无
  返 回 值  : oal_uint32
  调用函数  :

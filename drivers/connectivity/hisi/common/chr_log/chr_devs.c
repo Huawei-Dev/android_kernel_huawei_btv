@@ -53,16 +53,16 @@
 /*****************************************************************************
   2 函数声明
 *****************************************************************************/
-static int32 chr_misc_open(struct inode *fd, struct file *fp);
-static ssize_t chr_misc_read(struct file *fp, int8 __user *buff, size_t count, loff_t *loff);
-static int64 chr_misc_ioctl(struct file* fp, uint32 cmd, uint64 arg);
-static int32 chr_misc_release(struct inode *fd, struct file* fp);
+static int chr_misc_open(struct inode *fd, struct file *fp);
+static ssize_t chr_misc_read(struct file *fp, char __user *buff, size_t count, loff_t *loff);
+static long chr_misc_ioctl(struct file* fp, unsigned int cmd, unsigned long arg);
+static int chr_misc_release(struct inode *fd, struct file* fp);
 /*****************************************************************************
   3 全局变量定义
 *****************************************************************************/
 static CHR_EVENT g_chr_event;
 /* 本模块debug控制全局变量 */
-static int32     g_log_enable = CHR_LOG_DISABLE;
+static int     g_log_enable = CHR_LOG_DISABLE;
 
 static const struct file_operations chr_misc_fops = {
     .owner   = THIS_MODULE,
@@ -96,7 +96,7 @@ static struct miscdevice chr_misc_dev = {
     修改内容   : 新生成函数
 
 *****************************************************************************/
-static int32 chr_misc_open(struct inode *fd, struct file *fp)
+static int chr_misc_open(struct inode *fd, struct file *fp)
 {
     if (CHR_LOG_ENABLE != g_log_enable)
     {
@@ -117,10 +117,10 @@ static int32 chr_misc_open(struct inode *fd, struct file *fp)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-static ssize_t chr_misc_read(struct file *fp, int8 __user *buff, size_t count, loff_t *loff)
+static ssize_t chr_misc_read(struct file *fp, char __user *buff, size_t count, loff_t *loff)
 {
-    int32 ret;
-    uint32 __user   *puser = (uint32 __user *)buff;
+    int ret;
+    unsigned int __user   *puser = (unsigned int __user *)buff;
     struct sk_buff  *skb   =NULL;
 
     if (CHR_LOG_ENABLE != g_log_enable)
@@ -129,7 +129,7 @@ static ssize_t chr_misc_read(struct file *fp, int8 __user *buff, size_t count, l
         return -EBUSY;
     }
 
-    if (count < sizeof(uint32))
+    if (count < sizeof(unsigned int))
     {
         CHR_ERR("The user space buff is too small\n");
         return -CHR_EFAIL;
@@ -163,16 +163,16 @@ static ssize_t chr_misc_read(struct file *fp, int8 __user *buff, size_t count, l
             }
         }
     }
-    ret = copy_to_user(puser, skb->data, sizeof(uint32));
+    ret = copy_to_user(puser, skb->data, sizeof(unsigned int));
     if (ret)
     {
-        CHR_WARNING("copy_to_user err!restore it, len=%d\n", (int32)sizeof(uint32));
+        CHR_WARNING("copy_to_user err!restore it, len=%d\n", (int)sizeof(unsigned int));
         skb_queue_head(&g_chr_event.errno_queue, skb);
         return -EFAULT;
     }
     kfree_skb(skb);
 
-    return sizeof(uint32);
+    return sizeof(unsigned int);
 }
 /*****************************************************************************
  函 数 名  : chr_write_errno_to_queue
@@ -184,7 +184,7 @@ static ssize_t chr_misc_read(struct file *fp, int8 __user *buff, size_t count, l
     修改内容   : 新生成函数
 
 *****************************************************************************/
-static int32 chr_write_errno_to_queue(uint32 ul_errno)
+static int chr_write_errno_to_queue(unsigned int ul_errno)
 {
     struct sk_buff  *skb   =NULL;
 
@@ -195,15 +195,15 @@ static int32 chr_write_errno_to_queue(uint32 ul_errno)
     }
 
     /* for code run in interrupt context */
-    skb = alloc_skb(sizeof(uint32), oal_in_interrupt() ? GFP_ATOMIC : GFP_KERNEL);
+    skb = alloc_skb(sizeof(unsigned int), oal_in_interrupt() ? GFP_ATOMIC : GFP_KERNEL);
     if( NULL == skb)
     {
-        CHR_ERR("chr errno alloc skbuff failed! len=%d, errno=%x\n", (int32)sizeof(uint32), ul_errno);
+        CHR_ERR("chr errno alloc skbuff failed! len=%d, errno=%x\n", (int)sizeof(unsigned int), ul_errno);
         return -ENOMEM;
     }
 
-    skb_put(skb, sizeof(uint32));
-    *(uint32*)skb->data = ul_errno;
+    skb_put(skb, sizeof(unsigned int));
+    *(unsigned int*)skb->data = ul_errno;
     skb_queue_tail(&g_chr_event.errno_queue, skb);
     wake_up_interruptible(&g_chr_event.errno_wait);
     return CHR_SUCC;
@@ -218,10 +218,10 @@ static int32 chr_write_errno_to_queue(uint32 ul_errno)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-static int64 chr_misc_ioctl(struct file* fp, uint32 cmd, uint64 arg)
+static long chr_misc_ioctl(struct file* fp, unsigned int cmd, unsigned long arg)
 {
-    uint32 __user   *puser = (uint32 __user *)arg;
-    uint32 ret, value = 0;
+    unsigned int __user   *puser = (unsigned int __user *)arg;
+    unsigned int ret, value = 0;
 
     if (CHR_LOG_ENABLE != g_log_enable)
     {
@@ -270,7 +270,7 @@ static int64 chr_misc_ioctl(struct file* fp, uint32 cmd, uint64 arg)
     修改内容   : 新生成函数
 
 *****************************************************************************/
-static int32 chr_misc_release(struct inode *fd, struct file* fp)
+static int chr_misc_release(struct inode *fd, struct file* fp)
 {
     if (CHR_LOG_ENABLE != g_log_enable)
     {
@@ -293,7 +293,7 @@ static int32 chr_misc_release(struct inode *fd, struct file* fp)
     修改内容   : 注空还函数
 
 *****************************************************************************/
-int32 __chr_printLog(CHR_LOGPRIORITY prio, CHR_DEV_INDEX dev_index, const int8 *fmt,...)
+int __chr_printLog(CHR_LOGPRIORITY prio, CHR_DEV_INDEX dev_index, const char *fmt,...)
 {
     return CHR_SUCC;
 }
@@ -308,7 +308,7 @@ EXPORT_SYMBOL(__chr_printLog);
     修改内容   : 新生成函数
 
 *****************************************************************************/
-int32  __chr_exception(uint32 errno)
+int  __chr_exception(unsigned int errno)
 {
     if (CHR_LOG_ENABLE != g_log_enable)
     {
@@ -330,7 +330,7 @@ EXPORT_SYMBOL(__chr_exception);
     修改内容   : 新生成函数
 
 *****************************************************************************/
-void chr_dev_exception_callback(void *buff, uint16 len)
+void chr_dev_exception_callback(void *buff, unsigned short len)
 {
     CHR_DEV_EXCEPTION_STRU* chr_dev_exception = NULL;
 
@@ -342,7 +342,7 @@ void chr_dev_exception_callback(void *buff, uint16 len)
 
     if (len != sizeof(CHR_DEV_EXCEPTION_STRU))
     {
-        CHR_WARNING("chr recv device errno fail, len %d is unavailable\n", (int32)len);
+        CHR_WARNING("chr recv device errno fail, len %d is unavailable\n", (int)len);
         return;
     }
 
@@ -366,9 +366,9 @@ EXPORT_SYMBOL(chr_dev_exception_callback);
     修改内容   : 新生成函数
 
 *****************************************************************************/
-int32 chr_miscdevs_init(void)
+int chr_miscdevs_init(void)
 {
-    int32 ret = 0;
+    int ret = 0;
 #if (_PRE_OS_VERSION_LINUX == _PRE_OS_VERSION)
     if (!is_my_chip()) {
         CHR_INFO("cfg chr log chip type is not match, skip driver init");

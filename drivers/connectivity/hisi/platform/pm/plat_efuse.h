@@ -100,10 +100,10 @@ extern "C" {
 /*****************************************************************************
   10 º¯ÊıÉùÃ÷
 *****************************************************************************/
-extern int32 number_type_cmd_send(uint8 *Key, uint8 *Value);
-extern int32 read_msg(uint8 *data, int32 len);
+extern int number_type_cmd_send(unsigned char *Key, unsigned char *Value);
+extern int read_msg(unsigned char *data, int len);
 extern void  store_efuse_info(void);
-extern uint8 get_ec_version(void);
+extern unsigned char get_ec_version(void);
 
 #ifdef __cplusplus
     #if __cplusplus

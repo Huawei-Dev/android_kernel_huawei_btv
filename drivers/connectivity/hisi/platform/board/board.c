@@ -28,7 +28,7 @@
 BOARD_INFO g_board_info = {0};
 EXPORT_SYMBOL(g_board_info);
 
-uint32 g_device_subchip_type = 0xFFFFFF;  /*save device board index*/
+unsigned int g_device_subchip_type = 0xFFFFFF;  /*save device board index*/
 
 DEVICE_BOARD_VERSION device_board_version_list[BOARD_VERSION_BOTT] = {
     {.index = BOARD_VERSION_HI1102, .name = BOARD_VERSION_NAME_HI1102},
@@ -56,7 +56,7 @@ inline BOARD_INFO * get_hi110x_board_info(void)
 }
 
 #ifdef _PRE_CONFIG_USE_DTS
-int32 get_board_dts_node(struct device_node ** np, const char * node_prop)
+int get_board_dts_node(struct device_node ** np, const char * node_prop)
 {
 	if (NULL ==np || NULL == node_prop)
 	{
@@ -74,9 +74,9 @@ int32 get_board_dts_node(struct device_node ** np, const char * node_prop)
 	return BOARD_SUCC;
 }
 
-int32 get_board_dts_prop(struct device_node *np, const char * dts_prop, const char ** prop_val)
+int get_board_dts_prop(struct device_node *np, const char * dts_prop, const char ** prop_val)
 {
-	int32 ret = BOARD_FAIL;
+	int ret = BOARD_FAIL;
 
 	if (NULL == np || NULL == dts_prop || NULL == prop_val)
 	{
@@ -96,9 +96,9 @@ int32 get_board_dts_prop(struct device_node *np, const char * dts_prop, const ch
 	return BOARD_SUCC;
 }
 
-int32 get_board_dts_gpio_prop(struct device_node *np, const char * dts_prop, int32 * prop_val)
+int get_board_dts_gpio_prop(struct device_node *np, const char * dts_prop, int * prop_val)
 {
-	int32 ret = BOARD_FAIL;
+	int ret = BOARD_FAIL;
 
 	if (NULL == np || NULL == dts_prop || NULL == prop_val)
 	{
@@ -121,10 +121,10 @@ int32 get_board_dts_gpio_prop(struct device_node *np, const char * dts_prop, int
 
 #endif
 
-int32 get_board_gpio(const char * gpio_node, const char * gpio_prop, int32 *physical_gpio)
+int get_board_gpio(const char * gpio_node, const char * gpio_prop, int *physical_gpio)
 {
 #ifdef _PRE_CONFIG_USE_DTS
-	int32 ret= BOARD_FAIL;
+	int ret= BOARD_FAIL;
 	struct device_node * np = NULL;
 
 	ret = get_board_dts_node(&np, gpio_node);
@@ -145,10 +145,10 @@ int32 get_board_gpio(const char * gpio_node, const char * gpio_prop, int32 *phys
 #endif
 }
 
-int32 get_board_custmize(const char * cust_node, const char * cust_prop, const char **cust_prop_val)
+int get_board_custmize(const char * cust_node, const char * cust_prop, const char **cust_prop_val)
 {
 #ifdef _PRE_CONFIG_USE_DTS
-	int32 ret= BOARD_FAIL;
+	int ret= BOARD_FAIL;
 	struct device_node * np = NULL;
 
 	if (NULL == cust_node || NULL == cust_prop || NULL == cust_prop_val)
@@ -177,9 +177,9 @@ int32 get_board_custmize(const char * cust_node, const char * cust_prop, const c
 #endif
 }
 
-int32 get_board_pmu_clk32k(void)
+int get_board_pmu_clk32k(void)
 {
-	int32 ret= BOARD_FAIL;
+	int ret= BOARD_FAIL;
 	const char * clk_name = NULL;
 
 	PS_PRINT_DBG("in func\n");
@@ -194,9 +194,9 @@ int32 get_board_pmu_clk32k(void)
 	return BOARD_SUCC;
 }
 
-int32 set_board_pmu_clk32k(struct platform_device *pdev)
+int set_board_pmu_clk32k(struct platform_device *pdev)
 {
-	int32 ret= BOARD_FAIL;
+	int ret= BOARD_FAIL;
 	const char * clk_name = NULL;
 	struct clk* clk = NULL;
 	struct device *dev = NULL;
@@ -225,10 +225,10 @@ int32 set_board_pmu_clk32k(struct platform_device *pdev)
 	return BOARD_SUCC;
 }
 
-int32 get_board_uart_port(void)
+int get_board_uart_port(void)
 {
 #ifdef _PRE_CONFIG_USE_DTS
-    int32 ret= BOARD_FAIL;
+    int ret= BOARD_FAIL;
     struct device_node * np = NULL;
     const char *uart_port = NULL;
 
@@ -264,10 +264,10 @@ int32 get_board_uart_port(void)
 #endif
 }
 
-int32 check_evb_or_fpga(void)
+int check_evb_or_fpga(void)
 {
 #ifdef _PRE_CONFIG_USE_DTS
-    int32 ret= BOARD_FAIL;
+    int ret= BOARD_FAIL;
     struct device_node * np = NULL;
 
     ret = get_board_dts_node(&np, DTS_NODE_HI110X);
@@ -295,10 +295,10 @@ int32 check_evb_or_fpga(void)
 #endif
 }
 
-int32 board_get_power_pinctrl(struct platform_device *pdev)
+int board_get_power_pinctrl(struct platform_device *pdev)
 {
-    int32  ret = BOARD_FAIL;
-    int32  physical_gpio = 0;
+    int  ret = BOARD_FAIL;
+    int  physical_gpio = 0;
     struct device_node * np = NULL;
     struct pinctrl *pinctrl;
     struct pinctrl_state *pinctrl_def;
@@ -397,9 +397,9 @@ int32 board_get_power_pinctrl(struct platform_device *pdev)
     return BOARD_FAIL;
 }
 
-int32 board_power_gpio_init(void)
+int board_power_gpio_init(void)
 {
-    int32 ret = BOARD_FAIL;
+    int ret = BOARD_FAIL;
     switch (g_device_subchip_type)
     {
         case  BOARD_VERSION_HI1102:
@@ -446,9 +446,9 @@ void free_board_wakeup_gpio(void)
     }
 }
 
-int32 board_wakeup_gpio_init(void)
+int board_wakeup_gpio_init(void)
 {
-    int32 ret = BOARD_FAIL;
+    int ret = BOARD_FAIL;
     switch (g_device_subchip_type)
     {
         case  BOARD_VERSION_HI1102:
@@ -464,11 +464,11 @@ int32 board_wakeup_gpio_init(void)
     return ret;
 }
 
-int32 board_ir_ctrl_gpio_init(void)
+int board_ir_ctrl_gpio_init(void)
 {
 
-    int32 ret = BOARD_FAIL;
-    int32 physical_gpio = 0;
+    int ret = BOARD_FAIL;
+    int physical_gpio = 0;
 
     /* ir ctrl gpio request */
     ret = get_board_gpio(DTS_NODE_HI110X, DTS_PROP_GPIO_BFGN_IR_CTRL, &physical_gpio);
@@ -493,11 +493,11 @@ int32 board_ir_ctrl_gpio_init(void)
 }
 
 
-int32 board_ir_ctrl_pmic_init(struct platform_device *pdev)
+int board_ir_ctrl_pmic_init(struct platform_device *pdev)
 {
-    int32 ret = BOARD_FAIL;
+    int ret = BOARD_FAIL;
     struct device_node * np = NULL;
-    int32 irled_voltage = 0;
+    int irled_voltage = 0;
     if (NULL == pdev){
         PS_PRINT_ERR("board pmu pdev is NULL!\n");
         return ret;
@@ -544,9 +544,9 @@ int32 board_ir_ctrl_pmic_init(struct platform_device *pdev)
     return BOARD_SUCC;
 }
 
-int32 board_gpio_init(struct platform_device *pdev)
+int board_gpio_init(struct platform_device *pdev)
 {
-    int32 ret= BOARD_FAIL;
+    int ret= BOARD_FAIL;
     struct device_node * np = NULL;
 
     PS_PRINT_INFO("in func board_gpio_init\n");
@@ -644,11 +644,11 @@ int board_get_wlan_wkup_gpio_val(void)
 }
 
 
-int32 board_irq_init(void)
+int board_irq_init(void)
 {
-    int32 ret = BOARD_FAIL;
-    uint32 irq = 0;
-    int32 gpio = 0;
+    int ret = BOARD_FAIL;
+    unsigned int irq = 0;
+    int gpio = 0;
 
     PS_PRINT_INFO("in func\n");
 
@@ -674,9 +674,9 @@ int32 board_irq_init(void)
     return BOARD_SUCC;
 }
 
-int32 board_clk_init(struct platform_device *pdev)
+int board_clk_init(struct platform_device *pdev)
 {
-    int32 ret= BOARD_FAIL;
+    int ret= BOARD_FAIL;
 
     PS_PRINT_INFO("in func\n");
 
@@ -703,7 +703,7 @@ int32 board_clk_init(struct platform_device *pdev)
 
 void prepare_to_power_on(void)
 {
-    int32 ret = BOARD_FAIL;
+    int ret = BOARD_FAIL;
 
     if (NO_NEED_POWER_PREPARE == g_board_info.need_power_prepare)
     {
@@ -740,7 +740,7 @@ void prepare_to_power_on(void)
 
 void post_to_power_on(void)
 {
-    int32 ret = BOARD_FAIL;
+    int ret = BOARD_FAIL;
 
     if (NO_NEED_POWER_PREPARE == g_board_info.need_power_prepare)
     {
@@ -769,7 +769,7 @@ void post_to_power_on(void)
 
     return;
 }
-void power_state_change(int32 gpio, int32 flag)
+void power_state_change(int gpio, int flag)
 {
     if (BOARD_POWER_ON == flag)
     {
@@ -783,7 +783,7 @@ void power_state_change(int32 gpio, int32 flag)
         gpio_direction_output(gpio, GPIO_LOWLEVEL);
     }
 }
-void board_power_on(uint32 subsystem)
+void board_power_on(unsigned int subsystem)
 {
     if (subsystem >= POWER_BUTT)
     {
@@ -816,7 +816,7 @@ void board_power_on(uint32 subsystem)
 
     post_to_power_on();
 }
-void board_power_off(uint32 subsystem)
+void board_power_off(unsigned int subsystem)
 {
     if (subsystem >= POWER_BUTT)
     {
@@ -846,9 +846,9 @@ void board_power_off(uint32 subsystem)
     }
 }
 
-int32 find_device_board_version(void)
+int find_device_board_version(void)
 {
-    int32 ret= BOARD_FAIL;
+    int ret= BOARD_FAIL;
     const char *device_version = NULL;
 
     ret = get_board_custmize(DTS_NODE_HI110X, DTS_PROP_SUBCHIP_TYPE_VERSION, &device_version);
@@ -861,9 +861,9 @@ int32 find_device_board_version(void)
     return BOARD_SUCC;
 }
 
-int32 get_device_board_version(void)
+int get_device_board_version(void)
 {
-    int32 ret= BOARD_FAIL;
+    int ret= BOARD_FAIL;
 
     ret = find_device_board_version();
     if(BOARD_SUCC != ret)
@@ -886,9 +886,9 @@ int32 get_device_board_version(void)
     return BOARD_SUCC;
 }
 
-int32 check_download_channel_name(uint8* wlan_buff, int32* index)
+int check_download_channel_name(unsigned char* wlan_buff, int* index)
 {
-    int32 i = 0;
+    int i = 0;
     for (i = 0; i < MODE_DOWNLOAD_BUTT; i++)
     {
         if (0 == strncmp(device_download_mode_list[i].name, wlan_buff, strlen(device_download_mode_list[i].name)))
@@ -900,11 +900,11 @@ int32 check_download_channel_name(uint8* wlan_buff, int32* index)
     return BOARD_FAIL;
 }
 
-int32 get_download_channel(void)
+int get_download_channel(void)
 {
-    int32 ret= BOARD_FAIL;
-    uint8 wlan_mode[DOWNLOAD_CHANNEL_LEN]={0};
-    uint8 bfgn_mode[DOWNLOAD_CHANNEL_LEN]={0};
+    int ret= BOARD_FAIL;
+    unsigned char wlan_mode[DOWNLOAD_CHANNEL_LEN]={0};
+    unsigned char bfgn_mode[DOWNLOAD_CHANNEL_LEN]={0};
 
     /*wlan channel*/
     ret = find_download_channel(wlan_mode, INI_WLAN_DOWNLOAD_CHANNEL);
@@ -945,9 +945,9 @@ int32 get_download_channel(void)
     return BOARD_SUCC;
 }
 
-int32 check_device_board_name(void)
+int check_device_board_name(void)
 {
-    int32 i = 0;
+    int i = 0;
     for (i = 0; i < BOARD_VERSION_BOTT; i++)
     {
         if (0 == strncmp(device_board_version_list[i].name, g_board_info.chip_type, strlen(device_board_version_list[i].name)))
@@ -960,12 +960,12 @@ int32 check_device_board_name(void)
     return BOARD_FAIL;
 }
 
-int32 get_uart_pclk_source(void)
+int get_uart_pclk_source(void)
 {
     return g_board_info.uart_pclk;
 }
 
-STATIC int32 hi110x_board_probe(struct platform_device *pdev)
+STATIC int hi110x_board_probe(struct platform_device *pdev)
 {
     int ret = BOARD_FAIL;
     PS_PRINT_INFO("enter\n");
@@ -1040,7 +1040,7 @@ err_gpio_source:
     return BOARD_FAIL;
 }
 
-STATIC int32 hi110x_board_remove(struct platform_device *pdev)
+STATIC int hi110x_board_remove(struct platform_device *pdev)
 {
     PS_PRINT_INFO("enter\n");
 
@@ -1076,12 +1076,12 @@ STATIC int32 hi110x_board_remove(struct platform_device *pdev)
     return BOARD_SUCC;
 }
 
-int32 hi110x_board_suspend(struct platform_device *pdev, pm_message_t state)
+int hi110x_board_suspend(struct platform_device *pdev, pm_message_t state)
 {
     return BOARD_SUCC;
 }
 
-int32 hi110x_board_resume(struct platform_device *pdev)
+int hi110x_board_resume(struct platform_device *pdev)
 {
     return BOARD_SUCC;
 }
@@ -1099,20 +1099,20 @@ int32 hi110x_board_resume(struct platform_device *pdev)
 #define INTERVAL_TIME             (10)
 #define SSI_DATA_LEN              (16)
 
-uint32 g_ssi_clk  = 0;              /*模拟ssi时钟的GPIO管脚号*/
-uint32 g_ssi_data = 0;              /*模拟ssi数据线的GPIO管脚号*/
-uint16 g_ssi_base = 0x8000;         /*ssi基址*/
-uint32 g_interval = INTERVAL_TIME;  /*GPIO拉出来的波形保持时间，单位us*/
-uint32 g_delay    = 5;
+unsigned int g_ssi_clk  = 0;              /*模拟ssi时钟的GPIO管脚号*/
+unsigned int g_ssi_data = 0;              /*模拟ssi数据线的GPIO管脚号*/
+short g_ssi_base = 0x8000;         /*ssi基址*/
+unsigned int g_interval = INTERVAL_TIME;  /*GPIO拉出来的波形保持时间，单位us*/
+unsigned int g_delay    = 5;
 
-int32 ssi_show_setup(void)
+int ssi_show_setup(void)
 {
     PS_PRINT_INFO("clk=%d, data=%d, interval=%d us, ssi base=0x%x, r/w delay=%d cycle\n",
                     g_ssi_clk, g_ssi_data, g_interval, g_ssi_base, g_delay);
     return BOARD_SUCC;
 }
 
-int32 ssi_setup(uint32 interval, uint32 delay, uint16 ssi_base)
+int ssi_setup(unsigned int interval, unsigned int delay, unsigned short ssi_base)
 {
     g_interval    = interval;
     g_delay       = delay;
@@ -1121,9 +1121,9 @@ int32 ssi_setup(uint32 interval, uint32 delay, uint16 ssi_base)
     return BOARD_SUCC;
 }
 
-int32 ssi_request_gpio(uint32 clk, uint32 data)
+int ssi_request_gpio(unsigned int clk, unsigned int data)
 {
-    int32 ret = BOARD_FAIL;
+    int ret = BOARD_FAIL;
 
     PS_PRINT_INFO("request hi110x ssi GPIO\n");
 
@@ -1157,7 +1157,7 @@ err_get_ssi_clk_gpio:
     return ret;
 }
 
-int32 ssi_free_gpio(void)
+int ssi_free_gpio(void)
 {
     PS_PRINT_INFO("free hi110x ssi GPIO\n");
 
@@ -1183,7 +1183,7 @@ void ssi_clk_output(void)
     gpio_direction_output(g_ssi_clk, GPIO_HIGHLEVEL);
 }
 
-void ssi_data_output(uint16 data)
+void ssi_data_output(unsigned short data)
 {
     udelay(5);
     if (data)
@@ -1198,10 +1198,10 @@ void ssi_data_output(uint16 data)
     udelay(g_interval);
 }
 
-int32 ssi_write_data(uint16 addr, uint16 value)
+int ssi_write_data(unsigned short addr, unsigned short value)
 {
-    uint16 tx;
-    uint32 i;
+    unsigned short tx;
+    unsigned int i;
 
     for (i = 0; i < g_delay; i++)
     {
@@ -1250,14 +1250,14 @@ int32 ssi_write_data(uint16 addr, uint16 value)
     return BOARD_SUCC;
 }
 
-uint16 ssi_read_data(uint16 addr)
+unsigned short ssi_read_data(unsigned short addr)
 {
 #define SSI_READ_RETTY (1000)
-    uint16 tx;
-    uint32 i;
-    uint32 retry = 0;
-    uint16 rx;
-    uint16 data = 0;
+    unsigned short tx;
+    unsigned int i;
+    unsigned int retry = 0;
+    unsigned short rx;
+    unsigned short data = 0;
 
     for (i = 0; i < g_delay; i++)
     {
@@ -1328,10 +1328,10 @@ uint16 ssi_read_data(uint16 addr)
     return data;
 }
 
-int32 ssi_write16(uint16 addr, uint16 value)
+int ssi_write16(unsigned short addr, unsigned short value)
 {
 #define write_retry   (3)
-    uint32 retry = 0;
+    unsigned int retry = 0;
 
     do
     {
@@ -1349,9 +1349,9 @@ int32 ssi_write16(uint16 addr, uint16 value)
     return BOARD_FAIL;
 }
 
-uint16 ssi_read16(uint16 addr)
+unsigned short ssi_read16(unsigned short addr)
 {
-    uint16 data;
+    unsigned short data;
 
     data = ssi_read_data(addr);
 
@@ -1360,10 +1360,10 @@ uint16 ssi_read16(uint16 addr)
     return data;
 }
 
-int32 ssi_write32(uint32 addr, uint16 value)
+int ssi_write32(unsigned int addr, unsigned short value)
 {
-    uint16 addr_half_word_high;
-    uint16 addr_half_word_low;
+    unsigned short addr_half_word_high;
+    unsigned short addr_half_word_low;
 
     addr_half_word_high = (addr >> 16) & 0xffff;
     addr_half_word_low  = (addr & 0xffff) >> 1;
@@ -1387,11 +1387,11 @@ int32 ssi_write32(uint32 addr, uint16 value)
     return BOARD_SUCC;
 }
 
-int32 ssi_read32(uint32 addr)
+int ssi_read32(unsigned int addr)
 {
-    uint16  data = 0;
-    uint16 addr_half_word_high;
-    uint16 addr_half_word_low;
+    unsigned short  data = 0;
+    unsigned short addr_half_word_high;
+    unsigned short addr_half_word_low;
 
     addr_half_word_high = (addr >> 16) & 0xffff;
     addr_half_word_low  = (addr & 0xffff) >> 1;
@@ -1440,9 +1440,9 @@ STATIC struct platform_driver hi110x_board_driver = {
         },
 };
 
-int32 hi110x_board_init(void)
+int hi110x_board_init(void)
 {
-    int32 ret = BOARD_FAIL;
+    int ret = BOARD_FAIL;
 
     PS_PRINT_FUNCTION_NAME;
 

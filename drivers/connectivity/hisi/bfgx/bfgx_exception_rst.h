@@ -30,10 +30,10 @@
 *****************************************************************************/
 typedef struct DUMP_MEM_RES
 {
-    uint8 *file_name;
-    uint32 start_addr;
-    uint32 align_type;
-    uint32 men_len;
+    unsigned char *file_name;
+    unsigned int start_addr;
+    unsigned int align_type;
+    unsigned int men_len;
 }exception_bcpu_dump_msg;
 enum dump_msg_align_type
 {
@@ -70,8 +70,8 @@ enum BFGX_DUMP_TYPE
 /*****************************************************************************
   6 EXTERN FUNCTION
 *****************************************************************************/
-extern void plat_dfr_cfg_set(uint64 arg);
-extern void plat_beatTimer_timeOut_reset_cfg_set(uint64 arg);
+extern void plat_dfr_cfg_set(unsigned long arg);
+extern void plat_beatTimer_timeOut_reset_cfg_set(unsigned long arg);
 
 #endif
 
