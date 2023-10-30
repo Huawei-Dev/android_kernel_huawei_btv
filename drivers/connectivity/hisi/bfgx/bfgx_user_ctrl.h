@@ -51,19 +51,19 @@ typedef struct
   4 EXTERN VARIABLE
 *****************************************************************************/
 extern struct kobject *g_sysfs_hi110x_bfgx;
-extern int32 g_plat_loglevel;
-extern int32 g_bug_on_enable;
+extern int g_plat_loglevel;
+extern int g_bug_on_enable;
 
 #ifdef PLATFORM_DEBUG_ENABLE
-extern int32 g_uart_rx_dump;
+extern int g_uart_rx_dump;
 #endif
 
 /*****************************************************************************
   5 EXTERN FUNCTION
 *****************************************************************************/
-extern int32 bfgx_user_ctrl_init(void);
+extern int bfgx_user_ctrl_init(void);
 extern void bfgx_user_ctrl_exit(void);
-extern int32 plat_send_rotate_cmd_2_app(uint32 which_dump);
+extern int plat_send_rotate_cmd_2_app(unsigned int which_dump);
 extern void plat_wait_last_rotate_finish(void);
 extern void plat_rotate_finish_set(void);
 extern void plat_exception_dump_file_rotate_init(void);

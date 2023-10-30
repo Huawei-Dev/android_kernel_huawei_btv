@@ -20,10 +20,10 @@ typedef  enum {
   3 STRUCT DEFINE
 *****************************************************************************/
 struct ps_uart_state_s {
-    uint32 tty_tx_cnt;
-    uint32 tty_rx_cnt;
-    uint32 tty_stopped;     /* tty 软件流控标志位 */
-    uint32 tty_hw_stopped;  /* tty 硬件流控标志位 */
+    unsigned int tty_tx_cnt;
+    unsigned int tty_rx_cnt;
+    unsigned int tty_stopped;     /* tty 软件流控标志位 */
+    unsigned int tty_hw_stopped;  /* tty 硬件流控标志位 */
     struct uart_icount uart_cnt;
 };
 
@@ -34,14 +34,14 @@ struct ps_uart_state_s {
 /*****************************************************************************
   5 EXTERN FUNCTION
 *****************************************************************************/
-extern int32 plat_uart_init(void);
-extern int32 plat_uart_exit(void);
-extern int32 open_tty_drv(void *pm_data);
-extern int32 release_tty_drv(void *pm_data);
-extern int32 ps_change_uart_baud_rate(int64 baud_rate, uint8 enable_flowctl);
-extern void ps_uart_tty_tx_add(uint32 cnt);
+extern int plat_uart_init(void);
+extern int plat_uart_exit(void);
+extern int open_tty_drv(void *pm_data);
+extern int release_tty_drv(void *pm_data);
+extern int ps_change_uart_baud_rate(long baud_rate, unsigned char enable_flowctl);
+extern void ps_uart_tty_tx_add(unsigned int cnt);
 extern void ps_uart_state_pre(struct tty_struct *tty);
 extern void ps_uart_state_dump(struct tty_struct *tty);
-extern uint32 ps_uart_state_cur(uint32 index);
+extern unsigned int ps_uart_state_cur(unsigned int index);
 #endif
 

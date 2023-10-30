@@ -1,9 +1,6 @@
-
-
 /*****************************************************************************
   1 Header File Including
 *****************************************************************************/
-/*lint -e322*//*lint -e7*/
 #include <linux/mmc/sdio.h>
 #include <linux/mmc/host.h>
 #include <linux/mmc/card.h>
@@ -11,7 +8,6 @@
 #include <linux/mmc/sdio_ids.h>
 #include <linux/mmc/sdio_func.h>
 #include <linux/mmc/host.h>
-/*lint +e322*//*lint +e7*/
 
 #include "oal_sdio.h"
 #include "oal_sdio_host_if.h"
@@ -31,7 +27,7 @@
 /*
  * Prototype    : sdio_patch_writesb
  * Description  : provide interface for pm driver
- * Input        : uint8* buf, uint32 len
+ * Input        : unsigned char* buf, unsigned int len
  * Output       : None
  * Return Value : int32
  * Calls        :
@@ -43,7 +39,7 @@
  *     Modification : Created function
  *
  */
-int32 sdio_patch_writesb(uint8* buf, uint32 len)
+int sdio_patch_writesb(unsigned char* buf, unsigned int len)
 {
     int ret;
     struct pm_drv_data *pm_data = pm_get_drvdata();
@@ -85,7 +81,7 @@ int32 sdio_patch_writesb(uint8* buf, uint32 len)
 /*
  * Prototype    : sdio_patch_readsb
  * Description  : provide interface for pm driver
- * Input        : uint8* buf, uint32 len uint32 timeout (ms)
+ * Input        : unsigned char* buf, unsigned int len unsigned int timeout (ms)
  * Output       : None
  * Return Value : int32
  * Calls        :
@@ -98,13 +94,13 @@ int32 sdio_patch_writesb(uint8* buf, uint32 len)
  *
  */
 
-int32 sdio_patch_readsb(uint8* buf, uint32 len, uint32 timeout)
+int sdio_patch_readsb(unsigned char* buf, unsigned int len, unsigned int timeout)
 {
-    uint8   int_mask;
-    uint8  *ver_info;
+    unsigned char   int_mask;
+    unsigned char  *ver_info;
     int     ret = 0;
     unsigned long timeout_jiffies;
-    uint32  xfer_count;
+    unsigned int  xfer_count;
     int     i;
     struct pm_drv_data *pm_data = pm_get_drvdata();
 

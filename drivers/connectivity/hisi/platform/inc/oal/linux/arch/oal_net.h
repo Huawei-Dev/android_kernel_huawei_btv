@@ -320,7 +320,7 @@ typedef netdev_tx_t  oal_net_dev_tx_enum;
 #else
 typedef oal_int32    oal_net_dev_tx_enum;
 #endif
-/* 由于02 device是裸系统，需要使用uint8，所有02用uint8类型 51不改变*/
+/* 由于02 device是裸系统，需要使用unsigned char，所有02用unsigned char类型 51不改变*/
 #if (defined(_PRE_PRODUCT_ID_HI110X_DEV) || defined(_PRE_PRODUCT_ID_HI110X_HOST))
 typedef oal_uint8  oal_nl80211_auth_type_enum_uint8;
 #elif (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1151)

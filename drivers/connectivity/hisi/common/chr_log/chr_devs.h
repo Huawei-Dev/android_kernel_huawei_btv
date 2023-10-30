@@ -61,22 +61,8 @@
 #define CHR_MAGIC                   'C'
 #define CHR_MAX_NR                  1
 #define chr_ERRNO_WRITE_NR          1
-#define CHR_ERRNO_WRITE             _IOW(CHR_MAGIC, 1, int32)
-/*****************************************************************************
-  3 数据类型定义
-*****************************************************************************/
-typedef unsigned char               uint8;
-typedef char                        int8;
-typedef unsigned short              uint16;
-typedef short                       int16;
-typedef unsigned int                uint32;
-typedef int                         int32;
-typedef unsigned long               uint64;
-typedef long                        int64;
+#define CHR_ERRNO_WRITE             _IOW(CHR_MAGIC, 1, int)
 
-/*****************************************************************************
-  4 枚举类型定义
-*****************************************************************************/
 typedef enum chr_dev_index{
     CHR_INDEX_KMSG_PLAT = 0,
     CHR_INDEX_KMSG_WIFI,
@@ -129,10 +115,10 @@ typedef struct {
 
 typedef struct
 {
-    uint8  framehead;
-    uint8  reserved[3];
-    uint32 errno;
-    uint8  frametail;
+    unsigned char  framehead;
+    unsigned char  reserved[3];
+    unsigned int errno;
+    unsigned char  frametail;
 }CHR_DEV_EXCEPTION_STRU;
 
 #endif

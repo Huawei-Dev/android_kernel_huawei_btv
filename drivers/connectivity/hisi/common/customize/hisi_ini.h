@@ -167,10 +167,10 @@ extern INI_PARAM_VERSION_STRU g_param_version;
 /*
  * 10 Function Declare
  */
-extern int32 get_cust_conf_int32(int32 tag_index, int8 * puc_var, int32 *pul_value);
-extern int32 get_cust_conf_string(int32 tag_index, int8* puc_var, int8 *puc_value, uint32 size);
-extern int32 find_download_channel(uint8* buff, int8 * puc_var);
-extern int32 ini_cfg_init(void);
+extern int get_cust_conf_int32(int tag_index, char * puc_var, int *pul_value);
+extern int get_cust_conf_string(int tag_index, char* puc_var, char *puc_value, unsigned int size);
+extern int find_download_channel(unsigned char* buff, char * puc_var);
+extern int ini_cfg_init(void);
 extern void  ini_cfg_exit(void);
 #endif 
 

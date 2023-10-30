@@ -342,7 +342,7 @@ enum cfg80211_signal_type {
     CFG80211_SIGNAL_TYPE_UNSPEC,
 };
 
-typedef oal_uint8 en_cfg80211_signal_type_uint8;
+typedef oal_uint8 en_cfg80211_signal_type_unsigned char;
 
 typedef struct oal_cpu_usage_stat
 {
@@ -951,7 +951,7 @@ typedef struct oal_wiphy_tag
     oal_uint8   perm_addr[6];
     oal_uint8   addr_mask[6];
     oal_uint32  flags;
-    en_cfg80211_signal_type_uint8        signal_type;
+    en_cfg80211_signal_type_unsigned char        signal_type;
     oal_uint8                            max_scan_ssids;
     oal_uint16                           interface_modes;
     oal_uint16                           max_scan_ie_len;

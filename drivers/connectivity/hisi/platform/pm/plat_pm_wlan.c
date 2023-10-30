@@ -60,26 +60,26 @@ EXPORT_SYMBOL_GPL(g_wlan_pm_switch);
 oal_uint32 auto_freq_enable = 1;
 module_param(auto_freq_enable, uint, S_IRUGO | S_IWUSR);
 
-extern  int32 wlan_power_on(void);
-extern  int32 wlan_power_off(void);
+extern  int wlan_power_on(void);
+extern  int wlan_power_off(void);
 void wlan_pm_wakeup_work(oal_work_stru *pst_worker);
 void wlan_pm_sleep_work(oal_work_stru *pst_worker);
 void wlan_pm_freq_adjust_work(oal_work_stru *pst_worker);
 
 void wlan_pm_wdg_timeout(struct wlan_pm_s *pm_data);
 
-int32 wlan_pm_wakeup_done_callback(void *data);
-int32 wlan_pm_close_done_callback(void *data);
-int32 wlan_pm_open_bcpu_done_callback(void *data);
-int32 wlan_pm_close_bcpu_done_callback(void *data);
-int32 wlan_pm_halt_bcpu_done_callback(void *data);
+int wlan_pm_wakeup_done_callback(void *data);
+int wlan_pm_close_done_callback(void *data);
+int wlan_pm_open_bcpu_done_callback(void *data);
+int wlan_pm_close_bcpu_done_callback(void *data);
+int wlan_pm_halt_bcpu_done_callback(void *data);
 
 #ifdef _PRE_WLAN_DOWNLOAD_PM
 oal_uint16 g_us_download_rate_limit_pps = 0;
 EXPORT_SYMBOL_GPL(g_us_download_rate_limit_pps);
 #endif
 
-int32 wlan_pm_stop_wdg(struct wlan_pm_s *pst_wlan_pm_info);
+int wlan_pm_stop_wdg(struct wlan_pm_s *pst_wlan_pm_info);
 oal_int wlan_pm_work_submit(struct wlan_pm_s    *pst_wlan_pm, oal_work_stru* pst_worker);
 void wlan_pm_info_clean(void);
 
@@ -269,7 +269,7 @@ struct wlan_pm_s*  wlan_pm_init(oal_void)
     struct wlan_pm_s*   pst_wlan_pm;
     BOARD_INFO *        pst_board = get_hi110x_board_info();
 
-    if(OAL_PTR_NULL == pst_board)
+    if (OAL_PTR_NULL == pst_board)
     {
         return OAL_PTR_NULL;
     }
@@ -369,7 +369,7 @@ oal_uint  wlan_pm_exit(oal_void)
 {
     struct wlan_pm_s    *pst_wlan_pm = wlan_pm_get_drv();
 
-    if(OAL_PTR_NULL == pst_wlan_pm)
+    if (OAL_PTR_NULL == pst_wlan_pm)
     {
         return OAL_SUCC;
     }
@@ -417,13 +417,13 @@ oal_uint32 wlan_pm_is_poweron(oal_void)
 
     //struct pm_drv_data  *pm_data = pm_get_drvdata();
 
-    if(OAL_PTR_NULL == pst_wlan_pm)
+    if (OAL_PTR_NULL == pst_wlan_pm)
     {
         return OAL_FALSE;
     }
     //mutex_lock(&pm_data->host_mutex);
 
-    if(POWER_STATE_OPEN == pst_wlan_pm->ul_wlan_power_state)
+    if (POWER_STATE_OPEN == pst_wlan_pm->ul_wlan_power_state)
     {
         //mutex_unlock(&pm_data->host_mutex);
         return OAL_TRUE;
@@ -455,9 +455,9 @@ struct wifi_srv_callback_handler* wlan_pm_get_wifi_srv_handler(oal_void)
 {
     struct wlan_pm_s    *pst_wlan_pm = wlan_pm_get_drv();
 
-    if(OAL_PTR_NULL == pst_wlan_pm)
+    if (OAL_PTR_NULL == pst_wlan_pm)
     {
-        return OAL_FALSE;
+        return NULL;
     }
 
     return &pst_wlan_pm->st_wifi_srv_handler;
@@ -495,7 +495,7 @@ oal_int32 wlan_pm_open(oal_void)
 
     mutex_lock(&pm_data->host_mutex);
 
-    if(POWER_STATE_OPEN == pst_wlan_pm->ul_wlan_power_state)
+    if (POWER_STATE_OPEN == pst_wlan_pm->ul_wlan_power_state)
     {
         mutex_unlock(&pm_data->host_mutex);
         OAM_WARNING_LOG0(0, OAM_SF_PWR, "wlan_pm_open::aleady opened");
@@ -505,7 +505,7 @@ oal_int32 wlan_pm_open(oal_void)
     hisi_idle_sleep_vote(ID_WIFI,1);
     OAM_WARNING_LOG0(0, OAM_SF_PWR, "wlan_pm_open::hisi_idle_sleep_vote value 1!");
 #endif
-    if(!pst_wlan_pm->pst_sdio->st_sdio_wakelock.lock_count)
+    if (!pst_wlan_pm->pst_sdio->st_sdio_wakelock.lock_count)
     {
         /*make sure open only lock once*/
         oal_sdio_wake_lock(pst_wlan_pm->pst_sdio);
@@ -515,7 +515,7 @@ oal_int32 wlan_pm_open(oal_void)
 
     pst_wlan_pm->ul_open_cnt++;
 
-    if(OAL_SUCC != wlan_power_on())
+    if (OAL_SUCC != wlan_power_on())
     {
         OAM_ERROR_LOG0(0, OAM_SF_PWR, "wlan_pm_open::wlan_power_on fail!");
         pst_wlan_pm->ul_wlan_power_state = POWER_STATE_SHUTDOWN;
@@ -532,7 +532,7 @@ oal_int32 wlan_pm_open(oal_void)
 
         wlan_pm_init_device_ready(pm_data->pst_wlan_pm_info);
 
-        if(OAL_PTR_NULL == g_pst_custom_process_func.p_custom_cali_func)
+        if (OAL_PTR_NULL == g_pst_custom_process_func.p_custom_cali_func)
         {
             OAM_ERROR_LOG0(0,OAM_SF_PWR, "wlan_pm_open::NO g_pst_custom_process_func registered");
             mutex_unlock(&pm_data->host_mutex);
@@ -545,14 +545,14 @@ oal_int32 wlan_pm_open(oal_void)
         /* 如果校准下发成功则等待device ready；否则继续打开wifi */
         if (OAL_SUCC == g_pst_custom_process_func.p_custom_cali_func())
         {
-            if(0 == wlan_pm_wait_device_ready(pm_data->pst_wlan_pm_info))
+            if (0 == wlan_pm_wait_device_ready(pm_data->pst_wlan_pm_info))
             {
                 DECLARE_DFT_TRACE_KEY_INFO("wlan_wait_custom_cali_fail", OAL_DFT_TRACE_FAIL);
 
                 OAM_ERROR_LOG1(0,OAM_SF_PWR, "wlan_pm_open::wlan_pm_wait_custom_cali timeout %d !!!!!!", HOST_WAIT_BOTTOM_INIT_TIMEOUT);
 
                 mutex_unlock(&pm_data->host_mutex);
-                if(OAL_TRUE == oal_trigger_sdio_exception(oal_get_sdio_default_handler(), OAL_TRUE))
+                if (OAL_TRUE == oal_trigger_sdio_exception(oal_get_sdio_default_handler(), OAL_TRUE))
                 {
                     OAL_IO_PRINT("dump device mem when cali custom failed!\n");
                 }
@@ -592,7 +592,7 @@ oal_int32 wlan_device_mem_check(void)
     ram_reg_test_time = 0;
     oal_sdio_wake_lock(pst_wlan_pm->pst_sdio);
 
-    if(0!=wlan_pm_work_submit(pst_wlan_pm,&pst_wlan_pm->st_ram_reg_test_work))
+    if (0!=wlan_pm_work_submit(pst_wlan_pm,&pst_wlan_pm->st_ram_reg_test_work))
     {
         oal_sdio_wake_unlock(pst_wlan_pm->pst_sdio);
         OAM_WARNING_LOG0(0, OAM_SF_PWR,"st_ram_reg_test_work submit work fail !\n");
@@ -657,12 +657,12 @@ oal_uint32 wlan_pm_close(oal_void)
         return OAL_FAIL;
     }
 
-    if(OAL_PTR_NULL == pst_wlan_pm)
+    if (OAL_PTR_NULL == pst_wlan_pm)
     {
         return OAL_FAIL;
     }
 
-    if(!pst_wlan_pm->ul_apmode_allow_pm_flag)
+    if (!pst_wlan_pm->ul_apmode_allow_pm_flag)
     {
         OAM_WARNING_LOG0(0, OAM_SF_PWR, "wlan_pm_close,AP mode,do not shutdown power.");
         return OAL_SUCC;
@@ -681,7 +681,7 @@ oal_uint32 wlan_pm_close(oal_void)
 
     pst_wlan_pm->ul_close_cnt++;
 
-    if(POWER_STATE_SHUTDOWN == pst_wlan_pm->ul_wlan_power_state)
+    if (POWER_STATE_SHUTDOWN == pst_wlan_pm->ul_wlan_power_state)
     {
         mutex_unlock(&pm_data->host_mutex);
         return OAL_ERR_CODE_ALREADY_CLOSE;
@@ -698,7 +698,7 @@ oal_uint32 wlan_pm_close(oal_void)
     /*mask rx sdio data interrupt*/
     oal_sdio_func1_int_mask(pst_wlan_pm->pst_sdio, HISDIO_FUNC1_INT_DREADY);
 
-    if(OAL_SUCC!=wlan_power_off())
+    if (OAL_SUCC!=wlan_power_off())
     {
         OAM_ERROR_LOG0(0, OAM_SF_PWR,"wlan_power_off FAIL!\n");
         mutex_unlock(&pm_data->host_mutex);
@@ -753,14 +753,14 @@ oal_uint32 wlan_pm_enable(oal_void)
 
     struct wlan_pm_s    *pst_wlan_pm = wlan_pm_get_drv();
 
-    if(!g_wlan_pm_switch)
+    if (!g_wlan_pm_switch)
     {
         return OAL_SUCC;
     }
 
     hcc_tx_transfer_lock(hcc_get_default_handler());
 
-    if(OAL_TRUE == pst_wlan_pm->ul_wlan_pm_enable)
+    if (OAL_TRUE == pst_wlan_pm->ul_wlan_pm_enable)
     {
         OAM_WARNING_LOG0(0, OAM_SF_PWR,"wlan_pm_enable already enabled!");
         hcc_tx_transfer_unlock(hcc_get_default_handler());
@@ -771,7 +771,7 @@ oal_uint32 wlan_pm_enable(oal_void)
 
 
 #ifdef _PRE_WLAN_FEATURE_AUTO_FREQ
-     if(OAL_PTR_NULL != g_pst_alg_process_func.p_auto_freq_set_lock_mod_func)
+     if (OAL_PTR_NULL != g_pst_alg_process_func.p_auto_freq_set_lock_mod_func)
      {
            g_pst_alg_process_func.p_auto_freq_set_lock_mod_func(OAL_TRUE);
      }
@@ -810,14 +810,14 @@ oal_uint32 wlan_pm_disable_check_wakeup(oal_int32 flag)
 
     hcc_tx_transfer_lock(hcc_get_default_handler());
 
-    if(OAL_FALSE == pst_wlan_pm->ul_wlan_pm_enable)
+    if (OAL_FALSE == pst_wlan_pm->ul_wlan_pm_enable)
     {
         OAM_WARNING_LOG0(0, OAM_SF_PWR,"wlan_pm_disable already disabled!");
         hcc_tx_transfer_unlock(hcc_get_default_handler());
         return OAL_SUCC;
     }
 
-    if(OAL_TRUE == flag)
+    if (OAL_TRUE == flag)
     {
          if (OAL_SUCC != wlan_pm_wakeup_dev())
          {
@@ -829,7 +829,7 @@ oal_uint32 wlan_pm_disable_check_wakeup(oal_int32 flag)
 
 
 #ifdef _PRE_WLAN_FEATURE_AUTO_FREQ
-     if(OAL_PTR_NULL != g_pst_alg_process_func.p_auto_freq_set_lock_mod_func)
+     if (OAL_PTR_NULL != g_pst_alg_process_func.p_auto_freq_set_lock_mod_func)
      {
            g_pst_alg_process_func.p_auto_freq_set_lock_mod_func(OAL_FALSE);
      }
@@ -941,12 +941,12 @@ oal_uint wlan_pm_wakeup_dev(oal_void)
         return OAL_FAIL;
     }
 
-    if(OAL_FALSE == pst_wlan_pm->ul_wlan_pm_enable)
+    if (OAL_FALSE == pst_wlan_pm->ul_wlan_pm_enable)
     {
         return OAL_SUCC;
     }
 
-    if(HOST_DISALLOW_TO_SLEEP == pst_wlan_pm->ul_wlan_dev_state)
+    if (HOST_DISALLOW_TO_SLEEP == pst_wlan_pm->ul_wlan_dev_state)
     {
       return OAL_SUCC;
     }
@@ -975,14 +975,14 @@ wakeup_again:
     ret = oal_sdio_wakeup_dev(pst_wlan_pm->pst_sdio);
     OAL_IO_PRINT("wifi wakeup cmd send,wakelock cnt %lu\n",pst_wlan_pm->pst_sdio->st_sdio_wakelock.lock_count);
 
-    if(OAL_SUCC != ret)
+    if (OAL_SUCC != ret)
     {
         DECLARE_DFT_TRACE_KEY_INFO("wifi wakeup cmd send fail",OAL_DFT_TRACE_FAIL);
-        for(uc_retry = 0;uc_retry<WLAN_SDIO_MSG_RETRY_NUM;uc_retry++)
+        for (uc_retry = 0;uc_retry<WLAN_SDIO_MSG_RETRY_NUM;uc_retry++)
         {
             msleep(10);
             ret = oal_sdio_wakeup_dev(pst_wlan_pm->pst_sdio);
-            if(OAL_SUCC == ret)
+            if (OAL_SUCC == ret)
             {
                 break;
             }
@@ -991,7 +991,7 @@ wakeup_again:
         }
 
         /*after max retry still fail,log error*/
-        if(OAL_SUCC != ret)
+        if (OAL_SUCC != ret)
         {
             pst_wlan_pm->ul_wakeup_fail_set_reg++;
             OAM_ERROR_LOG1(0, OAM_SF_PWR,"oal_sdio_wakeup_dev Fail ret = %d",ret);
@@ -1011,17 +1011,17 @@ wakeup_again:
     up(&pst_wlan_pm->pst_sdio->gpio_rx_sema);
 
     ul_ret =  oal_wait_for_completion_timeout(&pst_wlan_pm->st_wakeup_done, (oal_uint32)OAL_MSECS_TO_JIFFIES(WLAN_WAKUP_MSG_WAIT_TIMEOUT));
-    if(0 == ul_ret)
+    if (0 == ul_ret)
     {
 
-        if(DISALLOW_TO_SLEEP_VALUE == oal_sdio_get_sleep_state(pst_wlan_pm->pst_sdio))
+        if (DISALLOW_TO_SLEEP_VALUE == oal_sdio_get_sleep_state(pst_wlan_pm->pst_sdio))
         {
             pst_wlan_pm->ul_wakeup_fail_timeout++;
             OAM_WARNING_LOG0(0, OAM_SF_PWR,"oal_sdio_wakeup_dev SUCC to set 0xf0 = 0");
             oal_sdio_sleep_dev(pst_wlan_pm->pst_sdio);
             pst_wlan_pm->ul_wlan_dev_state = HOST_ALLOW_TO_SLEEP;
             oal_sdio_wake_unlock(pst_wlan_pm->pst_sdio);
-            if(0==uc_wakeup_retry)
+            if (0==uc_wakeup_retry)
             {
                 OAM_WARNING_LOG1(0, OAM_SF_PWR,"wlan_pm_wakeup_dev wait device complete fail,wait time %d ms!,try again",WLAN_WAKUP_MSG_WAIT_TIMEOUT);
                 uc_wakeup_retry++;
@@ -1078,7 +1078,7 @@ oal_void wlan_pm_wakeup_dev_ack(oal_void)
 {
     struct wlan_pm_s    *pst_wlan_pm;
 
-    if(oal_atomic_read(&g_wakeup_dev_wait_ack))
+    if (oal_atomic_read(&g_wakeup_dev_wait_ack))
     {
         pst_wlan_pm = wlan_pm_get_drv();
 
@@ -1122,7 +1122,7 @@ oal_uint  wlan_pm_open_bcpu(oal_void)
     struct wlan_pm_s    *pst_wlan_pm = wlan_pm_get_drv();
     oal_uint32           ul_ret;
 
-    if(OAL_PTR_NULL == pst_wlan_pm)
+    if (OAL_PTR_NULL == pst_wlan_pm)
     {
         return OAL_FAIL;
     }
@@ -1141,7 +1141,7 @@ oal_uint  wlan_pm_open_bcpu(oal_void)
         }
     }
 
-    if(OAL_SUCC != ret)
+    if (OAL_SUCC != ret)
     {
         OAM_ERROR_LOG0(0, OAM_SF_PWR,"wlan_pm_wakeup_dev fail!");
         hcc_tx_transfer_unlock(hcc_get_default_handler());
@@ -1153,12 +1153,12 @@ oal_uint  wlan_pm_open_bcpu(oal_void)
     OAL_INIT_COMPLETION(&pst_wlan_pm->st_open_bcpu_done);
 
     ul_ret = oal_sdio_send_msg(pst_wlan_pm->pst_sdio, H2D_MSG_RESET_BCPU);
-    if(OAL_SUCC == ul_ret)
+    if (OAL_SUCC == ul_ret)
     {
         /*等待device执行命令*/
         up(&pst_wlan_pm->pst_sdio->gpio_rx_sema);
         ul_ret =  oal_wait_for_completion_timeout(&pst_wlan_pm->st_open_bcpu_done, (oal_uint32)OAL_MSECS_TO_JIFFIES(WLAN_OPEN_BCPU_WAIT_TIMEOUT));
-        if(0 == ul_ret)
+        if (0 == ul_ret)
         {
             OAM_ERROR_LOG0(0, OAM_SF_PWR,"wlan_pm_open_bcpu wait device ACK timeout !");
             hcc_tx_transfer_unlock(hcc_get_default_handler());
@@ -1200,7 +1200,7 @@ oal_uint wlan_pm_wakeup_host(void)
     oal_sdio_wake_lock(pst_wlan_pm->pst_sdio);
     OAM_INFO_LOG1(0, OAM_SF_PWR,"wlan_pm_wakeup_host get wakelock %lu!\n",pst_wlan_pm->pst_sdio->st_sdio_wakelock.lock_count);
 
-    if(0!=wlan_pm_work_submit(pst_wlan_pm,&pst_wlan_pm->st_wakeup_work))
+    if (0!=wlan_pm_work_submit(pst_wlan_pm,&pst_wlan_pm->st_wakeup_work))
     {
         pst_wlan_pm->ul_wakeup_fail_submit_work++;
         oal_sdio_wake_unlock(pst_wlan_pm->pst_sdio);
@@ -1235,7 +1235,7 @@ oal_int wlan_pm_work_submit(struct wlan_pm_s    *pst_wlan_pm, oal_work_stru* pst
 {
     oal_int  i_ret    = 0;
 
-    if(work_busy(pst_worker))
+    if (work_busy(pst_worker))
     {
         /*If comm worker is processing,
           we need't submit again*/
@@ -1245,7 +1245,7 @@ oal_int wlan_pm_work_submit(struct wlan_pm_s    *pst_wlan_pm, oal_work_stru* pst
     else
     {
         OAM_INFO_LOG1(0, OAM_SF_PWR,"WiFi %pF Worker Submit\n",(void*)pst_worker->func);
-        if(false==queue_work(pst_wlan_pm->pst_pm_wq, pst_worker))
+        if (false==queue_work(pst_wlan_pm->pst_pm_wq, pst_worker))
         {
            i_ret = -OAL_EFAIL;
         }
@@ -1279,7 +1279,7 @@ void wlan_pm_wakeup_work(oal_work_stru *pst_worker)
     hcc_tx_transfer_lock(hcc_get_default_handler());
 
     l_ret = wlan_pm_wakeup_dev();
-    if(OAL_UNLIKELY(OAL_SUCC!=l_ret))
+    if (OAL_UNLIKELY(OAL_SUCC!=l_ret))
     {
         DECLARE_DFT_TRACE_KEY_INFO("wlan_wakeup_fail",OAL_DFT_TRACE_FAIL);
     }
@@ -1311,7 +1311,7 @@ void wlan_pm_wakeup_work(oal_work_stru *pst_worker)
 
 *****************************************************************************/
 
-int32 wlan_pm_wakeup_done_callback(void *data)
+int wlan_pm_wakeup_done_callback(void *data)
 {
     struct wlan_pm_s *pst_wlan_pm = (struct wlan_pm_s *)data;
 
@@ -1341,7 +1341,7 @@ int32 wlan_pm_wakeup_done_callback(void *data)
 
 *****************************************************************************/
 
-int32 wlan_pm_close_done_callback(void *data)
+int wlan_pm_close_done_callback(void *data)
 {
     struct wlan_pm_s *pst_wlan_pm = (struct wlan_pm_s *)data;
 
@@ -1375,7 +1375,7 @@ int32 wlan_pm_close_done_callback(void *data)
 
 *****************************************************************************/
 
-int32 wlan_pm_open_bcpu_done_callback(void *data)
+int wlan_pm_open_bcpu_done_callback(void *data)
 {
     struct wlan_pm_s *pst_wlan_pm = (struct wlan_pm_s *)data;
 
@@ -1405,7 +1405,7 @@ int32 wlan_pm_open_bcpu_done_callback(void *data)
 
 *****************************************************************************/
 
-int32 wlan_pm_close_bcpu_done_callback(void *data)
+int wlan_pm_close_bcpu_done_callback(void *data)
 {
     struct wlan_pm_s *pst_wlan_pm = (struct wlan_pm_s *)data;
 
@@ -1435,7 +1435,7 @@ int32 wlan_pm_close_bcpu_done_callback(void *data)
 
 *****************************************************************************/
 
-int32 wlan_pm_halt_bcpu_done_callback(void *data)
+int wlan_pm_halt_bcpu_done_callback(void *data)
 {
     struct wlan_pm_s *pst_wlan_pm = (struct wlan_pm_s *)data;
 
@@ -1476,7 +1476,7 @@ void wlan_pm_sleep_work(oal_work_stru *pst_worker)
 
    hcc_tx_transfer_lock(hcc_get_default_handler());
 
-   if(OAL_FALSE == pst_wlan_pm->ul_wlan_pm_enable)
+   if (OAL_FALSE == pst_wlan_pm->ul_wlan_pm_enable)
    {
         wlan_pm_feed_wdg();
         hcc_tx_transfer_unlock(hcc_get_default_handler());
@@ -1484,19 +1484,19 @@ void wlan_pm_sleep_work(oal_work_stru *pst_worker)
    }
 
    /*协议栈回调获取是否pause低功耗*/
-   if(pst_wlan_pm->st_wifi_srv_handler.p_wifi_srv_get_pm_pause_func)
+   if (pst_wlan_pm->st_wifi_srv_handler.p_wifi_srv_get_pm_pause_func)
    {
        ul_wifi_pause_pm = pst_wlan_pm->st_wifi_srv_handler.p_wifi_srv_get_pm_pause_func();
    }
 
-   if(OAL_TRUE == ul_wifi_pause_pm)
+   if (OAL_TRUE == ul_wifi_pause_pm)
    {
         wlan_pm_feed_wdg();
         hcc_tx_transfer_unlock(hcc_get_default_handler());
         return ;
    }
 
-   if(HOST_ALLOW_TO_SLEEP == pst_wlan_pm->ul_wlan_dev_state)
+   if (HOST_ALLOW_TO_SLEEP == pst_wlan_pm->ul_wlan_dev_state)
    {
      //PS_PRINT_INFO("wakeuped,need not do again!\n");
      wlan_pm_feed_wdg();
@@ -1509,7 +1509,7 @@ void wlan_pm_sleep_work(oal_work_stru *pst_worker)
    OAL_INIT_COMPLETION(&pst_wlan_pm->st_sleep_request_ack);
 
    l_ret = wlan_pm_sleep_request(pst_wlan_pm);
-   if(OAL_SUCC != l_ret)
+   if (OAL_SUCC != l_ret)
    {
       pst_wlan_pm->ul_sleep_fail_request++;
       OAM_ERROR_LOG0(0, OAM_SF_PWR,"wlan_pm_sleep_request fail !\n");
@@ -1520,14 +1520,14 @@ void wlan_pm_sleep_work(oal_work_stru *pst_worker)
    up(&pst_wlan_pm->pst_sdio->gpio_rx_sema);
 
    ul_ret =  oal_wait_for_completion_timeout(&pst_wlan_pm->st_sleep_request_ack, (oal_uint32)OAL_MSECS_TO_JIFFIES(WLAN_SLEEP_MSG_WAIT_TIMEOUT));
-   if(0 == ul_ret)
+   if (0 == ul_ret)
    {
        pst_wlan_pm->ul_sleep_fail_wait_timeout++;
        OAM_ERROR_LOG0(0, OAM_SF_PWR,"wlan_pm_sleep_work wait completion fail !\n");
        goto fail_sleep;
    }
 
-   if(SLEEP_ALLOW_RCV == pst_wlan_pm->ul_sleep_stage)
+   if (SLEEP_ALLOW_RCV == pst_wlan_pm->ul_sleep_stage)
    {
 
        oal_wlan_gpio_intr_enable(pst_wlan_pm->pst_sdio,OAL_FALSE);
@@ -1536,13 +1536,13 @@ void wlan_pm_sleep_work(oal_work_stru *pst_worker)
 
        l_ret = oal_sdio_sleep_dev(pst_wlan_pm->pst_sdio);
        OAL_IO_PRINT("wifi sleep cmd send ,wakelock cnt %lu\n",pst_wlan_pm->pst_sdio->st_sdio_wakelock.lock_count);
-       if(OAL_SUCC!=l_ret)
+       if (OAL_SUCC!=l_ret)
        {
-            for(uc_retry = 0;uc_retry<WLAN_SDIO_MSG_RETRY_NUM;uc_retry++)
+            for (uc_retry = 0;uc_retry<WLAN_SDIO_MSG_RETRY_NUM;uc_retry++)
             {
                 msleep(10);
                 l_ret = oal_sdio_sleep_dev(pst_wlan_pm->pst_sdio);
-                if(OAL_SUCC == l_ret)
+                if (OAL_SUCC == l_ret)
                 {
                     break;
                 }
@@ -1550,7 +1550,7 @@ void wlan_pm_sleep_work(oal_work_stru *pst_worker)
             }
 
             /*after max retry still fail,log error*/
-           if(OAL_SUCC!=l_ret)
+           if (OAL_SUCC!=l_ret)
            {
                 pst_wlan_pm->ul_sleep_fail_set_reg++;
                 DECLARE_DFT_TRACE_KEY_INFO("wlan_sleep_cmd_fail",OAL_DFT_TRACE_FAIL);
@@ -1580,7 +1580,7 @@ void wlan_pm_sleep_work(oal_work_stru *pst_worker)
 
    DECLARE_DFT_TRACE_KEY_INFO("wlan_sleep_ok",OAL_DFT_TRACE_SUCC);
    pst_wlan_pm->ul_sleep_succ++;
-   if(0!=pst_wlan_pm->pst_sdio->st_sdio_wakelock.lock_count)
+   if (0!=pst_wlan_pm->pst_sdio->st_sdio_wakelock.lock_count)
    {
       OAM_WARNING_LOG1(0, OAM_SF_PWR,"wlan_pm_sleep_work release wakelock %lu!\n",pst_wlan_pm->pst_sdio->st_sdio_wakelock.lock_count);
    }
@@ -1624,14 +1624,14 @@ void wlan_pm_freq_adjust_work(oal_work_stru *pst_worker)
 
     hcc_tx_transfer_lock(hcc_get_default_handler());
 
-    if(OAL_FALSE == pst_wlan_pm->ul_wlan_pm_enable)
+    if (OAL_FALSE == pst_wlan_pm->ul_wlan_pm_enable)
     {
         hcc_tx_transfer_unlock(hcc_get_default_handler());
         return ;
     }
 
 #ifdef _PRE_WLAN_FEATURE_AUTO_FREQ
-    if(OAL_PTR_NULL != g_pst_alg_process_func.p_auto_freq_adjust_to_level_func)
+    if (OAL_PTR_NULL != g_pst_alg_process_func.p_auto_freq_adjust_to_level_func)
     {
        g_pst_alg_process_func.p_auto_freq_adjust_to_level_func();
     }
@@ -1709,7 +1709,7 @@ oal_void  wlan_pm_set_timeout(oal_uint32 ul_timeout)
 {
     struct wlan_pm_s    *pst_wlan_pm = wlan_pm_get_drv();
 
-    if(OAL_PTR_NULL == pst_wlan_pm)
+    if (OAL_PTR_NULL == pst_wlan_pm)
     {
         return ;
     }
@@ -1777,14 +1777,14 @@ oal_void  wlan_pm_feed_wdg(oal_void)
 
 *****************************************************************************/
 
-int32 wlan_pm_stop_wdg(struct wlan_pm_s *pst_wlan_pm_info)
+int wlan_pm_stop_wdg(struct wlan_pm_s *pst_wlan_pm_info)
 {
     OAL_IO_PRINT("wlan_pm_stop_wdg \r\n");
 
     pst_wlan_pm_info->ul_wdg_timeout_curr_cnt = 0;
     pst_wlan_pm_info->ul_packet_cnt = 0;
 
-    if(in_interrupt())
+    if (in_interrupt())
     {
         return del_timer(&pst_wlan_pm_info->st_watchdog_timer);
     }
@@ -1818,13 +1818,13 @@ void wlan_pm_wdg_timeout(struct wlan_pm_s *pm_data)
 
     //OAL_IO_PRINT("wlan_pm_wdg_timeout.... \r\n");
 
-    if(NULL == pm_data)
+    if (NULL == pm_data)
     {
         return;
     }
 
 #ifdef _PRE_WLAN_FEATURE_AUTO_FREQ
-    if(OAL_PTR_NULL != g_pst_alg_process_func.p_auto_freq_process_func)
+    if (OAL_PTR_NULL != g_pst_alg_process_func.p_auto_freq_process_func)
     {
         pm_data->ul_packet_cnt += g_pst_alg_process_func.p_auto_freq_process_func();
     }
@@ -1836,14 +1836,14 @@ void wlan_pm_wdg_timeout(struct wlan_pm_s *pm_data)
 #endif
 
     /*和调频共用一个timer，低功耗关闭时timer不会停*/
-    if(pm_data->ul_wlan_pm_enable)
+    if (pm_data->ul_wlan_pm_enable)
     {
-		if(0 == pm_data->ul_packet_cnt)
+		if (0 == pm_data->ul_packet_cnt)
 		{
 			pm_data->ul_wdg_timeout_curr_cnt++;
-			if((pm_data->ul_wdg_timeout_curr_cnt == pm_data->ul_wdg_timeout_cnt))
+			if (pm_data->ul_wdg_timeout_curr_cnt == pm_data->ul_wdg_timeout_cnt)
 			{
-                if(0 != wlan_pm_work_submit(pm_data, &pm_data->st_sleep_work))
+                if (0 != wlan_pm_work_submit(pm_data, &pm_data->st_sleep_work))
                 {
                     OAM_WARNING_LOG0(0, OAM_SF_PWR,"wlan_pm_sleep_work submit fail,work is running !\n");
                 }
@@ -1898,12 +1898,12 @@ oal_uint wlan_pm_adjust_feq(void)
 {
     struct wlan_pm_s    *pst_wlan_pm = wlan_pm_get_drv();
 
-    if(!auto_freq_enable)
+    if (!auto_freq_enable)
         return OAL_SUCC;
 
     OAL_BUG_ON(!pst_wlan_pm);
 
-    if(0!=wlan_pm_work_submit(pst_wlan_pm,&pst_wlan_pm->st_freq_adjust_work))
+    if (0!=wlan_pm_work_submit(pst_wlan_pm,&pst_wlan_pm->st_freq_adjust_work))
     {
         OAM_WARNING_LOG0(0, OAM_SF_PWR,"wlan_pm_adjust_feq submit work fail !\n");
     }
@@ -1938,7 +1938,7 @@ oal_int32 wlan_pm_poweroff_cmd(oal_void)
 
     hcc_tx_transfer_lock(hcc_get_default_handler());
 
-    if(OAL_SUCC != wlan_pm_wakeup_dev())
+    if (OAL_SUCC != wlan_pm_wakeup_dev())
     {
         hcc_tx_transfer_unlock(hcc_get_default_handler());
         return OAL_FAIL;
@@ -1946,11 +1946,11 @@ oal_int32 wlan_pm_poweroff_cmd(oal_void)
 
 
     ret =  oal_sdio_send_msg(pst_wlan_pm->pst_sdio,H2D_MSG_PM_WLAN_OFF);
-    if(OAL_SUCC == ret)
+    if (OAL_SUCC == ret)
     {
         /*等待device执行命令*/
         msleep(20);
-        if(0==board_get_wlan_wkup_gpio_val())
+        if (0==board_get_wlan_wkup_gpio_val())
         {
             OAM_ERROR_LOG1(0, OAM_SF_PWR,"wlan_pm_poweroff_cmd  wait device ACK timeout && GPIO_LEVEL[%d] !",board_get_wlan_wkup_gpio_val());
 
@@ -2013,7 +2013,7 @@ oal_int32 wlan_pm_shutdown_bcpu_cmd(oal_void)
         }
     }
 
-    if(OAL_SUCC != ret)
+    if (OAL_SUCC != ret)
     {
         OAM_ERROR_LOG0(0, OAM_SF_PWR,"wlan_pm_wakeup_dev fail!");
         hcc_tx_transfer_unlock(hcc_get_default_handler());
@@ -2025,11 +2025,11 @@ oal_int32 wlan_pm_shutdown_bcpu_cmd(oal_void)
     OAL_INIT_COMPLETION(&pst_wlan_pm->st_close_bcpu_done);
 
     ret =  oal_sdio_send_msg(pst_wlan_pm->pst_sdio,H2D_MSG_PM_BCPU_OFF);
-    if(OAL_SUCC == ret)
+    if (OAL_SUCC == ret)
     {
         /*等待device执行命令*/
         ul_ret = oal_wait_for_completion_timeout(&pst_wlan_pm->st_close_bcpu_done, (oal_uint32)OAL_MSECS_TO_JIFFIES(WLAN_POWEROFF_ACK_WAIT_TIMEOUT));
-        if(0 == ul_ret)
+        if (0 == ul_ret)
         {
             OAM_ERROR_LOG0(0, OAM_SF_PWR,"wlan_pm_shutdown_bcpu_cmd wait device ACK timeout !");
             hcc_tx_transfer_unlock(hcc_get_default_handler());
@@ -2068,7 +2068,7 @@ void wlan_pm_dump_host_info(void)
 {
     struct wlan_pm_s    *pst_wlan_pm = wlan_pm_get_drv();
 
-    if(NULL == pst_wlan_pm)
+    if (NULL == pst_wlan_pm)
     {
         return;
     }
