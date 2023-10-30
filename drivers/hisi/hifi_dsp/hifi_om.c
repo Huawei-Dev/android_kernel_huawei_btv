@@ -594,65 +594,9 @@ END:
 
 static debug_level_com s_debug_level_com[4] = {{'d', 3},{'i', 2},{'w', 1},{'e', 0}};
 
-static unsigned int hifi_get_debug_level_num(char level_char)
-{
-	int i = 0;
-	int len = sizeof(s_debug_level_com)/sizeof(s_debug_level_com[0]);
-
-	for (i = 0; i < len; i++) {
-		if(level_char == s_debug_level_com[i].level_char) {
-			return s_debug_level_com[i].level_num;
-		}
-	}
-
-	return 2; /*info*/
-}
-
-static char hifi_get_debug_level_char(char level_num)
-{
-	int i = 0;
-	int len = sizeof(s_debug_level_com)/sizeof(s_debug_level_com[0]);
-
-	for (i = 0; i < len; i++) {
-		if(level_num == s_debug_level_com[i].level_num) {
-			return s_debug_level_com[i].level_char;
-		}
-	}
-
-	return 'i'; /*info*/
-}
-
 static void hifi_set_dsp_debug_level(unsigned int level)
 {
 	*(unsigned int*)g_om_data.dsp_debug_level_addr = level;
-}
-
-static int hifi_send_str_todsp(const char* cmd_str, size_t size)
-{
-	int           ret     = OK;
-	unsigned int  msg_len = 0;
-	hifi_str_cmd *pcmd    = NULL;
-
-	BUG_ON(cmd_str == NULL);
-
-	msg_len = sizeof(hifi_str_cmd) + size + 1; //add 1 for last \0
-
-	pcmd = (hifi_str_cmd *)kmalloc(msg_len, GFP_ATOMIC);
-	if (!pcmd) {
-		loge("cmd malloc is null\n");
-		return -ENOMEM;
-	}
-	memset(pcmd, 0, msg_len);
-
-	pcmd->msg_id = ID_AP_AUDIO_STR_CMD;
-	pcmd->str_len = size;
-	strncpy(pcmd->str, cmd_str, size);
-
-	ret = (int)mailbox_send_msg(MAILBOX_MAILCODE_ACPU_TO_HIFI_MISC, pcmd, msg_len);
-
-	kfree(pcmd);
-
-	return ret;
 }
 
 static void hifi_create_procfs(void)
