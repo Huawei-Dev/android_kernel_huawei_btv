@@ -592,8 +592,6 @@ END:
 	return;
 }
 
-static debug_level_com s_debug_level_com[4] = {{'d', 3},{'i', 2},{'w', 1},{'e', 0}};
-
 static void hifi_set_dsp_debug_level(unsigned int level)
 {
 	*(unsigned int*)g_om_data.dsp_debug_level_addr = level;

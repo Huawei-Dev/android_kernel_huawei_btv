@@ -142,7 +142,7 @@ void hwifi_panic_log_dump(char* print_level)
     printk("%sdump wifi info when panic\n",print_level);
     list_for_each_entry(pst_log,head,list)
     {
-        if(NULL == pst_log)
+        if (NULL == pst_log)
         {
             printk(KERN_ERR"hwifi_panic_log_dump:pst_log is null\n");
             return;
@@ -162,14 +162,14 @@ oal_int32 hcc_flowctrl_info_print(struct hcc_handler* hcc,char* buf, oal_int32 b
 {
     oal_int32 ret = 0;
     struct oal_sdio* hi_sdio;
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         return ret;
     }
 
 #ifdef CONFIG_MMC
     hi_sdio = (struct oal_sdio*)hcc->hi_sdio;
-    if(hi_sdio->func->card->host->claimer)
+    if (hi_sdio->func->card->host->claimer)
         ret +=  snprintf(buf + ret , buf_len - ret,"claim host name:%s\n", hi_sdio->func->card->host->claimer->comm);
 #else
     OAL_REFERENCE(hi_sdio);
@@ -194,35 +194,35 @@ oal_int32 hcc_assem_info_print(struct hcc_handler* hcc,char* buf, oal_int32 buf_
     oal_int32 ret = 0;
     oal_int32 i;
     oal_int32 total = 0;
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         return ret;
     }
-    for(i = 0; i < HCC_TX_ASSEM_INFO_MAX_NUM; i++)
+    for (i = 0; i < HCC_TX_ASSEM_INFO_MAX_NUM; i++)
     {
-        if(hcc->hcc_transer_info.tx_assem_info.info[i])
+        if (hcc->hcc_transer_info.tx_assem_info.info[i])
         {
-            if(hcc->hcc_transer_info.tx_assem_info.info[i])
+            if (hcc->hcc_transer_info.tx_assem_info.info[i])
                 ret +=  snprintf(buf + ret , buf_len - ret,"[tx][%2d]:%-20u pkts\n",i,hcc->hcc_transer_info.tx_assem_info.info[i]);
             total += (oal_int32)hcc->hcc_transer_info.tx_assem_info.info[i]*(i==0 ? 1:i);
         }
     }
-    if(total)
+    if (total)
         ret +=  snprintf(buf + ret , buf_len - ret,"hcc tx total:%d!\n", total);
 
     total = 0;
 
-    for(i = 0; i < HCC_RX_ASSEM_INFO_MAX_NUM; i++)
+    for (i = 0; i < HCC_RX_ASSEM_INFO_MAX_NUM; i++)
     {
-        if(hcc->hcc_transer_info.rx_assem_info.info[i])
+        if (hcc->hcc_transer_info.rx_assem_info.info[i])
         {
             total += (oal_int32)hcc->hcc_transer_info.rx_assem_info.info[i]*(i==0 ? 1:i);
-            if(hcc->hcc_transer_info.rx_assem_info.info[i])
+            if (hcc->hcc_transer_info.rx_assem_info.info[i])
                 ret +=  snprintf(buf + ret , buf_len - ret,"[rx][%2d]:%-20u pkts\n",i,hcc->hcc_transer_info.rx_assem_info.info[i]);
         }
     }
 
-    if(total)
+    if (total)
         ret +=  snprintf(buf + ret , buf_len - ret,"hcc rx total:%d!\n", total);
     return ret;
 }
@@ -233,30 +233,30 @@ oal_int32 hcc_queues_pkts_info_print(struct hcc_handler* hcc,char* buf, oal_int3
     int i,j;
     oal_uint64 total;
     hcc_trans_queue *pst_hcc_queue;
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         return ret;
     }
     ret +=  snprintf(buf + ret , buf_len - ret,"queues_pkts_info_show\n");
-    for(i = 0; i < HCC_DIR_COUNT; i++)
+    for (i = 0; i < HCC_DIR_COUNT; i++)
     {
         total = 0;
         ret +=  snprintf(buf + ret , buf_len - ret,"transfer dir:%s\n",HCC_GET_CHAN_STRING(i));
-        for(j = 0; j < HCC_QUEUE_COUNT; j++ )
+        for (j = 0; j < HCC_QUEUE_COUNT; j++ )
         {
             pst_hcc_queue = &hcc->hcc_transer_info.hcc_queues[i].queues[j];
-            if(pst_hcc_queue->total_pkts || pst_hcc_queue->loss_pkts)
+            if (pst_hcc_queue->total_pkts || pst_hcc_queue->loss_pkts)
                 ret +=  snprintf(buf + ret , buf_len - ret,"queue:%4d,pkts num:%10u,loss num:%10u\n",j,
                                 pst_hcc_queue->total_pkts,
                                 pst_hcc_queue->loss_pkts);
             total += pst_hcc_queue->total_pkts;
         }
-        if(total)
+        if (total)
             ret +=  snprintf(buf + ret , buf_len - ret,"total:%llu\n", total);
     }
 
     ret +=  snprintf(buf + ret , buf_len - ret,"flow ctrl info show\n");
-    for(j = 0; j < HCC_QUEUE_COUNT;j++)
+    for (j = 0; j < HCC_QUEUE_COUNT;j++)
     {
         pst_hcc_queue = &hcc->hcc_transer_info.hcc_queues[HCC_TX].queues[j];
         ret +=  snprintf(buf + ret , buf_len - ret,"tx queue:%4d,%s,low wl:%u, high wl:%u\n",
@@ -267,7 +267,7 @@ oal_int32 hcc_queues_pkts_info_print(struct hcc_handler* hcc,char* buf, oal_int3
     }
 
 #if 0
-    for(j = 0; j < HCC_QUEUE_COUNT;j++)
+    for (j = 0; j < HCC_QUEUE_COUNT;j++)
     {
         pst_hcc_queue = &hcc->hcc_transer_info.hcc_queues[HCC_RX].queues[j];
         ret +=  snprintf(buf + ret , buf_len - ret,"rx queue:%4d,low wl:%u,high wl:%u\n",
@@ -294,16 +294,16 @@ oal_int32 hcc_queues_len_info_print(struct hcc_handler* hcc,char* buf, oal_int32
 {
     oal_int32 ret = 0;
     oal_int32 i ,j;
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         return ret;
     }
-    for(i = 0; i < HCC_DIR_COUNT; i++)
+    for (i = 0; i < HCC_DIR_COUNT; i++)
     {
         ret +=  snprintf(buf + ret , buf_len - ret,"dir:%s\n", HCC_GET_CHAN_STRING(i));
-        for(j = 0; j < HCC_QUEUE_COUNT;j++)
+        for (j = 0; j < HCC_QUEUE_COUNT;j++)
         {
-            if(oal_netbuf_list_len(&hcc->hcc_transer_info.hcc_queues[i].queues[j].data_queue))
+            if (oal_netbuf_list_len(&hcc->hcc_transer_info.hcc_queues[i].queues[j].data_queue))
                 ret +=  snprintf(buf + ret , buf_len - ret,"queue:%d, len:%d\n", j,
                             oal_netbuf_list_len(&hcc->hcc_transer_info.hcc_queues[i].queues[j].data_queue));
         }
@@ -320,7 +320,7 @@ OAL_STATIC ssize_t  hcc_get_assem_info(struct device *dev, struct device_attribu
     OAL_BUG_ON(NULL == buf);
 
     hcc = hcc_get_default_handler();
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         OAL_IO_PRINT("get hcc handler failed!%s\n",__FUNCTION__);
         return ret;
@@ -339,7 +339,7 @@ OAL_STATIC ssize_t  hcc_set_assem_info(struct device *dev, struct device_attribu
     OAL_BUG_ON(NULL == attr);
     OAL_BUG_ON(NULL == buf);
     hcc = hcc_get_default_handler();
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         OAL_IO_PRINT("get hcc handler failed!%s\n",__FUNCTION__);
         return count;
@@ -363,7 +363,7 @@ OAL_STATIC ssize_t  hcc_get_queues_pkts_info(struct device *dev, struct device_a
     OAL_BUG_ON(NULL == buf);
 
     hcc = hcc_get_default_handler();
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         OAL_IO_PRINT("get hcc handler failed!%s\n",__FUNCTION__);
         return ret;
@@ -383,7 +383,7 @@ OAL_STATIC ssize_t  hcc_get_queues_len_info(struct device *dev, struct device_at
     OAL_BUG_ON(NULL == buf);
 
     hcc = hcc_get_default_handler();
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         OAL_IO_PRINT("get hcc handler failed!%s\n",__FUNCTION__);
         return ret;
@@ -403,7 +403,7 @@ OAL_STATIC ssize_t  hcc_get_flowctrl_info(struct device *dev, struct device_attr
     OAL_BUG_ON(NULL == buf);
 
     hcc = hcc_get_default_handler();
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         OAL_IO_PRINT("get hcc handler failed!%s\n",__FUNCTION__);
         return ret;
@@ -417,12 +417,12 @@ OAL_STATIC ssize_t  hcc_get_flowctrl_info(struct device *dev, struct device_attr
 oal_int32 hcc_wakelock_info_print(struct hcc_handler* hcc,char* buf, oal_int32 buf_len)
 {
     oal_int32 ret = 0;
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         return ret;
     }
 #ifdef CONFIG_PRINTK
-    if(hcc->tx_wake_lock.locked_addr)
+    if (hcc->tx_wake_lock.locked_addr)
     {
         ret +=  snprintf(buf + ret , buf_len - ret,"wakelocked by:%pf\n",
                     (oal_void*)hcc->tx_wake_lock.locked_addr);
@@ -443,7 +443,7 @@ OAL_STATIC ssize_t  hcc_get_wakelock_info(struct device *dev, struct device_attr
     OAL_BUG_ON(NULL == buf);
 
     hcc = hcc_get_default_handler();
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         OAL_IO_PRINT("get hcc handler failed!%s\n",__FUNCTION__);
         return ret;
@@ -515,19 +515,19 @@ oal_void hcc_test_throughput_cac(oal_uint64 trans_bytes, ktime_t start_time, kti
 
 OAL_STATIC  oal_void hcc_test_throughput_gen(oal_void)
 {
-    if(HCC_TEST_CASE_TX == g_hcc_test_event->test_data.mode_idx)
+    if (HCC_TEST_CASE_TX == g_hcc_test_event->test_data.mode_idx)
     {
         hcc_test_throughput_cac(g_hcc_test_event->test_data.total_sent_bytes,
                                 g_hcc_test_event->start_time,
                                 g_hcc_test_event->last_time);
     }
-    else if(HCC_TEST_CASE_RX == g_hcc_test_event->test_data.mode_idx)
+    else if (HCC_TEST_CASE_RX == g_hcc_test_event->test_data.mode_idx)
     {
         hcc_test_throughput_cac(g_hcc_test_event->test_data.total_rcvd_bytes,
                                 g_hcc_test_event->start_time,
                                 g_hcc_test_event->last_time);
     }
-    else if(HCC_TEST_CASE_LOOP == g_hcc_test_event->test_data.mode_idx )
+    else if (HCC_TEST_CASE_LOOP == g_hcc_test_event->test_data.mode_idx )
     {
         hcc_test_throughput_cac(g_hcc_test_event->test_data.total_rcvd_bytes + g_hcc_test_event->test_data.total_sent_bytes,
                                 g_hcc_test_event->start_time,
@@ -540,21 +540,20 @@ OAL_STATIC  oal_uint64 hcc_test_utilization_ratio_gen(oal_uint64 payload_size,oa
 {
     oal_uint64 ret;
     payload_size = payload_size*1000;
-    if(transfer_size)
+    if (transfer_size)
         ret = div_u64(payload_size,transfer_size);
     else
         ret = 0;
     return ret;
 }
 
-/*统计发送方向的丢包率，接收方向默认不丢包*/
 OAL_STATIC  oal_uint32 hcc_test_tx_pkt_loss_gen(oal_uint32 tx_pkts,oal_uint32 actual_tx_pkts)
 {
     oal_uint32 ul_loss;
     //g_hcc_test_event->test_data.pkt_sent
-    if(tx_pkts == actual_tx_pkts || !tx_pkts )
+    if (tx_pkts == actual_tx_pkts || !tx_pkts )
         return 0;
-    if(tx_pkts < actual_tx_pkts )
+    if (tx_pkts < actual_tx_pkts )
         return 0;
 
     ul_loss = tx_pkts - actual_tx_pkts;
@@ -569,14 +568,13 @@ OAL_STATIC oal_int32 hcc_test_rcvd(oal_uint8 stype, hcc_netbuf_stru* pst_hcc_net
 
     //OAL_IO_PRINT("hcc_test_rcvd:%d\n",stype);
 
-    if(OAL_LIKELY(HCC_TEST_SUBTYPE_DATA == stype))
+    if (OAL_LIKELY(HCC_TEST_SUBTYPE_DATA == stype))
     {
         oal_int32 filter_flag = 0;
 
-        /*计算总共数据包长度*/
-        if(OAL_UNLIKELY(OAL_NETBUF_LEN(pst_netbuf)!= g_hcc_test_event->test_data.pkt_len))
+        if (OAL_UNLIKELY(OAL_NETBUF_LEN(pst_netbuf)!= g_hcc_test_event->test_data.pkt_len))
         {
-            if(printk_ratelimit())
+            if (printk_ratelimit())
             {
                 OAL_IO_PRINT("[E]recvd netbuf pkt len:%d,but request len:%d\n",
                                 OAL_NETBUF_LEN(pst_netbuf),
@@ -585,14 +583,14 @@ OAL_STATIC oal_int32 hcc_test_rcvd(oal_uint8 stype, hcc_netbuf_stru* pst_hcc_net
             filter_flag = 1;
         }
 
-        if(g_hcc_test_event->verified)
+        if (g_hcc_test_event->verified)
         {
             oal_int32 i;
             oal_int32 flag = 0;
             oal_uint8 *data =  OAL_NETBUF_DATA(pst_netbuf);
-            for(i = 0; i < OAL_NETBUF_LEN(pst_netbuf);i++)
+            for (i = 0; i < OAL_NETBUF_LEN(pst_netbuf);i++)
             {
-                if(*(data + i) != g_hcc_test_event->test_value)
+                if (*(data + i) != g_hcc_test_event->test_value)
                 {
                     flag = 1;
                     OAL_IO_PRINT("[E]data wrong, [i:%d] value:%x should be %x\n",i,*(data + i),g_hcc_test_event->test_value);
@@ -600,27 +598,26 @@ OAL_STATIC oal_int32 hcc_test_rcvd(oal_uint8 stype, hcc_netbuf_stru* pst_hcc_net
                 }
             }
 
-            if(flag)
+            if (flag)
             {
                 oal_print_hex_dump(data, OAL_NETBUF_LEN(pst_netbuf), 32, "hcc rx verified ");
                 filter_flag = 1;
             }
         }
 
-        if(!filter_flag)
+        if (!filter_flag)
         {
-            /*filter_flag=1 时接收的数据包不符合要求，则过滤掉*/
-            g_hcc_test_event->test_data.pkt_rcvd++;
+             g_hcc_test_event->test_data.pkt_rcvd++;
             g_hcc_test_event->test_data.total_rcvd_bytes += OAL_NETBUF_LEN(pst_netbuf);
             g_hcc_test_event->last_time= ktime_get();
         }
     }
-    else if(HCC_TEST_SUBTYPE_CMD == stype)
+    else if (HCC_TEST_SUBTYPE_CMD == stype)
     {
         hcc_test_cmd_stru cmd;
         oal_memcopy(&cmd,OAL_NETBUF_DATA(pst_netbuf),OAL_SIZEOF(hcc_test_cmd_stru));
 
-        if(HCC_TEST_CMD_STOP_TEST == cmd.cmd_type)
+        if (HCC_TEST_CMD_STOP_TEST == cmd.cmd_type)
         {
             oal_memcopy(&g_hcc_test_event->test_data.trans_info,
                         hcc_get_test_cmd_data(OAL_NETBUF_DATA(pst_netbuf)),
@@ -657,14 +654,14 @@ OAL_STATIC oal_int32 hcc_test_sent(struct hcc_handler* hcc,struct hcc_transfer_p
      return -OAL_EFAIL;
     }
 
-    if(pad_payload)
+    if (pad_payload)
     {
         oal_netbuf_reserve(pst_netbuf,pad_payload);
     }
 
     oal_memset(oal_netbuf_put(pst_netbuf,g_hcc_test_event->test_data.pkt_len),g_hcc_test_event->test_value,g_hcc_test_event->test_data.pkt_len);
 
-    if(HCC_TEST_SUBTYPE_DATA == start_cmd)
+    if (HCC_TEST_SUBTYPE_DATA == start_cmd)
     {
         g_hcc_test_event->test_data.total_sent_bytes += OAL_NETBUF_LEN(pst_netbuf);
     }
@@ -677,7 +674,7 @@ OAL_STATIC oal_int32 hcc_send_test_cmd(oal_uint8* cmd,oal_int32 cmd_len)
     oal_netbuf_stru*       pst_netbuf;
     struct hcc_transfer_param st_hcc_transfer_param = {0};
     struct hcc_handler* hcc = hcc_get_default_handler();
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         return -OAL_EFAIL;
     }
@@ -710,13 +707,13 @@ OAL_STATIC oal_int32 hcc_test_rx_start(oal_uint16 start_cmd)
 
     struct hcc_handler* hcc;
     hcc = hcc_get_default_handler();
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         return -OAL_EFAIL;
     }
     cmd_len = OAL_SIZEOF(hcc_test_cmd_stru) + OAL_SIZEOF(hsdio_trans_test_rx_info);
     pst_cmd = (hcc_test_cmd_stru*)oal_memalloc(cmd_len);
-    if(NULL == pst_cmd)
+    if (NULL == pst_cmd)
     {
         return -OAL_EFAIL;
     }
@@ -740,7 +737,7 @@ OAL_STATIC oal_int32 hcc_test_rx_start(oal_uint16 start_cmd)
     pst_rx_info->pkt_len = g_hcc_test_event->test_data.pkt_len;
     pst_rx_info->pkt_value = g_hcc_test_event->test_value;
 
-    if(OAL_SUCC != hcc_send_test_cmd((oal_uint8*)pst_cmd,pst_cmd->cmd_len))
+    if (OAL_SUCC != hcc_send_test_cmd((oal_uint8*)pst_cmd,pst_cmd->cmd_len))
     {
         oal_free(pst_cmd);
         return -OAL_EFAIL;
@@ -750,9 +747,8 @@ OAL_STATIC oal_int32 hcc_test_rx_start(oal_uint16 start_cmd)
 
     g_hcc_test_event->last_time= ktime_get();
 
-    /*等待回来的CMD命令*/
     ret = wait_for_completion_interruptible(&g_hcc_test_event->test_trans_done);
-    if(ret < 0)
+    if (ret < 0)
     {
         OAL_IO_PRINT("Test Event  terminated ret=%d\n", ret);
         ret = -OAL_EFAIL;
@@ -760,7 +756,7 @@ OAL_STATIC oal_int32 hcc_test_rx_start(oal_uint16 start_cmd)
         oal_sdio_send_msg(hcc->hi_sdio, H2D_MSG_STOP_SDIO_TEST);
     }
 
-    if(g_test_force_stop)
+    if (g_test_force_stop)
     {
         oal_sdio_send_msg(hcc->hi_sdio, H2D_MSG_STOP_SDIO_TEST);
         g_test_force_stop = 0;
@@ -781,7 +777,7 @@ OAL_STATIC oal_int32 hcc_test_normal_start(oal_uint16 start_cmd)
     struct hcc_handler* hcc;
     hcc_hdr_param_init(&st_hcc_transfer_param,HCC_ACTION_TYPE_TEST,HCC_TEST_SUBTYPE_DATA,0,HCC_FC_WAIT,g_hcc_test_event->hcc_test_queue);
     hcc = hcc_get_default_handler();
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         return -OAL_EFAIL;
     }
@@ -796,7 +792,7 @@ OAL_STATIC oal_int32 hcc_test_normal_start(oal_uint16 start_cmd)
 
     cmd.cmd_type = start_cmd;
     cmd.cmd_len = OAL_SIZEOF(hcc_test_cmd_stru) + OAL_SIZEOF(hsdio_trans_test_info);
-    if(OAL_SUCC != hcc_send_test_cmd((oal_uint8*)&cmd,cmd.cmd_len))
+    if (OAL_SUCC != hcc_send_test_cmd((oal_uint8*)&cmd,cmd.cmd_len))
     {
         return -OAL_EFAIL;
     }
@@ -808,7 +804,7 @@ OAL_STATIC oal_int32 hcc_test_normal_start(oal_uint16 start_cmd)
     for (i = 0; i < g_hcc_test_event->test_data.pkt_gen; i++)
     {
         ret = hcc_test_sent(hcc, &st_hcc_transfer_param,HCC_TEST_SUBTYPE_DATA);
-        if(ret < 0)
+        if (ret < 0)
         {
             OAL_IO_PRINT("hcc test gen pkt send fail.\n");
             break;
@@ -816,7 +812,7 @@ OAL_STATIC oal_int32 hcc_test_normal_start(oal_uint16 start_cmd)
 
         g_hcc_test_event->test_data.pkt_sent++ ;
         g_hcc_test_event->last_time= ktime_get();
-        if(OAL_UNLIKELY(OAL_FALSE == g_hcc_test_event->started))
+        if (OAL_UNLIKELY(OAL_FALSE == g_hcc_test_event->started))
         {
             ret = -OAL_EFAIL;
             break;
@@ -828,18 +824,17 @@ OAL_STATIC oal_int32 hcc_test_normal_start(oal_uint16 start_cmd)
     g_hcc_test_event->last_time= ktime_get();
 
 retry:
-    /*等待回来的CMD命令*/
     ret = wait_for_completion_interruptible_timeout(&g_hcc_test_event->test_trans_done,OAL_MSECS_TO_JIFFIES(500));
-    if(ret < 0)
+    if (ret < 0)
     {
         OAL_IO_PRINT("Test Event  terminated ret=%d\n", ret);
         ret = -OAL_EFAIL;
         hcc_send_test_cmd((oal_uint8*)&cmd,cmd.cmd_len);
     }
-    else if(ret == 0)
+    else if (ret == 0)
     {
         /*cmd response timeout*/
-        if(retry_count++ < 1)
+        if (retry_count++ < 1)
         {
             oal_msleep(100);
             hcc_send_test_cmd((oal_uint8*)&cmd,cmd.cmd_len);
@@ -855,7 +850,7 @@ retry:
     }
     else
     {
-        if(g_test_force_stop)
+        if (g_test_force_stop)
         {
             hcc_send_test_cmd((oal_uint8*)&cmd,cmd.cmd_len);
             g_hcc_test_event->last_time= ktime_get();
@@ -873,7 +868,7 @@ retry:
 OAL_STATIC oal_int32 hcc_test_start(oal_uint16 start_cmd)
 {
     OAL_IO_PRINT("%s Test start.\n",g_hcc_test_stru[g_hcc_test_event->test_data.mode_idx].mode);
-    if(HCC_TEST_CASE_RX == g_hcc_test_event->test_data.mode_idx)
+    if (HCC_TEST_CASE_RX == g_hcc_test_event->test_data.mode_idx)
     {
         return hcc_test_rx_start(start_cmd);
     }
@@ -936,13 +931,13 @@ OAL_STATIC ssize_t  hcc_test_get_para(struct device *dev, struct device_attribut
     ret +=  snprintf(buf + ret,  PAGE_SIZE-1, "PayloadRcvd %llu bytes, SDIOActualRecv  %llu bytes\n",
                                                             g_hcc_test_event->test_data.total_rcvd_bytes,
                                                             g_hcc_test_event->test_data.trans_info.total_d2h_trans_bytes);
-    /*SDIO通道利用率*/
-    ret +=  snprintf(buf + ret,  PAGE_SIZE-1, "Hcc Utilization Ratio %llu ‰\n",
+
+    ret +=  snprintf(buf + ret,  PAGE_SIZE-1, "Hcc Utilization Ratio %llu \n",
                             hcc_test_utilization_ratio_gen(g_hcc_test_event->test_data.total_sent_bytes + g_hcc_test_event->test_data.total_rcvd_bytes,
                                                             g_hcc_test_event->test_data.trans_info.total_h2d_trans_bytes +
                                                              g_hcc_test_event->test_data.trans_info.total_d2h_trans_bytes));
-    /*发送方向的丢包率*/
-    ret +=  snprintf(buf + ret,  PAGE_SIZE-1, "TxPackageLoss %u ‰, pkt_sent: %d actual_tx_pkts: %u\n",
+
+    ret +=  snprintf(buf + ret,  PAGE_SIZE-1, "TxPackageLoss %u, pkt_sent: %d actual_tx_pkts: %u\n",
                                     hcc_test_tx_pkt_loss_gen(g_hcc_test_event->test_data.pkt_sent,g_hcc_test_event->test_data.trans_info.actual_tx_pkts),
                                     g_hcc_test_event->test_data.pkt_sent,
                                     g_hcc_test_event->test_data.trans_info.actual_tx_pkts);
@@ -996,7 +991,7 @@ OAL_STATIC ssize_t  hcc_test_set_para(struct device *dev, struct device_attribut
     data.pkt_gen = tmp_pkt_gen;
     data.mode_idx = i;
 
-    if(hcc_test_set_case(&data))
+    if (hcc_test_set_case(&data))
     {
         return -OAL_EINVAL;
     }
@@ -1062,7 +1057,7 @@ OAL_STATIC ssize_t  hcc_test_set_queue_id(struct device *dev, struct device_attr
         OAL_IO_PRINT("set value one char!\n");
         return -OAL_EINVAL;
     }
-    if(queue_id >= HCC_QUEUE_COUNT)
+    if (queue_id >= HCC_QUEUE_COUNT)
     {
         OAL_IO_PRINT("wrong queue id:%u\n",queue_id);
         return count;
@@ -1195,9 +1190,9 @@ oal_int32 hsdio_sysfs_info_print(struct oal_sdio *hi_sdio,char* buf, oal_int32 b
     ret +=  snprintf(buf + ret , buf_len - ret,"rx_scatt_info_not_match:%d\n", hi_sdio->error_stat.rx_scatt_info_not_match);
     ret +=  snprintf(buf + ret , buf_len - ret,"msg count info:\n");
     ret +=  snprintf(buf + ret , buf_len - ret,"tx scatt buf len:%u\n", hi_sdio->scatt_buff.len);
-    for(bit = 0; bit < D2H_MSG_COUNT; bit++)
+    for (bit = 0; bit < D2H_MSG_COUNT; bit++)
     {
-        if(hi_sdio->msg[bit].count)
+        if (hi_sdio->msg[bit].count)
             ret +=  snprintf(buf + ret , buf_len - ret,"msg [%d] count:%u:,last update time:%llu\n",
                         bit,hi_sdio->msg[bit].count,
                         hi_sdio->msg[bit].cpu_time);
@@ -1215,13 +1210,13 @@ OAL_STATIC ssize_t  hsdio_get_sdio_info(struct device *dev, struct device_attrib
     OAL_BUG_ON(NULL == buf);
 
     hcc = hcc_get_default_handler();
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         OAL_IO_PRINT("get hcc handler failed!%s\n",__FUNCTION__);
         return ret;
     }
 
-    if(hcc->hi_sdio)
+    if (hcc->hi_sdio)
         ret += hsdio_sysfs_info_print((struct oal_sdio *)hcc->hi_sdio,buf,PAGE_SIZE - ret);
 
     return ret;
@@ -1231,7 +1226,7 @@ oal_int32 hsdio_wakelock_info_print(struct oal_sdio *hi_sdio,char* buf, oal_int3
 {
     oal_int32 ret = 0;
 #ifdef CONFIG_PRINTK
-    if(hi_sdio->st_sdio_wakelock.locked_addr)
+    if (hi_sdio->st_sdio_wakelock.locked_addr)
     {
         ret +=  snprintf(buf + ret , buf_len - ret,"wakelocked by:%pf\n",
                     (oal_void*)hi_sdio->st_sdio_wakelock.locked_addr);
@@ -1252,13 +1247,13 @@ OAL_STATIC ssize_t  hsdio_get_wakelock_info(struct device *dev, struct device_at
     OAL_BUG_ON(NULL == buf);
 
     hcc = hcc_get_default_handler();
-    if(NULL == hcc)
+    if (NULL == hcc)
     {
         OAL_IO_PRINT("get hcc handler failed!%s\n",__FUNCTION__);
         return ret;
     }
 
-    if(hcc->hi_sdio)
+    if (hcc->hi_sdio)
         ret += hsdio_wakelock_info_print((struct oal_sdio *)hcc->hi_sdio,buf,PAGE_SIZE - ret);
 
     return ret;
@@ -1282,7 +1277,7 @@ int hcc_test_set_case(hcc_test_data *data)
     int ret;
     int errorno = OAL_SUCC;
     OAL_BUG_ON(NULL == data);
-    if(OAL_UNLIKELY(!g_hcc_test_event->test_workqueue))
+    if (OAL_UNLIKELY(!g_hcc_test_event->test_workqueue))
     {
         OAL_IO_PRINT("wifi probe failed, please retry.\n");
         return -OAL_EBUSY;
@@ -1309,7 +1304,7 @@ int hcc_test_set_case(hcc_test_data *data)
 
     queue_work(g_hcc_test_event->test_workqueue, &g_hcc_test_event->test_work);
     ret = wait_for_completion_interruptible(&g_hcc_test_event->test_done);
-    if(ret < 0)
+    if (ret < 0)
     {
         OAL_IO_PRINT("Test Event  terminated ret=%d\n", ret);
         g_hcc_test_event->started = OAL_FALSE;
@@ -1337,7 +1332,7 @@ int conn_test_sdio_loop(char *param)
     data.pkt_gen = 10000;
     data.mode_idx = HCC_TEST_CMD_START_LOOP;
 
-    if(hcc_test_set_case(&data))
+    if (hcc_test_set_case(&data))
     {
         OAL_IO_PRINT("conn_test_sdio_loop test sdio failed!\n");
         return -1;
@@ -1358,7 +1353,7 @@ oal_void hcc_test_get_case(hcc_test_data *data)
 OAL_STATIC oal_int32 hwifi_panic_handler(struct notifier_block *this,
                    oal_ulong event, oal_void *unused)
 {
-    if(wifi_panic_debug)
+    if (wifi_panic_debug)
         hwifi_panic_log_dump(KERN_ERR);
     else
         printk(KERN_WARNING"wifi panic debug off\n");
@@ -1376,14 +1371,14 @@ oal_int32  hcc_test_init_module(struct hcc_handler* hcc)
     oal_kobject*     pst_root_object = NULL;
 
     pst_root_object = oal_get_sysfs_root_object();
-    if(NULL == pst_root_object)
+    if (NULL == pst_root_object)
     {
         OAL_IO_PRINT("[E]get root sysfs object failed!\n");
         return -OAL_EFAIL;
     }
 
     g_conn_syfs_hcc_object = kobject_create_and_add("hcc", pst_root_object);
-    if(NULL == g_conn_syfs_hcc_object)
+    if (NULL == g_conn_syfs_hcc_object)
     {
         goto fail_g_conn_syfs_hcc_object;
     }
@@ -1498,7 +1493,7 @@ oal_void  hcc_test_exit_module(struct hcc_handler* hcc)
                                     &hwifi_panic_notifier);
 #endif
 
-    if(g_hcc_test_event->test_workqueue)
+    if (g_hcc_test_event->test_workqueue)
     {
         destroy_workqueue(g_hcc_test_event->test_workqueue);
         g_hcc_test_event->test_workqueue = NULL;
