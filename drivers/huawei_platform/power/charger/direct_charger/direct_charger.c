@@ -602,7 +602,7 @@ int scp_adaptor_detect(void)
 	if (NULL == di || NULL == di->scp_ops || NULL == di->scp_ops->scp_adaptor_detect)
 	{
 		hwlog_err("[%s]bad scp adaptor detect ops!\n", __func__);
-		return;
+		return -1;
 	}
 	ret = di->scp_ops->scp_adaptor_detect();
 	if (SCP_ADAPTOR_DETECT_FAIL == ret)
@@ -635,7 +635,6 @@ int scp_adaptor_detect(void)
 static void scp_adaptor_and_cable_detect(struct direct_charge_device *di)
 {
 	int ret;
-	int i;
 
 	ret = scp_adaptor_detect();
 	/*try again in the next loop*/
@@ -1815,8 +1814,6 @@ static void scp_start_charging(struct direct_charge_device *di)
 }
 void vbat_ovp_exit_direct_charge(int enable_charge)
 {
-	int i = 0;
-	int ibus = 0;
 	struct direct_charge_device *di = g_di;
 
 	di->vbat_ovp_enable_charger = enable_charge;
@@ -1890,7 +1887,6 @@ static int vbat_ovp_scp_exit(void)
 int vbat_ovp_scp_handle(void)
 {
 	struct direct_charge_device *di = g_di;
-	int timeout;
 	int ret;
 	int adaptor_vol;
 	int iadaptor;
