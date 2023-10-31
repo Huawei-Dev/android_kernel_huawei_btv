@@ -661,8 +661,8 @@ int ps_recv_debug_data(struct ps_core_s *ps_core_d, unsigned char *buf_ptr)
             && (PACKET_RX_RPT_IND_LAST_WORDS == buf_ptr[RPT_IND_INDEX_LAST_WORDS]))
         {
             PS_PRINT_ERR("recv device last words!Faulttype=0x%x,FaultReason=0x%x,PC=0x%x,LR=0x%x\n",
-                          *(unsigned int**)&buf_ptr[FAULT_TYPE_INDEX_LAST_WORDS], *(unsigned int**)&buf_ptr[FAULT_REASON_INDEX_LAST_WORDS],
-                          *(unsigned int**)&buf_ptr[PC_INDEX_LAST_WORDS], *(unsigned int**)&buf_ptr[LR_INDEX_LAST_WORDS]);
+                          *(unsigned int*)&buf_ptr[FAULT_TYPE_INDEX_LAST_WORDS], *(unsigned int*)&buf_ptr[FAULT_REASON_INDEX_LAST_WORDS],
+                          *(unsigned int*)&buf_ptr[PC_INDEX_LAST_WORDS], *(unsigned int*)&buf_ptr[LR_INDEX_LAST_WORDS]);
             plat_exception_handler(SUBSYS_BFGX, BFGX_THREAD_BOTTOM, LAST_WORD);
         }
         else
@@ -670,7 +670,7 @@ int ps_recv_debug_data(struct ps_core_s *ps_core_d, unsigned char *buf_ptr)
             /*buf maybe less than log header len*/
             if (rx_pkt_total_len > PACKET_HEADER_LEN)
             {
-                PS_PRINT_WARNING("recv wrong last words,[%x %x]\n", *(unsigned int**)&buf_ptr[0], *(unsigned int**)&buf_ptr[4]);
+                PS_PRINT_WARNING("recv wrong last words,[%x %x]\n", *(unsigned int*)&buf_ptr[0], *(unsigned int*)&buf_ptr[4]);
             }
             else
             {
