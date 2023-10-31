@@ -2593,7 +2593,7 @@ int plat_dump_rotate_cmd_read(unsigned long arg)
         return -EINVAL;
     }
 
-    PS_PRINT_INFO("read rotate cmd [%d] from queue\n", *(unsigned int**)skb->data);
+    PS_PRINT_INFO("read rotate cmd [%d] from queue\n", *(unsigned int*)skb->data);
 
     skb_pull(skb, skb->len);
     kfree_skb(skb);
