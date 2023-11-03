@@ -1,9 +1,6 @@
-
-
 /*****************************************************************************
   1 Header File Including
 *****************************************************************************/
-/*lint -e322*//*lint -e7*/
 #include <linux/tty.h>
 #include <linux/delay.h>
 #include "plat_debug.h"
@@ -15,7 +12,6 @@
 #include <linux/jiffies.h>
 
 #include "oal_ext_if.h"
-/*lint +e322*//*lint +e7*/
 
 /*****************************************************************************
   2 Global Variable Definition

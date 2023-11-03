@@ -1,5 +1,3 @@
-
-
 /*****************************************************************************
   1 Header File Including
 *****************************************************************************/
@@ -7,14 +5,13 @@
 #include <linux/of.h>
 #include <linux/of_gpio.h>
 #endif
-/*lint -e322*//*lint -e7*/
+
 #include <linux/clk.h>
 #include <linux/interrupt.h>
 #include <linux/platform_device.h>
 #include <linux/timer.h>
 #include <linux/delay.h>
 #include <linux/pinctrl/consumer.h>
-/*lint +e322*//*lint +e7*/
 
 #include "board.h"
 #include "plat_debug.h"
@@ -239,7 +236,6 @@ int get_board_uart_port(void)
         return BOARD_FAIL;
     }
 
-    /*使用uart4，需要在dts里新增DTS_PROP_UART_PCLK项，指明uart4不依赖sensorhub*/
     if (of_property_read_bool(np, DTS_PROP_UART_PCLK))
     {
         PS_PRINT_INFO("uart pclk normal\n");
@@ -304,8 +300,6 @@ int board_get_power_pinctrl(struct platform_device *pdev)
     struct pinctrl_state *pinctrl_def;
     struct pinctrl_state *pinctrl_idle;
 
-    /* 检查是否需要prepare before board power on */
-    /* JTAG SELECT 拉低，XLDO MODE选择2.8v */
 	ret = get_board_dts_node(&np, DTS_NODE_HI110X);
 	if(BOARD_SUCC != ret)
 	{
@@ -868,7 +862,6 @@ int get_device_board_version(void)
     ret = find_device_board_version();
     if(BOARD_SUCC != ret)
     {
-        /*兼容1102*/
         g_board_info.chip_type = device_board_version_list[0].name;
         g_device_subchip_type  = BOARD_VERSION_HI1102;
         PS_PRINT_WARNING("can not find device_board_version ,choose default:%s\n", device_board_version_list[0].name);
@@ -910,7 +903,6 @@ int get_download_channel(void)
     ret = find_download_channel(wlan_mode, INI_WLAN_DOWNLOAD_CHANNEL);
     if (BOARD_SUCC != ret)
     {
-        /*兼容1102,1102无此配置项*/
         g_board_info.wlan_download_channel = MODE_SDIO;
         PS_PRINT_WARNING("can not find wlan_download_channel ,choose default:%s\n", device_download_mode_list[0].name);
     }
@@ -927,7 +919,6 @@ int get_download_channel(void)
     ret = find_download_channel(bfgn_mode, INI_BFGX_DOWNLOAD_CHANNEL);
     if (BOARD_SUCC != ret)
     {
-        /*如果不存在该项，则默认保持和wlan一致*/
         g_board_info.bfgn_download_channel = g_board_info.wlan_download_channel;
         PS_PRINT_WARNING("can not find bfgn_download_channel ,choose default:%s\n", device_download_mode_list[0].name);
         return BOARD_SUCC;
@@ -1086,11 +1077,6 @@ int hi110x_board_resume(struct platform_device *pdev)
     return BOARD_SUCC;
 }
 
-
-/*********************************************************************/
-/********************   SSI调试代码start   ***************************/
-/*********************************************************************/
-
 #ifdef PLATFORM_DEBUG_ENABLE
 #ifdef _PRE_CONFIG_GPIO_TO_SSI_DEBUG
 
@@ -1099,10 +1085,10 @@ int hi110x_board_resume(struct platform_device *pdev)
 #define INTERVAL_TIME             (10)
 #define SSI_DATA_LEN              (16)
 
-unsigned int g_ssi_clk  = 0;              /*模拟ssi时钟的GPIO管脚号*/
-unsigned int g_ssi_data = 0;              /*模拟ssi数据线的GPIO管脚号*/
-short g_ssi_base = 0x8000;         /*ssi基址*/
-unsigned int g_interval = INTERVAL_TIME;  /*GPIO拉出来的波形保持时间，单位us*/
+unsigned int g_ssi_clk  = 0;
+unsigned int g_ssi_data = 0;
+short g_ssi_base = 0x8000;
+unsigned int g_interval = INTERVAL_TIME;
 unsigned int g_delay    = 5;
 
 int ssi_show_setup(void)
@@ -1209,17 +1195,14 @@ int ssi_write_data(unsigned short addr, unsigned short value)
         ssi_data_output(0);
     }
 
-    /*发送SYNC位*/
     PS_PRINT_DBG("tx sync bit\n");
     ssi_clk_output();
     ssi_data_output(1);
 
-    /*指示本次操作为写，高读低写*/
     PS_PRINT_DBG("tx r/w->w\n");
     ssi_clk_output();
     ssi_data_output(0);
 
-    /*发送地址*/
     PS_PRINT_DBG("write addr:0x%x\n", addr);
     for (i = 0; i < SSI_DATA_LEN; i++)
     {
@@ -1229,7 +1212,6 @@ int ssi_write_data(unsigned short addr, unsigned short value)
         ssi_data_output(tx);
     }
 
-    /*发送数据*/
     PS_PRINT_DBG("write value:0x%x\n", value);
     for (i = 0; i < SSI_DATA_LEN; i++)
     {
@@ -1239,7 +1221,6 @@ int ssi_write_data(unsigned short addr, unsigned short value)
         ssi_data_output(tx);
     }
 
-    /*数据发送完成以后，保持delay个周期的0*/
     PS_PRINT_DBG("ssi write:finish, delay %d cycle\n", g_delay);
     for (i = 0; i < g_delay; i++)
     {
@@ -1265,17 +1246,14 @@ unsigned short ssi_read_data(unsigned short addr)
         ssi_data_output(0);
     }
 
-    /*发送SYNC位*/
     PS_PRINT_DBG("tx sync bit\n");
     ssi_clk_output();
     ssi_data_output(1);
 
-    /*指示本次操作为读，高读低写*/
     PS_PRINT_DBG("tx r/w->r\n");
     ssi_clk_output();
     ssi_data_output(1);
 
-    /*发送地址*/
     PS_PRINT_DBG("read addr:0x%x\n", addr);
     for (i = 0; i < SSI_DATA_LEN; i++)
     {
@@ -1285,15 +1263,12 @@ unsigned short ssi_read_data(unsigned short addr)
         ssi_data_output(tx);
     }
 
-    /*延迟一个clk，否则上一个数据只保持了半个时钟周期*/
     ssi_clk_output();
 
-    /*设置data线GPIO为输入，准备读取数据*/
     gpio_direction_input(g_ssi_data);
 
     PS_PRINT_DBG("data in mod, current gpio level is %d\n", gpio_get_value(g_ssi_data));
 
-    /*读取SYNC同步位*/
     do
     {
         ssi_clk_output();
@@ -1322,7 +1297,6 @@ unsigned short ssi_read_data(unsigned short addr)
         data = data | (rx << (SSI_DATA_LEN - i - 1));
     }
 
-    /*恢复data线GPIO为输出，并输出0*/
     ssi_data_output(0);
 
     return data;
@@ -1368,14 +1342,12 @@ int ssi_write32(unsigned int addr, unsigned short value)
     addr_half_word_high = (addr >> 16) & 0xffff;
     addr_half_word_low  = (addr & 0xffff) >> 1;
 
-    /*往基地址写地址的高16位*/
     if (ssi_write16(g_ssi_base, addr_half_word_high) < 0)
     {
         PS_PRINT_ERR("ssi write: 0x%x=0x%x fail\n", addr, value);
         return BOARD_FAIL;
     }
 
-    /*低地址写实际要写入的value*/
     if (ssi_write16(addr_half_word_low, value) < 0)
     {
         PS_PRINT_ERR("ssi write: 0x%x=0x%x fail\n", addr, value);
@@ -1411,10 +1383,6 @@ int ssi_read32(unsigned int addr)
 
 #endif
 #endif
-
-/*********************************************************************/
-/********************   SSI调试代码end    ****************************/
-/*********************************************************************/
 
 #ifdef _PRE_CONFIG_USE_DTS
 static struct of_device_id hi110x_board_match_table[] = {

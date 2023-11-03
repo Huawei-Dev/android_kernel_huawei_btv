@@ -1,5 +1,3 @@
-
-
 #ifndef __HISI__ONEIMAGE_H__
 #define __HISI__ONEIMAGE_H__
 

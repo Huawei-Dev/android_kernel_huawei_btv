@@ -1,5 +1,3 @@
-
-
 /*****************************************************************************
   1 Include Head file
 *****************************************************************************/
@@ -48,7 +46,6 @@ void host_allow_bfg_sleep(struct ps_core_s *ps_core_d)
         return;
     }
 
-    /* 设置device状态为睡眠态，在host唤醒dev完成之前(或dev唤醒host前)uart不可用 */
     ps_core_d->ps_pm->bfgx_uart_state_set(UART_NOT_READY);
     ps_core_d->ps_pm->bfgx_dev_state_set(BFGX_SLEEP);
 

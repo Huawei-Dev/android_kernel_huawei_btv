@@ -1,16 +1,10 @@
-
-
-/*
- * 1 Header File Including
- */
-
-#define HISI_NVRAM_SUPPORT
-
 #include <linux/module.h>
 #include <linux/printk.h>
 #include <linux/time.h>
 #include <linux/fs.h>
 #include <linux/of.h>
+
+#define HISI_NVRAM_SUPPORT
 
 #ifdef HISI_NVRAM_SUPPORT
 #include <linux/mtd/hisi_nve_interface.h>
@@ -24,8 +18,8 @@
  */
 #define CUST_COMP_NODE             "hi1102,customize"
 #define PROC_NAME_INI_FILE_NAME    "ini_file_name"
-#define CUST_PATH_SPEC             "/cust_spec"     /*某运营商在不同产品的差异配置*/
-#define CUST_PATH_COMM             "/data/cust"     /*某运营商在所有产品的相同配置*/
+#define CUST_PATH_SPEC             "/cust_spec"
+#define CUST_PATH_COMM             "/data/cust"
 /* mutex for open ini file */
 struct mutex        file_mutex;
 char g_ini_file_name[INI_FILE_PATH_LEN] = {0};

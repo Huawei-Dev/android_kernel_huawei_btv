@@ -1,5 +1,3 @@
-
-
 #ifdef __cplusplus
     #if __cplusplus
         extern "C" {

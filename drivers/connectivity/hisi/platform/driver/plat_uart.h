@@ -1,5 +1,3 @@
-
-
 #ifndef __PLAT_UART_H__
 #define __PLAT_UART_H__
 /*****************************************************************************
@@ -22,8 +20,8 @@ typedef  enum {
 struct ps_uart_state_s {
     unsigned int tty_tx_cnt;
     unsigned int tty_rx_cnt;
-    unsigned int tty_stopped;     /* tty 软件流控标志位 */
-    unsigned int tty_hw_stopped;  /* tty 硬件流控标志位 */
+    unsigned int tty_stopped;
+    unsigned int tty_hw_stopped;
     struct uart_icount uart_cnt;
 };
 

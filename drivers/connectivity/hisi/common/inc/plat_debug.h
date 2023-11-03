@@ -1,4 +1,3 @@
-
 #ifndef __PLAT_DEBUG_H__
 #define __PLAT_DEBUG_H__
 
