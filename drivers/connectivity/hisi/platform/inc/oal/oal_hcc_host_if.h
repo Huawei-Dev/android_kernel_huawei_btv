@@ -1,22 +1,3 @@
-/******************************************************************************
-
-                  版权所有 (C), 2001-2011, 华为技术有限公司
-
- ******************************************************************************
-  文 件 名   : oal_hcc_if.h
-  版 本 号   : 初稿
-  作    者   : z00262551
-  生成日期   : 2014年10月20日
-  最近修改   :
-  功能描述   : oal_hcc_if.c 的头文件
-  函数列表   :
-  修改历史   :
-  1.日    期   : 2014年10月20日
-    作    者   : z00262551
-    修改内容   : 创建文件
-
-******************************************************************************/
-
 #ifndef __OAL_HCC_HOST_IF_H
 #define __OAL_HCC_HOST_IF_H
 
@@ -41,15 +22,15 @@ extern "C" {
 #endif
 #define CONFIG_CREDIT_MSG_FLOW_WATER_LINE   (60)
 
-#define HCC_FLOW_HIGH_PRI_BUFF_CNT      5   /* device侧预留的高优先级专用buffer个数，要与OAL_NETBUF_HIGH_PRIORITY_COUNT相同 */
+#define HCC_FLOW_HIGH_PRI_BUFF_CNT      5
 
 #define HCC_FLUSH_ALL   (~0UL)
 
 /*hcc tx transfer flow control*/
-#define HCC_FC_NONE         (0x0)   /*对调用者不进行流控，netbuf一直缓冲在hcc队列中,这种类型的数据包不宜过多*/
-#define HCC_FC_WAIT         (0x1)   /*阻塞等待，如果是在中断上下文调用，该标记被自动清除,非中断上下文生效*/
-#define HCC_FC_NET          (0x2)   /*对于网络层的流控*/
-#define HCC_FC_DROP         (0x4)   /*流控采用丢包方式,流控时返回成功*/
+#define HCC_FC_NONE         (0x0)
+#define HCC_FC_WAIT         (0x1)
+#define HCC_FC_NET          (0x2)
+#define HCC_FC_DROP         (0x4)
 #define HCC_FC_ALL          (HCC_FC_WAIT|HCC_FC_NET|HCC_FC_DROP)
 
 struct hcc_transfer_param
@@ -57,8 +38,8 @@ struct hcc_transfer_param
     oal_uint32  main_type;
     oal_uint32  sub_type;
     oal_uint32  extend_len;
-    oal_uint32  fc_flag;/*流控标记*/
-    oal_uint32  queue_id;/*期望进入的队列号,*/
+    oal_uint32  fc_flag;
+    oal_uint32  queue_id;
 };
 
 #ifdef _PRE_WLAN_FEATURE_OFFLOAD_FLOWCTL
@@ -244,7 +225,7 @@ typedef struct _hcc_tx_flow_ctrl_info_
     oal_uint32 flowctrl_hipri_update_count;
     oal_uint8  uc_hipriority_cnt;
     oal_uint8  auc_resv[3];
-    oal_spin_lock_stru  st_hipri_lock;  /* 读写uc_hipriority_cnt时要加锁 */
+    oal_spin_lock_stru  st_hipri_lock;
     oal_wait_queue_head_stru   wait_queue;
     flowctrl_cb net_stopall;
     flowctrl_cb net_startall;
@@ -264,7 +245,7 @@ typedef struct _hcc_thread_stat_
     oal_uint64  wait_event_block_count;
     oal_uint64  wait_event_run_count;
     oal_uint64  loop_have_data_count;
-    oal_uint64  loop_no_data_count;/*空转*/
+    oal_uint64  loop_no_data_count;
 }hcc_thread_stat;
 
 struct hcc_transfer_handler
@@ -356,12 +337,10 @@ oal_void hcc_clear_all_queues(struct hcc_handler * hcc, oal_int32 is_need_lock);
 oal_void hcc_enable(struct hcc_handler * hcc, oal_int32 is_need_lock);
 oal_void hcc_disable(struct hcc_handler * hcc, oal_int32 is_need_lock);
 
-/*获取默认的HCC通道句柄*/
 extern struct hcc_handler* hcc_get_default_handler(oal_void);
 extern oal_void hcc_dev_flowctrl_on(struct hcc_handler *hcc, oal_uint8 need_notify_dev);
 extern oal_void hcc_dev_flowctrl_off(struct hcc_handler *hcc);
 
-/*自动调频处理函数，在hcc的收发线程中调用*/
 #ifdef _PRE_WLAN_FEATURE_AUTO_FREQ
 typedef oal_void (*hmac_auto_freq_count_func)(oal_uint32 ul_pkt_cout);
 typedef oal_uint32 (*hmac_auto_freq_process_func)(oal_void);
@@ -498,21 +477,7 @@ extern struct custom_process_func_handler g_pst_custom_process_func;
 
 
 #define HCC_NETBUF_RESERVED_ROOM_SIZE   (HCC_HDR_TOTAL_LEN+HISDIO_H2D_SCATT_BUFFLEN_ALIGN)
-/*****************************************************************************
- 函 数 名  : hcc_netbuf_alloc
- 功能描述  : reserved the fixed headroom and tailroom for hcc transfer!
- 输入参数  : 无
- 输出参数  : 无
- 返 回 值  : oal_void
- 调用函数  :
- 被调函数  :
 
- 修改历史      :
-  1.日    期   : 2015年4月12日
-    作    者   : z00262551
-    修改内容   : 新生成函数
-
-*****************************************************************************/
 #define hcc_netbuf_alloc(ul_size)   oal_netbuf_alloc(ul_size + HCC_NETBUF_RESERVED_ROOM_SIZE,HCC_NETBUF_RESERVED_ROOM_SIZE,0)
 
 OAL_STATIC OAL_INLINE oal_void hcc_tx_netbuf_free(oal_netbuf_stru* pst_netbuf)

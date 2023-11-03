@@ -1,22 +1,3 @@
-/******************************************************************************
-
-                  版权所有 (C), 2001-2011, 华为技术有限公司
-
- ******************************************************************************
-  文 件 名   : frw_ext_if.h
-  版 本 号   : 初稿
-  作    者   : 康国昌
-  生成日期   : 2012年9月20日
-  最近修改   :
-  功能描述   : frw对外公共接口头文件
-  函数列表   :
-  修改历史   :
-  1.日    期   : 2012年9月20日
-    作    者   : 康国昌
-    修改内容   : 创建文件
-
-******************************************************************************/
-
 #ifndef __FRW_EXT_IF_H__
 #define __FRW_EXT_IF_H__
 
@@ -26,10 +7,6 @@ extern "C" {
 #endif
 #endif
 
-
-/*****************************************************************************
-  1 其他头文件包含
-*****************************************************************************/
 #include "oal_ext_if.h"
 #include "oam_ext_if.h"
 
@@ -50,52 +27,41 @@ extern "C" {
 #define FRW_TIMER_TRACK_NUM     256
 #define FRW_TIMEOUT_TRACK_NUM   256
 
-/*****************************************************************************
-  2 枚举定义
-*****************************************************************************/
-/* 此枚举用于定义从FRW模块以上各模块的初始化状态 */
 typedef enum
 {
-    FRW_INIT_STATE_START,                /* 表示初始化刚启动，即FRW初始化开始 */
-    FRW_INIT_STATE_FRW_SUCC,             /* 表示FRW模块初始化成功 */
-    FRW_INIT_STATE_HAL_SUCC,             /* 表示HAL模块初始化成功 */
-    FRW_INIT_STATE_DMAC_CONFIG_VAP_SUCC, /* 表示DMAC模块启动初始化成功，配置VAP已正常；如果在此状态之后再初始化，即为业务VAP的初始化 */
-    FRW_INIT_STATE_HMAC_CONFIG_VAP_SUCC, /* 表示HMAC模块启动初始化成功，配置VAP已正常；如果在此状态之后再初始化，即为业务VAP的初始化 */
-    FRW_INIT_STATE_ALL_SUCC,             /* 此状态表示HMAC以上模块均已初始化成功 */
+    FRW_INIT_STATE_START,
+    FRW_INIT_STATE_FRW_SUCC,
+    FRW_INIT_STATE_HAL_SUCC,
+    FRW_INIT_STATE_DMAC_CONFIG_VAP_SUCC,
+    FRW_INIT_STATE_HMAC_CONFIG_VAP_SUCC,
+    FRW_INIT_STATE_ALL_SUCC,
 
     FRW_INIT_STATE_BUTT
 }frw_init_enum;
 typedef oal_uint16 frw_init_enum_uint16;
 
-/*****************************************************************************
-  枚举名  : frw_event_type_enum_uint8
-  协议表格:
-  枚举说明: 事件类型
-*****************************************************************************/
 typedef enum
 {
-    FRW_EVENT_TYPE_HIGH_PRIO = 0,        /*高优先级事件队列 */
-    FRW_EVENT_TYPE_HOST_CRX,             /* 接收Host侧发来的配置事件 */
-    FRW_EVENT_TYPE_HOST_DRX,             /* 接收Host侧发来的数据事件 */
-    FRW_EVENT_TYPE_HOST_CTX,             /* 发向HOST侧的配置事件 */
-    FRW_EVENT_TYPE_HOST_SDT_REG  = 4,    /* SDT读取寄存器，wifi驱动侧上报SDT */
-    FRW_EVENT_TYPE_WLAN_CRX,             /* 接收Wlan侧发来的管理/控制帧事件 */
-    FRW_EVENT_TYPE_WLAN_DRX,             /* 接收Wlan侧发来的数据帧事件 */
-    FRW_EVENT_TYPE_WLAN_CTX,             /* 管理/控制帧发送至Wlan侧事件 */
-    FRW_EVENT_TYPE_WLAN_DTX,             /* 数据帧发送至Wlan侧事件*/
-    FRW_EVENT_TYPE_WLAN_TX_COMP  = 9,    /* 发送完成事件 */
-    FRW_EVENT_TYPE_TBTT,                 /* TBTT中断事件 */
-    FRW_EVENT_TYPE_TIMEOUT,              /* FRW普通超时事件 */
-    FRW_EVENT_TYPE_HMAC_MISC,            /* HMAC杂散事件，例如雷达检测事件 */
-    FRW_EVENT_TYPE_DMAC_MISC     = 13,   /* DMAC杂散事件 */
-    /* 添加新的事件类型 */
-
+    FRW_EVENT_TYPE_HIGH_PRIO = 0,
+    FRW_EVENT_TYPE_HOST_CRX,
+    FRW_EVENT_TYPE_HOST_DRX,
+    FRW_EVENT_TYPE_HOST_CTX,
+    FRW_EVENT_TYPE_HOST_SDT_REG  = 4,
+    FRW_EVENT_TYPE_WLAN_CRX,
+    FRW_EVENT_TYPE_WLAN_DRX,
+    FRW_EVENT_TYPE_WLAN_CTX,
+    FRW_EVENT_TYPE_WLAN_DTX,
+    FRW_EVENT_TYPE_WLAN_TX_COMP  = 9,
+    FRW_EVENT_TYPE_TBTT,
+    FRW_EVENT_TYPE_TIMEOUT,
+    FRW_EVENT_TYPE_HMAC_MISC,
+    FRW_EVENT_TYPE_DMAC_MISC     = 13,
     FRW_EVENT_TYPE_BUTT
 }frw_event_type_enum;
 
 typedef oal_uint8 frw_event_type_enum_uint8;
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
-/* HCC事件子类型定义*/
+
 typedef enum
 {
     DMAC_HCC_TX_EVENT_SUB_TYPE,
@@ -115,10 +81,10 @@ typedef oal_uint8 dmac_hcc_rx_event_sub_type_enum_uint8;
 
 typedef struct
 {
-    frw_event_type_enum_uint8  en_nest_type;   /*嵌套的业务事件的主类型*/
-    oal_uint8                  uc_nest_sub_type; /*嵌套的业务事件的子类型*/
-    void                      *pst_netbuf;     /*如果是数据事件，则对应于链表头netbuf的地址;其他事件，则对应于buff首地址*/
-    oal_uint32                 ul_buf_len;     /*如果是数据事件，则对应于netbuf个数;其他事件，则对应于buff len*/
+    frw_event_type_enum_uint8  en_nest_type;
+    oal_uint8                  uc_nest_sub_type;
+    void                      *pst_netbuf;
+    oal_uint32                 ul_buf_len;
 }hcc_event_stru;
 
 /*record the data type by the hcc*/
@@ -136,27 +102,26 @@ struct frw_hcc_extend_hdr
 
 #endif
 
-
 typedef oal_uint32          (*frw_timeout_func)(oal_void *);
 
 typedef struct
 {
-    oal_void                   *p_timeout_arg;      /* 超时处理函数入参 */
-    frw_timeout_func            p_func;             /* 超时处理函数 */
-    oal_uint32                  ul_time_stamp;      /* 定时器启动时间 */
-    oal_uint32                  ul_curr_time_stamp; /* 定时器进入当前时间 */
-    oal_uint32                  ul_timeout;         /* 过多长时间定时器超时 */
-    oal_bool_enum_uint8         en_is_deleting;     /* 是否需要删除 */
-    oal_bool_enum_uint8         en_is_registerd;    /* 定时器是否已经注册 */
-    oal_bool_enum_uint8         en_is_periodic;     /* 定时器是否为周期的 */
-    oal_bool_enum_uint8         en_is_enabled;      /* 定时器是否使能 */
+    oal_void                   *p_timeout_arg;
+    frw_timeout_func            p_func;
+    oal_uint32                  ul_time_stamp;
+    oal_uint32                  ul_curr_time_stamp;
+    oal_uint32                  ul_timeout;
+    oal_bool_enum_uint8         en_is_deleting;
+    oal_bool_enum_uint8         en_is_registerd;
+    oal_bool_enum_uint8         en_is_periodic;
+    oal_bool_enum_uint8         en_is_enabled;
     oal_bool_enum_uint8         en_is_running;
     oal_uint8                   uc_pad;
-    oam_module_id_enum_uint16   en_module_id;       /* 维测用模块id */
-    oal_uint32                  ul_core_id;         /* 绑定的核id */
+    oam_module_id_enum_uint16   en_module_id;
+    oal_uint32                  ul_core_id;
     oal_uint32                  ul_file_id;
     oal_uint32                  ul_line_num;
-    oal_dlist_head_stru         st_entry;           /* 定期器链表索引 */
+    oal_dlist_head_stru         st_entry;
 }frw_timeout_stru;
 #ifdef _PRE_DEBUG_MODE
 
@@ -174,11 +139,7 @@ typedef struct
     oal_uint32              ul_os_timer_interval;
 }frw_timeout_track_stru;
 #endif
-/*****************************************************************************
-  枚举名  : frw_event_type_enum_uint8
-  协议表格:
-  枚举说明: 事件分段号，取值[0, 1]
-*****************************************************************************/
+
 typedef enum
 {
     FRW_EVENT_PIPELINE_STAGE_0 = 0,
@@ -190,91 +151,51 @@ typedef enum
 }frw_event_pipeline_enum;
 typedef oal_uint8 frw_event_pipeline_enum_uint8;
 
-
 #define FRW_RX_EVENT_TRACK_NUM 256
 #define FRW_EVENT_TRACK_NUM     128
 
-
-
-/*****************************************************************************
-  3 全局变量声明
-*****************************************************************************/
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC != _PRE_MULTI_CORE_MODE)
     extern oal_uint8 g_tx_debug;
 #endif
 
+typedef oal_mem_stru    frw_event_mem_stru;
 
-/*****************************************************************************
-  4 消息头定义
-*****************************************************************************/
-typedef oal_mem_stru    frw_event_mem_stru;    /* 事件结构体内存块转定义 */
-
-
-/*****************************************************************************
-  5 消息定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  6 STRUCT定义
-*****************************************************************************/
-/*****************************************************************************
-  结构名  : frw_event_hdr_stru
-  结构说明: 事件头结构体,
-  备注    : uc_length的值为(payload长度 + 事件头长度 - 2)
-*****************************************************************************/
 typedef struct
 {
-    frw_event_type_enum_uint8        en_type;         /* 事件类型 */
-    oal_uint8                        uc_sub_type;     /* 事件子类型 */
-    oal_uint16                       us_length;        /* 事件总体长度 */
-    frw_event_pipeline_enum_uint8    en_pipeline;     /* 事件分段号 */
-    oal_uint8                        uc_chip_id;      /* 芯片ID */
-    oal_uint8                        uc_device_id;    /* 设备ID */
-    oal_uint8                        uc_vap_id;       /* VAP ID */
+    frw_event_type_enum_uint8        en_type;
+    oal_uint8                        uc_sub_type;
+    oal_uint16                       us_length;
+    frw_event_pipeline_enum_uint8    en_pipeline;
+    oal_uint8                        uc_chip_id;
+    oal_uint8                        uc_device_id;
+    oal_uint8                        uc_vap_id;
 }frw_event_hdr_stru;
 
-/*****************************************************************************
-  结构名  : frw_event_stru
-  结构说明: 事件结构体
-*****************************************************************************/
 typedef struct
 {
-    frw_event_hdr_stru    st_event_hdr;           /* 事件头 */
-    oal_uint8             auc_event_data[4];      /* payload */
+    frw_event_hdr_stru    st_event_hdr;
+    oal_uint8             auc_event_data[4];
 }frw_event_stru;
 
-/*****************************************************************************
-  结构名  : frw_event_sub_table_item_stru
-  结构说明: 事件子表结构体
-*****************************************************************************/
 typedef struct
 {
-    oal_uint32 (*p_func)(frw_event_mem_stru *);       /* (type, subtype, pipeline)类型的事件对应的处理函数 */
+    oal_uint32 (*p_func)(frw_event_mem_stru *);
 #if (_PRE_MULTI_CORE_MODE_OFFLOAD_DMAC == _PRE_MULTI_CORE_MODE)
     oal_uint32 (*p_tx_adapt_func)(frw_event_mem_stru *);
     frw_event_mem_stru *(*p_rx_adapt_func)(frw_event_mem_stru *);
 #endif
 }frw_event_sub_table_item_stru;
 
-/*****************************************************************************
-  结构名  : frw_event_table_item_stru
-  结构说明: 事件表结构体
-*****************************************************************************/
 typedef struct
 {
-    frw_event_sub_table_item_stru   *pst_sub_table;    /* 指向子表的指针 */
+    frw_event_sub_table_item_stru   *pst_sub_table;
 }frw_event_table_item_stru;
 
-/*****************************************************************************
-  结构名  : frw_ipc_msg_header_stru
-  结构说明: IPC(核间通信)头结构体
-*****************************************************************************/
 typedef struct
 {
-    oal_uint16      us_seq_number;          /* 核间消息序号 */
-    oal_uint8       uc_target_cpuid;        /* 目标核cpuid frw_ipc_cpu_id_enum_uint8 */
-    oal_uint8       uc_msg_type;            /* 消息类型 frw_ipc_msg_type_enum_uint8 */
+    oal_uint16      us_seq_number;
+    oal_uint8       uc_target_cpuid;
+    oal_uint8       uc_msg_type;
 }frw_ipc_msg_header_stru;
 
 typedef struct
@@ -287,23 +208,12 @@ typedef struct
 
 #define FRW_IPC_MSG_HEADER_LENGTH       (OAL_SIZEOF(frw_ipc_msg_header_stru))
 
-/*****************************************************************************
-  7 UNION定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  8 宏定义
-*****************************************************************************/
-/* 事件头长度 */
 #define FRW_EVENT_HDR_LEN    OAL_SIZEOF(frw_event_hdr_stru)
 
-/* 事件队列最大个数 */
 #define FRW_EVENT_MAX_NUM_QUEUES    (FRW_EVENT_TYPE_BUTT * WLAN_VAP_SUPPORT_MAX_NUM_LIMIT)
 
 #define FRW_FIELD_SETUP(_p, _m, _v)    ((_p)->_m = (_v))
 
-/* 事件头修改宏(修改事件头中的pipeline和subtype) */
 #define FRW_EVENT_HDR_MODIFY_PIPELINE_AND_SUBTYPE(_pst_event_hdr, _uc_sub_type)      \
     do {                                                                            \
         FRW_FIELD_SETUP((_pst_event_hdr), en_pipeline, 1);             \
@@ -326,7 +236,6 @@ typedef struct
 #define FRW_EVENT_FREE(_pst_event_mem) \
     frw_event_free(THIS_FILE_ID, __LINE__, _pst_event_mem)
 
-/* 事件头初始化宏 */
 #define FRW_EVENT_HDR_INIT(_pst_event_hdr, _en_type, _uc_sub_type, _us_length, _en_pipeline, _uc_chip_id, _uc_device_id, _uc_vap_id) \
     do{\
          FRW_FIELD_SETUP((_pst_event_hdr), us_length, (_us_length + FRW_EVENT_HDR_LEN));\
@@ -342,26 +251,6 @@ typedef struct
 #define frw_get_event_hdr(pst_event_mem)   ((frw_event_hdr_stru*)(&((frw_event_stru *)(pst_event_mem)->puc_data)->st_event_hdr))
 #define frw_get_event_payload(pst_event_mem)   ((oal_uint8*)((frw_event_stru *)(pst_event_mem)->puc_data)->auc_event_data)
 
-/*****************************************************************************
-  9 OTHERS定义
-*****************************************************************************/
-
-/*****************************************************************************
- 函 数 名  : frw_event_alloc
- 功能描述  : 申请事件内存
- 输入参数  : us_length: payload长度 + 事件头长度
- 输出参数  : 无
- 返 回 值  : 成功: 指向frw_event_mem_stru的指针
-             失败: OAL_PTR_NULL
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2012年10月12日
-    作    者   : mayuan m00212148
-    修改内容   : 新生成函数
-
-*****************************************************************************/
 OAL_STATIC OAL_INLINE frw_event_mem_stru*  frw_event_alloc(oal_uint32    ul_file_id,
                                                            oal_uint32    ul_line_num,
                                                            oal_uint16    us_payload_length)
@@ -391,21 +280,6 @@ OAL_STATIC OAL_INLINE frw_event_mem_stru*  frw_event_alloc(oal_uint32    ul_file
     return pst_event_mem;
 }
 
-/*****************************************************************************
- 函 数 名  : frw_event_free
- 功能描述  : 释放事件所占用的内存
- 输入参数  : pst_event_mem: 指向事件内存块的指针
- 输出参数  : 无
- 返 回 值  : OAL_SUCC 或其它错误码
- 调用函数  :
- 被调函数  :
-
- 修改历史      :
-  1.日    期   : 2012年10月12日
-    作    者   : mayuan m00212148
-    修改内容   : 新生成函数
-
-*****************************************************************************/
 OAL_STATIC OAL_INLINE oal_uint32  frw_event_free(oal_uint32            ul_file_id,
                                                  oal_uint32            ul_line_num,
                                                  frw_event_mem_stru   *pst_event_mem)
@@ -413,9 +287,6 @@ OAL_STATIC OAL_INLINE oal_uint32  frw_event_free(oal_uint32            ul_file_i
     oal_uint32       ul_ret;
     //oal_uint     ul_irq_flag;
     frw_event_stru  *pst_frw_event;
-
-    /* 中断上半部会申请事件，所以需要关中断 */
-    //oal_irq_save(&ul_irq_flag, OAL_5115IRQ_FEF);
 
     ul_ret = oal_mem_free_enhanced(ul_file_id, ul_line_num, pst_event_mem, OAL_TRUE);
     if(OAL_WARN_ON(OAL_SUCC != ul_ret))
@@ -429,9 +300,6 @@ OAL_STATIC OAL_INLINE oal_uint32  frw_event_free(oal_uint32            ul_file_i
     return ul_ret;
 }
 
-/*****************************************************************************
-  10 函数声明
-*****************************************************************************/
 #ifdef _PRE_DEBUG_MODE
 extern frw_event_track_time_stru g_ast_event_time_track[FRW_RX_EVENT_TRACK_NUM];
 extern oal_uint32                g_ul_rx_event_idx;

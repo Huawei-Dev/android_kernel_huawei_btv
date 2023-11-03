@@ -1,22 +1,3 @@
-/******************************************************************************
-
-                  版权所有 (C), 2001-2011, 华为技术有限公司
-
- ******************************************************************************
-  文 件 名   : oal_pci_if.h
-  版 本 号   : 初稿
-  作    者   : zhangheng
-  生成日期   : 2013年2月28日
-  最近修改   :
-  功能描述   : oal_pci_if.c 的头文件
-  函数列表   :
-  修改历史   :
-  1.日    期   : 2013年2月28日
-    作    者   : zhangheng
-    修改内容   : 创建文件
-
-******************************************************************************/
-
 #ifndef __OAL_PCI_IF_H__
 #define __OAL_PCI_IF_H__
 
@@ -26,9 +7,6 @@ extern "C" {
 #endif
 #endif
 
-/*****************************************************************************
-  1 其他头文件包含
-*****************************************************************************/
 #if (_PRE_PRODUCT_ID == _PRE_PRODUCT_ID_HI1151)
 
 #include "oal_types.h"
@@ -39,14 +17,6 @@ extern "C" {
 #undef  THIS_FILE_ID
 #define THIS_FILE_ID OAM_FILE_ID_OAL_PCI_IF_H
 
-/*****************************************************************************
-  2 枚举定义
-*****************************************************************************/
-/*****************************************************************************
-  枚举名  : oal_pci_bar_idx_enum_uint8
-  协议表格:
-  枚举说明:
-*****************************************************************************/
 typedef enum
 {
     OAL_PCI_BAR_0 = 0,
@@ -70,16 +40,8 @@ typedef enum
 }oal_pci_gen_enum;
 typedef oal_uint8 oal_pci_gen_enum_uint8;
 
-
-/*****************************************************************************
-  3 全局变量声明
-*****************************************************************************/
 extern oal_pci_bar_idx_enum_uint8 g_en_bar_table[1];
 
-
-/*****************************************************************************
-  4 宏定义
-*****************************************************************************/
 #define OAL_WITP_MAX_BARS   OAL_ARRAY_SIZE(g_en_bar_table)
 
 /*
@@ -94,7 +56,7 @@ PCIE internal:    0x0~0x3ff*/
 #else
 #define OAL_DBI_BASE_ADDR_0        (0x40000000)
 #endif
-//pcie1暂时不使用，定义为750平台形式，不考虑区分平台
+
 #define OAL_DBI_BASE_ADDR_1        (0xA8010000)
 
 #define OAL_PERI_W_PCIE0         (0xC28)
@@ -109,12 +71,12 @@ PCIE internal:    0x0~0x3ff*/
 #define OAL_PCIE_TARGET_ADDR         (0xA0000000)
 #endif
 
-#else   /* 主要用作5610平台使用 */
+#else
 
-#define OAL_PCIE_CRG_BASE        (0x14880000)        /* cfg_base */
-#define OAL_PCIE_SYS_BASE_PHYS   (0x10100000)        /* SYSCTRL */
-#define OAL_DBI_BASE_ADDR_0      (0x10A00000)        /* IO空间 64k */
-#define OAL_DBI_BASE_ADDR_1      (0x10A02000)        /* IO空间 64k */
+#define OAL_PCIE_CRG_BASE        (0x14880000)
+#define OAL_PCIE_SYS_BASE_PHYS   (0x10100000)
+#define OAL_DBI_BASE_ADDR_0      (0x10A00000)
+#define OAL_DBI_BASE_ADDR_1      (0x10A02000)
 #define OAL_PERI_W_PCIE0	     (0xBC)
 #define OAL_PERI_R_PCIE0         (0xC0)
 #define OAL_PERI_W_PCIE1         (0xEC)
@@ -124,25 +86,9 @@ PCIE internal:    0x0~0x3ff*/
 #define OAL_PCIE_TARGET_ADDR         (0x80000000)
 #endif
 
-#define OAL_PCIE_NONFATAL_ERR_CNT           200     /* pcie err_nonfatal周期错误次数阈值 */
-#define OAL_PCIE_NONFATAL_ERR_TIMEOUT_MS    1000    /* pcie err_nonfatal每1000ms到期 */
-/*****************************************************************************
-  5 消息头定义
-*****************************************************************************/
+#define OAL_PCIE_NONFATAL_ERR_CNT           200
+#define OAL_PCIE_NONFATAL_ERR_TIMEOUT_MS    1000
 
-
-/*****************************************************************************
-  6 消息定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  7 STRUCT定义
-*****************************************************************************/
-/*****************************************************************************
-  结构名  : oal_pcie_iatu_stru
-  结构说明: Internal Address Translation Unit(iATU)结构体
-*****************************************************************************/
 typedef struct
 {
     oal_uint32    ul_viewport;          /* iATU Viewport Register                    */
@@ -155,19 +101,6 @@ typedef struct
 	oal_uint32    ul_utar;              /* iATU Region Upper Target Address Register */
 } oal_pcie_iatu_stru;
 
-/*****************************************************************************
-  8 UNION定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  9 OTHERS定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  10 函数声明
-*****************************************************************************/
 extern oal_void oal_pcie_set_inbound_iatu_slip_window(oal_pci_dev_stru *pst_pci_dev);
 extern oal_void oal_pcie_set_inbound_iatu(oal_pci_dev_stru *pst_pci_dev);
 extern oal_void  oal_pcie_set_outbound_iatu(oal_pci_dev_stru *pst_pci_dev);

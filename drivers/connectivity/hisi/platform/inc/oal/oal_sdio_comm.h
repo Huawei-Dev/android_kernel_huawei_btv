@@ -1,23 +1,3 @@
-/******************************************************************************
-
-                  版权所有 (C), 2001-2011, 华为技术有限公司
-
- ******************************************************************************
-  文 件 名   : sdio_comm.h
-  版 本 号   : 初稿
-  作    者   : z00262551
-  生成日期   : 2012年11月24日
-  最近修改   :
-  功能描述   : host/device 公共信息存放头文件,host/device 接口机制差异大，
-			 接口不要求做到归一，但是结构体，宏枚举等公共信息需要放到此文件
-  函数列表   :
-  修改历史   :
-  1.日    期   : 2014年11月24日
-    作    者   : z00262551
-    修改内容   : 创建文件
-
-******************************************************************************/
-
 #ifndef __OAL_SDIO_COMM_H__
 #define __OAL_SDIO_COMM_H__
 
@@ -38,17 +18,10 @@ extern "C" {
 
 #undef CONFIG_SDIO_REINIT_SUPPORT
 
-/*SDIO传输时，将所有的SG LIST 合并成一块完整的内存发送!*/
 #define CONFIG_HISDIO_H2D_SCATT_LIST_ASSEMBLE
 
-/*定义此宏表示打开arm to host 的消息回读ACK，
-  消息是从ARM发送至host,
-  必须读高字节才能产生ACK*/
 #define CONFIG_SDIO_D2H_MSG_ACK
 
-/*定义此宏表示打开host to arm 的消息回读ACK，
-  消息是从Host发送至ARM,
-  必须读高字节才能产生ACK*/
 #undef CONFIG_SDIO_H2D_MSG_ACK
 /*Device to host sdio message type*/
 typedef enum _HISDIO_D2H_MSG_TYPE_{
@@ -70,7 +43,6 @@ typedef enum _HISDIO_D2H_MSG_TYPE_{
     D2H_MSG_COUNT = 16 /*max support msg count*/
 }HISDIO_D2H_MSG_TYPE;
 
-
 /*Host to device sdio message type*/
 typedef enum _HISDIO_H2D_MSG_TYPE_{
     H2D_MSG_FLOWCTRL_ON         = 0,/*can send data, force to open*/
@@ -83,7 +55,6 @@ typedef enum _HISDIO_H2D_MSG_TYPE_{
 
     H2D_MSG_RESET_BCPU          = 7,
     H2D_MSG_QUERY_RF_TEMP       = 8,
-
 
     H2D_MSG_HCC_SLAVE_THRUPUT_BYPASS = 9,
     H2D_MSG_DEVICE_MEM_INFO          = 10,
@@ -144,4 +115,3 @@ typedef enum _HISDIO_H2D_MSG_TYPE_{
 #endif
 
 #endif
-

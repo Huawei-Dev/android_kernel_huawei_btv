@@ -1,22 +1,3 @@
-/******************************************************************************
-
-                  版权所有 (C), 2001-2011, 华为技术有限公司
-
- ******************************************************************************
-  文 件 名   : oal_schedule.h
-  版 本 号   : 初稿
-  作    者   : t00231215
-  生成日期   : 2012年11月29日
-  最近修改   :
-  功能描述   : oal_types.h 的头文件
-  函数列表   :
-  修改历史   :
-  1.日    期   : 2012年11月29日
-    作    者   : t00231215
-    修改内容   : 创建文件
-
-******************************************************************************/
-
 #ifndef __OAL_SCHEDULE_H__
 #define __OAL_SCHEDULE_H__
 
@@ -26,25 +7,14 @@ extern "C" {
 #endif
 #endif
 
-
-/*****************************************************************************
-  1 其他头文件包含
-*****************************************************************************/
 #include "oal_types.h"
 #include "oal_hardware.h"
 #include "oal_mm.h"
 #include "arch/oal_schedule.h"
 
-
-/*****************************************************************************
-  2 宏定义
-*****************************************************************************/
 #if (_PRE_CHIP_BITS_MIPS32 == _PRE_CHIP_BITS)
-/* 32位寄存器最大长度 */
 #define OAL_TIME_US_MAX_LEN  (0xFFFFFFFF - 1)
-
 #elif (_PRE_CHIP_BITS_MIPS64 == _PRE_CHIP_BITS)
-/* 64位寄存器最大长度 */
 #define OAL_TIME_US_MAX_LEN  (0xFFFFFFFFFFFFFFFF - 1)
 
 #endif
@@ -69,6 +39,7 @@ typedef enum
 #ifdef _PRE_OAL_FEATURE_KEY_PROCESS_TRACE
 #include "oal_list.h"
 #include <linux/rtc.h>
+
 typedef struct _oal_dft_trace_item_
 {
     oal_list_entry_stru list;
@@ -87,7 +58,6 @@ extern oal_void oal_dft_exit(oal_void);
 extern oal_void oal_dft_print_error_key_info(oal_void);
 extern oal_void oal_dft_print_all_key_info(oal_void);
 
-/*关键流程发生时间点记录，有加锁动作，慎用*/
 #define DECLARE_DFT_TRACE_KEY_INFO(dname,dtype)\
         do\
         {\
@@ -124,55 +94,16 @@ extern oal_void oal_dft_print_all_key_info(oal_void);
 typedef struct _oal_wakelock_stru_
 {
 #ifdef CONFIG_WAKELOCK
-    struct wake_lock        st_wakelock;        //wakelock锁
-    oal_spin_lock_stru      lock;    //wakelock锁操作spinlock锁
+    struct wake_lock        st_wakelock;
+    oal_spin_lock_stru      lock;
 #endif
-    oal_ulong               lock_count;         //持有wakelock锁的次数
-    oal_ulong			    locked_addr;/*the locked address*/
+    oal_ulong               lock_count;
+    oal_ulong			    locked_addr;
 }oal_wakelock_stru;
 
-
-/* 获取从_ul_start到_ul_end的时间差 */
 #define OAL_TIME_GET_RUNTIME(_ul_start, _ul_end) \
     (((_ul_start) > (_ul_end))?(OAL_TIME_CALC_RUNTIME((_ul_start), (_ul_end))):((_ul_end) - (_ul_start)))
 
-/*****************************************************************************
-  3 枚举定义
-*****************************************************************************/
-
-/*****************************************************************************
-  4 全局变量声明
-*****************************************************************************/
-
-
-/*****************************************************************************
-  5 消息头定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  6 消息定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  7 STRUCT定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  8 UNION定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  9 OTHERS定义
-*****************************************************************************/
-
-
-/*****************************************************************************
-  10 函数声明
-*****************************************************************************/
 #ifdef _PRE_CONFIG_HISI_CONN_SOFTWDFT
 extern oal_int32 oal_softwdt_init(oal_void);
 extern oal_void oal_softwdt_exit(oal_void);
