@@ -3,9 +3,7 @@ obj-$(CONFIG_HDMI)                += hdmi.o
 
 obj-$(CONFIG_ADF)		  += adf/
 obj-$(CONFIG_VT)		  += console/
-ifneq ($(OBB_PRINT_CMD), true)
 obj-$(CONFIG_LOGO)		  += logo/
-endif
 obj-y				  += backlight/
 
 obj-y				  += fbdev/

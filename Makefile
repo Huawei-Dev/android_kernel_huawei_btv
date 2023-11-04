@@ -1049,15 +1049,7 @@ endif
 ifdef CONFIG_GDB_SCRIPTS
 	$(Q)ln -fsn `cd $(srctree) && /bin/pwd`/scripts/gdb/vmlinux-gdb.py
 endif
-ifeq ($(OBB_PRINT_CMD), true)
-	$(call if_changed,link-vmlinux)
-else
-ifeq ($(link_kernel),false)
-	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/gen-link-vmlinux.sh $(vmlinux-deps)
-else
 	+$(call if_changed,link-vmlinux)
-endif
-endif
 
 # The actual objects are generated when descending,
 # make sure no implicit rule kicks in
